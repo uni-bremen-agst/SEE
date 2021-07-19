@@ -1,5 +1,6 @@
 ﻿using System;
 using SEE.Game.GestureRecognition;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.Architecture
@@ -23,7 +24,7 @@ namespace SEE.Game.Architecture
         /// <summary>
         /// The type of this architectural node.
         /// </summary>
-        public ArchitectureElementType ElementType;
+        public readonly ArchitectureElementType ElementType;
 
         /// <summary>
         /// The global height for this type of architectural node.
@@ -33,7 +34,17 @@ namespace SEE.Game.Architecture
         /// <summary>
         /// 
         /// </summary>
-        public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
+        public ColorRange ColorRange = new ColorRange(Color.grey.Darker(), Color.red, 10);
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        public ArchitectureElementSettings(ArchitectureElementType type)
+        {
+            this.ElementType = type;
+        }
 
     }
 }

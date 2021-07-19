@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Controls.Architecture;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -38,32 +39,14 @@ namespace SEE.Controls.Actions.Architecture
         /// <returns>The action type</returns>
         public abstract  ArchitectureActionType GetActionType();
 
-        /// <summary>
-        /// The hovered graph element.
-        /// </summary>
-        protected InteractableObject hoveredObject;
 
         /// <summary>
-        /// Event listener for <see cref="InteractableObject.AnyHoverIn"/>.
+        /// Interaction controller instance to handle hovering and selection of graph elements.
+        /// <see cref="PenInteractionController"/>. Gets assigned within <see cref="ArchitectureAction"/>.
         /// </summary>
-        /// <param name="hoveredObject">The hovered object</param>
-        /// <param name="isInitiator">Whether this client is the initiator.</param>
-        protected void OnAnyHoverIn(InteractableObject hoveredObject, bool isInitiator)
-        {
-            this.hoveredObject = hoveredObject;
-        }
+        public PenInteractionController PenInteractionController;
 
-        /// <summary>
-        /// Event listener for <see cref="InteractableObject.AnyHoverOut"/>.
-        /// </summary>
-        /// <param name="hoveredObject">The de-hovered object</param>
-        /// <param name="isInitiator">Whether this client is the initiator.</param>
-        protected void OnAnyHoverOut(InteractableObject hoveredObject, bool isInitiator)
-        {
-            this.hoveredObject = null;
-        }
-        
-        
+
         /// <summary>
         /// Raycasts to find a node graph element to find a node graph element. Uses the pen position as the ray origin.
         /// </summary>

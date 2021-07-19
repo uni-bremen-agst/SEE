@@ -162,11 +162,12 @@ namespace SEE.Game
 
         /// <param name="cityChildTransform">The child transform, to find the root for.</param>
         /// <returns>The root transform of given child, so the highest transform with the tag
-        /// <see cref="Tags.Node"/>.</returns>
+        /// <see cref="Tags.Node"/> or <see cref="Tags.Whiteboard"/>
+        /// if its <see cref="SEECityArchitecture"/></returns>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
             Transform result = cityChildTransform;
-            while (result.parent.CompareTag(Tags.Node))
+            while (result.parent.CompareTag(Tags.Node) || result.parent.CompareTag(Tags.Whiteboard))
             {
                 result = result.parent;
             }

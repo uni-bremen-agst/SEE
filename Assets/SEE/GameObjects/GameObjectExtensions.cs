@@ -47,7 +47,7 @@ namespace SEE.GO
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
         public static SEECity ContainingCity(this GameObject gameObject)
         {
-            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef() && !gameObject.CompareTag(Tags.Whiteboard)))
             {
                 return null;
             }
@@ -74,7 +74,7 @@ namespace SEE.GO
         /// <returns>The containing <see cref="SEECityArchitecture"/> of <paramref name="gameObject"/> or null</returns>
         public static SEECityArchitecture ContainingArchitectureCity(this GameObject gameObject)
         {
-            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef() && !gameObject.CompareTag(Tags.Whiteboard)) )
             {
                 return null;
             }

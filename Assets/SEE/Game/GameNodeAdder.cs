@@ -49,11 +49,25 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
         /// <param name="node">The node to add to the graph</param>
-        private static void AddNodeToGraph(Node parent, Node node)
+        private static void AddNodeToGraph(Node parent, Node node, Graph parentGraph)
         {
+            //TODO could be done way easier
             if (parent == null)
             {
-                throw new Exception("Parent must not be null.");
+                if (parentGraph == null)
+                {
+                    throw new Exception("Parent must be in a graph.");
+                }
+                if (string.IsNullOrEmpty(node.ID))
+                {
+                    // Loop until the node.ID is unique within the graph.
+                    node.ID = Guid.NewGuid().ToString();
+                    while (parentGraph.GetNode(node.ID) != null)
+                    {
+                        node.ID = Guid.NewGuid().ToString();
+                    }
+                }
+                parentGraph.AddNode(node);
             }
             else if (parent == node)
             {
@@ -98,7 +112,7 @@ namespace SEE.Game
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
-                AddNodeToGraph(parent.GetNode(), node);
+                AddNodeToGraph(parent.GetNode(), node, city.LoadedGraph);
                 GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = position;
@@ -129,11 +143,12 @@ namespace SEE.Game
             SEECityArchitecture city = parent.ContainingArchitectureCity();
             if (city != null)
             {
+                parent.TryGetNode(out Node parentNode);
                 Assert.IsNotNull(nodeType);
                 //Generate the default source name for this new architecture node.
                 string sourceName = "arch_" + nodeType + "_" + city.NODE_COUNTER++;
                 Node node = NewGraphNode(nodeID, nodeType, sourceName);
-                AddNodeToGraph(parent.GetNode(), node);
+                AddNodeToGraph(parentNode, node, city.LoadedGraph);
                 GameObject result = city.Renderer.DrawNode(node);
                 result.transform.localScale = worldScale;
                 result.transform.position = position;

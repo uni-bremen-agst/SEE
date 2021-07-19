@@ -168,6 +168,52 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Selection",
+            "id": "ea8be314-d32c-440f-a2cf-40c45645a8c2",
+            "actions": [
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "f5963785-da0e-4369-bf93-a3a9819aa590",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Position",
+                    "type": "Value",
+                    "id": "ad3f50cf-74e6-40aa-9f52-0bf75adc0536",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "698b9049-0393-4c19-9016-c437ea9e153f",
+                    "path": "<Pen>/tip",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3292cd00-e4bf-4f18-bde0-2a223080394b",
+                    "path": "<Pen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

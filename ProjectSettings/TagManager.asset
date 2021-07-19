@@ -26,6 +26,7 @@ TagManager:
   - Runtime
   - Path
   - Erosion
+  - Whiteboard
   layers:
   - Default
   - TransparentFX

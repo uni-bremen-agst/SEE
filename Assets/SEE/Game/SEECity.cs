@@ -42,7 +42,7 @@ namespace SEE.Game
         /// Neither serialized nor saved to the config file.
         /// </summary>
         [NonSerialized]
-        private Graph loadedGraph = null;
+        protected Graph loadedGraph = null;
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-﻿using SEE.Game;
+ using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.Utils;
 using UnityEngine;

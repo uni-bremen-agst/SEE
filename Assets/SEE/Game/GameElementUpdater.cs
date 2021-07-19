@@ -32,11 +32,11 @@ namespace SEE.Game
         public static void UpdateEdgePoints(GameObject gameObject, bool recalculateMesh = false)
         {
             // Find the City 
-            SEECity city = SceneQueries.FindArchitecture();
+            SEECityArchitecture city = SceneQueries.FindArchitectureCity();
             if (gameObject.TryGetNode(out Node node))
             {
                 List<EdgeRef> edges = SceneQueries.FindAllConnectingEdges(node);
-                UpdateEdgePoints(gameObject, node, edges, city.edgeLayoutSettings.isEdgeSelectable, recalculateMesh);
+                UpdateEdgePoints(gameObject, node, edges, city.EdgeLayoutSettings.isEdgeSelectable, recalculateMesh);
             }
             else
             {
@@ -92,6 +92,12 @@ namespace SEE.Game
             
         }
         
+        
+        /// <summary>
+        /// Recalculates the mesh for the collider mesh. Avoid using this in Update(), due to its performance impact.
+        /// </summary>
+        /// <param name="points">The world points for this edge.</param>
+        /// <returns>The recalculated mesh</returns>
         private static Mesh RecalculateMesh(List<Vector3> points)
         {
             return Tubular.Tubular.Build(new Curve.CatmullRomCurve(points), 50, 0.005f, 8, false);

@@ -41,6 +41,9 @@ namespace SEE.DataModel
         
         // for the main camera in the scene
         public const string MainCamera = "MainCamera";
+        
+        //Architecture modelling
+        public const string Whiteboard = "Whiteboard";
 
         /// <summary>
         /// All existing tags in one.

@@ -1,9 +1,12 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.UI3D;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions.Architecture
 {
@@ -73,6 +76,7 @@ namespace SEE.Controls.Actions.Architecture
         private InputAction positionAction;
         
         
+        
         /// <summary>
         /// Creates a new <see cref="AbstractArchitectureAction"/> for this type of action.
         /// </summary>
@@ -87,8 +91,6 @@ namespace SEE.Controls.Actions.Architecture
         {
             actions.Moving.ButtonPress.performed -= OnButtonPress;
             actions.Moving.ButtonRelease.performed -= OnButtonRelease;
-            InteractableObject.AnyHoverIn -= OnAnyHoverIn;
-            InteractableObject.AnyHoverOut -= OnAnyHoverOut;
             actions.Moving.Disable();
         }
 
@@ -96,8 +98,6 @@ namespace SEE.Controls.Actions.Architecture
         {
             actions.Moving.ButtonPress.performed += OnButtonPress;
             actions.Moving.ButtonRelease.performed += OnButtonRelease;
-            InteractableObject.AnyHoverIn += OnAnyHoverIn;
-            InteractableObject.AnyHoverOut += OnAnyHoverOut;
             actions.Moving.Enable();
         }
 
@@ -134,9 +134,11 @@ namespace SEE.Controls.Actions.Architecture
         private void OnButtonPress(InputAction.CallbackContext _)
         {
             bool isTouching = pressureAction.ReadValue<float>() > 0f;
-            if (hoveredObject && isTouching)
+            GameObject obj = PenInteractionController.PrimaryHoveredObject;
+            if (obj.TryGetEdge(out Edge edge)) return;
+            if (obj && isTouching)
             {
-                actionState.rootTransform = SceneQueries.GetCityRootTransformUpwards(hoveredObject.transform);
+                actionState.rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
                 Assert.IsNotNull(actionState.rootTransform);
             }
 
@@ -144,10 +146,10 @@ namespace SEE.Controls.Actions.Architecture
                 out Vector3 hitPoint, positionAction.ReadValue<Vector2>()))
             {
                 actionState.moving = true;
-                actionState.hit = new Hit(hoveredObject.transform);
+                actionState.hit = new Hit(obj.transform);
                 actionState.mouseOffset = actionState.hit.transform.position - hitPoint;
                 actionState.startPosition = actionState.hit.transform.position;
-                actionState.yLevel = hoveredObject.transform.position.y;
+                actionState.yLevel = obj.transform.position.y;
                 gizomo.gameObject.SetActive(true);
             }
         }
@@ -158,22 +160,11 @@ namespace SEE.Controls.Actions.Architecture
             if (actionState.moving && isTouching &&
                 Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 point, positionAction.ReadValue<Vector2>()))
             {
+                
                 actionState.hit.transform.position = new Vector3(point.x + actionState.mouseOffset.x,
                     actionState.yLevel, point.z + actionState.mouseOffset.z);
                 gizomo.SetPositions(actionState.startPosition - actionState.mouseOffset, actionState.hit.transform.position);
                 GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject);
-            }else if (actionState.moving && !isTouching)
-            {
-                actionState.moving = false;
-                gizomo.gameObject.SetActive(false);
-                if (actionState.hit.transform != actionState.hit.root && actionState.rootTransform != null &&
-                    Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 _, positionAction.ReadValue<Vector2>()))
-                {
-                    GameNodeMover.FinalizePosition(actionState.hit.transform.gameObject, actionState.startPosition - actionState.mouseOffset);
-                    GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject, true);
-                    GameElementUpdater.UpdateNodeStyles();
-                }
-                actionState.hit = new Hit();
             }
         }
         

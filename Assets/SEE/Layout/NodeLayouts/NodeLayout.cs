@@ -160,6 +160,33 @@ namespace SEE.Layout.NodeLayouts
             return scaleFactor;
         }
 
+        
+        /// <summary>
+        /// Scales all nodes in <paramref name="layoutNodes"/>.
+        /// Since the architecture parent is not always a perfect square,
+        /// make sure the scale factor is based on the smallest value of width and depth.
+        /// </summary>
+        /// <param name="layoutNodes">layout nodes to be scaled</param>
+        /// <param name="width">the absolute width (x axis)</param>
+        /// <param name="depth">the absolute depth (z axis</param>
+        /// <returns>the factory by which the scale of edge node was multiplied</returns>
+        public static float ScaleArchitecture(ICollection<ILayoutNode> layoutNodes, float width, float depth)
+        {
+            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            float currentDepth = right.z - left.z;
+            float currentWidth = right.x - left.x;
+            //Make sure to calculate the scale factor based on the smallest side of the parent.
+            float scaleFactor = width > depth ? depth / currentDepth : width / currentWidth;
+            foreach (ILayoutNode layoutNode in layoutNodes)
+            {
+                layoutNode.ScaleBy(scaleFactor);
+                // The x/z co-ordinates must be adjusted after scaling
+                Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
+                layoutNode.CenterPosition = newPosition;
+            }
+            return scaleFactor;
+        }
+
         /// <summary>
         /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/> 
         /// in between parent and children (children are on top of their parent) where the initial 

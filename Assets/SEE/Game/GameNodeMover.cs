@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -37,6 +38,7 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// TODO FIX DOC
         /// Finalizes the position of the <paramref name="movingObject"/>. If the current
         /// pointer of the user is pointing at a game object with a NodeRef the final
         /// position of <paramref name="movingObject"/> will be the game object with a NodeRef
@@ -82,25 +84,41 @@ namespace SEE.Game
                     if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
                         // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
+                        if (newGraphParent == null || newGameParent == null || nodeRef.Value.Level > newGraphParent.Level)
                         {
                             newGraphParent = nodeRef.Value;
                             newGameParent = hit.collider.gameObject;
                             newPosition = hit.point;
                         }
+                    }else if (hit.collider.gameObject.CompareTag(Tags.Whiteboard) && newGraphParent == null)
+                    {
+                        //The dragged node was dropped onto the whiteboard, so there will be no graph parent
+                        newGameParent = hit.collider.gameObject;
+                        newPosition = hit.point;
+                        newGraphParent = null;
                     }
                 }
             }
 
             if (newGraphParent != null)
             {
-                movingObject.transform.position = newPosition;
+                // The parent has a graph element attached, therefore the dragged node put on top
+                //movingObject.transform.position = newPosition;
                 PutOn(movingObject.transform, newGameParent);
                 if (movingNode.Parent != newGraphParent)
                 {
+                    //The new parent differs from the current one, hence we need to re-parent the graph node.
                     movingNode.Reparent(newGraphParent);
                     movingObject.transform.SetParent(newGameParent.transform);
                 }
+            }else if (newGameParent != null)
+            {
+                // The new parent object of this dragged object has no graph element,
+                // hence the dragged node is now a root node.
+                //movingObject.transform.position = newPosition;
+                //PutOn(movingObject.transform, newGameParent);
+                movingNode.Reparent(null);
+                movingObject.transform.SetParent(newGameParent.transform);
             }
             else
             {
@@ -109,6 +127,8 @@ namespace SEE.Game
                 Tweens.Move(movingObject, originalPosition, 1.0f);
             }
         }
+
+        
 
         /// <summary>
         /// Sets the new parent for <paramref name="child"/> via the network.

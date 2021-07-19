@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Controls.Architecture;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Edge = SEE.DataModel.DG.Edge;
@@ -47,7 +49,13 @@ namespace SEE.Game.Architecture
                     default:
                         throw new Exception("Unhandled ArchitectureElementType");
                 }
-                this.loadedGraph = loadedGraph;
+            }
+            this.loadedGraph = loadedGraph;
+            //Get the PenInteractionController from the SEECityArchitecture object. Should be set from PlayerSettingsEditor
+            if (!settings.TryGetComponent(out PenInteractionController))
+            {
+                throw new Exception(
+                    "City game object does not have the PenInteractionController component attached! Check your setup");
             }
 
         }
@@ -57,6 +65,11 @@ namespace SEE.Game.Architecture
         /// Settings for the graph visualization.
         /// </summary>
         private SEECityArchitecture settings;
+
+        /// <summary>
+        /// The <see cref="PenInteractionController"/> component that is always attached to the <see cref="SEECityArchitecture"/>.
+        /// </summary>
+        private PenInteractionController PenInteractionController;
         
         /// <summary>
         /// The loaded graph to be rendered.
@@ -83,23 +96,6 @@ namespace SEE.Game.Architecture
         /// </summary>
         private const float LevelDistance = 0.001f;
 
-        
-        /// <summary>
-        /// The maximum allowed block width.
-        /// </summary>
-        private const float MaxBlockWidth = 100f;
-
-        /// <summary>
-        /// The maximum allowed block depth.
-        /// </summary>
-        private const float MaxBlockDepth = 100f;
-        
-        /// <summary>
-        /// The mapping for the node style by id.
-        /// </summary>
-        private Dictionary<string, int> style_mapping = new Dictionary<string, int>();
-
-
         /// <summary>
         /// Mapping of the string graph node types onto the <see cref="ArchitectureElementType"/>.
         /// </summary>
@@ -107,8 +103,7 @@ namespace SEE.Game.Architecture
             new Dictionary<string, ArchitectureElementType>()
             {
                 {"Cluster", ArchitectureElementType.Cluster},
-                {"Component", ArchitectureElementType.Component},
-                {"ROOTTYPE", ArchitectureElementType.Cluster}
+                {"Component", ArchitectureElementType.Component}
             };
 
 
@@ -145,9 +140,7 @@ namespace SEE.Game.Architecture
             Edge edge = string.IsNullOrEmpty(id) ? new Edge {Source = fromNode, Target = toNode, Type = Graph.UnknownType} : new Edge {ID = id, Source = fromNode, Target = toNode, Type = Graph.UnknownType};
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
-
             HashSet<GameObject> gameObjects = new HashSet<GameObject>();
-            
             // Gather node ascendants and add them to the list
             RendererUtils.AddAscendants(from, gameObjects);
             RendererUtils.AddAscendants(to, gameObjects);
@@ -170,13 +163,10 @@ namespace SEE.Game.Architecture
                     toLayoutNode = layoutNode;
                 }
             }
-            
             Assert.IsNotNull(fromlayoutNode, $"Source node {fromNode.ID} does not have a layout node.\n");
             Assert.IsNotNull(toLayoutNode, $"Target node {toNode.ID} does not have a layout node.\n");
-    
             ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge>()
                 {new LayoutEdge(fromlayoutNode, toLayoutNode, edge)};
-            
             //Apply the Edge Layout
             ICollection<GameObject> edges = ApplyEdgeLayout(layoutNodes, layoutEdges);
             GameObject resultingEdge = edges.FirstOrDefault();
@@ -211,37 +201,19 @@ namespace SEE.Game.Architecture
         private ICollection<GameObject> ApplyEdgeLayout(ICollection<GameNode> gameNodes,
             ICollection<LayoutEdge> layoutEdges)
         {
-            float minimalEdgeLevelDistance = 2.5f * settings.edgeLayoutSettings.edgeWidth;
-            bool edgesAboveBlocks = settings.edgeLayoutSettings.edgesAboveBlocks;
-            float rdp = settings.edgeLayoutSettings.rdp;
-            IEdgeLayout layout;
-            switch (settings.edgeLayoutSettings.kind)
-            {
-                case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
-                    break;
-                case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
-                    break;
-                case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance,
-                        settings.edgeLayoutSettings.tension, rdp);
-                    break;
-                case EdgeLayoutKind.None:
-                    return new List<GameObject>();
-                default:
-                    throw new Exception($"Unhandled edge layout was found {settings.edgeLayoutSettings.kind}");
-            }
-
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeLayoutSettings.edgeWidth;
+            bool edgesAboveBlocks = settings.EdgeLayoutSettings.edgesAboveBlocks;
+            float rdp = settings.EdgeLayoutSettings.rdp;
+            IEdgeLayout layout = new ArchitectureEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
             EdgeFactory edgeFactory = new EdgeFactory(
                 layout,
-                settings.edgeLayoutSettings.edgeWidth,
-                settings.edgeLayoutSettings.tubularSegments,
-                settings.edgeLayoutSettings.radius,
-                settings.edgeLayoutSettings.radialSegments,
-                settings.edgeLayoutSettings.isEdgeSelectable);
+                settings.EdgeLayoutSettings.edgeWidth,
+                settings.EdgeLayoutSettings.tubularSegments,
+                settings.EdgeLayoutSettings.radius,
+                settings.EdgeLayoutSettings.radialSegments,
+                settings.EdgeLayoutSettings.isEdgeSelectable);
             ICollection<GameObject> result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-            //TODO Decorate edges
+            ArchitectureDecorator.DecorateForInteraction(result, PenInteractionController);
             RendererUtils.AddLOD(result);
             return result;
         }
@@ -255,102 +227,100 @@ namespace SEE.Game.Architecture
         public void Draw(GameObject parent)
         {
             List<Node> nodes = loadedGraph.Nodes();
-            
-            
             if (nodes.Count == 0)
             {
-                Debug.Log("Supplied GXL graph does not contain any graph nodes.\n Adding the base root node.\n");
-                //TODO add base root node.
-                AddAndRenderArtificialRootNode(loadedGraph, new Dictionary<Node, GameObject>());
+                Debug.Log("Supplied GXL graph does not contain any graph nodes.\n Adding just a whiteboard.\n");
+                PrepareNewArchitectureGraph(parent);
+                return;
             }
-
             // Draw the graph nodes as GameObjects
             Dictionary<Node, GameObject> nodeToGO = DrawNodes(nodes);
             // Add the root node that acts as a drawing plane, if it not already exists within the graph.
-            Node artificialRoot = AddAndRenderArtificialRootNode(loadedGraph, nodeToGO);
+            //Node artificialRoot = AddAndRenderArtificialRootNode(loadedGraph, nodeToGO);
             // Loads the layout from the supplied layout file
             NodeLayout layout = GetLayout();
-
             ICollection<GameNode> gameNodes = new List<GameNode>();
             Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-            
             //Wraps all game object nodes with the GameNode wrapper class
             gameNodes = ToLayoutNodes(nodeToGO.Values, to_layout_node);
             //Converts the list of created game object nodes to ILayoutNodes
             ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
             //Applies the loaded layout to the nodes.
             layout.Apply(layoutNodes);
+            GameObject whiteboard = AddWhiteboardIfNecessary(parent);
             //Scales the nodes to fit within the parent transform
-            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
+            NodeLayout.ScaleArchitecture(layoutNodes, parent.transform.lossyScale.x, parent.transform.lossyScale.z);
             //Moves the nodes to the center of the parent.
-            NodeLayout.MoveTo(layoutNodes, parent.transform.position);
-
+            NodeLayout.MoveTo(layoutNodes, whiteboard.transform.position);
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeToGO.Values;
             //Creates a new portal plane to position the nodes and edges on
-            GameObject plane = NewPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-            //Add the plane as a child to the parent
-            RendererUtils.AddToParent(plane, parent);
             
+            //Add the plane as a child to the parent
+            RendererUtils.AddToParent(whiteboard, parent);
             //Currently all nodes are layed out flat, therefore they need to be stacked on top of each other
-            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
-            // Scale the artificial root node to the maximum allowed block size.
-            GameObject artificialRootGO = nodeToGO[artificialRoot];
-            Vector3 scaling = artificialRootGO.transform.lossyScale;
-            artificialRootGO.transform.localScale = new Vector3(MaxBlockWidth, scaling.y, MaxBlockDepth);
-            nodeToGO[artificialRoot] = artificialRootGO;
+            NodeLayout.Stack(layoutNodes, whiteboard.transform.position.y + whiteboard.transform.lossyScale.y / 2.0f + LevelDistance);
             //Creates the game object object hierarchy
-            RendererUtils.CreateObjectHierarchy(nodeToGO, parent);
-            GameObject rootNode = RendererUtils.RootGameNode(parent);
-            RendererUtils.AddToParent(ApplyEdgeLayout(gameNodes), rootNode);
+            RendererUtils.CreateObjectHierarchy(nodeToGO, whiteboard);
+            //GameObject rootNode = RendererUtils.RootGameNode(parent);
+            RendererUtils.AddToParent(ApplyEdgeLayout(gameNodes), whiteboard);
             RefreshNodeStyle(parent, nodeToGameObject);
             //Sets the portal size to the extents of this parent.
             Portal.SetPortal(parent);
         }
 
-        
+
         /// <summary>
-        ///  Creates and returns a new plane enclosing all given <paramref name="gameNodes"/>
+        /// Creates a new whiteboard to place the graph elements on. If there is already a child of <see cref="parent"/>
+        /// tagged with <see cref="Tags.Whiteboard"/> that game object is returned. Otherwise a new one is generated.
         /// </summary>
-        /// <param name="gameNodes">The gameobjects</param>
-        /// <param name="yLevel">The level of plane y-Axis</param>
-        /// <returns>The plane</returns>
-        public GameObject NewPlane(ICollection<GameObject> gameNodes, float yLevel)
+        /// <param name="city">The architecture city game object.</param>
+        /// <returns>The whiteboard.</returns>
+        private GameObject AddWhiteboardIfNecessary(GameObject city)
         {
-            RendererUtils.ArchitectureBoundingBox(gameNodes, out Vector2 leftFrontCorner, 
-                out Vector2 rightBackCorner, nodeFactories, typeToElementType);
-            return PlaneFactory.NewPlane(ShaderType, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
+            foreach (Transform child in city.transform)
+            {
+                if (child.CompareTag(Tags.Whiteboard))
+                {
+                    return child.gameObject;
+                }
+            }
+            GetParentSize(city, out Vector2 leftFront, out Vector2 rightBack, out float yLevel);
+            GameObject whiteboard = PlaneFactory.NewPlane(ShaderType, new Vector2(-50f, -50f), new Vector2(50f, 50f), yLevel, Color.white, LevelDistance);
+            whiteboard.tag = Tags.Whiteboard;
+            whiteboard.name = "Whiteboard";
+            return whiteboard;
         }
 
-        
         /// <summary>
-        /// Prepares a new empty architecture graph that only contains a root drawing node with max block size.
-        /// The created root is then added as a child game object to the passed parent.
+        /// Computes a 2D plane that is placed right on top of the parent.
         /// </summary>
-        /// <param name="parent"></param>
+        /// <param name="parent">The parent object.</param>
+        /// <param name="leftFront">The left front 2D point</param>
+        /// <param name="rightBack"></param>
+        /// <param name="yLevel"></param>
+        private void GetParentSize(GameObject parent, out Vector2 leftFront, out Vector2 rightBack, out float yLevel)
+        {
+            Vector3 worldScale = parent.transform.lossyScale;
+            Vector3 position = parent.transform.position;
+            // Width from center to sides
+            float width = worldScale.x / 2;
+            //Depth from center to sides
+            float depth = worldScale.z / 2;
+            leftFront = new Vector2(position.x - width, position.z - depth);
+            rightBack = new Vector2(position.x + width, position.z + depth);
+            yLevel = position.y + worldScale.y / 2.0f + LevelDistance;
+        }
+
+
+        /// <summary>
+        /// Prepares a new empty architecture graph that only contains the whiteboard plane.
+        /// </summary>
+        /// <param name="parent">The parent object to attach the whiteboard to.</param>
         public void PrepareNewArchitectureGraph(GameObject parent)
         {
-            Dictionary<Node, GameObject> nodeToGO = new Dictionary<Node, GameObject>();
-            Node artificialRoot = AddAndRenderArtificialRootNode(loadedGraph, nodeToGO);
-            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-            
-            ICollection<GameNode> gamNodes = ToLayoutNodes(nodeToGO.Values, to_layout_node);
-            ICollection<ILayoutNode> layoutNodes = gamNodes.Cast<ILayoutNode>().ToList();
-            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
-            NodeLayout.MoveTo(layoutNodes, parent.transform.position);
-            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeToGO.Values;
-            GameObject plane = NewPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-            RendererUtils.AddToParent(plane, parent);
-            
-            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
-            RendererUtils.CreateObjectHierarchy(nodeToGO, parent);
-            GameObject artificialRootGO = nodeToGO[artificialRoot];
-            Vector3 scaling = artificialRootGO.transform.lossyScale;
-            Debug.Log($"Scaling {scaling}");
-            artificialRootGO.transform.localScale = new Vector3(MaxBlockWidth, scaling.y, MaxBlockDepth);
-            nodeToGO[artificialRoot] = artificialRootGO;
-            
+            GameObject whiteboard = AddWhiteboardIfNecessary(parent);
+            RendererUtils.AddToParent(whiteboard, parent);
             Portal.SetPortal(parent);
-            
         }
 
         
@@ -378,25 +348,25 @@ namespace SEE.Game.Architecture
         
         /// <summary>
         /// Retrieves the <see cref="NodeFactory"/> by the given string node type.
+        /// If <paramref name="nodeType"/> has no registered factory, the Cluster factory should be used as default.
         /// </summary>
         /// <param name="nodeType">The node type to find the mapping.</param>
-        /// <returns></returns>
-        /// <exception cref="Exception">Thrown when an unhandled node type is found.</exception>
+        /// <returns>The <see cref="NodeFactory"/> for the <paramref name="nodeType"/></returns>
         private NodeFactory GetFactoryByType(string nodeType)
         {
             if (typeToElementType.TryGetValue(nodeType, out ArchitectureElementType type))
             {
                 return nodeFactories[(int) type];
             }
-            throw new Exception($"Caught unhandled node type {nodeType}.\n");
+            return nodeFactories[(int) ArchitectureElementType.Cluster];
         }
     
         
         /// <summary>
-        /// Loads the Layout
+        /// Loads the <see cref="LoadedNodeLayout">.
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>The <see cref="LoadedNodeLayout"/> instance.</returns>
+        /// <exception cref="Exception">Thrown when the path is invalid or empty.</exception>
         private NodeLayout GetLayout()
         {
             if (File.Exists(settings.ArchitectureLayoutPath.Path))
@@ -451,6 +421,7 @@ namespace SEE.Game.Architecture
         public GameObject DrawNode(Node node)
         {
             NodeFactory factory = GetFactoryByType(node.Type);
+            ArchitectureElementSettings elementSettings = GetSettingsByType(node.Type);
             
             GameObject go = factory.NewBlock(SelectStyle(node), node.Level);
             go.name = node.ID;
@@ -458,56 +429,27 @@ namespace SEE.Game.Architecture
             go.AddComponent<NodeRef>().Value = node;
             Vector3 scaling = go.transform.localScale;
             go.transform.localScale =
-                new Vector3(scaling.x, settings.ArchitectureElementSettings[(int) typeToElementType[node.Type]].ElementHeight, scaling.z);
-            ArchitectureDecorator.DecorateForInteraction(go);
+                new Vector3(scaling.x, elementSettings.ElementHeight, scaling.z);
+            ArchitectureDecorator.DecorateForInteraction(go, PenInteractionController);
             return go;
         }
         
         /// <summary>
-        ///  Adds a root node to the architecture to act as a drawing sheet.
+        /// Find the <see cref="ArchitectureElementSettings"/> for a given type of nodes.
+        /// If none was found, the cluster settings are used as default.
         /// </summary>
-        /// <param name="graph">The graph to add the artificial root node to.</param>
-        /// <param name="nodeMap">The node gameobject map.</param>
-        /// <returns>The artificial root</returns>
-        public Node AddAndRenderArtificialRootNode(Graph graph, IDictionary<Node, GameObject> nodeMap)
+        /// <param name="nodeType">The node type as string</param>
+        /// <returns>The <see cref="ArchitectureElementSettings"/> for this <paramref name="nodeType"/>
+        /// or the cluster settings as default</returns>
+        private ArchitectureElementSettings GetSettingsByType(string nodeType)
         {
-            Node artificialRoot = AddArtificialRootNode(graph);
-            nodeMap[artificialRoot] = DrawNode(artificialRoot);
-            return artificialRoot;
-        }
-
-        
-        /// <summary>
-        /// Adds an artificial root node to the graph. This node represents the drawing plane on which the nodes are drawn.
-        /// </summary>
-        /// <param name="graph"></param>
-        /// <returns></returns>
-        public Node AddArtificialRootNode(Graph graph)
-        {
-            if (graph.ContainsNode(graph.Name + "#ROOT"))
+            if (typeToElementType.TryGetValue(nodeType,out  ArchitectureElementType type))
             {
-                Debug.Log($"Graph already contains drawing root with id {graph.Name + "#ROOT"}. Skipping adding of new root");
-                return graph.GetNode(graph.Name + "#ROOT");
-            }
-            ICollection<Node> roots = graph.GetRoots();
-            Node artificialRoot = new Node
-            {
-                ID = graph.Name + "#ROOT",
-                SourceName = graph.Name + "#ROOT",
-                Type = "ROOTTYPE"
-            };
-            graph.AddNode(artificialRoot);
-            if (roots.Count > 1)
-            {
-                foreach (Node root in roots)
-                {
-                    artificialRoot.AddChild(root);
-                }
+                return settings.ArchitectureElementSettings[(int) type];
             }
 
-            return artificialRoot;
+            return settings.ArchitectureElementSettings[(int) ArchitectureElementType.Cluster];
         }
-
         
         /// <summary>
         /// Refreshes the node style for each entry in the passed list of game nodes.

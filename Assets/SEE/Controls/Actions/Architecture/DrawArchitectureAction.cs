@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game.GestureRecognition;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions.Architecture
 {
@@ -62,7 +65,7 @@ namespace SEE.Controls.Actions.Architecture
         /// Input action for the pen position.
         /// </summary>
         private InputAction positionAction;
-        
+
         /// <summary>
         /// Creates a new <see cref="AbstractArchitectureAction"/> for this type of action.
         /// </summary>
@@ -100,7 +103,7 @@ namespace SEE.Controls.Actions.Architecture
             {
                 if (actionState.parentObject.ContainingCity())
                 {
-                    if (TryRaycast(out RaycastHit hit, positionAction.ReadValue<Vector2>()))
+                    if (TryRaycastWhiteboard(out RaycastHit hit))
                     {
                         GestureContext ctx = new GestureContext()
                         {
@@ -117,6 +120,8 @@ namespace SEE.Controls.Actions.Architecture
             actionState = new ActionState();
         }
 
+        
+        
         /// <summary>
         /// Event handler method for the DrawBegin mapping from <see cref="ArchitectureInputActions.DrawingActions"/>.
         /// If the raycast target is a node instantiate the gesture path prefab and assign parentObject and sourceNode.
@@ -125,7 +130,7 @@ namespace SEE.Controls.Actions.Architecture
         {
             actionState.isDrawing = true;
             Vector2 position = positionAction.ReadValue<Vector2>();
-            if (TryRaycast(out RaycastHit hit, position))
+            if (TryRaycastWhiteboard(out RaycastHit hit))
             {
                 actionState.pathInstance =
                     GameObject.Instantiate(pathPrefab, hit.point + HeightOffset, Quaternion.identity);
@@ -147,7 +152,7 @@ namespace SEE.Controls.Actions.Architecture
         {
             Vector2 position = positionAction.ReadValue<Vector2>();
             // Update the pathInstance according to the pen movement.
-            if (actionState.isDrawing && actionState.pathInstance != null && TryRaycast(out RaycastHit hit, position))
+            if (actionState.isDrawing && actionState.pathInstance != null && TryRaycastWhiteboard(out RaycastHit hit))
             {
                 actionState.pathInstance.transform.position = hit.point + HeightOffset;
                 actionState.parentObject = hit.collider.gameObject;
@@ -169,6 +174,28 @@ namespace SEE.Controls.Actions.Architecture
             actions.Drawing.Draw.performed -= OnDraw;
             actions.Drawing.DrawEnd.performed -= OnDrawEnd;
 
+        }
+
+        /// <summary>
+        /// Performs raycast to find a game object with a <see cref="NodeRef"/> or the whiteboard game object
+        /// with tag <see cref="Tags.Whiteboard"/>.
+        /// </summary>
+        /// <param name="hit"></param>
+        /// <returns></returns>
+        private bool TryRaycastWhiteboard(out RaycastHit hit)
+        { 
+            hit = default(RaycastHit);
+           
+            if(Raycasting.RaycastAnything(out hit))
+            {
+                GameObject go = hit.collider.gameObject;
+                if (go.HasNodeRef() || go.CompareTag(Tags.Whiteboard))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

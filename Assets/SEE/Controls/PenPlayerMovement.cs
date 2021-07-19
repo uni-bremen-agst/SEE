@@ -61,7 +61,7 @@ namespace SEE.Controls
                 cameraState.lastPosition = MainCamera.Camera.transform.position;
                 cameraState.lastRotation = MainCamera.Camera.transform.rotation.eulerAngles;
                 SEECityArchitecture city = SceneQueries.FindArchitectureCity();
-                Tweens.Move(MainCamera.Camera.gameObject, city.transform.position + new Vector3(0, 2f, 0), 5f);
+                Tweens.Move(MainCamera.Camera.gameObject, city.transform.position + new Vector3(0, 1.25f, 0), 5f);
                 Tweens.Rotate(MainCamera.Camera.transform.gameObject, new Vector3(90f, 0f, 0f), 5f);
             };
         }

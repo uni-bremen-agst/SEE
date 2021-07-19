@@ -65,7 +65,7 @@ namespace SEEEditor
 
             if (city.LoadedGraph != null && GUILayout.Button("Delete Graph"))
             {
-                city.ResetGraph();
+                city.Reset();
             }
 
             if (city.LoadedGraph != null && GUILayout.Button("Save Graph"))
@@ -104,10 +104,8 @@ namespace SEEEditor
                 EditorStyles.foldoutHeader);
             if (showEdgeLayout)
             {
-                EdgeLayoutSettings settings = city.edgeLayoutSettings;
+                EdgeLayoutSettings settings = city.EdgeLayoutSettings;
                 Assert.IsTrue(settings.GetType().IsClass);
-                
-                settings.kind = (EdgeLayoutKind)EditorGUILayout.EnumPopup("Edge layout", settings.kind);
                 settings.edgeWidth = EditorGUILayout.FloatField("Edge width", settings.edgeWidth);
                 settings.edgesAboveBlocks = EditorGUILayout.Toggle("Edges above blocks", settings.edgesAboveBlocks);
                 EditorGUILayout.BeginHorizontal();
@@ -141,7 +139,7 @@ namespace SEEEditor
                         ArchitectureElementSettings settings = city.ArchitectureElementSettings[i];
                         Assert.IsTrue(settings.GetType().IsClass);
 
-                        settings.ElementType = (ArchitectureElementType) i;
+                        
                         settings.ElementHeight = EditorGUILayout.FloatField("Element height", settings.ElementHeight);
                         settings.ColorRange.lower =
                             EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);

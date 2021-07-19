@@ -24,7 +24,6 @@ namespace SEE.Game.Architecture
         /// <exception cref="Exception">Thrown when an unhandled node type was found.</exception>
         public static void ArchitectureBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner, NodeFactory[] nodeFactories, Dictionary<string, ArchitectureElementType> typeToElementType)
         {
-            //TODO refactor into static helper class
             if (gameNodes.Count == 0)
             {
                 leftLowerCorner = Vector2.zero;
@@ -38,49 +37,45 @@ namespace SEE.Game.Architecture
                 foreach (GameObject go in gameNodes)
                 {
                     Node node = go.GetNode();
-                    if (typeToElementType.TryGetValue(node.Type, out ArchitectureElementType type))
+                    ArchitectureElementType elementType =
+                        typeToElementType.TryGetValue(node.Type, out ArchitectureElementType type)
+                            ? type
+                            : ArchitectureElementType.Cluster;
+                    NodeFactory factory = nodeFactories[(int) elementType];
+                    Vector3 extent = factory.GetSize(go) / 2.0f;
+                    // Note: position denotes the center of the object
+                    Vector3 position = factory.GetCenterPosition(go);
                     {
-                        NodeFactory factory = nodeFactories[(int) type];
-                        Vector3 extent = factory.GetSize(go) / 2.0f;
-                        // Note: position denotes the center of the object
-                        Vector3 position = factory.GetCenterPosition(go);
+                        // x co-ordinate of lower left corner
+                        float x = position.x - extent.x;
+                        if (x < leftLowerCorner.x)
                         {
-                            // x co-ordinate of lower left corner
-                            float x = position.x - extent.x;
-                            if (x < leftLowerCorner.x)
-                            {
-                                leftLowerCorner.x = x;
-                            }
-                        }
-                        {
-                            // z co-ordinate of lower left corner
-                            float z = position.z - extent.z;
-                            if (z < leftLowerCorner.y)
-                            {
-                                leftLowerCorner.y = z;
-                            }
-                        }
-                        {   // x co-ordinate of upper right corner
-                            float x = position.x + extent.x;
-                            if (x > rightUpperCorner.x)
-                            {
-                                rightUpperCorner.x = x;
-                            }
-                        }
-                        {
-                            // z co-ordinate of upper right corner
-                            float z = position.z + extent.z;
-                            if (z > rightUpperCorner.y)
-                            {
-                                rightUpperCorner.y = z;
-                            }
+                            leftLowerCorner.x = x;
                         }
                     }
-                    else
                     {
-                        throw new Exception($"Caught unhandled node type {node.Type}");
+                        // z co-ordinate of lower left corner
+                        float z = position.z - extent.z;
+                        if (z < leftLowerCorner.y)
+                        {
+                            leftLowerCorner.y = z;
+                        }
                     }
-                    
+                    {   // x co-ordinate of upper right corner
+                        float x = position.x + extent.x;
+                        if (x > rightUpperCorner.x)
+                        {
+                            rightUpperCorner.x = x;
+                        }
+                    }
+                    {
+                        // z co-ordinate of upper right corner
+                        float z = position.z + extent.z;
+                        if (z > rightUpperCorner.y)
+                        {
+                            rightUpperCorner.y = z;
+                        }
+                    }
                 }
             }
         }
@@ -135,7 +130,6 @@ namespace SEE.Game.Architecture
         /// <param name="root">the parent of every game object not nested in any other game object</param>
         public static void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
-            //TODO refactor into static helper class
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
                 Node node = entry.Key;
@@ -255,6 +249,31 @@ namespace SEE.Game.Architecture
             if (result == null)
             {
                 throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
+            }
+
+            return result;
+        }
+        
+        /// <summary>
+        /// The nodes and edges are childs of a whiteboard game object, hence we need to find the whiteboard first.
+        /// </summary>
+        /// <param name="architectureCity">The architecture city.</param>
+        /// <returns>The root game node that is child of the whiteboard</returns>
+        /// <exception cref="Exception">Thrown when no Whiteboard game object was found,
+        /// when duplicate root nodes exist and when no child node of the whiteboard was found.</exception>
+        public static GameObject FindArchitecturRootNode(GameObject architectureCity)
+        {
+            GameObject result = null;
+            foreach (Transform child in architectureCity.transform)
+            {
+                if (child.tag == Tags.Whiteboard)
+                {
+                    result = RootGameNode(child.gameObject);
+                }
+            }
+            if (result == null)
+            {
+                throw new Exception("Code city " + architectureCity.name + " has no child tagged by " + Tags.Whiteboard);
             }
 
             return result;

@@ -181,6 +181,52 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Selection"",
+            ""id"": ""ea8be314-d32c-440f-a2cf-40c45645a8c2"",
+            ""actions"": [
+                {
+                    ""name"": ""Select"",
+                    ""type"": ""Button"",
+                    ""id"": ""f5963785-da0e-4369-bf93-a3a9819aa590"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""ad3f50cf-74e6-40aa-9f52-0bf75adc0536"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""698b9049-0393-4c19-9016-c437ea9e153f"",
+                    ""path"": ""<Pen>/tip"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Select"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3292cd00-e4bf-4f18-bde0-2a223080394b"",
+                    ""path"": ""<Pen>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -197,6 +243,10 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
         m_Moving_Pressure = m_Moving.FindAction("Pressure", throwIfNotFound: true);
         m_Moving_ButtonPress = m_Moving.FindAction("ButtonPress", throwIfNotFound: true);
         m_Moving_ButtonRelease = m_Moving.FindAction("ButtonRelease", throwIfNotFound: true);
+        // Selection
+        m_Selection = asset.FindActionMap("Selection", throwIfNotFound: true);
+        m_Selection_Select = m_Selection.FindAction("Select", throwIfNotFound: true);
+        m_Selection_Position = m_Selection.FindAction("Position", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -356,6 +406,47 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
         }
     }
     public MovingActions @Moving => new MovingActions(this);
+
+    // Selection
+    private readonly InputActionMap m_Selection;
+    private ISelectionActions m_SelectionActionsCallbackInterface;
+    private readonly InputAction m_Selection_Select;
+    private readonly InputAction m_Selection_Position;
+    public struct SelectionActions
+    {
+        private @ArchitectureInputActions m_Wrapper;
+        public SelectionActions(@ArchitectureInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Select => m_Wrapper.m_Selection_Select;
+        public InputAction @Position => m_Wrapper.m_Selection_Position;
+        public InputActionMap Get() { return m_Wrapper.m_Selection; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SelectionActions set) { return set.Get(); }
+        public void SetCallbacks(ISelectionActions instance)
+        {
+            if (m_Wrapper.m_SelectionActionsCallbackInterface != null)
+            {
+                @Select.started -= m_Wrapper.m_SelectionActionsCallbackInterface.OnSelect;
+                @Select.performed -= m_Wrapper.m_SelectionActionsCallbackInterface.OnSelect;
+                @Select.canceled -= m_Wrapper.m_SelectionActionsCallbackInterface.OnSelect;
+                @Position.started -= m_Wrapper.m_SelectionActionsCallbackInterface.OnPosition;
+                @Position.performed -= m_Wrapper.m_SelectionActionsCallbackInterface.OnPosition;
+                @Position.canceled -= m_Wrapper.m_SelectionActionsCallbackInterface.OnPosition;
+            }
+            m_Wrapper.m_SelectionActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Select.started += instance.OnSelect;
+                @Select.performed += instance.OnSelect;
+                @Select.canceled += instance.OnSelect;
+                @Position.started += instance.OnPosition;
+                @Position.performed += instance.OnPosition;
+                @Position.canceled += instance.OnPosition;
+            }
+        }
+    }
+    public SelectionActions @Selection => new SelectionActions(this);
     public interface IDrawingActions
     {
         void OnDrawBegin(InputAction.CallbackContext context);
@@ -369,5 +460,10 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
         void OnPressure(InputAction.CallbackContext context);
         void OnButtonPress(InputAction.CallbackContext context);
         void OnButtonRelease(InputAction.CallbackContext context);
+    }
+    public interface ISelectionActions
+    {
+        void OnSelect(InputAction.CallbackContext context);
+        void OnPosition(InputAction.CallbackContext context);
     }
 }

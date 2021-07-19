@@ -29,10 +29,13 @@ namespace SEE.Controls.Actions.Architecture
             "Prefabs/Architecture/UI/MoveButton", MoveArchitectureAction.NewInstance);
 
         public static ArchitectureActionType Select { get; } = new ArchitectureActionType("Edit", 2,
-            "Prefabs/Architecture/UI/SelectButton", EditArchitectureAction.NewInstance);
+            "Prefabs/Architecture/UI/SelectButton", SelectArchitectureAction.NewInstance);
 
         public static ArchitectureActionType View { get; } = new ArchitectureActionType("View", 3,
             "Prefabs/Architecture/UI/ViewButton", ViewArchitectureAction.NewInstance);
+
+        public static ArchitectureActionType Scale { get; } = new ArchitectureActionType("Scale", 4,
+            "Prefabs/Architecture/UI/ScaleButton", ScaleArchitectureAction.NewInstance);
 
         /// <summary>
         /// The name of this action.

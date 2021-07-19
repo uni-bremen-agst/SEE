@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using SEE.Controls.Architecture;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Net.Dashboard;
@@ -111,6 +112,11 @@ namespace SEEEditor
             codeCity.AddComponent<Plane>();
 
             codeCity.AddComponent(CityTypes[selectedCityType]);
+            // Add the PenInteractionController needed by the SEECityArchitecture
+            if (CityTypes[selectedCityType] == typeof(SEECityArchitecture))
+            {
+                codeCity.AddComponent<PenInteractionController>();
+            }
         }
 
         /// <summary>

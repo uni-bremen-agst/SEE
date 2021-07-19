@@ -27,7 +27,8 @@ namespace SEE.Game
         None,
         Straight,
         Spline,
-        Bundling
+        Bundling,
+        Architecture
     }
 
     /// <summary>

@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Architecture;
+using SEE.Controls.Architecture;
+using SEE.DataModel;
+using SEE.Game;
+using SEE.Game.UI.Architecture;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -61,8 +65,46 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject UICanvas;
 
-        private GameObject IndicatorUI;
+        /// <summary>
+        /// UI element that shows the currently selected <see cref="AbstractArchitectureAction"/>.
+        /// Components attached:
+        /// <see cref="Game.UI.Architecture.ModeIndicator"/>
+        /// </summary>
+        private GameObject ModeIndicator;
+
+        /// <summary>
+        /// Modal Dialog that asks for delete permission.
+        /// Prefab instantiated from Prefabs/Architecture/UI/DeleteElementDialog
+        /// Components attached:
+        /// <see cref="DeleteElementDialog"/>
+        /// </summary>
+        private GameObject DeleteElementDialog;
         
+        /// <summary>
+        /// UI Context menu for node selection. Contains context action such as delete or edit for nodes.
+        /// Prefab instantiated from Prefabs/Architecture/UI/NodeContextMenuHolder
+        /// Components attached:
+        /// <see cref="NodeContextMenu"/>
+        /// </summary>
+        private GameObject NodeContextMenu;
+
+        /// <summary>
+        /// UI context menu for edge selection. Contains context actions such as delete.
+        /// Prefab instantiated from Prefabs/Architecture/UI/EdgeContextMenuHolder
+        /// Components attached:
+        /// <see cref="EdgeContextMenu"/>
+        /// </summary>
+        private GameObject EdgeContextMenu;
+        /// <summary>
+        /// UI element that holds the graph element tooltip for displaying the names.
+        /// Prefab instantiated from Prefabs/Architecture/UI/ObjectTooltip.
+        /// Components attached:
+        /// <see cref="TooltipHolder"/>
+        /// <see cref="Tooltip"/>
+        /// </summary>
+        private GameObject ToolTipDisplay;
+
+
         public override HashSet<string> GetChangedObjects()
         {
             // We handle the undo process within this action itself
@@ -99,8 +141,16 @@ namespace SEE.Controls.Actions
             {
                 UICanvas = GameObject.Find("UI Canvas");
             }
+            //Get the PenInteractionController from the SEECityArchitecture
+            SEECityArchitecture city = SceneQueries.FindArchitectureCity();
+            if (!city.TryGetComponent(out PenInteractionController penInteractionController))
+            {
+                throw new Exception(
+                    "City game object does not have the PenInteractionController component attached! Check your setup");
+            }
             //Initialize the action instances
-            InitializeActions();
+            InitializeActions(penInteractionController);
+            PrepareUI(penInteractionController);
             //Start the active action.
             activeAction.Start();
         }
@@ -108,11 +158,10 @@ namespace SEE.Controls.Actions
 
         public override void Stop()
         {
-            Debug.Log("Stop");
             OnArchitectureActionDisabled?.Invoke();
             activeAction.Stop();
             nameToUI.Values.ForEach(e => e.SetActive(false));
-            IndicatorUI.SetActive(false);
+            Destroyer.DestroyGameObject(ModeIndicator);
         }
 
         public override void Awake()
@@ -120,15 +169,35 @@ namespace SEE.Controls.Actions
             Debug.Log("Awake");
         }
 
+        /// <summary>
+        /// Instantiates the UI elements for the <see cref="ArchitectureAction"/>.
+        /// </summary>
+        private void PrepareUI(PenInteractionController penInteractionController)
+        {
+            ModeIndicator = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/Indicator", UICanvas.transform, false);
+            ModeIndicator.GetComponent<ModeIndicator>().ChangeStateIndicator(activeAction.GetActionType().Name);
+            DeleteElementDialog = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/DeleteElementDialog", UICanvas.transform, false);
+            NodeContextMenu = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/NodeContextMenuHolder",
+                UICanvas.transform, false);
+            EdgeContextMenu = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/EdgeContextMenuHolder",
+                UICanvas.transform, false);
+            // Initialize Tooltip Display
+            ToolTipDisplay = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/ObjectTooltip", UICanvas.transform, false);
+            ToolTipDisplay.GetComponent<TooltipHolder>().Controller = penInteractionController;
+        }
+        
+
         
         /// <summary>
         /// Initializes the available <see cref="AbstractArchitectureAction"/> instances.
         /// </summary>
-        private void InitializeActions()
+        private void InitializeActions(PenInteractionController penInteractionController)
         {
+           
             foreach (ArchitectureActionType type in ArchitectureActionType.AllTypes)
             {
                 AbstractArchitectureAction action = type.CreateAbstractArchitectureAction();
+                action.PenInteractionController = penInteractionController;
                 GameObject uiElement = PrefabInstantiator.InstantiatePrefab(type.PrefabPath, UICanvas.transform, false);
                 ButtonManagerBasicIcon bmi = uiElement.GetComponent<ButtonManagerBasicIcon>();
                 bmi.clickEvent.AddListener((() => SwitchMode(type.Name)));
@@ -137,24 +206,27 @@ namespace SEE.Controls.Actions
             }
             nameToAction.Values.ForEach(a => a.Awake());
             activeAction = nameToAction.Values.First();
-            IndicatorUI = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/Indicator");
+            
+            
+
         }
 
         
         /// <summary>
         /// Switches between the separate <see cref="ArchitectureAction"/> sub modes e.g Draw or Select.
+        /// Updates the <see cref="ModeIndicator"/> with the new <see cref="AbstractArchitectureAction"/> name.
         /// </summary>
         /// <param name="actionName">The name of the exception defined in <see cref="ArchitectureActionType"/></param>
         /// <exception cref="Exception">Thrown when an <paramref name="actionName"/>
         /// was passed that has no <see cref="AbstractArchitectureAction"/> implementation</exception>
         private void SwitchMode(string actionName)
         {
-            Debug.Log("Switch Action");
             if (nameToAction.TryGetValue(actionName, out AbstractArchitectureAction action))
             {
                 activeAction.Stop();
                 activeAction = action;
                 activeAction.Start();
+                ModeIndicator.GetComponent<ModeIndicator>().ChangeStateIndicator(action.GetActionType().Name);
                 return;
             }
             throw new Exception($"There is no implementation of AbstractArchitectureAction for action {actionName}");

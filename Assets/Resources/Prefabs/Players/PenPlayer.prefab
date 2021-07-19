@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6840467278216287030}
   - component: {fileID: 4661247303289038579}
   - component: {fileID: 3066545712025672169}
+  - component: {fileID: 3172305009796298148}
   m_Layer: 0
   m_Name: PenPlayer
   m_TagString: MainCamera
@@ -140,7 +141,7 @@ MonoBehaviour:
   m_TrackedDevicePositionAction: {fileID: 4754684134866288074, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_TrackedDeviceOrientationAction: {fileID: 1025543830046995696, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
-  m_PointerBehavior: 0
+  m_PointerBehavior: 1
 --- !u!114 &3066545712025672169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,3 +155,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focusedObject: {fileID: 0}
+--- !u!114 &3172305009796298148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7471d69248f7439abcfbae7a2a43d31e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedObject: {fileID: 0}

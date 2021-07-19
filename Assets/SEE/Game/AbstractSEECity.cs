@@ -180,7 +180,7 @@ namespace SEE.Game
             List<GameObject> result = new List<GameObject>();
             foreach (Transform child in transform)
             {
-                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration) || child.CompareTag(Tags.Whiteboard))
                 {
                     result.Add(child.gameObject);
                 }
