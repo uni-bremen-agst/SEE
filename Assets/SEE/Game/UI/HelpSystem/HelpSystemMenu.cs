@@ -77,17 +77,46 @@ public class HelpSystemMenu : MonoBehaviour
         List<MenuEntry> debuggingEntries = new List<MenuEntry>();
         List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
-        playerMenuEntries = new List<MenuEntry>
+        List<string> addEdge = new List<string>
         {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "TEST1", "TEST1", entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "TEST2", "TEST2", entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, null, null, entry)
+            "PlayerMenu: Space",
+            "Leftklick: Add Edge",
+            "Leftklick: Start Node",
+            "Leftklick: Target Node",
+            "For Removing Start Node: F11",
+        };
+
+        List<string> addNode = new List<string>
+        {
+            "PlayerMenu: Space",
+            "Leftklick: Add Node",
+            "Leftklick: Position for new Node",
+        };
+
+        List<string> addLine = new List<string>
+        {
+            "PlayerMenu: Space",
+            "Leftklick: Draw",
+            "Leftklick with pressed mouse",
+            "Release left mousebutton for ending"
+        };
+
+        List<string> placeholder = new List<string>
+        {
+            "TESTE",
+        };
+
+        playerMenuEntries = new List<MenuEntry>
+        {        
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "TEST1", "TEST1", addEdge, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "TEST2", "TEST2", addNode, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, null, null, addLine, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon, null, null, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon, null, null, placeholder, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>
@@ -98,6 +127,6 @@ public class HelpSystemMenu : MonoBehaviour
             HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Quality Description", Color.cyan,RefIcon)
         };
 
-        mainMenu = HelpSystemBuilder.CreateMainMenu(HelpSystem, "MainMenu", "Main Description", "Materials/Notification/info", mainMenuEntries);
+        mainMenu = HelpSystemBuilder.CreateMainMenu("MainMenu", "Main Description", "Materials/Notification/info", mainMenuEntries);
     }
 }
