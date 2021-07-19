@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions.Architecture
         private ArchitectureInputActions actions;
 
         /// <summary>
-        /// 
+        /// Input action for the pen position.
         /// </summary>
         private InputAction positionAction;
         
@@ -75,8 +75,7 @@ namespace SEE.Controls.Actions.Architecture
         public override void Awake()
         {
             pathPrefab = Resources.Load<GameObject>(GESTURE_PATH_PREFAB_PATH);
-            ArchitectureInputActions inputActions = new ArchitectureInputActions();
-            actions = inputActions;
+            actions = new ArchitectureInputActions();
             
             actions.Drawing.DrawBegin.performed += OnDrawBegin;
             actions.Drawing.Draw.performed += OnDraw;
@@ -101,14 +100,17 @@ namespace SEE.Controls.Actions.Architecture
             {
                 if (actionState.parentObject.ContainingCity())
                 {
-                    AbstractGestureHandler.GestureContext ctx = new AbstractGestureHandler.GestureContext()
+                    if (TryRaycast(out RaycastHit hit, positionAction.ReadValue<Vector2>()))
                     {
-                        HeightOffset = HeightOffset,
-                        ParentObject = actionState.parentObject,
-                        Source = actionState.sourceNode,
-                        Target = actionState.targetNode
-                    };
-                    GestureHandlerManager.HandleGesture(result, rawPoints, ctx);
+                        GestureContext ctx = new GestureContext()
+                        {
+                            HeightOffset = HeightOffset,
+                            ParentObject = actionState.parentObject,
+                            Source = actionState.sourceNode,
+                            Target = hit.collider.gameObject
+                        };
+                        GestureHandler.HandleGesture(result, rawPoints, ctx);
+                    }
                 }
             }
             Destroyer.DestroyGameObject(actionState.pathInstance);

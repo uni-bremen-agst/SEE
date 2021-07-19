@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.StateIndicator;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -26,6 +28,11 @@ namespace SEE.GO.Menu
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
         private ActionStateIndicator Indicator;
+
+        /// <summary>
+        /// The menu button to open the SEE Playermenu.
+        /// </summary>
+        private GameObject MenuButton;
 
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
@@ -94,7 +101,7 @@ namespace SEE.GO.Menu
         }
 
         /// <summary>
-        /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
+        /// This creates and returns the <see cref="ActionStateIndicator"/>, which displays the current mode.
         /// The indicator will either be attached to the given GameObject or to a new GameObject if
         /// <paramref name="attachTo"/> is null.
         /// </summary>
@@ -130,6 +137,10 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
+            if (MenuButton == null)
+            {
+                CreateMenuButton();
+            }
             try
             {
                 // Select action state via numbers on the keyboard
@@ -181,6 +192,17 @@ namespace SEE.GO.Menu
             }
         }
 
+        private void CreateMenuButton()
+        {
+            GameObject UICanvas = GameObject.Find("UI Canvas");
+            if (UICanvas == null) return;
+            MenuButton =
+                PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/PlayerMenu", UICanvas.transform, false);
+            MenuButton.GetComponent<ButtonManagerBasicWithIcon>().clickEvent.AddListener(() =>
+            {
+                ModeMenu.ToggleMenu();
+            });
+        }
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>

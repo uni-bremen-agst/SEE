@@ -38,6 +38,31 @@ namespace SEE.Controls.Actions.Architecture
         /// <returns>The action type</returns>
         public abstract  ArchitectureActionType GetActionType();
 
+        /// <summary>
+        /// The hovered graph element.
+        /// </summary>
+        protected InteractableObject hoveredObject;
+
+        /// <summary>
+        /// Event listener for <see cref="InteractableObject.AnyHoverIn"/>.
+        /// </summary>
+        /// <param name="hoveredObject">The hovered object</param>
+        /// <param name="isInitiator">Whether this client is the initiator.</param>
+        protected void OnAnyHoverIn(InteractableObject hoveredObject, bool isInitiator)
+        {
+            this.hoveredObject = hoveredObject;
+        }
+
+        /// <summary>
+        /// Event listener for <see cref="InteractableObject.AnyHoverOut"/>.
+        /// </summary>
+        /// <param name="hoveredObject">The de-hovered object</param>
+        /// <param name="isInitiator">Whether this client is the initiator.</param>
+        protected void OnAnyHoverOut(InteractableObject hoveredObject, bool isInitiator)
+        {
+            this.hoveredObject = null;
+        }
+        
         
         /// <summary>
         /// Raycasts to find a node graph element to find a node graph element. Uses the pen position as the ray origin.

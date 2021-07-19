@@ -90,9 +90,33 @@
             "id": "7cd3705f-3a15-448e-8adf-1903a0b553dc",
             "actions": [
                 {
-                    "name": "New action",
-                    "type": "Button",
+                    "name": "Position",
+                    "type": "PassThrough",
                     "id": "84c8b9c7-0427-4232-bcb0-1b0d323f6afb",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Pressure",
+                    "type": "PassThrough",
+                    "id": "f96bf419-1678-48a4-8d06-dc061c41e2c2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "ButtonPress",
+                    "type": "Button",
+                    "id": "357b4daf-2ec3-4c0c-8884-3b4c1e4ac551",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "ButtonRelease",
+                    "type": "Button",
+                    "id": "6d529a4d-f040-4203-b753-9f8d00ba7f2e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -102,11 +126,44 @@
                 {
                     "name": "",
                     "id": "e42dabbe-cf15-4459-bc7c-ad8b660020f6",
-                    "path": "",
+                    "path": "<Pen>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ec49de86-e35a-4d53-92a8-7da18327a72a",
+                    "path": "<Pen>/pressure",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pressure",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d60eb8f6-4493-4073-815c-3b16e214c5b9",
+                    "path": "<Pen>/barrel1",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ButtonPress",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc14ce03-6e06-476a-859f-157ede4ad09a",
+                    "path": "<Pen>/barrel1",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ButtonRelease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -486,5 +486,40 @@ namespace SEE.Game
             }
             return result;
         }
+        
+        /// <summary>
+        /// Recursively collects all node ids of <paramref name="node"/> and its descendants.
+        /// </summary>
+        /// <param name="node">The node</param>
+        /// <param name="ids">The set of already collected ids</param>
+        private static void fetchNodeIds(Node node, HashSet<string> ids)
+        {
+            ids.Add(node.ID);
+            foreach (Node child in node.Children())
+            {
+                fetchNodeIds(child, ids);
+            }
+        }
+        
+        /// <summary>
+        /// Find all edges that are connected to <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">The node to find all edges for.</param>
+        /// <returns>List of all edges that are connected to the <paramref name="node"/></returns>
+        public static List<EdgeRef> FindAllConnectingEdges(Node node)
+        {
+            HashSet<string> ids = new HashSet<string>();
+            fetchNodeIds(node, ids);
+            List<EdgeRef> edges = new List<EdgeRef>();
+            EdgeRef[] refs = UnityEngine.Object.FindObjectsOfType<EdgeRef>();
+            foreach (EdgeRef edgeRef in refs)
+            {
+                if(ids.Contains(edgeRef.Value.Source.ID) || ids.Contains(edgeRef.Value.Target.ID))
+                {
+                    edges.Add(edgeRef);
+                }
+            }
+            return edges;
+        }
     }
 }

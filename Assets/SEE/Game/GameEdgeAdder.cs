@@ -61,6 +61,46 @@ namespace SEE.Game
             }
             return result;
         }
+        
+        /// <summary>
+        /// Creates and returns a new edge from <paramref name="source"/> to <paramref name="target"/> A new graph edge will be added to the underlying graph as well and attached as an <see cref="EdgeRef"/>.
+        /// The line of the edge itself is created by the <see cref="ArchitectureRenderer"/> of the architecture city the edge belongs to.
+        /// </summary>
+        /// <param name="source">Source of the edge</param>
+        /// <param name="target">Target of the edge</param>
+        /// <param name="edgeID">unique id of the edge (may be null or empty in which a generated ID will be used.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static GameObject AddArchitectureEdge(GameObject source, GameObject target, string edgeID = null)
+        {
+            Transform cityObject = SceneQueries.GetCodeCity(source.transform);
+            GameObject result;
+            if (cityObject != null)
+            {
+                if (cityObject.TryGetComponent(out SEECityArchitecture city))
+                {
+                    try
+                    {
+                        result = city.Renderer.DrawEdge(source, target, id: edgeID);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(
+                            $"The new edge from {source.name} to {target.name} could not be created: {e.Message}.\n");
+                    }
+                }
+                else
+                {
+                    throw new Exception(
+                        $"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
+                }
+            }
+            else
+            {
+                throw new Exception($"Could not determine the code city for the new edge from {source.name} to {target.name}.\n");
+            }
+            return result;
+        }
 
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, GameObject, string)"/>.

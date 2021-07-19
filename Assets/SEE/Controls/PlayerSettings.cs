@@ -12,6 +12,7 @@ using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -181,6 +182,13 @@ namespace SEE.Controls
                     {
                         player = PlayerFactory.CreateVRPlayer();
                         SetupVR(player);                        
+                    }
+                    break;
+                case PlayerInputType.PenPlayer:
+                    {
+                        Assert.IsNotNull(FocusPlane);
+                        player = PlayerFactory.CreatePenPlayer(FocusPlane);
+                        
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:

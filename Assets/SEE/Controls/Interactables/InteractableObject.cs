@@ -859,7 +859,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            bool isDesktopPlayer = isMouseOrPenPlayer();
+            Debug.Log("Mouse entered");
             if (isDesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
@@ -871,7 +872,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            bool isDesktopPlayer = isMouseOrPenPlayer();
             if (isDesktopPlayer)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
@@ -892,11 +893,17 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
+            bool isDesktopPlayer = isMouseOrPenPlayer();
             if (isDesktopPlayer && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);
             }
+        }
+
+        private bool isMouseOrPenPlayer()
+        {
+            return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ||
+                   PlayerSettings.GetInputType() == PlayerInputType.PenPlayer;
         }
         
         //----------------------------------------

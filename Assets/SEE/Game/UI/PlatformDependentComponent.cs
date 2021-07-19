@@ -99,6 +99,7 @@ namespace SEE.Game.UI
             Platform = PlayerSettings.GetInputType();
             switch (Platform)
             {
+                case PlayerInputType.PenPlayer:
                 case PlayerInputType.DesktopPlayer: StartDesktop();
                     break;
                 case PlayerInputType.TouchGamepadPlayer: StartTouchGamepad();
@@ -121,6 +122,7 @@ namespace SEE.Game.UI
         {
             switch (Platform)
             {
+                case PlayerInputType.PenPlayer:
                 case PlayerInputType.DesktopPlayer: UpdateDesktop();
                     break;
                 case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();

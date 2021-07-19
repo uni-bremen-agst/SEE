@@ -156,7 +156,20 @@ namespace SEE.Utils
         /// <returns>Whether the plane was hit.</returns>
         public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            return RaycastPlane(plane, out hit, Input.mousePosition);
+        }
+        
+        /// <summary>
+        /// Raycasts against the given plane.
+        /// </summary>
+        /// <param name="plane">The plane to raycast against.</param>
+        /// <param name="hit">The hit point of the plane or <see cref="Vector3.positiveInfinity"/>,
+        /// <param name="position">The screen point to construct to ray from.</param>
+        /// if ray and plane are parallel.</param>
+        /// <returns>Whether the plane was hit.</returns>
+        public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit, Vector2 position)
+        {
+            Ray ray = MainCamera.Camera.ScreenPointToRay(position);
             bool result = plane.Raycast(ray, out float enter);
             if (result)
             {

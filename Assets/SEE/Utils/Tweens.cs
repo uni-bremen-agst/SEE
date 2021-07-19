@@ -46,6 +46,26 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        ///  Rotates a GameObject to a specific rotation vector in euler format over a given duration
+        /// </summary>
+        /// <param name="gameObject">The target of the animation</param>
+        /// <param name="maxAnimationTime">The time in seconds the animation will take to complete</param>
+        /// <param name="targetPoint">The target euler vector of the animation</param>
+        /// <param name="callback">The invoked callback after the animation</param>
+        public static void Rotate(GameObject gameObject, Vector3 targetPoint, float maxAnimationTime, Action<object> callback = null )
+        {
+            if (callback != null)
+            {
+                gameObject.transform.DORotate(targetPoint, maxAnimationTime)
+                    .OnComplete(() => { callback?.Invoke(gameObject); });
+            }
+            else
+            {
+                gameObject.transform.DORotate(targetPoint, maxAnimationTime);
+            }
+        }
+
+        /// <summary>
         /// Randomly shakes a GameObject's rotation by a diminishing amount over time with
         /// and makes a <paramref name="callback"/> if this is not null.
         /// </summary>

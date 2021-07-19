@@ -93,6 +93,11 @@ namespace SEE.Game.Architecture
         /// The maximum allowed block depth.
         /// </summary>
         private const float MaxBlockDepth = 100f;
+        
+        /// <summary>
+        /// The mapping for the node style by id.
+        /// </summary>
+        private Dictionary<string, int> style_mapping = new Dictionary<string, int>();
 
 
         /// <summary>
@@ -137,7 +142,7 @@ namespace SEE.Game.Architecture
             }
 
             // initialize graph edge element
-            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge {ID = id, Source = fromNode, Target = toNode, Type = Graph.UnknownType};
+            Edge edge = string.IsNullOrEmpty(id) ? new Edge {Source = fromNode, Target = toNode, Type = Graph.UnknownType} : new Edge {ID = id, Source = fromNode, Target = toNode, Type = Graph.UnknownType};
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
 
@@ -297,6 +302,7 @@ namespace SEE.Game.Architecture
             RendererUtils.CreateObjectHierarchy(nodeToGO, parent);
             GameObject rootNode = RendererUtils.RootGameNode(parent);
             RendererUtils.AddToParent(ApplyEdgeLayout(gameNodes), rootNode);
+            RefreshNodeStyle(parent, nodeToGameObject);
             //Sets the portal size to the extents of this parent.
             Portal.SetPortal(parent);
         }
@@ -431,7 +437,7 @@ namespace SEE.Game.Architecture
             NodeFactory factory = GetFactoryByType(node.Type);
             float maxGraphDepth = node.ItsGraph.MaxDepth;
             uint numberOfStyles = factory.NumberOfStyles();
-            int result = Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles, (node.Level + 1) / maxGraphDepth));
+            int result = Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles, (node.Level) / maxGraphDepth));
             Debug.Log($"Calculated style index {result} for node {node.SourceName}");
             return result;
         }
@@ -453,7 +459,7 @@ namespace SEE.Game.Architecture
             Vector3 scaling = go.transform.localScale;
             go.transform.localScale =
                 new Vector3(scaling.x, settings.ArchitectureElementSettings[(int) typeToElementType[node.Type]].ElementHeight, scaling.z);
-            //TODO decorate node
+            ArchitectureDecorator.DecorateForInteraction(go);
             return go;
         }
         

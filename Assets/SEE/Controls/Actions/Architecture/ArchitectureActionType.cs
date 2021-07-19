@@ -23,7 +23,16 @@ namespace SEE.Controls.Actions.Architecture
         public static List<ArchitectureActionType> AllTypes { get; } =  new List<ArchitectureActionType>();
         
         public static ArchitectureActionType Draw { get; } = new ArchitectureActionType("Draw", 0, 
-            "Materials/ModernUIPack/Pencil", DrawArchitectureAction.NewInstance);
+            "Prefabs/Architecture/UI/DrawButton", DrawArchitectureAction.NewInstance);
+
+        public static ArchitectureActionType Move { get; } = new ArchitectureActionType("Move", 1,
+            "Prefabs/Architecture/UI/MoveButton", MoveArchitectureAction.NewInstance);
+
+        public static ArchitectureActionType Select { get; } = new ArchitectureActionType("Edit", 2,
+            "Prefabs/Architecture/UI/SelectButton", EditArchitectureAction.NewInstance);
+
+        public static ArchitectureActionType View { get; } = new ArchitectureActionType("View", 3,
+            "Prefabs/Architecture/UI/ViewButton", ViewArchitectureAction.NewInstance);
 
         /// <summary>
         /// The name of this action.
@@ -37,9 +46,9 @@ namespace SEE.Controls.Actions.Architecture
         
         
         /// <summary>
-        /// Path to the material of the icon for this action. The icon itself should be a visual representation of the action.
+        /// Path to the button prefab for this action type.
         /// </summary>
-        public string IconPath { get; }
+        public string PrefabPath { get; }
         
         /// <summary>
         /// Delegate that can be called to create a new instance of this kind of action.
@@ -53,15 +62,15 @@ namespace SEE.Controls.Actions.Architecture
         /// </summary>
         /// <param name="name">The name of the action type</param>
         /// <param name="value">The id of this action type. Must be unique and increased by one for each new implementation</param>
-        /// <param name="iconPath">The path to the icon material for this action type</param>
+        /// <param name="prefabPath">The path to the icon material for this action type</param>
         /// <param name="createAbstractArchitectureAction">Delegate to create new instances of this type</param>
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// are not unqiue, or when the <paramref name="value"/> does not fulfill the criteria</exception>
-        private ArchitectureActionType(string name, int value, string iconPath, CreateAbstractArchitectureAction createAbstractArchitectureAction)
+        private ArchitectureActionType(string name, int value, string prefabPath, CreateAbstractArchitectureAction createAbstractArchitectureAction)
         {
             Name = name;
             Value = value;
-            IconPath = iconPath;
+            PrefabPath = prefabPath;
             CreateAbstractArchitectureAction = createAbstractArchitectureAction;
             //Check for duplicates
             if (AllTypes.Any(x => x.Value == value || x.Name == name))

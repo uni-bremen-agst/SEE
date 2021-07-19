@@ -103,9 +103,33 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
             ""id"": ""7cd3705f-3a15-448e-8adf-1903a0b553dc"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
+                    ""name"": ""Position"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""84c8b9c7-0427-4232-bcb0-1b0d323f6afb"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Pressure"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""f96bf419-1678-48a4-8d06-dc061c41e2c2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""ButtonPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""357b4daf-2ec3-4c0c-8884-3b4c1e4ac551"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""ButtonRelease"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d529a4d-f040-4203-b753-9f8d00ba7f2e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -115,11 +139,44 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e42dabbe-cf15-4459-bc7c-ad8b660020f6"",
-                    ""path"": """",
+                    ""path"": ""<Pen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ec49de86-e35a-4d53-92a8-7da18327a72a"",
+                    ""path"": ""<Pen>/pressure"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pressure"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d60eb8f6-4493-4073-815c-3b16e214c5b9"",
+                    ""path"": ""<Pen>/barrel1"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ButtonPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cc14ce03-6e06-476a-859f-157ede4ad09a"",
+                    ""path"": ""<Pen>/barrel1"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ButtonRelease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -136,7 +193,10 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
         m_Drawing_Position = m_Drawing.FindAction("Position", throwIfNotFound: true);
         // Moving
         m_Moving = asset.FindActionMap("Moving", throwIfNotFound: true);
-        m_Moving_Newaction = m_Moving.FindAction("New action", throwIfNotFound: true);
+        m_Moving_Position = m_Moving.FindAction("Position", throwIfNotFound: true);
+        m_Moving_Pressure = m_Moving.FindAction("Pressure", throwIfNotFound: true);
+        m_Moving_ButtonPress = m_Moving.FindAction("ButtonPress", throwIfNotFound: true);
+        m_Moving_ButtonRelease = m_Moving.FindAction("ButtonRelease", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -243,12 +303,18 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
     // Moving
     private readonly InputActionMap m_Moving;
     private IMovingActions m_MovingActionsCallbackInterface;
-    private readonly InputAction m_Moving_Newaction;
+    private readonly InputAction m_Moving_Position;
+    private readonly InputAction m_Moving_Pressure;
+    private readonly InputAction m_Moving_ButtonPress;
+    private readonly InputAction m_Moving_ButtonRelease;
     public struct MovingActions
     {
         private @ArchitectureInputActions m_Wrapper;
         public MovingActions(@ArchitectureInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Moving_Newaction;
+        public InputAction @Position => m_Wrapper.m_Moving_Position;
+        public InputAction @Pressure => m_Wrapper.m_Moving_Pressure;
+        public InputAction @ButtonPress => m_Wrapper.m_Moving_ButtonPress;
+        public InputAction @ButtonRelease => m_Wrapper.m_Moving_ButtonRelease;
         public InputActionMap Get() { return m_Wrapper.m_Moving; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -258,16 +324,34 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
         {
             if (m_Wrapper.m_MovingActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_MovingActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_MovingActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_MovingActionsCallbackInterface.OnNewaction;
+                @Position.started -= m_Wrapper.m_MovingActionsCallbackInterface.OnPosition;
+                @Position.performed -= m_Wrapper.m_MovingActionsCallbackInterface.OnPosition;
+                @Position.canceled -= m_Wrapper.m_MovingActionsCallbackInterface.OnPosition;
+                @Pressure.started -= m_Wrapper.m_MovingActionsCallbackInterface.OnPressure;
+                @Pressure.performed -= m_Wrapper.m_MovingActionsCallbackInterface.OnPressure;
+                @Pressure.canceled -= m_Wrapper.m_MovingActionsCallbackInterface.OnPressure;
+                @ButtonPress.started -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonPress;
+                @ButtonPress.performed -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonPress;
+                @ButtonPress.canceled -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonPress;
+                @ButtonRelease.started -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonRelease;
+                @ButtonRelease.performed -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonRelease;
+                @ButtonRelease.canceled -= m_Wrapper.m_MovingActionsCallbackInterface.OnButtonRelease;
             }
             m_Wrapper.m_MovingActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @Position.started += instance.OnPosition;
+                @Position.performed += instance.OnPosition;
+                @Position.canceled += instance.OnPosition;
+                @Pressure.started += instance.OnPressure;
+                @Pressure.performed += instance.OnPressure;
+                @Pressure.canceled += instance.OnPressure;
+                @ButtonPress.started += instance.OnButtonPress;
+                @ButtonPress.performed += instance.OnButtonPress;
+                @ButtonPress.canceled += instance.OnButtonPress;
+                @ButtonRelease.started += instance.OnButtonRelease;
+                @ButtonRelease.performed += instance.OnButtonRelease;
+                @ButtonRelease.canceled += instance.OnButtonRelease;
             }
         }
     }
@@ -281,6 +365,9 @@ public class @ArchitectureInputActions : IInputActionCollection, IDisposable
     }
     public interface IMovingActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnPosition(InputAction.CallbackContext context);
+        void OnPressure(InputAction.CallbackContext context);
+        void OnButtonPress(InputAction.CallbackContext context);
+        void OnButtonRelease(InputAction.CallbackContext context);
     }
 }

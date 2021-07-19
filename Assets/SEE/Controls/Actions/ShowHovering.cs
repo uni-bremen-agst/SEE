@@ -10,12 +10,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The local hovering color of the outline.
         /// </summary>
-        private readonly static Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+        protected static readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
 
         /// <summary>
         /// The remote hovering color of the outline.
         /// </summary>
-        private readonly static Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+        protected static readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be

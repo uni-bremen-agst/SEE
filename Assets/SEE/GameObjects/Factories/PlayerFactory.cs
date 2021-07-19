@@ -37,6 +37,21 @@ namespace SEE.GO
             player.name = PlayerInputType.VRPlayer.ToString();
             return player;
         }
+        
+        /// <summary>
+        /// Creates and returns a pen player instantiated from prefab Resources/Prefabs/Players/PenPlayer
+        /// with all required components attached to it.
+        /// </summary>
+        /// <param name="plane">The culling plane the PenPlayerMovement should be focusing</param>
+        /// <returns>A player for the desktop environment with pen input</returns>
+        public static GameObject CreatePenPlayer(Plane plane)
+        {
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/PenPlayer");
+            player.name = PlayerInputType.PenPlayer.ToString();
+            player.tag = Tags.MainCamera;
+            player.GetComponent<PenPlayerMovement>().focusedObject = plane;
+            return player;
+        }
 
         /// <summary>
         /// Creates and returns a HoloLens player instantiated from prefab Resources/Prefabs/Players/HoloLensPlayer

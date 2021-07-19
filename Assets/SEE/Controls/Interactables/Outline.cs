@@ -95,8 +95,15 @@ namespace SEE.Controls
         private Material outlineFillMaterial;
 
         private bool needsUpdate;
-
-        public static Outline Create(GameObject go, Color color)
+        
+        /// <summary>
+        /// Creates and attaches an outline component to the passed game object
+        /// </summary>
+        /// <param name="go">The game object to attach the outline to</param>
+        /// <param name="color">The color of the outline</param>
+        /// <param name="width">The width of the outline. If null the default value 4 is used.</param>
+        /// <returns></returns>
+        public static Outline Create(GameObject go, Color color, float width = 4.0f)
         {
             Outline result = null;
 
@@ -112,7 +119,7 @@ namespace SEE.Controls
                 result = go.AddComponent<Outline>();
                 result.OutlineMode = Mode.OutlineAll;
                 result.OutlineColor = color;
-                result.OutlineWidth = 4.0f;
+                result.OutlineWidth = width;
 
                 // FIXME: This code needs documentation.
                 NodeRef nodeRef = go.GetComponent<NodeRef>();
