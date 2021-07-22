@@ -27,7 +27,7 @@ namespace SEE.GO
         /// <summary>
         /// The color for the rectangle line.
         /// </summary>
-        private Color color;
+        private readonly Color color;
 
         /// <summary>
         /// The material we use for the rectangle line. It is the same for all rectangle lines
@@ -36,10 +36,10 @@ namespace SEE.GO
         private readonly Material material = Materials.New(Materials.ShaderType.TransparentLine);
 
         /// <summary>
-        /// Attaches a deccorators to rectangle line to all game nodes. 
+        /// Attaches a decorators to rectangle line to all game nodes. 
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create rectangle lines</param>
-        public void Add(ICollection<GameObject> gameNodes)
+        public void Add(IEnumerable<GameObject> gameNodes)
         {
             foreach (GameObject gameNode in gameNodes)
             {

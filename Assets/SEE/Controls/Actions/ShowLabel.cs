@@ -168,7 +168,6 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
-        /// 
         /// May be null.
         /// </summary>
         private AbstractSEECity City()
@@ -180,6 +179,19 @@ namespace SEE.Controls.Actions
             }
             codeCityObject.TryGetComponent(out AbstractSEECity city);
             return city;
+        }
+
+        /// <summary>
+        /// Returns the node this class is attached to.
+        /// May be null.
+        /// </summary>
+        private Node Node()
+        {
+            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+            {
+                return null;
+            }
+            return nodeRef.Value;
         }
 
         /// <summary>
@@ -208,13 +220,12 @@ namespace SEE.Controls.Actions
                 // are not doing anything.
                 return;
             }
-
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+            Node node = Node();
+            if (node == null)
             {
                 return;
             }
-            Node node = nodeRef.Value;
-
+            
             bool isLeaf = node.IsLeaf();
             if (!LabelsEnabled(city, node))
             {
@@ -236,16 +247,7 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
 
-            string shownText;
-            if (node == null)
-            {
-                Debug.LogWarning($"Game node {name} has no valid node reference.\n");
-                shownText = name;
-            }
-            else
-            {
-                shownText = node.SourceName;
-            }
+            string shownText = node.SourceName;
 
             // Now we create the label
             // We define starting and ending positions for the animation
@@ -364,7 +366,6 @@ namespace SEE.Controls.Actions
                     Debug.LogError("Couldn't find line component in newly created label.\n");
                 }
             }
-            #endregion
 
             void SetAttributesImmediately()
             {
@@ -382,6 +383,7 @@ namespace SEE.Controls.Actions
                     Debug.LogError("Couldn't find required component in newly created label.\n");
                 }
             }
+            #endregion
         }
 
         /// <summary>

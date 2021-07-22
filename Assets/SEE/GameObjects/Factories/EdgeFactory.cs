@@ -28,12 +28,10 @@ namespace SEE.GO
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            if (tubularSegments > 0) this.tubularSegments = tubularSegments;
-            else this.tubularSegments = 50;
-            if (radius > 0) this.radius = radius;
-            else this.radius = 0.005f;
-            if (radialSegments > 0) this.radialSegments = radialSegments;
-            else this.radialSegments = 8;
+            this.tubularSegments = tubularSegments > 0 ? tubularSegments : 50;
+
+            this.radius = radius > 0 ? radius : 0.005f;
+            this.radialSegments = radialSegments > 0 ? radialSegments : 8;
             this.isEdgeSelectable = isEdgeSelectable;
             defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
@@ -83,7 +81,7 @@ namespace SEE.GO
         /// Returns a new game edge.
         /// </summary>
         /// <returns>new game edge</returns>
-        private GameObject NewGameEdge(LayoutEdge layoutEdge)
+        private static GameObject NewGameEdge(LayoutEdge layoutEdge)
         {
             GameObject gameEdge = new GameObject
             {
@@ -148,8 +146,8 @@ namespace SEE.GO
                     MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
 
                     // Build tubular mesh with Curve
-                    bool closed = false; // closed curve or not
-                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.OfType<Vector3>().ToList()),
+                    const bool closed = false; // closed curve or not
+                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.ToList()),
                                                       tubularSegments, radius, radialSegments, closed);
 
                     // visualize mesh

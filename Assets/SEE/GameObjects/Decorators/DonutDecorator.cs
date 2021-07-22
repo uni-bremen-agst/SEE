@@ -30,7 +30,7 @@ namespace SEE.GO
         /// Attaches Donut charts to all <paramref name="gameNodes"/> as children.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create Donut chart visualizations</param>
-        public void Add(ICollection<GameObject> gameNodes)
+        public void Add(IEnumerable<GameObject> gameNodes)
         {
             foreach (GameObject node in gameNodes)
             {
@@ -75,12 +75,6 @@ namespace SEE.GO
         /// <param name="gameNode">parent of the circle segments and inner circle</param>
         private void Add(GameObject gameNode)
         {
-            Vector3 extent = nodeFactory.GetSize(gameNode) / 2.0f;
-            // We want the circle to fit into gameNode, that is why we choose
-            // the shorter value of the x and z co-ordinates. If the object
-            // is a circle, then both are alike anyway.
-            float radius = Mathf.Min(extent.x, extent.z);
-
             float[] values = new float[metrics.Length];
 
             Node node = gameNode.GetComponent<NodeRef>().Value;

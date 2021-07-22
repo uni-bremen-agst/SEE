@@ -1,9 +1,9 @@
-﻿using SEE.DataModel.DG;
-using SEE.Tools;
-using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Tools;
+using SEE.Utils;
 
 namespace SEE.Game
 {
@@ -15,7 +15,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEECityRandom.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECityRandom.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEECityRandom.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace SEE.Game
             LeafConstraint.Restore(attributes, LeafConstraintLabel);
             InnerNodeConstraint.Restore(attributes, InnerNodeConstraintLabel);
             // LeafAttributes are stored as a list
-            ConfigIO.RestoreList<RandomAttributeDescriptor>(attributes, LeafAttributesLabel, ref LeafAttributes);
+            ConfigIO.RestoreList(attributes, LeafAttributesLabel, ref LeafAttributes);
         }
     }
 }
