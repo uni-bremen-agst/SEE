@@ -106,27 +106,28 @@ public class HelpSystemMenu : MonoBehaviour
             "TESTE",
         };
 
+        // Hint: Description is responsible for the title, title is useless
         playerMenuEntries = new List<MenuEntry>
         {        
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "TEST1", "TEST1", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "TEST2", "TEST2", addNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, null, null, addLine, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "Add Edge", addEdge, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "Add Node", addNode, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, "Draw Line", addLine, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon, null, null, placeholder, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon,null, placeholder, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>
         {
-            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Architecture Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Evolution Description", Color.red, RefIcon),
-            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Debugging Description", Color.blue, RefIcon),
-            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Quality Description", Color.cyan,RefIcon)
+            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use-Cases related to the architecture", Color.green, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use-Cases related to software-evolution", Color.red, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use-Cases related to software-debugging ", Color.blue, RefIcon),
+            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use-Cases related to the software-quality", Color.cyan,RefIcon)
         };
 
-        mainMenu = HelpSystemBuilder.CreateMainMenu("MainMenu", "Main Description", "Materials/Notification/info", mainMenuEntries);
+        mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
     }
 }

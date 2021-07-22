@@ -22,15 +22,15 @@ public static class HelpSystemBuilder
     /// <param name="description">The description of the HelpSystemMenu-Entry, displayed as a tooltip.</param>
     /// <param name="entryColor">The color of the HelpSystemMenu-Entry.</param>
     /// <param name="iconPath">The path of the icon of the HelpSystemMenu-Entry.</param>
-    /// <param name="titleh">The title of the HelpSystemEntry which will be opened onclick.</param>
-    /// <param name="desh">The description of the HelpSystemEntry which will be openend onclick.</param>
+    /// <param name="entryDescription">The description of the HelpSystemEntry which will be openend onclick.</param>
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string titleh, string desh, List<string> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string entryDescription, List<string> keywords, HelpSystemEntry entry = null)
     {
+        string titleh = entryDescription;
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry,titleh,desh, keywords); }),
+            action: new UnityAction(() => { Execute(entry,titleh,entryDescription, keywords); }),
             title: title,
             description: description,
             entryColor: entryColor,
@@ -120,6 +120,7 @@ public static class HelpSystemBuilder
         {
             keywordsAsString += "- " + keyword + "\n";
         }
+        keywordsAsString += "\n";
         tmp.text = keywordsAsString;
         entry.Manager.UpdateUI();
         videoPlayer.Play();

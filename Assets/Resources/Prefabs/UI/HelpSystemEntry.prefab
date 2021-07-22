@@ -1005,8 +1005,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 2, y: 0.14999771}
+  m_SizeDelta: {x: 119.4802, y: -0.3000046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3473854751470043413
 CanvasRenderer:
@@ -1594,14 +1594,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 100
-  m_fontSizeBase: 100
+  m_fontSize: 70
+  m_fontSizeBase: 70
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 50
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1661,7 +1661,7 @@ GameObject:
   - component: {fileID: 3896434704958353592}
   - component: {fileID: 1979287370843410574}
   - component: {fileID: 2769623530188412840}
-  - component: {fileID: 2884305938292903116}
+  - component: {fileID: 4285899934894100255}
   m_Layer: 5
   m_Name: RawImageVideo
   m_TagString: videoCollider
@@ -1723,19 +1723,21 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
---- !u!65 &2884305938292903116
-BoxCollider:
+--- !u!114 &4285899934894100255
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4277855249564522214}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 103, y: 130, z: 1}
-  m_Center: {x: 0, y: -15.93, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 1, y: 3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &4723634788083259091
 GameObject:
   m_ObjectHideFlags: 0
@@ -2293,7 +2295,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 92.5, y: -30}
+  m_AnchoredPosition: {x: 44, y: -23}
   m_SizeDelta: {x: 25, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9070108519256239568
@@ -2324,7 +2326,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1d4948cb340975049a089512e0d55db0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: eaac66d1a04c85d44bc7fbc47c011804, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -2488,7 +2490,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6479319221155974301}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: b724cd3a0cd8fc649b7e1affe4142fa6, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: 221acbba85c8d3345882489b08313673, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -2834,7 +2836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragArea: {fileID: 0}
   dragObject: {fileID: 1956587250728438420}
-  topOnClick: 1
+  topOnClick: 0
 --- !u!114 &3807602048575623759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2874,6 +2876,7 @@ GameObject:
   - component: {fileID: 1545828978954985442}
   - component: {fileID: 8987656776127651226}
   - component: {fileID: 3052089363034872700}
+  - component: {fileID: 1466307139456396552}
   m_Layer: 5
   m_Name: Scrollbar
   m_TagString: Untagged
@@ -2899,8 +2902,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 20, y: 0}
+  m_AnchoredPosition: {x: 3.2399902, y: -30.09999}
+  m_SizeDelta: {x: 20, y: -14.2000065}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &4079236713802471035
 CanvasRenderer:
@@ -2954,7 +2957,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1654701897743705188}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.2446769
+  m_Size: 0.34953645
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2996,6 +2999,21 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &1466307139456396552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7349856318344838257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 1, g: 1, b: 1, a: 1}
+  m_EffectDistance: {x: 5, y: 5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &7668425702566739646
 GameObject:
   m_ObjectHideFlags: 0
@@ -3164,7 +3182,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 295, y: -30}
+  m_AnchoredPosition: {x: 275, y: -23}
   m_SizeDelta: {x: 350, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7249608285462351406
@@ -3197,8 +3215,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Description here
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fa328c1ae3ffb6b4583cf371153b0be6, type: 2}
-  m_sharedMaterial: {fileID: 21918420405216288, guid: fa328c1ae3ffb6b4583cf371153b0be6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2f17e8bb3967fe14093d5fec798fffd9, type: 2}
+  m_sharedMaterial: {fileID: 21700449227511232, guid: 2f17e8bb3967fe14093d5fec798fffd9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3222,13 +3240,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 36
+  m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 16
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -3535,7 +3553,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9142791057468249636}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
