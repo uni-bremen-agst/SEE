@@ -61,9 +61,16 @@ namespace Michsky.UI.ModernUIPack
                 return;
 
             if (delay != 0)
+            {
                 StopCoroutine("ShowTooltip");
 
-            tooltipAnimator.Play("Out");
+                if (tooltipAnimator.GetCurrentAnimatorStateInfo(0).IsName("In"))
+                     tooltipAnimator.Play("Out");
+            }
+
+            else
+                tooltipAnimator.Play("Out");
+
             tpManager.allowUpdating = false;
         }
 

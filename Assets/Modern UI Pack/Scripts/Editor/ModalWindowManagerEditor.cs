@@ -132,13 +132,19 @@ namespace Michsky.UI.ModernUIPack
                     if (mwTarget.GetComponent<CanvasGroup>().alpha == 0)
                     {
                         if (GUILayout.Button("Make It Visible", customSkin.button))
+                        {
                             mwTarget.GetComponent<CanvasGroup>().alpha = 1;
+                            Undo.RegisterCreatedObjectUndo(mwTarget, "Modal set visible");
+                        }
                     }
 
                     else
                     {
                         if (GUILayout.Button("Make It Invisible", customSkin.button))
+                        {
                             mwTarget.GetComponent<CanvasGroup>().alpha = 0;
+                            Undo.RegisterCreatedObjectUndo(mwTarget, "Modal set invisible");
+                        }
                     }
 
                     break;
