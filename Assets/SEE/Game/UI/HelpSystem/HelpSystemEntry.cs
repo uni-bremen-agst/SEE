@@ -1,4 +1,4 @@
-using Michsky.UI.ModernUIPack;
+  using Michsky.UI.ModernUIPack;
 using SEE.Game.UI;
 using SEE.Game.UI.Menu;
 using SEE.GO;
@@ -141,6 +141,8 @@ public partial class HelpSystemEntry : PlatformDependentComponent
             throw new System.Exception("No Video-Player found");
         }
         videoPlayer.Stop();
+        HelpSystemMenu.IsEntryOpened = false;
+
     }
 
     /// <summary>
