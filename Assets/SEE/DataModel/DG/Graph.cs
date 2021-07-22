@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Object = System.Object;
 
 namespace SEE.DataModel.DG
 {
@@ -20,11 +19,6 @@ namespace SEE.DataModel.DG
         private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();
 
         // The (view) name of the graph.
-        private string name = "";
-
-        // The path of the file from which this graph was loaded. Could be the
-        /// empty string if the graph was not created by loading it from disk.
-        private string path = "";
 
         /// <summary>
         /// Name of the artificial node type used for artificial root nodes added
@@ -71,7 +65,7 @@ namespace SEE.DataModel.DG
         /// <param name="name">name of the graph</param>
         public Graph(string name = "")
         {
-            this.name = name;
+            this.Name = name;
         }
 
         /// Adds a node to the graph.
@@ -187,11 +181,11 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(node, null))
             {
-                throw new Exception("node must not be null");
+                throw new ArgumentNullException(nameof(node));
             }
-            if (String.IsNullOrEmpty(node.ID))
+            if (string.IsNullOrEmpty(node.ID))
             {
-                throw new Exception("ID of a node must neither be null nor empty");
+                throw new ArgumentException("ID of a node must neither be null nor empty");
             }
             return nodes.ContainsKey(node.ID);
         }
@@ -208,10 +202,7 @@ namespace SEE.DataModel.DG
             List<Node> roots = GetRoots();
             if (roots.Count > 0)
             {
-                Node newRoot = new Node();
-                newRoot.SourceName = name;
-                newRoot.ID = name;
-                newRoot.Type = type;
+                Node newRoot = new Node {SourceName = name, ID = name, Type = type};
                 AddNode(newRoot);
                 foreach (Node oldRoot in roots)
                 {
@@ -228,9 +219,9 @@ namespace SEE.DataModel.DG
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
         public Node GetNode(string ID)
         {
-            if (String.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(ID))
             {
-                throw new Exception("ID must neither be null nor empty");
+                throw new ArgumentException("ID must neither be null nor empty");
             }
             if (nodes.TryGetValue(ID, out Node node))
             {
@@ -248,7 +239,7 @@ namespace SEE.DataModel.DG
         {
             if (string.IsNullOrEmpty(ID))
             {
-                throw new Exception("ID must neither be null nor empty");
+                throw new ArgumentException("ID must neither be null nor empty");
             }
             if (edges.TryGetValue(ID, out Edge edge))
             {
@@ -268,25 +259,25 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(edge, null))
             {
-                throw new Exception("Edge must not be null.");
+                throw new ArgumentNullException(nameof(edge));
             }
             if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
-                throw new Exception("Source/target of this edge is null.");
+                throw new ArgumentException("Source/target of this edge is null.");
             }
             if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
-                    throw new Exception($"Source node {edge.Source} is not in the graph.");
+                    throw new InvalidOperationException($"Source node {edge.Source} is not in the graph.");
                 }
                 if (edge.Target.ItsGraph != this)
                 {
-                    throw new Exception($"Target node {edge.Target} is not in the graph.");
+                    throw new InvalidOperationException($"Target node {edge.Target} is not in the graph.");
                 }
                 if (edges.ContainsKey(edge.ID))
                 {
-                    throw new Exception($"There is already an edge with the ID {edge.ID}.");
+                    throw new InvalidOperationException($"There is already an edge with the ID {edge.ID}.");
                 }
 
                 edge.ItsGraph = this;
@@ -308,19 +299,19 @@ namespace SEE.DataModel.DG
         {
             if (ReferenceEquals(edge, null))
             {
-                throw new Exception("Edge must not be null");
+                throw new ArgumentNullException(nameof(edge));
             }
             if (edge.ItsGraph != this)
             {
                 if (ReferenceEquals(edge.ItsGraph, null))
                 {
-                    throw new Exception($"Edge {edge} is not contained in any graph");
+                    throw new ArgumentException($"Edge {edge} is not contained in any graph");
                 }
-                throw new Exception($"Edge {edge} is contained in a different graph {edge.ItsGraph.Name}.");
+                throw new ArgumentException($"Edge {edge} is contained in a different graph {edge.ItsGraph.Name}.");
             }
             if (!edges.ContainsKey(edge.ID))
             {
-                throw new Exception($"Edge {edge} is not contained in graph {Name}.");
+                throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
             }
 
             edge.Source.RemoveOutgoing(edge);
@@ -342,21 +333,13 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Name of the graph (the view name of the underlying RFG).
         /// </summary>
-        public string Name
-        {
-            get => name;
-            set => name = value;
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
         /// </summary>
-        public string Path
-        {
-            get => path;
-            set => path = value;
-        }
+        public string Path { get; set; } = "";
 
         /// <summary>
         /// Returns all nodes of the graph.
@@ -479,7 +462,7 @@ namespace SEE.DataModel.DG
         /// Dumps the hierarchy for given root by adding level many -
         /// as indentation. Used for debugging.
         /// </summary>
-        private void DumpTree(Node root, int level)
+        private static void DumpTree(Node root, int level)
         {
             string indentation = "";
             for (int i = 0; i < level; i++)
@@ -534,17 +517,9 @@ namespace SEE.DataModel.DG
         /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
         public IList<Edge> ConnectingEdges(ICollection<Node> selectedNodes)
         {
-            IList<Edge> result = new List<Edge>();
             HashSet<Node> nodes = new HashSet<Node>(selectedNodes);
 
-            foreach (Edge edge in Edges())
-            {
-                if (nodes.Contains(edge.Source) && nodes.Contains(edge.Target))
-                {
-                    result.Add(edge);
-                }
-            }
-            return result;
+            return Edges().Where(edge => nodes.Contains(edge.Source) && nodes.Contains(edge.Target)).ToList();
         }
 
         /// <summary>
@@ -554,14 +529,10 @@ namespace SEE.DataModel.DG
         /// <param name="nodes">nodes for which to determine the depth</param>
         /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
         /// <returns></returns>
-        private int CalcMaxDepth(IList<Node> nodes, int currentDepth)
+        private static int CalcMaxDepth(IList<Node> nodes, int currentDepth)
         {
-            int max = currentDepth + 1;
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                max = Math.Max(max, CalcMaxDepth(nodes[i].Children(), currentDepth + 1));
-            }
-            return max;
+            return nodes.Select(node => CalcMaxDepth(node.Children(), currentDepth + 1))
+                        .Prepend(currentDepth+1).Max();
         }
 
         /// <summary>
@@ -573,7 +544,7 @@ namespace SEE.DataModel.DG
         {
             string result = "{\n";
             result += " \"kind\": graph,\n";
-            result += " \"name\": \"" + name + "\",\n";
+            result += $" \"name\": \"{Name}\",\n";
             // its own attributes
             result += base.ToString();
             // its nodes
@@ -673,8 +644,8 @@ namespace SEE.DataModel.DG
         {
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
-            target.name = name;
-            target.path = path;
+            target.Name = Name;
+            target.Path = Path;
             CopyNodesTo(target);
             CopyEdgesTo(target);
             CopyHierarchy(this, target);
@@ -756,7 +727,7 @@ namespace SEE.DataModel.DG
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with ID " + fromChild.ID);
+                    throw new Exception($"target graph does not have a node with ID {fromChild.ID}");
                 }
             }
         }
@@ -823,12 +794,11 @@ namespace SEE.DataModel.DG
             {
                 // the node that corresponds to root in subgraph (may be null if
                 // there is no corresponding node)
-                Node rootInSubgraph = null;
                 if (relevantTypes.Contains(root.Type))
                 {
                     // root must be kept => a corresponding node is added to subgraph
                     // and root is mapped onto that node
-                    rootInSubgraph = (Node)root.Clone();
+                    Node rootInSubgraph = (Node)root.Clone();
                     subgraph.AddNode(rootInSubgraph);
                     mapsTo[root] = rootInSubgraph;
                 }
@@ -850,11 +820,8 @@ namespace SEE.DataModel.DG
         /// <param name="relevantTypes">the node types that should be kept</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
-        private void AddToSubGraph
-            (Graph subgraph,
-             HashSet<string> relevantTypes,
-             Dictionary<Node, Node> mapsTo,
-             Node parent)
+        private static void AddToSubGraph (Graph subgraph, ICollection<string> relevantTypes, 
+                                           IDictionary<Node, Node> mapsTo, Node parent)
         {
             foreach (Node child in parent.Children())
             {
@@ -872,10 +839,7 @@ namespace SEE.DataModel.DG
                     // a root with a type to be ignored or if all its ascendants
                     // have a type to be ignored.
                     Node parentInSubgraph = mapsTo[parent];
-                    if (parentInSubgraph != null)
-                    {
-                        parentInSubgraph.AddChild(childInSubgraph);
-                    }
+                    parentInSubgraph?.AddChild(childInSubgraph);
                     AddToSubGraph(subgraph, relevantTypes, mapsTo, child);
                 }
                 else
@@ -901,7 +865,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="subgraph">graph where to propagate the edges too</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
-        private void AddEdgesToSubgraph(Graph subgraph, Dictionary<Node, Node> mapsTo)
+        private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo)
         {
             foreach (Edge edge in Edges())
             {
@@ -998,26 +962,27 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
                 Graph otherNode = other as Graph;
                 if (other != null)
                 {
-                    Report("Graphs " + name + " " + otherNode.name + " have differences");
+                    Report($"Graphs {Name} {otherNode?.Name} have differences");
                 }
                 return false;
             }
 
             Graph otherGraph = other as Graph;
-            if (path != otherGraph.path)
+            Assert.IsNotNull(otherGraph);
+            if (Path != otherGraph.Path)
             {
                 Report("Graph paths are different");
                 return false;
             }
 
-            if (name != otherGraph.name)
+            if (Name != otherGraph.Name)
             {
                 Report("Graph names are different");
                 return false;
@@ -1059,7 +1024,7 @@ namespace SEE.DataModel.DG
         public override int GetHashCode()
         {
             // we are using the viewName which is intended to be unique
-            return name.GetHashCode();
+            return Name.GetHashCode();
         }
 
         /// <summary>
@@ -1110,7 +1075,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node whose string attributes are to be retrieved</param>
         /// <returns>all string attribute names</returns>
-        private ICollection<string> AllStringAttributeNames(Node node)
+        private static ICollection<string> AllStringAttributeNames(Node node)
         {
             return node.StringAttributes.Keys;
         }
@@ -1120,7 +1085,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node whose toggle attributes are to be retrieved</param>
         /// <returns>all toggle attribute names</returns>
-        private ICollection<string> AllToggleAttributeNames(Node node)
+        private static ICollection<string> AllToggleAttributeNames(Node node)
         {
             return node.ToggleAttributes;
         }
@@ -1130,7 +1095,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node whose float attributes are to be retrieved</param>
         /// <returns>all float attribute names</returns>
-        private ICollection<string> AllFloatAttributeNames(Node node)
+        private static ICollection<string> AllFloatAttributeNames(Node node)
         {
             return node.FloatAttributes.Keys;
         }
@@ -1140,7 +1105,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node whose integer attributes are to be retrieved</param>
         /// <returns>all integer attribute names</returns>
-        private ICollection<string> AllIntAttributeNames(Node node)
+        private static ICollection<string> AllIntAttributeNames(Node node)
         {
             return node.IntAttributes.Keys;
         }

@@ -20,23 +20,22 @@
     {
         public static string Name(this NumericAttributeNames me)
         {
-            switch (me)
+            return me switch
             {
-                case NumericAttributeNames.Number_Of_Tokens: return "Metric.Number_of_Tokens";
-                case NumericAttributeNames.Clone_Rate: return "Metric.Clone_Rate";
-                case NumericAttributeNames.LOC: return "Metric.LOC";
-                case NumericAttributeNames.Complexity: return "Metric.Complexity";
-                case NumericAttributeNames.Architecture_Violations: return "Metric.Architecture_Violations";
-                case NumericAttributeNames.Clone: return "Metric.Clone";
-                case NumericAttributeNames.Cycle: return "Metric.Cycle";
-                case NumericAttributeNames.Dead_Code: return "Metric.Dead_Code";
-                case NumericAttributeNames.Metric: return "Metric.Metric";
-                case NumericAttributeNames.Style: return "Metric.Style";
-                case NumericAttributeNames.Universal: return "Metric.Universal";
-                case NumericAttributeNames.IssuesTotal: return "Metric.IssuesTotal";
-                default:
-                    throw new System.Exception("Unknown attribute name " + me);
-            }
+                NumericAttributeNames.Number_Of_Tokens => "Metric.Number_of_Tokens",
+                NumericAttributeNames.Clone_Rate => "Metric.Clone_Rate",
+                NumericAttributeNames.LOC => "Metric.LOC",
+                NumericAttributeNames.Complexity => "Metric.Complexity",
+                NumericAttributeNames.Architecture_Violations => "Metric.Architecture_Violations",
+                NumericAttributeNames.Clone => "Metric.Clone",
+                NumericAttributeNames.Cycle => "Metric.Cycle",
+                NumericAttributeNames.Dead_Code => "Metric.Dead_Code",
+                NumericAttributeNames.Metric => "Metric.Metric",
+                NumericAttributeNames.Style => "Metric.Style",
+                NumericAttributeNames.Universal => "Metric.Universal",
+                NumericAttributeNames.IssuesTotal => "Metric.IssuesTotal",
+                _ => throw new System.Exception("Unknown attribute name " + me)
+            };
         }
     }
 }

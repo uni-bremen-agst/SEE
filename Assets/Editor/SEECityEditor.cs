@@ -1,14 +1,14 @@
 ﻿#if UNITY_EDITOR
 
-using SEE;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEEEditor
 {
@@ -319,13 +319,14 @@ namespace SEEEditor
         /// </summary>
         protected virtual void Attributes()
         {
-            SEECity seeCity = target as SEECity;
+            SEECity city = target as SEECity;
+            Assert.IsNotNull(city);
             showDataFiles = EditorGUILayout.Foldout(showDataFiles,
                                                     "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
-                seeCity.GXLPath = DataPathEditor.GetDataPath("GXL file", seeCity.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                seeCity.CSVPath = DataPathEditor.GetDataPath("Metric file", seeCity.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+                city.GXLPath = DataPathEditor.GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                city.CSVPath = DataPathEditor.GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
             }
         }
 

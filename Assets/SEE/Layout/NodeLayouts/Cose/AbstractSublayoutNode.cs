@@ -16,6 +16,7 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
+using SEE.Game;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {

@@ -1,12 +1,15 @@
-﻿using SEE.DataModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using SEE.DataModel;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SEE.GO
 {
     /// <summary>
-    /// A factory for Donut charts for inner nodes of the tree in the Ballon layout.
+    /// A factory for Donut charts for inner nodes of the tree in the Balloon layout.
     /// </summary>
     internal class DonutFactory
     {
@@ -26,7 +29,7 @@ namespace SEE.GO
             int numberOfDonutMetrics = metrics.Length;
             if (numberOfDonutMetrics > colorPalette.Length)
             {
-                throw new System.Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
+                throw new Exception("[DonutFactory] number of metrics must not exceed " + (colorPalette.Length + 1) + ".");
             }
             materials = GetMaterials(numberOfDonutMetrics);
             this.innerMetric = innerMetric;
@@ -78,23 +81,23 @@ namespace SEE.GO
         /// <returns>array of new materials</returns>
         private Material[] GetMaterials(int howMany)
         {
-            switch (howMany)
+            return howMany switch
             {
-                case 0: return NewMaterials();
-                case 1: return NewMaterials(colorPalette[0]);
-                case 2: return NewMaterials(colorPalette[0], colorPalette[11]);
-                case 3: return NewMaterials(colorPalette[0], colorPalette[5], colorPalette[11]);
-                case 4: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[6], colorPalette[11]);
-                case 5: return NewMaterials(colorPalette[0], colorPalette[3], colorPalette[5], colorPalette[8], colorPalette[11]);
-                case 6: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[11]);
-                case 7: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[10], colorPalette[11]);
-                case 8: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
-                case 9: return NewMaterials(colorPalette[0], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
-                case 10: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
-                case 11: return NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[7], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]);
-                case 12: return NewMaterials(colorPalette);
-                default: return null; // cannot happen
-            }
+                0 => NewMaterials(),
+                1 => NewMaterials(colorPalette[0]),
+                2 => NewMaterials(colorPalette[0], colorPalette[11]),
+                3 => NewMaterials(colorPalette[0], colorPalette[5], colorPalette[11]),
+                4 => NewMaterials(colorPalette[0], colorPalette[3], colorPalette[6], colorPalette[11]),
+                5 => NewMaterials(colorPalette[0], colorPalette[3], colorPalette[5], colorPalette[8], colorPalette[11]),
+                6 => NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[11]),
+                7 => NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[10], colorPalette[11]),
+                8 => NewMaterials(colorPalette[0], colorPalette[2], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]),
+                9 => NewMaterials(colorPalette[0], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]),
+                10 => NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]),
+                11 => NewMaterials(colorPalette[0], colorPalette[1], colorPalette[2], colorPalette[3], colorPalette[4], colorPalette[6], colorPalette[7], colorPalette[8], colorPalette[9], colorPalette[10], colorPalette[11]),
+                12 => NewMaterials(colorPalette),
+                _ => null
+            };
         }
 
         /// <summary>
@@ -104,22 +107,14 @@ namespace SEE.GO
         /// </summary>
         /// <param name="list">list of colors for the materials</param>
         /// <returns>array of new materials</returns>
-        private Material[] NewMaterials(params Color[] list)
-        {
-            Material[] result = new Material[list.Length];
-            for (int i = 0; i < list.Length; i++)
-            {
-                result[i] = NewMaterial(list[i]);
-            }
-            return result;
-        }
+        private Material[] NewMaterials(params Color[] list) => list.Select(NewMaterial).ToArray();
 
         /// <summary>
         /// Returns a new material (shader Standard) with given color.
         /// </summary>
         /// <param name="color">color of the material</param>
         /// <returns>new material</returns>
-        private Material NewMaterial(Color color)
+        private static Material NewMaterial(Color color)
         {
             Material materialPrefab = Resources.Load<Material>(Materials.OpaqueMaterialName);
             Material material = new Material(materialPrefab)
@@ -187,7 +182,7 @@ namespace SEE.GO
         /// <returns></returns>
         private static float ParseHexString(string hexNumber)
         {
-            int.TryParse(hexNumber, System.Globalization.NumberStyles.HexNumber, null, out int result);
+            int.TryParse(hexNumber, NumberStyles.HexNumber, null, out int result);
             return result;
         }
 
@@ -292,7 +287,7 @@ namespace SEE.GO
                 {
                     if (value < 0.0f)
                     {
-                        throw new System.Exception("[DonutChart] values must not be negative.");
+                        throw new Exception("[DonutChart] values must not be negative.");
                     }
                     sum += value;
                 }
@@ -331,7 +326,7 @@ namespace SEE.GO
         {
             GameObject innerCircle = new GameObject
             {
-                name = innerMetric + " = " + innerValue,
+                name = $"{innerMetric} = {innerValue}",
                 tag = Tags.Decoration,
                 isStatic = false
             };
@@ -360,8 +355,8 @@ namespace SEE.GO
                     float x = 0.5f * Mathf.Cos((i / (float)segments) * 2.0f * Mathf.PI);
                     float z = 0.5f * Mathf.Sin((i / (float)segments) * 2.0f * Mathf.PI);
 
-                    Vector3 bottomVertex = new Vector3((float)x, -y, (float)z);
-                    Vector3 topVertex = new Vector3((float)x, y, (float)z);
+                    Vector3 bottomVertex = new Vector3(x, -y, z);
+                    Vector3 topVertex = new Vector3(x, y, z);
                     Vector2 textureCoordinates = new Vector2(x, z);
 
                     positions[1 + i] = bottomVertex;
@@ -417,7 +412,7 @@ namespace SEE.GO
 
             innerCircle.transform.parent = donutChart.transform;
             // the inner circle is put at the bottom of the parent but somewhat above
-            // the circle segements in order to cover their inner part
+            // the circle segments in order to cover their inner part
             innerCircle.transform.localPosition = new Vector3(0.0f, Y_Of_Inner_Circle_Within_Parent, 0.0f);
             innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 0.01f, fractionOfInnerCircle);
 
@@ -425,18 +420,15 @@ namespace SEE.GO
             //innerCircle.transform.localScale = new Vector3(fractionOfInnerCircle, 1.0f, fractionOfInnerCircle);
             Renderer renderer = innerCircle.GetComponent<Renderer>();
             renderer.sharedMaterial = ShadesOfGrey.GetGreyMaterial(innerValue);
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.receiveShadows = false;
         }
 
-        private GameObject CreateCircleSectorAsLine(Vector3 center,
-                                                    float radius,
-                                                    float startRadian,
-                                                    float endRadian,
-                                                    Material material)
+        private static GameObject CreateCircleSectorAsLine(Vector3 center, float radius, float startRadian,
+                                                           float endRadian, Material material)
         {
             Color color = Color.red;
-            float lineWidth = 0.5f;
+            const float lineWidth = 0.5f;
 
             Debug.Assert(startRadian <= endRadian);
             // the resulting game object for which we create the circle sector by a line
@@ -576,7 +568,7 @@ namespace SEE.GO
             mesh.triangles = triangles;
 
             renderer.sharedMaterial = material;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
             mesh.RecalculateNormals();

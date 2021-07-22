@@ -1,5 +1,5 @@
-﻿using SEE.DataModel;
-using System;
+﻿using System;
+using SEE.DataModel;
 using UnityEngine;
 
 namespace SEE.GO
@@ -7,8 +7,9 @@ namespace SEE.GO
     /// <summary>
     /// A factory for planes where blocks can be put on.
     /// </summary>
-    internal class PlaneFactory
+    internal static class PlaneFactory
     {
+        private static readonly int SpecularHighlights = Shader.PropertyToID("_SpecularHighlights");
         private const float planeMeshFactor = 10.0f;
 
         /// <summary>
@@ -21,7 +22,8 @@ namespace SEE.GO
         /// <param name="depth">depth of the plane (z axis)</param>
         /// <param name="height">height of the plane (y axis)</param>
         /// <returns></returns>
-        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector3 centerPosition, Color color, float width, float depth, float height = 1.0f)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector3 centerPosition, Color color, 
+                                          float width, float depth, float height = 1.0f)
         {
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.tag = Tags.Decoration;
@@ -37,7 +39,7 @@ namespace SEE.GO
             // Turn off reflection of plane
             planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
             planeRenderer.sharedMaterial.EnableKeyword("_GLOSSYREFLECTIONS_OFF");
-            planeRenderer.sharedMaterial.SetFloat("_SpecularHighlights", 0.0f);
+            planeRenderer.sharedMaterial.SetFloat(SpecularHighlights, 0.0f);
             // To turn reflection on again, use (_SPECULARHIGHLIGHTS_OFF and _GLOSSYREFLECTIONS_OFF
             // work as toggle, there is no _SPECULARHIGHLIGHTS_ON and _GLOSSYREFLECTIONS_ON):
             //planeRenderer.sharedMaterial.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
@@ -46,7 +48,7 @@ namespace SEE.GO
 
             // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
             // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors for X and Y. 
-            // When we want a plane to have width 12 units, we need to devide the scale for the width 
+            // When we want a plane to have width 12 units, we need to divide the scale for the width 
             // by 1.2.
             Vector3 planeScale = new Vector3(width, height * planeMeshFactor, depth) / planeMeshFactor;
             plane.transform.localScale = planeScale;
@@ -69,7 +71,9 @@ namespace SEE.GO
         ///    defines the lower end along the y axis</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector2 leftFrontCorner, Vector2 rightBackCorner, float groundLevel, Color color, float height = 2 * float.Epsilon)
+        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector2 leftFrontCorner, 
+                                          Vector2 rightBackCorner, float groundLevel, Color color, 
+                                          float height = 2 * float.Epsilon)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
@@ -118,9 +122,7 @@ namespace SEE.GO
         /// <param name="rightBackCorner">new right back corner of the plane</param>
         internal static void AdjustXZ(GameObject plane, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
-            Vector3 centerPosition, planeScale;
-            GetTransform(plane, leftFrontCorner, rightBackCorner, out centerPosition, out planeScale);
-
+            GetTransform(plane, leftFrontCorner, rightBackCorner, out Vector3 centerPosition, out Vector3 planeScale);
             plane.transform.position = centerPosition;
             plane.transform.localScale = planeScale;
         }
@@ -150,7 +152,7 @@ namespace SEE.GO
 
             // A plane is a flat square with edges ten units long oriented in the XZ plane of the local 
             // coordinate space. Thus, the mesh of a plane is 10 times larger than its scale factors for X and Y. 
-            // When we want a plane to have width 12 units, we need to devide the scale for the width 
+            // When we want a plane to have width 12 units, we need to divide the scale for the width 
             // by 1.2.
             scale = new Vector3(width, height * planeMeshFactor, depth) / planeMeshFactor;
         }
