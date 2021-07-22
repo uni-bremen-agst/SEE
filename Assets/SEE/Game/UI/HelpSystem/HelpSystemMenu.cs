@@ -109,15 +109,15 @@ public class HelpSystemMenu : MonoBehaviour
         // Hint: Description is responsible for the title, title is useless
         playerMenuEntries = new List<MenuEntry>
         {        
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "Add Edge", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "Add Node", addNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, "Draw Line", addLine, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "Add Edge", "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "Add Node", "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, "Draw Line", "Assets/SEE/Videos/AddEdge.mp4", addLine, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon,null, placeholder, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon,null,  "Assets/SEE/Videos/AddEdge.mp4",placeholder, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>

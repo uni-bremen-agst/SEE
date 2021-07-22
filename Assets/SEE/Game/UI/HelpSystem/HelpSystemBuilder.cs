@@ -26,11 +26,11 @@ public static class HelpSystemBuilder
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string entryDescription, List<string> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string entryDescription, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
     {
         string titleh = entryDescription;
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry,titleh,entryDescription, keywords); }),
+            action: new UnityAction(() => { Execute(entry,titleh,entryDescription, keywords,videoPath); }),
             title: title,
             description: description,
             entryColor: entryColor,
@@ -91,9 +91,9 @@ public static class HelpSystemBuilder
     /// the title and description of the HelpSystemEntry as selected.
     /// </summary>
     /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
-    /// <param name="titleh">The title of the HelpSystemEntry.</param>
-    /// <param name="desh">The description of the HelpSystemEntry.</param>
-    public static void Execute(HelpSystemEntry helpSystem, string titleh, string desh, List<string> keywords)
+    /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
+    /// <param name="entryDescription">The description of the HelpSystemEntry.</param>
+    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, string entryDescription, List<string> keywords, string videoPath)
     {
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
@@ -103,10 +103,10 @@ public static class HelpSystemBuilder
         {
             throw new System.Exception("No Video-Player found");
         }
-        if (titleh != null)
+        if (entryTitle != null)
         {
-            entry.Manager.titleText = titleh;
-            entry.Manager.descriptionText = desh;
+            entry.Manager.titleText = entryTitle;
+            entry.Manager.descriptionText = entryDescription;
         }
         else
         {
@@ -123,6 +123,7 @@ public static class HelpSystemBuilder
         keywordsAsString += "\n";
         tmp.text = keywordsAsString;
         entry.Manager.UpdateUI();
+        videoPlayer.url = videoPath;
         videoPlayer.Play();
         entry.IsPlaying = true;
         menu.ToggleMenu();
