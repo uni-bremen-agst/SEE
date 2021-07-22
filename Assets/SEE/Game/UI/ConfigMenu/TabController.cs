@@ -43,8 +43,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private int previousPageCount;
         private Transform tabOutlet;
-
-        void Start()
+        private void Start()
         {
             tabOutlet = gameObject.transform.Find("TabOutlet");
             RefreshPages();
@@ -74,10 +73,10 @@ namespace SEE.Game.UI.ConfigMenu
         /// Sets the page that corresponds to the requested index active and all other
         /// pages inactive.
         /// </summary>
-        /// <param name="requestedIndex">The index of the page that should be set active.</param>
+        /// <param name="requestedIndex">The requested index of the page that should be set active.</param>
         public void OnIndexUpdate(int requestedIndex)
         {
-            for (var i = 0; i < Pages.Count; i++)
+            for (int i = 0; i < Pages.Count; i++)
             {
                 Pages[i].SetActive(i == requestedIndex);
             }
