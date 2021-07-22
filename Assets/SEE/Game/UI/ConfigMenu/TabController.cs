@@ -79,14 +79,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             for (var i = 0; i < Pages.Count; i++)
             {
-                if (i == requestedIndex)
-                {
-                    Pages[i].SetActive(true);
-                }
-                else
-                {
-                    Pages[i].SetActive(false);
-                }
+                Pages[i].SetActive(i == requestedIndex);
             }
         }
     }
