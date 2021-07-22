@@ -455,23 +455,45 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetOnChangeHandler(b => city.nodeLayoutSettings.zScoreScale = b)
                 .Build();
 
-            // Show erosions
+            // Show leaf erosions
             SwitchBuilder.Init(controls.transform)
-                .SetLabel("Show erosions")
-                .SetDefaultValue(city.nodeLayoutSettings.showErosions)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.showErosions = b)
+                .SetLabel("Show leaf erosions")
+                .SetDefaultValue(city.nodeLayoutSettings.showLeafErosions)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.showLeafErosions = b)
                 .Build();
 
-            // Max erosion width
+            // Show inner erosions
+            SwitchBuilder.Init(controls.transform)
+                .SetLabel("Show inner erosions")
+                .SetDefaultValue(city.nodeLayoutSettings.showInnerErosions)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.showInnerErosions = b)
+                .Build();
+
+            // loadDashboardMetrics
+            SwitchBuilder.Init(controls.transform)
+                .SetLabel("Load dashboard metrics")
+                .SetDefaultValue(city.nodeLayoutSettings.loadDashboardMetrics)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.loadDashboardMetrics = b)
+                .Build();
+
+            // FIXME: Provide an configuration input for city.nodeLayoutSettings.issuesAddedFromVersion.
+            // Apparently, there is no string input field.
+
+            // overrideMetrics
+            SwitchBuilder.Init(controls.transform)
+                .SetLabel("Dashboard metrics override")
+                .SetDefaultValue(city.nodeLayoutSettings.overrideMetrics)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.overrideMetrics = b)
+                .Build();            
+
+            // Erosion scaling factor
             SliderBuilder.Init(controls.transform)
-                .SetLabel("Max erosion width")
-                .SetMode(SliderMode.Integer)
-                .SetDefaultValue(city.nodeLayoutSettings.maxErosionWidth)
-                .SetOnChangeHandler(f => city.nodeLayoutSettings.maxErosionWidth = f)
+                .SetLabel("Erosion scaling factor")
+                .SetMode(SliderMode.Float)
+                .SetDefaultValue(city.nodeLayoutSettings.erosionScalingFactor)
+                .SetOnChangeHandler(f => city.nodeLayoutSettings.erosionScalingFactor = f)
                 .SetRange((1, 10))
                 .Build();
-
-            // FIXME: The new options introduced for pull request #369 need to be configured, too.
         }
 
         private void SetupEdgesLayoutPage()
