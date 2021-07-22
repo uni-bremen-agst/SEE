@@ -20,6 +20,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using SEE.Controls;
 using SEE.GO;
 using UnityEngine;
 using Valve.VR;
@@ -43,14 +44,11 @@ namespace SEE.Game.UI.ConfigMenu
 
         private GameObject configMenuPrefab;
         private ConfigMenu configMenu;
-        private bool isModPressed;
-
         private void Awake()
         {
             configMenuPrefab = MustLoadPrefabAtPath(ConfigMenuPrefabPath);
             BuildConfigMenu(DefaultInstanceToEdit, false);
         }
-
         private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(configMenuPrefab);
@@ -63,13 +61,11 @@ namespace SEE.Game.UI.ConfigMenu
             configMenu.CurrentlyEditing = instanceToEdit;
             configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
         }
-
         private void ReplaceMenu(EditableInstance newInstance)
         {
             Destroy(configMenu.gameObject);
             BuildConfigMenu(newInstance, true);
         }
-
         private void Update()
         {
             switch (PlayerSettings.GetInputType())
@@ -86,17 +82,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
         private void HandleDesktopUpdate()
         {
-            // FIXME: We should not use Input directly. Instead SEEInput should be used.
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-            {
-                isModPressed = true;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
-            {
-                isModPressed = false;
-            }
-
-            if (isModPressed && Input.GetKeyUp(KeyCode.Escape))
+            if (SEEInput.ToggleConfigMenu())
             {
                 configMenu.Toggle();
             }
