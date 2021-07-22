@@ -54,19 +54,16 @@ namespace SEE.Game.UI.ConfigMenu
 
         private bool currentlyDictating;
         private Color initialColor;
-
-        void Awake()
+        private void Awake()
         {
             MustGetComponent(out button);
             MustGetComponent(out buttonImage);
         }
-
-        void Start()
+        private void Start()
         {
             button.clickEvent.AddListener(ToggleDictation);
             initialColor = buttonImage.color;
         }
-
         private void ToggleDictation()
         {
             if (currentlyDictating)
@@ -78,12 +75,10 @@ namespace SEE.Game.UI.ConfigMenu
                 StartDictation();
             }
         }
-
         private void DictationResultCallBack(string text, ConfidenceLevel confidence)
         {
             OnDictationFinished?.Invoke(text);
         }
-
         private void StartDictation()
         {
             currentlyDictating = true;
@@ -95,7 +90,6 @@ namespace SEE.Game.UI.ConfigMenu
             dictationInput.Register(DictationResultCallBack);
             dictationInput.Start();
         }
-
         private void StopDictation()
         {
             currentlyDictating = false;

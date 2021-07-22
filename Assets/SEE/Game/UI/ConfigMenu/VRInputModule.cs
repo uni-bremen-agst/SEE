@@ -71,12 +71,7 @@ namespace SEE.Game.UI.ConfigMenu
                 ProcessRelease(data);
             }
         }
-
-        public PointerEventData GetData()
-        {
-            return data;
-        }
-
+        public PointerEventData GetData() => data;
         private void ProcessPress(PointerEventData data)
         {
             data.pointerPressRaycast = data.pointerCurrentRaycast;

@@ -46,8 +46,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private readonly List<UpdateNotifier> updateSubscriber = new List<UpdateNotifier>();
         private TabButton activeButton;
-
-        void Start()
+        private void Start()
         {
             TabController = GetComponentInParent<TabController>();
             if (!TabController)
@@ -84,7 +83,7 @@ namespace SEE.Game.UI.ConfigMenu
             button.SetActive();
             ResetButtons();
             TabController.OnIndexUpdate(button.transform.GetSiblingIndex());
-            foreach (var updateNotifier in updateSubscriber)
+            foreach (UpdateNotifier updateNotifier in updateSubscriber)
             {
                 updateNotifier();
             }
@@ -93,7 +92,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// Rests all inactive buttons.
         /// </summary>
-        void ResetButtons()
+        private void ResetButtons()
         {
             foreach (TabButton tabButton in TabButtons)
             {

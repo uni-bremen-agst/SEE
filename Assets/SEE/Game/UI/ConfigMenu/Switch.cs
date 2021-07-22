@@ -51,8 +51,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             set => valueUpdates.Enqueue(value);
         }
-
-        void Start()
+        private void Start()
         {
             MustGetComponentInChild("Label", out label);
             label.text = Label;
@@ -60,15 +59,14 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetComponentInChild("Switch", out switchManager);
             switchManager.OnEvents.AddListener(() => OnValueChange.Invoke(true));
             switchManager.OffEvents.AddListener(() => OnValueChange.Invoke(false));
+            // FIXME: Why is ApplyUpdate() called here? Shouldn't Update() be automatically called after Start()?
             ApplyUpdate();
         }
-
-        void Update()
+        private void Update()
         {
             ApplyUpdate();
         }
-
-        void ApplyUpdate()
+        private void ApplyUpdate()
         {
             if (valueUpdates.Count > 0)
             {

@@ -43,7 +43,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The controller script of the singleton color picker.
         /// </summary>
-        public ColorPickerControl colorPickerControl;
+        public ColorPickerControl ColorPickerControl;
 
         /// <summary>
         /// The label of the component.
@@ -68,18 +68,18 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public Color Value { set => valueUpdates.Enqueue(value); }
 
-        void Update()
+        private void Update()
         {
             HandleQueuedUpdates();
         }
 
-        void Start()
+        private void Start()
         {
             MustGetComponentInChild("Label", out labelText);
             labelText.text = Label;
 
             MustGetComponentInChild("Trigger", out buttonManager);
-            buttonManager.clickEvent.AddListener(() => colorPickerControl.RequestControl(this));
+            buttonManager.clickEvent.AddListener(() => ColorPickerControl.RequestControl(this));
 
             HandleQueuedUpdates();
         }
@@ -91,7 +91,7 @@ namespace SEE.Game.UI.ConfigMenu
                 Color newColor = valueUpdates.Dequeue();
                 LatestSelectedColor = newColor;
                 ReflectColorUpdate();
-                colorPickerControl.AskForColorUpdate(this, newColor);
+                ColorPickerControl.AskForColorUpdate(this, newColor);
             }
         }
 
@@ -145,7 +145,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         public ColorPickerBuilder SetColorPickerControl(ColorPickerControl colorPickerControl)
         {
-            Instance.colorPickerControl = colorPickerControl;
+            Instance.ColorPickerControl = colorPickerControl;
             return this;
         }
     }

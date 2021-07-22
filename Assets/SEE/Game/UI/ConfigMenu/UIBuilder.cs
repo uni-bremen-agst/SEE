@@ -59,8 +59,7 @@ namespace SEE.Game.UI.ConfigMenu
         protected UIBuilder(Transform parent)
         {
             GameObject instanceHost = Object.Instantiate(GetPrefab(), parent);
-            instanceHost.AddComponent<T>();
-            instanceHost.MustGetComponent(out Instance);
+            Instance = instanceHost.AddComponent<T>();
         }
 
         /// <summary>
@@ -77,6 +76,9 @@ namespace SEE.Game.UI.ConfigMenu
         {
             if (prefab == null)
             {
+                // FIXME: This shouldn't use LoadAssetAtPath, because it won't work with the built game
+                // (due to using the UnityEditor namespace). Instead, the PrefabInstantiator utility
+                // class can be used.
                 prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
             }
             return prefab;

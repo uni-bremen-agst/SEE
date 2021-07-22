@@ -40,7 +40,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// same behavior as part of this component.
     ///
     /// To manipulate the RootKind of a DataPath, the prefab of this file picker comes with a select
-    /// box change the root kind. The root kind should also be updated if you pick something via the
+    /// box to change the root kind. The root kind should also be updated if you pick something via the
     /// file picker.
     ///
     /// The actual file picker dialog comes from an external library and uses a global interface to
@@ -67,8 +67,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// The label of this component.
         /// </summary>
         public string Label;
-
-        void Start()
+        private void Start()
         {
             MustGetComponentInChild("DropdownCombo/Dropdown", out dropdown);
             MustGetComponentInChild("DropdownCombo/SelectableInput/Input", out customInput);
@@ -183,28 +182,23 @@ namespace SEE.Game.UI.ConfigMenu
     public class FilePickerBuilder : UIBuilder<FilePicker>
     {
         protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - File Picker.prefab";
-
         private FilePickerBuilder(Transform parent) : base(parent)
         {
         }
-
         public static FilePickerBuilder Init(Transform parent)
         {
             return new FilePickerBuilder(parent);
         }
-
         public FilePickerBuilder SetLabel(string label)
         {
             Instance.Label = label;
             return this;
         }
-
         public FilePickerBuilder SetPathInstance(DataPath dataPath)
         {
             Instance.DataPathInstance = dataPath;
             return this;
         }
-
         public FilePickerBuilder SetPickMode(FileBrowser.PickMode pickMode)
         {
             Instance.PickMode = pickMode;

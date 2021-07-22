@@ -69,8 +69,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             set => valueUpdates.Enqueue(value);
         }
-
-        void Start()
+        private void Start()
         {
             MustGetComponentInChild("Label", out label);
             label.text = Label;
@@ -84,8 +83,7 @@ namespace SEE.Game.UI.ConfigMenu
             sliderManager.usePercent = false;
             sliderManager.useRoundValue = SliderMode == SliderMode.Integer;
         }
-
-        void Update()
+        private void Update()
         {
             if (valueUpdates.Count > 0)
             {

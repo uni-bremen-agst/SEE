@@ -79,10 +79,10 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void Reset()
         {
-                colorPickerHost.onValueChanged.RemoveAllListeners();
-                colorPickerHost.AssignColor(Color.white);
-                gameObject.SetActive(false);
-                registeredPicker = null;
+            colorPickerHost.onValueChanged.RemoveAllListeners();
+            colorPickerHost.AssignColor(Color.white);
+            gameObject.SetActive(false);
+            registeredPicker = null;
         }
     }
 }
