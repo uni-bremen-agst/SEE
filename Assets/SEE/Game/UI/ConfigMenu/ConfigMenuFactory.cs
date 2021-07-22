@@ -36,7 +36,7 @@ namespace SEE.Game.UI.ConfigMenu
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
         private static readonly EditableInstance DefaultInstanceToEdit = EditableInstance.Implementation;
-        private static readonly string ConfigMenuPrefabPath = "Assets/Prefabs/UI/ConfigMenu.prefab";
+        private const string ConfigMenuPrefabPath = "Assets/Prefabs/UI/ConfigMenu.prefab";
 
         private readonly SteamVR_Action_Boolean openAction = SteamVR_Actions._default.OpenSettingsMenu;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;

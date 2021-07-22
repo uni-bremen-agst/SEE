@@ -56,8 +56,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// The color when the button gets hovered.
         /// </summary>
         public Color HoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
-
-        void Start()
+        private void Start()
         {
             group = GetComponentInParent<TabGroup>();
             if (!group)
@@ -83,7 +82,6 @@ namespace SEE.Game.UI.ConfigMenu
                 SetActive();
             }
         }
-
         public void ResetStyles()
         {
             uiGradient.enabled = false;
@@ -94,7 +92,6 @@ namespace SEE.Game.UI.ConfigMenu
             buttonColors.normalColor = normalColor;
             button.colors = buttonColors;
         }
-
         public void SetActive()
         {
             uiGradient.enabled = true;

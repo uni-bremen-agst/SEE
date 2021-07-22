@@ -135,8 +135,12 @@ namespace SEE.Game.UI.ConfigMenu
         private void SetupCity(EditableInstance instanceToEdit)
         {
             // FIXME: Find should be avoided.
-            GameObject.Find(instanceToEdit.GameObjectName)?.MustGetComponent(out city);
-            if (!city)
+            GameObject instanceGameObject = GameObject.Find(instanceToEdit.GameObjectName);
+            if (instanceGameObject != null)
+            {
+                instanceGameObject.MustGetComponent(out city);
+            }
+            else
             {
                 Debug.LogError("Did not find a city instance.\n");
             }
@@ -173,11 +177,9 @@ namespace SEE.Game.UI.ConfigMenu
                 Camera pointerCamera = pointer.GetComponent<Camera>();
 
                 // Replace the default input system with our VR input system.
-                GameObject vrEventSystem =
-                    GameObject.FindWithTag("VREventSystem");
-                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
-                vrEventSystem.AddComponent<VRInputModule>();
-                VRInputModule vrInputModule = vrEventSystem.GetComponent<VRInputModule>();
+                GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
+                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;                
+                VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
 
@@ -192,6 +194,10 @@ namespace SEE.Game.UI.ConfigMenu
                 colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
 
                 // Place the menu as a whole in front of the 'table'.
+                // FIXME: Do not use absolute positioning. Instead, it may better to use
+                // positioning relative to the table or to the player, since the absolute
+                // position of the table may change in the future (or on other platforms,
+                // like it does on the HoloLens).
                 gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
             }
         }
@@ -202,7 +208,6 @@ namespace SEE.Game.UI.ConfigMenu
             pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
             actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
         }
-
         private void SetupActions()
         {
             actions.SetActive(false);
@@ -224,8 +229,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void CreateActionButton(string buttonText, UnityAction onClick)
         {
-            GameObject deleteGraphButtonGo =
-                Instantiate(actionButtonPrefab, actions.transform, false);
+            GameObject deleteGraphButtonGo = Instantiate(actionButtonPrefab, actions.transform, false);
             deleteGraphButtonGo.MustGetComponent(out ButtonManagerBasic deleteGraphButton);
             deleteGraphButton.buttonText = buttonText;
             deleteGraphButton.clickEvent.AddListener(onClick);
@@ -331,7 +335,6 @@ namespace SEE.Game.UI.ConfigMenu
             // be dropped soon. So we will not invest any effort in this for the time being.
             InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
             {
-
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
@@ -467,6 +470,8 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetOnChangeHandler(f => city.nodeLayoutSettings.maxErosionWidth = f)
                 .SetRange((1, 10))
                 .Build();
+
+            // FIXME: The new options introduced for pull request #369 need to be configured, too.
         }
 
         private void SetupEdgesLayoutPage()
