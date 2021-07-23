@@ -29,16 +29,6 @@ public class HelpSystemMenu : MonoBehaviour
     /// </summary>
     public static bool IsEntryOpened { get; set; } = false;
 
-    /// <summary>
-    /// The path to the default-icon for an RefEntry in the nested menu.
-    /// </summary>
-    private const string RefIcon = "Materials/ModernUIPack/Plus";
-
-    /// <summary>
-    /// The path to the default-icon for an HelpSystemEntry in the nested menu.
-    /// </summary>
-    private const string EntryIcon = "Materials/ModernUIPack/Eye";
-
     // Start is called before the first frame update
     void Start()
     {
