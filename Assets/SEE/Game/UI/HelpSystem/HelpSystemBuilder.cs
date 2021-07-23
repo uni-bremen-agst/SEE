@@ -15,24 +15,33 @@ public static class HelpSystemBuilder
     public const string HelpSystemGO = "HelpSystem";
 
     /// <summary>
+    /// The path to the default-icon for an HelpSystemEntry in the nested menu.
+    /// </summary>
+    private const string EntryIcon = "Materials/ModernUIPack/Eye";
+
+    /// <summary>
+    /// The path to the default-icon for an RefEntry in the nested menu.
+    /// </summary>
+    private const string RefIcon = "Materials/ModernUIPack/Plus";
+
+    /// <summary>
     /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
     /// As a difference to a normal HelpSystemMenu-Entry, onclick, there will be started an HelpSystemEntry which explains the specific use-Case.
     /// </summary>
     /// <param name="title">The title of the HelpSystemMenu-Entry.</param>
     /// <param name="description">The description of the HelpSystemMenu-Entry, displayed as a tooltip.</param>
     /// <param name="entryColor">The color of the HelpSystemMenu-Entry.</param>
-    /// <param name="iconPath">The path of the icon of the HelpSystemMenu-Entry.</param>
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
             action: new UnityAction(() => { Execute(entry, title, keywords, videoPath); }),
             title: title,
             description: description,
             entryColor: entryColor,
-            icon: Resources.Load<Sprite>(iconPath));
+            icon: Resources.Load<Sprite>(EntryIcon));
 
         return helpSystemEntry;
     }
@@ -48,14 +57,14 @@ public static class HelpSystemBuilder
     /// <param name="entryColor">The color of the Ref-Entry.</param>
     /// <param name="iconPath">The path of the icon of the RefEntry.</param>
     /// <returns>A new NestedMenuEntry.</returns>
-    public static NestedMenuEntry CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor, string iconPath)
+    public static NestedMenuEntry CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor)
     {
         NestedMenuEntry refEntry = new NestedMenuEntry(
             innerEntries: innerEntries,
             title: title,
             description: description,
             entryColor: entryColor,
-            icon: Resources.Load<Sprite>(iconPath));
+            icon: Resources.Load<Sprite>(RefIcon));
 
         return refEntry;
     }
