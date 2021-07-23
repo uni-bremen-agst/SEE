@@ -69,7 +69,7 @@ public class HelpSystemMenu : MonoBehaviour
         // That means, the mainMenu will be defined at the end and the lowest entry-list first.
 
         PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
-      
+
         List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
         List<MenuEntry> architectureEntries = new List<MenuEntry>();
         List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
@@ -108,16 +108,16 @@ public class HelpSystemMenu : MonoBehaviour
 
         // Hint: Description is responsible for the title, title is useless
         playerMenuEntries = new List<MenuEntry>
-        {        
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "Add Edge", "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "Add Node", "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, "Draw Line", "Assets/SEE/Videos/AddEdge.mp4", addLine, entry)
+        {
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.green, EntryIcon, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.green, EntryIcon, "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.green, EntryIcon, "Assets/SEE/Videos/AddEdge.mp4", addLine, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.green, RefIcon),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon,null,  "Assets/SEE/Videos/AddEdge.mp4",placeholder, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.green, EntryIcon, "Assets/SEE/Videos/AddEdge.mp4",placeholder, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>

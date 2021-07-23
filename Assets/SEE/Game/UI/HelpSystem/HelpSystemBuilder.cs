@@ -22,15 +22,13 @@ public static class HelpSystemBuilder
     /// <param name="description">The description of the HelpSystemMenu-Entry, displayed as a tooltip.</param>
     /// <param name="entryColor">The color of the HelpSystemMenu-Entry.</param>
     /// <param name="iconPath">The path of the icon of the HelpSystemMenu-Entry.</param>
-    /// <param name="entryDescription">The description of the HelpSystemEntry which will be openend onclick.</param>
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string entryDescription, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string iconPath, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
     {
-        string titleh = entryDescription;
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry,titleh,entryDescription, keywords,videoPath); }),
+            action: new UnityAction(() => { Execute(entry, title, keywords, videoPath); }),
             title: title,
             description: description,
             entryColor: entryColor,
@@ -78,7 +76,7 @@ public static class HelpSystemBuilder
         mainMenu.Title = title;
         mainMenu.Description = description;
         mainMenu.Icon = Resources.Load<Sprite>(icon);
-        foreach(MenuEntry entry in mainMenuEntries)
+        foreach (MenuEntry entry in mainMenuEntries)
         {
             mainMenu.AddEntry(entry);
         }
@@ -93,20 +91,20 @@ public static class HelpSystemBuilder
     /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
     /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
     /// <param name="entryDescription">The description of the HelpSystemEntry.</param>
-    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, string entryDescription, List<string> keywords, string videoPath)
+    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, List<string> keywords, string videoPath)
     {
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
         GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
-        if(videoPlayer == null)
+        if (videoPlayer == null)
         {
             throw new System.Exception("No Video-Player found");
         }
         if (entryTitle != null)
         {
             entry.Manager.titleText = entryTitle;
-            entry.Manager.descriptionText = entryDescription;
+            entry.Manager.descriptionText = entryTitle;
         }
         else
         {
@@ -116,7 +114,7 @@ public static class HelpSystemBuilder
         GameObject keywordDisplay = GameObject.Find("Code");
         TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
         string keywordsAsString = "";
-        foreach(string keyword in keywords)
+        foreach (string keyword in keywords)
         {
             keywordsAsString += "- " + keyword + "\n";
         }
