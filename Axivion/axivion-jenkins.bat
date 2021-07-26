@@ -42,8 +42,8 @@ REM   net (start|stop) "axivion_dashboard_service"
 REM or use the Windows Services Console (services.msc).
 
 REM The Visual Studio .csproj files need to be created before we can start the build.
-"C:\Program Files\Unity\Hub\Editor\2020.3.11f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
-"C:\Program Files\Unity\Hub\Editor\2020.3.11f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+"C:\Program Files\Unity\Hub\Editor\2020.3.14f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
+"C:\Program Files\Unity\Hub\Editor\2020.3.14f1\Editor\Unity.exe" -batchmode -nographics -logFile - -executeMethod UnityEditor.SyncVS.SyncSolution -projectPath . -quit
 
 REM Count the number of command-line parameters
 setlocal enabledelayedexpansion
