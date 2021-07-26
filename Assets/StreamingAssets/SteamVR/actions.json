@@ -85,6 +85,11 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/OpenSettingsMenu",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
