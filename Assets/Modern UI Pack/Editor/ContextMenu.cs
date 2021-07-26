@@ -39,6 +39,8 @@ namespace Michsky.UI.ModernUIPack
                     clone.transform.SetParent(canvas.transform, false);
                     clone.name = clone.name.Replace("(Clone)", "").Trim();
                 }
+
+                Selection.activeObject = clone;
             }
 
             catch
@@ -84,6 +86,8 @@ namespace Michsky.UI.ModernUIPack
                     clone.transform.SetParent(canvas.transform, false);
                     clone.name = "Button";
                 }
+
+                Selection.activeObject = clone;
             }
 
             catch
@@ -105,6 +109,7 @@ namespace Michsky.UI.ModernUIPack
                 GameObject clone = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/" + EditorPrefs.GetString("UIManager.RootFolder") + "Other/Canvas" + ".prefab", typeof(GameObject)), Vector3.zero, Quaternion.identity) as GameObject;
                 Undo.RegisterCreatedObjectUndo(clone, "Created an object");
                 clone.name = clone.name.Replace("(Clone)", "").Trim();
+                Selection.activeObject = clone;
             }
 
             catch

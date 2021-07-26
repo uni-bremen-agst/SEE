@@ -68,17 +68,19 @@ namespace Michsky.UI.ModernUIPack
             graphicRaycaster = GetComponentInParent<GraphicRaycaster>();
 
             if (graphicRaycaster == null)
-            {
-                Debug.LogWarning("Could not find GraphicRaycaster component in parent of this GameObject: " + name, this);
-                Destroy(gameObject);
-            }
+                Debug.LogWarning("<b>[Radial Slider]</b> Could not find GraphicRaycaster component in parent.", this);
         }
 
         private void Start()
         {
             valueDisplayPrecision = Mathf.Pow(10, decimals);
-            LoadState();
-            SliderAngle = currentValue * 3.6f;
+
+            if (rememberValue == true)
+                LoadState();
+            else
+                SliderAngle = currentValue * 3.6f;
+
+            onValueChanged.Invoke(SliderValueRaw);
             UpdateUI();
         }
 
@@ -119,9 +121,6 @@ namespace Michsky.UI.ModernUIPack
 
         public void LoadState()
         {
-            if (!rememberValue)
-                return;
-
             currentAngle = PlayerPrefs.GetFloat(sliderTag + PREFS_UI_SAVE_NAME);
         }
 
