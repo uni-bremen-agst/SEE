@@ -52,6 +52,9 @@ Properties {
 	_ColorMask			("Color Mask", Float) = 15
 	
 	_Cutoff             ("Cutoff", Range(0, 1)) = 0.5
+
+	_PortalMin          ("Portal Minimum", vector) = (-10, -10, 0, 0)
+	_PortalMax          ("Portal Maximum", vector) = (10, 10, 0, 0)
 }
 
 SubShader {
@@ -265,5 +268,5 @@ SubShader {
 	}
 }
 
-CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
+//CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
 }
