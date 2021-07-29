@@ -9,6 +9,7 @@ using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
+using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -1029,6 +1030,8 @@ namespace SEE.Game
             // Add software erosion decorators for all nodes if requested.
             if (settings.nodeLayoutSettings.showInnerErosions)
             {
+                //FIXME: This should instead check whether each node has non-aggregated metrics available,
+                // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
                 ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
                                                                  scaler, settings.nodeLayoutSettings.erosionScalingFactor);
                 issueDecorator.Add(innerNodes);
@@ -1036,12 +1039,14 @@ namespace SEE.Game
             if (settings.nodeLayoutSettings.showLeafErosions)
             {
                 ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory,
-                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor);
+                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor*5);
                 issueDecorator.Add(leafNodes);
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon || nodeLayout == NodeLayoutKind.EvoStreets)
+            if (nodeLayout == NodeLayoutKind.Balloon 
+                || nodeLayout == NodeLayoutKind.EvoStreets
+                || nodeLayout == NodeLayoutKind.CirclePacking)
             {
                 AddLabels(innerNodes, innerNodeFactory);
             }
@@ -1157,14 +1162,18 @@ namespace SEE.Game
         /// <returns>the game objects created for the text labels</returns>
         private static void AddLabels(IEnumerable<GameObject> gameNodes, NodeFactory innerNodeFactory)
         {
+            GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
+                Node theNode = node.GetComponent<NodeRef>().Value;
                 Vector3 size = innerNodeFactory.GetSize(node);
                 float length = Mathf.Min(size.x, size.z);
                 // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().Value.SourceName,
-                                                      node.transform.position, length * 0.3f);
+                GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
+                                                               node.transform.position, length * 0.3f);
                 text.transform.SetParent(node.transform);
+                codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                Portal.SetPortal(codeCity, text);
             }
         }
 
