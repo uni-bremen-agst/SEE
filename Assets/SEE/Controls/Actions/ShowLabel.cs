@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -203,8 +204,8 @@ namespace SEE.Controls.Actions
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.
-            return node.IsLeaf() && city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings.Show
-                || !node.IsLeaf() && city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings.Show;
+            return node.IsLeaf() && city.leafNodeAttributesPerKind[0].labelSettings.Show
+                || node.IsInnerNode() && city.innerNodeAttributesPerKind[0].labelSettings.Show;
         }
 
         /// <summary>
@@ -269,7 +270,8 @@ namespace SEE.Controls.Actions
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             edge.transform.SetParent(nodeLabel.transform);
-            Portal.SetInfinitePortal(nodeLabel);
+            //FIXME: Normal text labels also get an infinite portal due to shared material, so this is commented out for now
+            //Portal.SetInfinitePortal(nodeLabel);
 
             AnimateLabel(city, node);
         }
