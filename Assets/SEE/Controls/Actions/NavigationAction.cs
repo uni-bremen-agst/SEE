@@ -58,8 +58,7 @@ namespace SEE.Controls.Actions
             /// <returns>Whether the command has finished zooming.</returns>
             internal bool IsFinished()
             {
-                bool result = Time.realtimeSinceStartup - startTime >= duration;
-                return result;
+                return Time.realtimeSinceStartup - startTime >= duration;
             }
 
             /// <summary>
@@ -72,8 +71,7 @@ namespace SEE.Controls.Actions
             {
                 float x = Mathf.Min((Time.realtimeSinceStartup - startTime) / duration, 1.0f);
                 float t = 0.5f - 0.5f * Mathf.Cos(x * Mathf.PI);
-                float result = t * TargetZoomSteps;
-                return result;
+                return t * TargetZoomSteps;
             }
         }
 
