@@ -116,6 +116,9 @@ namespace SEE.Game
                 {
                     SetPortal(leftFront, rightBack, material);
                 }
+            } else
+            {
+                Debug.LogError($"No Renderer found for '{go.name}'!");
             }
         }
 

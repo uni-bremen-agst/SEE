@@ -64,7 +64,8 @@ namespace SEE.Game
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original LoadedGraph
-        /// if all node types are relevant. It is null if no graph has been loaded yet.
+        /// if all node types are relevant. It is null if no graph has been loaded yet
+        /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
         public Graph VisualizedSubGraph
         {
@@ -83,67 +84,25 @@ namespace SEE.Game
             }
         }
 
-        private static readonly Dictionary<string, SEECity> dict = new Dictionary<string, SEECity>();
-        public static SEECity GetByGraph(Graph graph)
-        {
-            SEECity result = null;
-
-            if (graph.Path != null)
-            {
-                if (!dict.TryGetValue(graph.Path, out result))
-                {
-                    if (graph.Name != null)
-                    {
-                        dict.TryGetValue(graph.Name, out result);
-                    }
-                }
-            }
-
-            return result;
-        }
-
         /// <summary>
-        /// Loads the graph from GXLPath() and sets all NodeRef components to the
-        /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
-        /// the graph to make it available at runtime.
+        /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
+        /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
+        /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
+        /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
+        /// nodes saved in the underlying GXL file.
         /// </summary>
         protected void Awake()
         {
-            string filename = GXLPath.Path;
+            LoadData();
+            loadedGraph = VisualizedSubGraph;
             if (loadedGraph != null)
             {
-                Debug.Log("SEECity.Awake: graph is already loaded.\n");
-            }
-            else if (!string.IsNullOrEmpty(filename))
-            {
-                loadedGraph = LoadGraph(filename);
-                if (loadedGraph != null)
-                {
-                    LoadMetrics();
-                    SetNodeEdgeRefs(loadedGraph, gameObject);
-                }
-                else
-                {
-                    Debug.LogError($"SEECity.Awake: Could not load GXL file {filename} of city {name}.\n");
-                }
+                SetNodeEdgeRefs(loadedGraph, gameObject);
             }
             else
             {
-                Debug.LogError($"SEECity.Awake: GXL file of city {name} is undefined.\n");
+                Debug.LogError($"SEECity.Awake: Could not load GXL file {GXLPath.Path} of city {name}.\n");
             }
-
-            if (loadedGraph != null)
-            {
-                if (dict.ContainsKey(filename))
-                {
-                    Debug.Log($"SEECity.Awake: Graph contained in {filename} of city {name} seems to exist twice.\n");
-                }
-                else
-                {
-                    dict.Add(filename, this);
-                }
-            }
-
             RemoveTransparency();
         }
 
@@ -287,9 +246,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Loads the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath(). Afterwards, DrawGraph() can be used
-        /// to actually render the graph data.
+        /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
+        /// everything will be reset by calling <see cref="Reset"/>. 
+        /// Second, the graph data from the GXL file with GXLPath() and the metrics
+        /// from the CSV file with CSVPath() are loaded. The loaded graph is available
+        /// in <see cref="LoadedGraph"/> afterwards.
+        /// 
+        /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         public virtual void LoadData()
         {

@@ -29,7 +29,7 @@ namespace SEE.DataModel.DG.IO
         public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom);
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -56,26 +56,33 @@ namespace SEE.DataModel.DG.IO
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
                     int? line = node.SourceLine();
+                    IEnumerable<Issue> relevantIssues;
                     if (!line.HasValue)
                     {
-                        continue;
+                        // Relevant issues are those which are contained in this file, so all issues
+                        relevantIssues = issueList;
                     }
-                    int? length = node.SourceLength();
-                    HashSet<int> lineRange = Enumerable.Range(line.Value, length ?? 1).ToHashSet();
-                    // Relevant issues are those which are entirely contained by the source region of this node
-                    IEnumerable<Issue> relevantIssues = issueList.Where(
-                        x => x.Entities.Any(e => lineRange.Contains(e.line) && 
-                                                 (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                    else
+                    {
+                        int? length = node.SourceLength();
+                        HashSet<int> lineRange = Enumerable.Range(line.Value, length ?? 1).ToHashSet();
+                        // Relevant issues are those which are entirely contained by the source region of this node
+                        relevantIssues = issueList.Where(
+                            x => x.Entities.Any(e => lineRange.Contains(e.line) &&
+                                                     (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                    }
+
                     foreach (Issue issue in relevantIssues)
                     {
-                        if (node.TryGetFloat(issue.AttributeName.Name(), out float value)) {
+                        if (node.TryGetFloat(issue.AttributeName.Name(), out float value)) 
+                        {
                             if (!encounteredIssueNodes.Contains(node))
                             {
                                 // If the value already exists and it was set from somewhere else,
                                 // we override it if the caller wishes to do so.
                                 if (@override)
                                 {
-                                    node.SetFloat(issue.AttributeName.Name(), 0);
+                                    node.SetFloat(issue.AttributeName.Name(), 1);
                                     encounteredIssueNodes.Add(node);
                                 }
                             }
@@ -87,7 +94,7 @@ namespace SEE.DataModel.DG.IO
                         }
                         else 
                         {
-                            node.SetFloat(issue.AttributeName.Name(), 0);
+                            node.SetFloat(issue.AttributeName.Name(), 1);
                             encounteredIssueNodes.Add(node);
                         }
                     }
@@ -101,6 +108,8 @@ namespace SEE.DataModel.DG.IO
                 NumericAttributeNames.Metric, NumericAttributeNames.Style, 
                 NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
             };
+            //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
+            // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)
             MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
 
             await UniTask.SwitchToMainThread();
@@ -108,10 +117,10 @@ namespace SEE.DataModel.DG.IO
                       + "using the Axivion dashboard.\n");
 
             
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, state: Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, state: Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
@@ -155,7 +164,7 @@ namespace SEE.DataModel.DG.IO
         {
             if (!File.Exists(filename))
             {
-                Debug.LogWarningFormat("Metric file {0} does not exist. Metrics will not be available.\n", filename);
+                Debug.LogWarningFormat("Metric file {0} does not exist. CSV Metrics will not be available.\n", filename);
                 return 0;
             }
             int numberOfErrors = 0;
