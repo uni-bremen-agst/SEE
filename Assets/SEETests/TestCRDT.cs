@@ -58,28 +58,40 @@ namespace SEETests
 
 
         [Test]
-        public void testKommutativ()
+        public void testRemoteAdd()
         {
             CRDT crdt1 = new CRDT(1);
-            CRDT cradt2 = new CRDT(2);
+            CRDT crdt2 = new CRDT(2);
+
+            crdt1.addChar('H', 0);
+            crdt2.RemoteAddChar('H', crdt1.getCRDT()[0].GetIdentifier(), null);
+            
+            crdt1.addChar('A', 1);
+            crdt2.RemoteAddChar('A', crdt1.getCRDT()[1].GetIdentifier(), crdt1.getCRDT()[0].GetIdentifier());
+
+            crdt1.addChar('L', 2);
+            crdt2.RemoteAddChar('L', crdt1.getCRDT()[2].GetIdentifier(), crdt1.getCRDT()[1].GetIdentifier());
+
+            crdt1.addChar('O', 3);
+            crdt2.RemoteAddChar('O', crdt1.getCRDT()[3].GetIdentifier(), crdt1.getCRDT()[2].GetIdentifier());
+
+            //Simulate sync problems
+            crdt2.addChar('l', 2);
+
+            crdt1.addChar('!', 4);
+            crdt2.RemoteAddChar('!', crdt1.getCRDT()[4].GetIdentifier(), crdt1.getCRDT()[3].GetIdentifier());
+
+            crdt1.RemoteAddChar('l', crdt2.getCRDT()[2].GetIdentifier(), crdt2.getCRDT()[1].GetIdentifier());
+            //End sync problem
+
+            print(crdt1);
+            print(crdt2);
         }
 
         private void print(CRDT crdt)
         {
-            string ret = "";
-            if(crdt.getCRDT() == null)
-            {
-                Debug.LogWarning("CRDT EMPTY");
-                return;
-            }
-            foreach(CharObj elm in crdt.getCRDT())
-            {
-                if(elm != null)
-                {
-                    ret += elm.ToString();
-                }
-            }
-            Debug.LogWarning("CRDT: " + ret);
+            Debug.LogWarning("CRDT: " + crdt.ToString());
+            Debug.LogWarning(crdt.PrintString());
         }
         
     }
