@@ -53,6 +53,11 @@ public class CRDT
             this.value = value;
             this.position = position;
         }
+
+        public char GetValue()
+        {
+            return value;
+        }
         public Identifier[] GetIdentifier()
         {
             return position;
@@ -83,15 +88,39 @@ public class CRDT
 
     private List<CharObj> crdt = new List<CharObj>();
 
-    public List<CharObj>getCRDT()
+    public List<CharObj> getCRDT()
     {
         return crdt;
     }
-
-    public void RemoteAddChar(char c, Identifier[] position)
+    public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
     {
+        if (prePosition != null)
+        {
+            (int, CharObj) found = Find(prePosition);
+            if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
+            {
+                crdt.Insert(found.Item1 + 1, new CharObj(c, position));
+            }
+            else
+            {
+                Debug.LogError("RemoteAddChar fehlgeschlagen! ");
+            }
+        }
+        else
+        {
+            int idx = FindNextFittingIndex(position, 0);
+            if(idx < crdt.Count())
+            {
+                crdt.Insert(idx, new CharObj(c, position));
+            }
+            else
+            {
+                crdt.Add(new CharObj(c, position));
+            }
 
+        }
     }
+
 
     /// <summary>
     /// Adds a new Char to the CRDT structure
@@ -240,7 +269,6 @@ public class CRDT
                 digitP2[i] = pos2[i].GetDigit();
             }
             int[] delta = CalcDelta(digitP1, digitP2);
-            Debug.LogWarning(digitP1[0] + " " + delta[delta.Length - 1] + " incR " + Increment(digitP1, delta)[0]);
             return ToIdentifierList(Increment(digitP1, delta), pos1, pos2, site);
         }
         else if (headP1.GetSite() < headP2.GetSite())
@@ -266,18 +294,40 @@ public class CRDT
     /// </summary>
     /// <param name="position">The position of the CharObj to find</param>
     /// <returns>A tuple of the index and the CharObj, Returns (-1,null) if the position is not in the CRDT</returns>
-    public (int,CharObj) Find(Identifier[] position)
+    public (int, CharObj) Find(Identifier[] position)
     {
         int index = 0;
-       foreach(CharObj elm in crdt)
+        foreach (CharObj elm in crdt)
         {
-            if(elm.GetIdentifier() == position)
+            if (elm.GetIdentifier() == position)
             {
                 return (index, elm);
             }
             index++;
         }
         return (-1, null);
+    }
+
+    /// <summary>
+    /// Finds the next fitting index for a position by recursive testing if the startIdx fitts.
+    /// </summary>
+    /// <param name="position">The position that need an idx</param>
+    /// <param name="startIdx">The idx wich should be tested first</param>
+    /// <returns>The index at which the position should be placed. WARNING CAN BE GREATER THEN THE SIZE OF THE CRDT!</returns>
+    private int FindNextFittingIndex(Identifier[] position, int startIdx)
+    {
+        if (startIdx < crdt.Count()-1  && ComparePosition(crdt[startIdx].GetIdentifier(), position) < 0)
+        {
+            return FindNextFittingIndex(position, startIdx + 1);
+        }
+        else if (startIdx >= crdt.Count)
+        {
+            return startIdx + 1;
+        }
+        else
+        {
+            return startIdx;
+        }
     }
 
     /// <summary>
@@ -317,7 +367,6 @@ public class CRDT
         }
 
         int[] incValue = Add(value, inc);
-        foreach (int elm in incValue) Debug.LogWarning("INCR " + elm);
 
         return incValue[incValue.Length - 1] == 0 ? Add(incValue, inc) : incValue;
     }
@@ -409,5 +458,41 @@ public class CRDT
             }
         }
         return delta;
+    }
+
+    /// <summary>
+    /// Converts the CRDT values to a String 
+    /// </summary>
+    /// <returns>The readable String of the values in the CRDT</returns>
+    public string PrintString()
+    {
+        string ret = "";
+        foreach(CharObj elm in crdt)
+        {
+            ret += elm.GetValue();
+        }
+        return ret;
+    }
+
+
+    /// <summary>
+    /// Converts the CRDT to a String
+    /// </summary>
+    /// <returns>A string representing the CRDT</returns>
+    public override string ToString()
+    {
+        string ret = "";
+        if (crdt == null)
+        {
+            return "CRDT EMPTY!";
+        }
+        foreach (CharObj elm in crdt)
+        {
+            if (elm != null)
+            {
+                ret += elm.ToString();
+            }
+        }
+        return ret;
     }
 }
