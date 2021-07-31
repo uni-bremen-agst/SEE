@@ -1,6 +1,4 @@
-using OdinSerializer.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -49,8 +47,8 @@ public class CRDT
     public class CharObj
     {
         private Identifier[] position;
-        private string value;
-        public CharObj(string value, Identifier[] position)
+        private char value;
+        public CharObj(char value, Identifier[] position)
         {
             this.value = value;
             this.position = position;
@@ -83,37 +81,50 @@ public class CRDT
 
     }
 
-    public List<CharObj> text = new List<CharObj>();
+    private List<CharObj> crdt = new List<CharObj>();
 
+    public List<CharObj>getCRDT()
+    {
+        return crdt;
+    }
 
+    public void RemoteAddChar(char c, Identifier[] position)
+    {
 
+    }
+
+    /// <summary>
+    /// Adds a new Char to the CRDT structure
+    /// </summary>
+    /// <param name="c">The Char to add</param>
+    /// <param name="pos">The position in the local string</param>
     public void addChar(char c, int pos)
     {
         Identifier[] position;
-        if (pos - 1 >= 0 && text.Count > pos)
+        if (pos - 1 >= 0 && crdt.Count > pos)
         {
-            position = GeneratePositionBetween(text[pos - 1].GetIdentifier(), text[pos].GetIdentifier(), siteID);
+            position = GeneratePositionBetween(crdt[pos - 1].GetIdentifier(), crdt[pos].GetIdentifier(), siteID);
         }
-        else if (pos - 1 >= 0 && text.Count > pos - 1)
+        else if (pos - 1 >= 0 && crdt.Count > pos - 1)
         {
-            position = GeneratePositionBetween(text[pos - 1].GetIdentifier(), null, siteID);
+            position = GeneratePositionBetween(crdt[pos - 1].GetIdentifier(), null, siteID);
         }
-        else if (pos - 1 < 0 && text.Count > pos)
+        else if (pos - 1 < 0 && crdt.Count > pos)
         {
-            position = GeneratePositionBetween(null, text[pos].GetIdentifier(), siteID);
+            position = GeneratePositionBetween(null, crdt[pos].GetIdentifier(), siteID);
         }
         else
         {
             position = GeneratePositionBetween(null, null, siteID);
         }
 
-        if (text.Count > pos)
+        if (crdt.Count > pos)
         {
-            text.Insert(pos, new CharObj(c.ToString(), position));
+            crdt.Insert(pos, new CharObj(c, position));
         }
         else
         {
-            text.Add(new CharObj(c.ToString(), position));
+            crdt.Add(new CharObj(c, position));
         }
     }
 
@@ -180,6 +191,13 @@ public class CRDT
         }
     }
 
+    /// <summary>
+    /// Generates a new position between two old positions, or a complete new one if no position given or only one.
+    /// </summary>
+    /// <param name="pos1">Before position</param>
+    /// <param name="pos2">After position</param>
+    /// <param name="site">The site ID of the requester</param>
+    /// <returns>A new position</returns>
     public Identifier[] GeneratePositionBetween(Identifier[] pos1, Identifier[] pos2, int site)
     {
         Identifier headP1, headP2;
@@ -242,6 +260,31 @@ public class CRDT
         }
     }
 
+
+    /// <summary>
+    /// Finds a CharObj in the CRDT by the position
+    /// </summary>
+    /// <param name="position">The position of the CharObj to find</param>
+    /// <returns>A tuple of the index and the CharObj, Returns (-1,null) if the position is not in the CRDT</returns>
+    public (int,CharObj) Find(Identifier[] position)
+    {
+        int index = 0;
+       foreach(CharObj elm in crdt)
+        {
+            if(elm.GetIdentifier() == position)
+            {
+                return (index, elm);
+            }
+            index++;
+        }
+        return (-1, null);
+    }
+
+    /// <summary>
+    /// Converts a IEnumerable to an Identifier[]
+    /// </summary>
+    /// <param name="ienum">The enum that should be converted</param>
+    /// <returns>The Identifier[]</returns>
     private Identifier[] FromIEnumToIdentifier(IEnumerable<Identifier> ienum)
     {
         Identifier[] ret = new Identifier[ienum.Count()];
