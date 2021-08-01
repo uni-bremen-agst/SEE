@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using SEE.Controls;
+using SEE.Game.UI.HelpSystem;
 using SEE.Game.UI.Menu;
 using SEE.GO;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Video;
 
 public static class HelpSystemBuilder
@@ -37,7 +37,7 @@ public static class HelpSystemBuilder
     public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
-            action: new UnityAction(() => { Execute(entry, title, keywords, videoPath); }),
+            action: () => { Execute(entry, title, keywords, videoPath); },
             title: title,
             description: description,
             entryColor: entryColor,
@@ -105,8 +105,8 @@ public static class HelpSystemBuilder
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
-        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer);
-        if (videoPlayer == null)
+        
+        if (!GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer))
         {
             throw new System.Exception("No Video-Player found");
         }
