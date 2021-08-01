@@ -24,7 +24,7 @@ namespace SEE.Game.UI.HelpSystem
         /// Path to the HelpSystemEntry prefab.
         /// </summary>
         private const string HELP_SYSTEM_ENTRY_PREFAB = "Prefabs/UI/HelpSystemEntry";
-        
+
         /// <summary>
         /// Path to the HelpSystemEntrySpace prefab.
         /// </summary>
@@ -55,31 +55,41 @@ namespace SEE.Game.UI.HelpSystem
         private string icon = "Materials/Notification/info";
 
         private VideoPlayer videoPlayer;
+        
+        private ButtonManagerBasicIcon pauseButton;
 
-    protected override void StartDesktop()
-    {
-        GameObject helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
-        GameObject helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
-        RectTransform rectTransform = (RectTransform)helpSystemEntry.transform;
-        ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
-        foreach (ModalWindowManager m in managers)
+        protected override void StartDesktop()
         {
-            Manager = m;
+            GameObject helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
+            GameObject helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
+            RectTransform rectTransform = (RectTransform) helpSystemEntry.transform;
+            ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
+            foreach (ModalWindowManager m in managers)
+            {
+                Manager = m;
+            }
+
+            Manager.titleText = titleManager;
+            Manager.descriptionText = description;
+            Manager.icon = Resources.Load<Sprite>(icon);
+            Manager.onConfirm.AddListener(Back);
+            Manager.onCancel.AddListener(Close);
+            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
+
+            if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
+            {
+                Destroy(this);
+            }
+
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause")
+                           .gameObject.TryGetComponentOrLog(out pauseButton);
+            pauseButton.clickEvent.AddListener(() =>
+            {
+                Debug.Log("Clicked");
+            });
+
+            Panel panel = PanelUtils.CreatePanelFor((RectTransform) helpSystemEntry.transform, PanelsCanvas);
         }
-        Manager.titleText = titleManager;
-        Manager.descriptionText = description;
-        Manager.icon = Resources.Load<Sprite>(icon);
-        Manager.onConfirm.AddListener(Back);
-        Manager.onCancel.AddListener(Close);
-        GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
-        
-        if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
-        {
-            Destroy(this);
-        }
-        
-        Panel panel = PanelUtils.CreatePanelFor((RectTransform) helpSystemEntry.transform, PanelsCanvas);
-    }
 
         protected override void UpdateDesktop()
         {
@@ -88,15 +98,18 @@ namespace SEE.Game.UI.HelpSystem
             {
                 videoPlayer.Pause();
             }
+
             if (Input.GetKeyDown(KeyCode.W))
             {
                 videoPlayer.Play();
             }
+
             if (Input.GetKeyDown(KeyCode.L))
             {
                 videoPlayer.url = "Assets/SEE/Videos/ZwischenstandAddNode.mp4";
                 videoPlayer.Play();
             }
+
             if (Input.GetKeyDown(KeyCode.T))
             {
                 TogglePlaying();
@@ -108,7 +121,6 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
-
         }
 
         /// <summary>
@@ -128,6 +140,7 @@ namespace SEE.Game.UI.HelpSystem
             {
                 throw new System.Exception("No Video-Player found");
             }
+
             go.TryGetComponentOrLog(out NestedMenu menu);
             menu.ResetToBase();
             videoPlayer.Stop();
@@ -154,9 +167,9 @@ namespace SEE.Game.UI.HelpSystem
             {
                 throw new System.Exception("No Video-Player found");
             }
+
             videoPlayer.Stop();
             HelpSystemMenu.IsEntryOpened = false;
-
         }
 
         /// <summary>
