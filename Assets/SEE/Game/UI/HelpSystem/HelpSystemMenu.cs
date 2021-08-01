@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SEE.Controls;
+using SEE.Game.UI.HelpSystem;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using UnityEngine;
