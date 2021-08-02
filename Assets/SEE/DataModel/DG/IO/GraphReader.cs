@@ -352,7 +352,7 @@ namespace SEE.DataModel.DG.IO
                 else
                 {
                     Edge edge = current as Edge;
-                    if (hierarchicalEdgeTypes.Contains(edge.Type))
+                    if (hierarchicalEdgeTypes.Contains(edge.Type) && edge.Target != null && edge.Source != null)
                     {
                         // hierarchial edges are turned into children
                         // Note: a hierarchical edge starts at the child and ends at the parent

@@ -226,6 +226,7 @@ GameObject:
   - component: {fileID: 4715037597484871969}
   - component: {fileID: 596013344010646263}
   - component: {fileID: 7747828687868905650}
+  - component: {fileID: 2162287995791718032}
   m_Layer: 0
   m_Name: VRPlayer
   m_TagString: Untagged
@@ -368,6 +369,18 @@ MonoBehaviour:
   activateOnStart: 1
   deactivateOnDestroy: 1
   initialPriority: 0
+--- !u!114 &2162287995791718032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 107946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6cb20baf6c4463c80226ea253f91daa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &109154
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,12 +799,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 471232}
-  - component: {fileID: 11461462}
-  - component: {fileID: 11464692}
-  - component: {fileID: 114000013786455312}
+  - component: {fileID: 7792666182870344538}
+  - component: {fileID: 2433580078558703831}
   m_Layer: 0
   m_Name: InputModule
-  m_TagString: Untagged
+  m_TagString: VREventSystem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -810,7 +822,7 @@ Transform:
   m_Father: {fileID: 447954}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &11461462
+--- !u!114 &7792666182870344538
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -835,8 +847,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9e05292e0d62b542ac5bba92674a86d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &114000013786455312
 MonoBehaviour:
   m_ObjectHideFlags: 0

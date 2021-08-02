@@ -173,7 +173,7 @@ namespace SEE.DataModel.DG
         /// <returns>number of lines of the element in source file or null</returns>
         public int? SourceLength()
         {
-            if (TryGetInt("Source.Region_Start", out int result))
+            if (TryGetInt("Source.Region_Length", out int result))
             {
                 return result;
             }
