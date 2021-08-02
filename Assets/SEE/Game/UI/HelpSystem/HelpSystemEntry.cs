@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -54,14 +55,41 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private string icon = "Materials/Notification/info";
 
+        /// <summary>
+        /// The video-player which is responsible for interaction with the video such as play, pause, skip etc.
+        /// </summary>
         private VideoPlayer videoPlayer;
         
+        /// <summary>
+        /// The pause or rather the pause/play- button which pauses or plays the video
+        /// </summary>
         private ButtonManagerBasicIcon pauseButton;
+
+        /// <summary>
+        /// The forward-button, which skips a specific time of the video forwards.
+        /// </summary>
+        private ButtonManagerBasicIcon forwardButton;
+
+        /// <summary>
+        /// The forward-button, which skips a specific time of the video backwards.
+        /// </summary>
+        private ButtonManagerBasicIcon backwardButton;
+
+        /// <summary>
+        /// The helpSystemEntry-GameObject.
+        /// </summary>
+        private GameObject helpSystemEntry;
+
+        /// <summary>
+        /// A instance of tmp which displays the current progress of the video such as "1s / 35 s".
+        /// </summary>
+        private TextMeshProUGUI progress;
+
 
         protected override void StartDesktop()
         {
             GameObject helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
-            GameObject helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
+            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
             RectTransform rectTransform = (RectTransform) helpSystemEntry.transform;
             ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
             foreach (ModalWindowManager m in managers)
@@ -85,8 +113,23 @@ namespace SEE.Game.UI.HelpSystem
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             pauseButton.clickEvent.AddListener(() =>
             {
-                Debug.Log("Clicked");
+                TogglePlaying();
             });
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Forward")
+                          .gameObject.TryGetComponentOrLog(out forwardButton);
+            forwardButton.clickEvent.AddListener(() =>
+            {
+                Forward(10);
+            });
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Back")
+                        .gameObject.TryGetComponentOrLog(out backwardButton);
+            backwardButton.clickEvent.AddListener(() =>
+            {
+                Backward(10);
+            });
+
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Dragger/progress")
+                   .gameObject.TryGetComponentOrLog(out progress);
 
             Panel panel = PanelUtils.CreatePanelFor((RectTransform) helpSystemEntry.transform, PanelsCanvas);
         }
@@ -94,26 +137,8 @@ namespace SEE.Game.UI.HelpSystem
         protected override void UpdateDesktop()
         {
             base.UpdateDesktop();
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                videoPlayer.Pause();
-            }
 
-            if (Input.GetKeyDown(KeyCode.W))
-            {
-                videoPlayer.Play();
-            }
-
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                videoPlayer.url = "Assets/SEE/Videos/ZwischenstandAddNode.mp4";
-                videoPlayer.Play();
-            }
-
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                TogglePlaying();
-            }
+            progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
         }
 
         /// <summary>
@@ -154,6 +179,34 @@ namespace SEE.Game.UI.HelpSystem
         public void Replay() { }
 
         /// <summary>
+        /// Skips the video forwards.
+        /// </summary>
+        /// <param name="deltaTime">The time which has to be skipped</param>
+        public void Forward(int deltaTime)
+        {
+            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+            if (videoPlayer == null)
+            {
+                throw new System.Exception("No Video-Player found");
+            }
+            videoPlayer.time += deltaTime;
+        }
+
+        /// <summary>
+        /// Skips the video backwards.
+        /// </summary>
+        /// <param name="deltaTime">The time which has to be skipped.</param>
+        public void Backward(int deltaTime)
+        {
+            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+            if (videoPlayer == null)
+            {
+                throw new System.Exception("No Video-Player found");
+            }
+            videoPlayer.time -= deltaTime;
+        }
+
+        /// <summary>
         /// Pauses the running HelpSystemEntry. That means after playing on the entry will be played from the same 
         /// state of progress as before pausing.
         /// </summary>
@@ -178,13 +231,26 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void TogglePlaying()
         {
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause")
+                        .gameObject.TryGetComponentOrLog(out pauseButton);
+            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause/Icon")
+            .gameObject.TryGetComponentOrLog(out RectTransform rectTransform);
             if (!IsPlaying)
             {
+                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Pause");
+                //rectTransform.localPosition = new Vector3(-0.1f, -50.12466f, 0);
+                //rectTransform.localScale = new Vector3(1.2f, 0.94f, 1);
+                pauseButton.UpdateUI();
                 videoPlayer.Play();
                 IsPlaying = true;
+
             }
             else
             {
+                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Play");
+                //rectTransform.localPosition = new Vector3(1f, -50.22466f, 0f);
+                //rectTransform.localScale = new Vector3(2f, 1.31f, 1);
+                pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 IsPlaying = false;
             }
