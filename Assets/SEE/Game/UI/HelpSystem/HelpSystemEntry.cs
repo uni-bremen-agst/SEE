@@ -59,7 +59,7 @@ namespace SEE.Game.UI.HelpSystem
         /// The video-player which is responsible for interaction with the video such as play, pause, skip etc.
         /// </summary>
         private VideoPlayer videoPlayer;
-        
+
         /// <summary>
         /// The pause or rather the pause/play- button which pauses or plays the video
         /// </summary>
@@ -80,6 +80,8 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private GameObject helpSystemEntry;
 
+        private GameObject helpSystemSpace;
+
         /// <summary>
         /// A instance of tmp which displays the current progress of the video such as "1s / 35 s".
         /// </summary>
@@ -88,9 +90,25 @@ namespace SEE.Game.UI.HelpSystem
 
         protected override void StartDesktop()
         {
-            GameObject helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
+            Debug.Log("start");
+        }
+
+        protected override void UpdateDesktop()
+        {
+            base.UpdateDesktop();
+            if (EntryShown) {
+                progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
+            }
+        }
+
+        /// <summary>
+        /// Shows the HelpSystemEntry with the inserted values. Per default - it will be started directly by showing the entry.
+        /// </summary>
+        public void ShowEntry()
+        {
+            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
-            RectTransform rectTransform = (RectTransform) helpSystemEntry.transform;
+            RectTransform rectTransform = (RectTransform)helpSystemEntry.transform;
             ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
             foreach (ModalWindowManager m in managers)
             {
@@ -131,21 +149,7 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemEntry.transform.Find("Main Content/Movable Window/Dragger/progress")
                    .gameObject.TryGetComponentOrLog(out progress);
 
-            Panel panel = PanelUtils.CreatePanelFor((RectTransform) helpSystemEntry.transform, PanelsCanvas);
-        }
-
-        protected override void UpdateDesktop()
-        {
-            base.UpdateDesktop();
-
-            progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
-        }
-
-        /// <summary>
-        /// Shows the HelpSystemEntry with the inserted values. Per default - it will be started directly by showing the entry.
-        /// </summary>
-        public void ShowEntry()
-        {
+            Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
         }
 
         /// <summary>
@@ -171,6 +175,9 @@ namespace SEE.Game.UI.HelpSystem
             videoPlayer.Stop();
             IsPlaying = false;
             HelpSystemMenu.IsEntryOpened = false;
+            Destroy(helpSystemSpace);
+            EntryShown = false;
+
         }
 
         /// <summary>
