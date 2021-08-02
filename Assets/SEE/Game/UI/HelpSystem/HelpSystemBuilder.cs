@@ -102,6 +102,8 @@ public static class HelpSystemBuilder
     /// <param name="entryDescription">The description of the HelpSystemEntry.</param>
     public static void Execute(HelpSystemEntry helpSystem, string entryTitle, List<string> keywords, string videoPath)
     {
+        helpSystem.EntryShown = true;
+        helpSystem.ShowEntry();
         GameObject go = GameObject.Find(HelpSystemGO);
         go.TryGetComponentOrLog(out NestedMenu menu);
         PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
