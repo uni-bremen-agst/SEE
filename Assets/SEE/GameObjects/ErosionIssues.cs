@@ -127,6 +127,7 @@ namespace SEE.GO
             // ascending order of their widths.
             {
                 Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
+                currentRoof += Vector3.up * innerNodeFactory.GetSize(gameNode.gameObject).x / 6;
                 sprites.Sort(Comparer<GameObject>.Create((left, right) =>
                                                              GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)

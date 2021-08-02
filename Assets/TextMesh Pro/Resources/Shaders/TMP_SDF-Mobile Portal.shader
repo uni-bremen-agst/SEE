@@ -52,6 +52,9 @@ Properties {
 	_ColorMask			("Color Mask", Float) = 15
 	
 	_Cutoff             ("Cutoff", Range(0, 1)) = 0.5
+
+	_PortalMin          ("Portal Minimum", vector) = (-10, -10, 0, 0)
+	_PortalMax          ("Portal Maximum", vector) = (10, 10, 0, 0)
 }
 
 SubShader {
@@ -152,7 +155,13 @@ SubShader {
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 
 #ifdef SEE_TEXT_FACING_CAMERA
-			vPosition = mul(UNITY_MATRIX_P, float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0) + float4(input.vertex.x, input.vertex.y, 0.0, 0.0) * float4(_ScaleX, _ScaleY, 1.0, 1.0));
+			// The following two variables will make sure that the localScale is correctly applied to the billboarded text.
+			// Source: https://forum.unity.com/threads/billboard-shader-that-respects-gameobjects-transform-localscale.451431
+            float scaleX = length(float4(UNITY_MATRIX_M[0].r, UNITY_MATRIX_M[1].r, UNITY_MATRIX_M[2].r, UNITY_MATRIX_M[3].r));
+            float scaleY = length(float4(UNITY_MATRIX_M[0].g, UNITY_MATRIX_M[1].g, UNITY_MATRIX_M[2].g, UNITY_MATRIX_M[3].g));
+			vPosition = mul(UNITY_MATRIX_P, float4(UnityObjectToViewPos(
+				float3(0.0, 0.0, 0.0)), 1.0) 
+				+ float4(input.vertex.x, input.vertex.y, 0.0, 0.0) * float4(scaleX, scaleY, 1.0, 1.0));
 #endif
 
 			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
@@ -259,5 +268,5 @@ SubShader {
 	}
 }
 
-CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
+//CustomEditor "TMPro.EditorUtilities.TMP_SDFShaderGUI"
 }
