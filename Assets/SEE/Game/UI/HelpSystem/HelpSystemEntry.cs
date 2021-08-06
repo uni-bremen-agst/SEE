@@ -1,8 +1,12 @@
+using Crosstales.RTVoice;
+using Crosstales.RTVoice.Model;
 using DynamicPanels;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -80,6 +84,10 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private GameObject helpSystemEntry;
 
+        /// <summary>
+        /// The helpSystemEntrySpace-GameObject which contains the helpSystemEntry.
+        /// It is nessecary because of the dynamic panel for scaling the entry.
+        /// </summary>
         private GameObject helpSystemSpace;
 
         /// <summary>
@@ -87,17 +95,60 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private TextMeshProUGUI progress;
 
+        public static int timeSum;
+
+        private int counter;
+
+        private bool isAdded;
+
+        /// <summary>
+        /// The audio source used to say the text. Will be retrieved from the character.
+        /// </summary>
+        private AudioSource audioSource;
+
+        /// <summary>
+        /// The voice used to speak. Will be retrieved from the available voices on
+        /// the current system.
+        /// </summary>
+        private Voice voice;
 
         protected override void StartDesktop()
         {
-            Debug.Log("start");
+            counter = 1;
+            if (!GameObject.Find("PersonalAssistant").TryGetComponent(out audioSource))
+            {
+                Debug.LogError("No AudioSource found.\n");
+                enabled = false;
+            }
+            voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
         }
 
         protected override void UpdateDesktop()
         {
             base.UpdateDesktop();
-            if (EntryShown) {
+            if (EntryShown)
+            {
                 progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
+                if (HelpSystemBuilder.currentEntry != null)
+                {
+                    Dictionary<string, int> currentEntries = HelpSystemBuilder.currentEntry;
+                    if (Mathf.Round((float)videoPlayer.time) == currentEntries.Values.ElementAt(counter-1) && !isAdded)
+                    {
+                        GameObject keywordDisplay = GameObject.Find("Code");
+                        TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+                        tmp.text += currentEntries.Keys.ElementAt(counter-1) + "\n";
+                        Speaker.Instance.Speak(currentEntries.Keys.ElementAt(counter-1), audioSource, voice: voice);
+                        isAdded = true;
+                    }
+                    else if(videoPlayer.time > currentEntries.Values.ElementAt(counter-1) && isAdded)
+                    {
+                        isAdded = false;
+                        if (counter-1 < currentEntries.Count)
+                        {
+                            counter++;
+                        }
+                    }
+                }
             }
         }
 
@@ -210,7 +261,18 @@ namespace SEE.Game.UI.HelpSystem
             {
                 throw new System.Exception("No Video-Player found");
             }
-            videoPlayer.time -= deltaTime;
+            if (counter >= 2)
+            {
+                videoPlayer.time = HelpSystemBuilder.currentEntry.Values.ElementAt(counter - 2);
+                counter--;
+            }
+            else
+            {
+                videoPlayer.time = HelpSystemBuilder.currentEntry.Values.ElementAt(counter - 1);
+            }
+            GameObject keywordDisplay = GameObject.Find("Code");
+            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+            tmp.text = tmp.text.Substring(0, tmp.text.Length - HelpSystemBuilder.currentEntry.Keys.ElementAt(counter).Length -1);
         }
 
         /// <summary>
@@ -251,6 +313,7 @@ namespace SEE.Game.UI.HelpSystem
                 //rectTransform.localScale = new Vector3(1.2f, 0.94f, 1);
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
+                Speaker.Instance.PauseOrUnPause();
                 IsPlaying = true;
 
             }
@@ -261,6 +324,8 @@ namespace SEE.Game.UI.HelpSystem
                 //rectTransform.localScale = new Vector3(2f, 1.31f, 1);
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
+                Speaker.Instance.Pause();
+                
                 IsPlaying = false;
             }
         }

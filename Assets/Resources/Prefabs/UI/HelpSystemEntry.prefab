@@ -2088,8 +2088,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "- Dr\xFCcke X\n\n- Danach Y\n\n- Jetzt dreh dich im Kreis\n\n- Dr\xFCcke
-    X\n\n- Danach Y\n\n- Jetzt dreh dich im Kreis"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2f17e8bb3967fe14093d5fec798fffd9, type: 2}
   m_sharedMaterial: {fileID: 21700449227511232, guid: 2f17e8bb3967fe14093d5fec798fffd9, type: 2}
@@ -3931,7 +3930,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1654701897743705188}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.34953642
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
