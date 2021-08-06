@@ -230,6 +230,8 @@ namespace SEE.Game.UI.HelpSystem
 
             videoPlayer.Stop();
             HelpSystemMenu.IsEntryOpened = false;
+            EntryShown = false;
+            Destroy(helpSystemSpace);
         }
 
         /// <summary>
