@@ -95,10 +95,18 @@ namespace SEE.Game.UI.Menu
             }
         }
 
+        private bool menuShown;
+
         /// <summary>
         /// Whether the menu shall be shown.
         /// </summary>
-        public bool MenuShown { get; set; }
+        public bool MenuShown { 
+            get => menuShown;
+            private set
+            {
+                menuShown = value;
+                OnMenuToggle.Invoke(value);
+            }}
 
         /// <summary>
         /// Whether the menu is currently shown or not.
@@ -112,6 +120,8 @@ namespace SEE.Game.UI.Menu
         /// Its parameter will be the chosen <see cref="MenuEntry"/> with type <typeparamref name="T"/>.
         /// </summary>
         public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new MenuEntrySelectedEvent();
+
+        protected readonly UnityEvent<bool> OnMenuToggle = new UnityEvent<bool>();
 
         /// <summary>
         /// A list of menu entries for this menu.

@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FuzzySharp;
+using SEE.Controls;
+using SEE.GO;
+using SEE.GO.Menu;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -25,12 +30,18 @@ namespace SEE.Game.UI.Menu
         /// The keyword to be used to step back in the menu verbally.
         /// </summary>
         private const string BackMenuCommand = "go back";
+        
+        private TMP_InputField searchInput;
 
         /// <summary>
         /// Whether to reset the level of the menu when clicking on the close button.
         /// Can only be changed before this component has been started.
         /// </summary>
         public bool ResetLevelOnClose = true;
+
+        private IDictionary<string, MenuEntry> AllEntries;
+
+        private bool searchActive;
 
         protected override void OnEntrySelected(MenuEntry entry)
         {
@@ -162,11 +173,72 @@ namespace SEE.Game.UI.Menu
         protected override void StartDesktop()
         {
             base.StartDesktop();
+
+            MenuContent.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
+            
+            searchInput.onValueChanged.AddListener(SearchTextEntered);
             Manager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
+            Manager.onCancel.AddListener(() =>
+            {
+                searchActive = false;
+                searchInput.text = string.Empty;
+            });
             if (ResetLevelOnClose)
             {
                 Manager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
             }
+            
+            OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
+        }
+
+        private IEnumerable<MenuEntry> GetAllEntries()
+        {
+            IList<MenuEntry> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
+            return GetAllEntries(allEntries);
+        }
+
+        private static IEnumerable<MenuEntry> GetAllEntries(IEnumerable<MenuEntry> startingEntries)
+        {
+            List<MenuEntry> leafEntries = new List<MenuEntry>();
+            foreach (MenuEntry startingEntry in startingEntries)
+            {
+                if (startingEntry is NestedMenuEntry nestedMenuEntry)
+                {
+                    leafEntries.AddRange(GetAllEntries(nestedMenuEntry.InnerEntries));
+                }
+                else
+                {
+                    leafEntries.Add(startingEntry);
+                }
+            }
+
+            return leafEntries;
+        }
+
+        private void SearchTextEntered(string text)
+        {
+            if (searchActive)
+            {
+                DescendLevel();
+            }
+
+            searchActive = text.Length != 0;
+            if (text.Length == 0)
+            {
+                return;
+            }
+            
+            AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
+            IEnumerable<MenuEntry> results =
+                Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
+                       .OrderByDescending(x => x.Score)
+                       .Select(x => AllEntries[x.Value])
+                       .ToList();
+
+            NestedMenuEntry resultEntry = new NestedMenuEntry(
+                 results, "Results", $"Found {results.Count()} help pages."
+            );
+            AscendLevel(resultEntry);
         }
 
         /// <summary>
