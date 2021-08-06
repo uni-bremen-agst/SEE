@@ -36,7 +36,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
-        private GameObject MenuContent;
+        protected GameObject MenuContent;
         
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
