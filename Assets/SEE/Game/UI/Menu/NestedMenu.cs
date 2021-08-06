@@ -164,6 +164,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public void ResetToBase()
         {
+            searchInput.text = String.Empty;
             while (Levels.Count > 0)
             {
                 DescendLevel();

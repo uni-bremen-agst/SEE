@@ -68,34 +68,28 @@ public class HelpSystemMenu : MonoBehaviour
         List<MenuEntry> debuggingEntries = new List<MenuEntry>();
         List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
-        List<string> addEdge = new List<string>
-        {
-            "PlayerMenu: Space",
-            "Leftklick: Add Edge",
-            "Leftklick: Start Node",
-            "Leftklick: Target Node",
-            "For Removing Start Node: F11",
-        };
+        Dictionary<string, int> addEdge = new Dictionary<string, int>();
+        addEdge.Add("Press Space for opening player menu", 3);
+        addEdge.Add("Leftklick on the entry add edge", 8);
+        addEdge.Add("Lefklick on a node to select the start node", 18);
+        addEdge.Add("Lefklick on a node to select the target node", 23);
+        addEdge.Add("Press Key F11 to  remove the selected start node", 36);
 
-        List<string> addNode = new List<string>
-        {
-            "PlayerMenu: Space",
-            "Leftklick: Add Node",
-            "Leftklick: Position for new Node",
-        };
 
-        List<string> addLine = new List<string>
-        {
-            "PlayerMenu: Space",
-            "Leftklick: Draw",
-            "Leftklick with pressed mouse",
-            "Release left mousebutton for ending"
-        };
+        Dictionary<string, int> addNode = new Dictionary<string, int>();
+        addNode.Add("Press2 Space for opening player menu", 5);
+        addNode.Add("Leftklick2 on the entry add edge", 2);
+        addNode.Add("Lefklick2 on a node to select the start node", 10);
 
-        List<string> placeholder = new List<string>
-        {
-            "TESTE",
-        };
+        Dictionary<string, int> addLine = new Dictionary<string, int>();
+        addLine.Add("Press Space3 for opening player menu", 5);
+        addLine.Add("Leftklick3 on the entry add edge", 2);
+        addLine.Add("Lefklick3 on a node to select the start node", 10);
+
+        Dictionary<string, int> placeholder = new Dictionary<string, int>();
+        placeholder.Add("Press4 Space for opening player menu", 5);
+        placeholder.Add("Leftklick4 on the entry add edge", 2);
+        placeholder.Add("Lefklick4 on a node to select the start node", 10);
 
         // Hint: Description is responsible for the title, title is useless
         playerMenuEntries = new List<MenuEntry>

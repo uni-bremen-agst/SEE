@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Controls;
 using SEE.Game.UI.HelpSystem;
 using SEE.Game.UI.Menu;
 using SEE.GO;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -24,6 +24,8 @@ public static class HelpSystemBuilder
     /// </summary>
     private const string RefIcon = "Materials/ModernUIPack/Plus";
 
+    public static Dictionary<string, int> currentEntry;
+
     /// <summary>
     /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
     /// As a difference to a normal HelpSystemMenu-Entry, onclick, there will be started an HelpSystemEntry which explains the specific use-Case.
@@ -34,7 +36,7 @@ public static class HelpSystemBuilder
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, List<string> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, Dictionary<string,int> keywords, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
             action: () => { Execute(entry, title, keywords, videoPath); },
@@ -99,8 +101,7 @@ public static class HelpSystemBuilder
     /// </summary>
     /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
     /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
-    /// <param name="entryDescription">The description of the HelpSystemEntry.</param>
-    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, List<string> keywords, string videoPath)
+    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, Dictionary<string,int> keywords, string videoPath)
     {
         helpSystem.EntryShown = true;
         helpSystem.ShowEntry();
@@ -122,21 +123,15 @@ public static class HelpSystemBuilder
             entry.Manager.descriptionText = "placeholder";
             entry.Manager.titleText = "placeholder";
         }
-        GameObject keywordDisplay = GameObject.Find("Code");
-        TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-        string keywordsAsString = "";
-        foreach (string keyword in keywords)
-        {
-            keywordsAsString += "- " + keyword + "\n";
-        }
-        keywordsAsString += "\n";
-        tmp.text = keywordsAsString;
         entry.Manager.UpdateUI();
         videoPlayer.url = videoPath;
         videoPlayer.Play();
+        videoPlayer.SetDirectAudioMute((ushort)0, true);
         entry.IsPlaying = true;
         menu.ToggleMenu();
         helpSystem.Manager.OpenWindow();
         HelpSystemMenu.IsEntryOpened = true;
+        currentEntry = keywords;
+        HelpSystemEntry.timeSum = currentEntry.Values.ElementAt(0);
     }
 }
