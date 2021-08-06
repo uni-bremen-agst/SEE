@@ -126,8 +126,18 @@ namespace SEE.Game.UI.HelpSystem
         protected override void UpdateDesktop()
         {
             base.UpdateDesktop();
+            Debug.Log(counter);
             if (EntryShown)
             {
+                if(videoPlayer.time == 0)
+                {
+                    GameObject keywordDisplay = GameObject.Find("Code");
+                    TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+                    tmp.text = "";
+                    counter = 1;
+                    isAdded = false;
+                    Debug.Log("HIER?");
+                }
                 progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
                 if (HelpSystemBuilder.currentEntry != null)
                 {
@@ -143,9 +153,13 @@ namespace SEE.Game.UI.HelpSystem
                     else if(videoPlayer.time > currentEntries.Values.ElementAt(counter-1) && isAdded)
                     {
                         isAdded = false;
-                        if (counter-1 < currentEntries.Count)
+                        if (counter < currentEntries.Count)
                         {
-                            counter++;
+                            counter++; 
+                        }
+                        else
+                        {
+                            isAdded = true;
                         }
                     }
                 }
