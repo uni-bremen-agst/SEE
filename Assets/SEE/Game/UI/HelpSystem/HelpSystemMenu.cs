@@ -68,41 +68,41 @@ public class HelpSystemMenu : MonoBehaviour
         List<MenuEntry> debuggingEntries = new List<MenuEntry>();
         List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
-        Dictionary<string, int> addEdge = new Dictionary<string, int>();
-        addEdge.Add("Press Space for opening player menu", 3);
-        addEdge.Add("Leftklick on the entry add edge", 8);
-        addEdge.Add("Lefklick on a node to select the start node", 18);
-        addEdge.Add("Lefklick on a node to select the target node", 23);
-        addEdge.Add("Press Key F11 to  remove the selected start node", 36);
+        LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
+        addEdge.AddLast(new LinkedListEntry("Press Space for opening player menu", 3));
+        addEdge.AddLast(new LinkedListEntry("Leftklick on the entry add edge", 8));
+        addEdge.AddLast(new LinkedListEntry("Lefklick on a node to select the start node", 18));
+        addEdge.AddLast(new LinkedListEntry("Lefklick on a node to select the target node", 23));
+        addEdge.AddLast(new LinkedListEntry("Press Key F11 to  remove the selected start node", 36));
 
 
-        Dictionary<string, int> addNode = new Dictionary<string, int>();
-        addNode.Add("Press2 Space for opening player menu", 5);
-        addNode.Add("Leftklick2 on the entry add edge", 2);
-        addNode.Add("Lefklick2 on a node to select the start node", 10);
+        //Dictionary<string, int> addNode = new Dictionary<string, int>();
+        //addNode.Add("Press2 Space for opening player menu", 5);
+        //addNode.Add("Leftklick2 on the entry add edge", 2);
+        //addNode.Add("Lefklick2 on a node to select the start node", 10);
 
-        Dictionary<string, int> addLine = new Dictionary<string, int>();
-        addLine.Add("Press Space3 for opening player menu", 5);
-        addLine.Add("Leftklick3 on the entry add edge", 2);
-        addLine.Add("Lefklick3 on a node to select the start node", 10);
+        //Dictionary<string, int> addLine = new Dictionary<string, int>();
+        //addLine.Add("Press Space3 for opening player menu", 5);
+        //addLine.Add("Leftklick3 on the entry add edge", 2);
+        //addLine.Add("Lefklick3 on a node to select the start node", 10);
 
-        Dictionary<string, int> placeholder = new Dictionary<string, int>();
-        placeholder.Add("Press4 Space for opening player menu", 5);
-        placeholder.Add("Leftklick4 on the entry add edge", 2);
-        placeholder.Add("Lefklick4 on a node to select the start node", 10);
+        //Dictionary<string, int> placeholder = new Dictionary<string, int>();
+        //placeholder.Add("Press4 Space for opening player menu", 5);
+        //placeholder.Add("Leftklick4 on the entry add edge", 2);
+        //placeholder.Add("Lefklick4 on a node to select the start node", 10);
 
         // Hint: Description is responsible for the title, title is useless
         playerMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addLine, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", null, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", null, entry)
         };
 
         architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.magenta),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4",placeholder, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4",null, entry)
         };
 
         mainMenuEntries = new List<MenuEntry>
