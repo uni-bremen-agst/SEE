@@ -101,6 +101,8 @@ namespace SEE.Game.UI.HelpSystem
 
         private bool isAdded;
 
+        LinkedListEntry currentEntry;
+
         /// <summary>
         /// The audio source used to say the text. Will be retrieved from the character.
         /// </summary>
@@ -126,40 +128,54 @@ namespace SEE.Game.UI.HelpSystem
         protected override void UpdateDesktop()
         {
             base.UpdateDesktop();
-            Debug.Log(counter);
             if (EntryShown)
             {
-                if(videoPlayer.time == 0)
+                if (videoPlayer.time == 0)
                 {
                     GameObject keywordDisplay = GameObject.Find("Code");
                     TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-                    tmp.text = "";
-                    counter = 1;
+                    tmp.text = string.Empty;
+                    counter = 0;
                     isAdded = false;
-                    Debug.Log("HIER?");
+                    currentEntry = null;
                 }
-                progress.text = Mathf.Round((float)videoPlayer.time).ToString() + " s / " + Mathf.Round((float)videoPlayer.length).ToString() + " s";
+                if (counter == HelpSystemBuilder.currentEntry.Count)
+                {
+                    progress.text = counter + "/" + HelpSystemBuilder.currentEntry.Count;
+                }
+                else
+                {
+                    progress.text = counter + 1 + "/" + HelpSystemBuilder.currentEntry.Count;
+                }
                 if (HelpSystemBuilder.currentEntry != null)
                 {
-                    Dictionary<string, int> currentEntries = HelpSystemBuilder.currentEntry;
-                    if (Mathf.Round((float)videoPlayer.time) == currentEntries.Values.ElementAt(counter-1) && !isAdded)
+                    LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntry;
+                    currentEntry ??= currentEntries.First();
+                    if (counter <= currentEntries.Count)
                     {
-                        GameObject keywordDisplay = GameObject.Find("Code");
-                        TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-                        tmp.text += currentEntries.Keys.ElementAt(counter-1) + "\n";
-                        Speaker.Instance.Speak(currentEntries.Keys.ElementAt(counter-1), audioSource, voice: voice);
-                        isAdded = true;
-                    }
-                    else if(videoPlayer.time > currentEntries.Values.ElementAt(counter-1) && isAdded)
-                    {
-                        isAdded = false;
-                        if (counter < currentEntries.Count)
-                        {
-                            counter++; 
-                        }
-                        else
+                        if (Mathf.Round((float)videoPlayer.time) == currentEntry.CumulatedTime && !isAdded)
                         {
                             isAdded = true;
+                            GameObject keywordDisplay = GameObject.Find("Code");
+                            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+                            tmp.text += currentEntry.Text + "\n";
+                            Debug.Log(currentEntry.Text);
+                            Debug.Log(currentEntry.Text.Length);
+                            Debug.Log(tmp.text.Length);
+                            Speaker.Instance.Speak(currentEntry.Text, audioSource, voice: voice);
+                            currentEntry = currentEntries.Find(currentEntry).Next?.Value;
+                            if (counter == HelpSystemBuilder.currentEntry.Count)
+                            {
+                                GameObject keywordDisplay2 = GameObject.Find("Code");
+                                TextMeshProUGUI tmpTemp = keywordDisplay2.GetComponent<TextMeshProUGUI>();
+                                tmpTemp.text = "";
+                                counter = 0;
+                            }
+                        }
+                        if (videoPlayer.time > currentEntry?.CumulatedTime && isAdded)
+                        {
+                                isAdded = false;
+                                counter++;
                         }
                     }
                 }
@@ -202,13 +218,13 @@ namespace SEE.Game.UI.HelpSystem
                           .gameObject.TryGetComponentOrLog(out forwardButton);
             forwardButton.clickEvent.AddListener(() =>
             {
-                Forward(10);
+                Forward();
             });
             helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Back")
                         .gameObject.TryGetComponentOrLog(out backwardButton);
             backwardButton.clickEvent.AddListener(() =>
             {
-                Backward(10);
+                Backward();
             });
 
             helpSystemEntry.transform.Find("Main Content/Movable Window/Dragger/progress")
@@ -254,39 +270,88 @@ namespace SEE.Game.UI.HelpSystem
         /// Skips the video forwards.
         /// </summary>
         /// <param name="deltaTime">The time which has to be skipped</param>
-        public void Forward(int deltaTime)
+        public void Forward()
         {
-            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+            // TODO: videoPlayer.time = next.kumulierteZeit
+            // TODO: tmp add bzw. remove text
+            // TODO: voice von currentEntry abspielen
+            // TODO: Abstrahieren der Logik von Forward und Backward -> skipChapter oder so
+            ;
             if (videoPlayer == null)
             {
                 throw new System.Exception("No Video-Player found");
             }
-            videoPlayer.time += deltaTime;
+            videoPlayer.time = currentEntry.CumulatedTime;
+            GameObject keywordDisplay = GameObject.Find("Code");
+            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+            if ((HelpSystemBuilder.currentEntry.Count <= counter))
+            {
+                counter = 0;
+                tmp.text = "";
+            }
         }
 
         /// <summary>
         /// Skips the video backwards.
         /// </summary>
         /// <param name="deltaTime">The time which has to be skipped.</param>
-        public void Backward(int deltaTime)
+        public void Backward()
         {
-            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
+            // TODO: previous - if previous is nullref - index out of bounds
+            GameObject keywordDisplay = GameObject.Find("Code");
+            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
             if (videoPlayer == null)
             {
                 throw new System.Exception("No Video-Player found");
             }
-            if (counter >= 2)
+            if (videoPlayer.time -1f < HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.CumulatedTime)
             {
-                videoPlayer.time = HelpSystemBuilder.currentEntry.Values.ElementAt(counter - 2);
-                counter--;
+               string textToBeRemoved = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.Text;
+                textToBeRemoved += HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous.Value.Text;
+
+                Debug.Log("vorheriges");
+                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
+                {
+                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                    counter = HelpSystemBuilder.currentEntry.Count-3;
+                }
+                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous == null)
+                {
+                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                    counter = HelpSystemBuilder.currentEntry.Count-3;
+                }
+                else
+                {
+                    currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous.Value;
+                    counter -= 2;
+                }
+                tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 2));
             }
             else
             {
-                videoPlayer.time = HelpSystemBuilder.currentEntry.Values.ElementAt(counter - 1);
+                string textToBeRemoved2 = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.Text;
+                Debug.Log("au0erhalb der 2 sekunden - dasslebe");
+                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
+                {
+                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                }
+                else
+                {
+                    currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value;
+                }
+                counter--;
+                Debug.Log(tmp.text.Length);
+                Debug.Log(textToBeRemoved2);
+                Debug.Log(textToBeRemoved2.Length);
+                tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved2.Length +1));
             }
-            GameObject keywordDisplay = GameObject.Find("Code");
-            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-            tmp.text = tmp.text.Substring(0, tmp.text.Length - HelpSystemBuilder.currentEntry.Keys.ElementAt(counter).Length -1);
+            videoPlayer.time = currentEntry.CumulatedTime;
+           
+            if ((HelpSystemBuilder.currentEntry.Count <= counter))
+            {
+                counter = 0;
+                tmp.text = "";
+            }
         }
 
         /// <summary>
@@ -339,7 +404,7 @@ namespace SEE.Game.UI.HelpSystem
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();
-                
+
                 IsPlaying = false;
             }
         }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using SEE.Controls;
 using SEE.Game.UI.HelpSystem;
 using SEE.Game.UI.Menu;
@@ -24,7 +23,7 @@ public static class HelpSystemBuilder
     /// </summary>
     private const string RefIcon = "Materials/ModernUIPack/Plus";
 
-    public static Dictionary<string, int> currentEntry;
+    public static LinkedList<LinkedListEntry> currentEntry;
 
     /// <summary>
     /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
@@ -36,7 +35,7 @@ public static class HelpSystemBuilder
     /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
     /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
     /// <returns>A new HelpSystemMenu-Entry.</returns>
-    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, Dictionary<string,int> keywords, HelpSystemEntry entry = null)
+    public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, LinkedList<LinkedListEntry> keywords, HelpSystemEntry entry = null)
     {
         MenuEntry helpSystemEntry = new MenuEntry(
             action: () => { Execute(entry, title, keywords, videoPath); },
@@ -101,7 +100,7 @@ public static class HelpSystemBuilder
     /// </summary>
     /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
     /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
-    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, Dictionary<string,int> keywords, string videoPath)
+    public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<LinkedListEntry> keywords, string videoPath)
     {
         helpSystem.EntryShown = true;
         helpSystem.ShowEntry();
@@ -132,6 +131,5 @@ public static class HelpSystemBuilder
         helpSystem.Manager.OpenWindow();
         HelpSystemMenu.IsEntryOpened = true;
         currentEntry = keywords;
-        HelpSystemEntry.timeSum = currentEntry.Values.ElementAt(0);
     }
 }
