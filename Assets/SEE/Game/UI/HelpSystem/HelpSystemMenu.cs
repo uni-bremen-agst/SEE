@@ -70,34 +70,30 @@ namespace SEE.Game.UI.HelpSystem
             List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
             LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
-            addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening player menu", 0));
+            addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
             addEdge.AddLast(new LinkedListEntry(2, "Leftklick on the entry add edge", 8));
             addEdge.AddLast(new LinkedListEntry(3, "Lefklick on a node to select the start node", 18));
             addEdge.AddLast(new LinkedListEntry(4, "Lefklick on a node to select the target node", 23));
             addEdge.AddLast(new LinkedListEntry(5, "Press Key F11 to  remove the selected start node", 36));
 
-
             LinkedList<LinkedListEntry> addNode = new LinkedList<LinkedListEntry>();
-            addNode.AddLast(new LinkedListEntry(1, "Press2 Space for opening player menu", 0));
-            addNode.AddLast(new LinkedListEntry(2, "Leftklick2 on the entry add edge", 10));
-            addNode.AddLast(new LinkedListEntry(3, "Lefklick2 on a node to select the start node", 15));
+            addNode.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
+            addNode.AddLast(new LinkedListEntry(2, "Leftklick on the entry add node", 10));
+            addNode.AddLast(new LinkedListEntry(3, "Leftklick on the city where a new node should be added", 14));
+            addNode.AddLast(new LinkedListEntry(4, "The new node will be inserted automatically", 17));
+            addNode.AddLast(new LinkedListEntry(5, "If you want to change the scale or the metrics, choose edit or scale node.", 20));
 
-            //Dictionary<string, int> addLine = new Dictionary<string, int>();
-            //addLine.Add("Press Space3 for opening player menu", 5);
-            //addLine.Add("Leftklick3 on the entry add edge", 2);
-            //addLine.Add("Lef,klick3 on a node to select the start node", 10);
+            LinkedList<LinkedListEntry> drawLine = new LinkedList<LinkedListEntry>();
+            drawLine.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
+            drawLine.AddLast(new LinkedListEntry(2, "Leftklick on the entry draw line", 5));
+            drawLine.AddLast(new LinkedListEntry(3, "Leftklick at the place where the line should be started. Hold the mouse-button for drawing", 10));
+            drawLine.AddLast(new LinkedListEntry(4, "Release the left mouse button for stop drawing the line. You can start drawing another", 15));
 
-            //Dictionary<string, int> placeholder = new Dictionary<string, int>();
-            //placeholder.Add("Press4 Space for opening player menu", 5);
-            //placeholder.Add("Leftklick4 on the entry add edge", 2);
-            //placeholder.Add("Lefklick4 on a node to select the start node", 10);
-
-            // Hint: Description is responsible for the title, title is useless
             playerMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", null, entry)
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", drawLine, entry)
         };
 
             architectureEntries = new List<MenuEntry>
