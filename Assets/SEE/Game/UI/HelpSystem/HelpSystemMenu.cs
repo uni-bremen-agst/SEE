@@ -69,22 +69,22 @@ public class HelpSystemMenu : MonoBehaviour
         List<MenuEntry> qualityEntries = new List<MenuEntry>();
 
         LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
-        addEdge.AddLast(new LinkedListEntry("Press Space for opening player menu", 3));
-        addEdge.AddLast(new LinkedListEntry("Leftklick on the entry add edge", 8));
-        addEdge.AddLast(new LinkedListEntry("Lefklick on a node to select the start node", 18));
-        addEdge.AddLast(new LinkedListEntry("Lefklick on a node to select the target node", 23));
-        addEdge.AddLast(new LinkedListEntry("Press Key F11 to  remove the selected start node", 36));
+        addEdge.AddLast(new LinkedListEntry(1,"Press Space for opening player menu", 0));
+        addEdge.AddLast(new LinkedListEntry(2,"Leftklick on the entry add edge", 8));
+        addEdge.AddLast(new LinkedListEntry(3,"Lefklick on a node to select the start node", 18));
+        addEdge.AddLast(new LinkedListEntry(4,"Lefklick on a node to select the target node", 23));
+        addEdge.AddLast(new LinkedListEntry(5,"Press Key F11 to  remove the selected start node", 36));
 
 
-        //Dictionary<string, int> addNode = new Dictionary<string, int>();
-        //addNode.Add("Press2 Space for opening player menu", 5);
-        //addNode.Add("Leftklick2 on the entry add edge", 2);
-        //addNode.Add("Lefklick2 on a node to select the start node", 10);
+        LinkedList<LinkedListEntry> addNode = new LinkedList<LinkedListEntry>();
+        addNode.AddLast(new LinkedListEntry(1,"Press2 Space for opening player menu", 0));
+        addNode.AddLast(new LinkedListEntry(2,"Leftklick2 on the entry add edge", 10));
+        addNode.AddLast(new LinkedListEntry(3,"Lefklick2 on a node to select the start node", 15));
 
         //Dictionary<string, int> addLine = new Dictionary<string, int>();
         //addLine.Add("Press Space3 for opening player menu", 5);
         //addLine.Add("Leftklick3 on the entry add edge", 2);
-        //addLine.Add("Lefklick3 on a node to select the start node", 10);
+        //addLine.Add("Lef,klick3 on a node to select the start node", 10);
 
         //Dictionary<string, int> placeholder = new Dictionary<string, int>();
         //placeholder.Add("Press4 Space for opening player menu", 5);
@@ -95,7 +95,7 @@ public class HelpSystemMenu : MonoBehaviour
         playerMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", null, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", null, entry)
         };
 

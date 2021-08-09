@@ -5,6 +5,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -95,9 +96,9 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private TextMeshProUGUI progress;
 
-        public static int timeSum;
+        GameObject keywordDisplay;
 
-        private int counter;
+        public static int timeSum;
 
         private bool isAdded;
 
@@ -116,12 +117,12 @@ namespace SEE.Game.UI.HelpSystem
 
         protected override void StartDesktop()
         {
-            counter = 1;
             if (!GameObject.Find("PersonalAssistant").TryGetComponent(out audioSource))
             {
                 Debug.LogError("No AudioSource found.\n");
                 enabled = false;
             }
+            keywordDisplay = GameObject.Find("Code");
             voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
         }
 
@@ -132,54 +133,58 @@ namespace SEE.Game.UI.HelpSystem
             {
                 if (videoPlayer.time == 0)
                 {
-                    GameObject keywordDisplay = GameObject.Find("Code");
+                    keywordDisplay = keywordDisplay != null ? keywordDisplay : GameObject.Find("Code");
                     TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
                     tmp.text = string.Empty;
-                    counter = 0;
                     isAdded = false;
                     currentEntry = null;
-                }
-                if (counter == HelpSystemBuilder.currentEntry.Count)
-                {
-                    progress.text = counter + "/" + HelpSystemBuilder.currentEntry.Count;
-                }
-                else
-                {
-                    progress.text = counter + 1 + "/" + HelpSystemBuilder.currentEntry.Count;
                 }
                 if (HelpSystemBuilder.currentEntry != null)
                 {
                     LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntry;
                     currentEntry ??= currentEntries.First();
-                    if (counter <= currentEntries.Count)
+                    SetTmpProgress();
+
+                    if (currentEntry.Index <= currentEntries.Count)
                     {
                         if (Mathf.Round((float)videoPlayer.time) == currentEntry.CumulatedTime && !isAdded)
                         {
+                            if (currentEntry?.Index - 1 == HelpSystemBuilder.currentEntry.Count)
+                            {
+                                TextMeshProUGUI tmpTemp = keywordDisplay.GetComponent<TextMeshProUGUI>();
+                                tmpTemp.text = string.Empty;
+                            }
                             isAdded = true;
-                            GameObject keywordDisplay = GameObject.Find("Code");
                             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
                             tmp.text += currentEntry.Text + "\n";
-                            Debug.Log(currentEntry.Text);
-                            Debug.Log(currentEntry.Text.Length);
-                            Debug.Log(tmp.text.Length);
                             Speaker.Instance.Speak(currentEntry.Text, audioSource, voice: voice);
                             currentEntry = currentEntries.Find(currentEntry).Next?.Value;
-                            if (counter == HelpSystemBuilder.currentEntry.Count)
-                            {
-                                GameObject keywordDisplay2 = GameObject.Find("Code");
-                                TextMeshProUGUI tmpTemp = keywordDisplay2.GetComponent<TextMeshProUGUI>();
-                                tmpTemp.text = "";
-                                counter = 0;
-                            }
                         }
                         if (videoPlayer.time > currentEntry?.CumulatedTime && isAdded)
                         {
-                                isAdded = false;
-                                counter++;
+                            isAdded = false;
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the TextMeshPro-Text which represents the progress of the video. It is
+        /// splitted in parts of texts, e.g. 1/5 or 2/5 instead of time.
+        /// </summary>
+        private void SetTmpProgress()
+        {
+            int currentProgress;
+            if (currentEntry.Index - 1 != 0)
+            {
+                currentProgress = currentEntry.Index - 1;
+            }
+            else
+            {
+                currentProgress = HelpSystemBuilder.currentEntry.Count;
+            }
+            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntry.Count;
         }
 
         /// <summary>
@@ -234,12 +239,6 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Stops the HelpSystemEntry. That means, that the video will be resetted and SEE´s reading will be stopped.
-        /// This does not means, that the Entry will be closed. The user can start it again, but from the beginning, again.
-        /// </summary>
-        public void Stop() { }
-
-        /// <summary>
         /// Closes the HelpSystemEntry, stops the displayed video and resets the HelpSystemMenu too to the start.
         /// </summary>
         public void Close()
@@ -282,13 +281,7 @@ namespace SEE.Game.UI.HelpSystem
                 throw new System.Exception("No Video-Player found");
             }
             videoPlayer.time = currentEntry.CumulatedTime;
-            GameObject keywordDisplay = GameObject.Find("Code");
             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-            if ((HelpSystemBuilder.currentEntry.Count <= counter))
-            {
-                counter = 0;
-                tmp.text = "";
-            }
         }
 
         /// <summary>
@@ -298,59 +291,53 @@ namespace SEE.Game.UI.HelpSystem
         public void Backward()
         {
             // TODO: previous - if previous is nullref - index out of bounds
-            GameObject keywordDisplay = GameObject.Find("Code");
             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
             if (videoPlayer == null)
             {
                 throw new System.Exception("No Video-Player found");
             }
-            if (videoPlayer.time -1f < HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.CumulatedTime)
+            // normal - selben eintrag nochmal
+            if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
             {
-               string textToBeRemoved = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.Text;
-                textToBeRemoved += HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous.Value.Text;
+                currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+            }
+            else
+            {
+                currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value;
+            }
+            string textToBeRemoved2 = currentEntry.Text;
+            tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved2.Length + 1));
+            videoPlayer.time = currentEntry.CumulatedTime;
 
+            // ein eintrag zurück
+            if (videoPlayer.time - 1f < currentEntry.CumulatedTime)
+            {
+                string textToBeRemoved;
                 Debug.Log("vorheriges");
                 if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
                 {
                     currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
-                    counter = HelpSystemBuilder.currentEntry.Count-3;
-                }
-                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous == null)
-                {
-                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
-                    counter = HelpSystemBuilder.currentEntry.Count-3;
-                }
-                else
-                {
-                    currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Previous.Value;
-                    counter -= 2;
-                }
-                tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 2));
-            }
-            else
-            {
-                string textToBeRemoved2 = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value.Text;
-                Debug.Log("au0erhalb der 2 sekunden - dasslebe");
-                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
-                {
-                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                    textToBeRemoved = currentEntry.Text;
                 }
                 else
                 {
                     currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value;
+                    textToBeRemoved = currentEntry.Text;
                 }
-                counter--;
-                Debug.Log(tmp.text.Length);
-                Debug.Log(textToBeRemoved2);
-                Debug.Log(textToBeRemoved2.Length);
-                tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved2.Length +1));
-            }
-            videoPlayer.time = currentEntry.CumulatedTime;
-           
-            if ((HelpSystemBuilder.currentEntry.Count <= counter))
-            {
-                counter = 0;
-                tmp.text = "";
+                try
+                {
+                    videoPlayer.time = currentEntry.CumulatedTime;
+                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 1));
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    tmp.text = string.Empty;
+                    foreach (LinkedListEntry s in HelpSystemBuilder.currentEntry)
+                    {
+                        tmp.text += s.Text + "\n";
+                    }
+                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (HelpSystemBuilder.currentEntry.Last.Value.Text.Length + 1));
+                }
             }
         }
 
@@ -368,7 +355,6 @@ namespace SEE.Game.UI.HelpSystem
             {
                 throw new System.Exception("No Video-Player found");
             }
-
             videoPlayer.Stop();
             HelpSystemMenu.IsEntryOpened = false;
             EntryShown = false;
@@ -388,23 +374,17 @@ namespace SEE.Game.UI.HelpSystem
             if (!IsPlaying)
             {
                 pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Pause");
-                //rectTransform.localPosition = new Vector3(-0.1f, -50.12466f, 0);
-                //rectTransform.localScale = new Vector3(1.2f, 0.94f, 1);
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
                 Speaker.Instance.PauseOrUnPause();
                 IsPlaying = true;
-
             }
             else
             {
                 pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Play");
-                //rectTransform.localPosition = new Vector3(1f, -50.22466f, 0f);
-                //rectTransform.localScale = new Vector3(2f, 1.31f, 1);
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();
-
                 IsPlaying = false;
             }
         }
