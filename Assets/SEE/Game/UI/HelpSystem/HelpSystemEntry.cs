@@ -373,7 +373,7 @@ namespace SEE.Game.UI.HelpSystem
             .gameObject.TryGetComponentOrLog(out RectTransform rectTransform);
             if (!IsPlaying)
             {
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Pause");
+                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
                 Speaker.Instance.PauseOrUnPause();
@@ -381,7 +381,7 @@ namespace SEE.Game.UI.HelpSystem
             }
             else
             {
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/ModernUIPack/Play");
+                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();
