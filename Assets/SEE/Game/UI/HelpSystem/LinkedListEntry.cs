@@ -7,12 +7,16 @@ public class LinkedListEntry
 
     private readonly int cumulatedTime;
 
-    public LinkedListEntry(string text, int cumulatedTime)
+    private readonly int index;
+
+    public LinkedListEntry(int index, string text, int cumulatedTime)
     {
         this.text = text;
         this.cumulatedTime = cumulatedTime;
+        this.index = index;
     }
 
     public int CumulatedTime { get => cumulatedTime; }
     public string Text { get => text;}
+    public int Index { get => index; }
 }
