@@ -31,6 +31,9 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private const string BackMenuCommand = "go back";
         
+        /// <summary>
+        /// The input-field for the fuzzy-search of the nestedMenu.
+        /// </summary>
         private TMP_InputField searchInput;
 
         /// <summary>
@@ -39,8 +42,14 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public bool ResetLevelOnClose = true;
 
+        /// <summary>
+        /// All leaf-entries of the nestedMenu.
+        /// </summary>
         private IDictionary<string, MenuEntry> AllEntries;
 
+        /// <summary>
+        /// True, if the fuzzy-search is active, else false.
+        /// </summary>
         private bool searchActive;
 
         protected override void OnEntrySelected(MenuEntry entry)
@@ -79,8 +88,6 @@ namespace SEE.Game.UI.Menu
         /// <param name="args">the phrase recognized</param>
         protected override void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
         {
-            Debug.Log(args.text);
-            Debug.Log("overwritten");
             int i = 0;
             foreach (string keyword in GetMenuEntryTitles())
             {
@@ -192,12 +199,21 @@ namespace SEE.Game.UI.Menu
             OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
         }
 
+        /// <summary>
+        /// Gets all leaf-entries - or rather menuEntries (no nestedMenuEntries) of the nestedMenu.
+        /// </summary>
+        /// <returns>All leaf-entries of the nestedMenu.</returns>
         private IEnumerable<MenuEntry> GetAllEntries()
         {
             IList<MenuEntry> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
             return GetAllEntries(allEntries);
         }
 
+        /// <summary>
+        /// Searchs through the complete tree of the nestedMenu and selects all MenuEntries.
+        /// </summary>
+        /// <param name="startingEntries">the entries to research.</param>
+        /// <returns>All leafEntries of the nestedMenu.</returns>
         private static IEnumerable<MenuEntry> GetAllEntries(IEnumerable<MenuEntry> startingEntries)
         {
             List<MenuEntry> leafEntries = new List<MenuEntry>();
@@ -216,6 +232,11 @@ namespace SEE.Game.UI.Menu
             return leafEntries;
         }
 
+        /// <summary>
+        /// The action which is called by typing inside of the fuzzy-search input field.
+        /// Displays all results of the fuzzySearch inside of the menu ordered by matching-specifity.
+        /// </summary>
+        /// <param name="text">the text inside of the fuzzy-search.</param>
         private void SearchTextEntered(string text)
         {
             if (searchActive)

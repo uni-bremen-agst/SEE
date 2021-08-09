@@ -1,111 +1,112 @@
 using System.Collections.Generic;
 using SEE.Controls;
-using SEE.Game.UI.HelpSystem;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using UnityEngine;
 
-public class HelpSystemMenu : MonoBehaviour
+namespace SEE.Game.UI.HelpSystem
 {
-    /// <summary>
-    /// The name of the PersonalAssistant-GameObject
-    /// </summary>
-    public const string PersonalAssistant = "PersonalAssistant";
-
-    /// <summary>
-    /// The name of the HelpSystem-GameObject
-    /// </summary>
-    public const string HelpSystem = "HelpSystem";
-
-    /// <summary>
-    /// The NestedMenu of the HelpSystem - responsible for the navigation
-    /// inside of the use-cases.
-    /// </summary>
-    public NestedMenu mainMenu;
-
-    /// <summary>
-    /// True, if an entry is currently displayed. That means, 
-    /// that there should be no interaction possible with the collider of see 
-    /// for opening the nestedMenu while Entry is opened.
-    /// </summary>
-    public static bool IsEntryOpened { get; set; } = false;
-
-    // Start is called before the first frame update
-    void Start()
+    public class HelpSystemMenu : MonoBehaviour
     {
-        CreateStartMenu();
-    }
+        /// <summary>
+        /// The name of the PersonalAssistant-GameObject
+        /// </summary>
+        public const string PersonalAssistant = "PersonalAssistant";
 
-    public void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
+        /// <summary>
+        /// The name of the HelpSystem-GameObject
+        /// </summary>
+        public const string HelpSystem = "HelpSystem";
+
+        /// <summary>
+        /// The NestedMenu of the HelpSystem - responsible for the navigation
+        /// inside of the use-cases.
+        /// </summary>
+        public NestedMenu mainMenu;
+
+        /// <summary>
+        /// True, if an entry is currently displayed. That means, 
+        /// that there should be no interaction possible with the collider of see 
+        /// for opening the nestedMenu while Entry is opened.
+        /// </summary>
+        public static bool IsEntryOpened { get; set; } = false;
+
+        // Start is called before the first frame update
+        void Start()
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit))
-                if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false && !IsEntryOpened)
-                {
-                    mainMenu.ShowMenu(true);
-                }
+            CreateStartMenu();
         }
-    }
 
-    /// <summary>
-    /// Contains all Hierachy-Layers of the Help-System-Menu from the lowest to the highest layer.
-    /// It creates all Sub-Menu's, RefEntries and HelpSystemEntrys and should be expanded by the developers.
-    /// </summary>
-    private void CreateStartMenu()
-    {
-        // Important note: You have to define the lowest hierachy-level first. 
-        // That means, the mainMenu will be defined at the end and the lowest entry-list first.
+        public void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit))
+                    if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false && !IsEntryOpened)
+                    {
+                        mainMenu.ShowMenu(true);
+                    }
+            }
+        }
 
-        PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+        /// <summary>
+        /// Contains all Hierachy-Layers of the Help-System-Menu from the lowest to the highest layer.
+        /// It creates all Sub-Menu's, RefEntries and HelpSystemEntrys and should be expanded by the developers.
+        /// </summary>
+        private void CreateStartMenu()
+        {
+            // Important note: You have to define the lowest hierachy-level first. 
+            // That means, the mainMenu will be defined at the end and the lowest entry-list first.
 
-        List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
-        List<MenuEntry> architectureEntries = new List<MenuEntry>();
-        List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
-        List<MenuEntry> evolutionEntries = new List<MenuEntry>();
-        List<MenuEntry> debuggingEntries = new List<MenuEntry>();
-        List<MenuEntry> qualityEntries = new List<MenuEntry>();
+            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
 
-        LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
-        addEdge.AddLast(new LinkedListEntry(1,"Press Space for opening player menu", 0));
-        addEdge.AddLast(new LinkedListEntry(2,"Leftklick on the entry add edge", 8));
-        addEdge.AddLast(new LinkedListEntry(3,"Lefklick on a node to select the start node", 18));
-        addEdge.AddLast(new LinkedListEntry(4,"Lefklick on a node to select the target node", 23));
-        addEdge.AddLast(new LinkedListEntry(5,"Press Key F11 to  remove the selected start node", 36));
+            List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
+            List<MenuEntry> architectureEntries = new List<MenuEntry>();
+            List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
+            List<MenuEntry> evolutionEntries = new List<MenuEntry>();
+            List<MenuEntry> debuggingEntries = new List<MenuEntry>();
+            List<MenuEntry> qualityEntries = new List<MenuEntry>();
+
+            LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
+            addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening player menu", 0));
+            addEdge.AddLast(new LinkedListEntry(2, "Leftklick on the entry add edge", 8));
+            addEdge.AddLast(new LinkedListEntry(3, "Lefklick on a node to select the start node", 18));
+            addEdge.AddLast(new LinkedListEntry(4, "Lefklick on a node to select the target node", 23));
+            addEdge.AddLast(new LinkedListEntry(5, "Press Key F11 to  remove the selected start node", 36));
 
 
-        LinkedList<LinkedListEntry> addNode = new LinkedList<LinkedListEntry>();
-        addNode.AddLast(new LinkedListEntry(1,"Press2 Space for opening player menu", 0));
-        addNode.AddLast(new LinkedListEntry(2,"Leftklick2 on the entry add edge", 10));
-        addNode.AddLast(new LinkedListEntry(3,"Lefklick2 on a node to select the start node", 15));
+            LinkedList<LinkedListEntry> addNode = new LinkedList<LinkedListEntry>();
+            addNode.AddLast(new LinkedListEntry(1, "Press2 Space for opening player menu", 0));
+            addNode.AddLast(new LinkedListEntry(2, "Leftklick2 on the entry add edge", 10));
+            addNode.AddLast(new LinkedListEntry(3, "Lefklick2 on a node to select the start node", 15));
 
-        //Dictionary<string, int> addLine = new Dictionary<string, int>();
-        //addLine.Add("Press Space3 for opening player menu", 5);
-        //addLine.Add("Leftklick3 on the entry add edge", 2);
-        //addLine.Add("Lef,klick3 on a node to select the start node", 10);
+            //Dictionary<string, int> addLine = new Dictionary<string, int>();
+            //addLine.Add("Press Space3 for opening player menu", 5);
+            //addLine.Add("Leftklick3 on the entry add edge", 2);
+            //addLine.Add("Lef,klick3 on a node to select the start node", 10);
 
-        //Dictionary<string, int> placeholder = new Dictionary<string, int>();
-        //placeholder.Add("Press4 Space for opening player menu", 5);
-        //placeholder.Add("Leftklick4 on the entry add edge", 2);
-        //placeholder.Add("Lefklick4 on a node to select the start node", 10);
+            //Dictionary<string, int> placeholder = new Dictionary<string, int>();
+            //placeholder.Add("Press4 Space for opening player menu", 5);
+            //placeholder.Add("Leftklick4 on the entry add edge", 2);
+            //placeholder.Add("Lefklick4 on a node to select the start node", 10);
 
-        // Hint: Description is responsible for the title, title is useless
-        playerMenuEntries = new List<MenuEntry>
+            // Hint: Description is responsible for the title, title is useless
+            playerMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "Add Edge Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Node", "Add Node Description", Color.magenta, "Assets/SEE/Videos/AddNode.mp4", addNode, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Line", "Add Line Description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", null, entry)
         };
 
-        architectureEntries = new List<MenuEntry>
+            architectureEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.magenta),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4",null, entry)
         };
 
-        mainMenuEntries = new List<MenuEntry>
+            mainMenuEntries = new List<MenuEntry>
         {
             HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use-Cases related to the architecture", Color.magenta),
             HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use-Cases related to software-evolution", Color.red),
@@ -113,6 +114,7 @@ public class HelpSystemMenu : MonoBehaviour
             HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use-Cases related to the software-quality", Color.cyan)
         };
 
-        mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
+            mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
+        }
     }
 }

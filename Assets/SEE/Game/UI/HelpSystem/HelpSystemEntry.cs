@@ -139,9 +139,9 @@ namespace SEE.Game.UI.HelpSystem
                     isAdded = false;
                     currentEntry = null;
                 }
-                if (HelpSystemBuilder.currentEntry != null)
+                if (HelpSystemBuilder.currentEntries != null)
                 {
-                    LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntry;
+                    LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntries;
                     currentEntry ??= currentEntries.First();
                     SetTmpProgress();
 
@@ -149,7 +149,7 @@ namespace SEE.Game.UI.HelpSystem
                     {
                         if (Mathf.Round((float)videoPlayer.time) == currentEntry.CumulatedTime && !isAdded)
                         {
-                            if (currentEntry?.Index - 1 == HelpSystemBuilder.currentEntry.Count)
+                            if (currentEntry?.Index - 1 == HelpSystemBuilder.currentEntries.Count)
                             {
                                 TextMeshProUGUI tmpTemp = keywordDisplay.GetComponent<TextMeshProUGUI>();
                                 tmpTemp.text = string.Empty;
@@ -182,9 +182,9 @@ namespace SEE.Game.UI.HelpSystem
             }
             else
             {
-                currentProgress = HelpSystemBuilder.currentEntry.Count;
+                currentProgress = HelpSystemBuilder.currentEntries.Count;
             }
-            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntry.Count;
+            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntries.Count;
         }
 
         /// <summary>
@@ -297,13 +297,13 @@ namespace SEE.Game.UI.HelpSystem
                 throw new System.Exception("No Video-Player found");
             }
             // normal - selben eintrag nochmal
-            if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
+            if (HelpSystemBuilder.currentEntries.Find(currentEntry).Previous == null)
             {
-                currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                currentEntry = HelpSystemBuilder.currentEntries.Last.Value;
             }
             else
             {
-                currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value;
+                currentEntry = HelpSystemBuilder.currentEntries.Find(currentEntry).Previous.Value;
             }
             string textToBeRemoved2 = currentEntry.Text;
             tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved2.Length + 1));
@@ -314,14 +314,14 @@ namespace SEE.Game.UI.HelpSystem
             {
                 string textToBeRemoved;
                 Debug.Log("vorheriges");
-                if (HelpSystemBuilder.currentEntry.Find(currentEntry).Previous == null)
+                if (HelpSystemBuilder.currentEntries.Find(currentEntry).Previous == null)
                 {
-                    currentEntry = HelpSystemBuilder.currentEntry.Last.Value;
+                    currentEntry = HelpSystemBuilder.currentEntries.Last.Value;
                     textToBeRemoved = currentEntry.Text;
                 }
                 else
                 {
-                    currentEntry = HelpSystemBuilder.currentEntry.Find(currentEntry).Previous.Value;
+                    currentEntry = HelpSystemBuilder.currentEntries.Find(currentEntry).Previous.Value;
                     textToBeRemoved = currentEntry.Text;
                 }
                 try
@@ -332,11 +332,11 @@ namespace SEE.Game.UI.HelpSystem
                 catch (ArgumentOutOfRangeException e)
                 {
                     tmp.text = string.Empty;
-                    foreach (LinkedListEntry s in HelpSystemBuilder.currentEntry)
+                    foreach (LinkedListEntry s in HelpSystemBuilder.currentEntries)
                     {
                         tmp.text += s.Text + "\n";
                     }
-                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (HelpSystemBuilder.currentEntry.Last.Value.Text.Length + 1));
+                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (HelpSystemBuilder.currentEntries.Last.Value.Text.Length + 1));
                 }
             }
         }
