@@ -258,8 +258,8 @@ namespace SEE.Game.UI.Menu
                        .ToList();
 
             NestedMenuEntry resultEntry = new NestedMenuEntry(
-                 results, "Results", $"Found {results.Count()} help pages."
-            );
+                 results, "Results", $"Found {results.Count()} help pages.",default,default, Resources.Load<Sprite>("Materials/Notification/info")
+            ) ;
             AscendLevel(resultEntry);
         }
 
