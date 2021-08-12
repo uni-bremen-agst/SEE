@@ -205,20 +205,18 @@ namespace SEE.Utils
             if (crdt.Count > index)
             {
                 crdt.Insert(index, new CharObj(c, position));
-                if (index - 1 >= 0)
-                {
-                    new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier());
-                }
-                else
-                {
-                    new NetCRDT().AddChar(c, position, null);
-                }
-
             }
             else
             {
                 crdt.Add(new CharObj(c, position));
+            }
+            if (index - 1 >= 0)
+            {
                 new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier());
+            }
+            else
+            {
+                new NetCRDT().AddChar(c, position, null);
             }
         }
 
