@@ -168,8 +168,8 @@ namespace SEE.Utils
         {
             if (crdt.Count() > index && index > -1)
             {
+                new NetCRDT().DeleteChar(crdt[index].GetIdentifier());
                 crdt.RemoveAt(index);
-                new NetCRDT().DeleteChar(position);
             }
             else
             {
