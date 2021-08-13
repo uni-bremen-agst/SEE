@@ -127,7 +127,7 @@ namespace SEE.Game.UI.Menu
             // (Maybe displaying it above the title in a different color or something would work,
             // as the title is technically the last element in the breadcrumb)
             string breadcrumb = GetBreadcrumb();
-            Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\nHierarchy: {GetBreadcrumb()}" : "");
+            Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
             Icon = nestedEntry.Icon;
             nestedEntry.InnerEntries.ForEach(AddEntry);
             keywordInput.Unregister(OnMenuEntryTitleRecognized);
