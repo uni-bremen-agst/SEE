@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
@@ -54,17 +55,29 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh) 
             && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
-                TextMesh.text = Text;
+                //TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
                 
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
                 int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
-                TextMeshInputField.text = Text; //string.Concat('\n', Text.Split('\n')
-                                                //                        .Select((x, i) => GetCleanLine(i).Substring(neededPadding))
-                                                //                       .ToArray()); 
-                TextMeshInputField.caretPosition = 1;
+                List<string> textWitzhOutNumbers = Text.Split('\n')
+                                                                   .Select((x, i) => {
+                                                                       string cleanLine = GetCleanLine(i);
+                                                                       if (cleanLine.Length > 0)
+                                                                       {
+                                                                           return cleanLine.Substring(neededPadding);
+                                                                       }
+                                                                       else
+                                                                       { 
+                                                                           return cleanLine;
+                                                                       }
+
+                                                                   }).ToList();
+                TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
+                //TextMeshInputField.caretPosition = 1;
+                
             }
 
             // Register events to find out when window was scrolled in.
@@ -108,7 +121,7 @@ namespace SEE.Game.UI.CodeWindow
         private Tooltip.Tooltip issueTooltip;
 
         protected override void UpdateDesktop()
-        {
+        { 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.GO;
@@ -38,6 +39,15 @@ namespace SEE.Controls.Actions
         /// The selected node's filename.
         /// </summary>
         private string selectedPath;
+        
+        /// <summary>
+        /// For the Key Listenr remembers if shift is pressed 
+        /// </summary>
+        bool shiftPressed = false;
+        /// <summary>
+        /// For the Key Listenr remembers if CapsLock is pressed 
+        /// </summary>
+        bool capsLock = false;
 
         private void OnDisable()
         {
@@ -49,6 +59,41 @@ namespace SEE.Controls.Actions
         {
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
+        }
+
+        private void OnGUI()
+        {
+
+            /// You need to look at the caretPostition and caretSelectPos on the input field. get the selected text
+            if (Input.GetKeyDown(KeyCode.CapsLock))
+            {
+                if (capsLock) capsLock = false;
+                else capsLock = true;
+            }
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+            {
+                shiftPressed = true;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+            {
+                shiftPressed = false;
+            }
+
+            Event e = Event.current;
+            if (e.isKey )
+            {
+                if ((shiftPressed && !capsLock) || (capsLock && !shiftPressed))
+                {
+                    Debug.Log("Detected key code: LARGE" + e.keyCode);
+
+                }
+                else
+                {
+                    Debug.Log("Detected key code: SMALL" + e.keyCode.ToString().ToLower());
+
+                }
+            }
+            
         }
 
         private void Start()
