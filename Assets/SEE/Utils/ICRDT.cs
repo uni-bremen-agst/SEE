@@ -24,6 +24,15 @@ namespace SEE.Utils
             crdt.DeleteChar(index);
         }
 
+        public static void AddChar(char c, int idx)
+        {
+            crdt.AddChar(c, idx);
+        }
+
+        public static string PrintString()
+        {
+            return crdt.PrintString();
+        }
         //TODO COMPLETE
     }
 }
