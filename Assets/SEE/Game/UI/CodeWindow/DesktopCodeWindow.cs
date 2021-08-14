@@ -138,17 +138,17 @@ namespace SEE.Game.UI.CodeWindow
             {
                 //logic related to the char pressed
                 //Debug.Log("Pressed char: " + Input.inputString);
-                crdt.AddChar(input[0], typeIndex);
+                ICRDT.AddChar(input[0], typeIndex);
                 typeIndex++;
             }
             if (Input.GetKeyDown(KeyCode.Delete) && typeIndex > 0)
             {
                 Debug.LogWarning("DLELEEEE");
                 typeIndex--;
-                crdt.DeleteChar(typeIndex);
+                ICRDT.DeleteChar(typeIndex);
                 
             }
-            Debug.Log(crdt.PrintString());
+            Debug.Log(ICRDT.PrintString());
 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
