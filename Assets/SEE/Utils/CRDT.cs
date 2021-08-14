@@ -19,9 +19,13 @@ namespace SEE.Utils
             public DeleteNotPossibleException(string v) : base(v)
             { }
         }
+        
+        [Serializable]
         public class Identifier
         {
+            [field: SerializeField]
             private int digit;
+            [field: SerializeField]
             private int site;
             public Identifier(int digit, int site)
             {
@@ -519,6 +523,18 @@ namespace SEE.Utils
             return delta;
         }
 
+        public Identifier[] StringToPosition(string s)
+        {
+            List<Identifier> ret = new List<Identifier>();
+            foreach (char c in s)
+            {
+                if (c == '(')
+                {
+
+                }
+            }
+            return ret.ToArray();
+        }
         /// <summary>
         /// Converts the CRDT values to a String 
         /// </summary>
