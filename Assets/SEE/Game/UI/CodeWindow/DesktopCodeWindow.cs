@@ -22,6 +22,13 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private ScrollRect scrollRect;
 
+        private CRDT crdt = new CRDT(1); //FIXME: Use Ip or such a identifier
+
+        /// <summary>
+        /// FIXME: REPLACE ALLL USAGE WITH THE CARRETPOS from the TMP
+        /// </summary>
+        private int typeIndex = 0;
+
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
         /// </summary>
@@ -77,7 +84,7 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
                 //TextMeshInputField.caretPosition = 1;
-                
+                     
             }
 
             // Register events to find out when window was scrolled in.
@@ -121,7 +128,28 @@ namespace SEE.Game.UI.CodeWindow
         private Tooltip.Tooltip issueTooltip;
 
         protected override void UpdateDesktop()
-        { 
+        {
+            //Input Handling
+            //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
+            //get the input
+            var input = Input.inputString;
+            //ignore null input to avoid unnecessary computation
+            if (!string.IsNullOrEmpty(input))
+            {
+                //logic related to the char pressed
+                //Debug.Log("Pressed char: " + Input.inputString);
+                crdt.AddChar(input[0], typeIndex);
+                typeIndex++;
+            }
+            if (Input.GetKeyDown(KeyCode.Delete) && typeIndex > 0)
+            {
+                Debug.LogWarning("DLELEEEE");
+                typeIndex--;
+                crdt.DeleteChar(typeIndex);
+                
+            }
+            Debug.Log(crdt.PrintString());
+
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {
