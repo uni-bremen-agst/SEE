@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using static SEE.Utils.CRDT;
 
 namespace SEE.Utils
@@ -32,6 +33,11 @@ namespace SEE.Utils
         public static string PrintString()
         {
             return crdt.PrintString();
+        }
+
+        public static Identifier[] StringToPosition(string s)
+        {
+            return crdt.StringToPosition(s);
         }
         //TODO COMPLETE
     }

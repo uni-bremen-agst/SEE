@@ -61,11 +61,11 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, position, prePosition);
+                        ICRDT.RemoteAddChar(c, /*ICRDT.StringToPosition(*/position/*)*/, /*ICRDT.StringToPosition(*/prePosition/*)*/);
                         break;
 
                     case RemoteAction.DelteChar:
-                        ICRDT.RemoteDeleteChar(position);
+                        ICRDT.RemoteDeleteChar(/*ICRDT.StringToPosition(*/position/*)*/);
                         break;
                 }
 
@@ -74,7 +74,7 @@ namespace SEE.Net
 
         public void DeleteChar(Identifier[] position)
         {
-            this.position = position;
+            this.position = position;//.ToString();
             state = RemoteAction.DelteChar;
             Execute(null);
         }
@@ -82,8 +82,9 @@ namespace SEE.Net
         public void AddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
             this.c = c;
-            this.position = position;
-            this.prePosition = prePosition;
+            this.position = position;//.ToString();
+            //Debug.LogWarning("TO STRING  " + position);
+            this.prePosition = prePosition;//.ToString();
             state = RemoteAction.AddChar;
             Execute(null);
         }
