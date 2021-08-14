@@ -41,10 +41,6 @@ namespace SEE.Controls.Actions
         private string selectedPath;
         
         /// <summary>
-        /// For the Key Listenr remembers if shift is pressed 
-        /// </summary>
-        bool shiftPressed = false;
-        /// <summary>
         /// For the Key Listenr remembers if CapsLock is pressed 
         /// </summary>
         bool capsLock = false;
@@ -60,38 +56,49 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
-
+        private string KeyCodeToString(Event e)
+        {
+            string ret = "";
+            if(e.keyCode >= KeyCode.A && e.keyCode <= KeyCode.Z)
+            {
+                if(e.shift || e.capsLock)
+                {
+                   ret = e.keyCode.ToString();
+                }
+                else
+                {
+                    ret = e.keyCode.ToString().ToLower();
+                }
+                
+            }
+            if(e.keyCode > KeyCode.Delete && e.keyCode < KeyCode.Clear)
+            {
+                ret = e.keyCode.ToString();
+            }
+            return ret;
+        }
         private void OnGUI()
         {
-
+            List<string> notChars =new List<string> {"None", "Backspace", "Delete", "Clear", "Pause", "Escape", "UpArrow", "DownArrow", "RightArrow", "LeftArrow", "Insert", "Home", "End", "PageUp", "PageDown", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F13", "F14", "F15", "Numlock", "CapsLock", "ScrollLock", "RightShift", "LeftShift", "RightControl" };
             /// You need to look at the caretPostition and caretSelectPos on the input field. get the selected text
             if (Input.GetKeyDown(KeyCode.CapsLock))
             {
                 if (capsLock) capsLock = false;
                 else capsLock = true;
             }
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-            {
-                shiftPressed = true;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
-            {
-                shiftPressed = false;
-            }
+            
 
-            Event e = Event.current;
-            if (e.isKey )
+            Event e = Event.current;  //FIXME: WAIT MS BETRWEEN INPUT
+            if (e.isKey && "None" != e.keyCode.ToString())
             {
-                if ((shiftPressed && !capsLock) || (capsLock && !shiftPressed))
-                {
-                    Debug.Log("Detected key code: LARGE" + e.keyCode);
-
-                }
-                else
-                {
-                    Debug.Log("Detected key code: SMALL" + e.keyCode.ToString().ToLower());
-
-                }
+               // if ((shiftPressed && !capsLock) || (capsLock && !shiftPressed))
+                //{
+                   // Debug.Log("Detected key code: " + KeyCodeToString(e) + "  REAL " + e.keyCode.ToString());
+                //}
+               // else
+               // {
+               //     Debug.Log("Detected key code: " + e.keyCode.ToString().ToLower());
+               // }
             }
             
         }
