@@ -23,9 +23,9 @@ namespace SEE.Utils
         [Serializable]
         public class Identifier
         {
-            [field: SerializeField]
+            [SerializeField]
             private int digit;
-            [field: SerializeField]
+            [SerializeField]
             private int site;
             public Identifier(int digit, int site)
             {
@@ -523,18 +523,60 @@ namespace SEE.Utils
             return delta;
         }
 
+        /// <summary>
+        /// Transforms an string into a position
+        /// </summary>
+        /// <param name="s">The string contianing the position</param>
+        /// <returns>a psotion - Identifier[]</returns>
         public Identifier[] StringToPosition(string s)
         {
             List<Identifier> ret = new List<Identifier>();
+            string digit = "";
+            string siteID = "";
+            bool isDigit = false;
+            bool isSiteID = false;
+            bool next = false;
             foreach (char c in s)
             {
                 if (c == '(')
                 {
+                    isDigit = true;
+                    next = false;
+                }
+                else if(c == ',' && !next)
+                {
+                    isDigit = false;
+                    isSiteID = true;
+                }
+                else  if(c == ')')
+                {
+                    isSiteID = false;
+                    next = true;
+                }
+                else if(c == ',' && next)
+                {
+                    ret.Add(new Identifier( Int32.Parse(digit), Int32.Parse(siteID)));
+                    digit = "";
+                    siteID = "";
 
+                }
+                else
+                {
+                    if (isDigit)
+                    {
+                        digit += c;
+                    }
+                    else if (isSiteID)
+                    {
+                        siteID += c;
+                    }
                 }
             }
             return ret.ToArray();
         }
+
+
+
         /// <summary>
         /// Converts the CRDT values to a String 
         /// </summary>
