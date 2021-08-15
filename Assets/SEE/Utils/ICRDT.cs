@@ -39,6 +39,11 @@ namespace SEE.Utils
         {
             return crdt.StringToPosition(s);
         }
+
+        public static string PositionToString(Identifier[] position)
+        {
+            return crdt.PositionToString(position);
+        }
         //TODO COMPLETE
     }
 }

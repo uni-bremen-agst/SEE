@@ -548,6 +548,10 @@ namespace SEE.Utils
                     isDigit = false;
                     isSiteID = true;
                 }
+                else if(c == ' ')
+                {
+                    //do nothing
+                }
                 else  if(c == ')')
                 {
                     isSiteID = false;
@@ -575,7 +579,29 @@ namespace SEE.Utils
             return ret.ToArray();
         }
 
-
+        /// <summary>
+        /// Converts a position into a string
+        /// </summary>
+        /// <param name="position">The position that should be converted to a string</param>
+        /// <returns>A string of a position</returns>
+        public string PositionToString(Identifier[] position)
+        {
+            string ret = "";
+            bool fst = true;
+            foreach(Identifier i in position)
+            {
+                if (!fst)
+                {
+                    ret += ',';
+                }
+                else
+                {
+                    fst = false;
+                }
+                ret += i.ToString();
+            }
+            return ret;
+        }
 
         /// <summary>
         /// Converts the CRDT values to a String 
