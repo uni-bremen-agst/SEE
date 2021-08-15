@@ -536,6 +536,7 @@ namespace SEE.Utils
             bool isDigit = false;
             bool isSiteID = false;
             bool next = false;
+            if (s == null) return null;
             foreach (char c in s)
             {
                 if (c == '(')
@@ -588,6 +589,7 @@ namespace SEE.Utils
         {
             string ret = "";
             bool fst = true;
+            if (position == null) return null;
             foreach(Identifier i in position)
             {
                 if (!fst)
