@@ -5,11 +5,10 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
-    ///   
+    ///
     /// Loads a city with the attributes defined in object with name
     /// <see cref="gameObjectName"/> for every client.
     /// </summary>
@@ -80,6 +79,8 @@ namespace SEE.Net
         public NodeLayoutKind NodeLayout;
         public EdgeLayoutKind EdgeLayout;
         public bool ZScoreScale;
+        public bool ScaleOnlyLeafMetrics;
+
         public float EdgeWidth;
         public bool ShowLeafErosions;
         public bool ShowInnerErosions;
@@ -177,6 +178,8 @@ namespace SEE.Net
             NodeLayout = city.nodeLayoutSettings.kind;
             EdgeLayout = city.edgeLayoutSettings.kind;
             ZScoreScale = city.nodeLayoutSettings.zScoreScale;
+            ScaleOnlyLeafMetrics = city.nodeLayoutSettings.ScaleOnlyLeafMetrics;
+
             EdgeWidth = city.edgeLayoutSettings.edgeWidth;
             ShowInnerErosions = city.nodeLayoutSettings.showInnerErosions;
             ShowLeafErosions = city.nodeLayoutSettings.showLeafErosions;
@@ -311,6 +314,8 @@ namespace SEE.Net
             city.nodeLayoutSettings.kind = NodeLayout;
             city.edgeLayoutSettings.kind = EdgeLayout;
             city.nodeLayoutSettings.zScoreScale = ZScoreScale;
+            city.nodeLayoutSettings.ScaleOnlyLeafMetrics = ScaleOnlyLeafMetrics;
+
             city.edgeLayoutSettings.edgeWidth = EdgeWidth;
             city.nodeLayoutSettings.showInnerErosions = ShowInnerErosions;
             city.nodeLayoutSettings.showLeafErosions = ShowLeafErosions;
@@ -349,5 +354,4 @@ namespace SEE.Net
             }
         }
     }
-
 }
