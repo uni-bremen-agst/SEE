@@ -19,9 +19,13 @@ namespace SEE.Utils
             public DeleteNotPossibleException(string v) : base(v)
             { }
         }
+        
+        [Serializable]
         public class Identifier
         {
+            [SerializeField]
             private int digit;
+            [SerializeField]
             private int site;
             public Identifier(int digit, int site)
             {
@@ -114,6 +118,7 @@ namespace SEE.Utils
         /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
         public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
+            Debug.LogWarning("REMOTE ADDD " + position + " pre " + prePosition + " char " + c);
             if (prePosition != null)
             {
                 (int, CharObj) found = Find(prePosition);
@@ -517,6 +522,88 @@ namespace SEE.Utils
                 }
             }
             return delta;
+        }
+
+        /// <summary>
+        /// Transforms an string into a position
+        /// </summary>
+        /// <param name="s">The string contianing the position</param>
+        /// <returns>a psotion - Identifier[]</returns>
+        public Identifier[] StringToPosition(string s)
+        {
+            List<Identifier> ret = new List<Identifier>();
+            string digit = "";
+            string siteID = "";
+            bool isDigit = false;
+            bool isSiteID = false;
+            bool next = false;
+            if (s == null) return null;
+            foreach (char c in s)
+            {
+                if (c == '(')
+                {
+                    isDigit = true;
+                    next = false;
+                }
+                else if(c == ',' && !next)
+                {
+                    isDigit = false;
+                    isSiteID = true;
+                }
+                else if(c == ' ')
+                {
+                    //do nothing
+                }
+                else  if(c == ')')
+                {
+                    isSiteID = false;
+                    next = true;
+                }
+                else if(c == ',' && next)
+                {
+                    ret.Add(new Identifier( Int32.Parse(digit), Int32.Parse(siteID)));
+                    digit = "";
+                    siteID = "";
+
+                }
+                else
+                {
+                    if (isDigit)
+                    {
+                        digit += c;
+                    }
+                    else if (isSiteID)
+                    {
+                        siteID += c;
+                    }
+                }
+            }
+            return ret.ToArray();
+        }
+
+        /// <summary>
+        /// Converts a position into a string
+        /// </summary>
+        /// <param name="position">The position that should be converted to a string</param>
+        /// <returns>A string of a position</returns>
+        public string PositionToString(Identifier[] position)
+        {
+            string ret = "";
+            bool fst = true;
+            if (position == null) return null;
+            foreach(Identifier i in position)
+            {
+                if (!fst)
+                {
+                    ret += ',';
+                }
+                else
+                {
+                    fst = false;
+                }
+                ret += i.ToString();
+            }
+            return ret;
         }
 
         /// <summary>

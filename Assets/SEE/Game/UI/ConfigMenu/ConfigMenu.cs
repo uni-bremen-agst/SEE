@@ -178,7 +178,7 @@ namespace SEE.Game.UI.ConfigMenu
 
                 // Replace the default input system with our VR input system.
                 GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
-                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;                
+                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
                 VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
@@ -455,6 +455,13 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetOnChangeHandler(b => city.nodeLayoutSettings.zScoreScale = b)
                 .Build();
 
+            // Leaf/inner node metric scaling
+            SwitchBuilder.Init(controls.transform)
+                .SetLabel("Scale only leaf metrics")
+                .SetDefaultValue(city.nodeLayoutSettings.ScaleOnlyLeafMetrics)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.ScaleOnlyLeafMetrics = b)
+                .Build();
+
             // Show leaf erosions
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show leaf erosions")
@@ -484,7 +491,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetLabel("Dashboard metrics override")
                 .SetDefaultValue(city.nodeLayoutSettings.overrideMetrics)
                 .SetOnChangeHandler(b => city.nodeLayoutSettings.overrideMetrics = b)
-                .Build();            
+                .Build();
 
             // Erosion scaling factor
             SliderBuilder.Init(controls.transform)

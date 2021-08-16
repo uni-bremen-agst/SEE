@@ -34,8 +34,8 @@ namespace SEE.Net
         public RemoteAction state = RemoteAction.Init;
 
         public char c;
-        public Identifier[] position;
-        public Identifier[] prePosition;
+        public string position;
+        public string prePosition;
 
 
         public NetCRDT() : base()
@@ -61,11 +61,13 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, position, prePosition);
+                        Debug.LogWarning("POSITION " + position + " PREE " + prePosition);
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position), ICRDT.StringToPosition(prePosition));
+
                         break;
 
                     case RemoteAction.DelteChar:
-                        ICRDT.RemoteDeleteChar(position);
+                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position));
                         break;
                 }
 
@@ -74,7 +76,7 @@ namespace SEE.Net
 
         public void DeleteChar(Identifier[] position)
         {
-            this.position = position;
+            this.position = ICRDT.PositionToString(position);
             state = RemoteAction.DelteChar;
             Execute(null);
         }
@@ -82,8 +84,8 @@ namespace SEE.Net
         public void AddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
             this.c = c;
-            this.position = position;
-            this.prePosition = prePosition;
+            this.position = ICRDT.PositionToString(position);
+            this.prePosition = ICRDT.PositionToString(prePosition);
             state = RemoteAction.AddChar;
             Execute(null);
         }
