@@ -118,15 +118,20 @@ namespace SEE.Game
         public bool zScoreScale = true;
 
         /// <summary>
+        /// If true, only the metrics of leaf nodes are scaled.
+        /// </summary>
+        public bool ScaleOnlyLeafMetrics = true;
+
+        /// <summary>
         /// Whether erosions should be visible above inner node blocks.
         /// </summary>
         public bool showInnerErosions = false;
-        
+
         /// <summary>
         /// Whether erosions should be visible above leaf node blocks.
         /// </summary>
         public bool showLeafErosions = false;
-        
+
         /// <summary>
         /// Whether metrics shall be retrieved from the dashboard.
         /// This includes erosion data.
@@ -138,7 +143,7 @@ namespace SEE.Game
         /// the given version to the most recent one will be loaded.
         /// </summary>
         public string issuesAddedFromVersion = "";
-        
+
         /// <summary>
         /// Whether metrics retrieved from the dashboard shall override existing metrics.
         /// </summary>
