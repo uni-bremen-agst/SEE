@@ -277,8 +277,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8001156058010488143}
   m_HandleRect: {fileID: 6675216537217133775}
   m_Direction: 0
-  m_Value: -0.0000007511566
-  m_Size: 0.09971757
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -310,7 +310,6 @@ GameObject:
   - component: {fileID: 8300615001808544220}
   - component: {fileID: 8300615001808544222}
   - component: {fileID: 8300615001808544221}
-  - component: {fileID: 8300615001808544216}
   - component: {fileID: 8300615001808544223}
   m_Layer: 5
   m_Name: Code
@@ -335,7 +334,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0.0061035156, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: -0.00047302246}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &8300615001808544222
@@ -366,48 +365,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pellentesque
-    eget metus a ullamcorper. \nOrci varius natoque penatibus et magnis dis parturient
-    montes, nascetur ridiculus mus. \nIn hac habitasse platea dictumst. Suspendisse
-    blandit aliquet sem, vel mattis erat. \nSed eu ligula condimentum, pharetra nisi
-    ultrices, consequat arcu. \nSuspendisse felis tortor, facilisis id lacinia in,
-    pharetra vitae odio. \nInterdum et malesuada fames ac ante ipsum primis in faucibus.
-    \nMaecenas posuere id nisi id vehicula. Cras eu enim eu enim viverra molestie
-    a non enim. \nVivamus vel sem scelerisque, luctus sapien quis, tempus magna.
-    \nVestibulum vitae dolor id nisl tristique vestibulum. \nQuisque ut pharetra
-    massa. In vitae ipsum non justo consequat convallis. \nPraesent id ante iaculis,
-    rutrum dolor quis, blandit lorem.\r\n\r\nAliquam eget libero eu arcu pulvinar
-    congue posuere eget lectus. Donec vel venenatis mauris, a aliquet ante. Pellentesque
-    diam tortor, gravida a commodo eu, tempor ac lacus. Sed vitae auctor arcu. Donec
-    aliquam blandit facilisis. Donec et hendrerit diam. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos. Ut hendrerit,
-    lorem sodales vehicula cursus, nisi neque suscipit mauris, vel feugiat mi sapien
-    eu sem. Etiam malesuada consequat volutpat. Fusce turpis sapien, pretium a tellus
-    a, ornare accumsan neque.\r\n\r\nMorbi sed lectus dignissim, sagittis justo vitae,
-    scelerisque ex. Integer sit amet metus fermentum, lacinia dolor sit amet, fringilla
-    purus. Phasellus ultrices vestibulum ex ac condimentum. Suspendisse mattis diam
-    sed nulla pulvinar, vel fringilla odio viverra. Cras egestas dolor ac nisl dignissim
-    posuere. Morbi dignissim ante ut egestas iaculis. Sed turpis dui, rhoncus ut
-    auctor sit amet, pretium vel turpis.\r\n\r\nVestibulum ut congue metus. Duis
-    et massa condimentum, tristique sapien a, tincidunt urna. Etiam efficitur ex
-    in orci finibus, vitae auctor leo scelerisque. Ut aliquam venenatis blandit.
-    Curabitur pharetra eget nulla quis egestas. Nulla gravida ut urna nec fermentum.
-    Quisque est eros, rhoncus vel sem ut, luctus tincidunt neque. Quisque tincidunt
-    eu velit sed suscipit. Quisque sit amet tortor metus. Duis auctor risus ac mauris
-    luctus, non accumsan neque imperdiet. Nulla facilisi. Proin egestas est sit amet
-    ipsum bibendum, eu vestibulum risus laoreet. Cras dignissim, magna consectetur
-    ultrices tempor, dui nibh gravida libero, eu malesuada nulla felis ut magna.
-    Nullam laoreet lorem at dolor ornare porttitor. Nulla sed risus vulputate, viverra
-    orci ut, finibus lorem. Morbi ac felis laoreet, feugiat tortor vel, rhoncus ante.\r\n\r\nNullam
-    euismod vehicula mauris non ultricies. Nulla facilisi. Donec convallis est nec
-    mauris condimentum commodo. Quisque in mi dictum, tincidunt elit at, fringilla
-    mi. Vestibulum placerat quis purus a euismod. Proin non justo aliquam sapien
-    placerat pretium. Vestibulum non dolor et metus fermentum convallis. Quisque
-    id mi in lorem lobortis scelerisque ac sit amet dolor. Aenean purus erat, facilisis
-    et blandit nec, hendrerit ac lorem. Praesent convallis facilisis bibendum. Suspendisse
-    elementum, ex at laoreet tincidunt, nulla enim euismod nisi, nec tincidunt nibh
-    orci eget nisl. Curabitur dapibus, arcu cursus rhoncus suscipit, dolor nulla
-    congue nibh, id lacinia mi leo sed leo. Nunc id urna vitae mi pulvinar faucibus."
+  m_text: "\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 92937507b904a7642830aa23bef85941, type: 2}
   m_sharedMaterial: {fileID: 21347512826212414, guid: 92937507b904a7642830aa23bef85941, type: 2}
@@ -476,104 +434,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8300615001808544216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8300615001808544219}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 3
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 0
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 0
-  m_TargetGraphic: {fileID: 8300615001808544221}
-  m_TextViewport: {fileID: 8300615002390573300}
-  m_TextComponent: {fileID: 8300615001808544221}
-  m_Placeholder: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 8300615001976069999}
-  m_VerticalScrollbarEventHandler: {fileID: 0}
-  m_LayoutGroup: {fileID: 0}
-  m_ScrollSensitivity: 1
-  m_ContentType: 0
-  m_InputType: 0
-  m_AsteriskChar: 42
-  m_KeyboardType: 0
-  m_LineType: 0
-  m_HideMobileInput: 0
-  m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
-  m_RegexValue: 
-  m_GlobalPointSize: 14
-  m_CharacterLimit: 0
-  m_OnEndEdit:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSubmit:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnSelect:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnDeselect:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnTextSelection:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnEndTextSelection:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_OnTouchScreenKeyboardStatusChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  m_CustomCaretColor: 0
-  m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 
-  m_CaretBlinkRate: 0.85
-  m_CaretWidth: 1
-  m_ReadOnly: 0
-  m_RichText: 1
-  m_GlobalFontAsset: {fileID: 11400000, guid: 92937507b904a7642830aa23bef85941, type: 2}
-  m_OnFocusSelectAll: 0
-  m_ResetOnDeActivation: 0
-  m_RestoreOriginalTextOnEscape: 0
-  m_isRichTextEditingAllowed: 0
-  m_LineLimit: 0
-  m_InputValidator: {fileID: 0}
 --- !u!114 &8300615001808544223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,7 +540,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8300615002663608548}
   m_HandleRect: {fileID: 8300615002663608547}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -962,6 +822,7 @@ GameObject:
   - component: {fileID: 8300615002390573256}
   - component: {fileID: 8300615002390573303}
   - component: {fileID: 8414185065164131075}
+  - component: {fileID: 4508158556131232377}
   m_Layer: 5
   m_Name: Scrollable
   m_TagString: Untagged
@@ -1012,7 +873,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 8300615001808544220}
-  m_Horizontal: 0
+  m_Horizontal: 1
   m_Vertical: 1
   m_MovementType: 1
   m_Elasticity: 0.1
@@ -1093,6 +954,104 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &4508158556131232377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8300615002390573299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 8300615002390573256}
+  m_TextViewport: {fileID: 0}
+  m_TextComponent: {fileID: 8300615001808544221}
+  m_Placeholder: {fileID: 0}
+  m_VerticalScrollbar: {fileID: 0}
+  m_VerticalScrollbarEventHandler: {fileID: 0}
+  m_LayoutGroup: {fileID: 0}
+  m_ScrollSensitivity: 1
+  m_ContentType: 0
+  m_InputType: 0
+  m_AsteriskChar: 42
+  m_KeyboardType: 0
+  m_LineType: 0
+  m_HideMobileInput: 0
+  m_HideSoftKeyboard: 0
+  m_CharacterValidation: 0
+  m_RegexValue: 
+  m_GlobalPointSize: 14
+  m_CharacterLimit: 0
+  m_OnEndEdit:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnSubmit:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnSelect:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnDeselect:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnTextSelection:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnEndTextSelection:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnTouchScreenKeyboardStatusChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_CustomCaretColor: 0
+  m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
+  m_Text: 
+  m_CaretBlinkRate: 0.85
+  m_CaretWidth: 1
+  m_ReadOnly: 0
+  m_RichText: 1
+  m_GlobalFontAsset: {fileID: 0}
+  m_OnFocusSelectAll: 0
+  m_ResetOnDeActivation: 0
+  m_RestoreOriginalTextOnEscape: 1
+  m_isRichTextEditingAllowed: 0
+  m_LineLimit: 0
+  m_InputValidator: {fileID: 0}
 --- !u!1 &8300615002402893322
 GameObject:
   m_ObjectHideFlags: 0
