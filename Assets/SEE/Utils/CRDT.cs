@@ -561,6 +561,7 @@ namespace SEE.Utils
                 }
                 else if(c == ',' && next)
                 {
+                    Debug.LogWarning("PARSER STR " + digit + " s " + siteID + " int " + Int32.Parse(digit) + " d " + Int32.Parse(siteID));
                     ret.Add(new Identifier( Int32.Parse(digit), Int32.Parse(siteID)));
                     digit = "";
                     siteID = "";
