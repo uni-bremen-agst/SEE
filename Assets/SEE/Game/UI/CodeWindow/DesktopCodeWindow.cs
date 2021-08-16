@@ -52,7 +52,7 @@ namespace SEE.Game.UI.CodeWindow
             // Set title, text and preferred font size
             codeWindow.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
             if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh) 
-            && codeWindow.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out TextMeshInputField))
+            && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
                 TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;

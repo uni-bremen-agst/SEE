@@ -402,6 +402,7 @@ namespace SEE.Game.UI.CodeWindow
             try
             {
                 TextMesh.text = Text;
+                TextMeshInputField.text = Text;
                 TextMesh.ForceMeshUpdate();
             }
             catch (IndexOutOfRangeException)
