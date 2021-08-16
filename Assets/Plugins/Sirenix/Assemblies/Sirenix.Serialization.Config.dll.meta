@@ -1,112 +1,47 @@
 fileFormatVersion: 2
 guid: 74721b9f0af448f5ae2e91102a1a5edd
+timeCreated: 1488828285
+licenseType: Store
 PluginImporter:
-  externalObjects: {}
-  serializedVersion: 2
+  serializedVersion: 1
   iconMap: {}
   executionOrder: {}
-  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
-  isExplicitlyReferenced: 0
-  validateReferences: 1
   platformData:
-  - first:
-      : Any
-    second:
+    Any:
+      enabled: 1
+      settings:
+        Exclude Android: 0
+        Exclude Editor: 0
+        Exclude Linux: 0
+        Exclude Linux64: 0
+        Exclude LinuxUniversal: 0
+        Exclude N3DS: 0
+        Exclude OSXIntel: 0
+        Exclude OSXIntel64: 0
+        Exclude OSXUniversal: 0
+        Exclude PS4: 0
+        Exclude PSM: 0
+        Exclude PSP2: 0
+        Exclude SamsungTV: 0
+        Exclude Tizen: 0
+        Exclude WebGL: 0
+        Exclude WiiU: 0
+        Exclude Win: 0
+        Exclude Win64: 0
+        Exclude WindowsStoreApps: 0
+        Exclude XboxOne: 0
+        Exclude iOS: 0
+        Exclude tvOS: 0
+    Editor:
       enabled: 0
       settings:
-        Exclude Editor: 0
-  - first:
-      Android: Android
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Any: 
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      CloudRendering: CloudRendering
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      GameCoreXboxOne: GameCoreXboxOne
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Lumin: Lumin
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Nintendo Switch: Switch
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      PS4: PS4
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      PS5: PS5
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Stadia: Stadia
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Standalone: Linux64
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Standalone: OSXUniversal
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Standalone: Win
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Standalone: Win64
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      WebGL: WebGL
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      Windows Store Apps: WindowsStoreApps
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      XboxOne: XboxOne
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      iPhone: iOS
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      tvOS: tvOS
-    second:
-      enabled: 1
-      settings: {}
+        DefaultValueInitialized: true
+    WindowsStoreApps:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
   userData: 
   assetBundleName: 
   assetBundleVariant: 
