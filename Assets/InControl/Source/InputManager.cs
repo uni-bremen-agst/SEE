@@ -857,5 +857,14 @@ namespace InControl
 				return currentTick;
 			}
 		}
+
+
+		public static float CurrentTime
+		{
+			get
+			{
+				return currentTime;
+			}
+		}
 	}
 }

@@ -46,7 +46,7 @@ namespace InControl
 
 		public bool enableNativeInput = true;
 		public bool nativeInputEnableXInput = true;
-		public bool nativeInputEnableMFi = false;
+		public bool nativeInputEnableMFi = true;
 		public bool nativeInputPreventSleep = false;
 		public bool nativeInputOverrideUpdateRate = false;
 		public int nativeInputUpdateRate = 0;
@@ -217,4 +217,3 @@ namespace InControl
 		}
 	}
 }
-

@@ -88,10 +88,7 @@ namespace InControl
 			logDebugInfo.boolValue = EditorGUILayout.ToggleLeft( "Log Debug Info", logDebugInfo.boolValue, EditorUtility.labelStyle );
 			invertYAxis.boolValue = EditorGUILayout.ToggleLeft( "Invert Y Axis", invertYAxis.boolValue, EditorUtility.labelStyle );
 
-			// This is deprecated and replaced by updateMode
-			// useFixedUpdate.boolValue = EditorGUILayout.ToggleLeft( "Use Fixed Update", useFixedUpdate.boolValue, EditorUtility.labelStyle );
-
-			dontDestroyOnLoad.boolValue = EditorGUILayout.ToggleLeft( "Don't Destroy On Load", dontDestroyOnLoad.boolValue, EditorUtility.labelStyle );
+			dontDestroyOnLoad.boolValue = EditorGUILayout.ToggleLeft( "Don't Destroy On Load <color=#777>(Recommended)</color>", dontDestroyOnLoad.boolValue, EditorUtility.labelStyle );
 			suspendInBackground.boolValue = EditorGUILayout.ToggleLeft( "Suspend In Background", suspendInBackground.boolValue, EditorUtility.labelStyle );
 
 			GUILayout.Space( 5.0f );
@@ -113,19 +110,13 @@ namespace InControl
 			EditorUtility.EndGroup();
 
 
-			EditorUtility.GroupTitle( "Enable ICade (iOS/tvOS only)", enableICade );
+			EditorUtility.GroupTitle( "Enable ICade <color=#777>- iOS/tvOS</color>", enableICade );
 
 
-			EditorUtility.GroupTitle( "Enable XInput (Windows only)", enableXInput );
+			EditorUtility.GroupTitle( "Enable XInput <color=#777>- Windows, Deprecated</color>", enableXInput );
 			if (enableXInput.boolValue)
 			{
 				EditorUtility.BeginGroup();
-
-				//var text = "" +
-				//		   "<b>Warning: <color=#cc0000>Advanced Settings</color></b>\n" +
-				//		   "Do not modify these unless you perfectly understand what effect they will have. " +
-				//		   "Set to zero to automatically use sensible defaults.";
-				//GUILayout.Box( text, EditorUtility.wellStyle, GUILayout.ExpandWidth( true ) );
 
 				xInputOverrideUpdateRate.boolValue = EditorGUILayout.ToggleLeft( "Override Update Rate <color=#777>(Not Recommended)</color>", xInputOverrideUpdateRate.boolValue, EditorUtility.labelStyle );
 				xInputUpdateRate.intValue = xInputOverrideUpdateRate.boolValue ? Mathf.Max( EditorGUILayout.IntField( "Update Rate (Hz)", xInputUpdateRate.intValue ), 0 ) : 0;
@@ -137,28 +128,21 @@ namespace InControl
 			}
 
 
-			EditorUtility.GroupTitle( "Enable Native Input (Windows/macOS/iOS/tvOS only)", enableNativeInput );
+			EditorUtility.GroupTitle( "Enable Native Input <color=#777>- Windows/macOS/iOS/tvOS</color>", enableNativeInput );
 			if (enableNativeInput.boolValue)
 			{
 				EditorUtility.BeginGroup();
 
-				var text1 = "" +
-				            //							"<b>Warning: <color=#cc0000>This feature is in BETA!</color></b>\n" +
-				            "Enabling native input will disable using Unity input internally, " +
-				            "but should provide more efficient and robust input support.";
+				const string text1 = "" +
+				                     "Enabling native input will disable using Unity input internally, " +
+				                     "but should provide more efficient and robust input support.";
 				EditorUtility.SetTintColor();
 				GUILayout.Box( text1, EditorUtility.wellStyle, GUILayout.ExpandWidth( true ) );
 				EditorUtility.PopTintColor();
 
-				nativeInputEnableXInput.boolValue = EditorGUILayout.ToggleLeft( "Enable XInput Support <color=#777>(Windows Only)</color>", nativeInputEnableXInput.boolValue, EditorUtility.labelStyle );
-				nativeInputEnableMFi.boolValue = EditorGUILayout.ToggleLeft( "Enable MFi Support On macOS <color=#cc5500>(BETA)</color>", nativeInputEnableMFi.boolValue, EditorUtility.labelStyle );
+				nativeInputEnableXInput.boolValue = EditorGUILayout.ToggleLeft( "Enable XInput Support <color=#777>(Windows, Recommended)</color>", nativeInputEnableXInput.boolValue, EditorUtility.labelStyle );
+				nativeInputEnableMFi.boolValue = EditorGUILayout.ToggleLeft( "Enable MFi Support <color=#777>(macOS, Recommended)</color>", nativeInputEnableMFi.boolValue, EditorUtility.labelStyle );
 				nativeInputPreventSleep.boolValue = EditorGUILayout.ToggleLeft( "Prevent Screensaver / Sleep", nativeInputPreventSleep.boolValue, EditorUtility.labelStyle );
-
-				//var text2 = "" +
-				//			"<b>Warning: <color=#cc0000>Advanced Settings</color></b>\n" +
-				//			"Do not modify these unless you perfectly understand what effect they will have. " +
-				//			"Set to zero to automatically use sensible defaults.";
-				//GUILayout.Box( text2, EditorUtility.wellStyle, GUILayout.ExpandWidth( true ) );
 
 				nativeInputOverrideUpdateRate.boolValue = EditorGUILayout.ToggleLeft( "Override Update Rate <color=#777>(Not Recommended)</color>", nativeInputOverrideUpdateRate.boolValue, EditorUtility.labelStyle );
 				nativeInputUpdateRate.intValue = nativeInputOverrideUpdateRate.boolValue ? Mathf.Max( nativeInputUpdateRate.intValue, EditorGUILayout.IntField( "Update Rate (Hz)", nativeInputUpdateRate.intValue ), 0 ) : 0;

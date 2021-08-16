@@ -27,6 +27,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.HID,
 					VendorID = 0x54c,
 					ProductID = 0xce6,
 				},
@@ -84,13 +85,13 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Left Bumper",
+					Name = "L1",
 					Target = InputControlType.LeftBumper,
 					Source = Button( 4 )
 				},
 				new InputControlMapping
 				{
-					Name = "Right Bumper",
+					Name = "R1",
 					Target = InputControlType.RightBumper,
 					Source = Button( 5 )
 				},
@@ -150,8 +151,8 @@ namespace InControl.NativeDeviceProfiles
 				RightStickUpMapping( 3 ),
 				RightStickDownMapping( 3 ),
 
-				LeftTriggerMapping( 4 ),
-				RightTriggerMapping( 5 ),
+				LeftTriggerMapping( 4, "L2" ),
+				RightTriggerMapping( 5, "R2" ),
 			};
 		}
 	}

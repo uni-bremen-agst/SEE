@@ -88,8 +88,8 @@ namespace InControl
 			UpdateWithState( InputControlType.LeftStickButton, state.Buttons.LeftStick == ButtonState.Pressed, updateTick, deltaTime );
 			UpdateWithState( InputControlType.RightStickButton, state.Buttons.RightStick == ButtonState.Pressed, updateTick, deltaTime );
 
-			UpdateWithState( InputControlType.View, state.Buttons.Start == ButtonState.Pressed, updateTick, deltaTime );
-			UpdateWithState( InputControlType.Menu, state.Buttons.Back == ButtonState.Pressed, updateTick, deltaTime );
+			UpdateWithState( InputControlType.View, state.Buttons.Back == ButtonState.Pressed, updateTick, deltaTime );
+			UpdateWithState( InputControlType.Menu, state.Buttons.Start == ButtonState.Pressed, updateTick, deltaTime );
 		}
 
 

@@ -13,7 +13,7 @@ namespace InControl.NativeDeviceProfiles
 			base.Define();
 
 			DeviceName = "Microsoft Xbox One Controller";
-			DeviceNotes = "Microsoft Xbox One Controller on iOS / tvOS";
+			DeviceNotes = "Microsoft Xbox One Controller on iOS / tvOS / macOS";
 
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.XboxOne;
@@ -32,6 +32,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.AppleGameController,
 					VendorID = 0xFFFF,
 					ProductID = 0x0001,
 					VersionNumber = 0
@@ -127,7 +128,7 @@ namespace InControl.NativeDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "Guide",
-					Target = InputControlType.Home,
+					Target = InputControlType.Guide,
 					Source = Button( 14 )
 				}
 			};

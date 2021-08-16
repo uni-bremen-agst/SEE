@@ -303,6 +303,7 @@ namespace InControl
 				{
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.XboxOneSBluetoothMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation4MacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation5MacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.SteelseriesNimbusMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.HoriPadUltimateMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.NintendoSwitchProMacNativeProfile) );

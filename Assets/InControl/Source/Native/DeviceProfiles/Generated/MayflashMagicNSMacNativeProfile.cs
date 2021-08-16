@@ -19,6 +19,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.HID,
 					VendorID = 0x0079,
 					ProductID = 0x18d3,
 				},

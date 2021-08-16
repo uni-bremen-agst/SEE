@@ -4,6 +4,7 @@
 // ReSharper disable UnusedType.Global
 namespace InControl.NativeDeviceProfiles
 {
+	// @cond nodoc
 	[Preserve, NativeInputDeviceProfile]
 	public class KiwitataNESWindowsNativeProfile : InputDeviceProfile
 	{
@@ -107,4 +108,6 @@ namespace InControl.NativeDeviceProfiles
 			};
 		}
 	}
+
+	// @endcond
 }

@@ -437,11 +437,11 @@ namespace InControl
 		}
 
 
-		protected static InputControlMapping LeftTriggerMapping( int analog )
+		protected static InputControlMapping LeftTriggerMapping( int analog, string name = "Left Trigger" )
 		{
 			return new InputControlMapping
 			{
-				Name = "Left Trigger",
+				Name = name,
 				Target = InputControlType.LeftTrigger,
 				Source = Analog( analog ),
 				SourceRange = InputRangeType.MinusOneToOne,
@@ -451,11 +451,11 @@ namespace InControl
 		}
 
 
-		protected static InputControlMapping RightTriggerMapping( int analog )
+		protected static InputControlMapping RightTriggerMapping( int analog, string name = "Right Trigger" )
 		{
 			return new InputControlMapping
 			{
-				Name = "Right Trigger",
+				Name = name,
 				Target = InputControlType.RightTrigger,
 				Source = Analog( analog ),
 				SourceRange = InputRangeType.MinusOneToOne,

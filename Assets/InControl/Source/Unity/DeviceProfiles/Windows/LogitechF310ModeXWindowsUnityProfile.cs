@@ -78,7 +78,7 @@ namespace InControl.UnityDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "Back",
-					Target = InputControlType.Select,
+					Target = InputControlType.Back,
 					Source = Button( 6 )
 				},
 				new InputControlMapping
@@ -128,3 +128,4 @@ namespace InControl.UnityDeviceProfiles
 
 	// @endcond
 }
+

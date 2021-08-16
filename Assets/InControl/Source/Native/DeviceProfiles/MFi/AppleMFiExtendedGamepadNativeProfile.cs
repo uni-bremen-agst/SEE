@@ -32,6 +32,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.AppleGameController,
 					VendorID = 0xFFFF,
 					ProductID = 0x0000,
 					VersionNumber = 0
