@@ -118,6 +118,7 @@ namespace SEE.Utils
         /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
         public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
+            Debug.LogWarning("REMOTE ADDD " + position + " pre " + prePosition + " char " + c);
             if (prePosition != null)
             {
                 (int, CharObj) found = Find(prePosition);
