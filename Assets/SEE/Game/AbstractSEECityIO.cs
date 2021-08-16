@@ -64,6 +64,8 @@ namespace SEE.Game
         private const string EdgeLayoutLabel = "EdgeLayout";
 
         private const string ZScoreScaleLabel = "ZScoreScale";
+        private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
+
         private const string EdgeWidthLabel = "EdgeWidth";
         private const string ShowLeafErosionsLabel = "ShowLeafErosions";
         private const string ShowInnerErosionsLabel = "ShowInnerErosions";
@@ -138,6 +140,8 @@ namespace SEE.Game
             writer.Save(edgeLayoutSettings.kind.ToString(), EdgeLayoutLabel);
 
             writer.Save(nodeLayoutSettings.zScoreScale, ZScoreScaleLabel);
+            writer.Save(nodeLayoutSettings.ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
+
             writer.Save(edgeLayoutSettings.edgeWidth, EdgeWidthLabel);
             writer.Save(nodeLayoutSettings.showInnerErosions, ShowInnerErosionsLabel);
             writer.Save(nodeLayoutSettings.showLeafErosions, ShowLeafErosionsLabel);
@@ -219,6 +223,7 @@ namespace SEE.Game
             ConfigIO.RestoreEnum(attributes, EdgeLayoutLabel, ref edgeLayoutSettings.kind);
 
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref nodeLayoutSettings.zScoreScale);
+            ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref nodeLayoutSettings.ScaleOnlyLeafMetrics);
             ConfigIO.Restore(attributes, EdgeWidthLabel, ref edgeLayoutSettings.edgeWidth);
             ConfigIO.Restore(attributes, ShowInnerErosionsLabel, ref nodeLayoutSettings.showInnerErosions);
             ConfigIO.Restore(attributes, ShowLeafErosionsLabel, ref nodeLayoutSettings.showLeafErosions);
