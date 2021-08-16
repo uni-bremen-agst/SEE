@@ -34,7 +34,7 @@ namespace Crosstales.RTVoice.Model
 
       private string uid;
 
-      private string cachedString;
+      //private string cachedString;
       private readonly System.DateTime created = System.DateTime.Now;
 
       #endregion
@@ -47,24 +47,26 @@ namespace Crosstales.RTVoice.Model
       {
          get
          {
-            if (cachedString == null)
+            //if (cachedString == null)
+            //{
+            string result /*= cachedString*/ = Util.Helper.CleanText(text, Speaker.Instance.AutoClearTags || !ForceSSML /*&& !(Speaker.isMaryMode /* || Util.Helper.isWindowsPlatform )*/);
+
+            if (result.Length > Speaker.Instance.MaxTextLength)
             {
-               string result = cachedString = Util.Helper.CleanText(text, Speaker.Instance.AutoClearTags /*&& !(Speaker.isMaryMode /* || Util.Helper.isWindowsPlatform )*/);
+               Debug.LogWarning("Text is too long! It will be shortened to " + Speaker.Instance.MaxTextLength + " characters: " + this);
 
-               if (result.Length > Speaker.Instance.MaxTextLength)
-               {
-                  Debug.LogWarning("Text is too long! It will be shortened to " + Speaker.Instance.MaxTextLength + " characters: " + this);
-
-                  cachedString = result.Substring(0, Speaker.Instance.MaxTextLength);
-               }
+               return result.Substring(0, Speaker.Instance.MaxTextLength);
+               //cachedString = result.Substring(0, Speaker.Instance.MaxTextLength);
             }
+            //}
 
-            return cachedString;
+            return result;
+            //return cachedString;
          }
 
          set
          {
-            cachedString = null;
+            //cachedString = null;
             text = value;
          }
       }

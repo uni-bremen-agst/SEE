@@ -23,8 +23,11 @@ import java.util.ArrayList;
 //endregion
 
 /**
+ * RTVoiceAndroidBridge.java
+ * Version 2021.2.5
+ * 
  * Acts as a handler for all TTS functions called by RT-Voice on Android.
- * <p>
+ *
  * © 2016-2021 crosstales LLC (https://www.crosstales.com)
  */
 public class RTVoiceAndroidBridge {
@@ -91,9 +94,8 @@ public class RTVoiceAndroidBridge {
     }
     
     /**
-     * Checks if the TTS engine is currently busy by calling the boolean
-     * "working".
-     * <p>
+     * Checks if the TTS engine is currently busy by calling the boolean "working".
+     *
      * Returns immediately
      *
      * @return the boolean signifying if the engine is busy or not
@@ -103,9 +105,8 @@ public class RTVoiceAndroidBridge {
     }
 
     /**
-     * Checks if the engine has been instantiated by calling the
-     * boolean "initialized".
-     * <p>
+     * Checks if the engine has been instantiated by calling the boolean "initialized".
+     *
      * Returns immediately
      *
      * @return the boolean signifying if the engine has been instantiated or not
@@ -115,10 +116,9 @@ public class RTVoiceAndroidBridge {
     }
 
     /**
-     * If the TTS engine is instantiated, shut it down and set boolean
-     * "initialized" to false.
+     * If the TTS engine is instantiated, shut it down and set boolean "initialized" to false.
      * Log the result.
-     * <p>
+     *
      * Logs after the TTS engine has been shut down or immediately,
      * if the TTS engine is not instantiated.
      */
@@ -136,7 +136,7 @@ public class RTVoiceAndroidBridge {
 
     /**
      * Starts the private task "speakNative".
-     * <p>
+     *
      * This method generates multiple logs in Log.d regarding its current state.
      *
      * @param speechText the text that is supposed to be read.
@@ -192,7 +192,7 @@ public class RTVoiceAndroidBridge {
 
     /**
      * Checks if the TTS engine is busy. If it's busy, stop the engine.
-     * <p>
+     *
      * This method generates a log in Log.d on call and on exit.
      */
     public static void StopNative() {
@@ -211,7 +211,7 @@ public class RTVoiceAndroidBridge {
 
     /**
      * Generates audio and starts the private task "generateAudio".
-     * <p>
+     *
      * This method generates multiple logs in Log.d regarding its current state.
      *
      * @param speechText the text that is supposed to be read.
@@ -219,7 +219,7 @@ public class RTVoiceAndroidBridge {
      * @param pitch      the pitch that gets applied to the Locale/Voice reading the text.
      * @param voiceName  the name of the Locale/Voice that is supposed to read the text.
      * @param outputFile the target path
-     * @return Multiple Log.d entries, String with the .wav-File path
+     * @return String with the .wav-File path
      */
     public static String Speak(String speechText, float rate, float pitch, String voiceName, String outputFile) {
         if (DEBUG)
@@ -266,18 +266,15 @@ public class RTVoiceAndroidBridge {
     }
 
     /**
-     * Checks if the TTS engine is initialized, then -
+     * Checks if the TTS engine is initialized:
      * - if SDK >= Lollipop:
-     * Looks for installed voices on the Android device and use their names to
-     * generate a for RTVoice readable list.
+     * Looks for installed voices on the Android device and use their names to generate a for RTVoice readable list.
      * - if SDK < Lollipop:
-     * Looks for installed locales on the Android device, check each if they
-     * have an available voice to them and use their names and languages to
-     * generate a for RTVoice readable list.
-     * <p>
+     * Looks for installed locales on the Android device, check each if they have an available voice to them and use their names and languages to generate a for RTVoice readable list.
+     *
      * It returns a String array when the tasks are done, not immediately.
      *
-     * @return Multiple Log.d entries, String[] with the available voices/locales
+     * @return String[] with the available voices/locales
      */
     public static String[] GetVoices() {
         String[] result = null;
@@ -307,6 +304,11 @@ public class RTVoiceAndroidBridge {
         return result;
     }
 
+    /**
+     * Returns the available TTS engines.
+     *
+     * @return String[] with the available TTS engines
+     */
     public static String[] GetEngines() {
         String[] result = null;
 
@@ -327,6 +329,13 @@ public class RTVoiceAndroidBridge {
         return result;
     }
 
+
+    /**
+     * Set a specific TTS engine.
+     *
+     * @param engine TTS engine to be used
+     * @return String[] with the available TTS engines
+     */
     public static void SetupEngine(String engine) {
         tts = createTTS(engine);
     }

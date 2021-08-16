@@ -1,5 +1,20 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2021.2.7 - 15.06.2021
+* AWS Polly:
+  * Improvements for neural voices
+  * ca-central-1 as endpoint added for neural voices
+* All providers improved to always call "OnVoicesReady"
+* Speeches.txt improved
+* MaryTTS now uses SSML as default
+
+## 2021.2.6 - 04.06.2021
+* Editor improvements
+* Updated to Common 2021.2.2
+
+## 2021.2.5 - 23.05.2021
+* Android: fix for non-IL2CPP builds
+
 ## 2021.2.4 - 06.05.2021
 * iOS: fix for Xcode 12.5 and newer
 * Speaker: improvements for given AudioSources

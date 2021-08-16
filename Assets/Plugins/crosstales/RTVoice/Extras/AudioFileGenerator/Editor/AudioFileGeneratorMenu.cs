@@ -12,8 +12,7 @@ namespace Crosstales.RTVoice.EditorIntegration
       [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Prefabs/AudioFileGenerator", false, EditorHelper.MENU_ID + 60)]
       private static void AddAudioFileGenerator()
       {
-         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath($"Assets{EditorConfig.ASSET_PATH}Extras/AudioFileGenerator/Resources/Prefabs/AudioFileGenerator.prefab", typeof(GameObject)));
-         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+         EditorHelper.InstantiatePrefab("AudioFileGenerator", $"{EditorConfig.ASSET_PATH}Extras/AudioFileGenerator/Resources/Prefabs/");
       }
    }
 }

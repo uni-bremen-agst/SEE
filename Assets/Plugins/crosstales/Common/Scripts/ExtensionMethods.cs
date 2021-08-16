@@ -6,19 +6,9 @@ namespace Crosstales
    /// <summary>Various extension methods.</summary>
    public static class ExtensionMethods
    {
-      #region Strings
+      #region Variables
 
       private static readonly Vector3 flat = new Vector3(1, 0, 1);
-
-      private static readonly System.Text.RegularExpressions.Regex REGEX_EMAIL = new System.Text.RegularExpressions.Regex(@"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
-      private static readonly System.Text.RegularExpressions.Regex REGEX_CREDITCARD = new System.Text.RegularExpressions.Regex(@"^((\d{4}[- ]?){3}\d{4})$");
-      private static readonly System.Text.RegularExpressions.Regex REGEX_URL_WEB = new System.Text.RegularExpressions.Regex(@"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?$");
-      private static readonly System.Text.RegularExpressions.Regex REGEX_IP_ADDRESS = new System.Text.RegularExpressions.Regex(@"^([0-9]{1,3}\.){3}[0-9]{1,3}$");
-      private static readonly System.Text.RegularExpressions.Regex REGEX_INVALID_CHARS = new System.Text.RegularExpressions.Regex(@"[^\w\.@-]");
-
-      private static readonly System.Text.RegularExpressions.Regex REGEX_ALPHANUMERIC = new System.Text.RegularExpressions.Regex(@"([A-Za-z0-9_]+)");
-      //private static readonly System.Text.RegularExpressions.Regex REGEX_REALNUMBER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]*\.?[0-9]+)");
-//      private static readonly System.Text.RegularExpressions.Regex REGEX_SIGNED_INTEGER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]+)");
 
       #endregion
 
@@ -104,16 +94,20 @@ namespace Crosstales
          if (newString == null)
             return str;
 
-         int index = str.IndexOf(oldString, comp);
-
-         bool MatchFound = index >= 0;
-
-         if (MatchFound)
+         bool matchFound;
+         do
          {
-            str = str.Remove(index, oldString.Length);
+            int index = str.IndexOf(oldString, comp);
 
-            str = str.Insert(index, newString);
-         }
+            matchFound = index >= 0;
+
+            if (matchFound)
+            {
+               str = str.Remove(index, oldString.Length);
+
+               str = str.Insert(index, newString);
+            }
+         } while (matchFound);
 
          return str;
       }
@@ -200,6 +194,38 @@ namespace Crosstales
 
       /// <summary>
       /// Extension method for strings.
+      /// Replaces new lines with a replacement string pattern.
+      /// </summary>
+      /// <param name="str">String-instance.</param>
+      /// <param name="replacement">Replacement string pattern (default: "#nl#", optional).</param>
+      /// <param name="newLine">New line string (default: System.Environment.NewLine, optional).</param>
+      /// <returns>Replaced string without new lines.</returns>
+      public static string CTRemoveNewLines(this string str, string replacement = "#nl#", string newLine = null)
+      {
+         if (str == null)
+            return str;
+
+         return str.Replace(string.IsNullOrEmpty(newLine) ? System.Environment.NewLine : newLine, replacement);
+      }
+
+      /// <summary>
+      /// Extension method for strings.
+      /// Replaces a given string pattern with new lines in a string.
+      /// </summary>
+      /// <param name="str">String-instance.</param>
+      /// <param name="replacement">Replacement string pattern (default: "#nl#", optional).</param>
+      /// <param name="newLine">New line string (default: System.Environment.NewLine, optional).</param>
+      /// <returns>Replaced string with new lines.</returns>
+      public static string CTAddNewLines(this string str, string replacement = "#nl#", string newLine = null)
+      {
+         if (str == null)
+            return str;
+
+         return str.CTReplace(replacement, string.IsNullOrEmpty(newLine) ? System.Environment.NewLine : newLine);
+      }
+
+      /// <summary>
+      /// Extension method for strings.
       /// Checks if the string is numeric.
       /// </summary>
       /// <param name="str">String-instance.</param>
@@ -237,7 +263,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_EMAIL.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_EMAIL.IsMatch(str);
       }
 
       /// <summary>
@@ -251,7 +277,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_URL_WEB.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_URL_WEB.IsMatch(str);
       }
 
       /// <summary>
@@ -265,7 +291,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_CREDITCARD.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_CREDITCARD.IsMatch(str);
       }
 
       /// <summary>
@@ -279,7 +305,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_IP_ADDRESS.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_IP_ADDRESS.IsMatch(str);
       }
 
       /// <summary>
@@ -293,7 +319,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_ALPHANUMERIC.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_ALPHANUMERIC.IsMatch(str);
       }
 
       /// <summary>
@@ -321,7 +347,7 @@ namespace Crosstales
          if (str == null)
             return false;
 
-         return REGEX_INVALID_CHARS.IsMatch(str);
+         return Common.Util.BaseConstants.REGEX_INVALID_CHARS.IsMatch(str);
       }
 
       /// <summary>
