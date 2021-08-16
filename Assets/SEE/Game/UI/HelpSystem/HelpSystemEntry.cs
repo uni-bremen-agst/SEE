@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
 using DynamicPanels;
@@ -5,9 +8,6 @@ using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -35,11 +35,6 @@ namespace SEE.Game.UI.HelpSystem
         /// Path to the HelpSystemEntrySpace prefab.
         /// </summary>
         private const string HELP_SYSTEM_ENTRY_SPACE_PREFAB = "Prefabs/UI/HelpSystemEntrySpace";
-
-        /// <summary>
-        /// The modal window manager which contains the actual menu.
-        /// </summary>
-        public ModalWindowManager Manager;
 
         /// <summary>
         /// Brief description of what this menu controls.
@@ -194,18 +189,13 @@ namespace SEE.Game.UI.HelpSystem
         {
             helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
-            RectTransform rectTransform = (RectTransform)helpSystemEntry.transform;
-            ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
-            foreach (ModalWindowManager m in managers)
-            {
-                Manager = m;
-            }
 
-            Manager.titleText = titleManager;
-            Manager.descriptionText = description;
-            Manager.icon = Resources.Load<Sprite>(icon);
-            Manager.onConfirm.AddListener(Back);
-            Manager.onCancel.AddListener(Close);
+            //FIXME
+            //Manager.titleText = titleManager;
+            //Manager.descriptionText = description;
+            //Manager.icon = Resources.Load<Sprite>(icon);
+            //Manager.onConfirm.AddListener(Back);
+            //Manager.onCancel.AddListener(Close);
             GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
 
             if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
@@ -213,29 +203,29 @@ namespace SEE.Game.UI.HelpSystem
                 Destroy(this);
             }
 
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause")
+            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
-            pauseButton.clickEvent.AddListener(() =>
-            {
-                TogglePlaying();
-            });
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Forward")
+            pauseButton.clickEvent.AddListener(TogglePlaying);
+            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Forward")
                           .gameObject.TryGetComponentOrLog(out forwardButton);
-            forwardButton.clickEvent.AddListener(() =>
-            {
-                Forward();
-            });
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Back")
+            forwardButton.clickEvent.AddListener(Forward);
+            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Back")
                         .gameObject.TryGetComponentOrLog(out backwardButton);
-            backwardButton.clickEvent.AddListener(() =>
-            {
-                Backward();
-            });
+            backwardButton.clickEvent.AddListener(Backward);
 
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Dragger/progress")
-                   .gameObject.TryGetComponentOrLog(out progress);
+            helpSystemEntry.transform.Find("Content/progress").gameObject.TryGetComponentOrLog(out progress);
 
             Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
+            PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
+            tab.Label = "Titel";
+
+            PanelNotificationCenter.OnTabClosed += panelTab =>
+            {
+                if (panelTab.Panel == panel)
+                {
+                    //TODO: Close panel
+                }
+            };
         }
 
         /// <summary>
@@ -243,7 +233,7 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void Close()
         {
-            Manager.CloseWindow();
+            //TODO: Manager.CloseWindow();
             GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             if (videoPlayer == null)
             {
@@ -349,7 +339,7 @@ namespace SEE.Game.UI.HelpSystem
         {
             GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             go.TryGetComponentOrLog(out NestedMenu menu);
-            Manager.CloseWindow();
+            //TODO: Manager.CloseWindow();
             menu.ToggleMenu();
             if (videoPlayer == null)
             {

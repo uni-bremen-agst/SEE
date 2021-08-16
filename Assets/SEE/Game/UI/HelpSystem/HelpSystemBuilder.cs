@@ -124,21 +124,25 @@ namespace SEE.Game.UI.HelpSystem
             }
             if (entryTitle != null)
             {
-                entry.Manager.titleText = entryTitle;
-                entry.Manager.descriptionText = entryTitle;
+                //FIXME: Set title and description
+                //entry.Manager.titleText = entryTitle;
+                //entry.Manager.descriptionText = entryTitle;
             }
             else
             {
-                entry.Manager.descriptionText = "placeholder";
-                entry.Manager.titleText = "placeholder";
+                //FIXME: Set title and description
+                //entry.Manager.descriptionText = "placeholder";
+                //entry.Manager.titleText = "placeholder";
             }
-            entry.Manager.UpdateUI();
+            //FIXME: Check if this is necessary
+            //entry.Manager.UpdateUI();
             videoPlayer.url = videoPath;
             videoPlayer.Play();
-            videoPlayer.SetDirectAudioMute((ushort)0, true);
+            videoPlayer.SetDirectAudioMute(0, true);
             entry.IsPlaying = true;
             menu.ToggleMenu();
-            helpSystem.Manager.OpenWindow();
+            //FIXME: Open window
+            //helpSystem.Manager.OpenWindow();
             HelpSystemMenu.IsEntryOpened = true;
             currentEntries = keywords;
         }
