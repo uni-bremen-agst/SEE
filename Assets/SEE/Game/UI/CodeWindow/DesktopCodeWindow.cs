@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
@@ -20,6 +21,13 @@ namespace SEE.Game.UI.CodeWindow
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
         private ScrollRect scrollRect;
+
+        private CRDT crdt = new CRDT(1); //FIXME: Use Ip or such a identifier
+
+        /// <summary>
+        /// FIXME: REPLACE ALLL USAGE WITH THE CARRETPOS from the TMP
+        /// </summary>
+        private int typeIndex = 0;
 
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
@@ -54,17 +62,29 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh) 
             && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
-                TextMesh.text = Text;
+                //TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
                 
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
                 int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
-                TextMeshInputField.text = Text; //string.Concat('\n', Text.Split('\n')
-                                                //                        .Select((x, i) => GetCleanLine(i).Substring(neededPadding))
-                                                //                       .ToArray()); 
-                TextMeshInputField.caretPosition = 1;
+                List<string> textWitzhOutNumbers = Text.Split('\n')
+                                                                   .Select((x, i) => {
+                                                                       string cleanLine = GetCleanLine(i);
+                                                                       if (cleanLine.Length > 0)
+                                                                       {
+                                                                           return cleanLine.Substring(neededPadding);
+                                                                       }
+                                                                       else
+                                                                       { 
+                                                                           return cleanLine;
+                                                                       }
+
+                                                                   }).ToList();
+                TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
+                //TextMeshInputField.caretPosition = 1;
+                     
             }
 
             // Register events to find out when window was scrolled in.
@@ -109,6 +129,27 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
+            //Input Handling
+            //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
+            //get the input
+            var input = Input.inputString;
+            //ignore null input to avoid unnecessary computation
+            if (!string.IsNullOrEmpty(input))
+            {
+                //logic related to the char pressed
+                //Debug.Log("Pressed char: " + Input.inputString);
+                ICRDT.AddChar(input[0], typeIndex);
+                typeIndex++;
+            }
+            if (Input.GetKeyDown(KeyCode.Delete) && typeIndex > 0)
+            {
+                Debug.LogWarning("DLELEEEE");
+                typeIndex--;
+                ICRDT.DeleteChar(typeIndex);
+                
+            }
+            Debug.Log(ICRDT.PrintString());
+
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {
