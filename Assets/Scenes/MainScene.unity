@@ -1995,10 +1995,10 @@ MonoBehaviour:
       Data: 1
     - Name: zScoreScale
       Entry: 5
-      Data: true
+      Data: false
     - Name: ScaleOnlyLeafMetrics
       Entry: 5
-      Data: false
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -2025,10 +2025,10 @@ MonoBehaviour:
       Data: 21|SEE.Game.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -3484,7 +3484,7 @@ MonoBehaviour:
       Data: true
     - Name: ScaleOnlyLeafMetrics
       Entry: 5
-      Data: false
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -3514,7 +3514,7 @@ MonoBehaviour:
       Data: 3
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -5686,10 +5686,10 @@ MonoBehaviour:
       Data: 1
     - Name: zScoreScale
       Entry: 5
-      Data: true
+      Data: false
     - Name: ScaleOnlyLeafMetrics
       Entry: 5
-      Data: false
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -5716,10 +5716,10 @@ MonoBehaviour:
       Data: 21|SEE.Game.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -6859,7 +6859,7 @@ MonoBehaviour:
       Data: false
     - Name: ScaleOnlyLeafMetrics
       Entry: 5
-      Data: false
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
