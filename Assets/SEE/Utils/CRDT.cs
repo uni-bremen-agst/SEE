@@ -369,12 +369,15 @@ namespace SEE.Utils
             int index = 0;
             foreach (CharObj elm in crdt)
             {
-                if (elm.GetIdentifier() == position)
+                Debug.LogWarning("REAL " + PositionToString(elm.GetIdentifier()) + " Gesucht " + PositionToString(position));
+                if (ComparePosition( elm.GetIdentifier(), position ) == 0)
                 {
+                    Debug.LogWarning("RETURN SHITT");
                     return (index, elm);
                 }
                 index++;
             }
+            Debug.LogWarning("RETURN NULL");
             return (-1, null);
         }
 

@@ -89,11 +89,13 @@ namespace SEETests
 
             crdt1.AddChar('A', 0);
             crdt2.AddChar('a', 0);
+            crdt2.AddChar('a', 0);
 
             crdt2.RemoteAddChar('A', crdt1.getCRDT()[0].GetIdentifier(), null);
             crdt1.RemoteAddChar('a', crdt2.getCRDT()[1].GetIdentifier(), null);
-            Assert.AreEqual("Aa", crdt1.PrintString());
-            Assert.AreEqual("Aa", crdt2.PrintString());
+            crdt1.RemoteAddChar('a', crdt2.getCRDT()[1].GetIdentifier(), null);
+            Assert.AreEqual("Aaa", crdt1.PrintString());
+            Assert.AreEqual("Aaa", crdt2.PrintString());
         }
 
         [Test]
