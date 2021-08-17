@@ -143,8 +143,7 @@ namespace Crosstales.RTVoice.EditorUtil
       /// <param name="prefabName">Name of the prefab.</param>
       public static void InstantiatePrefab(string prefabName)
       {
-         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath("Assets" + EditorConfig.PREFAB_PATH + prefabName + ".prefab", typeof(GameObject)));
-         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+         InstantiatePrefab(prefabName, EditorConfig.PREFAB_PATH);
       }
 
       /// <summary>Checks if the "RTVoice"-prefab is in the scene.</summary>

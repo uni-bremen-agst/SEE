@@ -27,7 +27,9 @@ namespace InControl.UnityDeviceProfiles
 			{
 				new InputDeviceMatcher { NameLiteral = "Microsoft X-Box 360 pad" },
 				new InputDeviceMatcher { NameLiteral = "Generic X-Box pad" },
-				new InputDeviceMatcher { NameLiteral = "Mega World Thrustmaster dual analog 3.2" }
+				new InputDeviceMatcher { NameLiteral = "Mega World Thrustmaster dual analog 3.2" },
+				new InputDeviceMatcher { NameLiteral = "X360 Controller" },
+				new InputDeviceMatcher { NameLiteral = "XInput Controller" }
 			};
 
 			LastResortMatchers = new[] { new InputDeviceMatcher { NamePattern = "360" } };

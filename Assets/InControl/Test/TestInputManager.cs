@@ -86,36 +86,22 @@ namespace InControl
 		{
 			CheckForPauseButton();
 
-			//var inputDevice = InputManager.ActiveDevice;
-			//if (inputDevice.Direction.Left.WasPressed)
-			//{
-			//	Debug.Log( "Left.WasPressed" );
-			//}
-			//if (inputDevice.Direction.Left.WasReleased)
-			//{
-			//	Debug.Log( "Left.WasReleased" );
-			//}
-			//if (inputDevice.Action1.WasPressed)
-			//{
-			//	Debug.Log( "Action1.WasPressed" );
-			//}
-
-			//var inputDevice = InputManager.ActiveDevice;
-			//var control = inputDevice.Action1;
-			//if (control.WasReleased)
-			//{
-			//	InputManager.ClearInputState();
-			//	Debug.Log( "WasPressed = " + control.WasPressed );
-			//	Debug.Log( "WasReleased = " + control.WasReleased );
-			//}
-
 			var devicesCount = InputManager.Devices.Count;
 			for (var i = 0; i < devicesCount; i++)
 			{
 				var inputDevice = InputManager.Devices[i];
-				inputDevice.Vibrate( inputDevice.LeftTrigger, inputDevice.RightTrigger );
+				if (inputDevice.LeftBumper || inputDevice.RightBumper)
+				{
+					inputDevice.VibrateTriggers( inputDevice.LeftTrigger, inputDevice.RightTrigger );
+					inputDevice.Vibrate( 0, 0 );
+				}
+				else
+				{
+					inputDevice.Vibrate( inputDevice.LeftTrigger, inputDevice.RightTrigger );
+					inputDevice.VibrateTriggers( 0, 0 );
+				}
 
-				var color = Color.HSVToRGB( Mathf.Repeat( Time.realtimeSinceStartup, 1.0f ), 1.0f, 1.0f );
+				var color = Color.HSVToRGB( Mathf.Repeat( Time.realtimeSinceStartup * 0.1f, 1.0f ), 1.0f, 1.0f );
 				inputDevice.SetLightColor( color.r, color.g, color.b );
 			}
 		}
@@ -123,11 +109,6 @@ namespace InControl
 
 		void Start()
 		{
-			//var unityDeviceManager = InputManager.GetDeviceManager<UnityInputDeviceManager>();
-			//unityDeviceManager.ReloadDevices();
-
-			//Debug.Log( "IntPtr.Size = " + IntPtr.Size );
-
 			#if UNITY_IOS || UNITY_TVOS
 			ICadeDeviceManager.Active = true;
 			#endif
@@ -136,7 +117,7 @@ namespace InControl
 
 		void Update()
 		{
-			//Thread.Sleep( 250 );
+			// Thread.Sleep( 250 );
 
 			if (Input.GetKeyDown( KeyCode.R ))
 			{
@@ -178,7 +159,6 @@ namespace InControl
 
 			var info = "Devices:";
 			info += " (Platform: " + InputManager.Platform + ")";
-			//info += " (Joysticks " + InputManager.JoystickHash + ")";
 			info += " " + InputManager.ActiveDevice.Direction.Vector;
 
 			if (isPaused)
@@ -230,19 +210,26 @@ namespace InControl
 				GUI.Label( new Rect( x, y, x + w, y + 10 ), "GUID: " + inputDevice.GUID, style );
 				y += lineHeight;
 
-				GUI.Label( new Rect( x, y, x + w, y + 10 ), "SortOrder: " + inputDevice.SortOrder, style );
-				y += lineHeight;
+				// GUI.Label( new Rect( x, y, x + w, y + 10 ), "SortOrder: " + inputDevice.SortOrder, style );
+				// y += lineHeight;
 
-				//				GUI.Label( new Rect( x, y, x + w, y + 10 ), "LastChangeTick: " + inputDevice.LastChangeTick, style );
-				//				y += lineHeight;
+				// GUI.Label( new Rect( x, y, x + w, y + 10 ), "LastChangeTick: " + inputDevice.LastChangeTick, style );
+				// y += lineHeight;
 
-				GUI.Label( new Rect( x, y, x + w, y + 10 ), "LastInputTick: " + inputDevice.LastInputTick, style );
-				y += lineHeight;
+				// GUI.Label( new Rect( x, y, x + w, y + 10 ), "LastInputTick: " + inputDevice.LastInputTick, style );
+				// y += lineHeight;
 
 				var nativeDevice = inputDevice as NativeInputDevice;
 				if (nativeDevice != null)
 				{
-					var nativeDeviceInfo = string.Format( "VID = 0x{0:x}, PID = 0x{1:x}, VER = 0x{2:x}", nativeDevice.Info.vendorID, nativeDevice.Info.productID, nativeDevice.Info.versionNumber );
+					GUI.Label( new Rect( x, y, x + w, y + 10 ), "Profile: " + nativeDevice.ProfileName, style );
+					y += lineHeight;
+
+					var nativeDeviceInfo = string.Format( "VID: 0x{0:x}, PID: 0x{1:x}, VER: 0x{2:x}", nativeDevice.Info.vendorID, nativeDevice.Info.productID, nativeDevice.Info.versionNumber );
+					GUI.Label( new Rect( x, y, x + w, y + 10 ), nativeDeviceInfo, style );
+					y += lineHeight;
+
+					nativeDeviceInfo = string.Format( "DRV: {0}, TSP: {1}", nativeDevice.Info.driverType, nativeDevice.Info.transportType );
 					GUI.Label( new Rect( x, y, x + w, y + 10 ), nativeDeviceInfo, style );
 					y += lineHeight;
 				}

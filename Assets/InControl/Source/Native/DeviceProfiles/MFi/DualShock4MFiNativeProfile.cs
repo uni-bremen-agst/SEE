@@ -13,7 +13,7 @@ namespace InControl.NativeDeviceProfiles
 			base.Define();
 
 			DeviceName = "Sony DualShock 4 Controller";
-			DeviceNotes = "Sony DualShock 4 Controller on iOS / tvOS";
+			DeviceNotes = "Sony DualShock 4 Controller on iOS / tvOS / macOS";
 
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.PlayStation4;
@@ -32,6 +32,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.AppleGameController,
 					VendorID = 0xFFFF,
 					ProductID = 0x0002,
 					VersionNumber = 0
@@ -66,13 +67,13 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Left Bumper",
+					Name = "L1",
 					Target = InputControlType.LeftBumper,
 					Source = Button( 4 )
 				},
 				new InputControlMapping
 				{
-					Name = "Right Bumper",
+					Name = "R1",
 					Target = InputControlType.RightBumper,
 					Source = Button( 5 )
 				},
@@ -115,19 +116,19 @@ namespace InControl.NativeDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "Share",
-					Target = InputControlType.Options,
+					Target = InputControlType.Share,
 					Source = Button( 13 )
 				},
 				new InputControlMapping
 				{
 					Name = "Options",
-					Target = InputControlType.Menu,
+					Target = InputControlType.Options,
 					Source = Button( 12 )
 				},
 				new InputControlMapping
 				{
 					Name = "System",
-					Target = InputControlType.Home,
+					Target = InputControlType.System,
 					Source = Button( 14 )
 				}
 			};
@@ -146,7 +147,7 @@ namespace InControl.NativeDeviceProfiles
 
 				new InputControlMapping
 				{
-					Name = "Left Trigger",
+					Name = "L2",
 					Target = InputControlType.LeftTrigger,
 					Source = Analog( 4 ),
 					SourceRange = InputRangeType.ZeroToOne,
@@ -154,7 +155,7 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Right Trigger",
+					Name = "R2",
 					Target = InputControlType.RightTrigger,
 					Source = Analog( 5 ),
 					SourceRange = InputRangeType.ZeroToOne,

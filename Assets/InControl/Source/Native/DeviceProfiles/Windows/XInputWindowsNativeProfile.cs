@@ -121,7 +121,7 @@ namespace InControl.NativeDeviceProfiles
 				},
 				// new InputControlMapping {
 				// 	Handle = "Guide",
-				// 	Target = InputControlType.System,
+				// 	Target = InputControlType.Guide,
 				// 	Source = Button( 14 )
 				// }
 			};

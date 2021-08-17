@@ -191,6 +191,8 @@ namespace DG.Tweening
     /// </summary>
     public class DOTweenTMPAnimator : IDisposable
     {
+        static readonly Dictionary<TMP_Text,DOTweenTMPAnimator> _targetToAnimator = new Dictionary<TMP_Text,DOTweenTMPAnimator>();
+
         /// <summary><see cref="TMP_Text"/> that this animator is linked to</summary>
         public TMP_Text target { get; private set; }
         public TMP_TextInfo textInfo { get; private set; }
@@ -199,21 +201,51 @@ namespace DG.Tweening
         bool _ignoreTextChangedEvent;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="DOTweenTMPAnimator"/>, which is necessary to animate <see cref="TMP_Text"/> by single characters.
+        /// Creates a new instance of the <see cref="DOTweenTMPAnimator"/>, which is necessary to animate <see cref="TMP_Text"/> by single characters.<para/>
+        /// If a <see cref="DOTweenTMPAnimator"/> already exists for the same <see cref="TMP_Text"/> object it will be disposed
+        /// (but not its tweens, those you will have to kill manually).
         /// If you want to animate the whole text object you don't need this, and you can use direct <see cref="TMP_Text"/> DO shortcuts instead.<para/>
         /// IMPORTANT: the <see cref="TMP_Text"/> target must have been enabled/activated at least once before you can use it with this
         /// </summary>
         /// <param name="target">The <see cref="TMP_Text"/> that will be linked to this animator</param>
         public DOTweenTMPAnimator(TMP_Text target)
         {
+            if (target == null) {
+                Debugger.LogError("DOTweenTMPAnimator target can't be null");
+                return;
+            }
             if (!target.gameObject.activeInHierarchy) {
                 Debugger.LogError("You can't create a DOTweenTMPAnimator if its target is disabled");
                 return;
             }
+            // Verify that there's no other animators for the same target, and in case dispose them
+            if (_targetToAnimator.ContainsKey(target)) {
+                if (Debugger.logPriority >= 2) {
+                    Debugger.Log(string.Format(
+                        "A DOTweenTMPAnimator for \"{0}\" already exists: disposing it because you can't have more than one DOTweenTMPAnimator" +
+                        " for the same TextMesh Pro object. If you have tweens running on the disposed DOTweenTMPAnimator you should kill them manually",
+                        target
+                    ));
+                }
+                _targetToAnimator[target].Dispose();
+                _targetToAnimator.Remove(target);
+            }
+            //
             this.target = target;
+            _targetToAnimator.Add(target, this);
             Refresh();
             // Listeners
             TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTextChanged);
+        }
+
+        /// <summary>
+        /// If a <see cref="DOTweenTMPAnimator"/> instance exists for the given target disposes it
+        /// </summary>
+        public static void DisposeInstanceFor(TMP_Text target)
+        {
+            if (!_targetToAnimator.ContainsKey(target)) return;
+            _targetToAnimator[target].Dispose();
+            _targetToAnimator.Remove(target);
         }
 
         /// <summary>

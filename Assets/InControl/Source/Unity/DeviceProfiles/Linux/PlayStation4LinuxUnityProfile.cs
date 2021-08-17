@@ -23,7 +23,17 @@ namespace InControl.UnityDeviceProfiles
 				"Linux"
 			};
 
-			Matchers = new[] { new InputDeviceMatcher { NameLiteral = "Sony Computer Entertainment Wireless Controller" } };
+			Matchers = new[]
+			{
+				new InputDeviceMatcher { NameLiteral = "Sony Computer Entertainment Wireless Controller" },
+				new InputDeviceMatcher { NameLiteral = "PS4 Controller" }
+			};
+
+			LastResortMatchers = new[]
+			{
+				new InputDeviceMatcher { NamePattern = "PS4" },
+				new InputDeviceMatcher { NamePattern = "PlayStation 4" }
+			};
 
 			ButtonMappings = new[]
 			{

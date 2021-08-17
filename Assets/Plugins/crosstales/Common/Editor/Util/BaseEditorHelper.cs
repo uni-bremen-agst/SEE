@@ -230,10 +230,8 @@ namespace Crosstales.Common.EditorUtil
       /// <param name="options">Asset import options (default: ImportAssetOptions.Default, optional).</param>
       public static void RefreshAssetDatabase(ImportAssetOptions options = ImportAssetOptions.Default)
       {
-         if (isEditorMode)
-         {
+         if (!Application.isPlaying)
             AssetDatabase.Refresh(options);
-         }
       }
 
       /// <summary>Invokes a public static method on a full qualified class.</summary>
@@ -413,6 +411,61 @@ namespace Crosstales.Common.EditorUtil
       {
          string[] guids = AssetDatabase.FindAssets($"t:{typeof(T)}");
          return guids.Select(AssetDatabase.GUIDToAssetPath).Select(AssetDatabase.LoadAssetAtPath<T>).Where(asset => asset != null).ToList();
+      }
+
+      /// <summary>
+      /// Create and return a new asset in a smart location based on the current selection and then select it.
+      /// </summary>
+      /// <param name="name">Name of the new asset. Do not include the .asset extension.</param>
+      /// <param name="showSaveFileBrowser">Shows the save file browser to select a destination for the asset (default: true, optional).</param>
+      /// <returns>The new asset.</returns>
+      public static T CreateAsset<T>(string name, bool showSaveFileBrowser = true) where T : ScriptableObject
+      {
+         string path;
+
+         if (showSaveFileBrowser)
+         {
+            //string classname = nameof(T);
+            path = EditorUtility.SaveFilePanelInProject($"Save asset {name}", name, "asset", "");
+         }
+         else
+         {
+            path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            if (path.Length == 0)
+            {
+               // no asset selected, place in asset root
+               path = "Assets/" + name + ".asset";
+            }
+            else if (System.IO.Directory.Exists(path))
+            {
+               // place in currently selected directory
+               path += "/" + name + ".asset";
+            }
+            else
+            {
+               // place in current selection's containing directory
+               path = System.IO.Path.GetDirectoryName(path) + "/" + name + ".asset";
+            }
+         }
+
+         if (string.IsNullOrEmpty(path))
+            return default;
+
+         T asset = ScriptableObject.CreateInstance<T>();
+         AssetDatabase.CreateAsset(asset, AssetDatabase.GenerateUniqueAssetPath(path));
+         EditorUtility.FocusProjectWindow();
+         Selection.activeObject = asset;
+
+         return asset;
+      }
+
+      /// <summary>Instantiates a prefab.</summary>
+      /// <param name="prefabName">Name of the prefab.</param>
+      /// <param name="path">Path to the prefab.</param>
+      public static void InstantiatePrefab(string prefabName, string path)
+      {
+         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath($"Assets{path}{prefabName}.prefab", typeof(GameObject)));
+         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
       }
 
       #endregion

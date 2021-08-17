@@ -6,7 +6,7 @@ namespace InControl.NativeDeviceProfiles
 {
 	// @cond nodoc
 	[Preserve, NativeInputDeviceProfile]
-	public class PlayStation5WindowsNativeProfile : InputDeviceProfile
+	public class PlayStation5BluetoothWindowsNativeProfile : InputDeviceProfile
 	{
 		public override void Define()
 		{
@@ -29,6 +29,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					VendorID = 0x54c,
 					ProductID = 0xce6,
+					TransportType = InputDeviceTransportType.Bluetooth,
 				},
 			};
 
@@ -60,13 +61,13 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Left Bumper",
+					Name = "L1",
 					Target = InputControlType.LeftBumper,
 					Source = Button( 4 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Right Bumper",
+					Name = "R1",
 					Target = InputControlType.RightBumper,
 					Source = Button( 5 ),
 				},
@@ -106,12 +107,6 @@ namespace InControl.NativeDeviceProfiles
 					Target = InputControlType.TouchPadButton,
 					Source = Button( 13 ),
 				},
-				new InputControlMapping
-				{
-					Name = "Mute",
-					Target = InputControlType.Mute,
-					Source = Button( 14 ),
-				},
 			};
 
 			AnalogMappings = new[]
@@ -120,7 +115,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Right Stick Up",
 					Target = InputControlType.RightStickUp,
-					Source = Analog( 2 ),
+					Source = Analog( 0 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -128,7 +123,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Right Stick Down",
 					Target = InputControlType.RightStickDown,
-					Source = Analog( 2 ),
+					Source = Analog( 0 ),
 					SourceRange = InputRangeType.ZeroToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -136,7 +131,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Right Stick Left",
 					Target = InputControlType.RightStickLeft,
-					Source = Analog( 3 ),
+					Source = Analog( 1 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -144,7 +139,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Right Stick Right",
 					Target = InputControlType.RightStickRight,
-					Source = Analog( 3 ),
+					Source = Analog( 1 ),
 					SourceRange = InputRangeType.ZeroToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -152,7 +147,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Left Stick Up",
 					Target = InputControlType.LeftStickUp,
-					Source = Analog( 4 ),
+					Source = Analog( 2 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -160,7 +155,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Left Stick Down",
 					Target = InputControlType.LeftStickDown,
-					Source = Analog( 4 ),
+					Source = Analog( 2 ),
 					SourceRange = InputRangeType.ZeroToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -168,7 +163,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Left Stick Left",
 					Target = InputControlType.LeftStickLeft,
-					Source = Analog( 5 ),
+					Source = Analog( 3 ),
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -176,23 +171,23 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "Left Stick Right",
 					Target = InputControlType.LeftStickRight,
-					Source = Analog( 5 ),
+					Source = Analog( 3 ),
 					SourceRange = InputRangeType.ZeroToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
 				new InputControlMapping
 				{
-					Name = "Left Trigger",
+					Name = "L2",
 					Target = InputControlType.LeftTrigger,
-					Source = Analog( 1 ),
+					Source = Analog( 4 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
 				new InputControlMapping
 				{
-					Name = "Right Trigger",
+					Name = "R2",
 					Target = InputControlType.RightTrigger,
-					Source = Analog( 0 ),
+					Source = Analog( 5 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},

@@ -26,6 +26,8 @@ namespace InControl
 
 		InputControlSource[] controlSourceByTarget;
 
+		float lastSetLightColorTime;
+
 
 		internal NativeInputDevice() {}
 
@@ -203,9 +205,19 @@ namespace InControl
 		}
 
 
+		public override void VibrateTriggers( float leftTrigger, float rightTrigger )
+		{
+			Native.SetTriggersHapticState( Handle, FloatToByte( leftTrigger ), FloatToByte( rightTrigger ) );
+		}
+
+
 		public override void SetLightColor( float red, float green, float blue )
 		{
-			Native.SetLightColor( Handle, FloatToByte( red ), FloatToByte( green ), FloatToByte( blue ) );
+			if (InputManager.CurrentTime - lastSetLightColorTime > 0.05f)
+			{
+				Native.SetLightColor( Handle, FloatToByte( red ), FloatToByte( green ), FloatToByte( blue ) );
+				lastSetLightColorTime = InputManager.CurrentTime;
+			}
 		}
 
 
@@ -221,7 +233,7 @@ namespace InControl
 
 		public string GetAppleGlyphNameForControl( InputControlType controlType )
 		{
-			if (InputManager.NativeInputEnableMFi && Info.vendorID == 0xffff)
+			// if (InputManager.NativeInputEnableMFi && Info.vendorID == 0xffff)
 			{
 				var controlSource = controlSourceByTarget[(int) controlType];
 				if (controlSource.SourceType != InputControlSourceType.None)
@@ -289,6 +301,12 @@ namespace InControl
 		public bool HasSameSerialNumber( InputDeviceInfo deviceInfo )
 		{
 			return Info.HasSameSerialNumber( deviceInfo );
+		}
+
+
+		public string ProfileName
+		{
+			get { return profile == null ? "N/A" : profile.GetType().Name; }
 		}
 
 

@@ -1,8 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using Crosstales.RTVoice.EditorUtil;
-using UnityEngine;
-using UnityEditor.SceneManagement;
 
 namespace Crosstales.RTVoice.EditorIntegration
 {
@@ -12,8 +10,7 @@ namespace Crosstales.RTVoice.EditorIntegration
       [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/Sequencer", false, EditorHelper.GO_ID + 4)]
       private static void AddSequencer()
       {
-         PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath($"Assets{EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/Sequencer.prefab", typeof(GameObject)));
-         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+         EditorHelper.InstantiatePrefab("Sequencer", $"{EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/");
       }
    }
 }
