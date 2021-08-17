@@ -21,7 +21,9 @@ namespace SEETests
         public void testStringToPosition()
         {
             CRDT crdt = new CRDT(1);
-            Identifier[] pos = new Identifier[] { new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            Identifier[] pos = new Identifier[] {new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            Debug.LogWarning(pos[0] + " to string "  + crdt.StringToPosition("(1, 1), (2, 1), (3, 1)")[0]);
+
             Assert.AreEqual(pos, crdt.StringToPosition("(1, 1), (2, 1), (3, 1)"));
         }
 

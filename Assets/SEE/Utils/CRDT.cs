@@ -115,10 +115,13 @@ namespace SEE.Utils
         /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
         public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
-            Debug.LogWarning("REMOTE ADDD " + position + " pre " + prePosition + " char " + c);
-            if (prePosition != null)
+            
+            if (prePosition != null && prePosition.Length > 0)
             {
+                Debug.LogWarning("REMOTE ADDD " + PositionToString(position) + " pre " + PositionToString(prePosition) + " char " + c);
+
                 (int, CharObj) found = Find(prePosition);
+                Debug.LogWarning("FOUND " + found.Item2.ToString());
                 if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
                 {
                     crdt.Insert(found.Item1 + 1, new CharObj(c, position));
@@ -127,9 +130,11 @@ namespace SEE.Utils
                 {
                     Debug.LogError("RemoteAddChar fehlgeschlagen! ");
                 }
+
             }
             else
             {
+                Debug.LogWarning("REMOTE ADDD " + PositionToString(position) + " char " + c);
                 int idx = FindNextFittingIndex(position, 0);
                 Debug.LogWarning("idx " + idx + "CRDT S " + crdt.Count());
                 if (idx < crdt.Count())
@@ -218,7 +223,6 @@ namespace SEE.Utils
             }
             else
             {
-                Identifier[] testTmp = StringToPosition(PositionToString(position));
                 new NetCRDT().AddChar(c, position, null);
             }
         }
@@ -535,7 +539,7 @@ namespace SEE.Utils
             bool isDigit = false;
             bool isSiteID = false;
             bool next = false;
-            if (s == null) return null;
+            if (s == null || s == "") return null;
             foreach (char c in s)
             {
                 if (c == '(')
@@ -559,11 +563,9 @@ namespace SEE.Utils
                 }
                 else if(c == ',' && next)
                 {
-                    Debug.LogWarning("PARSER STR " + digit + " s " + siteID + " int " + int.Parse(digit) + " d " + int.Parse(siteID));
                     ret.Add(new Identifier(int.Parse(digit), int.Parse(siteID)));
                     digit = "";
                     siteID = "";
-
                 }
                 else
                 {
@@ -578,8 +580,12 @@ namespace SEE.Utils
                 }
             }
             //The last element in the string hasnt a comma behind it so we need to insert it here!
-            ret.Add(new Identifier(Int32.Parse(digit), Int32.Parse(siteID)));
-            Debug.LogWarning(PositionToString(ret.ToArray()));
+            if (digit != "" && siteID != "")
+            {
+                ret.Add(new Identifier(int.Parse(digit), int.Parse(siteID)));
+                Debug.LogWarning(PositionToString(ret.ToArray()));
+            }
+            
             return ret.ToArray();
         }
 
