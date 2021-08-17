@@ -1,0 +1,16 @@
+Comment: Error while executing global connection shutdown delegates for [TCP-E-S] 192.168.178.100:60227 -> 192.168.178.90:55555 (fkMdCnxSPE2-pzOZOlpjSw). Ensure any shutdown exceptions are caught in your own code.
+
+Base Exception Type: UnityEngine.UnityException: FindObjectsOfType can only be called from the main thread.
+Constructors and field initializers will be executed from the loading thread when loading a scene.
+Don't use this function in the constructor or field initializers, instead move initialization code to the Awake or Start function.
+  at (wrapper managed-to-native) UnityEngine.Object.FindObjectsOfType(System.Type,bool)
+  at UnityEngine.Object.FindObjectsOfType[T] () [0x00001] in <a0ef933b1aa54b668801ea864e4204fe>:0 
+  at SEE.Net.Network.SwitchToOfflineMode () [0x0000c] in C:\Users\moble\UNI\SEE\Assets\SEE\Net\Network.cs:352 
+  at SEE.Net.Client+<>c.<Initialize>b__16_0 (NetworkCommsDotNet.Connections.Connection c) [0x0000d] in C:\Users\moble\UNI\SEE\Assets\SEE\Net\Client.cs:64 
+  at NetworkCommsDotNet.Connections.Connection.CloseConnection (System.Boolean closeDueToError, System.Int32 logLocation) [0x00229] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 
+
+Stack Trace:   at (wrapper managed-to-native) UnityEngine.Object.FindObjectsOfType(System.Type,bool)
+  at UnityEngine.Object.FindObjectsOfType[T] () [0x00001] in <a0ef933b1aa54b668801ea864e4204fe>:0 
+  at SEE.Net.Network.SwitchToOfflineMode () [0x0000c] in C:\Users\moble\UNI\SEE\Assets\SEE\Net\Network.cs:352 
+  at SEE.Net.Client+<>c.<Initialize>b__16_0 (NetworkCommsDotNet.Connections.Connection c) [0x0000d] in C:\Users\moble\UNI\SEE\Assets\SEE\Net\Client.cs:64 
+  at NetworkCommsDotNet.Connections.Connection.CloseConnection (System.Boolean closeDueToError, System.Int32 logLocation) [0x00229] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 
