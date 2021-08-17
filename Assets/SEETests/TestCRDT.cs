@@ -7,8 +7,24 @@ using static SEE.Utils.CRDT;
 
 namespace SEETests
 {
-    public class TestCRDT 
+    public class TestCRDT
     {
+        [Test]
+        public void testPositionToString()
+        {
+            CRDT crdt = new CRDT(1);
+            Identifier[] pos = new Identifier[] { new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            Assert.AreEqual("(1, 1), (2, 1), (3, 1)", crdt.PositionToString(pos));
+        }
+
+        [Test]
+        public void testStringToPosition()
+        {
+            CRDT crdt = new CRDT(1);
+            Identifier[] pos = new Identifier[] { new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            Assert.AreEqual(pos, crdt.StringToPosition("(1, 1), (2, 1), (3, 1)"));
+        }
+
         [Test]
         public void testDeleteChar()
         {
@@ -35,7 +51,7 @@ namespace SEETests
 
             }
         }
-        
+
         [Test]
         public void testRemoteDeleteChar()
         {
@@ -62,7 +78,7 @@ namespace SEETests
 
             }
         }
-        
+
         [Test]
         public void RemoteAndAddCharSameTimePos0()
         {
@@ -71,7 +87,7 @@ namespace SEETests
 
             crdt1.AddChar('A', 0);
             crdt2.AddChar('a', 0);
-            
+
             crdt2.RemoteAddChar('A', crdt1.getCRDT()[0].GetIdentifier(), null);
             crdt1.RemoteAddChar('a', crdt2.getCRDT()[1].GetIdentifier(), null);
             Assert.AreEqual("Aa", crdt1.PrintString());
@@ -82,8 +98,8 @@ namespace SEETests
         public void testAddChar()
         {
             CRDT test = new CRDT(1);
-            test.AddChar('H', 0);         
-            test.AddChar('A', 1);            
+            test.AddChar('H', 0);
+            test.AddChar('A', 1);
             test.AddChar('L', 2);
             test.AddChar('O', 3);
             test.AddChar('L', 2);
@@ -130,7 +146,7 @@ namespace SEETests
 
             crdt1.AddChar('H', 0);
             crdt2.RemoteAddChar('H', crdt1.getCRDT()[0].GetIdentifier(), null);
-            
+
             crdt1.AddChar('A', 1);
             crdt2.RemoteAddChar('A', crdt1.getCRDT()[1].GetIdentifier(), crdt1.getCRDT()[0].GetIdentifier());
 
@@ -190,6 +206,6 @@ namespace SEETests
             Debug.LogWarning("CRDT: " + crdt.ToString());
             Debug.LogWarning(crdt.PrintString());
         }
-        
+
     }
 }
