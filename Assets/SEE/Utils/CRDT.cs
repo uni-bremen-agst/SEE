@@ -20,12 +20,9 @@ namespace SEE.Utils
             { }
         }
         
-        [Serializable]
         public class Identifier
         {
-            [SerializeField]
             private int digit;
-            [SerializeField]
             private int site;
             public Identifier(int digit, int site)
             {
@@ -221,6 +218,7 @@ namespace SEE.Utils
             }
             else
             {
+                Identifier[] testTmp = StringToPosition(PositionToString(position));
                 new NetCRDT().AddChar(c, position, null);
             }
         }
@@ -528,7 +526,7 @@ namespace SEE.Utils
         /// Transforms an string into a position
         /// </summary>
         /// <param name="s">The string contianing the position</param>
-        /// <returns>a psotion - Identifier[]</returns>
+        /// <returns>a position - Identifier[]</returns>
         public Identifier[] StringToPosition(string s)
         {
             List<Identifier> ret = new List<Identifier>();
@@ -561,8 +559,8 @@ namespace SEE.Utils
                 }
                 else if(c == ',' && next)
                 {
-                    Debug.LogWarning("PARSER STR " + digit + " s " + siteID + " int " + Int32.Parse(digit) + " d " + Int32.Parse(siteID));
-                    ret.Add(new Identifier( Int32.Parse(digit), Int32.Parse(siteID)));
+                    Debug.LogWarning("PARSER STR " + digit + " s " + siteID + " int " + int.Parse(digit) + " d " + int.Parse(siteID));
+                    ret.Add(new Identifier(int.Parse(digit), int.Parse(siteID)));
                     digit = "";
                     siteID = "";
 
@@ -579,6 +577,9 @@ namespace SEE.Utils
                     }
                 }
             }
+            //The last element in the string hasnt a comma behind it so we need to insert it here!
+            ret.Add(new Identifier(Int32.Parse(digit), Int32.Parse(siteID)));
+            Debug.LogWarning(PositionToString(ret.ToArray()));
             return ret.ToArray();
         }
 
@@ -596,7 +597,7 @@ namespace SEE.Utils
             {
                 if (!fst)
                 {
-                    ret += ',';
+                    ret += ", ";
                 }
                 else
                 {
