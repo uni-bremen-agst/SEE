@@ -154,7 +154,18 @@ namespace SEE.Utils
             }
         }
 
-
+        /// <summary>
+        /// Deletes every char between the start and end index (inclusive start and end index)
+        /// </summary>
+        /// <param name="startIdx">The start index</param>
+        /// <param name="endIdx">The end index</param>
+        public void DeleteString(int startIdx, int endIdx)
+        {
+            for(int i = endIdx; i >= startIdx; i--)
+            {
+                DeleteChar(i);
+            }
+        }
 
         /// <summary>
         /// Removes a Char from the CRDT at a given index
@@ -170,6 +181,21 @@ namespace SEE.Utils
             else
             {
                 throw new DeleteNotPossibleException("Index is out of range!");
+            }
+        }
+
+        /// <summary>
+        /// Adds a string to the CRDT at the startIdx
+        /// </summary>
+        /// <param name="s">The string that should be added</param>
+        /// <param name="startIdx">The start index of the string in the file</param>
+        public void AddString(string s , int startIdx)
+        {
+            int idx = startIdx;
+            foreach(Char c in s)
+            {
+                AddChar(c, idx);
+                idx++;
             }
         }
 
