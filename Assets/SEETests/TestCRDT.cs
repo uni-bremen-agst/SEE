@@ -1,7 +1,8 @@
 using NUnit.Framework;
 using SEE.Utils;
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using static SEE.Utils.CRDT;
 
@@ -12,25 +13,25 @@ namespace SEETests
         [Test]
         public void testPositionToString()
         {
-            CRDT crdt = new CRDT(1);
-            Identifier[] pos = new Identifier[] { new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            CRDT crdt = new CRDT(new GUID().ToString());
+            Identifier[] pos = new Identifier[] { new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
             Assert.AreEqual("(1, 1), (2, 1), (3, 1)", crdt.PositionToString(pos));
         }
 
         [Test]
         public void testStringToPosition()
         {
-            CRDT crdt = new CRDT(1);
-            Identifier[] pos = new Identifier[] {new Identifier(1, 1), new Identifier(2, 1), new Identifier(3, 1) };
+            CRDT crdt = new CRDT(new GUID().ToString());
+            Identifier[] pos = new Identifier[] {new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
             Debug.LogWarning(pos[0] + " to string "  + crdt.StringToPosition("(1, 1), (2, 1), (3, 1)")[0]);
 
-            Assert.AreEqual(pos, crdt.StringToPosition("(1, 1), (2, 1), (3, 1)"));
+            Assert.AreEqual(0, crdt.ComparePosition(pos, crdt.StringToPosition("(1, 1), (2, 1), (3, 1)")));
         }
 
         [Test]
         public void testDeleteChar()
         {
-            CRDT test = new CRDT(1);
+            CRDT test = new CRDT(new GUID().ToString());
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -57,7 +58,7 @@ namespace SEETests
         [Test]
         public void testRemoteDeleteChar()
         {
-            CRDT test = new CRDT(1);
+            CRDT test = new CRDT(new GUID().ToString());
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -72,7 +73,7 @@ namespace SEETests
             Assert.AreEqual("HAL !", test.PrintString());
             try
             {
-                test.RemoteDeleteChar(new Identifier[] { new Identifier(22, 22), new Identifier(11, 11), new Identifier(33, 33) });
+                test.RemoteDeleteChar(new Identifier[] { new Identifier(22, "22"), new Identifier(11, "11"), new Identifier(33, "33") });
                 Assert.Fail();
             }
             catch (RemoteDeleteNotPossibleException)
@@ -84,8 +85,8 @@ namespace SEETests
         [Test]
         public void RemoteAndAddCharSameTimePos0()
         {
-            CRDT crdt1 = new CRDT(1);
-            CRDT crdt2 = new CRDT(2);
+            CRDT crdt1 = new CRDT("1");
+            CRDT crdt2 = new CRDT("2");
 
             crdt1.AddChar('A', 0);
             crdt2.AddChar('a', 0);
@@ -101,7 +102,7 @@ namespace SEETests
         [Test]
         public void testAddChar()
         {
-            CRDT test = new CRDT(1);
+            CRDT test = new CRDT(new GUID().ToString());
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -124,11 +125,11 @@ namespace SEETests
         [Test]
         public void testFind()
         {
-            CRDT crdt = new CRDT(1);
+            CRDT crdt = new CRDT("1");
             crdt.AddChar('A', 0);
             crdt.AddChar('B', 1);
             crdt.AddChar('C', 2);
-            Identifier[] wrong = { new Identifier(99, 99), new Identifier(22, 22), new Identifier(77, 77) };
+            Identifier[] wrong = { new Identifier(99, "99"), new Identifier(22, "22"), new Identifier(77, "77") };
 
             Assert.AreEqual(0, crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item1);
             Assert.AreEqual(1, crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item1);
@@ -145,8 +146,8 @@ namespace SEETests
         [Test]
         public void testRemoteAdd()
         {
-            CRDT crdt1 = new CRDT(1);
-            CRDT crdt2 = new CRDT(2);
+            CRDT crdt1 = new CRDT("1");
+            CRDT crdt2 = new CRDT("2");
 
             crdt1.AddChar('H', 0);
             crdt2.RemoteAddChar('H', crdt1.getCRDT()[0].GetIdentifier(), null);
@@ -179,7 +180,7 @@ namespace SEETests
         [Test]
         public void TestToString()
         {
-            CRDT test = new CRDT(1);
+            CRDT test = new CRDT("1");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -194,7 +195,7 @@ namespace SEETests
         [Test]
         public void TestPrintString()
         {
-            CRDT test = new CRDT(1);
+            CRDT test = new CRDT("1");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
