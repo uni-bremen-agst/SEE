@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Video;
 
 namespace SEE.Game.UI.HelpSystem
@@ -169,8 +170,7 @@ namespace SEE.Game.UI.HelpSystem
                         }
                     }
                 }
-                Debug.Log(helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width);
-                text.fontSize = 30 * ((helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width)/550);
+                text.fontSize = 30 * ((helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width) / 550);
             }
         }
 
@@ -199,18 +199,16 @@ namespace SEE.Game.UI.HelpSystem
         {
             helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
-            helpSystemSpace.transform.localScale = new Vector3(1.7f,1.7f);
-            helpSystemEntry.transform.Find("Scrollable/Code")
+            HelpSystemBuilder.EntrySpace = helpSystemSpace;
+            helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
+            helpSystemEntry.transform.Find("Content/Scrollable/Code")
               .gameObject.TryGetComponentOrLog(out text);
             text.fontSize = 30;
-            PrefabInstantiator.InstantiatePrefab("Prefabs/UI/HeadlineHelpSystem", helpSystemSpace.transform.Find("PanelHeader"), false);
 
-            //FIXME
-            //Manager.titleText = titleManager;
-            //Manager.descriptionText = description;
-            //Manager.icon = Resources.Load<Sprite>(icon);
-            //Manager.onConfirm.AddListener(Back);
-            //Manager.onCancel.AddListener(Close);
+            helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponent<ButtonManagerWithIcon>(out ButtonManagerWithIcon manager);
+            manager.clickEvent.AddListener(Back);
+            helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponent<ButtonManagerWithIcon>(out ButtonManagerWithIcon manager2);
+            manager2.clickEvent.AddListener(Close);
             GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
 
             if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
@@ -221,27 +219,30 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             pauseButton.clickEvent.AddListener(TogglePlaying);
+
             helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Forward")
                           .gameObject.TryGetComponentOrLog(out forwardButton);
             forwardButton.clickEvent.AddListener(Forward);
+
             helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Back")
                         .gameObject.TryGetComponentOrLog(out backwardButton);
             backwardButton.clickEvent.AddListener(Backward);
 
-            helpSystemEntry.transform.Find("Content/progress").gameObject.TryGetComponentOrLog(out progress);
+            helpSystemEntry.transform.Find("progress").gameObject.TryGetComponentOrLog(out progress);
 
             Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
             PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
-            tab.Label = "Titel";
+            tab.Label = "";
+            GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"));
+            HelpSystemBuilder.Headline = headline;
+            headline.transform.parent = helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform;
+            headline.GetComponent<TextMeshProUGUI>().text = titleManager;
 
             PanelNotificationCenter.OnTabClosed += panelTab =>
             {
                 if (panelTab.Panel == panel)
                 {
-                    videoPlayer.Stop();
-                    HelpSystemMenu.IsEntryOpened = false;
-                    EntryShown = false;
-                    Destroy(helpSystemSpace);
+                    Close();
                 }
             };
         }
@@ -251,7 +252,6 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void Close()
         {
-            //TODO: Manager.CloseWindow();
             GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             if (videoPlayer == null)
             {
@@ -284,7 +284,6 @@ namespace SEE.Game.UI.HelpSystem
                 throw new System.Exception("No Video-Player found");
             }
             videoPlayer.time = currentKeyword.CumulatedTime;
-            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
