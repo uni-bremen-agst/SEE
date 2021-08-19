@@ -57,10 +57,9 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private void CreateStartMenu()
         {
-            // Important note: You have to define the lowest hierachy-level first. 
-            // That means, the mainMenu will be defined at the end and the lowest entry-list first.
-
             PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+
+            // Initialisation of all Lists for the NestedMenuEntries or MenuEntries.
 
             List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
             List<MenuEntry> architectureEntries = new List<MenuEntry>();
@@ -72,58 +71,69 @@ namespace SEE.Game.UI.HelpSystem
             List<MenuEntry> playerNavigationEntries = new List<MenuEntry>();
             List<MenuEntry> cityNavigationEntries = new List<MenuEntry>();
 
+            // Hint for LinkedLists:
+            // These lists are important for the Voice-Output of SEE and the displayed notes.
+            // The LinkedListEntries needs an index starting with number 1 ascending, the displayed and said text and the start-position, 
+            // where the text should appear and said by SEE. The first start-position has to be at point 0.
+            // The linked list has to be inserted into a menu entry at the end of the function.
 
             LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
             addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
-            addEdge.AddLast(new LinkedListEntry(2, "Leftklick on the entry new edge", 6));
-            addEdge.AddLast(new LinkedListEntry(3, "Lefklick on a node to select the start node", 12));
-            addEdge.AddLast(new LinkedListEntry(4, "Lefklick on a node to select the target node", 18));
-            addEdge.AddLast(new LinkedListEntry(5, "Press Key F11 to  remove the selected start node", 27));
+            addEdge.AddLast(new LinkedListEntry(2, "Left click on the entry new edge", 6));
+            addEdge.AddLast(new LinkedListEntry(3, "Left click on a node to select the start node", 12));
+            addEdge.AddLast(new LinkedListEntry(4, "Left click on a node to select the target node", 18));
+            addEdge.AddLast(new LinkedListEntry(5, "Press key F11 to reset the selected start node", 27));
 
             LinkedList<LinkedListEntry> editNode = new LinkedList<LinkedListEntry>();
             editNode.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
-            editNode.AddLast(new LinkedListEntry(2, "Leftklick on the entry edit node", 8));
-            editNode.AddLast(new LinkedListEntry(3, "Leftklick on the node you want to edit", 14));
-            editNode.AddLast(new LinkedListEntry(4, "You can see all editable Metrics inside of this new window", 21));
-            editNode.AddLast(new LinkedListEntry(5, "Insert new values, if you want to change some of them", 25));
-            editNode.AddLast(new LinkedListEntry(6, "Finish the edit-process by pushing the okay-button", 30));
-            editNode.AddLast(new LinkedListEntry(6, "You can see that your new values are inserted", 34));
+            editNode.AddLast(new LinkedListEntry(2, "Left click on the entry edit node", 8));
+            editNode.AddLast(new LinkedListEntry(3, "Left click on the node you want to edit", 14));
+            editNode.AddLast(new LinkedListEntry(4, "You can see all editable metrics inside of this new window", 21));
+            editNode.AddLast(new LinkedListEntry(5, "Insert new values, if so desired", 25));
+            editNode.AddLast(new LinkedListEntry(6, "Finish the editing process by pushing the Okay button", 30));
+            editNode.AddLast(new LinkedListEntry(6, "Your newly inserted values are now visible", 34));
 
-            LinkedList<LinkedListEntry> drawLine = new LinkedList<LinkedListEntry>();
-            drawLine.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
-            drawLine.AddLast(new LinkedListEntry(2, "Leftklick on the entry draw line", 5));
-            drawLine.AddLast(new LinkedListEntry(3, "Leftklick at the place where the line should be started. Hold the mouse-button for drawing", 10));
-            drawLine.AddLast(new LinkedListEntry(4, "Release the left mouse button for stop drawing the line. You can start drawing another", 15));
+            LinkedList<LinkedListEntry> searchNode = new LinkedList<LinkedListEntry>();
+            searchNode.AddLast(new LinkedListEntry(1, "Press key F for opening the search menu", 0));
+            searchNode.AddLast(new LinkedListEntry(2, "Insert the name of the node or part of it into the input field", 5));
+            searchNode.AddLast(new LinkedListEntry(3, "Press the button Okay", 13));
+            searchNode.AddLast(new LinkedListEntry(4, "You can see the 5 best matching nodes ascending by their matching score", 16));
+            searchNode.AddLast(new LinkedListEntry(5, "If you left click on one node entry, the respective node will be highlighted", 23));
+            searchNode.AddLast(new LinkedListEntry(6, "The node is blinking and a light beam strikes for a few seconds", 30));
+
 
             LinkedList<LinkedListEntry> simpleNav = new LinkedList<LinkedListEntry>();
 
             LinkedList<LinkedListEntry> switchTable = new LinkedList<LinkedListEntry>();
 
             LinkedList<LinkedListEntry> zoomIntoCity = new LinkedList<LinkedListEntry>();
-            // Senseful structure: Entry1 -> Subentry1 -> Subsubentry1, Subsubentry2,.... -> Subentry2 ...
+
+            // Important note: You have to define the lowest hierachy-level first. 
+            // That means, the mainMenu will be defined at the end and the lowest entry-list first.
+            // A list has to be filled with values before the higher hierachy-level will be filled with values and so on.
 
             playerMenuEntries = new List<MenuEntry>
-        {
+            {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Assets/SEE/Videos/EditNode.mp4", editNode, entry),
-        };
+            };
 
             architectureEntries = new List<MenuEntry>
-        {
+            {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.magenta),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Map Architecture", "Mapping description", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4",null, entry)
-        };
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
+            };
 
             playerNavigationEntries = new List<MenuEntry>
-        {
+            {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/AddEdge.mp4", switchTable, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/EditNode.mp4", simpleNav, entry),
-        };
+            };
 
             cityNavigationEntries = new List<MenuEntry>
-        {
+            {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/AddEdge.mp4", zoomIntoCity, entry),
-        };
+            }; 
 
             navigationEntries = new List<MenuEntry>
             {
@@ -132,13 +142,13 @@ namespace SEE.Game.UI.HelpSystem
             };
 
             mainMenuEntries = new List<MenuEntry>
-        {
+            {
             HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use-Cases related to the architecture", Color.magenta),
             HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use-Cases related to software-evolution", Color.red),
             HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use-Cases related to software-debugging ", Color.blue),
             HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use-Cases related to the software-quality", Color.cyan),
             HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use-Cases related to the navigation in SEE", Color.green)
-        };
+            };
 
             mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
         }
