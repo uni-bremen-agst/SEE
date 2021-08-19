@@ -24,6 +24,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,10 +72,10 @@ namespace SEE.Game.UI.ConfigMenu
                 EditableInstance.Implementation
             };
 
-        private const string PagePrefabPath = "Assets/Prefabs/UI/Page.prefab";
-        private const string TabButtonPrefabPath = "Assets/Prefabs/UI/TabButton.prefab";
-        private const string ActionButtonPrefabPath = "Assets/Prefabs/UI/ActionButton.prefab";
-        private const string PointerPrefabPath = "Assets/Prefabs/UI/Pointer.prefab";
+        private const string PagePrefabPath = "Prefabs/UI/Page";
+        private const string TabButtonPrefabPath = "Prefabs/UI/TabButton";
+        private const string ActionButtonPrefabPath = "Prefabs/UI/ActionButton";
+        private const string PointerPrefabPath = "Prefabs/UI/Pointer";
 
         private GameObject pagePrefab;
         private GameObject actionButtonPrefab;
@@ -173,7 +174,7 @@ namespace SEE.Game.UI.ConfigMenu
                 Transform attachmentPoint = GameObject
                     .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
                 GameObject pointer =
-                    Instantiate(MustLoadPrefabAtPath(PointerPrefabPath), attachmentPoint);
+                    Instantiate(PrefabInstantiator.InstantiatePrefab(PointerPrefabPath), attachmentPoint);
                 Camera pointerCamera = pointer.GetComponent<Camera>();
 
                 // Replace the default input system with our VR input system.
@@ -204,9 +205,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void LoadPrefabs()
         {
-            tabButtonPrefab = MustLoadPrefabAtPath(TabButtonPrefabPath);
-            pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
-            actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
+            tabButtonPrefab = PrefabInstantiator.InstantiatePrefab(TabButtonPrefabPath);
+            pagePrefab = PrefabInstantiator.InstantiatePrefab(PagePrefabPath);
+            actionButtonPrefab = PrefabInstantiator.InstantiatePrefab(ActionButtonPrefabPath);
         }
         private void SetupActions()
         {
