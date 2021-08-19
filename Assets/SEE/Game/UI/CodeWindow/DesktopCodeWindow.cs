@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -21,8 +22,6 @@ namespace SEE.Game.UI.CodeWindow
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
         private ScrollRect scrollRect;
-
-        private CRDT crdt = new CRDT(1); //FIXME: Use Ip or such a identifier
 
         /// <summary>
         /// FIXME: REPLACE ALLL USAGE WITH THE CARRETPOS from the TMP
@@ -86,7 +85,7 @@ namespace SEE.Game.UI.CodeWindow
                 //TextMeshInputField.caretPosition = 1;
                      
             }
-
+            SEEInput.KeyboardShortcutsEnabled = false;
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.

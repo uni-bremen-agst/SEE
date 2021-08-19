@@ -23,8 +23,8 @@ namespace SEE.Utils
         public class Identifier
         {
             private int digit;
-            private int site;
-            public Identifier(int digit, int site)
+            private string site;
+            public Identifier(int digit, string site)
             {
                 this.digit = digit;
                 this.site = site;
@@ -42,16 +42,10 @@ namespace SEE.Utils
             {
                 this.digit = digit;
             }
-            public int GetSite()
+            public string GetSite()
             {
                 return site;
             }
-            public void SetSite(int site)
-            {
-                this.site = site;
-            }
-
-
         }
         public class CharObj
         {
@@ -95,9 +89,9 @@ namespace SEE.Utils
 
         }
 
-        int siteID;
+        string siteID;
         private List<CharObj> crdt = new List<CharObj>();
-        public CRDT(int siteID)
+        public CRDT(string siteID)
         {
             this.siteID = siteID;
         }
@@ -275,11 +269,11 @@ namespace SEE.Utils
             }
             else
             {
-                if (o1.GetSite() < o2.GetSite())
+                if (String.Compare(o1.GetSite() , o2.GetSite()) < 0)
                 {
                     return -1;
                 }
-                else if (o1.GetSite() > o2.GetSite())
+                else if (String.Compare(o1.GetSite(), o2.GetSite()) > 0)
                 {
                     return 1;
                 }
@@ -297,7 +291,7 @@ namespace SEE.Utils
         /// <param name="pos2">After position</param>
         /// <param name="site">The site ID of the requester</param>
         /// <returns>A new position</returns>
-        public Identifier[] GeneratePositionBetween(Identifier[] pos1, Identifier[] pos2, int site)
+        public Identifier[] GeneratePositionBetween(Identifier[] pos1, Identifier[] pos2, string site)
         {
             Identifier headP1, headP2;
             int pos1Length, pos2Length;
@@ -341,7 +335,7 @@ namespace SEE.Utils
                 int[] delta = CalcDelta(digitP1, digitP2);
                 return ToIdentifierList(Increment(digitP1, delta), pos1, pos2, site);
             }
-            else if (headP1.GetSite() < headP2.GetSite())
+            else if (String.Compare(headP1.GetSite(), headP2.GetSite()) < 0)
             {
                 Identifier[] tmp = { headP1 };
                 return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(pos1.Skip(1)), null, site)));
@@ -449,7 +443,7 @@ namespace SEE.Utils
         /// <param name="after">The position after the new one</param>
         /// <param name="site">The site id from the user</param>
         /// <returns>A list of identifier, representing a position</returns>
-        private Identifier[] ToIdentifierList(int[] newPos, Identifier[] before, Identifier[] after, int site)
+        private Identifier[] ToIdentifierList(int[] newPos, Identifier[] before, Identifier[] after, string site)
         {
             return FromIEnumToIdentifier(newPos.Select((digit, index) =>
            {
@@ -566,7 +560,7 @@ namespace SEE.Utils
                 }
                 else if(c == ',' && next)
                 {
-                    ret.Add(new Identifier(int.Parse(digit), int.Parse(siteID)));
+                    ret.Add(new Identifier(int.Parse(digit), siteID));
                     digit = "";
                     siteID = "";
                 }
@@ -585,7 +579,7 @@ namespace SEE.Utils
             //The last element in the string hasnt a comma behind it so we need to insert it here!
             if (digit != "" && siteID != "")
             {
-                ret.Add(new Identifier(int.Parse(digit), int.Parse(siteID)));
+                ret.Add(new Identifier(int.Parse(digit), siteID));
                 Debug.LogWarning(PositionToString(ret.ToArray()));
             }
             

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Net;
 using static SEE.Utils.CRDT;
 
 namespace SEE.Utils
@@ -7,7 +9,7 @@ namespace SEE.Utils
     {
 
 
-        private static CRDT crdt = new CRDT(1);//TODO wie bekomme ich die SiteID hier richtig?
+        private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
 
 
         public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
