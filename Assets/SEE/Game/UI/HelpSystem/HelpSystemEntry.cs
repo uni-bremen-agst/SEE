@@ -195,7 +195,7 @@ namespace SEE.Game.UI.HelpSystem
         {
             helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
-
+            helpSystemSpace.transform.localScale = new Vector3(1.7f,1.7f);
             //FIXME
             //Manager.titleText = titleManager;
             //Manager.descriptionText = description;
