@@ -224,7 +224,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ComboSelectBuilder : UIBuilder<ComboSelect>
     {
-        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Dropdown.prefab";
+        protected override string PrefabPath => "Prefabs/UI/Input Group - Dropdown";
 
         private ComboSelectBuilder(Transform parent) : base(parent)
         {
