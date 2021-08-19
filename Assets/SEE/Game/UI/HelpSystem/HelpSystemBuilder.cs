@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Game.UI.Menu;
 using SEE.GO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -32,6 +33,16 @@ namespace SEE.Game.UI.HelpSystem
         /// The LinkedListEntries of the current selected HelpSystemEntry.
         /// </summary>
         public static LinkedList<LinkedListEntry> currentEntries;
+
+        /// <summary>
+        /// The space where the entry is inside.
+        /// </summary>
+        public static GameObject EntrySpace;
+
+        /// <summary>
+        /// The headline-gameObject of the helpSystemEntry or rather the headline which is inside of the dynamicPanel.
+        /// </summary>
+        public static GameObject Headline;
 
         /// <summary>
         /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
@@ -124,25 +135,20 @@ namespace SEE.Game.UI.HelpSystem
             }
             if (entryTitle != null)
             {
-                //FIXME: Set title and description
-                //entry.Manager.titleText = entryTitle;
-                //entry.Manager.descriptionText = entryTitle;
+                Debug.Log(EntrySpace.transform.Find("DynamicPanel/PanelHeader"));
+                EntrySpace.transform.Find("DynamicPanel/PanelHeader").gameObject.TryGetComponent<TextMeshProUGUI>(out TextMeshProUGUI text);
+                Debug.Log(text);
+                Headline.GetComponent<TextMeshProUGUI>().text = entryTitle;
             }
             else
             {
-                //FIXME: Set title and description
-                //entry.Manager.descriptionText = "placeholder";
-                //entry.Manager.titleText = "placeholder";
+                Headline.GetComponent<TextMeshProUGUI>().text = "placeholder";
             }
-            //FIXME: Check if this is necessary
-            //entry.Manager.UpdateUI();
             videoPlayer.url = videoPath;
             videoPlayer.Play();
             videoPlayer.SetDirectAudioMute(0, true);
             entry.IsPlaying = true;
             menu.ToggleMenu();
-            //FIXME: Open window
-            //helpSystem.Manager.OpenWindow();
             HelpSystemMenu.IsEntryOpened = true;
             currentEntries = keywords;
         }
