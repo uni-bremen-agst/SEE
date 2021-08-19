@@ -112,10 +112,7 @@ namespace SEE.Utils
             
             if (prePosition != null && prePosition.Length > 0)
             {
-                Debug.LogWarning("REMOTE ADDD " + PositionToString(position) + " pre " + PositionToString(prePosition) + " char " + c);
-
                 (int, CharObj) found = Find(prePosition);
-                Debug.LogWarning("FOUND " + found.Item2.ToString());
                 if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
                 {
                     crdt.Insert(found.Item1 + 1, new CharObj(c, position));
@@ -128,9 +125,7 @@ namespace SEE.Utils
             }
             else
             {
-                Debug.LogWarning("REMOTE ADDD " + PositionToString(position) + " char " + c);
                 int idx = FindNextFittingIndex(position, 0);
-                Debug.LogWarning("idx " + idx + "CRDT S " + crdt.Count());
                 if (idx < crdt.Count())
                 {
                     crdt.Insert(idx, new CharObj(c, position));
@@ -363,15 +358,12 @@ namespace SEE.Utils
             int index = 0;
             foreach (CharObj elm in crdt)
             {
-                Debug.LogWarning("REAL " + PositionToString(elm.GetIdentifier()) + " Gesucht " + PositionToString(position));
                 if (ComparePosition( elm.GetIdentifier(), position ) == 0)
                 {
-                    Debug.LogWarning("RETURN SHITT");
                     return (index, elm);
                 }
                 index++;
             }
-            Debug.LogWarning("RETURN NULL");
             return (-1, null);
         }
 
@@ -580,7 +572,6 @@ namespace SEE.Utils
             if (digit != "" && siteID != "")
             {
                 ret.Add(new Identifier(int.Parse(digit), siteID));
-                Debug.LogWarning(PositionToString(ret.ToArray()));
             }
             
             return ret.ToArray();
