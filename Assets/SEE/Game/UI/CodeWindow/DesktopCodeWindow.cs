@@ -28,6 +28,17 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private int typeIndex = 0;
 
+
+        /// <summary>
+        /// Saves the Current time for the Cooldown
+        /// </summary>
+        public float timeStamp = Time.time;
+
+        /// <summary>
+        /// The Cooldown between to deleteOperations
+        /// </summary>
+        public float coolDownTime = 100.000000f;
+
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
         /// </summary>
@@ -39,6 +50,7 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.SetActive(show);
             }
         }
+       
 
         protected override void StartDesktop()
         {
@@ -140,8 +152,12 @@ namespace SEE.Game.UI.CodeWindow
                 ICRDT.AddChar(input[0], typeIndex);
                 typeIndex++;
             }
-            if (Input.GetKeyDown(KeyCode.Delete) && typeIndex > 0)
+
+            Debug.LogWarning("COOL DOWN" + timeStamp + " TIME IS "+ Time.time);
+            if (Input.GetKey(KeyCode.Delete) && typeIndex > 0 && timeStamp <= Time.time)
             {
+                timeStamp = Time.time + 0.100000f;
+                Debug.LogWarning("TIME " + timeStamp);
                 Debug.LogWarning("DLELEEEE");
                 typeIndex--;
                 ICRDT.DeleteChar(typeIndex);
