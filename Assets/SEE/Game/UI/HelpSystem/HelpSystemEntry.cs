@@ -116,6 +116,8 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private Voice voice;
 
+        private TextMeshProUGUI text;
+
         protected override void StartDesktop()
         {
             if (!GameObject.Find("PersonalAssistant").TryGetComponent(out audioSource))
@@ -167,6 +169,8 @@ namespace SEE.Game.UI.HelpSystem
                         }
                     }
                 }
+                Debug.Log(helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width);
+                text.fontSize = 30 * ((helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width)/550);
             }
         }
 
@@ -196,6 +200,11 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
             helpSystemSpace.transform.localScale = new Vector3(1.7f,1.7f);
+            helpSystemEntry.transform.Find("Scrollable/Code")
+              .gameObject.TryGetComponentOrLog(out text);
+            text.fontSize = 30;
+            PrefabInstantiator.InstantiatePrefab("Prefabs/UI/HeadlineHelpSystem", helpSystemSpace.transform.Find("PanelHeader"), false);
+
             //FIXME
             //Manager.titleText = titleManager;
             //Manager.descriptionText = description;
@@ -229,7 +238,10 @@ namespace SEE.Game.UI.HelpSystem
             {
                 if (panelTab.Panel == panel)
                 {
-                    //TODO: Close panel
+                    videoPlayer.Stop();
+                    HelpSystemMenu.IsEntryOpened = false;
+                    EntryShown = false;
+                    Destroy(helpSystemSpace);
                 }
             };
         }
