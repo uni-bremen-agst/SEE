@@ -244,7 +244,7 @@ namespace SEE.Utils
 
             if (crdt.Count > index)
             {
-                crdt.Insert(index, new CharObj(c, position));
+                crdt.Insert(index , new CharObj(c, position));
             }
             else
             {
@@ -390,7 +390,6 @@ namespace SEE.Utils
                 throw new Exception("The CRDT has a wrong order");
             }
         }
-
 
         /// <summary>
         /// Finds a CharObj in the CRDT by the position
@@ -659,7 +658,6 @@ namespace SEE.Utils
             }
             return ret;
         }
-
 
         /// <summary>
         /// Converts the CRDT to a String

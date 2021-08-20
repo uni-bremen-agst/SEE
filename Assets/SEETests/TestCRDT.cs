@@ -110,6 +110,9 @@ namespace SEETests
             test.AddChar('L', 2);
             test.AddChar(' ', 5);
             test.AddChar('!', 6);
+            test.AddChar(':', 6);
+            test.AddChar('(', 6);
+            Debug.LogWarning(test.PrintString());
             Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[1].GetIdentifier()));
             Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[2].GetIdentifier()));
             Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[3].GetIdentifier()));
@@ -119,7 +122,7 @@ namespace SEETests
             Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[2].GetIdentifier(), test.getCRDT()[3].GetIdentifier()));
             Assert.AreEqual(1, test.ComparePosition(test.getCRDT()[6].GetIdentifier(), test.getCRDT()[1].GetIdentifier()));
             Assert.AreEqual(0, test.ComparePosition(test.getCRDT()[2].GetIdentifier(), test.getCRDT()[2].GetIdentifier()));
-            Assert.AreEqual("HALLO !", test.PrintString());
+            Assert.AreEqual("HALLO (:!", test.PrintString());
         }
 
         [Test]

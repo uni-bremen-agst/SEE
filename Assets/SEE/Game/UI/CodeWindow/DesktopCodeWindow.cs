@@ -24,6 +24,10 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private ScrollRect scrollRect;
 
+        private TMP_InputField.TextSelectionEvent textSelection = null;
+
+        private Tuple<int, int> selectedText;
+
         /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
@@ -40,7 +44,7 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.SetActive(show);
             }
         }
-       
+
 
         protected override void StartDesktop()
         {
@@ -60,32 +64,36 @@ namespace SEE.Game.UI.CodeWindow
 
             // Set title, text and preferred font size
             codeWindow.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
-            if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh) 
+            if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh)
             && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
                 //TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
-                
+
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
                 int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
                 List<string> textWitzhOutNumbers = Text.Split('\n')
-                                                                   .Select((x, i) => {
+                                                                   .Select((x, i) =>
+                                                                   {
                                                                        string cleanLine = GetCleanLine(i);
                                                                        if (cleanLine.Length > 0)
                                                                        {
                                                                            return cleanLine.Substring(neededPadding);
                                                                        }
                                                                        else
-                                                                       { 
+                                                                       {
                                                                            return cleanLine;
                                                                        }
 
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
-                //TextMeshInputField.caretPosition = 1;
-                     
+                                               //TextMeshInputField.caretPosition = 1;
+                if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
+                {
+                    ICRDT.AddString(Text, 0, Title);
+                }
             }
             SEEInput.KeyboardShortcutsEnabled = false;
             // Register events to find out when window was scrolled in.
@@ -130,32 +138,83 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            //Input Handling
-            //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
-            //get the input
-            var input = Input.inputString;
-            //ignore null input to avoid unnecessary computation
-            if (!string.IsNullOrEmpty(input))
-            {
-                //logic related to the char pressed
-                ICRDT.AddChar(input[0], TextMeshInputField.caretPosition, Title);
-            }
 
-            if (Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time)
+            //Input Handling
+            if (TextMeshInputField.isFocused)
             {
-                timeStamp = Time.time + 0.100000f;
-                ICRDT.DeleteChar(TextMeshInputField.caretPosition, Title);
-                
-            }
-            if((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))&& Input.GetKeyDown(KeyCode.V))
-            {
-                if (Clipboard.CanPaste<string>())
+
+                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
+                TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
+
+                //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
+                //get the input
+                var input = Input.inputString;
+                //ignore null input to avoid unnecessary computation
+                if (!string.IsNullOrEmpty(input))
                 {
-                    ICRDT.AddString(Clipboard.Paste<string>(), TextMeshInputField.caretPosition, Title);
+                    if (selectedText != null)
+                    {
+                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                    }
+                    ICRDT.AddChar(input[0], TextMeshInputField.stringPosition -1, Title);
                 }
+
+                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > TextMeshInputField.stringPosition && timeStamp <= Time.time)
+                {
+                    timeStamp = Time.time + 0.100000f;
+                    if (selectedText != null)
+                    {
+                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                    }
+                    else
+                    {
+                        ICRDT.DeleteChar(TextMeshInputField.stringPosition, Title);
+                    }
+                }
+
+                if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && TextMeshInputField.stringPosition > 0)
+                {
+                    timeStamp = Time.time + 0.100000f;
+                    if (selectedText != null)
+                    {
+                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                    }
+                    else
+                    {
+                        ICRDT.DeleteChar(TextMeshInputField.stringPosition+1, Title);
+                    }
+
+                }
+                if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
+                {
+                    if (Clipboard.CanPaste<string>())
+                    {
+                        if (selectedText != null)
+                        {
+                            ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                        }
+                        ICRDT.AddString(Clipboard.Paste<string>(), TextMeshInputField.stringPosition, Title);
+                    }
+                }
+                if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
+                {
+                    if (selectedText != null)
+                    {
+                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                    }
+                }
+                Debug.Log("carretpos" + TextMeshInputField.stringPosition + "  stringpos " + TextMeshInputField.stringPosition);
             }
-            Debug.Log("FILE:; " + Title);
-            Debug.Log(ICRDT.PrintString(Title));
+            if(Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.W))
+            {
+                Debug.Log("FILE:; " + Title);
+                Debug.Log(ICRDT.PrintString(Title));
+               
+            }
+            
+          
+            //Debug.Log("FILE:; " + Title);
+            // Debug.Log(ICRDT.PrintString(Title));
 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
