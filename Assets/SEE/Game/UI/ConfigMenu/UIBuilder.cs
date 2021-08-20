@@ -77,7 +77,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             if (prefab == null)
             {
-                prefab = PrefabInstantiator.InstantiatePrefab(PrefabPath);
+                prefab = PrefabInstantiator.LoadPrefab(PrefabPath);
             }
             return prefab;
         }

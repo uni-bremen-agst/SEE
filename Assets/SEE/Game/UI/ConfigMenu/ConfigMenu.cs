@@ -174,7 +174,7 @@ namespace SEE.Game.UI.ConfigMenu
                 Transform attachmentPoint = GameObject
                     .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
                 GameObject pointer =
-                    Instantiate(PrefabInstantiator.InstantiatePrefab(PointerPrefabPath), attachmentPoint);
+                    PrefabInstantiator.InstantiatePrefab(PointerPrefabPath, parent: attachmentPoint);
                 Camera pointerCamera = pointer.GetComponent<Camera>();
 
                 // Replace the default input system with our VR input system.
@@ -205,9 +205,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void LoadPrefabs()
         {
-            tabButtonPrefab = PrefabInstantiator.InstantiatePrefab(TabButtonPrefabPath);
-            pagePrefab = PrefabInstantiator.InstantiatePrefab(PagePrefabPath);
-            actionButtonPrefab = PrefabInstantiator.InstantiatePrefab(ActionButtonPrefabPath);
+            tabButtonPrefab = PrefabInstantiator.LoadPrefab(TabButtonPrefabPath);
+            pagePrefab = PrefabInstantiator.LoadPrefab(PagePrefabPath);
+            actionButtonPrefab = PrefabInstantiator.LoadPrefab(ActionButtonPrefabPath);
         }
         private void SetupActions()
         {

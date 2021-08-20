@@ -29,6 +29,8 @@ namespace SEE.Game.UI.ConfigMenu
     /// <summary>
     /// A button that is used in the sidebar of the config menu.
     /// It indicates the currently active page and allows for page switches.
+    /// 
+    /// Note: This component is the child of the TabButton prefab.
     /// </summary>
     [RequireComponent(typeof(ButtonManagerBasic))]
     public class TabButton : MonoBehaviour
