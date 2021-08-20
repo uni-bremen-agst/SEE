@@ -6,6 +6,7 @@ using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
+using Sirenix.Utilities.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -142,21 +143,26 @@ namespace SEE.Game.UI.CodeWindow
             if (!string.IsNullOrEmpty(input))
             {
                 //logic related to the char pressed
-                //Debug.Log("Pressed char: " + Input.inputString);
                 ICRDT.AddChar(input[0], typeIndex, Title);
+                
                 typeIndex++;
             }
 
-            Debug.LogWarning("COOL DOWN" + timeStamp + " TIME IS "+ Time.time);
             if (Input.GetKey(KeyCode.Delete) && typeIndex > 0 && timeStamp <= Time.time)
             {
                 timeStamp = Time.time + 0.100000f;
-                Debug.LogWarning("TIME " + timeStamp);
-                Debug.LogWarning("DLELEEEE");
                 typeIndex--;
                 ICRDT.DeleteChar(typeIndex, Title);
                 
             }
+            if((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))&& Input.GetKeyDown(KeyCode.V))
+            {
+                if (Clipboard.CanPaste<string>())
+                {
+                    ICRDT.AddString(Clipboard.Paste<string>(), typeIndex, Title);
+                }
+            }
+            Debug.Log("FILE:; " + Title);
             Debug.Log(ICRDT.PrintString(Title));
 
             // Show issue info on click (on hover would be too expensive)
