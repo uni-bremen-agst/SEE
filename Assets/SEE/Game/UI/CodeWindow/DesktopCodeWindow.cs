@@ -28,16 +28,10 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private int typeIndex = 0;
 
-        private CRDT crdt = new CRDT(new Guid().ToString());
         /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
         public float timeStamp = Time.time;
-
-        /// <summary>
-        /// The Cooldown between to deleteOperations
-        /// </summary>
-        public float coolDownTime = 100.000000f;
 
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
