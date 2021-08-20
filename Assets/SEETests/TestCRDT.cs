@@ -13,7 +13,7 @@ namespace SEETests
         [Test]
         public void testPositionToString()
         {
-            CRDT crdt = new CRDT(new GUID().ToString());
+            CRDT crdt = new CRDT(new GUID().ToString(), "test");
             Identifier[] pos = new Identifier[] { new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
             Assert.AreEqual("(1, 1), (2, 1), (3, 1)", crdt.PositionToString(pos));
         }
@@ -21,7 +21,7 @@ namespace SEETests
         [Test]
         public void testStringToPosition()
         {
-            CRDT crdt = new CRDT(new GUID().ToString());
+            CRDT crdt = new CRDT(new GUID().ToString(), "test");
             Identifier[] pos = new Identifier[] {new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
             Debug.LogWarning(pos[0] + " to string "  + crdt.StringToPosition("(1, 1), (2, 1), (3, 1)")[0]);
 
@@ -31,7 +31,7 @@ namespace SEETests
         [Test]
         public void testDeleteChar()
         {
-            CRDT test = new CRDT(new GUID().ToString());
+            CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -58,7 +58,7 @@ namespace SEETests
         [Test]
         public void testRemoteDeleteChar()
         {
-            CRDT test = new CRDT(new GUID().ToString());
+            CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -85,8 +85,8 @@ namespace SEETests
         [Test]
         public void RemoteAndAddCharSameTimePos0()
         {
-            CRDT crdt1 = new CRDT("1");
-            CRDT crdt2 = new CRDT("2");
+            CRDT crdt1 = new CRDT("1", "test");
+            CRDT crdt2 = new CRDT("2", "test");
 
             crdt1.AddChar('A', 0);
             crdt2.AddChar('a', 0);
@@ -102,7 +102,7 @@ namespace SEETests
         [Test]
         public void testAddChar()
         {
-            CRDT test = new CRDT(new GUID().ToString());
+            CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -125,7 +125,7 @@ namespace SEETests
         [Test]
         public void testFind()
         {
-            CRDT crdt = new CRDT("1");
+            CRDT crdt = new CRDT("1", "test");
             crdt.AddChar('A', 0);
             crdt.AddChar('B', 1);
             crdt.AddChar('C', 2);
@@ -146,8 +146,8 @@ namespace SEETests
         [Test]
         public void testRemoteAdd()
         {
-            CRDT crdt1 = new CRDT("1");
-            CRDT crdt2 = new CRDT("2");
+            CRDT crdt1 = new CRDT("1", "test");
+            CRDT crdt2 = new CRDT("2", "test");
 
             crdt1.AddChar('H', 0);
             crdt2.RemoteAddChar('H', crdt1.getCRDT()[0].GetIdentifier(), null);
@@ -180,7 +180,7 @@ namespace SEETests
         [Test]
         public void TestToString()
         {
-            CRDT test = new CRDT("1");
+            CRDT test = new CRDT("1", "test");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
@@ -195,7 +195,7 @@ namespace SEETests
         [Test]
         public void TestPrintString()
         {
-            CRDT test = new CRDT("1");
+            CRDT test = new CRDT("1", "test");
             test.AddChar('H', 0);
             test.AddChar('A', 1);
             test.AddChar('L', 2);
