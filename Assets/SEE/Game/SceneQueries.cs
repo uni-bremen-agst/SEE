@@ -167,7 +167,7 @@ namespace SEE.Game
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
             Transform result = cityChildTransform;
-            while (result.parent.CompareTag(Tags.Node) || result.parent.CompareTag(Tags.Whiteboard))
+            while (result.parent.CompareTag(Tags.Node) && !result.parent.CompareTag(Tags.Whiteboard))
             {
                 result = result.parent;
             }
@@ -425,6 +425,23 @@ namespace SEE.Game
             }
 
             return cachedArchitectureCity;
+        }
+        
+        /// <summary>
+        /// Finds the Whiteboard GameObject witht the Tag Whiteboard.
+        /// </summary>
+        /// <returns>The whiteboard Gameobject</returns>
+        /// <exception cref="Exception">Thrown in case there is less or more than one Gameobject tagged with whiteboard</exception>
+        public static GameObject FindWhiteboard()
+        {
+            GameObject[] whiteboards = GameObject.FindGameObjectsWithTag(Tags.Whiteboard);
+            if (whiteboards.Length != 1)
+            {
+                Debug.LogError("There should always be exactly one whiteboard");
+                throw new Exception("There should always be exactly one whiteboard");
+            }
+
+            return whiteboards[0];
         }
 
         private static SEECityArchitecture FindSEECityArchitecture(string name)

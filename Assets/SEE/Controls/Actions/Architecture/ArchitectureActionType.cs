@@ -31,11 +31,11 @@ namespace SEE.Controls.Actions.Architecture
         public static ArchitectureActionType Select { get; } = new ArchitectureActionType("Edit", 2,
             "Prefabs/Architecture/UI/SelectButton", SelectArchitectureAction.NewInstance);
 
-        public static ArchitectureActionType View { get; } = new ArchitectureActionType("View", 3,
-            "Prefabs/Architecture/UI/ViewButton", ViewArchitectureAction.NewInstance);
-
-        public static ArchitectureActionType Scale { get; } = new ArchitectureActionType("Scale", 4,
+        public static ArchitectureActionType Scale { get; } = new ArchitectureActionType("Scale", 3,
             "Prefabs/Architecture/UI/ScaleButton", ScaleArchitectureAction.NewInstance);
+
+        public static ArchitectureActionType Camera { get; } = new ArchitectureActionType("Camera", 4,
+            "Prefabs/Architecture/UI/CameraButton", CameraArchitectureAction.NewInstance);
 
         /// <summary>
         /// The name of this action.

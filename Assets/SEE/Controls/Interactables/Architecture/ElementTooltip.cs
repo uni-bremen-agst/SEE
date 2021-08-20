@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ namespace SEE.Controls.Architecture
 
         private void OnExit(GameObject initiator)
         {
-            if (!interactionObject.controller.PrimaryHoveredObject)
+            if (!interactionObject.controller.PrimaryHoveredObject || interactionObject.controller.PrimaryHoveredObject.CompareTag(Tags.Whiteboard))
             {
                 interactionObject.controller.PointerTooltipUpdated?.Invoke(null);
             }
@@ -35,7 +36,11 @@ namespace SEE.Controls.Architecture
         
         private void OnEnter(GameObject initiator)
         {
-            if (gameObject.TryGetNode(out Node node))
+            if (initiator.CompareTag(Tags.Whiteboard))
+            {
+                interactionObject.controller.PointerTooltipUpdated?.Invoke(null);
+            }
+            else if (gameObject.TryGetNode(out Node node))
             {
                 interactionObject.controller.PointerTooltipUpdated?.Invoke($"{node.SourceName}");
             }

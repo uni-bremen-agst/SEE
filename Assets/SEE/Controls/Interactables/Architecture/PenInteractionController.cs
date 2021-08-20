@@ -46,7 +46,7 @@ namespace SEE.Controls.Architecture
 
         PrimaryPenClicked += () =>
         {
-            if (TryRaycastTooltipObject(out RaycastHit hit, out GameObject obj))
+            if (TryRaycastPenInteractionObject(out RaycastHit hit, out GameObject obj))
             {
                 selectedObject = obj;
                 ObjectPrimaryClicked?.Invoke(new ObjectPrimaryClicked()
@@ -76,7 +76,7 @@ namespace SEE.Controls.Architecture
         HoveredObjects.Clear();
 
         //Find hovered objects with raycast
-        if (TryRaycastTooltipObject(out RaycastHit hit, out GameObject obj))
+        if (TryRaycastPenInteractionObject(out RaycastHit hit, out GameObject obj))
         {
             HoveredObjects.Add(obj);
         }
@@ -88,7 +88,7 @@ namespace SEE.Controls.Architecture
     /// <param name="raycastHit">The hit result</param>
     /// <param name="obj">The found gameobject</param>
     /// <returns>Whether the raycast found an GameObject with the <see cref="PointerInteraction"/> component.</returns>
-    private bool TryRaycastTooltipObject(out RaycastHit raycastHit, out GameObject obj)
+    private bool TryRaycastPenInteractionObject(out RaycastHit raycastHit, out GameObject obj)
     {
         raycastHit = new RaycastHit();
         obj = null;

@@ -4,7 +4,6 @@ using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Architecture;
 using SEE.Controls.Architecture;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.UI.Architecture;
 using SEE.Utils;
@@ -95,6 +94,7 @@ namespace SEE.Controls.Actions
         /// <see cref="EdgeContextMenu"/>
         /// </summary>
         private GameObject EdgeContextMenu;
+        
         /// <summary>
         /// UI element that holds the graph element tooltip for displaying the names.
         /// Prefab instantiated from Prefabs/Architecture/UI/ObjectTooltip.
@@ -104,10 +104,39 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject ToolTipDisplay;
 
+        /// <summary>
+        /// Global action button for the architecure save action.
+        /// </summary>
+        private GameObject SaveActionButton;
+
+        /// <summary>
+        /// Struct that holds the city zoom state.
+        /// </summary>
+        private struct ZoomState
+        {
+            internal Transform WhiteboardTransform;
+            internal Vector3 originalScale;
+            internal float currentZoomFactor;
+            internal GameObject CityObject;
+        }
+        
+        /// <summary>
+        /// The zoomstate instance.
+        /// </summary>
+        private ZoomState zoomState;
+        
+        /// <summary>
+        /// UI element that holds the slider for zooming into the architecture.
+        /// </summary>
+        private GameObject ZoomSlider;
+        /// <summary>
+        /// Flag whether the city is available for further processing.
+        /// </summary>
+        private bool cityAvailable;
+
 
         public override HashSet<string> GetChangedObjects()
         {
-            // We handle the undo process within this action itself
             return new HashSet<string>();
         }
 
@@ -128,6 +157,20 @@ namespace SEE.Controls.Actions
 
         public override bool Update()
         {
+            // Poll the SEECityArchitecture and the Whiteboard
+            if (zoomState.CityObject == null || !cityAvailable)
+            {
+                zoomState.WhiteboardTransform= SceneQueries.FindWhiteboard().transform;
+                GameObject city = SceneQueries.FindArchitecture().gameObject;
+                if (city != null)
+                {
+                    
+                    zoomState.CityObject = city;
+                    zoomState.originalScale = zoomState.WhiteboardTransform.localScale;
+                    zoomState.currentZoomFactor = 1.0f;
+                    cityAvailable = true;
+                }
+            }
             activeAction.Update();
             return false;
         }
@@ -151,6 +194,7 @@ namespace SEE.Controls.Actions
             //Initialize the action instances
             InitializeActions(penInteractionController);
             PrepareUI(penInteractionController);
+            PrepareGlobalActions();
             //Start the active action.
             activeAction.Start();
         }
@@ -160,14 +204,30 @@ namespace SEE.Controls.Actions
         {
             OnArchitectureActionDisabled?.Invoke();
             activeAction.Stop();
-            nameToUI.Values.ForEach(e => e.SetActive(false));
-            Destroyer.DestroyGameObject(ModeIndicator);
+            CleanUpAction();
         }
-
-        public override void Awake()
+        
+        /// <summary>
+        /// Clean up the ui elements after stopping the ArchitectureAction
+        /// </summary>
+        private void CleanUpAction()
         {
-            Debug.Log("Awake");
+            //Destroy all ui instances as they are newly generated on next action start
+            Destroyer.DestroyGameObject(ModeIndicator);
+            Destroyer.DestroyGameObject(DeleteElementDialog);
+            Destroyer.DestroyGameObject(NodeContextMenu);
+            Destroyer.DestroyGameObject(EdgeContextMenu);
+            Destroyer.DestroyGameObject(ZoomSlider);
+            Destroyer.DestroyGameObject(ToolTipDisplay);
+            Destroyer.DestroyGameObject(SaveActionButton);
+            
+            //Clear mappings
+            nameToUI.ForEach(e => Destroyer.DestroyGameObject(e.Value));
+            nameToUI.Clear();
+            nameToAction.Clear();
+            
         }
+        
 
         /// <summary>
         /// Instantiates the UI elements for the <see cref="ArchitectureAction"/>.
@@ -181,13 +241,47 @@ namespace SEE.Controls.Actions
                 UICanvas.transform, false);
             EdgeContextMenu = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/EdgeContextMenuHolder",
                 UICanvas.transform, false);
-            // Initialize Tooltip Display
             ToolTipDisplay = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/ObjectTooltip", UICanvas.transform, false);
             ToolTipDisplay.GetComponent<TooltipHolder>().Controller = penInteractionController;
         }
-        
 
         
+        /// <summary>
+        /// Prepares the global actions that do not need a AbstractArchitectureAction.
+        /// </summary>
+        private void PrepareGlobalActions()
+        {
+            //Instantiate save action button
+            SaveActionButton = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/SaveButton", UICanvas.transform, false);
+            ButtonManagerBasicIcon bmi = SaveActionButton.GetComponent<ButtonManagerBasicIcon>();
+            bmi.clickEvent.AddListener(() =>
+            {
+                SaveArchitectureDialog saveArchitectureDialog = new SaveArchitectureDialog();
+                saveArchitectureDialog.OnConfirm.AddListener(OnSaveConfirm);
+                saveArchitectureDialog.Open();
+            });
+            
+            ZoomSlider = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/ZoomSlider", UICanvas.transform, false);
+            SliderManager manager = ZoomSlider.GetComponent<SliderManager>();
+            manager.mainSlider.onValueChanged.AddListener(ChangeZoom);
+            manager.mainSlider.minValue = 0;
+            manager.mainSlider.maxValue = 32;
+            manager.mainSlider.wholeNumbers = false;
+            manager.mainSlider.value = 0;
+        }
+
+        /// <summary>
+        /// Event listener for the <see cref="SaveArchitectureDialog"/> confirm event.
+        /// </summary>
+        /// <param name="name">The name of the architecture</param>
+        private void OnSaveConfirm(String name)
+        {
+            Debug.Log("On Save Confirm");
+            SEECityArchitecture architecture = SceneQueries.FindArchitectureCity();
+            architecture.SaveLayoutAndGraph(name);
+        }
+
+
         /// <summary>
         /// Initializes the available <see cref="AbstractArchitectureAction"/> instances.
         /// </summary>
@@ -206,12 +300,25 @@ namespace SEE.Controls.Actions
             }
             nameToAction.Values.ForEach(a => a.Awake());
             activeAction = nameToAction.Values.First();
+        }
+        
+        /// <summary>
+        /// Handling the zoom action that the user can trigger by using the on screen slider.
+        /// </summary>
+        /// <param name="stepValue">The current zoom step value</param>
+        private void ChangeZoom(float stepValue)
+        {
+            if (cityAvailable)
+            {
+                zoomState.currentZoomFactor = Mathf.Pow(1.25f, stepValue * 0.5f);
+                zoomState.WhiteboardTransform.localScale = new Vector3(zoomState.originalScale.x * zoomState.currentZoomFactor, zoomState.originalScale.y,
+                    zoomState.originalScale.z * zoomState.currentZoomFactor);
+                Portal.SetPortal(zoomState.CityObject);
+            }
             
-            
-
         }
 
-        
+
         /// <summary>
         /// Switches between the separate <see cref="ArchitectureAction"/> sub modes e.g Draw or Select.
         /// Updates the <see cref="ModeIndicator"/> with the new <see cref="AbstractArchitectureAction"/> name.

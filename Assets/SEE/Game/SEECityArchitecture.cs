@@ -46,8 +46,8 @@ namespace SEE.Game
         /// </summary>
         [Tooltip("The path to the layout file used for this architectural graph visualization")]
         public DataPath ArchitectureLayoutPath = new DataPath();
-
-
+        
+        
         /// <summary>
         /// Settings holders for the architecture elements.
         /// </summary>
@@ -139,26 +139,46 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Saves the layout of the current architecture graph.
+        /// Saves the graph layout and the underlaying graph to disk. The files are named by the given architecture name.
+        /// The Layout is stored as SLD file, while the graph is stored as GXL.
         /// </summary>
-        public void SaveLayout()
+        /// <param name="name">the architecture name.</param>
+        public void SaveLayoutAndGraph(string name)
         {
-            if (string.IsNullOrEmpty(ArchitectureLayoutPath.Path))
+            if (string.IsNullOrEmpty(name))
             {
-                Debug.LogError("Architecture layout path is empty.\n");
+                Debug.LogError("Architecture name is empty!.\n");
                 return;
             }
 
-            if (Filenames.HasExtension(ArchitectureLayoutPath.Path, Filenames.GVLExtension))
+            string gxlFilePath = GenerateFileName(name, Filenames.GXLExtension);
+            string sldFilePath = GenerateFileName(name, Filenames.SLDExtension);
+            SLDWriter.Save(sldFilePath, AllNodeDescendants(gameObject));
+            foreach (string hierarchicalEdge in HierarchicalEdges)
             {
-                GVLWriter.Save(ArchitectureLayoutPath.Path, LoadedGraph.Name, AllNodeDescendants(gameObject));
-            }
-            else
-            {
-                SLDWriter.Save(ArchitectureLayoutPath.Path, AllNodeDescendants(gameObject));
+                GraphWriter.Save(gxlFilePath, loadedGraph, hierarchicalEdge);
+                break;
             }
         }
         
+        /// <summary>
+        /// Generates the filename for saving the architecture graph and its layout.
+        /// If the the output folder does not exist yet, it will be created.
+        /// </summary>
+        /// <param name="name">The name of the architecture.</param>
+        /// <param name="extension">The file extension to use.</param>
+        /// <returns></returns>
+        private string GenerateFileName(string name, string extension)
+        {
+            string subFolder = Application.streamingAssetsPath + "\\Architecture\\Output";
+            if (!Directory.Exists(subFolder))
+                Directory.CreateDirectory(subFolder);
+            return subFolder + $"\\{name}{extension}";
+        }
+        
+        /// <summary>
+        /// Does a fresh Draw call for the graph.
+        /// </summary>
         public new void ReDrawGraph()
         {
             if (loadedGraph == null)

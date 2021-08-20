@@ -10,6 +10,7 @@ using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Edge = SEE.DataModel.DG.Edge;
@@ -172,9 +173,9 @@ namespace SEE.Game.Architecture
             GameObject resultingEdge = edges.FirstOrDefault();
             //Find the SEECityArchitecture
             GameObject architectureCity = SceneQueries.FindArchitectureCity().gameObject;
-            Transform rootNode = SceneQueries.GetCityRootNode(architectureCity);
+            GameObject whiteboard = SceneQueries.FindWhiteboard();
             //Add the resulting edge as an parent to the root node
-            resultingEdge.transform.SetParent(rootNode);
+            resultingEdge.transform.SetParent(whiteboard.transform);
             //Sets the portal size to the extents of the architecture city
             Portal.SetPortal(root: architectureCity, gameObject: resultingEdge);
             return resultingEdge;
@@ -284,31 +285,28 @@ namespace SEE.Game.Architecture
                     return child.gameObject;
                 }
             }
-            GetParentSize(city, out Vector2 leftFront, out Vector2 rightBack, out float yLevel);
-            GameObject whiteboard = PlaneFactory.NewPlane(ShaderType, new Vector2(-50f, -50f), new Vector2(50f, 50f), yLevel, Color.white, LevelDistance);
+            float yLevel = GetParentYLevel(city);
+            Vector3 center = city.transform.position;
+            // Calculate the whiteboard plane
+            Vector2 lFront = new Vector2(center.x - 100f, center.z - 100f);
+            Vector2 rBack = new Vector2(center.x + 100f, center.z + 100f);
+            GameObject whiteboard = PlaneFactory.NewPlane(ShaderType, lFront, rBack, yLevel, Color.white, LevelDistance);
             whiteboard.tag = Tags.Whiteboard;
             whiteboard.name = "Whiteboard";
+            whiteboard.AddComponent<PenInteraction>().controller = PenInteractionController;
             return whiteboard;
         }
 
         /// <summary>
-        /// Computes a 2D plane that is placed right on top of the parent.
+        /// Computes the y level of the parent object.
         /// </summary>
         /// <param name="parent">The parent object.</param>
-        /// <param name="leftFront">The left front 2D point</param>
-        /// <param name="rightBack"></param>
         /// <param name="yLevel"></param>
-        private void GetParentSize(GameObject parent, out Vector2 leftFront, out Vector2 rightBack, out float yLevel)
+        private float GetParentYLevel(GameObject parent)
         {
             Vector3 worldScale = parent.transform.lossyScale;
             Vector3 position = parent.transform.position;
-            // Width from center to sides
-            float width = worldScale.x / 2;
-            //Depth from center to sides
-            float depth = worldScale.z / 2;
-            leftFront = new Vector2(position.x - width, position.z - depth);
-            rightBack = new Vector2(position.x + width, position.z + depth);
-            yLevel = position.y + worldScale.y / 2.0f + LevelDistance;
+            return position.y + worldScale.y / 2.0f + LevelDistance;
         }
 
 
@@ -433,7 +431,7 @@ namespace SEE.Game.Architecture
             ArchitectureDecorator.DecorateForInteraction(go, PenInteractionController);
             return go;
         }
-        
+
         /// <summary>
         /// Find the <see cref="ArchitectureElementSettings"/> for a given type of nodes.
         /// If none was found, the cluster settings are used as default.

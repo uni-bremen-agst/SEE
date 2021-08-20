@@ -147,7 +147,7 @@ namespace SEE.Game.GestureRecognition
             {
                 if (points[i].StrokeID == points[i - 1].StrokeID)
                 {
-                    float d = Gesture.EuclideanDistance(points[i - 1], points[i]);
+                    float d = EuclideanDistance(points[i - 1], points[i]);
                     if (D + d >= I)
                     {
                         GesturePoint firstStrokePoint = points[i - 1];
@@ -172,7 +172,7 @@ namespace SEE.Game.GestureRecognition
                     else D += d;
                 }
             }
-            if (numPoints == n - 1) // sometimes we fall a rounding-error short of adding the last point, so add it if so
+            if (numPoints == n - 1) // In certain situations a rounding error occurs and one point is missing. Therefore we add it manually to match n-Points
                 newPoints[numPoints++] = new GesturePoint(points[points.Length - 1].X, points[points.Length - 1].Y, points[points.Length - 1].StrokeID);
             return newPoints;
         }

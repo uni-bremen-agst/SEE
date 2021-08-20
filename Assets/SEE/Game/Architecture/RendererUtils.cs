@@ -13,72 +13,7 @@ namespace SEE.Game.Architecture
     /// </summary>
     public static class RendererUtils
     {
-        /// <summary>
-        /// Calculates the bounding box for the given list of game nodes.
-        /// </summary>
-        /// <param name="gameNodes">The game objects the bounding box should enclose</param>
-        /// <param name="leftLowerCorner">The 2D-Position of the left lower corner</param>
-        /// <param name="rightUpperCorner">The 2D-Position of the right upper corner</param>
-        /// <param name="nodeFactories">The <see cref="ArchitectureElementType"/> to <see cref="NodeFactory"/> mapping.</param>
-        /// <param name="typeToElementType">The string node type to <see cref="ArchitectureElementType"/> mapping</param>
-        /// <exception cref="Exception">Thrown when an unhandled node type was found.</exception>
-        public static void ArchitectureBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner, NodeFactory[] nodeFactories, Dictionary<string, ArchitectureElementType> typeToElementType)
-        {
-            if (gameNodes.Count == 0)
-            {
-                leftLowerCorner = Vector2.zero;
-                rightUpperCorner = Vector2.zero;
-            }
-            else
-            {
-                leftLowerCorner = new Vector2(Mathf.Infinity, Mathf.Infinity);
-                rightUpperCorner = new Vector2(Mathf.NegativeInfinity, Mathf.NegativeInfinity);
-
-                foreach (GameObject go in gameNodes)
-                {
-                    Node node = go.GetNode();
-                    ArchitectureElementType elementType =
-                        typeToElementType.TryGetValue(node.Type, out ArchitectureElementType type)
-                            ? type
-                            : ArchitectureElementType.Cluster;
-                    NodeFactory factory = nodeFactories[(int) elementType];
-                    Vector3 extent = factory.GetSize(go) / 2.0f;
-                    // Note: position denotes the center of the object
-                    Vector3 position = factory.GetCenterPosition(go);
-                    {
-                        // x co-ordinate of lower left corner
-                        float x = position.x - extent.x;
-                        if (x < leftLowerCorner.x)
-                        {
-                            leftLowerCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of lower left corner
-                        float z = position.z - extent.z;
-                        if (z < leftLowerCorner.y)
-                        {
-                            leftLowerCorner.y = z;
-                        }
-                    }
-                    {   // x co-ordinate of upper right corner
-                        float x = position.x + extent.x;
-                        if (x > rightUpperCorner.x)
-                        {
-                            rightUpperCorner.x = x;
-                        }
-                    }
-                    {
-                        // z co-ordinate of upper right corner
-                        float z = position.z + extent.z;
-                        if (z > rightUpperCorner.y)
-                        {
-                            rightUpperCorner.y = z;
-                        }
-                    }
-                }
-            }
-        }
+        
         
         /// <summary>
         /// Adds all <paramref name="children"/> as a child to <paramref name="parent"/>.
@@ -218,65 +153,6 @@ namespace SEE.Game.Architecture
                 map[node.ItsNode] = node;
             }
             return map;
-        }
-        
-        /// <summary>
-        /// Returns the child object of <paramref name="codeCity"/> tagged by Tags.Node.
-        /// If there is no such child or if there are more than one, an exception will
-        /// be thrown.
-        /// </summary>
-        /// <param name="codeCity">game object representing a code city</param>
-        /// <returns>child object of <paramref name="codeCity"/> tagged by Tags.Node</returns>
-        public static GameObject RootGameNode(GameObject codeCity)
-        {
-            
-            GameObject result = null;
-            foreach (Transform child in codeCity.transform)
-            {
-                if (child.tag == Tags.Node)
-                {
-                    if (result == null)
-                    {
-                        result = child.gameObject;
-                    }
-                    else
-                    {
-                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node
-                                            + ": " + result.name + " and " + child.name);
-                    }
-                }
-            }
-            if (result == null)
-            {
-                throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
-            }
-
-            return result;
-        }
-        
-        /// <summary>
-        /// The nodes and edges are childs of a whiteboard game object, hence we need to find the whiteboard first.
-        /// </summary>
-        /// <param name="architectureCity">The architecture city.</param>
-        /// <returns>The root game node that is child of the whiteboard</returns>
-        /// <exception cref="Exception">Thrown when no Whiteboard game object was found,
-        /// when duplicate root nodes exist and when no child node of the whiteboard was found.</exception>
-        public static GameObject FindArchitecturRootNode(GameObject architectureCity)
-        {
-            GameObject result = null;
-            foreach (Transform child in architectureCity.transform)
-            {
-                if (child.tag == Tags.Whiteboard)
-                {
-                    result = RootGameNode(child.gameObject);
-                }
-            }
-            if (result == null)
-            {
-                throw new Exception("Code city " + architectureCity.name + " has no child tagged by " + Tags.Whiteboard);
-            }
-
-            return result;
         }
     }
 }

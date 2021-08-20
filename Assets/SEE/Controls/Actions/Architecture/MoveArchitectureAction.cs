@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -54,6 +55,7 @@ namespace SEE.Controls.Actions.Architecture
             internal float yLevel;
             internal Vector3 mouseOffset;
             internal Transform rootTransform;
+            internal bool isWhiteboard;
         }
 
         /// <summary>
@@ -117,7 +119,8 @@ namespace SEE.Controls.Actions.Architecture
         {
             actionState.moving = false;
             gizomo.gameObject.SetActive(false);
-            if (actionState.hit.transform != actionState.hit.root && actionState.rootTransform != null &&
+            // Only update node and edge relevant data if the dragged object is not the whiteboard
+            if (!actionState.isWhiteboard && actionState.hit.transform != actionState.hit.root && actionState.rootTransform != null &&
                 Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 _, positionAction.ReadValue<Vector2>()))
             {
                 GameNodeMover.FinalizePosition(actionState.hit.transform.gameObject, actionState.startPosition - actionState.mouseOffset);
@@ -134,8 +137,15 @@ namespace SEE.Controls.Actions.Architecture
         private void OnButtonPress(InputAction.CallbackContext _)
         {
             bool isTouching = pressureAction.ReadValue<float>() > 0f;
+            actionState.isWhiteboard = false;
             GameObject obj = PenInteractionController.PrimaryHoveredObject;
             if (obj.TryGetEdge(out Edge edge)) return;
+            //Check whether the currently hovered object is the whiteboard
+            if (obj.CompareTag(Tags.Whiteboard))
+            {
+                actionState.isWhiteboard = true;
+            }
+            
             if (obj && isTouching)
             {
                 actionState.rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
@@ -164,7 +174,11 @@ namespace SEE.Controls.Actions.Architecture
                 actionState.hit.transform.position = new Vector3(point.x + actionState.mouseOffset.x,
                     actionState.yLevel, point.z + actionState.mouseOffset.z);
                 gizomo.SetPositions(actionState.startPosition - actionState.mouseOffset, actionState.hit.transform.position);
-                GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject);
+                //Do not try to update the edge points for the whiteboard object
+                if (!actionState.isWhiteboard)
+                {
+                    GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject);
+                }
             }
         }
         

@@ -196,12 +196,12 @@ namespace SEE.Controls.Actions.Architecture
             gizmoDrawn = false;
         }
             
-        private GameObject SelectedGizmo(GameObject gam)
+        private GameObject SelectedGizmo(GameObject anchor)
         {
             if (!gizmoDrawn) return null;
-            if (gam == _gizmo.topAnchor || gam == _gizmo.topRightAnchor || gam == _gizmo.rightAnchor ||
-                gam == _gizmo.bottomRightAnchor || gam == _gizmo.bottomAnchor || gam == _gizmo.bottomLeftAnchor ||
-                gam == _gizmo.leftAnchor || gam == _gizmo.topLeftAnchor) return gam;
+            if (anchor == _gizmo.topAnchor || anchor == _gizmo.topRightAnchor || anchor == _gizmo.rightAnchor ||
+                anchor == _gizmo.bottomRightAnchor || anchor == _gizmo.bottomAnchor || anchor == _gizmo.bottomLeftAnchor ||
+                anchor == _gizmo.leftAnchor || anchor == _gizmo.topLeftAnchor) return anchor;
             return null;
         }
         
