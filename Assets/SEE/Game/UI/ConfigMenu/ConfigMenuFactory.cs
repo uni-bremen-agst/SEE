@@ -47,12 +47,13 @@ namespace SEE.Game.UI.ConfigMenu
         private ConfigMenu configMenu;
         private void Awake()
         {
-            configMenuPrefab = PrefabInstantiator.InstantiatePrefab(ConfigMenuPrefabPath);
+            configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
             BuildConfigMenu(DefaultInstanceToEdit, false);
         }
         private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(configMenuPrefab);
+            configMenuGo.name = configMenuPrefab.name;
             configMenuGo.transform.SetSiblingIndex(0);
             configMenuGo.MustGetComponent(out configMenu);
             if (turnMenuOn)
