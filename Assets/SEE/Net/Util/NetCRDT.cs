@@ -1,3 +1,4 @@
+using SEE.Controls;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Utils.CRDT;
@@ -36,6 +37,7 @@ namespace SEE.Net
         public char c;
         public string position;
         public string prePosition;
+        public string file;
 
 
         public NetCRDT() : base()
@@ -62,30 +64,31 @@ namespace SEE.Net
                 {
                     case RemoteAction.AddChar:
                         Debug.LogWarning("POSITION " + position + " PREE " + prePosition);
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position), ICRDT.StringToPosition(prePosition));
-
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file);
                         break;
 
                     case RemoteAction.DelteChar:
-                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position));
+                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position, file), file);
                         break;
                 }
 
             }
         }
 
-        public void DeleteChar(Identifier[] position)
+        public void DeleteChar(Identifier[] position, string file)
         {
-            this.position = ICRDT.PositionToString(position);
+            this.file = file;
+            this.position = ICRDT.PositionToString(position, file);
             state = RemoteAction.DelteChar;
             Execute(null);
         }
 
-        public void AddChar(char c, Identifier[] position, Identifier[] prePosition)
+        public void AddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
+            this.file = file;
             this.c = c;
-            this.position = ICRDT.PositionToString(position);
-            this.prePosition = ICRDT.PositionToString(prePosition);
+            this.position = ICRDT.PositionToString(position, file);
+            this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
         }
