@@ -25,11 +25,6 @@ namespace SEE.Game.UI.CodeWindow
         private ScrollRect scrollRect;
 
         /// <summary>
-        /// FIXME: REPLACE ALLL USAGE WITH THE CARRETPOS from the TMP
-        /// </summary>
-        private int typeIndex = 0;
-
-        /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
         public float timeStamp = Time.time;
@@ -143,23 +138,20 @@ namespace SEE.Game.UI.CodeWindow
             if (!string.IsNullOrEmpty(input))
             {
                 //logic related to the char pressed
-                ICRDT.AddChar(input[0], typeIndex, Title);
-                
-                typeIndex++;
+                ICRDT.AddChar(input[0], TextMeshInputField.caretPosition, Title);
             }
 
-            if (Input.GetKey(KeyCode.Delete) && typeIndex > 0 && timeStamp <= Time.time)
+            if (Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time)
             {
                 timeStamp = Time.time + 0.100000f;
-                typeIndex--;
-                ICRDT.DeleteChar(typeIndex, Title);
+                ICRDT.DeleteChar(TextMeshInputField.caretPosition, Title);
                 
             }
             if((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))&& Input.GetKeyDown(KeyCode.V))
             {
                 if (Clipboard.CanPaste<string>())
                 {
-                    ICRDT.AddString(Clipboard.Paste<string>(), typeIndex, Title);
+                    ICRDT.AddString(Clipboard.Paste<string>(), TextMeshInputField.caretPosition, Title);
                 }
             }
             Debug.Log("FILE:; " + Title);
