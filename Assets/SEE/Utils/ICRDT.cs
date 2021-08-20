@@ -64,7 +64,11 @@ namespace SEE.Utils
         {
             return GetInstanceByName(file).PrintString();
         }
-
+        
+        public static string ToString(string file)
+        {
+            return GetInstanceByName(file).ToString();
+        }
         public static Identifier[] StringToPosition(string s, string file)
         {
             return GetInstanceByName(file).StringToPosition(s);
