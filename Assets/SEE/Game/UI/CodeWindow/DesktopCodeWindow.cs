@@ -28,7 +28,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private int typeIndex = 0;
 
-
+        private CRDT crdt = new CRDT(new Guid().ToString());
         /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
@@ -149,7 +149,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 //logic related to the char pressed
                 //Debug.Log("Pressed char: " + Input.inputString);
-                ICRDT.AddChar(input[0], typeIndex);
+                ICRDT.AddChar(input[0], typeIndex, Title);
                 typeIndex++;
             }
 
@@ -160,10 +160,10 @@ namespace SEE.Game.UI.CodeWindow
                 Debug.LogWarning("TIME " + timeStamp);
                 Debug.LogWarning("DLELEEEE");
                 typeIndex--;
-                ICRDT.DeleteChar(typeIndex);
+                ICRDT.DeleteChar(typeIndex, Title);
                 
             }
-            Debug.Log(ICRDT.PrintString());
+            Debug.Log(ICRDT.PrintString(Title));
 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))

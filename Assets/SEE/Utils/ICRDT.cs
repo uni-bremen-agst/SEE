@@ -9,42 +9,61 @@ namespace SEE.Utils
     {
 
 
-        private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
+        //private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
+        private static Dictionary<string, CRDT> crdts = new Dictionary<string, CRDT>();
 
 
-        public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
+        /// <summary>
+        /// Finds or creates an CRDT instance by the name of the file
+        /// </summary>
+        /// <param name="file">The name of the file</param>
+        /// <returns>A crdt instance</returns>
+        private static CRDT GetInstanceByName(string file)
         {
-            crdt.RemoteAddChar(c, position, prePosition);
+            if(crdts != null && crdts.Count > 0 && crdts.ContainsKey(file))
+            {
+                return crdts[file];
+            }
+            else
+            {
+                crdts.Add(file, new CRDT(new Guid().ToString(), file));
+                return crdts[file];
+            }
         }
 
-        public static void RemoteDeleteChar(Identifier[] position)
+        public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
-            crdt.RemoteDeleteChar(position);
+            GetInstanceByName(file).RemoteAddChar(c, position, prePosition);
         }
 
-        public static void DeleteChar(int index)
+        public static void RemoteDeleteChar(Identifier[] position, string file)
         {
-            crdt.DeleteChar(index);
+            GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static void AddChar(char c, int idx)
+        public static void DeleteChar(int index, string file)
         {
-            crdt.AddChar(c, idx);
+            GetInstanceByName(file).DeleteChar(index);
         }
 
-        public static string PrintString()
+        public static void AddChar(char c, int idx, string file)
         {
-            return crdt.PrintString();
+            GetInstanceByName(file).AddChar(c, idx);
         }
 
-        public static Identifier[] StringToPosition(string s)
+        public static string PrintString(string file)
         {
-            return crdt.StringToPosition(s);
+            return GetInstanceByName(file).PrintString();
         }
 
-        public static string PositionToString(Identifier[] position)
+        public static Identifier[] StringToPosition(string s, string file)
         {
-            return crdt.PositionToString(position);
+            return GetInstanceByName(file).StringToPosition(s);
+        }
+
+        public static string PositionToString(Identifier[] position, string file)
+        {
+            return GetInstanceByName(file).PositionToString(position);
         }
         //TODO COMPLETE
     }

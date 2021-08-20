@@ -89,11 +89,29 @@ namespace SEE.Utils
 
         }
 
-        string siteID;
+        /// <summary>
+        /// The ID 
+        /// </summary>
+        private string siteID;
+
+        /// <summary>
+        /// The name of the file that is managed with this CRDT
+        /// </summary>
+        private string filename;
+
+        /// <summary>
+        /// The chars of the CRDT with their positions
+        /// </summary>
         private List<CharObj> crdt = new List<CharObj>();
-        public CRDT(string siteID)
+        
+        /// <summary>
+        /// Constructs a CRDT
+        /// </summary>
+        /// <param name="siteID"></param>
+        public CRDT(string siteID, string filename)
         {
             this.siteID = siteID;
+            this.filename = filename;
         }
 
         public List<CharObj> getCRDT()
@@ -175,7 +193,7 @@ namespace SEE.Utils
         {
             if (crdt.Count() > index && index > -1)
             {
-                new NetCRDT().DeleteChar(crdt[index].GetIdentifier());
+                new NetCRDT().DeleteChar(crdt[index].GetIdentifier(), filename);
                 crdt.RemoveAt(index);
             }
             else
@@ -234,11 +252,11 @@ namespace SEE.Utils
             }
             if (index - 1 >= 0)
             {
-                new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier());
+                new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier(), filename);
             }
             else
             {
-                new NetCRDT().AddChar(c, position, null);
+                new NetCRDT().AddChar(c, position, null, filename);
             }
         }
 
