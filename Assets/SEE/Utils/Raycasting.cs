@@ -97,8 +97,21 @@ namespace SEE.Utils
         /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
         public static bool RaycastAnything(out RaycastHit raycastHit)
         {
+            return RaycastAnything(out raycastHit, Input.mousePosition);
+        }
+        
+        //// <summary>
+        /// Raycasts the scene from the camera in the direction the mouse is pointing.
+        /// Returns true if the mouse is not over any GUI element and if anything was hit.
+        /// <paramref name="raycastHit"/> will be set, if true is returned. 
+        /// </summary>
+        /// <param name="raycastHit">hit object if true is returned, undefined otherwise</param>
+        /// <param name="pointerPosition">The provided pointerposition</param>
+        /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
+        public static bool RaycastAnything(out RaycastHit raycastHit, Vector2 pointerPosition)
+        {
             raycastHit = new RaycastHit();
-            return !IsMouseOverGUI() && Physics.Raycast(MainCamera.Camera.ScreenPointToRay(Input.mousePosition), out raycastHit);
+            return !IsMouseOverGUI() && Physics.Raycast(MainCamera.Camera.ScreenPointToRay(pointerPosition), out raycastHit);
         }
 
         /// <summary>

@@ -129,7 +129,6 @@ namespace SEE.Controls.Actions.Architecture
         private void OnDrawBegin(InputAction.CallbackContext _)
         {
             actionState.isDrawing = true;
-            Vector2 position = positionAction.ReadValue<Vector2>();
             if (TryRaycastWhiteboard(out RaycastHit hit))
             {
                 actionState.pathInstance =
@@ -150,7 +149,6 @@ namespace SEE.Controls.Actions.Architecture
 
         public override void Update()
         {
-            Vector2 position = positionAction.ReadValue<Vector2>();
             // Update the pathInstance according to the pen movement.
             if (actionState.isDrawing && actionState.pathInstance != null && TryRaycastWhiteboard(out RaycastHit hit))
             {
@@ -180,13 +178,13 @@ namespace SEE.Controls.Actions.Architecture
         /// Performs raycast to find a game object with a <see cref="NodeRef"/> or the whiteboard game object
         /// with tag <see cref="Tags.Whiteboard"/>.
         /// </summary>
-        /// <param name="hit"></param>
-        /// <returns></returns>
+        /// <param name="hit">the hit struct</param>
+        /// <returns>True if the target is a node or the whiteboard object, false otherwise.</returns>
         private bool TryRaycastWhiteboard(out RaycastHit hit)
         { 
             hit = default(RaycastHit);
-           
-            if(Raycasting.RaycastAnything(out hit))
+            Vector2 pointerPosition = positionAction.ReadValue<Vector2>();
+            if(Raycasting.RaycastAnything(out hit, pointerPosition))
             {
                 GameObject go = hit.collider.gameObject;
                 if (go.HasNodeRef() || go.CompareTag(Tags.Whiteboard))

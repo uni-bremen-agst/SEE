@@ -26,6 +26,8 @@ namespace SEE.Game.GestureRecognition
         {
             public float Score;
             public Gesture Match;
+            public int DataSets;
+            public float Threshold;
         }
 
         /// <summary>
@@ -47,18 +49,15 @@ namespace SEE.Game.GestureRecognition
             }
             Gesture candidate = new Gesture(points);
             Gesture[] dataSet = GestureIO.DataSet;
-            RecognizerResult result = Recognize(candidate, dataSet);
-            if (result.Score < CONFIDENCE_THRESHOLD)
+            recognizerResult = Recognize(candidate, dataSet);
+            if (recognizerResult.Score < CONFIDENCE_THRESHOLD)
             {
                 Debug.LogWarning($"There is no exact matching gesture for this input. " +
-                                 $"The best match {result.Match.Name} only matches with score {result.Score}. " +
+                                 $"The best match {recognizerResult.Match.Name} only matches with score {recognizerResult.Score}. " +
                                  $"Expected confidence of > {CONFIDENCE_THRESHOLD}");
-                recognizerResult = default(RecognizerResult);
                 return false;
             }
-
-            recognizerResult = result;
-            Debug.Log($"Recognized gesture {result.Match.Name} with an score of {result.Score}");
+            Debug.Log($"Recognized gesture {recognizerResult.Match.Name} with an score of {recognizerResult.Score}");
             return true;
         }
 
@@ -83,7 +82,7 @@ namespace SEE.Game.GestureRecognition
         /// </summary>
         /// <param name="gestureGO">The gesture game object</param>
         /// <returns>The raw list of world space points.</returns>
-        private static Vector3[] ExtractRawPoints(GameObject gestureGO)
+        public static Vector3[] ExtractRawPoints(GameObject gestureGO)
         {
             TrailRenderer renderer = gestureGO.GetComponent<TrailRenderer>();
             Vector3[] points = new Vector3[renderer.positionCount];
@@ -133,7 +132,9 @@ namespace SEE.Game.GestureRecognition
             return new RecognizerResult
             {
                 Match = result,
-                Score = score
+                Score = score,
+                DataSets = templates.Length,
+                Threshold = CONFIDENCE_THRESHOLD
             };
         }
 
