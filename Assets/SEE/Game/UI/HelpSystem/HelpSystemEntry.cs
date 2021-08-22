@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
+using Crosstales.RTVoice.Model.Enum;
 using DynamicPanels;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.UI.Menu;
@@ -10,7 +11,6 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Video;
 
 namespace SEE.Game.UI.HelpSystem
@@ -25,7 +25,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <summary>
         /// True if the entry is running, else false.
         /// </summary>
-        public bool IsPlaying { get; set; } = false;
+        public bool IsPlaying { get; set; }
 
         /// <summary>
         /// Path to the HelpSystemEntry prefab.
@@ -127,7 +127,7 @@ namespace SEE.Game.UI.HelpSystem
                 enabled = false;
             }
             keywordDisplay = GameObject.Find("Code");
-            voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
+            voice = Speaker.Instance.VoiceForGender(Gender.FEMALE, culture: "en-US");
         }
 
         protected override void UpdateDesktop()
@@ -162,7 +162,7 @@ namespace SEE.Game.UI.HelpSystem
                             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
                             tmp.text += currentKeyword.Text + "\n";
                             Speaker.Instance.Speak(currentKeyword.Text, audioSource, voice: voice);
-                            currentKeyword = currentEntries.Find(currentKeyword).Next?.Value;
+                            currentKeyword = currentEntries.Find(currentKeyword)?.Next?.Value;
                         }
                         if (videoPlayer.time > currentKeyword?.CumulatedTime && isAdded)
                         {
@@ -201,13 +201,13 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
             HelpSystemBuilder.EntrySpace = helpSystemSpace;
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
-            helpSystemEntry.transform.Find("Content/Scrollable/Code")
+            helpSystemEntry.transform.Find("Content/Lower Video/Scrollable/Code")
               .gameObject.TryGetComponentOrLog(out text);
             text.fontSize = 30;
 
-            helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponent<ButtonManagerWithIcon>(out ButtonManagerWithIcon manager);
+            helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
             manager.clickEvent.AddListener(Back);
-            helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponent<ButtonManagerWithIcon>(out ButtonManagerWithIcon manager2);
+            helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager2);
             manager2.clickEvent.AddListener(Close);
             GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
 
@@ -216,26 +216,26 @@ namespace SEE.Game.UI.HelpSystem
                 Destroy(this);
             }
 
-            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Pause")
+            helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             pauseButton.clickEvent.AddListener(TogglePlaying);
 
-            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Forward")
+            helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Forward")
                           .gameObject.TryGetComponentOrLog(out forwardButton);
             forwardButton.clickEvent.AddListener(Forward);
 
-            helpSystemEntry.transform.Find("Content/RawImageVideo/Buttons/Back")
+            helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Back")
                         .gameObject.TryGetComponentOrLog(out backwardButton);
             backwardButton.clickEvent.AddListener(Backward);
 
-            helpSystemEntry.transform.Find("progress").gameObject.TryGetComponentOrLog(out progress);
+            helpSystemEntry.transform.Find("Content/Lower Video/progress").gameObject.TryGetComponentOrLog(out progress);
 
             Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
             PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
             tab.Label = "";
-            GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"));
+            GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"), 
+                                                          helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform, false);
             HelpSystemBuilder.Headline = headline;
-            headline.transform.parent = helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform;
             headline.GetComponent<TextMeshProUGUI>().text = titleManager;
 
             PanelNotificationCenter.OnTabClosed += panelTab =>
@@ -255,7 +255,7 @@ namespace SEE.Game.UI.HelpSystem
             GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             if (videoPlayer == null)
             {
-                throw new System.Exception("No Video-Player found");
+                throw new Exception("No Video-Player found");
             }
 
             go.TryGetComponentOrLog(out NestedMenu menu);
@@ -281,7 +281,7 @@ namespace SEE.Game.UI.HelpSystem
         {
             if (videoPlayer == null)
             {
-                throw new System.Exception("No Video-Player found");
+                throw new Exception("No Video-Player found");
             }
             videoPlayer.time = currentKeyword.CumulatedTime;
         }
@@ -295,7 +295,7 @@ namespace SEE.Game.UI.HelpSystem
             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
             if (videoPlayer == null)
             {
-                throw new System.Exception("No Video-Player found");
+                throw new Exception("No Video-Player found");
             }
             // play the current keyword again
             if (HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous == null)
@@ -352,7 +352,7 @@ namespace SEE.Game.UI.HelpSystem
             menu.ToggleMenu();
             if (videoPlayer == null)
             {
-                throw new System.Exception("No Video-Player found");
+                throw new Exception("No Video-Player found");
             }
             videoPlayer.Stop();
             HelpSystemMenu.IsEntryOpened = false;
