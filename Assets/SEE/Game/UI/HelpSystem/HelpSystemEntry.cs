@@ -38,22 +38,9 @@ namespace SEE.Game.UI.HelpSystem
         private const string HELP_SYSTEM_ENTRY_SPACE_PREFAB = "Prefabs/UI/HelpSystemEntrySpace";
 
         /// <summary>
-        /// Brief description of what this menu controls.
-        /// Will be displayed to the user above the choices.
-        /// The text may <i>not be longer than 3 lines!</i>
-        /// </summary>
-        private const string description = "No description added.";
-
-        /// <summary>
         /// The name of this menu. Displayed to the user.
         /// </summary>
         private const string titleManager = "Unnamed Menu";
-
-        /// <summary>
-        /// Icon for this menu. Displayed along the title.
-        /// Default is a generic settings (gear) icon.
-        /// </summary>
-        private const string icon = "Materials/Notification/info";
 
         /// <summary>
         /// The video-player which is responsible for interaction with the video such as play, pause, skip etc.
@@ -117,6 +104,9 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private Voice voice;
 
+        /// <summary>
+        /// The text inside of the HelpSystemEntry.
+        /// </summary>
         private TextMeshProUGUI text;
 
         protected override void StartDesktop()
@@ -146,7 +136,10 @@ namespace SEE.Game.UI.HelpSystem
                 if (HelpSystemBuilder.currentEntries != null)
                 {
                     LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntries;
-                    currentKeyword ??= currentEntries.First();
+                    if (currentEntries.Count > 0)
+                    {
+                        currentKeyword ??= currentEntries?.First();
+                    }
                     SetTmpProgress();
 
                     if (currentKeyword.Index <= currentEntries.Count)
@@ -170,7 +163,6 @@ namespace SEE.Game.UI.HelpSystem
                         }
                     }
                 }
-                text.fontSize = 30 * ((helpSystemSpace.transform.Find("DynamicPanel").GetComponent<RectTransform>().rect.width) / 550);
             }
         }
 
@@ -201,9 +193,11 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
             HelpSystemBuilder.EntrySpace = helpSystemSpace;
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
+            RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
+            dynamicPanel.sizeDelta = new Vector2(550, 425); 
             helpSystemEntry.transform.Find("Content/Lower Video/Scrollable/Code")
               .gameObject.TryGetComponentOrLog(out text);
-            text.fontSize = 30;
+            text.fontSize = 25;
 
             helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
             manager.clickEvent.AddListener(Back);
@@ -267,11 +261,6 @@ namespace SEE.Game.UI.HelpSystem
             EntryShown = false;
 
         }
-
-        /// <summary>
-        /// Replays the HelpSystemEntry after finishing. It starts from the beginning again.
-        /// </summary>
-        public void Replay() { }
 
         /// <summary>
         /// Skips the video forwards.
@@ -348,7 +337,6 @@ namespace SEE.Game.UI.HelpSystem
         {
             GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             go.TryGetComponentOrLog(out NestedMenu menu);
-            //TODO: Manager.CloseWindow();
             menu.ToggleMenu();
             if (videoPlayer == null)
             {
@@ -366,10 +354,8 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void TogglePlaying()
         {
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause")
+            helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                         .gameObject.TryGetComponentOrLog(out pauseButton);
-            helpSystemEntry.transform.Find("Main Content/Movable Window/Content/RawImageVideo/Buttons/Pause/Icon")
-            .gameObject.TryGetComponentOrLog(out RectTransform rectTransform);
             if (!IsPlaying)
             {
                 pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");

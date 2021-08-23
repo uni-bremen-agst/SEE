@@ -135,9 +135,7 @@ namespace SEE.Game.UI.HelpSystem
             }
             if (entryTitle != null)
             {
-                Debug.Log(EntrySpace.transform.Find("DynamicPanel/PanelHeader"));
                 EntrySpace.transform.Find("DynamicPanel/PanelHeader").gameObject.TryGetComponent<TextMeshProUGUI>(out TextMeshProUGUI text);
-                Debug.Log(text);
                 Headline.GetComponent<TextMeshProUGUI>().text = entryTitle;
             }
             else
