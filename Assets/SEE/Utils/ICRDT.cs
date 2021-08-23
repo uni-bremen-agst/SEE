@@ -31,6 +31,11 @@ namespace SEE.Utils
             }
         }
 
+        public static int GetIndexByPosition(Identifier[] position, string file)
+        {
+            return GetInstanceByName(file).GetIndexByPosition(position);
+        }
+
         public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
             GetInstanceByName(file).RemoteAddChar(c, position, prePosition);

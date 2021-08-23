@@ -261,6 +261,25 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Finds the Index to a Position
+        /// </summary>
+        /// <param name="position">The position</param>
+        /// <returns>The index of the Position or -1 if the position isnt in the crdt</returns>
+        public int GetIndexByPosition(Identifier[] position)
+        {
+            int i = 0;
+            foreach(CharObj c in crdt)
+            {
+                if(ComparePosition(c.GetIdentifier(), position) == 0)
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Compares two Positions and returns wether the first identifier is larger smaller or greater then the second
         /// </summary>
         /// <param name="o1">The first position</param>

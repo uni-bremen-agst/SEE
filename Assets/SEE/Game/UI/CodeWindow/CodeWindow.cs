@@ -23,7 +23,7 @@ namespace SEE.Game.UI.CodeWindow
         /// TextMeshPro component containing the code.
         /// </summary>
         private TextMeshProUGUI TextMesh;
-        
+
         private TMP_InputField TextMeshInputField;
 
         /// <summary>
@@ -131,6 +131,25 @@ namespace SEE.Game.UI.CodeWindow
             {
                 codeWindow.SetActive(true);
             }
+        }
+
+        /// <summary>
+        /// Inserts a Char at the given index, used for NetworkChanges.
+        /// </summary>
+        /// <param name="c">The Char that should be added.</param>
+        /// <param name="index">The index at which the Char should be added</param>
+        public void InsertChar(char c, int index)
+        {
+            TextMeshInputField.text.Insert(index, c.ToString());
+        }
+
+        /// <summary>
+        /// Removes a Char from the CodeWindow, used for NetworkChanges
+        /// </summary>
+        /// <param name="index">The index at which the Char should be removed</param>
+        public void DeletChar(int index)
+        {
+            TextMeshInputField.text.Remove(index);
         }
 
         #region Visible Line Calculation

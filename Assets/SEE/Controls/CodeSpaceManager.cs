@@ -15,7 +15,7 @@ namespace SEE.Controls
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
     /// using <see cref="ManagerInstance"/>.
     /// </summary>
-    public class CodeSpaceManager: MonoBehaviour
+    public class CodeSpaceManager : MonoBehaviour
     {
         /// <summary>
         /// String representing the local player.
@@ -26,7 +26,7 @@ namespace SEE.Controls
         /// String representing no player, i.e. no code windows being displayed.
         /// </summary>
         public const string NO_PLAYER = "None";
-        
+
         /// <summary>
         /// The name of the player whose code window is currently displayed.
         /// </summary>
@@ -70,6 +70,44 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Inserts a Char at the given index in the given CodeWindow
+        /// </summary>
+        /// <param name="playerName">The name of the player whose code space should be updated.</param>
+        /// <param name="title">The Title of the code window that should be updated.</param>
+        /// <param name="c">The Char that should be inserted.</param>
+        /// <param name="index">The index at which the Char should be inserted.</param>
+        public void InsertChar(string playerName, string title, char c, int index)
+        {
+            if (CodeSpaces.ContainsKey(playerName))
+            {
+                CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == title);
+                if(window != null)
+                {
+                    window.InsertChar(c, index);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes a Char in a given CodeWindow at the given index
+        /// </summary>
+        /// <param name="playerName">The name of the player whose code space should be updated.</param>
+        /// <param name="title">The Title of the code window that should be updated.</param>
+        /// <param name="index">The index at which the Char should be deleted.</param>
+        public void DeleteChar(string playerName, string title, int index)
+        {
+            if (CodeSpaces.ContainsKey(playerName))
+            {
+                CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == title);
+                if (window != null)
+                {
+                    window.DeletChar(index);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Updates the code space of the player specified by <paramref name="playerName"/> using the values
         /// from <paramref name="valueObject"/>.
         /// </summary>
@@ -87,7 +125,7 @@ namespace SEE.Controls
             {
                 CodeSpaces[playerName] = CodeSpace.FromValueObject(valueObject, gameObject);
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
-                                                  DeactivateCurrentSpace, playerName, 
+                                                  DeactivateCurrentSpace, playerName,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
                 CodeSpaces[playerName].CodeSpaceName += $" ({playerName})";
                 CodeSpaces[playerName].enabled = false;
@@ -96,7 +134,7 @@ namespace SEE.Controls
             else
             {
                 // We will try to do a partial update, otherwise we'd have to re-read each file on every update
-                
+
                 // Check for new entries
                 List<CodeWindow> closedWindows = new List<CodeWindow>(CodeSpaces[playerName].CodeWindows);
                 foreach (CodeWindow.CodeWindowValues windowValue in valueObject.CodeWindows)
@@ -115,7 +153,7 @@ namespace SEE.Controls
                         CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title);
                         window.VisibleLine = windowValue.VisibleLine;
                         //TODO: Text merge between windowValue.Text and window.Text
-                        
+
                         // Window is still open, so it's not closed
                         closedWindows.RemoveAll(x => x.Title == windowValue.Title);
                     }
@@ -123,7 +161,7 @@ namespace SEE.Controls
 
                 // Close windows which are no longer open
                 closedWindows.ForEach(CodeSpaces[playerName].CloseCodeWindow);
-                
+
                 // Set active window if it changed
                 if (CodeSpaces[playerName].ActiveCodeWindow.Title != valueObject.ActiveCodeWindow.Title)
                 {
@@ -150,7 +188,7 @@ namespace SEE.Controls
                 SpaceIndicator.Pivot = Vector2.zero;
                 ManagerInstance = this;
             }
-            
+
             // Create local code space and associate it with current player
             if (!TryGetComponent(out CodeSpace space))
             {
@@ -158,9 +196,9 @@ namespace SEE.Controls
             }
             CodeSpaces[LOCAL_PLAYER] = space;
             space.OnActiveCodeWindowChanged.AddListener(OnActiveCodeWindowChanged.Invoke);
-            
+
             ManagerInstance.SpaceIndicator.ChangeState(LOCAL_PLAYER, Color.black);
-            
+
             SetUpWindowSelectionMenu();
         }
 
@@ -180,17 +218,17 @@ namespace SEE.Controls
         {
             //TODO: Icons
             CodeWindowMenu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
+            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER),
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
+            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
                                                             "This option hides all code windows.", Color.grey);
             CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.AddEntry(localEntry);
             foreach (KeyValuePair<string, CodeSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
-                                                  DeactivateCurrentSpace, space.Key, 
+                                                  DeactivateCurrentSpace, space.Key,
                                                   $"Code window from player with IP address '{space.Key}'.", Color.white));
             }
             CodeWindowMenu.Title = "Code Window Selection";
