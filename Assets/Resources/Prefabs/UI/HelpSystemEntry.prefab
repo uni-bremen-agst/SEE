@@ -549,7 +549,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -180}
+  m_AnchoredPosition: {x: 0, y: -79}
   m_SizeDelta: {x: 100, y: 10}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &4074365028425571602
@@ -643,7 +643,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 1
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 21.382065, y: 107.23259, z: 21.643753, w: 191.7952}
+  m_margin: {x: 21.382065, y: 107.23259, z: 21.643753, w: -58.171482}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1534,8 +1534,8 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
-  m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_wordSpacing: -11.22
+  m_lineSpacing: 67.65
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -1559,7 +1559,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 1
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 288.14874, y: 0, z: 734.85834, w: 0}
+  m_margin: {x: 5.5677257, y: 0, z: 1928.4647, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2897,7 +2897,7 @@ RectTransform:
   m_GameObject: {fileID: 6395556488041900440}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.3, z: 1}
   m_Children:
   - {fileID: 1137906933376494649}
   - {fileID: 2637207559987487774}
@@ -2960,8 +2960,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3336459066374498949}
   m_HandleRect: {fileID: 3888421259579410364}
   m_Direction: 0
-  m_Value: 0.0000000550367
-  m_Size: 0.19870085
+  m_Value: 0
+  m_Size: 0.15141378
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3436,8 +3436,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3902556975958959298}
   m_HandleRect: {fileID: 2091764259962037311}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.38543355
+  m_Value: 0.99999994
+  m_Size: 0.24700974
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
