@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.100000754, g: 0.1693998, b: 0.3050715, a: 1}
+  m_IndirectSpecularColor: {r: 0.10010709, g: 0.1693151, b: 0.30522084, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -144,7 +144,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &57077442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -883,6 +883,9 @@ MonoBehaviour:
     - Name: zScoreScale
       Entry: 5
       Data: true
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
+      Data: false
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -1992,6 +1995,9 @@ MonoBehaviour:
       Data: 1
     - Name: zScoreScale
       Entry: 5
+      Data: false
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
       Data: true
     - Name: showInnerErosions
       Entry: 5
@@ -2019,10 +2025,10 @@ MonoBehaviour:
       Data: 21|SEE.Game.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -3476,6 +3482,9 @@ MonoBehaviour:
     - Name: zScoreScale
       Entry: 5
       Data: true
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -3505,7 +3514,7 @@ MonoBehaviour:
       Data: 3
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -5677,6 +5686,9 @@ MonoBehaviour:
       Data: 1
     - Name: zScoreScale
       Entry: 5
+      Data: false
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
       Data: true
     - Name: showInnerErosions
       Entry: 5
@@ -5704,10 +5716,10 @@ MonoBehaviour:
       Data: 21|SEE.Game.EdgeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 0
     - Name: edgeWidth
       Entry: 4
-      Data: 0.1
+      Data: 0.001
     - Name: edgesAboveBlocks
       Entry: 5
       Data: true
@@ -6845,6 +6857,9 @@ MonoBehaviour:
     - Name: zScoreScale
       Entry: 5
       Data: false
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -7537,50 +7552,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51821f11a04e1ab4d9151f06c2366bbc, type: 3}
---- !u!1 &1949717195
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1949717197}
-  - component: {fileID: 1949717196}
-  m_Layer: 0
-  m_Name: HelpSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1949717196
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1949717195}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b16e852193189f49ac33940066ae8fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainMenu: {fileID: 0}
---- !u!4 &1949717197
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1949717195}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.0510435, y: -8.946175, z: 18.766401}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1972412189
 GameObject:
   m_ObjectHideFlags: 0
@@ -8329,6 +8300,9 @@ MonoBehaviour:
     - Name: zScoreScale
       Entry: 5
       Data: false
+    - Name: ScaleOnlyLeafMetrics
+      Entry: 5
+      Data: true
     - Name: showInnerErosions
       Entry: 5
       Data: false
@@ -13240,7 +13214,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -13255,7 +13229,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: b6fb03c27a50bde4c90aa0b2d201eab7, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 1c87e6a7c7d35ca4ea295d8531c98b42, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

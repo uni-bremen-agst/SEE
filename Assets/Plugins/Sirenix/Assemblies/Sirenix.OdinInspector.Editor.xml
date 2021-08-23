@@ -47,6 +47,14 @@
             Executes the action for all selection indices.
             </summary>
         </member>
+        <member name="M:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolver.GetFromContext(Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext@)">
+            <summary>
+            Creates a new action resolver instance from a pre-built context struct. This is a more advanced use that requires you to
+            know how the context needs to be set up before action resolution happens. However, this allows you to do more advanced
+            things like adjust various context values before string resolution happens.
+            </summary>
+            <param name="context">The pre-built context that should be used to get a resolver.</param>
+        </member>
         <member name="M:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolver.Get(Sirenix.OdinInspector.Editor.InspectorProperty,System.String)">
             <summary>
             Creates a new action resolver instance for a given string.
@@ -92,24 +100,14 @@
             The property that *provides* the context for the action resolution. This is the instance that was passed to the resolver when it was created. Note that this is different from <see cref="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ContextProperty"/>, which is based on this value, but almost always isn't the same InspectorProperty instance.
             </summary>
         </member>
-        <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ResolvedString">
-            <summary>
-            The string that is resolved to perform an action.
-            </summary>
-        </member>
         <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ErrorMessage">
             <summary>
-            The error message, if a valid action resolution wasn't found, or if creation of the action resolver failed because <see cref="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ResolvedString"/> was invalid, or if the action was executed but threw an exception. (In this last case, <see cref="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ErrorMessageIsDueToException"/> will be true.)
+            The error message, if a valid action resolution wasn't found, or if creation of the action resolver failed because <see cref="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ResolvedString"/> was invalid, or if the action was executed but threw an exception. (In this last case, <see cref="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ErrorMessageIsDueToException"/> will be true.)
             </summary>
         </member>
         <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.NamedValues">
             <summary>
             The named values that are available to the action resolver. Use this field only to get and set named values - once the ValueResolver has been created, new named values will have no effect.
-            </summary>
-        </member>
-        <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.SyncRefParametersWithNamedValues">
-            <summary>
-            Whether the action resolver should sync ref parameters of invoked methods with named values. If this is true, then if a ref or out parameter value is changed during action execution, the named value associated with that parameter will also be changed to the same value.
             </summary>
         </member>
         <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ErrorMessageIsDueToException">
@@ -120,6 +118,21 @@
         <member name="F:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.LogExceptions">
             <summary>
             Whether exceptions thrown during action execution should be logged to the console.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ResolvedString">
+            <summary>
+            The string that is resolved to perform an action.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.SyncRefParametersWithNamedValues">
+            <summary>
+            Whether the action resolver should sync ref parameters of invoked methods with named values. If this is true, then if a ref or out parameter value is changed during action execution, the named value associated with that parameter will also be changed to the same value.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.IsResolved">
+            <summary>
+            Whether this context has been resolved.
             </summary>
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.ActionResolvers.ActionResolverContext.ParentType">
@@ -431,9 +444,18 @@
             A prefab tree for the prefabs of this property tree's prefab instances, if any exist.
             </summary>
         </member>
+        <member name="M:Sirenix.OdinInspector.Editor.PrefabModificationHandler.GetUnityPropertyModification(Sirenix.Utilities.Editor.StringSlice,System.Int32,System.Boolean@)">
+            <summary>
+            Gets the Unity PropertyModification for the property at this path, if there are any.
+            </summary>
+            <param name="path">The property path to get the modification for.</param>
+            <param name="selectionIndex">The index of the tree target to get the modification for.</param>
+            <param name="childrenHaveModifications">Whether any children of the path have modifications registered.</param>
+            <returns></returns>
+        </member>
         <member name="M:Sirenix.OdinInspector.Editor.PrefabModificationHandler.GetPrefabModificationType(Sirenix.OdinInspector.Editor.InspectorProperty,System.Boolean)">
             <summary>
-            Gets the prefab modification type of a given property, if any.
+            Gets the Odin prefab modification type of a given property, if any.
             </summary>
             <param name="property">The property to check.</param>
             <param name="forceAutoRegister"></param>
@@ -813,12 +835,12 @@
             Gets the strongly typed ValueEntry of the OdinValueStateUpdater's property.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.Drawers.AssetSelectorAttributeDrawer.Initialize">
+        <member name="M:Sirenix.OdinInspector.Editor.Drawers.AssetSelectorAttributeDrawer`1.Initialize">
             <summary>
             Initializes this instance.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.Drawers.AssetSelectorAttributeDrawer.DrawPropertyLayout(UnityEngine.GUIContent)">
+        <member name="M:Sirenix.OdinInspector.Editor.Drawers.AssetSelectorAttributeDrawer`1.DrawPropertyLayout(UnityEngine.GUIContent)">
             <summary>
             Draws the property with GUILayout support. This method is called by DrawPropertyImplementation if the GUICallType is set to GUILayout, which is the default.
             </summary>
@@ -3296,6 +3318,23 @@
             Draws an error message box if there is an error, and does nothing if there is no error.
             </summary>
         </member>
+        <member name="M:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolver.GetFromContextWeak(Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext@)">
+            <summary>
+            Creates a new value resolver instance from a pre-built context struct, in a weakly typed fashion, though the result 
+            is the same as using a strongly typed generic overload. This is a more advanced use that requires you to
+            know how the context needs to be set up before value resolution happens. However, this allows you to do more advanced
+            things like adjust various context values before string resolution happens.
+            </summary>
+            <param name="context">The pre-built context that should be used to get a resolver.</param>
+        </member>
+        <member name="M:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolver.GetFromContext``1(Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext@)">
+            <summary>
+            Creates a new value resolver instance from a pre-built context struct. This is a more advanced use that requires you to
+            know how the context needs to be set up before value resolution happens. However, this allows you to do more advanced
+            things like adjust various context values before string resolution happens.
+            </summary>
+            <param name="context">The pre-built context that should be used to get a resolver.</param>
+        </member>
         <member name="M:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolver.Get(System.Type,Sirenix.OdinInspector.Editor.InspectorProperty,System.String)">
             <summary>
             Creates a new value resolver instance in a weakly typed fashion, though the result is the same as using a strongly typed generic overload.
@@ -3445,34 +3484,19 @@
             This struct contains all of a ValueResolver's configurations and values it needs to function. For performance and simplicity reasons, this is a single very large struct that lives on a ValueResolver instance and is passed around by ref to anything that needs it.
             </summary>
         </member>
-        <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResultType">
-            <summary>
-            The type of value that the resolver is resolving.
-            </summary>
-        </member>
         <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.Property">
             <summary>
             The property that *provides* the context for the value resolution. This is the instance that was passed to the resolver when it was created. Note that this is different from <see cref="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ContextProperty"/>, which is based on this value, but almost always isn't the same InspectorProperty instance.
             </summary>
         </member>
-        <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResolvedString">
-            <summary>
-            The string that is resolved to get a value.
-            </summary>
-        </member>
         <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ErrorMessage">
             <summary>
-            The error message, if a valid value resolution wasn't found, or if creation of the value resolver failed because <see cref="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResolvedString"/> was invalid, or if value resolution was run but threw an exception. (In this last case, <see cref="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ErrorMessageIsDueToException"/> will be true.)
+            The error message, if a valid value resolution wasn't found, or if creation of the value resolver failed because <see cref="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResolvedString"/> was invalid, or if value resolution was run but threw an exception. (In this last case, <see cref="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ErrorMessageIsDueToException"/> will be true.)
             </summary>
         </member>
         <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.NamedValues">
             <summary>
             The named values that are available to the value resolver. Use this field only to get and set named values - once the ValueResolver has been created, new named values will have no effect.
-            </summary>
-        </member>
-        <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.SyncRefParametersWithNamedValues">
-            <summary>
-            Whether the value resolver should sync ref parameters of invoked methods with named values. If this is true, then if a ref or out parameter value is changed during value resolution, the named value associated with that parameter will also be changed to the same value.
             </summary>
         </member>
         <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.FallbackValue">
@@ -3493,6 +3517,26 @@
         <member name="F:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.LogExceptions">
             <summary>
             Whether exceptions thrown during value resolution should be logged to the console.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResultType">
+            <summary>
+            The type of value that the resolver is resolving.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ResolvedString">
+            <summary>
+            The string that is resolved to get a value.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.SyncRefParametersWithNamedValues">
+            <summary>
+            Whether the value resolver should sync ref parameters of invoked methods with named values. If this is true, then if a ref or out parameter value is changed during value resolution, the named value associated with that parameter will also be changed to the same value.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.IsResolved">
+            <summary>
+            Whether this context has been resolved.
             </summary>
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.ValueResolvers.ValueResolverContext.ParentType">
@@ -5343,6 +5387,26 @@
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ShowIndexLabels">
             <summary>
             Specify whether or not lists should show item count.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ListItemColorEvenDarkSkin">
+            <summary>
+            Specify the color of even list elements when in the dark skin.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ListItemColorOddDarkSkin">
+            <summary>
+            Specify the color of odd list elements when in the dark skin.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ListItemColorEvenLightSkin">
+            <summary>
+            Specify the color of even list elements when in the light skin.
+            </summary>
+        </member>
+        <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ListItemColorOddLightSkin">
+            <summary>
+            Specify the color of odd list elements when in the light skin.
             </summary>
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.SquareUnityObjectFieldHeight">
@@ -8073,6 +8137,13 @@
             <param name="name">The name of the child to get.</param>
             <returns>The child, if a child was found; otherwise, null.</returns>
         </member>
+        <member name="P:Sirenix.OdinInspector.Editor.PropertyChildren.Item(Sirenix.Utilities.Editor.StringSlice)">
+            <summary>
+            Gets a child by name. This is an alias for <see cref="!:Get(StringSlice)" />.
+            </summary>
+            <param name="name">The name of the child to get.</param>
+            <returns>The child, if a child was found; otherwise, null.</returns>
+        </member>
         <member name="M:Sirenix.OdinInspector.Editor.PropertyChildren.#ctor(Sirenix.OdinInspector.Editor.InspectorProperty)">
             <summary>
             Initializes a new instance of the <see cref="T:Sirenix.OdinInspector.Editor.PropertyChildren"/> class.
@@ -8091,6 +8162,14 @@
             </summary>
         </member>
         <member name="M:Sirenix.OdinInspector.Editor.PropertyChildren.Get(System.String)">
+            <summary>
+            Gets a child by name.
+            </summary>
+            <param name="name">The name of the child to get.</param>
+            <returns>The child, if a child was found; otherwise, null.</returns>
+            <exception cref="T:System.ArgumentNullException">name</exception>
+        </member>
+        <member name="M:Sirenix.OdinInspector.Editor.PropertyChildren.Get(Sirenix.Utilities.Editor.StringSlice@)">
             <summary>
             Gets a child by name.
             </summary>

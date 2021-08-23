@@ -27,6 +27,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.HID,
 					NameLiteral = "Nimbus+"
 				},
 			};

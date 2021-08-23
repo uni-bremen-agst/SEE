@@ -230,4 +230,3 @@ namespace InControl.NativeDeviceProfiles
 
 	// @endcond
 }
-

@@ -197,6 +197,11 @@ namespace InControl
 				var joystickDevice = new UnityInputDevice( unityJoystickId, unityJoystickName );
 				AttachDevice( joystickDevice );
 				Logger.LogWarning( "Device " + unityJoystickId + " with name \"" + unityJoystickName + "\" does not match any supported profiles and will be considered an unknown controller." );
+				//Debug.LogFormat( "String length: {0}", unityJoystickName.Length );
+				//foreach (char c in unityJoystickName)
+				//{
+				//	Debug.LogFormat( "\\u{0:x4}", (int) c );
+				//}
 				return;
 			}
 

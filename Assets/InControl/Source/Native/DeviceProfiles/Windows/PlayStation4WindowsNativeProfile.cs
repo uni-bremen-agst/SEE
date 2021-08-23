@@ -71,13 +71,13 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Left Bumper",
+					Name = "L1",
 					Target = InputControlType.LeftBumper,
 					Source = Button( 4 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Right Bumper",
+					Name = "R1",
 					Target = InputControlType.RightBumper,
 					Source = Button( 5 ),
 				},
@@ -187,7 +187,7 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Left Trigger",
+					Name = "L2",
 					Target = InputControlType.LeftTrigger,
 					Source = Analog( 5 ),
 					SourceRange = InputRangeType.MinusOneToOne,
@@ -195,7 +195,7 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "Right Trigger",
+					Name = "R2",
 					Target = InputControlType.RightTrigger,
 					Source = Analog( 4 ),
 					SourceRange = InputRangeType.MinusOneToOne,

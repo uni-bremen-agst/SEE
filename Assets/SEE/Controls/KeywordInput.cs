@@ -14,6 +14,11 @@ namespace SEE.Controls
     /// 
     /// As an example on how to use this class, take a look at the test
     /// case TestKeywordInput.
+    /// 
+    /// IMPORTANT NOTE.
+    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be 
+    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput 
+    /// cannot be active and vice versa.
     /// </summary>
     public class KeywordInput : SpeechInput
     {
@@ -35,7 +40,7 @@ namespace SEE.Controls
         /// Starts the <see cref="recognizer"/>.
         /// </summary>
         public override void Start()
-        {                        
+        {
             recognizer.Start();
         }
 

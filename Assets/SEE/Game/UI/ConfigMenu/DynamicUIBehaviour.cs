@@ -22,7 +22,6 @@
 
 using SEE.GO;
 using System;
-using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.UI.ConfigMenu
@@ -82,31 +81,6 @@ namespace SEE.Game.UI.ConfigMenu
         protected void MustGetComponent<T>(out T component)
         {
             gameObject.MustGetComponent(out component);
-        }
-
-        /// <summary>
-        /// Tries to load a prefab at a given path.
-        /// </summary>
-        /// <param name="path">The path to look for.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException">Gets thrown if the path doesn't resolve to a file.</exception>
-        protected GameObject MustLoadPrefabAtPath(string path)
-        {
-            // FIXME: 
-            // It seems like the PrefabInstantiator class does essentially the same thing as
-            // this method, with the difference that the PrefabInstantiator will also work in
-            // the built game, while this will not(due to using the UnityEditor namespace for
-            // LoadAssetAtPath instead of using Resources.Load).
-            // This means that any calls to this method should probably be replaced by a call
-            // to the prefab instantiator.
-            // Note that another important difference is that LoadAssetAtPath requires
-            // the .prefab extension to be present, while the PrefabInstantiator's Resources.Load
-            // approach requires it not to be present. To fix this, either all paths to the prefabs
-            // need to be updated, or the PrefabInstantiator should be updated to automatically
-            // remove this suffix. In addition, prefabs to be instantiated at runtime must be
-            // in the Resources folder.
-            return AssetDatabase.LoadAssetAtPath<GameObject>(path) ??
-                   throw new ArgumentException($"Prefab not found at path: {path}.");
         }
 
         /// <summary>

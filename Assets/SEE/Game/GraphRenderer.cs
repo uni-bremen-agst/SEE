@@ -9,7 +9,6 @@ using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
-using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -108,12 +107,6 @@ namespace SEE.Game
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
-        
-        /// <summary>
-        /// The scale used to normalize the erosion metrics determining the color and size of the erosion icons.
-        /// This is different from <see cref="scaler"/> insofar that 
-        /// </summary>
-        private IScale erosionScaler;
 
         /// <summary>
         /// A mapping from Node to ILayoutNode.
@@ -132,11 +125,13 @@ namespace SEE.Game
 
             if (settings.nodeLayoutSettings.zScoreScale)
             {
-                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
+                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength,
+                                         nodeMetrics, settings.nodeLayoutSettings.ScaleOnlyLeafMetrics);
             }
             else
             {
-                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
+                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength,
+                                         nodeMetrics, settings.nodeLayoutSettings.ScaleOnlyLeafMetrics);
             }
         }
 
@@ -1019,7 +1014,7 @@ namespace SEE.Game
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
         /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, 
+        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds,
                                     NodeLayoutKind nodeLayout)
         {
             InnerNodeFactory innerNodeFactory = innerNodeFactories[0];
@@ -1032,7 +1027,7 @@ namespace SEE.Game
             {
                 //FIXME: This should instead check whether each node has non-aggregated metrics available,
                 // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
-                ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
+                ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory,
                                                                  scaler, settings.nodeLayoutSettings.erosionScalingFactor);
                 issueDecorator.Add(innerNodes);
             }
@@ -1044,7 +1039,7 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon 
+            if (nodeLayout == NodeLayoutKind.Balloon
                 || nodeLayout == NodeLayoutKind.EvoStreets
                 || nodeLayout == NodeLayoutKind.CirclePacking)
             {

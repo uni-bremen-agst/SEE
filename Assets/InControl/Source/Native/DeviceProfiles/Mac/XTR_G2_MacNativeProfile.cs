@@ -26,6 +26,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.HID,
 					VendorID = 0xb9b,
 					ProductID = 0x4012,
 					NameLiteral = "KMODEL Simulator - XTR+G2+FMS Controller"

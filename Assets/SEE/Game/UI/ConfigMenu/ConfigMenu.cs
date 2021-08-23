@@ -24,6 +24,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,10 +72,10 @@ namespace SEE.Game.UI.ConfigMenu
                 EditableInstance.Implementation
             };
 
-        private const string PagePrefabPath = "Assets/Prefabs/UI/Page.prefab";
-        private const string TabButtonPrefabPath = "Assets/Prefabs/UI/TabButton.prefab";
-        private const string ActionButtonPrefabPath = "Assets/Prefabs/UI/ActionButton.prefab";
-        private const string PointerPrefabPath = "Assets/Prefabs/UI/Pointer.prefab";
+        private const string PagePrefabPath = "Prefabs/UI/Page";
+        private const string TabButtonPrefabPath = "Prefabs/UI/TabButton";
+        private const string ActionButtonPrefabPath = "Prefabs/UI/ActionButton";
+        private const string PointerPrefabPath = "Prefabs/UI/Pointer";
 
         private GameObject pagePrefab;
         private GameObject actionButtonPrefab;
@@ -173,12 +174,12 @@ namespace SEE.Game.UI.ConfigMenu
                 Transform attachmentPoint = GameObject
                     .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
                 GameObject pointer =
-                    Instantiate(MustLoadPrefabAtPath(PointerPrefabPath), attachmentPoint);
+                    PrefabInstantiator.InstantiatePrefab(PointerPrefabPath, parent: attachmentPoint);
                 Camera pointerCamera = pointer.GetComponent<Camera>();
 
                 // Replace the default input system with our VR input system.
                 GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
-                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;                
+                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
                 VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
@@ -204,9 +205,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void LoadPrefabs()
         {
-            tabButtonPrefab = MustLoadPrefabAtPath(TabButtonPrefabPath);
-            pagePrefab = MustLoadPrefabAtPath(PagePrefabPath);
-            actionButtonPrefab = MustLoadPrefabAtPath(ActionButtonPrefabPath);
+            tabButtonPrefab = PrefabInstantiator.LoadPrefab(TabButtonPrefabPath);
+            pagePrefab = PrefabInstantiator.LoadPrefab(PagePrefabPath);
+            actionButtonPrefab = PrefabInstantiator.LoadPrefab(ActionButtonPrefabPath);
         }
         private void SetupActions()
         {
@@ -455,6 +456,13 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetOnChangeHandler(b => city.nodeLayoutSettings.zScoreScale = b)
                 .Build();
 
+            // Leaf/inner node metric scaling
+            SwitchBuilder.Init(controls.transform)
+                .SetLabel("Scale only leaf metrics")
+                .SetDefaultValue(city.nodeLayoutSettings.ScaleOnlyLeafMetrics)
+                .SetOnChangeHandler(b => city.nodeLayoutSettings.ScaleOnlyLeafMetrics = b)
+                .Build();
+
             // Show leaf erosions
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show leaf erosions")
@@ -484,7 +492,7 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetLabel("Dashboard metrics override")
                 .SetDefaultValue(city.nodeLayoutSettings.overrideMetrics)
                 .SetOnChangeHandler(b => city.nodeLayoutSettings.overrideMetrics = b)
-                .Build();            
+                .Build();
 
             // Erosion scaling factor
             SliderBuilder.Init(controls.transform)

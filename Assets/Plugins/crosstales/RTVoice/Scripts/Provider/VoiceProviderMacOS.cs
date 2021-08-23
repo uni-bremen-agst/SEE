@@ -90,6 +90,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override IEnumerator SpeakNative(Model.Wrapper wrapper)
       {
+#if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
          {
             Debug.LogWarning("'wrapper' is null!");
@@ -169,10 +170,14 @@ namespace Crosstales.RTVoice.Provider
                }
             }
          }
+#else
+         yield return null;
+#endif
       }
 
       public override IEnumerator Speak(Model.Wrapper wrapper)
       {
+#if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
          {
             Debug.LogWarning("'wrapper' is null!");
@@ -259,10 +264,14 @@ namespace Crosstales.RTVoice.Provider
                }
             }
          }
+#else
+         yield return null;
+#endif
       }
 
       public override IEnumerator Generate(Model.Wrapper wrapper)
       {
+#if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
          {
             Debug.LogWarning("'wrapper' is null!");
@@ -342,6 +351,9 @@ namespace Crosstales.RTVoice.Provider
                }
             }
          }
+#else
+         yield return null;
+#endif
       }
 
       public override void Silence()
@@ -381,6 +393,7 @@ namespace Crosstales.RTVoice.Provider
 
       private IEnumerator getVoices()
       {
+#if UNITY_STANDALONE || UNITY_EDITOR
 #if ENABLE_IL2CPP
          using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
@@ -445,6 +458,9 @@ namespace Crosstales.RTVoice.Provider
          isLoading = false;
 
          onVoicesReady();
+#else
+         yield return null;
+#endif
       }
 
       private static int calculateRate(float rate)

@@ -72,23 +72,22 @@ namespace Crosstales.RTVoice.Provider
 
          if (voices.Length % 3 == 0)
          {
-         System.Collections.Generic.List<Model.Voice> voicesList = new System.Collections.Generic.List<Model.Voice>(60);
+            System.Collections.Generic.List<Model.Voice> voicesList = new System.Collections.Generic.List<Model.Voice>(60);
 
-         //for (int ii = 0; ii < voices.Length; ii += 2)
-         for (int ii = 0; ii < voices.Length; ii += 3)
-         {
-            string name = voices[ii + 1];
-            string culture = voices[ii + 2];
-            Model.Voice newVoice = new Model.Voice(name, "iOS voice: " + name + " " + culture,
-               Util.Helper.AppleVoiceNameToGender(name), "unknown", culture, voices[ii], "Apple");
+            //for (int ii = 0; ii < voices.Length; ii += 2)
+            for (int ii = 0; ii < voices.Length; ii += 3)
+            {
+               string name = voices[ii + 1];
+               string culture = voices[ii + 2];
+               Model.Voice newVoice = new Model.Voice(name, "iOS voice: " + name + " " + culture, Util.Helper.AppleVoiceNameToGender(name), "unknown", culture, voices[ii], "Apple");
 
-            voicesList.Add(newVoice);
-         }
+               voicesList.Add(newVoice);
+            }
 
-         cachediOSVoices = voicesList.OrderBy(s => s.Name).ToList();
+            cachediOSVoices = voicesList.OrderBy(s => s.Name).ToList();
 
-         if (Util.Constants.DEV_DEBUG)
-            Debug.Log("Voices read: " + cachediOSVoices.CTDump());
+            if (Util.Constants.DEV_DEBUG)
+               Debug.Log("Voices read: " + cachediOSVoices.CTDump());
          }
          else
          {
@@ -231,13 +230,11 @@ namespace Crosstales.RTVoice.Provider
 
                isWorking = true;
 
-               speechTextArray = Util.Helper.CleanText(wrapper.Text, false)
-                  .Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
+               speechTextArray = Util.Helper.CleanText(wrapper.Text, false).Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
                wordIndex = 0;
                wrapperNative = wrapper;
 
-               NativeMethods.RTVSpeak(voiceId, wrapper.Text, calculateRate(wrapper.Rate), wrapper.Pitch,
-                  wrapper.Volume);
+               NativeMethods.RTVSpeak(voiceId, wrapper.Text, calculateRate(wrapper.Rate), wrapper.Pitch, wrapper.Volume);
 
                do
                {

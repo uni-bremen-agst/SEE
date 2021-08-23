@@ -22,6 +22,7 @@
 
 using SEE.Controls;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
 using PlayerSettings = SEE.Controls.PlayerSettings;
@@ -37,7 +38,7 @@ namespace SEE.Game.UI.ConfigMenu
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
         private static readonly EditableInstance DefaultInstanceToEdit = EditableInstance.Implementation;
-        private const string ConfigMenuPrefabPath = "Assets/Prefabs/UI/ConfigMenu.prefab";
+        private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
 
         private readonly SteamVR_Action_Boolean openAction = SteamVR_Actions._default.OpenSettingsMenu;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
@@ -46,12 +47,13 @@ namespace SEE.Game.UI.ConfigMenu
         private ConfigMenu configMenu;
         private void Awake()
         {
-            configMenuPrefab = MustLoadPrefabAtPath(ConfigMenuPrefabPath);
+            configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
             BuildConfigMenu(DefaultInstanceToEdit, false);
         }
         private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(configMenuPrefab);
+            configMenuGo.name = configMenuPrefab.name;
             configMenuGo.transform.SetSiblingIndex(0);
             configMenuGo.MustGetComponent(out configMenu);
             if (turnMenuOn)

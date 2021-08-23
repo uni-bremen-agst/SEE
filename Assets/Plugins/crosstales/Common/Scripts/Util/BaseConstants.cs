@@ -107,6 +107,16 @@ namespace Crosstales.Common.Util
 
       public static readonly System.Text.RegularExpressions.Regex REGEX_LINEENDINGS = new System.Text.RegularExpressions.Regex(@"\r\n|\r|\n");
 
+      public static readonly System.Text.RegularExpressions.Regex REGEX_EMAIL = new System.Text.RegularExpressions.Regex(@"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
+      public static readonly System.Text.RegularExpressions.Regex REGEX_CREDITCARD = new System.Text.RegularExpressions.Regex(@"^((\d{4}[- ]?){3}\d{4})$");
+      public static readonly System.Text.RegularExpressions.Regex REGEX_URL_WEB = new System.Text.RegularExpressions.Regex(@"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?$");
+      public static readonly System.Text.RegularExpressions.Regex REGEX_IP_ADDRESS = new System.Text.RegularExpressions.Regex(@"^([0-9]{1,3}\.){3}[0-9]{1,3}$");
+      public static readonly System.Text.RegularExpressions.Regex REGEX_INVALID_CHARS = new System.Text.RegularExpressions.Regex(@"[^\w\.@-]");
+
+      public static readonly System.Text.RegularExpressions.Regex REGEX_ALPHANUMERIC = new System.Text.RegularExpressions.Regex(@"([A-Za-z0-9_]+)");
+      //public static readonly System.Text.RegularExpressions.Regex REGEX_REALNUMBER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]*\.?[0-9]+)");
+      //public static readonly System.Text.RegularExpressions.Regex REGEX_SIGNED_INTEGER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]+)");
+
       #endregion
 
 
