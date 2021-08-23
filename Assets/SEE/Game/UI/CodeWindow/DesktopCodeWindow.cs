@@ -157,8 +157,6 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                     ICRDT.AddChar(input[0], TextMeshInputField.stringPosition -1, Title);
-                    TextMeshInputField.text = ICRDT.PrintString(Title);
-
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > TextMeshInputField.stringPosition && timeStamp <= Time.time)
@@ -172,8 +170,6 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteChar(TextMeshInputField.stringPosition, Title);
                     }
-                     // = ICRDT.PrintString(Title);
-
                 }
 
                 if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && TextMeshInputField.stringPosition > 0)
@@ -199,7 +195,6 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
                         ICRDT.AddString(Clipboard.Paste<string>(), TextMeshInputField.stringPosition, Title);
-                        TextMeshInputField.text = ICRDT.PrintString(Title);
 
                     }
                 }
@@ -208,7 +203,6 @@ namespace SEE.Game.UI.CodeWindow
                     if (selectedText != null)
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
-                        TextMeshInputField.text = ICRDT.PrintString(Title);
                     }
                 }
                
