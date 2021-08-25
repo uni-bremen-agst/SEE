@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using SEE.GO;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -76,10 +77,7 @@ namespace SEE.Game.UI.ConfigMenu
         {
             if (prefab == null)
             {
-                // FIXME: This shouldn't use LoadAssetAtPath, because it won't work with the built game
-                // (due to using the UnityEditor namespace). Instead, the PrefabInstantiator utility
-                // class can be used.
-                prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+                prefab = PrefabInstantiator.LoadPrefab(PrefabPath);
             }
             return prefab;
         }

@@ -114,7 +114,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ColorPickerBuilder : UIBuilder<ColorPicker>
     {
-        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Color Picker.prefab";
+        protected override string PrefabPath => "Prefabs/UI/Input Group - Color Picker";
 
         private ColorPickerBuilder(Transform parent) : base(parent)
         {
