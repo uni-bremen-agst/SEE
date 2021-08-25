@@ -85,7 +85,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class SwitchBuilder : UIBuilder<Switch>
     {
-        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Switch.prefab";
+        protected override string PrefabPath => "Prefabs/UI/Input Group - Switch";
 
         private SwitchBuilder(Transform parent) : base(parent)
         {

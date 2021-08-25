@@ -28,7 +28,7 @@ namespace SEE.Game.UI.ConfigMenu
     public delegate void UpdateNotifier();
 
     /// <summary>
-    /// Controls all tab button in the sidebar.
+    /// Controls all tab buttons in the sidebar.
     /// Tab buttons register themselves to this group.
     /// Other components can subscribe to listen for button clicks.
     /// </summary>
@@ -74,7 +74,7 @@ namespace SEE.Game.UI.ConfigMenu
         }
 
         /// <summary>
-        /// Sets a tab button as the currently active.
+        /// Sets a tab button as the currently active one.
         /// </summary>
         /// <param name="button"></param>
         public void OnTabSelected(TabButton button)
@@ -90,17 +90,16 @@ namespace SEE.Game.UI.ConfigMenu
         }
 
         /// <summary>
-        /// Rests all inactive buttons.
+        /// Resets all inactive buttons.
         /// </summary>
         private void ResetButtons()
         {
             foreach (TabButton tabButton in TabButtons)
             {
-                if (tabButton == activeButton)
+                if (tabButton != activeButton)
                 {
-                    continue;
+                    tabButton.ResetStyles();
                 }
-                tabButton.ResetStyles();
             }
         }
     }

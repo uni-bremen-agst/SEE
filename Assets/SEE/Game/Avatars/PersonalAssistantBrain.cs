@@ -251,7 +251,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private const string goodByeText =
               "It was a pleasure to meet you. "
-            + "I hope to see you in the coming winter semester again in my team. "
+            + "I hope to see you soon again. "
             + "<emphasis level=\"strong\">Good bye!</emphasis>";
     }
 }

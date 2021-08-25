@@ -103,7 +103,7 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class SliderBuilder : UIBuilder<Slider>
     {
-        protected override string PrefabPath => "Assets/Prefabs/UI/Input Group - Slider.prefab";
+        protected override string PrefabPath => "Prefabs/UI/Input Group - Slider";
 
         private SliderBuilder(Transform parent) : base(parent)
         {
