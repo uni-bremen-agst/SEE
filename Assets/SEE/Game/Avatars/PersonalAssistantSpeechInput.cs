@@ -74,7 +74,7 @@ namespace SEE.Game.Avatars
         /// <param name="args">details about the recognized sentence</param>
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
-            // Debug.Log($"Phrase detected phrase '{args.text}' with confidence {args.confidence}\n");
+            // Debug.Log($"Detected phrase '{args.text}' with confidence {args.confidence}\n");
             SemanticMeaning[] meanings = args.semanticMeanings;
             if (meanings != null)
             {

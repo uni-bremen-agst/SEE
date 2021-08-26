@@ -1920,8 +1920,8 @@ namespace SEE.Tools
         /// <returns>Source.Line attribute or empty string</returns>
         private static string Get_Source_Line(GraphElement graphElement)
         {
-            int result = graphElement.SourceLine();
-            return result == 0 ? string.Empty : result.ToString();
+            int? result = graphElement.SourceLine();
+            return result.HasValue ? result.ToString() : string.Empty;
         }
 
         /// <summary>
