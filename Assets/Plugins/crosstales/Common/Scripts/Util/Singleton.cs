@@ -200,6 +200,9 @@ namespace Crosstales.Common.Util
       {
          get
          {
+            //if (BaseHelper.isEditorMode)
+            //   return false;
+
             if (!isQuittingSet)
             {
                isQuittingSet = true;
@@ -257,45 +260,16 @@ namespace Crosstales.Common.Util
             Application.quitting += onQuitting;
             //Application.wantsToQuit += onWantsToQuit;
 
-#if UNITY_EDITOR
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += onSceneLoaded;
             UnityEngine.SceneManagement.SceneManager.sceneUnloaded += onSceneUnloaded;
+			
+#if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += onPlayModeStateChanged;
             UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += onSceneClosing;
             //UnityEditor.SceneManagement.EditorSceneManager.sceneOpening += onSceneOpening;
             UnityEditor.SceneManagement.EditorSceneManager.sceneOpened += onSceneOpened;
 #endif
          }
-      }
-
-#if UNITY_EDITOR
-      private static void onSceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
-      {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpened");
-
-         isQuitting = false;
-      }
-
-/*
-   private static void onSceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
-   {
-      Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpening");
-
-      isQuitting = false;
-   }
-*/
-      private static void onSceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingscene)
-      {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneClosing");
-
-         isQuitting = true;
-      }
-
-      private static void onPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
-      {
-         isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingEditMode || obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
-
-         //Debug.LogWarning($"{Time.realtimeSinceStartup} - onPlayModeStateChanged: {obj} - {isQuitting}");
       }
 
       private static void onSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
@@ -312,6 +286,35 @@ namespace Crosstales.Common.Util
 
          isQuitting = true;
          Util.BaseHelper.ApplicationIsPlaying = false;
+      }
+
+#if UNITY_EDITOR
+      private static void onPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
+      {
+         isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingEditMode || obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
+
+         //Debug.LogWarning($"{Time.realtimeSinceStartup} - onPlayModeStateChanged: {obj} - {isQuitting}");
+      }
+
+      private static void onSceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingscene)
+      {
+         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneClosing");
+
+         isQuitting = true;
+      }
+/*
+   private static void onSceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
+   {
+      Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpening");
+
+      isQuitting = false;
+   }
+*/
+      private static void onSceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
+      {
+         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpened");
+
+         isQuitting = false;
       }
 #endif
 

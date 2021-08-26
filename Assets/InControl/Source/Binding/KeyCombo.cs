@@ -13,6 +13,8 @@ namespace InControl
 	/// </summary>
 	public struct KeyCombo
 	{
+		public static readonly KeyCombo Empty = new KeyCombo();
+
 		int includeSize;
 		ulong includeData;
 
@@ -212,8 +214,12 @@ namespace InControl
 			const Key minStandardKey = Key.Escape;
 			const Key maxStandardKey = Key.QuestionMark;
 
-			var keyCombo = new KeyCombo();
+			var keyCombo = Empty;
 			var provider = InputManager.KeyboardProvider;
+			if (provider == null)
+			{
+				return keyCombo;
+			}
 
 			if (modifiersAsKeys)
 			{

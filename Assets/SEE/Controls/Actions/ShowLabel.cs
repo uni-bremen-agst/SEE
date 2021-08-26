@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -168,7 +169,6 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Returns the code city holding the settings for the visualization of the node.
-        /// 
         /// May be null.
         /// </summary>
         private AbstractSEECity City()
@@ -183,6 +183,19 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns the node this class is attached to.
+        /// May be null.
+        /// </summary>
+        private Node Node()
+        {
+            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+            {
+                return null;
+            }
+            return nodeRef.Value;
+        }
+
+        /// <summary>
         /// Returns true iff labels are enabled for this kind of node.
         /// </summary>
         /// <param name="city">the code city holding the attributes for showing labels</param>
@@ -191,8 +204,8 @@ namespace SEE.Controls.Actions
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.
-            return node.IsLeaf() && city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings.Show
-                || !node.IsLeaf() && city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings.Show;
+            return node.IsLeaf() && city.leafNodeAttributesPerKind[0].labelSettings.Show
+                || node.IsInnerNode() && city.innerNodeAttributesPerKind[0].labelSettings.Show;
         }
 
         /// <summary>
@@ -208,13 +221,12 @@ namespace SEE.Controls.Actions
                 // are not doing anything.
                 return;
             }
-
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+            Node node = Node();
+            if (node == null)
             {
                 return;
             }
-            Node node = nodeRef.Value;
-
+            
             bool isLeaf = node.IsLeaf();
             if (!LabelsEnabled(city, node))
             {
@@ -236,16 +248,7 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
 
-            string shownText;
-            if (node == null)
-            {
-                Debug.LogWarning($"Game node {name} has no valid node reference.\n");
-                shownText = name;
-            }
-            else
-            {
-                shownText = node.SourceName;
-            }
+            string shownText = node.SourceName;
 
             // Now we create the label
             // We define starting and ending positions for the animation
@@ -267,7 +270,8 @@ namespace SEE.Controls.Actions
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             edge.transform.SetParent(nodeLabel.transform);
-            Portal.SetInfinitePortal(nodeLabel);
+            //FIXME: Normal text labels also get an infinite portal due to shared material, so this is commented out for now
+            //Portal.SetInfinitePortal(nodeLabel);
 
             AnimateLabel(city, node);
         }
@@ -364,7 +368,6 @@ namespace SEE.Controls.Actions
                     Debug.LogError("Couldn't find line component in newly created label.\n");
                 }
             }
-            #endregion
 
             void SetAttributesImmediately()
             {
@@ -382,6 +385,7 @@ namespace SEE.Controls.Actions
                     Debug.LogError("Couldn't find required component in newly created label.\n");
                 }
             }
+            #endregion
         }
 
         /// <summary>

@@ -415,9 +415,9 @@ namespace Crosstales.Common.Util
       public static bool hasActiveClip(AudioSource source)
       {
          return source != null && source.clip != null &&
-                (!source.loop && source.timeSamples > 0 && source.timeSamples < source.clip.samples - 256 ||
+                (source.isPlaying ||
                  source.loop ||
-                 source.isPlaying);
+                 (!source.loop && source.timeSamples > 0 && source.timeSamples < source.clip.samples - 256));
       }
 
 #if (!UNITY_WSA && !UNITY_XBOXONE) || UNITY_EDITOR
@@ -457,6 +457,9 @@ namespace Crosstales.Common.Util
       {
          if (!string.IsNullOrEmpty(path))
          {
+            if (isValidURL(path))
+               return path;
+
             string pathTemp = path.Trim();
             string result;
 
@@ -498,6 +501,9 @@ namespace Crosstales.Common.Util
       {
          if (!string.IsNullOrEmpty(path))
          {
+            if (isValidURL(path))
+               return path;
+
             string result = ValidatePath(path);
 
             if (result.CTEndsWith(BaseConstants.PATH_DELIMITER_WINDOWS) ||

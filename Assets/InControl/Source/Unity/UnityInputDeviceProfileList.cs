@@ -72,6 +72,7 @@ namespace InControl
 			"InControl.UnityDeviceProfiles.IpegaPG9037AndroidUnityProfile",
 			"InControl.UnityDeviceProfiles.IpegaPG9055AndroidUnityProfile",
 			"InControl.UnityDeviceProfiles.IpegaPG9068AndroidUnityProfile",
+			"InControl.UnityDeviceProfiles.IpegaPG9129AndroidUnityProfile",
 			"InControl.UnityDeviceProfiles.LevelUpBlackHawkWindowsUnityProfile",
 			"InControl.UnityDeviceProfiles.LogitechF310LinuxUnityProfile",
 			"InControl.UnityDeviceProfiles.LogitechF310ModeDMacUnityProfile",

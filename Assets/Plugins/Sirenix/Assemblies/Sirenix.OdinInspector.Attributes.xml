@@ -378,6 +378,11 @@
             <para>If this is set to false, the button method will instead be invoked through an ActionResolver or ValueResolver (based on whether it returns a value), giving access to contextual named parameter values like "InspectorProperty property" that can be passed to the button method.</para>
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.ButtonAttribute.DirtyOnClick">
+            <summary>
+            Whether the containing object or scene (if there is one) should be marked dirty when the button is clicked. True by default.
+            </summary>
+        </member>
         <member name="P:Sirenix.OdinInspector.ButtonAttribute.DrawResult">
             <summary>
             If the button has a return type, set this to false to not draw the result. Default value is true.
@@ -2073,6 +2078,11 @@
             Gets or sets the title for the dropdown. Null by default.
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.TypeFilterAttribute.DrawValueNormally">
+            <summary>
+            If true, the value will be drawn normally after the type selector dropdown has been drawn. False by default.
+            </summary>
+        </member>
         <member name="M:Sirenix.OdinInspector.TypeFilterAttribute.#ctor(System.String)">
             <summary>
             Creates a dropdown menu for a property.
@@ -2595,6 +2605,11 @@
             Gets or sets a value indicating whether this instance is read only.
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.DictionaryDrawerSettings.KeyColumnWidth">
+            <summary>
+            Gets or sets a value indicating the default key column width of the dictionary.
+            </summary>
+        </member>
         <member name="T:Sirenix.OdinInspector.DisableContextMenuAttribute">
             <summary>
             <para>DisableContextMenu is used on any property and disables the context menu for that property.</para>
@@ -2856,6 +2871,11 @@
         <member name="F:Sirenix.OdinInspector.InlineButtonAttribute.Label">
             <summary>
             Optional label of the button.
+            </summary>
+        </member>
+        <member name="F:Sirenix.OdinInspector.InlineButtonAttribute.ShowIf">
+            <summary>
+            Optional resolved string that specifies a condition for whether to show the inline button or not.
             </summary>
         </member>
         <member name="M:Sirenix.OdinInspector.InlineButtonAttribute.#ctor(System.String,System.String)">
@@ -4053,6 +4073,11 @@
             Whether adding a new element should copy the last element. False by default.
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.ListDrawerSettingsAttribute.ElementColor">
+            <summary>
+            A resolved string with "int index" and "Color defaultColor" parameters that lets you control the color of individual elements.
+            </summary>
+        </member>
         <member name="P:Sirenix.OdinInspector.ListDrawerSettingsAttribute.ShowPaging">
             <summary>
             Override the default setting specified in the Advanced Odin Preferences window and explicitly tell whether paging should be enabled or not.
@@ -4953,6 +4978,11 @@
             Whether to draw all child properties in a foldout.
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.ValueDropdownAttribute.CopyValues">
+            <summary>
+            Whether values selected by the value dropdown should be copies of the original or references (in the case of reference types). Defaults to true.
+            </summary>
+        </member>
         <member name="M:Sirenix.OdinInspector.ValueDropdownAttribute.#ctor(System.String)">
             <summary>
             Creates a dropdown menu for a property.
@@ -5513,9 +5543,10 @@
             Default message for invalid values.
             </summary>
         </member>
-        <member name="F:Sirenix.OdinInspector.ValidateInputAttribute.MemberName">
+        <member name="P:Sirenix.OdinInspector.ValidateInputAttribute.MemberName">
             <summary>
-            Name of callback function to validate input. The function must have at least one parameter of the same type as the property.
+            OBSOLETE; use the Condition member instead.
+            A resolved string that should evaluate to a boolean value, and which should validate the input. Note that in expressions, the $value named parameter, and in methods, a parameter named value, can be used to get the validated value instead of referring to the value by its containing member. This makes it easier to reuse validation strings.
             </summary>
         </member>
         <member name="F:Sirenix.OdinInspector.ValidateInputAttribute.Condition">

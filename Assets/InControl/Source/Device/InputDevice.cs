@@ -589,6 +589,9 @@ namespace InControl
 		}
 
 
+		public virtual void VibrateTriggers( float leftTrigger, float rightTrigger ) {}
+
+
 		public void StopVibration()
 		{
 			Vibrate( 0.0f );
@@ -976,6 +979,8 @@ namespace InControl
 			cachedDPadX = null;
 			cachedDPadY = null;
 			cachedCommand = null;
+			cachedLeftCommand = null;
+			cachedRightCommand = null;
 		}
 
 		#endregion

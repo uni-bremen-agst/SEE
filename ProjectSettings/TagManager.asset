@@ -24,7 +24,10 @@ TagManager:
   - JLG Visualization
   - Function Call
   - Runtime
+  - VRPointer
+  - FileBrowser
   - Path
+  - Erosion
   layers:
   - Default
   - TransparentFX

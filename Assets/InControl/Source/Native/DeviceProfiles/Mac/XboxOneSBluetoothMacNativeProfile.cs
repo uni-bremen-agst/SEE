@@ -31,6 +31,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.HID,
 					VendorID = 0x045e,
 					ProductID = 0x02fd,
 					// VersionNumber = 0x903,
@@ -126,7 +127,7 @@ namespace InControl.NativeDeviceProfiles
 				// new InputControlMapping
 				// {
 				// 	Name = "Guide",
-				// 	Target = InputControlType.System,
+				// 	Target = InputControlType.Guide,
 				// 	Source = Button( 0 ),
 				// 	Passive = true,
 				// }

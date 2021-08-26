@@ -228,6 +228,38 @@ namespace Michsky.UI.ModernUIPack
             }
         }
 
+        public void ShowCurrentWindow()
+        {
+            if (nextWindowAnimator == null)
+                currentWindowAnimator.Play(windowFadeIn);
+            else
+                nextWindowAnimator.Play(windowFadeIn);
+        }
+
+        public void HideCurrentWindow()
+        {
+            if (nextWindowAnimator == null)
+                currentWindowAnimator.Play(windowFadeOut);
+            else
+                nextWindowAnimator.Play(windowFadeOut);
+        }
+
+        public void ShowCurrentButton()
+        {
+            if (nextButtonAnimator == null)
+                currentButtonAnimator.Play(buttonFadeIn);
+            else
+                nextButtonAnimator.Play(buttonFadeIn);
+        }
+
+        public void HideCurrentButton()
+        {
+            if (nextButtonAnimator == null)
+                currentButtonAnimator.Play(buttonFadeOut);
+            else
+                nextButtonAnimator.Play(buttonFadeOut);
+        }
+
         public void AddNewItem()
         {
             WindowItem window = new WindowItem();

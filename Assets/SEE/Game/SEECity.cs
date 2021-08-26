@@ -64,7 +64,8 @@ namespace SEE.Game
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original LoadedGraph
-        /// if all node types are relevant. It is null if no graph has been loaded yet.
+        /// if all node types are relevant. It is null if no graph has been loaded yet
+        /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
         public Graph VisualizedSubGraph
         {
@@ -83,70 +84,26 @@ namespace SEE.Game
             }
         }
 
-        private static readonly Dictionary<string, SEECity> dict = new Dictionary<string, SEECity>();
-        public static SEECity GetByGraph(Graph graph)
-        {
-            SEECity result = null;
-
-            if (graph.Path != null)
-            {
-                if (!dict.TryGetValue(graph.Path, out result))
-                {
-                    if (graph.Name != null)
-                    {
-                        dict.TryGetValue(graph.Name, out result);
-                    }
-                }
-            }
-
-            return result;
-        }
-
         /// <summary>
-        /// Loads the graph from GXLPath() and sets all NodeRef components to the
-        /// loaded nodes if GXLPath() yields a valid filename. This "deserializes"
-        /// the graph to make it available at runtime.
+        /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
+        /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
+        /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
+        /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
+        /// nodes saved in the underlying GXL file.
         /// </summary>
         protected void Awake()
         {
-            string filename = GXLPath.Path;
+            LoadData();
+            loadedGraph = VisualizedSubGraph;
             if (loadedGraph != null)
             {
-                Debug.Log("SEECity.Awake: graph is already loaded.\n");
-            }
-            else if (!string.IsNullOrEmpty(filename))
-            {
-                loadedGraph = LoadGraph(filename);
-                if (loadedGraph != null)
-                {
-                    LoadMetrics();
-                    SetNodeEdgeRefs(loadedGraph, gameObject);
-                }
-                else
-                {
-                    Debug.LogError($"SEECity.Awake: Could not load GXL file {filename} of city {name}.\n");
-                }
+                SetNodeEdgeRefs(loadedGraph, gameObject);
             }
             else
             {
-                Debug.LogError($"SEECity.Awake: GXL file of city {name} is undefined.\n");
+                Debug.LogError($"SEECity.Awake: Could not load GXL file {GXLPath.Path} of city {name}.\n");
             }
-
-            if (loadedGraph != null)
-            {
-                if (dict.ContainsKey(filename))
-                {
-                    Debug.Log($"SEECity.Awake: Graph contained in {filename} of city {name} seems to exist twice.\n");
-                }
-                else
-                {
-                    dict.Add(filename, this);
-                }
-            }
-
-#if true
             RemoveTransparency();
-#endif
         }
 
         /// <summary>
@@ -162,9 +119,9 @@ namespace SEE.Game
                 if (meshRenderer)
                 {
                     Material material = meshRenderer.material;
-                    Color color = material.GetColor("_Color");
+                    Color color = material.GetColor(ColorProperty);
                     color.a = 1.0f;
-                    material.SetColor("_Color", color);
+                    material.SetColor(ColorProperty, color);
                 }
             }
             foreach (EdgeRef edgeRef in FindObjectsOfType<EdgeRef>())
@@ -173,9 +130,9 @@ namespace SEE.Game
                 if (lineRenderer)
                 {
                     Material material = lineRenderer.material;
-                    Color color = material.GetColor("_Color");
+                    Color color = material.GetColor(ColorProperty);
                     color.a = 1.0f;
-                    material.SetColor("_Color", color);
+                    material.SetColor(ColorProperty, color);
                 }
             }
         }
@@ -193,7 +150,7 @@ namespace SEE.Game
             if (loadedGraph != null)
             {
                 SetNodeEdgeRefs(loadedGraph, gameObject);
-                Debug.LogFormat("Node and edge references for {0} are resolved.\n", gameObject.name);
+                Debug.Log($"Node and edge references for {gameObject.name} are resolved.\n");
             }
             else
             {
@@ -261,12 +218,19 @@ namespace SEE.Game
         {
             string filename = CSVPath.Path;
             Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
-            int numberOfErrors = MetricImporter.Load(LoadedGraph, filename);
+            int numberOfErrors = MetricImporter.LoadCsv(LoadedGraph, filename);
             if (numberOfErrors > 0)
             {
                 Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
+            
+            // Substitute missing values from the dashboard
+            if (nodeLayoutSettings.loadDashboardMetrics)
+            {
+                MetricImporter.LoadDashboard(LoadedGraph, nodeLayoutSettings.overrideMetrics, 
+                nodeLayoutSettings.issuesAddedFromVersion).Forget();
+            }
         }
 
         /// <summary>
@@ -282,9 +246,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Loads the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath(). Afterwards, DrawGraph() can be used
-        /// to actually render the graph data.
+        /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
+        /// everything will be reset by calling <see cref="Reset"/>. 
+        /// Second, the graph data from the GXL file with GXLPath() and the metrics
+        /// from the CSV file with CSVPath() are loaded. The loaded graph is available
+        /// in <see cref="LoadedGraph"/> afterwards.
+        /// 
+        /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         public virtual void LoadData()
         {
@@ -381,6 +349,12 @@ namespace SEE.Game
         private GraphRenderer graphRenderer;
 
         /// <summary>
+        /// Color property of the shader. Lookups using this value are more efficient than lookups using the
+        /// string value "_Color".
+        /// </summary>
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+
+        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public GraphRenderer Renderer
@@ -423,10 +397,7 @@ namespace SEE.Game
         {
             base.Reset();
             // Delete the underlying graph.
-            if (loadedGraph != null)
-            {
-                loadedGraph.Destroy();
-            }
+            loadedGraph?.Destroy();
             LoadedGraph = null;
         }
 

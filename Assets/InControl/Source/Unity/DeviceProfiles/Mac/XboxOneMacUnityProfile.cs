@@ -114,7 +114,7 @@ namespace InControl.UnityDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "Guide",
-					Target = InputControlType.System,
+					Target = InputControlType.Guide,
 					Source = Button( 15 )
 				}
 			};

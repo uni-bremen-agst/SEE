@@ -1,6 +1,6 @@
 //
 //  RTVoiceIOSBridge.mm
-//  Version 2021.2.4
+//  Version 2021.2.5
 //
 //  Acts as a handler for all TTS functions called by RT-Voice on iOS.
 //

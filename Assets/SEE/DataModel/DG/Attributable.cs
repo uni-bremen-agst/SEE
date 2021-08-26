@@ -41,10 +41,7 @@ namespace SEE.DataModel.DG
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
-        public ICollection<string> ToggleAttributes
-        {
-            get => toggleAttributes;
-        }
+        public ICollection<string> ToggleAttributes => toggleAttributes;
 
         public void SetToggle(string attributeName)
         {
@@ -200,22 +197,22 @@ namespace SEE.DataModel.DG
             else
             {
                 Attributable otherAttributable = other as Attributable;
-                if (!toggleAttributes.SetEquals(otherAttributable.toggleAttributes))
+                if (!toggleAttributes.SetEquals(otherAttributable!.toggleAttributes))
                 {
                     Report("The toggle attributes are different");
                     return false;
                 }
-                else if (!AreEqual<string>(StringAttributes, otherAttributable.StringAttributes))
+                else if (!AreEqual(StringAttributes, otherAttributable.StringAttributes))
                 {
                     Report("The string attributes are different");
                     return false;
                 }
-                else if (!AreEqual<int>(IntAttributes, otherAttributable.IntAttributes))
+                else if (!AreEqual(IntAttributes, otherAttributable.IntAttributes))
                 {
                     Report("The int attributes are different");
                     return false;
                 }
-                else if (!AreEqual<float>(FloatAttributes, otherAttributable.FloatAttributes))
+                else if (!AreEqual(FloatAttributes, otherAttributable.FloatAttributes))
                 {
                     Report("The float attributes are different");
                     return false;
@@ -264,22 +261,22 @@ namespace SEE.DataModel.DG
 
             foreach (string attr in toggleAttributes)
             {
-                result += " \"" + attr + "\": true,\n";
+                result += $" \"{attr}\": true,\n";
             }
 
             foreach (KeyValuePair<string, string> attr in StringAttributes)
             {
-                result += " \"" + attr.Key + "\": \"" + attr.Value + "\",\n";
+                result += $" \"{attr.Key}\": \"{attr.Value}\",\n";
             }
 
             foreach (KeyValuePair<string, int> attr in IntAttributes)
             {
-                result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
+                result += $" \"{attr.Key}\": {attr.Value},\n";
             }
 
             foreach (KeyValuePair<string, float> attr in FloatAttributes)
             {
-                result += " \"" + attr.Key + "\": " + attr.Value + ",\n";
+                result += $" \"{attr.Key}\": {attr.Value},\n";
             }
             return result;
         }

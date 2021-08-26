@@ -336,7 +336,10 @@ namespace DG.DOTweenEditor
 //                _src.animationType = (DOTweenAnimation.AnimationType)EditorGUILayout.EnumPopup(_src.animationType, EditorGUIUtils.popupButton);
                 GUI.enabled = GUI.enabled && _src.isActive;
                 _src.animationType = AnimationToDOTweenAnimationType(_AnimationType[EditorGUILayout.Popup(DOTweenAnimationTypeToPopupId(_src.animationType), _AnimationType)]);
-                _src.autoPlay = DeGUILayout.ToggleButton(_src.autoPlay, new GUIContent("AutoPlay", "If selected, the tween will play automatically"));
+                _src.autoGenerate = DeGUILayout.ToggleButton(_src.autoGenerate, new GUIContent("AutoGenerate", "If selected, the tween will be generated at startup (during Start for RectTransform position tween, Awake for all the others)"));
+                if (_src.autoGenerate) {
+                    _src.autoPlay = DeGUILayout.ToggleButton(_src.autoPlay, new GUIContent("AutoPlay", "If selected, the tween will play automatically"));
+                }
                 _src.autoKill = DeGUILayout.ToggleButton(_src.autoKill, new GUIContent("AutoKill", "If selected, the tween will be killed when it completes, and won't be reusable"));
                 GUILayout.EndHorizontal();
                 if (prevAnimType != _src.animationType) {
@@ -381,6 +384,7 @@ namespace DG.DOTweenEditor
                         _src.optionalInt0 = 10;
                         _src.optionalFloat0 = 90;
                         _src.optionalBool0 = false;
+                        _src.optionalBool1 = true;
                         break;
                     case DOTweenAnimation.AnimationType.CameraAspect:
                     case DOTweenAnimation.AnimationType.CameraFieldOfView:
@@ -533,6 +537,7 @@ namespace DG.DOTweenEditor
                     canBeRelative = false;
                     _src.optionalInt0 = EditorGUILayout.IntSlider(new GUIContent("    Vibrato", "How much will the shake vibrate"), _src.optionalInt0, 1, 50);
                     _src.optionalFloat0 = EditorGUILayout.Slider(new GUIContent("    Randomness", "The shake randomness"), _src.optionalFloat0, 0, 90);
+                    _src.optionalBool1 = EditorGUILayout.Toggle(new GUIContent("    FadeOut", "If selected the shake will fade out, otherwise it will constantly play with full force"), _src.optionalBool1);
                     if (_src.animationType == DOTweenAnimation.AnimationType.ShakePosition) _src.optionalBool0 = EditorGUILayout.Toggle("    Snapping", _src.optionalBool0);
                     break;
                 case DOTweenAnimation.AnimationType.CameraAspect:

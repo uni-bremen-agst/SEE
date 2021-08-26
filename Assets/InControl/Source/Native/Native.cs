@@ -45,7 +45,11 @@ namespace InControl
 
 
 		[DllImport( libraryName, EntryPoint = "InControl_SetHapticState", CallingConvention = callingConvention )]
-		public static extern void SetHapticState( UInt32 handle, Byte motor0, Byte motor1 );
+		public static extern void SetHapticState( UInt32 handle, Byte lowFrequency, Byte highFrequency );
+
+
+		[DllImport( libraryName, EntryPoint = "InControl_SetTriggersHapticState", CallingConvention = callingConvention )]
+		public static extern void SetTriggersHapticState( UInt32 handle, Byte leftTrigger, Byte rightTrigger );
 
 
 		[DllImport( libraryName, EntryPoint = "InControl_SetLightColor", CallingConvention = callingConvention )]
@@ -71,7 +75,8 @@ namespace InControl
 		public static bool GetDeviceInfo( DeviceHandle handle, out InputDeviceInfo deviceInfo ) { deviceInfo = new InputDeviceInfo(); return false; }
 		public static bool GetDeviceState( DeviceHandle handle, out IntPtr deviceState ) { deviceState = IntPtr.Zero; return false; }
 		public static Int32 GetDeviceEvents( out IntPtr deviceEvents ) { deviceEvents = IntPtr.Zero; return 0; }
-		public static void SetHapticState( UInt32 handle, Byte motor0, Byte motor1 ) { }
+		public static void SetHapticState( UInt32 handle, Byte lowFrequency, Byte highFrequency ) { }
+		public static void SetTriggersHapticState( UInt32 handle, Byte leftTrigger, Byte rightTrigger ) { }
 		public static void SetLightColor( UInt32 handle, Byte red, Byte green, Byte blue ) { }
 		public static void SetLightFlash( UInt32 handle, Byte flashOnDuration, Byte flashOffDuration ) { }
 		public static UInt32 GetAnalogGlyphName( UInt32 handle, UInt32 index, out IntPtr glyphName ) { glyphName = IntPtr.Zero; return 0; }

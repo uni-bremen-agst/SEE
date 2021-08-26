@@ -1,7 +1,7 @@
-﻿using SEE.DataModel.DG;
-using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Tools
@@ -15,7 +15,7 @@ namespace SEE.Tools
     /// SeeCityRandomEditor.
     /// </summary>
     [Serializable]
-    public class RandomAttributeDescriptor : ConfigWriter.PersistentConfigItem
+    public class RandomAttributeDescriptor : ConfigIO.PersistentConfigItem
     {
         public RandomAttributeDescriptor()
         { }
@@ -73,8 +73,7 @@ namespace SEE.Tools
                 return false;
             }
 
-            bool result = false;
-            result = ConfigIO.Restore(values, NameLabel, ref Name) || result;
+            bool result = ConfigIO.Restore(values, NameLabel, ref Name);
             result = ConfigIO.Restore(values, MeanLabel, ref Mean) || result;
             result = ConfigIO.Restore(values, StandardDeviationLabel, ref StandardDeviation) || result;
             return result;
@@ -209,22 +208,22 @@ namespace SEE.Tools
             return graph;
         }
 
-        private void PrintStatistics(Graph graph, int leavesCount, int leafEdgesCount, int innerNodesCount, int innerEdgesCount)
+        private static void PrintStatistics(Graph graph, int leavesCount, int leafEdgesCount, int innerNodesCount, int innerEdgesCount)
         {
-            Debug.LogFormat("Number of nodes:       {0}\n", graph.NodeCount);
-            Debug.LogFormat("Number of leaf nodes:  {0}\n", leavesCount);
-            Debug.LogFormat("Number of inner nodes: {0}\n", innerNodesCount);
+            Debug.Log($"Number of nodes:       {graph.NodeCount}\n");
+            Debug.Log($"Number of leaf nodes:  {leavesCount}\n");
+            Debug.Log($"Number of inner nodes: {innerNodesCount}\n");
 
-            Debug.LogFormat("Number of edges:       {0}\n", graph.EdgeCount);
-            Debug.LogFormat("Number of leaf edges:  {0}\n", leafEdgesCount);
-            Debug.LogFormat("Leaf edge density:     {0}\n", leafEdgesCount / (float)leavesCount);
-            Debug.LogFormat("Number of inner edges: {0}\n", innerEdgesCount);
-            Debug.LogFormat("Inner edge density:    {0}\n", innerEdgesCount / (float)innerNodesCount);
+            Debug.Log($"Number of edges:       {graph.EdgeCount}\n");
+            Debug.Log($"Number of leaf edges:  {leafEdgesCount}\n");
+            Debug.Log($"Leaf edge density:     {leafEdgesCount / (float)leavesCount}\n");
+            Debug.Log($"Number of inner edges: {innerEdgesCount}\n");
+            Debug.Log($"Inner edge density:    {innerEdgesCount / (float)innerNodesCount}\n");
 
-            Debug.LogFormat("Maximal tree depth:    {0}\n", graph.MaxDepth);
+            Debug.Log($"Maximal tree depth:    {graph.MaxDepth}\n");
         }
 
-        private void AssignLeaves(Graph graph, ICollection<Node> leaves, IList<Node> innerNodes)
+        private static void AssignLeaves(Graph graph, IEnumerable<Node> leaves, IList<Node> innerNodes)
         {
             System.Random random = new System.Random(Seed);
             foreach (Node leaf in leaves)
@@ -245,7 +244,7 @@ namespace SEE.Tools
                 innerNodes.Add(CreateNode(graph, "Inner~" + i, innerNodeConstraint.NodeType));
             }
             // Create the tree.
-            int[] parent = RandomTrees.Random(innerNodeConstraint.NodeNumber, out int root);
+            int[] parent = RandomTrees.Random(innerNodeConstraint.NodeNumber, out int _);
             for (int i = 0; i < parent.Length; i++)
             {
                 if (parent[i] != -1)
@@ -257,7 +256,7 @@ namespace SEE.Tools
             return innerNodes;
         }
 
-        private ICollection<Edge> CreateEdges(Graph graph, ICollection<Node> nodes, Constraint constraint)
+        private static ICollection<Edge> CreateEdges(Graph graph, ICollection<Node> nodes, Constraint constraint)
         {
             System.Random random = new System.Random(Seed);
             ICollection<Edge> result = new List<Edge>();
@@ -284,7 +283,7 @@ namespace SEE.Tools
             return leaves;
         }
 
-        private void CreateAttributes(ICollection<Node> nodes, ICollection<RandomAttributeDescriptor> attributes)
+        private void CreateAttributes(IEnumerable<Node> nodes, ICollection<RandomAttributeDescriptor> attributes)
         {
             System.Random random = new System.Random(Seed);
 
@@ -307,15 +306,15 @@ namespace SEE.Tools
             return nodes;
         }
 
-        private Node CreateNode(Graph graph, string linkname, string type)
+        private static Node CreateNode(Graph graph, string linkName, string type)
         {
             Node result = new Node
             {
-                ID = linkname,
-                SourceName = linkname,
+                ID = linkName,
+                SourceName = linkName,
                 Type = type
             };
-            result.SetString(Node.LinknameAttribute, linkname);
+            result.SetString(Node.LinknameAttribute, linkName);
             graph.AddNode(result);
             return result;
         }
@@ -323,12 +322,12 @@ namespace SEE.Tools
 
         /// <summary>
         /// Returns a random number drawn from a normal distribution with given 
-        /// <paramref name="mean"/> and standard deviation <paramref name="stddev"/>.
+        /// <paramref name="mean"/> and <paramref name="standardDeviation"/>.
         /// </summary>
         /// <param name="mean">mean of the normal distribution</param>
-        /// <param name="stddev">standard deviation of the normal distribution</param>
+        /// <param name="standardDeviation">standard deviation of the normal distribution</param>
         /// <returns>random number drawn from a normal distribution</returns>
-        private float RandomGaussian(System.Random random, float mean, float stddev)
+        private static float RandomGaussian(System.Random random, float mean, float standardDeviation)
         {
             // Using two random variables, you can generate random values along a Gaussian 
             // distribution using the Box-Muller transformation.
@@ -338,7 +337,7 @@ namespace SEE.Tools
             double x2 = 1.0 - random.NextDouble();
 
             double y1 = Math.Sqrt(-2.0 * Math.Log(x1)) * Math.Cos(2.0 * Math.PI * x2); //random normal(0,1)
-            return (float)y1 * stddev + mean; //random normal(mean,stdDev^2)
+            return (float)y1 * standardDeviation + mean; //random normal(mean,stdDev^2)
         }
     }
 }

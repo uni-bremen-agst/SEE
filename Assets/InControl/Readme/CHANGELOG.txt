@@ -1,3 +1,12 @@
+### v1.8.5
+* Added support for additional Game Controller framework (MFi) controllers.
+* Added vibration support for Game Controller framework (MFi).
+* Fixed issue with PS5 controllers connected with bluetooth on Windows with native input plugin.
+* Fixed PS4 and PS5 bumper and trigger names on Windows native input to match controller labels: L1, R1, L2 and R2.
+* Fixed regression in managed XInput plugin that switched `View` and `Menu` controls.
+* Added `Ipega PG9129` profile for Android.
+* Updated a few Linux profiles.
+
 ### v1.8.4
 * Added `InputControlType.LeftCommand` and `InputControlType.RightCommand` aliases. Where possible, for devices with a correct `DeviceStyle`, it will map appropriately to the command buttons based on location, for example: `Back` and `Right` for Xbox 360, `View` and `Menu` for Xbox One, `Share` and `Options` for Dual Shock 4, etc.
 * Added support for querying control glyph names for controllers using Apple's Game Controller framework exposed through the native input module. To use, cast the device to `NativeInputDevice` and call the `GetAppleGlyphNameForControl()` method. Note: some controls may have no glyph name, but primary controls generally do.

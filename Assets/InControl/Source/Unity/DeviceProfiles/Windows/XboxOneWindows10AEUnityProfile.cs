@@ -103,7 +103,7 @@ namespace InControl.UnityDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "Guide",
-					Target = InputControlType.System,
+					Target = InputControlType.Guide,
 					Source = Button( 10 ),
 				},
 			};
@@ -207,7 +207,7 @@ namespace InControl.UnityDeviceProfiles
 					TargetRange = InputRangeType.ZeroToOne,
 				},
 
-#if !UNITY_2018_3_OR_NEWER
+				#if !UNITY_2018_3_OR_NEWER
 				new InputControlMapping
 				{
 					Name = "Left Trigger",
@@ -224,7 +224,7 @@ namespace InControl.UnityDeviceProfiles
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
-#endif
+				#endif
 
 				new InputControlMapping
 				{

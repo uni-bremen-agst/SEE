@@ -152,7 +152,7 @@ MonoBehaviour:
   ZScoreScale: 1
   EdgeWidth: 0.3
   ShowErosions: 0
-  MaxErosionWidth: 1
+  ErosionScalingFactor: 1
   EdgesAboveBlocks: 1
   Tension: 0.85
   RDP: 0.05

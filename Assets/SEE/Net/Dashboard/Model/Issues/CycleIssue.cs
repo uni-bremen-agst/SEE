@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Utils;
 using Valve.Newtonsoft.Json;
 
@@ -111,6 +112,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         public override string IssueKind => "CY";
+
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.Cycle;
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {

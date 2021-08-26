@@ -99,10 +99,10 @@ namespace SEE.Controls.Actions
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
-                int line = selectedNode.Value.SourceLine();
-                if (line != 0)
+                int? line = selectedNode.Value.SourceLine();
+                if (line.HasValue)
                 {
-                    codeWindow.VisibleLine = line;
+                    codeWindow.VisibleLine = line.Value;
                 }
                     
                 // Add code window to our space of code window, if it isn't in there yet

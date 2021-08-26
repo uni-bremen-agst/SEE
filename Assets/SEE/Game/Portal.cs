@@ -10,6 +10,16 @@ namespace SEE.Game
     public static class Portal
     {
         /// <summary>
+        /// Cached property index for the _PortalMin shader property.
+        /// </summary>
+        private static readonly int PortalMin = Shader.PropertyToID("_PortalMin");
+        
+        /// <summary>
+        /// Cached property index for the _PortalMax shader property.
+        /// </summary>
+        private static readonly int PortalMax = Shader.PropertyToID("_PortalMax");
+
+        /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
         /// complete area of <paramref name="parent"/>.
         /// 
@@ -39,7 +49,7 @@ namespace SEE.Game
         /// <param name="rightBackCorner">the right back corner in the X/Z plane of the plane component</param>
         public static void GetDimensions(GameObject gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner)
         {
-            if (gameObject.TryGetComponent<GO.Plane>(out GO.Plane cullingPlane))
+            if (gameObject.TryGetComponent(out GO.Plane cullingPlane))
             {
                 leftFrontCorner = cullingPlane.LeftFrontCorner;
                 rightBackCorner = cullingPlane.RightBackCorner;
@@ -100,19 +110,22 @@ namespace SEE.Game
 
         private static void SetPortalOfMaterials(GameObject go, Vector2 leftFront, Vector2 rightBack)
         {
-            if (go.TryGetComponent<Renderer>(out Renderer renderer))
+            if (go.TryGetComponent(out Renderer renderer))
             {
                 foreach (Material material in renderer.sharedMaterials)
                 {
                     SetPortal(leftFront, rightBack, material);
                 }
+            } else
+            {
+                Debug.LogError($"No Renderer found for '{go.name}'!");
             }
         }
 
         private static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
         {
-            material.SetVector("_PortalMin", new Vector4(leftFrontCorner.x, leftFrontCorner.y));
-            material.SetVector("_PortalMax", new Vector4(rightBackCorner.x, rightBackCorner.y));
+            material.SetVector(PortalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
+            material.SetVector(PortalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
         
     }

@@ -69,6 +69,7 @@ namespace InControl
 		Minus,
 		Create,
 		Mute,
+		Guide,
 
 		// Steering controls.
 		PedalLeft = 150,
@@ -95,6 +96,12 @@ namespace InControl
 		TiltX = 250,
 		TiltY,
 		TiltZ,
+		GyroscopeX = TiltX,
+		GyroscopeY = TiltY,
+		GyroscopeZ = TiltZ,
+		AccelerometerX,
+		AccelerometerY,
+		AccelerometerZ,
 		ScrollWheel,
 
 		[Obsolete( "Use InputControlType.TouchPadButton instead.", true )]
@@ -109,6 +116,11 @@ namespace InControl
 		LeftSR,
 		RightSL,
 		RightSR,
+
+		Paddle1,
+		Paddle2,
+		Paddle3,
+		Paddle4,
 
 		// Alias controls; can't be explicitly mapped in a profile.
 		//

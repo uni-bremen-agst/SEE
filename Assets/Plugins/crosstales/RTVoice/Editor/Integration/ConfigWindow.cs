@@ -172,9 +172,7 @@ namespace Crosstales.RTVoice.EditorIntegration
             GUILayout.Label(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds the '" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
-            {
                EditorHelper.InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
-            }
 
             GUI.enabled = true;
 
@@ -185,9 +183,7 @@ namespace Crosstales.RTVoice.EditorIntegration
             GUILayout.Label(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a '" + Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
-            {
                EditorHelper.InstantiatePrefab(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
-            }
 
             GUI.enabled = true;
 
@@ -196,63 +192,63 @@ namespace Crosstales.RTVoice.EditorIntegration
             GUILayout.Label("AudioFileGenerator");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'AudioFileGenerator'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("AudioFileGenerator");
-            }
+               EditorHelper.InstantiatePrefab("AudioFileGenerator", $"{EditorConfig.ASSET_PATH}Extras/AudioFileGenerator/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("Paralanguage");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Paralanguage'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("Paralanguage");
-            }
+               EditorHelper.InstantiatePrefab("Paralanguage", $"{EditorConfig.ASSET_PATH}Extras/Paralanguage/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("Sequencer");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Sequencer'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("Sequencer");
-            }
+               EditorHelper.InstantiatePrefab("Sequencer", $"{EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("SpeechText");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SpeechText'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("SpeechText");
-            }
+               EditorHelper.InstantiatePrefab("SpeechText", $"{EditorConfig.ASSET_PATH}Extras/SpeechText/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("TextFileSpeaker");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'TextFileSpeaker'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("TextFileSpeaker");
-            }
+               EditorHelper.InstantiatePrefab("TextFileSpeaker", $"{EditorConfig.ASSET_PATH}Extras/TextFileSpeaker/Resources/Prefabs/");
 
             EditorHelper.SeparatorUI();
 
             GUILayout.Label("Loudspeaker");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Loudspeaker'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("Loudspeaker");
-            }
+               EditorHelper.InstantiatePrefab("Loudspeaker", $"{EditorConfig.ASSET_PATH}Extras/Loudspeaker/Resources/Prefabs/");
 
             EditorHelper.SeparatorUI();
 
             GUILayout.Label("VoiceInitializer");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'VoiceInitializer'-prefab to the scene.")))
-            {
-               EditorHelper.InstantiatePrefab("VoiceInitializer");
-            }
+               EditorHelper.InstantiatePrefab("VoiceInitializer", $"{EditorConfig.ASSET_PATH}Extras/VoiceInitializer/Resources/Prefabs/");
+
+            EditorHelper.SeparatorUI();
+
+            GUILayout.Label("MaryTTS");
+
+            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'MaryTTS'-prefab to the scene.")))
+               EditorHelper.InstantiatePrefab("MaryTTS", $"{EditorConfig.ASSET_PATH}Extras/MaryTTS/Resources/Prefabs/");
+
+            GUILayout.Space(6);
+
+            GUILayout.Label("SAPI Unity");
+
+            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SAPI Unity'-prefab to the scene.")))
+               EditorHelper.InstantiatePrefab("SAPI Unity", $"{EditorConfig.ASSET_PATH}Extras/SAPI Unity/Resources/Prefabs/");
 
             GUILayout.Space(6);
          }

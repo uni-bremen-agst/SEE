@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 namespace InControl
 {
 	// Not all of these are necessarily used or supported.
@@ -33,3 +34,4 @@ namespace InControl
 		Oculus,
 	}
 }
+

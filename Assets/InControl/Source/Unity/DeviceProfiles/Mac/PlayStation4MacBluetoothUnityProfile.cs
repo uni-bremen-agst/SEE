@@ -28,7 +28,8 @@ namespace InControl.UnityDeviceProfiles
 			Matchers = new[]
 			{
 				new InputDeviceMatcher { NameLiteral = "Unknown Wireless Controller" },
-				new InputDeviceMatcher { NameLiteral = "Sony Interactive Entertainment DUALSHOCK" + RegistrationMark + "4 USB Wireless Adaptor" }
+				new InputDeviceMatcher { NameLiteral = "Sony Interactive Entertainment DUALSHOCK" + RegistrationMark + "4 USB Wireless Adaptor" },
+				new InputDeviceMatcher { NameLiteral = "Unknown DUALSHOCK 4 Wireless Controller" }
 			};
 
 			ButtonMappings = new[]
