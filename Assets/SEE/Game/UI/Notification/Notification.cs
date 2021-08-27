@@ -158,7 +158,6 @@ namespace SEE.Game.UI.Notification
 
         protected override void UpdateDesktop()
         {
-            Debug.Log("HI");
             // We only perform this expensive comparison once every 50 frames, if necessary
             if (DestroyAfterPlaying && ++frames % 50 == 0 && manager == null)
             {
