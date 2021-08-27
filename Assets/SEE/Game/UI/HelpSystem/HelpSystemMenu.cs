@@ -101,12 +101,27 @@ namespace SEE.Game.UI.HelpSystem
             searchNode.AddLast(new LinkedListEntry(5, "If you left click on one node entry, the respective node will be highlighted", 23));
             searchNode.AddLast(new LinkedListEntry(6, "The node is blinking and a light beam strikes for a few seconds", 30));
 
-
-            LinkedList<LinkedListEntry> simpleNav = new LinkedList<LinkedListEntry>();
+            LinkedList<LinkedListEntry> simpleNavigation = new LinkedList<LinkedListEntry>();
+            simpleNavigation.AddLast(new LinkedListEntry(1, "To switch your point of view, hold the mouse button and move the mouse", 0));
+            simpleNavigation.AddLast(new LinkedListEntry(2, "Press Key W or S to move forwards or backwards", 10));
+            simpleNavigation.AddLast(new LinkedListEntry(3, "If your view is unlocked, you can move to the right or left with Key A or D", 20));
 
             LinkedList<LinkedListEntry> switchTable = new LinkedList<LinkedListEntry>();
+            switchTable.AddLast(new LinkedListEntry(1, "By default, your focussed view is locked on the architecture-table", 0));
+            switchTable.AddLast(new LinkedListEntry(2, "Press key L for unlock your view to move free in space", 10));
+            switchTable.AddLast(new LinkedListEntry(3, "Now you can move free in space to other tables", 20));
+            switchTable.AddLast(new LinkedListEntry(4, "If you press key L again, your view is focussed on the architecture again", 28));
 
             LinkedList<LinkedListEntry> zoomIntoCity = new LinkedList<LinkedListEntry>();
+            zoomIntoCity.AddLast(new LinkedListEntry(1, "Hover with the mouse over the city you want to zoom into", 0));
+            zoomIntoCity.AddLast(new LinkedListEntry(2, "Now, you can scroll the mouse wheel up for zooming", 5));
+            zoomIntoCity.AddLast(new LinkedListEntry(3, "The zooming is focussed on the mouse pointer", 10));
+            zoomIntoCity.AddLast(new LinkedListEntry(2, "If you want to zoom out, scroll with the mouse wheel down", 15));
+            zoomIntoCity.AddLast(new LinkedListEntry(2, "If the city is not centered anymore, press key R to reset the layout to centered", 26));
+
+            LinkedList<LinkedListEntry> hideNode1 = new LinkedList<LinkedListEntry>();
+
+            LinkedList<LinkedListEntry> playEvolution = new LinkedList<LinkedListEntry>();
 
             // Important note: You have to define the lowest hierachy-level first. 
             // That means, the mainMenu will be defined at the end and the lowest entry-list first.
@@ -126,13 +141,13 @@ namespace SEE.Game.UI.HelpSystem
 
             playerNavigationEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/AddEdge.mp4", switchTable, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/EditNode.mp4", simpleNav, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/toggleFocus.mp4", switchTable, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/navigation.mp4", simpleNavigation, entry),
             };
 
             cityNavigationEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/AddEdge.mp4", zoomIntoCity, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
             }; 
 
             navigationEntries = new List<MenuEntry>
