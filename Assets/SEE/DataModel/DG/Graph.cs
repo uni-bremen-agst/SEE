@@ -582,7 +582,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         internal void FinalizeNodeHierarchy()
         {
-            Assert.IsTrue(NodeHierarchyHasChanged);
+            //Assert.IsTrue(NodeHierarchyHasChanged);
             GatherRoots();
             CalculateLevels();
             maxDepth = CalcMaxDepth(roots, -1);

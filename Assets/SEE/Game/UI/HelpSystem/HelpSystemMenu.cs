@@ -60,7 +60,6 @@ namespace SEE.Game.UI.HelpSystem
             PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
 
             // Initialisation of all Lists for the NestedMenuEntries or MenuEntries.
-
             List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
             List<MenuEntry> architectureEntries = new List<MenuEntry>();
             List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
@@ -91,7 +90,7 @@ namespace SEE.Game.UI.HelpSystem
             editNode.AddLast(new LinkedListEntry(4, "You can see all editable metrics inside of this new window", 21));
             editNode.AddLast(new LinkedListEntry(5, "Insert new values, if so desired", 25));
             editNode.AddLast(new LinkedListEntry(6, "Finish the editing process by pushing the Okay button", 30));
-            editNode.AddLast(new LinkedListEntry(6, "Your newly inserted values are now visible", 34));
+            editNode.AddLast(new LinkedListEntry(7, "Your newly inserted values are now visible", 34));
 
             LinkedList<LinkedListEntry> searchNode = new LinkedList<LinkedListEntry>();
             searchNode.AddLast(new LinkedListEntry(1, "Press key F for opening the search menu", 0));
@@ -102,7 +101,7 @@ namespace SEE.Game.UI.HelpSystem
             searchNode.AddLast(new LinkedListEntry(6, "The node is blinking and a light beam strikes for a few seconds", 30));
 
             LinkedList<LinkedListEntry> simpleNavigation = new LinkedList<LinkedListEntry>();
-            simpleNavigation.AddLast(new LinkedListEntry(1, "To switch your point of view, hold the mouse button and move the mouse", 0));
+            simpleNavigation.AddLast(new LinkedListEntry(1, "To switch your point of view, hold the right mouse button and move the mouse", 0));
             simpleNavigation.AddLast(new LinkedListEntry(2, "Press Key W or S to move forwards or backwards", 10));
             simpleNavigation.AddLast(new LinkedListEntry(3, "If your view is unlocked, you can move to the right or left with Key A or D", 20));
 
@@ -114,10 +113,10 @@ namespace SEE.Game.UI.HelpSystem
 
             LinkedList<LinkedListEntry> zoomIntoCity = new LinkedList<LinkedListEntry>();
             zoomIntoCity.AddLast(new LinkedListEntry(1, "Hover with the mouse over the city you want to zoom into", 0));
-            zoomIntoCity.AddLast(new LinkedListEntry(2, "Now, you can scroll the mouse wheel up for zooming", 5));
+            zoomIntoCity.AddLast(new LinkedListEntry(2, "Now, you can scroll the mouse wheel up for zooming", 6));
             zoomIntoCity.AddLast(new LinkedListEntry(3, "The zooming is focussed on the mouse pointer", 10));
-            zoomIntoCity.AddLast(new LinkedListEntry(2, "If you want to zoom out, scroll with the mouse wheel down", 15));
-            zoomIntoCity.AddLast(new LinkedListEntry(2, "If the city is not centered anymore, press key R to reset the layout to centered", 26));
+            zoomIntoCity.AddLast(new LinkedListEntry(4, "If you want to zoom out, scroll with the mouse wheel down", 15));
+            zoomIntoCity.AddLast(new LinkedListEntry(5, "If the city is not centered anymore, press key R to reset the layout to centered", 26));
 
             LinkedList<LinkedListEntry> hideNode1 = new LinkedList<LinkedListEntry>();
 
@@ -148,12 +147,12 @@ namespace SEE.Game.UI.HelpSystem
             cityNavigationEntries = new List<MenuEntry>
             {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
-            }; 
+            };
 
             navigationEntries = new List<MenuEntry>
             {
-                HelpSystemBuilder.CreateNewRefEntry(playerNavigationEntries,"Player navigation", "How to navigate in SEE", Color.green),
-                HelpSystemBuilder.CreateNewRefEntry(cityNavigationEntries, "City navigation", "How to navigate a code city", Color.green)
+            HelpSystemBuilder.CreateNewRefEntry(playerNavigationEntries,"Player navigation", "How to navigate in SEE", Color.green),
+            HelpSystemBuilder.CreateNewRefEntry(cityNavigationEntries, "City navigation", "How to navigate a code city", Color.green)
             };
 
             mainMenuEntries = new List<MenuEntry>
