@@ -1450,10 +1450,11 @@ namespace SEE.Game
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
+            Assert.IsNull(gameNode.transform.parent);
             NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
             if (nodeRef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
 
             Node node = nodeRef.Value;
@@ -1469,9 +1470,11 @@ namespace SEE.Game
                     // kind of layout was applied.
                     // In case of treemaps, the width metric is mapped on the ground area.
                     float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactories[(int)node.Domain].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetHeight(gameNode, NodeFactory.Unit * scale.y);
+                    // FIXME (Bug): scale.x is a value relative to the space that was made available for
+                    // the treemap layout; it is not the original absolute metric value, is it?
+                    Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare) * NodeFactory.Unit;
+                    Debug.Log($"adjusting scale of leaf {gameNode.name} to {targetScale} with x-metric {scale.x} and y-metric {scale.y}\n");
+                    leafNodeFactories[(int)node.Domain].SetSize(gameNode, targetScale);
                 }
                 else
                 {
@@ -1480,7 +1483,7 @@ namespace SEE.Game
             }
             else
             {
-                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                throw new Exception($"Game object {gameNode.name} is not a leaf.");
             }
         }
 
@@ -1517,7 +1520,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adjusts the scale of every node of every kind of node, such that the maximal extent
+        /// Adjusts the scale of every node of every kind of domain such that the maximal extent
         /// of each node is one.
         /// </summary>
         /// <param name="nodeMap">The nodes to scale.</param>
