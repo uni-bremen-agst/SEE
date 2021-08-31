@@ -1523,8 +1523,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1533,9 +1533,9 @@ MonoBehaviour:
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: 0
+  m_characterSpacing: -8.61
   m_wordSpacing: -11.22
-  m_lineSpacing: 67.65
+  m_lineSpacing: 75.27
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -2961,7 +2961,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3888421259579410364}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.15141378
+  m_Size: 0.15511483
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3437,7 +3437,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2091764259962037311}
   m_Direction: 2
   m_Value: 0.99999994
-  m_Size: 0.24700974
+  m_Size: 0.21376377
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

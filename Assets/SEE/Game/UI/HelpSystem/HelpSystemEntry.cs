@@ -197,7 +197,7 @@ namespace SEE.Game.UI.HelpSystem
             dynamicPanel.sizeDelta = new Vector2(550, 425); 
             helpSystemEntry.transform.Find("Content/Lower Video/Scrollable/Code")
               .gameObject.TryGetComponentOrLog(out text);
-            text.fontSize = 25;
+            text.fontSize = 20;
 
             helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
             manager.clickEvent.AddListener(Back);
@@ -342,6 +342,7 @@ namespace SEE.Game.UI.HelpSystem
             {
                 throw new Exception("No Video-Player found");
             }
+            audioSource.Stop();
             videoPlayer.Stop();
             HelpSystemMenu.IsEntryOpened = false;
             EntryShown = false;

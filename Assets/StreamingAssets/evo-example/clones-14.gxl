@@ -1,0 +1,2043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Clones" edgeids="true">
+    <node id="N1">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1305</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>243</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>FlyCamera.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Camera/FlyCamera.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>FlyCamera.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Camera/</string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>Camera</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Camera/Assets</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>Assets</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets</string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1115</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>179</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CityEditor.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Editor/CityEditor.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CityEditor.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Editor/</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>Editor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Editor/Assets</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>44</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>14</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>ImportProcessor.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Editor/ImportProcessor.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ImportProcessor.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Editor/</string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>112</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>16</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SEEEditor.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Editor/SEEEditor.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SEEEditor.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Editor/</string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>2972</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>482</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SerializableDictionaryPropertyDrawer.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Editor/SerializableDictionaryPropertyDrawer.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SerializableDictionaryPropertyDrawer.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Editor/</string>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>31</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>13</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>UnityEditorStartup.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/Editor/UnityEditorStartup.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>UnityEditorStartup.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/Editor/</string>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>810</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>113</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>LeapMovementSEE.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/LeapMovementSEE.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>LeapMovementSEE.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/</string>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>525</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>118</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Attributable.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/Attributable.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Attributable.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N12">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>DataModel</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>DataModel/SEECity/Assets</string>
+      </attr>
+    </node>
+    <node id="N13">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>SEECity</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>SEECity/Assets</string>
+      </attr>
+    </node>
+    <node id="N14">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>121</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>32</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Edge.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/Edge.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Edge.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N15">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1553</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>372</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>GXLParser.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/GXLParser.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>GXLParser.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>796</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>165</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Graph.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/Graph.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Graph.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N17">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>90</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>GraphElement.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/GraphElement.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>GraphElement.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N18">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1099</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>317</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>GraphReader.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/GraphReader.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>GraphReader.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N19">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>383</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>89</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>GraphSettings.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/GraphSettings.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>GraphSettings.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N20">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>534</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>102</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>MetricAggregator.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/MetricAggregator.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MetricAggregator.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N21">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>479</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>101</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>MetricImporter.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/MetricImporter.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MetricImporter.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N22">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>497</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>135</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Node.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/Node.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Node.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N23">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>StringFloatDictionary.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/StringFloatDictionary.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>StringFloatDictionary.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N24">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>StringIntDictionary.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/StringIntDictionary.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>StringIntDictionary.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N25">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>StringNodeDictionary.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/StringNodeDictionary.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>StringNodeDictionary.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N26">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>StringStringDictionary.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/StringStringDictionary.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>StringStringDictionary.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N27">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>106</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Tags.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/Tags.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Tags.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N28">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>56</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>UnknownAttribute.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/DataModel/UnknownAttribute.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>UnknownAttribute.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/DataModel/</string>
+      </attr>
+    </node>
+    <node id="N29">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>442</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>79</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>BSplineFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/BSplineFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>BSplineFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N30">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>Layout</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Layout/SEECity/Assets</string>
+      </attr>
+    </node>
+    <node id="N31">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1014</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>174</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>BalloonNodeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/BalloonNodeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>BalloonNodeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N32">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1153</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>208</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>BuildingFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/BuildingFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>BuildingFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N33">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1244</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>191</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>BundledEdgeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/BundledEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>BundledEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N34">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>303</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>48</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.478548</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CircleDecorator.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/CircleDecorator.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CircleDecorator.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N35">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>364</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>59</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.398352</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CircleFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/CircleFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CircleFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N36">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>609</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>90</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CirclePackingNodeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/CirclePackingNodeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CirclePackingNodeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N37">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>388</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>77</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CubeFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/CubeFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CubeFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N38">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>94</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>22</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>CylinderFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/CylinderFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>CylinderFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N39">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>316</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>52</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>DonutDecorator.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/DonutDecorator.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>DonutDecorator.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N40">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>2826</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>305</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>DonutFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/DonutFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>DonutFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N41">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>EdgeRef.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/EdgeRef.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>EdgeRef.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N42">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>437</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>66</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>ErosionIssues.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/ErosionIssues.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ErosionIssues.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N43">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1855</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>307</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>GraphRenderer.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/GraphRenderer.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>GraphRenderer.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N44">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>368</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>76</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>IEdgeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/IEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>IEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N45">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>300</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>56</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>IScale.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/IScale.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>IScale.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N46">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>574</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>113</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>IconFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/IconFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>IconFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N47">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>30</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>InnerNodeFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/InnerNodeFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>InnerNodeFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N48">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1277</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>206</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>LCAFinder.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/LCAFinder.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>LCAFinder.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N49">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>917</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>167</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>LCAFinderTest.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/LCAFinderTest.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>LCAFinderTest.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N50">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>230</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>47</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>LineFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/LineFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>LineFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N51">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>165</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>39</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>LinearScale.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/LinearScale.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>LinearScale.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N52">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>267</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>51</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>ManhattenLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/ManhattenLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ManhattenLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N53">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>97</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>23</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Materials.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/Materials.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Materials.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N54">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1383</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>179</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>MyCirclePacker.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/MyCirclePacker.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>MyCirclePacker.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N55">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>422</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>68</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/NodeFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N56">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>251</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>49</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/NodeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N57">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>33</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>12</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeRef.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/NodeRef.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeRef.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N58">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>219</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>45</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeToIntegerMap.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/NodeToIntegerMap.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeToIntegerMap.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N59">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>70</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>19</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeTransform.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/NodeTransform.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeTransform.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N60">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>99</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Pair.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/Pair.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Pair.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N61">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>332</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>52</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>PlaneFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/PlaneFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>PlaneFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N62">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>289</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>44</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SplineEdgeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/SplineEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SplineEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N63">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SpringEmbedderLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/SpringEmbedderLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SpringEmbedderLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N64">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>544</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>80</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>StraightEdgeLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/StraightEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>StraightEdgeLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N65">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>200</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>36</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TextFacingCamera.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/TextFacingCamera.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TextFacingCamera.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N66">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>252</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>41</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TextFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/TextFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TextFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N67">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1425</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>193</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TreemapLayout.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/TreemapLayout.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TreemapLayout.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N68">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>52</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>17</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>VanillaFactory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/VanillaFactory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>VanillaFactory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N69">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>595</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>116</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>ZScoreScale.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Layout/ZScoreScale.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ZScoreScale.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Layout/</string>
+      </attr>
+    </node>
+    <node id="N70">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>379</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>76</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SceneGraphs.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/SceneGraphs.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SceneGraphs.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/</string>
+      </attr>
+    </node>
+    <node id="N71">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>51</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>18</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>DestroyGameObject.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/DestroyGameObject.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>DestroyGameObject.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N72">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>Utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Utils/SEECity/Assets</string>
+      </attr>
+    </node>
+    <node id="N73">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>113</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>28</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>FramesPerSeconds.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/FramesPerSeconds.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>FramesPerSeconds.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N74">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>57</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>ILogger.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/ILogger.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>ILogger.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N75">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>177</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>34</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>Performance.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/Performance.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>Performance.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N76">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>62</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>20</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SEELogger.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/SEELogger.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SEELogger.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N77">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>597</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>103</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SerializableDictionary.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SEECity/Utils/SerializableDictionary.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SerializableDictionary.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/SEECity/Utils/</string>
+      </attr>
+    </node>
+    <node id="N78">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>159</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>25</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>SelectBuilding.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Assets/SelectBuilding.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>SelectBuilding.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>Assets/</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N2" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E2" from="N1" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E3" from="N5" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E4" from="N4" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E5" from="N6" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E6" from="N7" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E7" from="N8" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E8" from="N9" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E9" from="N10" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E10" from="N13" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E11" from="N12" to="N13">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E12" from="N11" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E13" from="N14" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E14" from="N15" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E15" from="N16" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E16" from="N17" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E17" from="N18" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E18" from="N19" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E19" from="N20" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E20" from="N21" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E21" from="N22" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E22" from="N23" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E23" from="N24" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E24" from="N25" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E25" from="N26" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E26" from="N27" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E27" from="N28" to="N12">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E28" from="N30" to="N13">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E29" from="N29" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E30" from="N31" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E31" from="N32" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E32" from="N33" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E33" from="N34" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E34" from="N35" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E35" from="N36" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E36" from="N37" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E37" from="N38" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E38" from="N39" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E39" from="N40" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E40" from="N41" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E41" from="N42" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E42" from="N43" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E43" from="N44" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E44" from="N45" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E45" from="N46" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E46" from="N47" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E47" from="N48" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E48" from="N49" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E49" from="N50" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E50" from="N51" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E51" from="N52" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E52" from="N53" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E53" from="N54" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E54" from="N55" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E55" from="N56" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E56" from="N57" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E57" from="N58" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E58" from="N59" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E59" from="N60" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E60" from="N61" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E61" from="N62" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E62" from="N63" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E63" from="N64" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E64" from="N65" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E65" from="N66" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E66" from="N67" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E67" from="N68" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E68" from="N69" to="N30">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E69" from="N70" to="N13">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E70" from="N72" to="N13">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E71" from="N71" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E72" from="N73" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E73" from="N74" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E74" from="N75" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E75" from="N76" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E76" from="N77" to="N72">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E77" from="N78" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E78" from="N34" to="N35">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>78</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>71</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>101</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>58</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>37</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>83</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>24</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>145</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>1</int>
+      </attr>
+    </edge>
+  </graph>
+</gxl>
