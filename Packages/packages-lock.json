@@ -105,11 +105,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "10.5.1",
+      "version": "10.6.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.render-pipelines.core": "10.5.1",
+        "com.unity.render-pipelines.core": "10.6.0",
         "com.unity.searcher": "4.3.2"
       },
       "url": "https://packages.unity.com"
