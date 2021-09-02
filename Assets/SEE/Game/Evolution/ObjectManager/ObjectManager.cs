@@ -30,8 +30,8 @@ namespace SEE.Game.Evolution
     /// <summary>
     /// An ObjectManager creates and manages GameObjects by using a supplied
     /// GraphRenderer to create game objects for graph nodes. Those game objects
-    /// will be cached, that is, non-existing GameObjects are created and stored 
-    /// for reuse during query. Each GameObject is identified by the ID of 
+    /// will be cached, that is, non-existing GameObjects are created and stored
+    /// for reuse during query. Each GameObject is identified by the ID of
     /// a node and can be retrieved via any node with the same ID.
     /// </summary>
     public class ObjectManager
@@ -108,8 +108,8 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
-        /// plane encloses all currently cached game objects of the city only if it was newly 
-        /// generated. It may need to be adjusted if it was not newly generated. 
+        /// plane encloses all currently cached game objects of the city only if it was newly
+        /// generated. It may need to be adjusted if it was not newly generated.
         /// </summary>
         /// <param name="plane">the plane intended to enclose all game objects of the city; the y co-ordinate of the plane will be 0</param>
         /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
@@ -125,8 +125,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Adjusts the current plane so that all current game objects managed here 
-        /// fit onto it. Height and y co-ordinate will be maintained. Only its 
+        /// Adjusts the current plane so that all current game objects managed here
+        /// fit onto it. Height and y co-ordinate will be maintained. Only its
         /// x and z co-ordinates will be adjusted.
         /// </summary>
         public void AdjustPlane()
@@ -135,7 +135,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the 
+        /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the
         /// plane so that it would enclose all cached game objects of the city where
         /// the y co-ordinate and the height of the plane would remain the same. The plane itself
         /// is not actually changed.
@@ -148,7 +148,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node 
+        /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node
         /// or creates a new one if none has existed. The game object is identified
         /// by the attribute ID of <paramref name="node"/>.
         /// If a game object existed already, the given <paramref name="node"/> will be
@@ -159,7 +159,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="node">the node to be represented by <paramref name="gameNode"/></param>
         /// <param name="gameNode">the resulting GameObject representing <paramref name="node"/></param>
-        /// <returns>the formerly attached graph node of <paramref name="gameNode"/> if 
+        /// <returns>the formerly attached graph node of <paramref name="gameNode"/> if
         /// such a game object existed or null if the game node was newly created</returns>
         public Node GetNode(Node node, out GameObject gameNode)
         {
@@ -175,7 +175,7 @@ namespace SEE.Game.Evolution
             {
                 if (node.IsLeaf())
                 {
-                    // NewLeafNode() will attach node to gameNode and will 
+                    // NewLeafNode() will attach node to gameNode and will
                     // also set the scale and style of gameNode.
                     gameNode = _graphRenderer.DrawLeafNode(node);
                 }
@@ -184,7 +184,7 @@ namespace SEE.Game.Evolution
                     // NewInnerNode() will attach node to gameNode.
                     gameNode = _graphRenderer.DrawInnerNode(node);
                     // Note: The scale of inner nodes will be adjusted later when
-                    // we have the layout. 
+                    // we have the layout.
                 }
                 // Add the newly created gameNode to the cache.
                 nodes[node.ID] = gameNode;
@@ -194,8 +194,8 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Re-attaches the given <paramref name="node"/> to the given <paramref name="gameObject"/>,
-        /// that is, the NodeRef component of <paramref name="gameObject"/> will refer to 
-        /// <paramref name="node"/> afterwards. Returns the node formerly attached to 
+        /// that is, the NodeRef component of <paramref name="gameObject"/> will refer to
+        /// <paramref name="node"/> afterwards. Returns the node formerly attached to
         /// <paramref name="gameObject"/> if there was one or null if there was none.
         /// </summary>
         /// <param name="gameObject">the game object where the node is to be attached to</param>
@@ -231,8 +231,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Removes the game object representing the given <paramref name="node"/> by using the ID 
-        /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if 
+        /// Removes the game object representing the given <paramref name="node"/> by using the ID
+        /// of the <paramref name="node"/> and returns the removed node in <paramref name="gameObject"/>, if
         /// it existed. Returns true if such a game object existed in the cache.
         /// </summary>
         /// <param name="node">node determining the game object to be removed from the cache</param>
@@ -276,7 +276,7 @@ namespace SEE.Game.Evolution
         {
             ClearAllEdges();
             // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(nodes.Values);
+            edges = _graphRenderer.EdgeLayout(nodes.Values, city);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace SEE.Game.Evolution
         public ICollection<GameObject> CalculateNewEdgeControlPoints()
         {
             ClearNewEdges();
-            newEdges = _graphRenderer.EdgeLayout(nodes.Values, false);
+            newEdges = _graphRenderer.EdgeLayout(nodes.Values, city, draw: false);
             return newEdges;
         }
 
@@ -343,7 +343,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Destroys the game object created for the plane (if one exists). 
+        /// Destroys the game object created for the plane (if one exists).
         /// Postcondition: currentPlane = null.
         /// </summary>
         private void ClearPlane()
@@ -369,7 +369,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Destroys all game objects created for edges.
-        /// Postcondition: 
+        /// Postcondition:
         /// </summary>
         private void ClearEdges()
         {
