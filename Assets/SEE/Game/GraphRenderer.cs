@@ -261,26 +261,32 @@ namespace SEE.Game
 
         /// <summary>
         /// Applies the edge layout according to the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
+        /// all edges in between nodes in <paramref name="gameNodes"/>. The resulting
+        /// edges are added to <paramref name="parent"/> as children.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="parent">the object the new edges are to become children</param>
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, bool draw = true)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent, bool draw = true)
         {
-            return EdgeLayout(ToLayoutNodes(gameNodes), draw);
+            return EdgeLayout(ToLayoutNodes(gameNodes), parent, draw);
         }
 
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
+        /// all edges in between nodes in <paramref name="gameNodes"/>. The resulting
+        /// edges are added to <paramref name="parent"/> as children.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
+        /// <param name="parent">the object the new edges are to become children</param>
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
+        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, GameObject parent, bool draw = true)
         {
-            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
+            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
+            AddToParent(result, parent);
+            return result;
         }
 
         /// <summary>
@@ -456,7 +462,7 @@ namespace SEE.Game
                     // The layoutNodes are put just above the plane w.r.t. the y axis.
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
-                    CreateObjectHierarchy(nodeMap, parent);
+                    CreateGameNodeHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(nodeToGameObject);
 
                     // add the decorations, too
@@ -518,7 +524,7 @@ namespace SEE.Game
                     // The layouNodes are put just above the plane w.r.t. the y axis.
                     NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
 
-                    CreateObjectHierarchy(nodeMap, parent);
+                    CreateGameNodeHierarchy(nodeMap, parent);
 
                     // Decorations must be applied after the blocks have been placed, so that
                     // we also know their positions.
@@ -536,7 +542,7 @@ namespace SEE.Game
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
-            AddToParent(EdgeLayout(gameNodes), rootGameNode);
+            EdgeLayout(gameNodes, rootGameNode);
 
             Portal.SetPortal(parent);
 
@@ -570,7 +576,6 @@ namespace SEE.Game
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
-                Debug.Log($"Setting leaf {gameNode.name}'s scale to {layout.LocalScale}\n");
                 leafNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
@@ -646,13 +651,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates the same nesting of all game objects in <paramref name="nodeMap"/> as in
+        /// Creates the same nesting of all game nodes in <paramref name="nodeMap"/> as in
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
         /// a child of the given <paramref name="root"/>.
         /// </summary>
         /// <param name="nodeMap">mapping of graph nodes onto their representing game objects</param>
         /// <param name="root">the parent of every game object not nested in any other game object</param>
-        private void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
+        public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
@@ -673,7 +678,7 @@ namespace SEE.Game
                     }
                     catch (Exception e)
                     {
-                        Debug.LogErrorFormat("Exception raised while adding the game object corresponding to {0} to the parent {1}: {2}\n", node.ID, parent.ID, e);
+                        Debug.LogError($"Exception raised while adding the game object corresponding to {node.ID} to the parent {parent.ID}: {e}\n");
                     }
                 }
             }
