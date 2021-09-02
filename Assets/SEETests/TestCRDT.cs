@@ -126,27 +126,6 @@ namespace SEETests
         }
 
         [Test]
-        public void testFind()
-        {
-            CRDT crdt = new CRDT("1", "test");
-            crdt.AddChar('A', 0);
-            crdt.AddChar('B', 1);
-            crdt.AddChar('C', 2);
-            Identifier[] wrong = { new Identifier(99, "99"), new Identifier(22, "22"), new Identifier(77, "77") };
-
-            Assert.AreEqual(0, crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item1);
-            Assert.AreEqual(1, crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item1);
-            Assert.AreEqual(2, crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item1);
-            Assert.AreEqual(-1, crdt.Find(wrong).Item1);
-
-            Assert.AreEqual(crdt.getCRDT()[0], crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[1], crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[2], crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item2);
-            Assert.AreEqual(null, crdt.Find(wrong).Item2);
-        }
-
-
-        [Test]
         public void testRemoteAdd()
         {
             CRDT crdt1 = new CRDT("1", "test");
@@ -207,6 +186,46 @@ namespace SEETests
             test.AddChar(' ', 5);
             test.AddChar('!', 6);
             Assert.AreEqual("HALLO !", test.PrintString());
+        }
+
+        [Test]
+        public void TestFind()
+        {
+            //This test also covers find 
+            string id = "test";
+            CRDT crdt = new CRDT(id, id);
+            crdt.AddChar('a', 0);
+            crdt.AddChar('b', 1);
+            crdt.AddChar('c', 2);
+            crdt.AddChar('d', 3);
+            crdt.AddChar('e', 4);
+            crdt.AddChar('f', 5);
+            crdt.AddChar('g', 6);
+            crdt.AddChar('h', 7);
+            crdt.AddChar('i', 8);
+
+            Identifier[] wrong = { new Identifier(99, "99"), new Identifier(22, "22"), new Identifier(77, "77") };
+            Assert.AreEqual(0, crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item1);
+            Debug.Log("works");
+            Assert.AreEqual(1, crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item1);
+            Assert.AreEqual(2, crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item1);
+            Debug.Log("works2");
+            Assert.AreEqual(3, crdt.Find(crdt.getCRDT()[3].GetIdentifier()).Item1);
+            Assert.AreEqual(7, crdt.Find(crdt.getCRDT()[7].GetIdentifier()).Item1);
+            Assert.AreEqual(8, crdt.Find(crdt.getCRDT()[8].GetIdentifier()).Item1);
+            Debug.Log("works");
+            Assert.AreEqual(-1, crdt.Find(wrong).Item1);
+
+            Assert.AreEqual(crdt.getCRDT()[0], crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.getCRDT()[1], crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.getCRDT()[2], crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.getCRDT()[3], crdt.Find(crdt.getCRDT()[3].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.getCRDT()[7], crdt.Find(crdt.getCRDT()[7].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.getCRDT()[8], crdt.Find(crdt.getCRDT()[8].GetIdentifier()).Item2);
+            Assert.AreEqual(null, crdt.Find(wrong).Item2);
+
+
+
         }
 
         private void print(CRDT crdt)

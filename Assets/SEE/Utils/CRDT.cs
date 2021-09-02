@@ -19,7 +19,7 @@ namespace SEE.Utils
             public DeleteNotPossibleException(string v) : base(v)
             { }
         }
-        
+
         public class Identifier
         {
             private int digit;
@@ -103,7 +103,7 @@ namespace SEE.Utils
         /// The chars of the CRDT with their positions
         /// </summary>
         private List<CharObj> crdt = new List<CharObj>();
-        
+
         /// <summary>
         /// Constructs a CRDT
         /// </summary>
@@ -127,7 +127,7 @@ namespace SEE.Utils
         /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
         public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
-            
+
             if (prePosition != null && prePosition.Length > 0)
             {
                 (int, CharObj) found = Find(prePosition);
@@ -179,7 +179,7 @@ namespace SEE.Utils
         /// <param name="endIdx">The end index</param>
         public void DeleteString(int startIdx, int endIdx)
         {
-            for(int i = endIdx; i >= startIdx; i--)
+            for (int i = endIdx; i >= startIdx; i--)
             {
                 DeleteChar(i);
             }
@@ -207,10 +207,10 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        public void AddString(string s , int startIdx)
+        public void AddString(string s, int startIdx)
         {
             int idx = startIdx;
-            foreach(Char c in s)
+            foreach (Char c in s)
             {
                 AddChar(c, idx);
                 idx++;
@@ -244,7 +244,7 @@ namespace SEE.Utils
 
             if (crdt.Count > index)
             {
-                crdt.Insert(index , new CharObj(c, position));
+                crdt.Insert(index, new CharObj(c, position));
             }
             else
             {
@@ -267,16 +267,7 @@ namespace SEE.Utils
         /// <returns>The index of the Position or -1 if the position isnt in the crdt</returns>
         public int GetIndexByPosition(Identifier[] position)
         {
-            int i = 0;
-            foreach(CharObj c in crdt)
-            {
-                if(ComparePosition(c.GetIdentifier(), position) == 0)
-                {
-                    return i;
-                }
-                i++;
-            }
-            return -1;
+            return BinarySearch(position, 0, crdt.Count -1);
         }
 
         /// <summary>
@@ -327,7 +318,8 @@ namespace SEE.Utils
             }
             else
             {
-                if (String.Compare(o1.GetSite() , o2.GetSite()) < 0)
+                //Debug.Log("o1 " + o1 + " o2 " + o2);
+                if (String.Compare(o1.GetSite(), o2.GetSite()) < 0)
                 {
                     return -1;
                 }
@@ -417,14 +409,10 @@ namespace SEE.Utils
         /// <returns>A tuple of the index and the CharObj, Returns (-1,null) if the position is not in the CRDT</returns>
         public (int, CharObj) Find(Identifier[] position)
         {
-            int index = 0;
-            foreach (CharObj elm in crdt)
+            int find = BinarySearch(position, 0, crdt.Count -1);
+            if(find > -1)
             {
-                if (ComparePosition( elm.GetIdentifier(), position ) == 0)
-                {
-                    return (index, elm);
-                }
-                index++;
+                return (find, crdt[find]);
             }
             return (-1, null);
         }
@@ -487,7 +475,6 @@ namespace SEE.Utils
 
             return incValue[incValue.Length - 1] == 0 ? Add(incValue, inc) : incValue;
         }
-
 
         /// <summary>
         /// Creates a new identifier list (position identifier) 
@@ -578,6 +565,54 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Binarysearches the CRDT for a given position
+        /// </summary>
+        /// <param name="position">The position that is searched</param>
+        /// <param name="start">The start index, usaly 0 if the full CRDT should be searched</param>
+        /// <param name="end">The end index, usaly crdt.Count if the full CRDT should be searched</param>
+        /// <returns>The index at which the position is placed or -1 if the position is not contained in the CRDT</returns>
+        private int BinarySearch(Identifier[] position, int start, int end)
+        {
+            Debug.Log("CLLL");
+            int length = end - start;
+            int mid = 0;
+            if (start == end)
+            {
+                if (ComparePosition(crdt[start].GetIdentifier(), position) == 0)
+                {
+                    return start;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            if (length % 2 == 0)
+            {
+                mid = length / 2 + start;
+            }
+            else
+            {
+                mid = (length + 1) / 2 + start;
+            }
+            Debug.Log("start " + start + " end " + end + " mid " + mid);
+
+            if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
+            {
+                return mid;
+            }
+            else if (ComparePosition(crdt[mid].GetIdentifier(), position) > 0)
+            {
+                return BinarySearch(position, start, mid -1);
+            }
+            else
+            {
+                return BinarySearch(position, mid, end);
+            }
+
+        }
+
+        /// <summary>
         /// Transforms an string into a position
         /// </summary>
         /// <param name="s">The string contianing the position</param>
@@ -598,21 +633,21 @@ namespace SEE.Utils
                     isDigit = true;
                     next = false;
                 }
-                else if(c == ',' && !next)
+                else if (c == ',' && !next)
                 {
                     isDigit = false;
                     isSiteID = true;
                 }
-                else if(c == ' ')
+                else if (c == ' ')
                 {
                     //do nothing
                 }
-                else  if(c == ')')
+                else if (c == ')')
                 {
                     isSiteID = false;
                     next = true;
                 }
-                else if(c == ',' && next)
+                else if (c == ',' && next)
                 {
                     ret.Add(new Identifier(int.Parse(digit), siteID));
                     digit = "";
@@ -635,7 +670,7 @@ namespace SEE.Utils
             {
                 ret.Add(new Identifier(int.Parse(digit), siteID));
             }
-            
+
             return ret.ToArray();
         }
 
@@ -649,7 +684,7 @@ namespace SEE.Utils
             string ret = "";
             bool fst = true;
             if (position == null) return null;
-            foreach(Identifier i in position)
+            foreach (Identifier i in position)
             {
                 if (!fst)
                 {
