@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.Evolution;
@@ -561,8 +562,51 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
+            UpdateGameNodeHierarchy();
             MoveEdges();
             Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+        }
+
+        /// <summary>
+        /// Updates the hierarchy of game nodes such that is isomorphic to the node
+        /// hierarchy of the underlying graph.
+        /// </summary>
+        private void UpdateGameNodeHierarchy()
+        {
+            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
+            CollectNodes(gameObject, nodeMap);
+            GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
+        }
+
+        /// <summary>
+        /// Yields a mapping of graph nodes onto the game node that represents them.
+        ///
+        /// nodeMap[n] = go if and only if:
+        /// 1) go is a descendant of <paramref name="root"/> in the game-object hierarchy
+        /// 2) n is the graph node referenced by go
+        /// </summary>
+        /// <param name="root">the game object at which to collect the nodes (this object
+        /// itself is not added to <paramref name="nodeMap"/>, it may, however, been added
+        /// before</param>
+        /// <param name="nodeMap">resulting mapping from graph nodes onto their game nodes</param>
+        private static void CollectNodes(GameObject root, Dictionary<Node, GameObject> nodeMap)
+        {
+            foreach (Transform childTransform in root.transform)
+            {
+                GameObject child = childTransform.gameObject;
+                if (child.CompareTag(Tags.Node))
+                {
+                    if (child.TryGetNodeRef(out NodeRef nodeRef))
+                    {
+                        nodeMap[nodeRef.Value] = child;
+                        CollectNodes(child, nodeMap);
+                    }
+                    else
+                    {
+                        throw new Exception($"Game node {child.name} without valid node reference.");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -613,13 +657,14 @@ namespace SEE.Game
             moveEdges = false;
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
-            NodeChangesBuffer.GetSingleton().currentRevisionCounter = currentGraphRevisionCounter;
-            NodeChangesBuffer.GetSingleton().addedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().addedNodeIDs);
-            NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
-            NodeChangesBuffer.GetSingleton().changedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().changedNodeIDs);
-            NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
-            NodeChangesBuffer.GetSingleton().removedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().removedNodeIDs);
-            NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
+            NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
+            nodeChangesBuffer.currentRevisionCounter = currentGraphRevisionCounter;
+            nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
+            nodeChangesBuffer.addedNodeIDs.Clear();
+            nodeChangesBuffer.changedNodeIDsCache = new List<string>(nodeChangesBuffer.changedNodeIDs);
+            nodeChangesBuffer.changedNodeIDs.Clear();
+            nodeChangesBuffer.removedNodeIDsCache = new List<string>(nodeChangesBuffer.removedNodeIDs);
+            nodeChangesBuffer.removedNodeIDs.Clear();
         }
 
         /// <summary>
@@ -887,7 +932,7 @@ namespace SEE.Game
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
             // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
-            GameObject animationNode = Instantiate(currentGameNode);
+            GameObject animationNode = Clone(currentGameNode);
             // The copied node is added to list animationNodes so that it can be deleted after animation.
             animationNodes.Add(animationNode);
             // The actual node is added to list currentNodes so that it can be reactivated after animation.
@@ -941,6 +986,32 @@ namespace SEE.Game
             graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
             // The copied node is animated.
             moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
+        }
+
+        private static GameObject Clone(GameObject gameNode)
+        {
+            return Instantiate(gameNode);
+
+            //// Original activation state.
+            //bool gameNodeIsActive = gameNode.activeSelf;
+            //if (gameNodeIsActive)
+            //{
+            //    // We need to turn gameNode inactive so that the Awake, Start, and OnEnable
+            //    // methods of its components are not executed in case they depend upon a
+            //    // a valid node reference (NodeRef).
+            //    gameNode.SetActive(false);
+            //}
+            //// Instantiate will copy all components of gameNode if they are serializable.
+            //// NodeRef is not serializable. That is why it needs to be handled separately.
+            //GameObject clone = Instantiate(gameNode);
+            //if (gameNode.TryGetComponent(out NodeRef gameNodeNodeRef) && clone.TryGetComponent(out NodeRef cloneNodeRef))
+            //{
+            //    cloneNodeRef.SetNode(gameNodeNodeRef.Value);
+            //}
+            //clone.SetActive(gameNodeIsActive);
+            //// Restore activation state.
+            //gameNode.SetActive(gameNodeIsActive);
+            //return clone;
         }
 
         /// <summary>
