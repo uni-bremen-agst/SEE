@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Zoom actions holding data about zooming into or out of the city 
+    /// Zoom actions holding data about zooming into or out of the city
     /// for a Desktop environment.
     /// </summary>
     public class ZoomActionDesktop : ZoomAction
@@ -22,6 +22,16 @@ namespace SEE.Controls.Actions
             if (obj)
             {
                 Transform rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
+                if (rootTransform == null)
+                {
+                    Debug.LogError($"ZoomActionDesktop.Update received null rootTransform for hovered {obj.name}.\n");
+                    return;
+                }
+                else if (rootTransform.parent == null)
+                {
+                    Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {obj.name} has no parent.\n");
+                    return;
+                }
                 GO.Plane clippingPlane = rootTransform.parent.GetComponent<GO.Plane>();
                 Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane);
 
