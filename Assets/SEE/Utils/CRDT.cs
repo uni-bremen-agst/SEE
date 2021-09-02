@@ -318,7 +318,6 @@ namespace SEE.Utils
             }
             else
             {
-                //Debug.Log("o1 " + o1 + " o2 " + o2);
                 if (String.Compare(o1.GetSite(), o2.GetSite()) < 0)
                 {
                     return -1;
@@ -414,6 +413,7 @@ namespace SEE.Utils
             {
                 return (find, crdt[find]);
             }
+            Debug.Log("NUUUUUULLL");
             return (-1, null);
         }
 
@@ -573,7 +573,6 @@ namespace SEE.Utils
         /// <returns>The index at which the position is placed or -1 if the position is not contained in the CRDT</returns>
         private int BinarySearch(Identifier[] position, int start, int end)
         {
-            Debug.Log("CLLL");
             int length = end - start;
             int mid = 0;
             if (start == end)
@@ -595,8 +594,6 @@ namespace SEE.Utils
             {
                 mid = (length + 1) / 2 + start;
             }
-            Debug.Log("start " + start + " end " + end + " mid " + mid);
-
             if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
             {
                 return mid;
