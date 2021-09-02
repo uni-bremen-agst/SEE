@@ -604,7 +604,7 @@ namespace SEE.Utils
             }
             else
             {
-                return BinarySearch(position, mid, end);
+                return BinarySearch(position, mid + 1, end);
             }
 
         }
