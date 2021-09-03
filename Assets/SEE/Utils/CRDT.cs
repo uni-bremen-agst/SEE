@@ -267,7 +267,7 @@ namespace SEE.Utils
         /// <returns>The index of the Position or -1 if the position isnt in the crdt</returns>
         public int GetIndexByPosition(Identifier[] position)
         {
-            return BinarySearch(position, 0, crdt.Count -1);
+            return BinarySearch(position, 0, crdt.Count - 1);
         }
 
         /// <summary>
@@ -408,8 +408,8 @@ namespace SEE.Utils
         /// <returns>A tuple of the index and the CharObj, Returns (-1,null) if the position is not in the CRDT</returns>
         public (int, CharObj) Find(Identifier[] position)
         {
-            int find = BinarySearch(position, 0, crdt.Count -1);
-            if(find > -1)
+            int find = BinarySearch(position, 0, crdt.Count - 1);
+            if (find > -1)
             {
                 return (find, crdt[find]);
             }
@@ -573,47 +573,33 @@ namespace SEE.Utils
         /// <returns>The index at which the position is placed or -1 if the position is not contained in the CRDT</returns>
         private int BinarySearch(Identifier[] position, int start, int end)
         {
-            int i = 0;
-            foreach(CharObj c in crdt)
+            /* int i = 0;
+             foreach(CharObj c in crdt)
+             {
+                 if (ComparePosition(c.GetIdentifier(), position) == 0) return i;
+                 i++;
+             }
+             return -1; */
+
+            if (start <= end)
             {
-                if (ComparePosition(c.GetIdentifier(), position) == 0) return i;
-                i++;
-            }
-            return -1;
-            /*
-            int length = end - start;
-            int mid = 0;
-            if (start == end)
-            {
-                if (ComparePosition(crdt[start].GetIdentifier(), position) == 0)
+                int length = end - start;
+                int mid = 0;
+                mid = (length + start) / 2;
+                if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
                 {
-                    return start;
+                    return mid;
+                }
+                else if (ComparePosition(crdt[mid].GetIdentifier(), position) > 0)
+                {
+                    return BinarySearch(position, start, mid - 1);
                 }
                 else
                 {
-                    return -1;
+                    return BinarySearch(position, mid + 1, end);
                 }
             }
-            if (length % 2 == 0)
-            {
-                mid = length / 2 + start;
-            }
-            else
-            {
-                mid = (length + 1) / 2 + start;
-            }
-            if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
-            {
-                return mid;
-            }
-            else if (ComparePosition(crdt[mid].GetIdentifier(), position) > 0)
-            {
-                return BinarySearch(position, start, mid -1);
-            }
-            else
-            {
-                return BinarySearch(position, mid + 1, end);
-            } */
+            return -1;
 
         }
 
