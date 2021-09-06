@@ -51,9 +51,9 @@ namespace SEE.Layout.NodeLayouts
         /// If inner nodes are represented as visible objects covering their total area
         /// and the visualizations of those inner nodes are stacked in a hierarchical layout,
         /// their visualizations should not be on the same level; otherwise they will hide
-        /// each other. For this reason, every inner node will be slightly lifted along the 
-        /// y axis according to its tree depth so that inner nodes are stacked visually 
-        /// (level 0 is at the bottom). The value levelIncreaseForInnerNodes is the 
+        /// each other. For this reason, every inner node will be slightly lifted along the
+        /// y axis according to its tree depth so that inner nodes are stacked visually
+        /// (level 0 is at the bottom). The value levelIncreaseForInnerNodes is the
         /// height factor for each level. It will be multiplied by the level to obtain
         /// an inner node's y co-ordinate.
         /// </summary>
@@ -63,7 +63,7 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the lift for an innner node as a product of its tree level
         /// and levelIncreaseForInnerNodes. This value is intended to be added
         /// to the ground level to define the y co-ordindate of an inner node
-        /// where visualizations of inner nodes can be stacked and would possibly 
+        /// where visualizations of inner nodes can be stacked and would possibly
         /// hide each other if they were all at the same height.
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
@@ -77,22 +77,22 @@ namespace SEE.Layout.NodeLayouts
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
-        /// 
-        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will 
-        /// be interpreted as the ground position of the game object (unlike in Unity 
+        ///
+        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will
+        /// be interpreted as the ground position of the game object (unlike in Unity
         /// where it is the center height).
         /// </summary>
         /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
         /// <returns>node layout</returns>
-        /// 
+        ///
         public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes);
 
         /// <summary>
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
-        /// 
-        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts 
+        ///
+        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts
         /// </summary>
         /// <param name="layoutNodes"></param>
         /// <param name="edges"></param>
@@ -161,8 +161,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/> 
-        /// in between parent and children (children are on top of their parent) where the initial 
+        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/>
+        /// in between parent and children (children are on top of their parent) where the initial
         /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
         /// The x and z co-ordinates of the <paramref name="layoutNodes"/> are not changed.
         /// </summary>
@@ -311,9 +311,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
         public void Apply(ICollection<ILayoutNode> layoutNodes)
         {
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes);
-
-            ApplyLayoutNodeTransform(layout);
+            ApplyLayoutNodeTransform(Layout(layoutNodes));
         }
 
         /// <summary>
@@ -324,9 +322,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="sublayouts">the sublayouts for the layout</param>
         public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, edges, sublayouts);
-
-            ApplyLayoutNodeTransform(layout);
+            ApplyLayoutNodeTransform(Layout(layoutNodes, edges, sublayouts));
         }
 
         /// <summary>
