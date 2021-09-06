@@ -26,7 +26,6 @@ using SEE.Game.Charts;
 using SEE.Game.Evolution;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.Utils;
 using SEE.Utils;
@@ -39,10 +38,10 @@ namespace SEE.Game
     /// <summary>
     /// Renders the evolution of the graph series through animations. Incrementally updates
     /// the graph (removal/addition of nodes/edges).
-    /// 
+    ///
     /// Note: The renderer is a MonoBehaviour, thus, will be added as a component to a game
     /// object. As a consequence, a constructor will not be called and is meaningless.
-    /// 
+    ///
     /// Assumption: This EvolutionRenderer is attached to a game object representing a code
     /// city that has another component of type SEECityEvolution.
     /// </summary>
@@ -99,9 +98,9 @@ namespace SEE.Game
         private GraphRenderer graphRenderer;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The manager of the game objects created for the city.         
+        /// The manager of the game objects created for the city.
         /// This attribute will be set in the setter of the attribute CityEvolution because it
-        /// depends upon the graphRenderer, which in turn depends upon the city, which is set by 
+        /// depends upon the graphRenderer, which in turn depends upon the city, which is set by
         /// this setter.
         /// </summary>
         private ObjectManager objectManager;  // not serialized by Unity; will be set in CityEvolution property
@@ -275,7 +274,7 @@ namespace SEE.Game
         /// </summary>
         private LaidOutGraph _nextCity;  // not serialized by Unity
         /// <summary>
-        /// The next city (graph + layout) to be shown. 
+        /// The next city (graph + layout) to be shown.
         /// Note: 'next' does not necessarily mean that it is a graph coming later in the
         /// series of the graph evolution. It just means that this is the next graph to
         /// be shown. If the user goes backward in time, _nextCity is actually an older
@@ -325,8 +324,8 @@ namespace SEE.Game
              = new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
 
         /// <summary>
-        /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will 
-        /// also create all necessary game objects -- even those game objects that are not 
+        /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will
+        /// also create all necessary game objects -- even those game objects that are not
         /// present in the first graph in this list.
         /// </summary>
         private void CalculateAllGraphLayouts(List<Graph> graphs)
@@ -359,7 +358,7 @@ namespace SEE.Game
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
-            // This may not necessarily be true. For instance, an empty directory could 
+            // This may not necessarily be true. For instance, an empty directory could
             // get subdirectories in the course of the evolution.
 
             // Collecting all game objects corresponding to nodes of the given graph.
@@ -368,20 +367,20 @@ namespace SEE.Game
             List<GameObject> gameObjects = new List<GameObject>();
 
             // The layout to be applied.
-            NodeLayout nodeLayout = graphRenderer.GetLayout();
+            NodeLayout nodeLayout = graphRenderer.GetLayout(gameObject);
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
             foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
             {
-                // All layouts (flat and hierarchical ones) must be able to handle leaves; 
-                // hence, leaves can be added at any rate. For a hierarchical layout, we 
+                // All layouts (flat and hierarchical ones) must be able to handle leaves;
+                // hence, leaves can be added at any rate. For a hierarchical layout, we
                 // need to add the game objects for inner nodes, too. To put it differently,
                 // inner nodes are added only if we apply a hierarchical layout.
                 objectManager.GetNode(node, out GameObject gameNode);
                 // Now after having attached the new node to the game object,
-                // we must adjust the scale of it according to the newly attached node so 
-                // that the layouter has these. We need to adjust the scale only for leaves, 
+                // we must adjust the scale of it according to the newly attached node so
+                // that the layouter has these. We need to adjust the scale only for leaves,
                 // however, because the layouter will select the scale for inner nodes.
                 if (node.IsLeaf())
                 {
@@ -399,7 +398,7 @@ namespace SEE.Game
             GraphRenderer.Fit(gameObject, layoutNodes);
             return ToNodeIDLayout(layoutNodes);
 
-            // Note: The game objects for leaf nodes are already properly scaled by the call to 
+            // Note: The game objects for leaf nodes are already properly scaled by the call to
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
             // the layout and there may be layouts that may shrink leaf nodes. For instance,
             // TreeMap shrinks leaves so that they fit into the available space.
@@ -410,7 +409,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
-        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node 
+        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node
         /// attached to the game node is passed on to the LayoutNode so that the graph node data is
         /// available to the node layout (e.g., Parent or Children).
         /// Sets also the node levels of all resulting LayoutNodes.
@@ -484,7 +483,7 @@ namespace SEE.Game
             // The upfront calculation of the node layout for all graphs has filled
             // objectManager with game objects for those nodes. Likewise, when we jump
             // to a graph directly in the version history, the nodes of its predecessors
-            // may still be contained in the scene and objectManager. We need to clean up 
+            // may still be contained in the scene and objectManager. We need to clean up
             // first.
             objectManager?.Clear();
             RenderGraph(_currentCity, graph);
@@ -542,7 +541,7 @@ namespace SEE.Game
                     .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
                     .ForEach(RenderRemovedOldEdge);
             }
-            // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and 
+            // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and
             // RenderEdge will access it.
             _nextCity = next;
             // Draw all nodes of next graph.
@@ -572,15 +571,15 @@ namespace SEE.Game
         private int currentGraphRevisionCounter;
 
         /// <summary>
-        /// Event function triggered when all animations are finished. Animates the transition of the edges 
+        /// Event function triggered when all animations are finished. Animates the transition of the edges
         /// and renders all edges as new and notifies everyone that the animation is finished.
-        /// 
-        /// Note: This method is a callback called from the animation framework (DoTween). It is 
+        ///
+        /// Note: This method is a callback called from the animation framework (DoTween). It is
         /// passed to this animation framework in <see cref="RenderGraph"/>.
         /// </summary>
         private void OnAnimationsFinished()
         {
-            // Activates the nodes that were deactivated for the animation    
+            // Activates the nodes that were deactivated for the animation
             foreach (GameObject currentNode in currentNodes)
             {
                 currentNode.SetActive(true);
@@ -684,7 +683,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Calculates the control points of the edges of the next graph and generates their actual line points from them. 
+        /// Calculates the control points of the edges of the next graph and generates their actual line points from them.
         /// </summary>
         protected virtual void MoveEdges()
         {
@@ -711,7 +710,7 @@ namespace SEE.Game
                         // The AdjustedSamplerate is determined by the performance of the last animation
                         // and tries to achieve a balance between performance and aesthetics
                         // by giving all edges a number of points according to their length,
-                        // the total number of edges, and the performance of the last animation.  
+                        // the total number of edges, and the performance of the last animation.
                         double adjustedSampleRate = Math.Floor(edgeAnimationPerfScore * dist * 10 * lastMovedEdgesCount / matchedEdges.Count());
 
                         lastMovedEdgesCount = matchedEdges.Count();
@@ -725,7 +724,7 @@ namespace SEE.Game
                         // No edge should have more than 75, or less than 2 points.
                         adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
-                        // Creates new line points from the control points 
+                        // Creates new line points from the control points
                         oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint)adjustedSampleRate);
                         nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint)adjustedSampleRate);
 
@@ -769,7 +768,7 @@ namespace SEE.Game
                     nP.linePoints = newLinePointsHalf;
 
                     // Saves the new line points to the LineRenderer
-                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer)) 
+                    if (oldEdge.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer))
                     {
                         lineRenderer.positionCount = oP.linePoints.Count() / 2;
                         lineRenderer.SetPositions(oldLinePointsHalf);
@@ -832,7 +831,7 @@ namespace SEE.Game
         /// <summary>
         /// Event function that adjusts the given <paramref name="gameNode"/>
         /// according to is attached node's color (style) metric.
-        /// It will be called as a callback after the animation of a node to be 
+        /// It will be called as a callback after the animation of a node to be
         /// rendered has been finished (see RenderNode()). The animation will
         /// adjust the game object's scale and position, but not its style.
         /// Here we adjust the style.
@@ -946,7 +945,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Event function that destroys the given <paramref name="gameObject"/>.
-        /// It will be called as a callback after the animation of a node to be 
+        /// It will be called as a callback after the animation of a node to be
         /// removed has been finished.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed</param>
@@ -1138,7 +1137,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If animations are still ongoing, auto-play mode is turned on, or <paramref name="index"/> 
+        /// If animations are still ongoing, auto-play mode is turned on, or <paramref name="index"/>
         /// does not denote a valid index in the graph series, false is returned and nothing else
         /// happens. Otherwise the graph with the given index in the graph series becomes the new
         /// currently shown graph.
@@ -1212,9 +1211,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If animation is still ongoing, auto-play mode is turned on, or we are at 
+        /// If animation is still ongoing, auto-play mode is turned on, or we are at
         /// the end of the graph series, nothing happens.
-        /// Otherwise we make the transition from the currently shown graph to its 
+        /// Otherwise we make the transition from the currently shown graph to its
         /// direct successor graph in the graph series.
         /// </summary>
         public void ShowNextGraph()
@@ -1237,7 +1236,7 @@ namespace SEE.Game
 
         /// <summary>
         /// If we are at the end of the graph series, false is returned and nothing else happens.
-        /// Otherwise we make the transition from the currently shown graph to its 
+        /// Otherwise we make the transition from the currently shown graph to its
         /// direct successor graph in the graph series. CurrentGraphIndex is increased
         /// by one accordingly.
         /// </summary>
@@ -1267,7 +1266,7 @@ namespace SEE.Game
 
         /// <summary>
         /// If we are at the beginning of the graph series, false is returned and nothing else happens.
-        /// Otherwise we make the transition from the currently shown graph to its 
+        /// Otherwise we make the transition from the currently shown graph to its
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
@@ -1298,7 +1297,7 @@ namespace SEE.Game
 
         /// <summary>
         /// If we are at the beginning of the graph series, nothing happens.
-        /// Otherwise we make the transition from the currently shown graph to its 
+        /// Otherwise we make the transition from the currently shown graph to its
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
@@ -1336,7 +1335,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
-        /// is true, the next graph in the series is shown and from there all other 
+        /// is true, the next graph in the series is shown and from there all other
         /// following graphs until we reach the end of the graph series or auto-play
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
@@ -1362,7 +1361,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets reverse auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
-        /// is true, the previous graph in the series is shown and from there all other 
+        /// is true, the previous graph in the series is shown and from there all other
         /// previous graphs until we reach the beginning of the graph series or reverse auto-play
         /// mode is turned off again. If <paramref name="enabled"/> is false instead,
         /// the currently shown graph remains visible.
