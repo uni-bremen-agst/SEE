@@ -119,42 +119,6 @@ namespace SEE.Game
         private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The city evolution to be drawn by this renderer.
-        /// </summary>
-        //public SEECityEvolution CityEvolution
-        //{
-        //    set
-        //    {
-        //        if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
-        //        {
-        //            // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-        //            // So we cannot make the following assignment in the constructor. Neither
-        //            // can we assign this value at the declaration of graphRenderer because
-        //            // we need the city argument, which comes only later. Anyhow, whenever we
-        //            // assign a new city, we also need a new graph renderer for that city.
-        //            // So in fact this is the perfect place to assign graphRenderer.
-        //            graphRenderer = new GraphRenderer(value, null);
-        //            Assert.IsNotNull(graphRenderer);
-        //            diff = new NumericAttributeDiff(value.AllMetricAttributes());
-        //            Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
-        //            objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
-        //            marker = new Marker(graphRenderer,
-        //                                markerWidth: cityEvolution.MarkerWidth,
-        //                                markerHeight: cityEvolution.MarkerHeight,
-        //                                additionColor: cityEvolution.AdditionBeamColor,
-        //                                changeColor: cityEvolution.ChangeBeamColor,
-        //                                deletionColor: cityEvolution.DeletionBeamColor,
-        //                                duration: AnimationLag);
-        //        }
-        //        else
-        //        {
-        //            Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
-        //            enabled = false;
-        //        }
-        //    }
-        //}
-
-        /// <summary>
         /// Shortest time period in which an animation can be run in seconds.
         /// </summary>
         private const float MinimalWaitTimeForNextRevision = 0.1f;
@@ -297,16 +261,6 @@ namespace SEE.Game
         /// Saves the names of the game objects representing nodes that were not moved during an iteration.
         /// </summary>
         private ISet<string> negligibleNodes = new HashSet<string>();
-
-        /// <summary>
-        /// List for saving the copied nodes. Is used for animation.
-        /// </summary>
-        private readonly IList<GameObject> animationNodes = new List<GameObject>();
-
-        /// <summary>
-        /// List for saving the deactivated nodes. Is used for animation.
-        /// </summary>
-        private readonly IList<GameObject> currentNodes = new List<GameObject>();
 
         /// <summary>
         /// List to add markers to the animated nodes afterwards.
@@ -562,9 +516,8 @@ namespace SEE.Game
             // We have made the transition to the next graph.
             _currentCity = next;
             RenderPlane();
-            UpdateGameNodeHierarchy();
             MoveEdges();
-            Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+            Invoke(nameof(OnAnimationsFinished), Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
         }
 
         /// <summary>
@@ -624,10 +577,10 @@ namespace SEE.Game
         private void OnAnimationsFinished()
         {
             // Activates the nodes that were deactivated for the animation
-            foreach (GameObject currentNode in currentNodes)
-            {
-                currentNode.SetActive(true);
-            }
+            //foreach (GameObject currentNode in currentNodes)
+            //{
+            //    currentNode.SetActive(true);
+            //}
             // Adds a marker to the nodes
             foreach ((GameObject, MarkerType) nodeMarker in animationMarker)
             {
@@ -644,8 +597,8 @@ namespace SEE.Game
                 }
             }
             // Clears all lists relevant for the animation of the nodes
-            animationNodes.Clear();
-            currentNodes.Clear();
+            //animationNodes.Clear();
+            //currentNodes.Clear();
             animationMarker.Clear();
 
             // Destroy all previous edges and draw all edges of next graph. This can only
@@ -665,6 +618,7 @@ namespace SEE.Game
             nodeChangesBuffer.changedNodeIDs.Clear();
             nodeChangesBuffer.removedNodeIDsCache = new List<string>(nodeChangesBuffer.removedNodeIDs);
             nodeChangesBuffer.removedNodeIDs.Clear();
+            UpdateGameNodeHierarchy();
         }
 
         /// <summary>
@@ -931,15 +885,6 @@ namespace SEE.Game
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
 
-            // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
-            GameObject animationNode = Clone(currentGameNode);
-            // The copied node is added to list animationNodes so that it can be deleted after animation.
-            animationNodes.Add(animationNode);
-            // The actual node is added to list currentNodes so that it can be reactivated after animation.
-            currentNodes.Add(currentGameNode);
-            // Hide the actual node during the animation.
-            currentGameNode.SetActive(false);
-
             Difference difference;
             if (formerGraphNode == null)
             {
@@ -958,8 +903,8 @@ namespace SEE.Game
                 difference = Difference.Added;
 
                 // Set the layout for the copied node.
-                animationNode.transform.localScale = layoutNode.LocalScale;
-                animationNode.transform.position = layoutNode.CenterPosition;
+                currentGameNode.transform.localScale = layoutNode.LocalScale;
+                currentGameNode.transform.position = layoutNode.CenterPosition;
             }
             else
             {
@@ -978,40 +923,9 @@ namespace SEE.Game
                 {
                     difference = Difference.None;
                 }
-                // Set the layout for the copied node.
-                animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
-                animationNode.transform.position = currentGameNode.transform.position;
             }
-            // The actual node is shifted to its new position.
-            graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
-            // The copied node is animated.
-            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
-        }
-
-        private static GameObject Clone(GameObject gameNode)
-        {
-            return Instantiate(gameNode);
-
-            //// Original activation state.
-            //bool gameNodeIsActive = gameNode.activeSelf;
-            //if (gameNodeIsActive)
-            //{
-            //    // We need to turn gameNode inactive so that the Awake, Start, and OnEnable
-            //    // methods of its components are not executed in case they depend upon a
-            //    // a valid node reference (NodeRef).
-            //    gameNode.SetActive(false);
-            //}
-            //// Instantiate will copy all components of gameNode if they are serializable.
-            //// NodeRef is not serializable. That is why it needs to be handled separately.
-            //GameObject clone = Instantiate(gameNode);
-            //if (gameNode.TryGetComponent(out NodeRef gameNodeNodeRef) && clone.TryGetComponent(out NodeRef cloneNodeRef))
-            //{
-            //    cloneNodeRef.SetNode(gameNodeNodeRef.Value);
-            //}
-            //clone.SetActive(gameNodeIsActive);
-            //// Restore activation state.
-            //gameNode.SetActive(gameNodeIsActive);
-            //return clone;
+            // currentGameNode is shifted to its new position through the animator.
+            moveScaleShakeAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
         }
 
         /// <summary>
@@ -1026,14 +940,24 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Event function that destroys the given <paramref name="gameObject"/>.
-        /// Called as a callback and deletes the <paramref name="gameObject"/>
-        /// after the animation is finished.
+        /// Event function that adds the given <paramref name="gameNode"/>
+        /// to <see cref="gameObject"/> as a child if <paramref name="gameNode"/>
+        /// is a <see cref="GameObject"/> and has no parent yet.
+        /// Called as a callback when the animation of new and existing
+        /// nodes is finished. <see cref="RenderNode(Node)"/>.
         /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
-        private void OnAnimationNodeAnimationFinished(object gameObject)
+        /// <param name="gameNode">new or existing game object representing a graph node</param>
+        private void OnAnimationNodeAnimationFinished(object gameNode)
         {
-            DestroyGameObject(gameObject);
+            if (gameNode is GameObject go && go.transform.parent == null)
+            {
+                /// We will just put this game object under <see cref="gameObject"/>
+                /// (the game object representing the city as a whole) as a child. When
+                /// the animation is over and all nodes have reached their destination,
+                /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
+                /// actual logical game-node parent.
+                go.transform.SetParent(gameObject.transform);
+            }
         }
 
         /// <summary>
