@@ -34,10 +34,10 @@ namespace SEE.Game.Evolution
     {
         /// <summary>
         /// Constructor setting the attributes for visualizing animated game objects.
-        /// 
+        ///
         /// Precondition: beamScale.x >= 0 and beamScale.y >= 0 and beamScale.z >= 0.
         /// </summary>
-        /// <param name="beamColor">color of the marker beam for the animated game objects 
+        /// <param name="beamColor">color of the marker beam for the animated game objects
         /// depending upon the kind of difference; if this mapping does not have a value
         /// for particular kind of difference, no beam will be created</param>
         /// <param name="beamScale">scale of the marker beam for the animated game objects</param>
@@ -60,7 +60,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
         /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
-        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
+        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as
         /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
         /// equals null, no callback happens.
         /// </summary>
@@ -116,7 +116,7 @@ namespace SEE.Game.Evolution
                     Tweens.Move(gameObject, position, MaxAnimationTime);
                 }
             }
-            
+
             // Create a new power beam if requested by beamColor.
             if (beamColor.TryGetValue(difference, out Color color))
             {
@@ -170,7 +170,7 @@ namespace SEE.Game.Evolution
                 GameObject.DestroyImmediate(powerBeam.GetComponent<Collider>());
                 powerBeam.tag = DataModel.Tags.PowerBeam;
                 Renderer powerBeamRenderer = powerBeam.GetComponent<Renderer>();
-                // The y co-ordinate will be increased in Update so that the beam grows continuously 
+                // The y co-ordinate will be increased in Update so that the beam grows continuously
                 // until it reaches its final height.
                 powerBeam.transform.localScale = new Vector3(beamScale.x, 0, beamScale.z);
                 if (beamScale.y > 0)
@@ -263,7 +263,7 @@ namespace SEE.Game.Evolution
                         deletedBeams.Add(beam);
                     }
                 }
-                foreach (GameObject beam in deletedBeams) 
+                foreach (GameObject beam in deletedBeams)
                 {
                     powerBeams.Remove(beam);
                 }
@@ -317,4 +317,4 @@ namespace SEE.Game.Evolution
         }
     }
 }
-    
+
