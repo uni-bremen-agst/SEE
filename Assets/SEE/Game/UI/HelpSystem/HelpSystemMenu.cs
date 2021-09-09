@@ -118,9 +118,24 @@ namespace SEE.Game.UI.HelpSystem
             zoomIntoCity.AddLast(new LinkedListEntry(4, "If you want to zoom out, scroll with the mouse wheel down", 15));
             zoomIntoCity.AddLast(new LinkedListEntry(5, "If the city is not centered anymore, press key R to reset the layout to centered", 26));
 
-            LinkedList<LinkedListEntry> hideNode1 = new LinkedList<LinkedListEntry>();
+            LinkedList<LinkedListEntry> hideNode = new LinkedList<LinkedListEntry>();
+            hideNode.AddLast(new LinkedListEntry(1, "For hiding one or more nodes press space to open the player menu and select hide node ", 0));
+            hideNode.AddLast(new LinkedListEntry(2, "Scroll down and select hide selected or hide unselected",9 ));
+            hideNode.AddLast(new LinkedListEntry(3, "Select the node to hide or stay by left click on it", 22));
+            hideNode.AddLast(new LinkedListEntry(4, "For the selection of multiple nodes, hold key Control while klicking", 30));
+            hideNode.AddLast(new LinkedListEntry(5, "If you are ready, confirm your selection with the button done", 39));
+            hideNode.AddLast(new LinkedListEntry(6, "Hint: If you hide a parent node, all connected edges and child nodes will be hidden too.", 50));
 
             LinkedList<LinkedListEntry> playEvolution = new LinkedList<LinkedListEntry>();
+            playEvolution.AddLast(new LinkedListEntry(1, "You can start the evolution with the play button at the navigation bar", 0));
+            playEvolution.AddLast(new LinkedListEntry(2, "You can see the current version of all versions on the lower right side", 10));
+            playEvolution.AddLast(new LinkedListEntry(3, "If you want to pause the evolution, press the pause button, which appears after pushing the play button", 20));
+            playEvolution.AddLast(new LinkedListEntry(4, "The other play button is for backward playing and works as same as the normal play button", 27));
+            playEvolution.AddLast(new LinkedListEntry(5, "Pushing multiple times on the double play buttons determines the play speed", 34));
+            playEvolution.AddLast(new LinkedListEntry(6, "You also can skip by moving the dragger of the navigation bar by left click on it", 44));
+            playEvolution.AddLast(new LinkedListEntry(7, "Yellow beams representing changes in classes", 49));
+            playEvolution.AddLast(new LinkedListEntry(8, "Green beams representing new classes", 52));
+            playEvolution.AddLast(new LinkedListEntry(9, "Red beams representing deleted classes", 55));
 
             // Important note: You have to define the lowest hierachy-level first. 
             // That means, the mainMenu will be defined at the end and the lowest entry-list first.
@@ -130,12 +145,18 @@ namespace SEE.Game.UI.HelpSystem
             {
             HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Assets/SEE/Videos/EditNode.mp4", editNode, entry),
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Hide Node", "How to hide node(s)", Color.magenta, "Assets/SEE/Videos/hideNode.mp4", hideNode, entry),
             };
 
             architectureEntries = new List<MenuEntry>
             {
             HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.magenta),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
+            };
+
+            evolutionEntries = new List<MenuEntry>
+            {
+            HelpSystemBuilder.CreateNewHelpSystemEntry("Navigation bar", "How to navigate between versions of evolution", Color.red, "Assets/SEE/Videos/evolution.mp4", playEvolution, entry)
             };
 
             playerNavigationEntries = new List<MenuEntry>
