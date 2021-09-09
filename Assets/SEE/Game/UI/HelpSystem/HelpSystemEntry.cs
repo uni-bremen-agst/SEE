@@ -257,6 +257,7 @@ namespace SEE.Game.UI.HelpSystem
             videoPlayer.Stop();
             IsPlaying = false;
             HelpSystemMenu.IsEntryOpened = false;
+            audioSource.Stop();
             Destroy(helpSystemSpace);
             EntryShown = false;
 
