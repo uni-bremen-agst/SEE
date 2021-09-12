@@ -886,7 +886,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Traverses the given graph. On every root node rootAction is called.
         /// On every node that is a leaf, leafAction is called, otherwise innerNodeAction is called.
-        /// If an action ist null, it just won't be called.
+        /// If an action is null, it just won't be called.
         /// </summary>
         /// <param name="rootAction">Function that is called on root nodes.</param>
         /// <param name="innerNodeAction">Function that is called when node is not a leaf.</param>
