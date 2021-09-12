@@ -655,7 +655,7 @@ namespace SEE.Game
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
         /// a child of the given <paramref name="root"/>.
         /// </summary>
-        /// <param name="nodeMap">mapping of graph nodes onto their representing game objects</param>
+        /// <param name="nodeMap">mapping of graph node IDs onto their representing game objects</param>
         /// <param name="root">the parent of every game object not nested in any other game object</param>
         public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
@@ -672,14 +672,7 @@ namespace SEE.Game
                 else
                 {
                     // node is a child of another game node
-                    try
-                    {
-                        AddToParent(entry.Value, nodeMap[parent]);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"Exception raised while adding the game object corresponding to {node.ID} to the parent {parent.ID}: {e}\n");
-                    }
+                    AddToParent(entry.Value, nodeMap[parent]);
                 }
             }
         }
