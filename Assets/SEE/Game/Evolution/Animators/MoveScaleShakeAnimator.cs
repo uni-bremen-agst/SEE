@@ -65,7 +65,7 @@ namespace SEE.Game.Evolution
                                      layout.LocalScale
                                    : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
 
-            Tweens.MoveScaleShakeRotate(gameObject, position: position, localScale: localScale, shakeRotate: new Vector3(0, 10, 0), maxAnimationTime: MaxAnimationTime, callback);
+            Tweens.MoveScaleShakeRotate(gameObject, position: position, localScale: localScale, strength: new Vector3(0, 10, 0), duration: MaxAnimationTime, callback);
         }
     }
 }
