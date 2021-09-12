@@ -34,9 +34,9 @@ namespace SEE.Game
     public class SEECityEvolution : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
+        /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace SEE.Game
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
-        /// 
+        ///
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
         private EvolutionRenderer evolutionRenderer;  // not serialized by Unity; will be set in Start()
@@ -105,14 +105,14 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Loads the graph data from the GXL files and the metrics from the CSV files contained 
+        /// Loads the graph data from the GXL files and the metrics from the CSV files contained
         /// in the directory with path PathPrefix and the metrics.
         /// </summary>
         private List<Graph> LoadData()
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, MaxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return graphsReader.graphs;
         }
 
@@ -121,9 +121,9 @@ namespace SEE.Game
         /// The order is ascending and alphabetic by the GXL filenames located in that directory.
         /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
         /// will be read, too, and the node metrics added to the graph.
-        /// Furthermore the selection of the specific node types selected by the user is applied in case 
+        /// Furthermore the selection of the specific node types selected by the user is applied in case
         /// the user specified it before. By default every node type is selected.
-        /// 
+        ///
         /// Precondition: PathPrefix must be set and denote an existing directory in the
         /// file system containing at least one GXL file.
         /// </summary>
@@ -131,7 +131,7 @@ namespace SEE.Game
         public Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
-            reader.Load(GXLDirectory.Path, HierarchicalEdges, 1);
+            reader.Load(GXLDirectory.Path, HierarchicalEdges, rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
@@ -155,7 +155,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Called by Unity when this SEECityEvolution instances comes into existence 
+        /// Called by Unity when this SEECityEvolution instances comes into existence
         /// and can enter the game for the first time. Loads all graphs, calculates their
         /// layouts, and displays the first graph in the graph series.
         /// </summary>
@@ -170,7 +170,7 @@ namespace SEE.Game
             {
                 animationInteraction = gameObject.AddComponent<AnimationInteraction>();
             }
-            animationInteraction.EvolutionRenderer = evolutionRenderer;            
+            animationInteraction.EvolutionRenderer = evolutionRenderer;
         }
 
         private void Start()
@@ -180,13 +180,13 @@ namespace SEE.Game
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
-        /// node types and the edges of these specific nodes of the graph evolution 
+        /// node types and the edges of these specific nodes of the graph evolution
         /// for given <paramref name="graphs"/> using it.
         /// </summary>
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(List<Graph> graphs)
-        {           
-            for (int i = 0; i < graphs.Count; i++) 
+        {
+            for (int i = 0; i < graphs.Count; i++)
             {
                 Graph relevantGraph = RelevantGraph(graphs[i]);
                 if (relevantGraph != graphs[i])
