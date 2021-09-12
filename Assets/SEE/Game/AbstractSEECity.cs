@@ -24,9 +24,9 @@ namespace SEE.Game
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="Save(ConfigWriter)"/> and 
-        /// <see cref="Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="Save(ConfigWriter)"/> and
+        /// <see cref="Restore(Dictionary{string,object})"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
@@ -136,7 +136,7 @@ namespace SEE.Game
         public DataPath CityPath = new DataPath();
 
         /// <summary>
-        /// Resets everything that is specific to a given graph. Here: 
+        /// Resets everything that is specific to a given graph. Here:
         /// all game objects created for this city.
         /// </summary>
         public virtual void Reset()
@@ -154,8 +154,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Deletes all game objects that were created for rendering nodes or edges
-        /// of the graph or any decoration thereof. More precisely, all children of this 
-        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed 
+        /// of the graph or any decoration thereof. More precisely, all children of this
+        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed
         /// (in editor mode or play mode).
         /// The underlying loaded graph is not deleted.
         /// </summary>
@@ -218,11 +218,11 @@ namespace SEE.Game
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
         /// Inspects the node types that occur in the graph and updates <see cref="SelectedNodeTypes"/>.
         /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
-        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's 
+        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's
         /// selection information will be re-used. If <see cref="SelectedNodeTypes"/> contains a node
         /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="SelectedNodeTypes"/>.
-        /// 
-        /// The node types can be retrieved and also be marked as irrelevant later via property 
+        ///
+        /// The node types can be retrieved and also be marked as irrelevant later via property
         /// <see cref="SelectedNodeTypes"/>.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
@@ -233,8 +233,8 @@ namespace SEE.Game
                 // The node types in the newly loaded graph.
                 HashSet<string> newTypes = new HashSet<string>();
                 foreach (Node node in graph.Nodes())
-                {                    
-                    newTypes.Add(node.Type);                    
+                {
+                    newTypes.Add(node.Type);
                 }
                 // nodeTypes contains the node types of the previously loaded graph.
                 // Node types in nodeTypes not in newTypes will disappear
@@ -258,8 +258,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns a subgraph of <paramref name="graph"/> where all nodes were 
-        /// removed that have a type considered to be irrelevant. If all node 
+        /// Returns a subgraph of <paramref name="graph"/> where all nodes were
+        /// removed that have a type considered to be irrelevant. If all node
         /// types are considered relevant, <paramref name="graph"/> will be returned.
         /// If not all types are considered relevant, a copied subgraph is returned.
         /// </summary>
@@ -281,7 +281,7 @@ namespace SEE.Game
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
-        /// DepthMetric, and LeafStyleMetric). 
+        /// DepthMetric, and LeafStyleMetric).
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
@@ -433,7 +433,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// Yields a mapping of all node attribute names that define erosion issues
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
@@ -450,7 +450,7 @@ namespace SEE.Game
             };
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// Yields a mapping of all node attribute names that define erosion issues
         /// for inner nodes onto the icons to be used for visualizing them.
         /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
         /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
@@ -489,8 +489,11 @@ namespace SEE.Game
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
+        /// <param name="filename">GXL filename from which to load the graph</param>
+        /// <param name="rootName">the name of the artifical root if any needs to be added;
+        /// if none is given, <paramref name="filename"/> will be used instead</param>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        public Graph LoadGraph(string filename)
+        public Graph LoadGraph(string filename, string rootName = "")
         {
             if (string.IsNullOrEmpty(filename))
             {
@@ -501,7 +504,9 @@ namespace SEE.Game
             if (File.Exists(filename))
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
+                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
+                                                           rootName: string.IsNullOrEmpty(rootName) ? filename : rootName,
+                                                           logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
                 p.End();
