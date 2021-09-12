@@ -165,23 +165,27 @@ namespace SEE.Game.Evolution
         {
             if (nodes.TryGetValue(node.ID, out gameNode))
             {
+                // A game node with the requested ID exists already, which can
+                // be re-used.
+
                 // The game object has already a node attached to it, but that
                 // node is part of a different graph (i.e,, different revision).
                 // That is why we replace the attached node by this node here.
-                Node result = ReattachNode(gameNode, node);
-                return result;
+                return ReattachNode(gameNode, node);
             }
             else
             {
+                // There is no game node with the given node ID, hence, we need to
+                // create a new one.
                 if (node.IsLeaf())
                 {
-                    // NewLeafNode() will attach node to gameNode and will
-                    // also set the scale and style of gameNode.
+                    /// <see cref="DrawLeafNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>
+                    /// and will also set the scale and style of gameNode.
                     gameNode = _graphRenderer.DrawLeafNode(node);
                 }
                 else
                 {
-                    // NewInnerNode() will attach node to gameNode.
+                    /// <see cref="DrawInnerNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>.
                     gameNode = _graphRenderer.DrawInnerNode(node);
                     // Note: The scale of inner nodes will be adjusted later when
                     // we have the layout.
@@ -209,8 +213,7 @@ namespace SEE.Game.Evolution
             if (noderef == null)
             {
                 // noderef should not be null
-                Debug.LogErrorFormat("Re-used game object for node '{0}' does not have a graph node attached to it\n",
-                                     node.ID);
+                Debug.LogError($"Re-used game object for node '{node.ID}' does not have a graph node attached to it\n");
                 noderef = gameObject.AddComponent<NodeRef>();
             }
             else
@@ -243,14 +246,6 @@ namespace SEE.Game.Evolution
             node.AssertNotNull("node");
 
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
-            // Create power beam for deleted node
-            if (wasNodeRemoved)
-            {
-                MoveScaleShakeAnimator.BeamAnimator.GetInstance().CreatePowerBeam
-                                                                    (gameObject.transform.position,
-                                                                     deletedNodeBeamColor,
-                                                                     deletedNodeBeamScale);
-            }
             // Add the removed node id to the revision changes list
             NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
 
