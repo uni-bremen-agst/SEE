@@ -8296,7 +8296,7 @@ MonoBehaviour:
       Data: 20|SEE.Game.NodeLayoutSettings, SEE
     - Name: kind
       Entry: 3
-      Data: 7
+      Data: 4
     - Name: zScoreScale
       Entry: 5
       Data: false
