@@ -404,7 +404,7 @@ namespace SEE.Game
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
             AdjustScaleBetweenNodeKinds(nodeMap);
             // the layout to be applied
-            NodeLayout nodeLayout = GetLayout();
+            NodeLayout nodeLayout = GetLayout(parent);
 
             // a mapping of graph nodes onto the game objects by which they are represented
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
@@ -502,7 +502,7 @@ namespace SEE.Game
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     nodeLayout.Apply(layoutNodes);
                     p.End();
-                    Debug.LogFormat("Built \"" + settings.nodeLayoutSettings.kind + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
+                    Debug.Log($"Built \"{settings.nodeLayoutSettings.kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
 
                     // 2) Apply the calculated layout to the game objects
 
@@ -570,6 +570,7 @@ namespace SEE.Game
                 // Leaf nodes were created as blocks by leaveNodeFactory.
                 // We need to first scale the game node and only afterwards set its
                 // position because transform.scale refers to the center position.
+                Debug.Log($"Setting leaf {gameNode.name}'s scale to {layout.LocalScale}\n");
                 leafNodeFactory.SetSize(gameNode, layout.LocalScale);
                 // FIXME: Must adjust layout.CenterPosition.y
                 leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
@@ -895,14 +896,15 @@ namespace SEE.Game
         /// place the nodes at ground level 0. This method just returns the layouter,
         /// it does not actually calculate the layout.
         /// </summary>
+        /// <param name="parent">the parent in which to fit the nodes</param>
         /// <returns>node layout selected</returns>
-        public NodeLayout GetLayout() =>
+        public NodeLayout GetLayout(GameObject parent) =>
             settings.nodeLayoutSettings.kind switch
             {
                 NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel, NodeFactory.Unit),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, 1000.0f * NodeFactory.Unit, 1000.0f * NodeFactory.Unit),
+                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
                 NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, settings),
@@ -1434,7 +1436,8 @@ namespace SEE.Game
             }
             else
             {
-                innerNodeFactories[(int)node.Domain].SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
+                // TODO: for some reason, the material is selected twice. Once here and once somewhere earlier (I believe in NewBlock somewhere).
+                innerNodeFactories[(int)node.Domain].SetStyle(gameNode, style);
             }
         }
 
@@ -1450,10 +1453,11 @@ namespace SEE.Game
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
+            Assert.IsNull(gameNode.transform.parent);
             NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
             if (nodeRef == null)
             {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
             }
 
             Node node = nodeRef.Value;
@@ -1467,11 +1471,26 @@ namespace SEE.Game
                 {
                     // FIXME: This is ugly. The graph renderer should not need to care what
                     // kind of layout was applied.
-                    // In case of treemaps, the width metric is mapped on the ground area.
+
+                    // Treemaps can represent a metric by the area of a rectangle. Hence,
+                    // they can represent only a single metric in the x/z plane.
+                    // Let M be the metric selected to be represented by the treemap.
+                    // Here, we choose the width metric (as selected by the user) to be M.
+                    // That is, M mapped onto the rectangle area.
+                    // The area of a rectangle is the product of the lengths of its two sides.
+                    // That is why we need to take the square root of M for the lengths, because
+                    // sqrt(M) * sqrt(M) = M. If were instead using M as width and depth of the
+                    // rectangle, the area would be M^2, which would skew the visual impression
+                    // in the eye of the beholder. Nodes with larger values of M would have a
+                    // disproportionally larger area.
+
+                    // The input to the treemap layout are rectangles with equally sized lengths,
+                    // in other words, squares. This determines only the ground area of the input
+                    // blocks. The height of the blocks remains the original value of the metric
+                    // chosen to determine the height, without any kind of transformation.
                     float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactories[(int)node.Domain].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetHeight(gameNode, NodeFactory.Unit * scale.y);
+                    Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare) * NodeFactory.Unit;
+                    leafNodeFactories[(int)node.Domain].SetSize(gameNode, targetScale);
                 }
                 else
                 {
@@ -1480,7 +1499,7 @@ namespace SEE.Game
             }
             else
             {
-                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
+                throw new Exception($"Game object {gameNode.name} is not a leaf.");
             }
         }
 
@@ -1517,7 +1536,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adjusts the scale of every node of every kind of node, such that the maximal extent
+        /// Adjusts the scale of every node of every kind of domain such that the maximal extent
         /// of each node is one.
         /// </summary>
         /// <param name="nodeMap">The nodes to scale.</param>
@@ -1732,7 +1751,6 @@ namespace SEE.Game
             {
                 throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
             }
-
             return result;
         }
     }
