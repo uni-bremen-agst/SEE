@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int) node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int) node.Domain].labelSettings).AnimationDuration;
+            return (node.IsLeaf() ? city.leafNodeAttributesPerKind.labelSettings : city.innerNodeAttributesPerKind.labelSettings).AnimationDuration;
         }
 
         private void On()

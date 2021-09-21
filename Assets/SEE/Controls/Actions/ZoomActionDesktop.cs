@@ -24,12 +24,14 @@ namespace SEE.Controls.Actions
                 Transform rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
                 if (rootTransform == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update received null rootTransform for hovered {obj.name}.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update received null rootTransform for hovered {obj.name}. Zooming turned off.\n");
+                    enabled = false;
                     return;
                 }
                 else if (rootTransform.parent == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {obj.name} has no parent.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {obj.name} has no parent. Zooming turned off.\n");
+                    enabled = false;
                     return;
                 }
                 GO.Plane clippingPlane = rootTransform.parent.GetComponent<GO.Plane>();

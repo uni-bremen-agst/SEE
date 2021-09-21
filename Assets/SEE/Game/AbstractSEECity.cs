@@ -36,16 +36,14 @@ namespace SEE.Game
         public GlobalCityAttributes globalCityAttributes = new GlobalCityAttributes();
 
         /// <summary>
-        /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
-        /// casted to an integer.
+        /// The attributes of the leaf nodes.
         /// </summary>
-        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new LeafNodeAttributes());
+        public LeafNodeAttributes leafNodeAttributesPerKind = new LeafNodeAttributes();
 
         /// <summary>
-        /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
-        /// casted to an integer.
+        /// The attributes of the inner nodes.
         /// </summary>
-        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new InnerNodeAttributes());
+        public InnerNodeAttributes innerNodeAttributesPerKind = new InnerNodeAttributes();
 
         /// <summary>
         /// The node layout settings.
@@ -287,14 +285,11 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
         public ICollection<string> AllLeafMetrics()
         {
-            List<string> result = new List<string>(leafNodeAttributesPerKind.Length * 4);
-            foreach (LeafNodeAttributes leafNodeAttributes in leafNodeAttributesPerKind)
-            {
-                result.Add(leafNodeAttributes.widthMetric);
-                result.Add(leafNodeAttributes.heightMetric);
-                result.Add(leafNodeAttributes.depthMetric);
-                result.Add(leafNodeAttributes.styleMetric);
-            }
+            List<string> result = new List<string>(4);
+            result.Add(leafNodeAttributesPerKind.widthMetric);
+            result.Add(leafNodeAttributesPerKind.heightMetric);
+            result.Add(leafNodeAttributesPerKind.depthMetric);
+            result.Add(leafNodeAttributesPerKind.styleMetric);
             return result;
         }
 
@@ -468,7 +463,7 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of an inner node</returns>
         public ICollection<string> AllInnerNodeMetrics()
         {
-            return innerNodeAttributesPerKind.SelectMany(x => new[] {x.styleMetric, x.heightMetric}).ToList();
+            return new List<string>() { innerNodeAttributesPerKind.styleMetric, innerNodeAttributesPerKind.heightMetric };
         }
 
         //--------------------------------------
@@ -543,7 +538,7 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, innerNodeAttributesPerKind[(int)node.Domain].kind);
+                        dirsShape.Add(node.ID, innerNodeAttributesPerKind.kind);
                         dirsLocal.Add(node.ID, false);
                         dirsLayout.Add(node.ID, nodeLayoutSettings.kind);
                     }

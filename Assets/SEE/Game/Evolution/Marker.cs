@@ -125,7 +125,8 @@ namespace SEE.Game.Evolution
         {
             // The marker should be drawn in front of the block, hence, its render
             // queue offset must be greater than the one of the block.
-            GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+            //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+            GameObject beamMarker = NewBeam(factory, 0);
 
             // FIXME: These kinds of beam markers make sense only for leaf nodes.
             // Could we better use some kind of blinking now that the cities
