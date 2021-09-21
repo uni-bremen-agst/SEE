@@ -1846,7 +1846,7 @@ MonoBehaviour:
       Data: 4|SEE.Game.InnerNodeAttributes, SEE
     - Name: kind
       Entry: 3
-      Data: 0
+      Data: 3
     - Name: heightMetric
       Entry: 1
       Data: 0.0001
