@@ -253,7 +253,7 @@ namespace SEE.Game.UI.ConfigMenu
 
             // FIXME: We can edit only the Unspecified domain. The concept of domains will
             // be dropped soon. So we will not invest any effort in this for the time being.
-            LeafNodeAttributes leafNodeAttributes = city.leafNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            LeafNodeAttributes leafNodeAttributes = city.leafNodeAttributesPerKind;
             {
                 // Shape type for leaf nodes
                 ComboSelectBuilder.Init(controls.transform)
@@ -334,7 +334,7 @@ namespace SEE.Game.UI.ConfigMenu
 
             // FIXME: We can edit only the Unspecified domain. The concept of domains will
             // be dropped soon. So we will not invest any effort in this for the time being.
-            InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind[(int)Node.NodeDomain.Unspecified];
+            InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind;
             {
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)

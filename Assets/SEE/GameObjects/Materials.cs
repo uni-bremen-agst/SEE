@@ -28,7 +28,7 @@ namespace SEE.GO
         public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
-        
+
         // MRTK variants
         public const string MRTKOpaqueMaterialName = "Materials/OpaqueMRTKMaterial";
         public const string MRTKTransparentMaterialName = "Materials/TransparentMRTKMaterial";
@@ -61,8 +61,15 @@ namespace SEE.GO
         public readonly Color Higher;
 
         /// <summary>
-        /// The different materials. They are all alike except for the color.
+        /// The different materials. They depend upon two aspects:
+        /// the offset in the rendering queue and the number of colors requested.
+        /// The first index in the list of <see cref="materials"/> is the offset
+        /// in the rendering queue, the second index in the materials array,
+        /// which is an element of that list, is the color index.
+        /// The entries of the inner material array are all alike except for the color.
         /// We will use a color gradient and one material for each color.
+        /// Similarly, <see cref="materials"/>[i] and <see cref="materials"/>[j] will
+        /// be alike except for the respective <see cref="Material.renderQueue"/> attribute.
         /// </summary>
         private readonly List<Material[]> materials;
 
@@ -73,12 +80,14 @@ namespace SEE.GO
             NumberOfMaterials = colorRange.NumberOfColors;
             Lower = colorRange.lower;
             Higher = colorRange.upper;
+            Debug.Log($"new Materials(number of colors: {NumberOfMaterials})\n");
+            // materials[0] is set up with the given colorRange for the render-queue offset 0.
             materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
         }
 
         /// <summary>
         /// Creates and returns the materials, one for each different color.
-        /// 
+        ///
         /// Precondition: <paramref name="numberOfColors"/> > 0.
         /// </summary>
         /// <param name="shaderType">the type of the shader to be used to create the material</param>
@@ -99,15 +108,17 @@ namespace SEE.GO
                 // Assumption: numberOfColors > 1; if numberOfColors == 0, we would divide by zero.
                 for (int i = 0; i < result.Length; i++)
                 {
-                    result[i] = New(shaderType, Color.Lerp(lower, higher, i / (float)(numberOfColors - 1)), renderQueueOffset);
+                    Color color = Color.Lerp(lower, higher, i / (float)(numberOfColors - 1));
+                    Debug.Log($"Materials color {i}: {color}\n");
+                    result[i] = New(shaderType, color, renderQueueOffset);
                 }
             }
             return result;
         }
 
         /// <summary>
-        /// Returns the default material for the given <paramref name="degree"/> (always the identical 
-        /// material, no matter how often this method is called). That means, if 
+        /// Returns the default material for the given <paramref name="degree"/> (always the identical
+        /// material, no matter how often this method is called). That means, if
         /// the caller modifies this material, other objects using it will be affected, too.
         /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
         /// The larger the offset, the later the object will be rendered. An object drawn later
@@ -129,6 +140,7 @@ namespace SEE.GO
             }
             if (renderQueueOffset >= materials.Count)
             {
+                Debug.Log($"increasing Materials.Get(renderQueueOffset: {renderQueueOffset}, degree: {degree}) with materials.Count = {materials.Count}\n");
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
                     materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
@@ -144,9 +156,10 @@ namespace SEE.GO
             Material material = new Material(prefab)
             {
                 // FIXME this is not a good solution. we may want to add an enum or something for
-                // possible materials, such that we can ensure the correct renderQueue. that would
+                // possible materials, such that we can ensure the correct renderQueue. That would
                 // adding new materials make easier as well.
-                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
+                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent
+                                                                  : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
                 color = color
             };
             return material;

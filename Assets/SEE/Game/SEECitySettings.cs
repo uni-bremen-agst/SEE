@@ -1,5 +1,8 @@
 using OdinSerializer;
 using SEE.DataModel.DG;
+using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game
@@ -51,17 +54,22 @@ namespace SEE.Game
         Cylinders
     }
 
+    public abstract class VisualAttributes
+    {
+
+    }
+
     /// <summary>
     /// Global attributes, that every city defines.
     /// </summary>
-    public class GlobalCityAttributes
+    public class GlobalCityAttributes : VisualAttributes
     {
         /// <summary>
         /// The screen relative height to use for the culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
         [Range(0.0f, 1.0f)]
-        public float lodCulling = 0.01f;
+        public float lodCulling = 0.001f;
 
         /// <summary>
         /// The path for the layout file containing the node layout information.
@@ -74,10 +82,18 @@ namespace SEE.Game
         public DataPath layoutPath = new DataPath();
     }
 
+    public abstract class VisualNodeAttributes : VisualAttributes
+    {
+        protected const string ColorRangeLabel = "ColorRange";
+        protected const string HeightMetricLabel = "HeightMetric";
+        protected const string StyleMetricLabel = "StyleMetric";
+        protected const string LabelSettingsLabel = "LabelSettings";
+    }
+
     /// <summary>
-    /// The settings of leaf nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
+    /// The settings of leaf nodes of a specific kind.
     /// </summary>
-    public class LeafNodeAttributes
+    public class LeafNodeAttributes : VisualNodeAttributes
     {
         public LeafNodeKinds kind = LeafNodeKinds.Blocks;
         public string widthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
@@ -88,12 +104,45 @@ namespace SEE.Game
 
         [OdinSerialize]
         public LabelSettings labelSettings = new LabelSettings();
+
+        protected const string LeafNodeKindsLabel = "Kind";
+        private const string WidthMetricLabel = "WidthMetric";
+        private const string DepthMetricLabel = "DepthMetric";
+
+        internal void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(kind.ToString(), LeafNodeKindsLabel);
+            writer.Save(widthMetric, WidthMetricLabel);
+            writer.Save(heightMetric, HeightMetricLabel);
+            writer.Save(depthMetric, DepthMetricLabel);
+            writer.Save(styleMetric, StyleMetricLabel);
+            colorRange.Save(writer, ColorRangeLabel);
+            labelSettings.Save(writer, LabelSettingsLabel);
+            writer.EndGroup();
+        }
+
+        internal void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.RestoreEnum(values, LeafNodeKindsLabel, ref kind);
+                ConfigIO.Restore(values, WidthMetricLabel, ref widthMetric);
+                ConfigIO.Restore(values, HeightMetricLabel, ref heightMetric);
+                ConfigIO.Restore(values, DepthMetricLabel, ref depthMetric);
+                ConfigIO.Restore(values, StyleMetricLabel, ref styleMetric);
+                colorRange.Restore(values, ColorRangeLabel);
+                labelSettings.Restore(values, LabelSettingsLabel);
+            }
+        }
     }
 
     /// <summary>
     /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
-    public class InnerNodeAttributes
+    public class InnerNodeAttributes : VisualNodeAttributes
     {
         public InnerNodeKinds kind = InnerNodeKinds.Blocks;
         public string heightMetric = "";
@@ -102,6 +151,33 @@ namespace SEE.Game
 
         [OdinSerialize]
         public LabelSettings labelSettings = new LabelSettings();
+
+        protected const string InnerNodeKindsLabel = "Kind";
+
+        internal void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(kind.ToString(), InnerNodeKindsLabel);
+            writer.Save(heightMetric, HeightMetricLabel);
+            writer.Save(styleMetric, StyleMetricLabel);
+            colorRange.Save(writer, ColorRangeLabel);
+            labelSettings.Save(writer, LabelSettingsLabel);
+            writer.EndGroup();
+        }
+
+        internal void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.RestoreEnum(values, InnerNodeKindsLabel, ref kind);
+                ConfigIO.Restore(values, HeightMetricLabel, ref heightMetric);
+                ConfigIO.Restore(values, StyleMetricLabel, ref styleMetric);
+                colorRange.Restore(values, ColorRangeLabel);
+                labelSettings.Restore(values, LabelSettingsLabel);
+            }
+        }
     }
 
     /// <summary>
