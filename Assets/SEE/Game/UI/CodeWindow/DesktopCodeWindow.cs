@@ -31,7 +31,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
-        public float timeStamp = Time.time;
+        public float timeStamp = 0; //Time.time;
 
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
