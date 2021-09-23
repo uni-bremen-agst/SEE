@@ -384,7 +384,7 @@ MonoBehaviour:
       Data: false
     - Name: loadDashboardMetrics
       Entry: 5
-      Data: true
+      Data: false
     - Name: issuesAddedFromVersion
       Entry: 1
       Data: 
