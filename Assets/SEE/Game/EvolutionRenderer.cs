@@ -357,6 +357,7 @@ namespace SEE.Game
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
             GraphRenderer.Fit(gameObject, layoutNodes);
+            GraphRenderer.Stack(gameObject, layoutNodes);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to
@@ -891,7 +892,6 @@ namespace SEE.Game
                 // We are re-using the existing plane, hence, we animate its change
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-
                 Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime / 2);
                 Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime / 2);
             }
