@@ -212,7 +212,7 @@ namespace SEE.Game
         /// Whether metrics shall be retrieved from the dashboard.
         /// This includes erosion data.
         /// </summary>
-        public bool loadDashboardMetrics = true;
+        public bool loadDashboardMetrics = false;
 
         /// <summary>
         /// If empty, all issues will be retrieved. Otherwise, only those issues which have been added from
