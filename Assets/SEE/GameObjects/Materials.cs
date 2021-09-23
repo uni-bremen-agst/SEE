@@ -15,12 +15,15 @@ namespace SEE.GO
     /// </summary>
     public class Materials
     {
+        /// <summary>
+        /// Different types of shaders used to draw the materials.
+        /// </summary>
         public enum ShaderType
         {
-            Opaque,
-            Transparent,
-            TransparentLine,
-            Invisible
+            Opaque,          // fully drawn with no transparency
+            Transparent,     // transparency is available
+            TransparentLine, // for lines with transparency
+            Invisible        // the object will be invisible
         }
 
         // Normal materials
@@ -73,6 +76,15 @@ namespace SEE.GO
         /// </summary>
         private readonly List<Material[]> materials;
 
+        /// <summary>
+        /// Creates materials for the given <paramref name="colorRange"/>, one material
+        /// for each color at render queue offset 0, with the associated <paramref name="shaderType"/>.
+        /// All created materials are alike except for their color.
+        ///
+        /// Precondition: <paramref name="colorRange.NumberOfColors"/> must be greater than 0.
+        /// </summary>
+        /// <param name="shaderType">shader type to be used to draw the new materials</param>
+        /// <param name="colorRange">the color range for the new materials</param>
         public Materials(ShaderType shaderType, ColorRange colorRange)
         {
             Type = shaderType;
@@ -80,7 +92,6 @@ namespace SEE.GO
             NumberOfMaterials = colorRange.NumberOfColors;
             Lower = colorRange.lower;
             Higher = colorRange.upper;
-            Debug.Log($"new Materials(number of colors: {NumberOfMaterials})\n");
             // materials[0] is set up with the given colorRange for the render-queue offset 0.
             materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
         }
@@ -109,7 +120,6 @@ namespace SEE.GO
                 for (int i = 0; i < result.Length; i++)
                 {
                     Color color = Color.Lerp(lower, higher, i / (float)(numberOfColors - 1));
-                    Debug.Log($"Materials color {i}: {color}\n");
                     result[i] = New(shaderType, color, renderQueueOffset);
                 }
             }
@@ -117,7 +127,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the default material for the given <paramref name="degree"/> (always the identical
+        /// Returns the default material for the given <paramref name="index"/> (always the identical
         /// material, no matter how often this method is called). That means, if
         /// the caller modifies this material, other objects using it will be affected, too.
         /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
@@ -126,13 +136,13 @@ namespace SEE.GO
         /// Precondition: 0 <= degree <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
         /// <param name="renderQueueOffset">offset for the render queue</param>
-        /// <param name="degree">index of the material (color) in the range [0, numberOfColors-1]</param>
+        /// <param name="index">index of the material (color) in the range [0, numberOfColors-1]</param>
         /// <returns>default material</returns>
-        public Material Get(int renderQueueOffset, int degree)
+        public Material Get(int renderQueueOffset, int index)
         {
-            if (degree < 0 || degree >= NumberOfMaterials)
+            if (index < 0 || index >= NumberOfMaterials)
             {
-                throw new Exception("Color degree " + degree + " out of range [0," + (NumberOfMaterials - 1) + "]");
+                throw new Exception($"Color degree {index} out of range [0, {NumberOfMaterials - 1}]");
             }
             if (renderQueueOffset < 0)
             {
@@ -140,19 +150,39 @@ namespace SEE.GO
             }
             if (renderQueueOffset >= materials.Count)
             {
-                Debug.Log($"increasing Materials.Get(renderQueueOffset: {renderQueueOffset}, degree: {degree}) with materials.Count = {materials.Count}\n");
+                // there are not materials for this renderQueueOffset; we need to create these first
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
                     materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
                 }
             }
-            return materials[renderQueueOffset][degree];
+            return materials[renderQueueOffset][index];
         }
 
+        /// <summary>
+        /// Sets the shared material of <paramref name="renderer"/> to the material with given <paramref name="index"/>
+        /// and <paramref name="renderQueueOffset"/>. The <paramref name="index"/> will be clamped into
+        /// [0, <see cref="NumberOfMaterials"/> - 1].
+        /// </summary>
+        /// <param name="renderer">renderer whose shared material is to be set</param>
+        /// <param name="renderQueueOffset">the offset in the render queue</param>
+        /// <param name="index">the index of the material</param>
+        public void SetSharedMaterial(Renderer renderer, int renderQueueOffset, int index)
+        {
+            renderer.sharedMaterial = Get(renderQueueOffset, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
+        }
+
+        /// <summary>
+        /// Creates and returns a new material. The material is loaded from a resource file with given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
+        /// <param name="color">the color of the new material</param>
+        /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
+        /// <returns>new material</returns>
         public static Material New(string name, Color color, int renderQueueOffset = 0)
         {
             Material prefab = Resources.Load<Material>(name);
-            Assert.IsNotNull(prefab, "Material resource '" + name + "' could not be found!");
+            Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
             Material material = new Material(prefab)
             {
                 // FIXME this is not a good solution. we may want to add an enum or something for
@@ -202,13 +232,7 @@ namespace SEE.GO
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
-
             return New(name, color, renderQueueOffset);
-        }
-
-        public static Material New(string name, int renderQueueOffset = 0)
-        {
-            return New(name, Color.white, renderQueueOffset);
         }
 
         /// <summary>
