@@ -566,8 +566,12 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 10
+      Entry: 7
+      Data: 16|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -579,7 +583,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 16|SEE.Game.DataPath, SEE
+      Data: 17|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -1846,13 +1850,13 @@ MonoBehaviour:
       Data: 4|SEE.Game.InnerNodeAttributes, SEE
     - Name: kind
       Entry: 3
-      Data: 3
+      Data: 5
     - Name: heightMetric
       Entry: 1
-      Data: 0.0001
+      Data: 0.001
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: Metric.Level
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1927,7 +1931,7 @@ MonoBehaviour:
       Data: 4
     - Name: zScoreScale
       Entry: 5
-      Data: true
+      Data: false
     - Name: ScaleOnlyLeafMetrics
       Entry: 5
       Data: true
@@ -2121,11 +2125,51 @@ MonoBehaviour:
       Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 10
+      Entry: 7
+      Data: 16|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -2134,7 +2178,7 @@ MonoBehaviour:
       Data: 
     - Name: CityPath
       Entry: 7
-      Data: 16|SEE.Game.DataPath, SEE
+      Data: 17|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -5100,7 +5144,7 @@ MonoBehaviour:
       Data: 0.0001
     - Name: styleMetric
       Entry: 1
-      Data: Metric.IssuesTotal
+      Data: Metric.Level
     - Name: colorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
