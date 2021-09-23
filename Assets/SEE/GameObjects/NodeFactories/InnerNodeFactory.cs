@@ -21,7 +21,7 @@ namespace SEE.GO
         /// <summary>
         /// Sets the width of lines drawn for the given object. If an object is not
         /// drawn by lines, this method has no effect.
-        /// 
+        ///
         /// Precondition: The given object must have been created by subclasses.
         /// </summary>
         /// <param name="gameNode">game object to be drawn with different line width</param>
@@ -34,7 +34,7 @@ namespace SEE.GO
         public Materials Materials;
 
         /// <summary>
-        /// The default height of a inner node in world space Unity unit.
+        /// The default height of an inner node in world space Unity unit.
         /// </summary>
         protected const float DefaultHeight = 0.000001f;
 
@@ -51,7 +51,7 @@ namespace SEE.GO
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
                 int level = block.GetComponent<NodeRef>().Value.Level;
-                renderer.sharedMaterial = Materials.Get(level, Mathf.Clamp(style, 0, (int)NumberOfStyles() - 1));
+                Materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
             }
         }
     }
