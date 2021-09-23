@@ -109,7 +109,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
         /// plane encloses all currently cached game objects of the city only if it was newly
-        /// generated. It may need to be adjusted if it was not newly generated.
+        /// generated. It may need to be adjusted if it was not newly generated. The resulting
+        /// plane is an immediate child of <see cref="city"/>.
         /// </summary>
         /// <param name="plane">the plane intended to enclose all game objects of the city; the y co-ordinate of the plane will be 0</param>
         /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
@@ -119,6 +120,7 @@ namespace SEE.Game.Evolution
             if (!hasPlane)
             {
                 currentPlane = _graphRenderer.DrawPlane(gameObjects, city.transform.position.y);
+                currentPlane.transform.SetParent(city.transform);
             }
             plane = currentPlane;
             return hasPlane;
