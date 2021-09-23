@@ -456,9 +456,7 @@ namespace SEE.Game
                     ComputeBoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
                     plane = DrawPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
-
-                    // The layoutNodes are put just above the plane w.r.t. the y axis.
-                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
+                    Stack(plane, layoutNodes);
 
                     CreateGameNodeHierarchy(nodeMap, parent);
                     InteractionDecorator.PrepareForInteraction(nodeToGameObject);
@@ -518,9 +516,7 @@ namespace SEE.Game
                     // add the plane surrounding all game objects for nodes
                     plane = DrawPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
                     AddToParent(plane, parent);
-
-                    // The layouNodes are put just above the plane w.r.t. the y axis.
-                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
+                    Stack(plane, layoutNodes);
 
                     CreateGameNodeHierarchy(nodeMap, parent);
 
@@ -551,6 +547,16 @@ namespace SEE.Game
             {
                 portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
             }
+        }
+
+        /// <summary>
+        /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
+        /// </summary>
+        /// <param name="plane">plane upon which <paramref name="layoutNodes"/> should be stacked</param>
+        /// <param name="layoutNodes">the layout nodes to be stacked</param>
+        public static void Stack(GameObject plane, ICollection<ILayoutNode> layoutNodes)
+        {
+            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
         }
 
         /// <summary>
@@ -1585,8 +1591,7 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
 
-            int style = SelectStyle(node);
-            GameObject result = innerNodeFactories.NewBlock(style, node.Level);
+            GameObject result = innerNodeFactories.NewBlock(style: SelectStyle(node), renderQueueOffset: node.Level);
             result.name = node.ID;
             result.tag = Tags.Node;
             result.AddComponent<NodeRef>().Value = node;
