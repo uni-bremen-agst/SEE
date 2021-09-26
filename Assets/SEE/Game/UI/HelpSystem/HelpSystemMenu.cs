@@ -150,7 +150,7 @@ namespace SEE.Game.UI.HelpSystem
 
             architectureEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu Description", Color.magenta),
+            HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu use cases", Color.magenta),
             HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
             };
 
