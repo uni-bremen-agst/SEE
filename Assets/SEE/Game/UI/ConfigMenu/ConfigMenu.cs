@@ -253,14 +253,14 @@ namespace SEE.Game.UI.ConfigMenu
 
             // FIXME: We can edit only the Unspecified domain. The concept of domains will
             // be dropped soon. So we will not invest any effort in this for the time being.
-            LeafNodeAttributes leafNodeAttributes = city.leafNodeAttributesPerKind;
+            LeafNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
             {
                 // Shape type for leaf nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
                     .SetAllowedValues(EnumToStr<LeafNodeKinds>())
-                    .SetDefaultValue(leafNodeAttributes.kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.kind))
+                    .SetDefaultValue(leafNodeAttributes.Kind.ToString())
+                    .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.Kind))
                     .SetComboSelectMode(ComboSelectMode.Restricted)
                     .Build();
 
@@ -268,47 +268,47 @@ namespace SEE.Game.UI.ConfigMenu
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Width")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(leafNodeAttributes.widthMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.widthMetric = s)
+                    .SetDefaultValue(leafNodeAttributes.WidthMetric)
+                    .SetOnChangeHandler(s => leafNodeAttributes.WidthMetric = s)
                     .Build();
 
                 // Height metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Height")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(leafNodeAttributes.heightMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.heightMetric = s)
+                    .SetDefaultValue(leafNodeAttributes.HeightMetric)
+                    .SetOnChangeHandler(s => leafNodeAttributes.HeightMetric = s)
                     .Build();
 
                 // Height metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Depth")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(leafNodeAttributes.depthMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.depthMetric = s)
+                    .SetDefaultValue(leafNodeAttributes.DepthMetric)
+                    .SetOnChangeHandler(s => leafNodeAttributes.DepthMetric = s)
                     .Build();
 
                 // Leaf style metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Style")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(leafNodeAttributes.styleMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.styleMetric = s)
+                    .SetDefaultValue(leafNodeAttributes.ColorMetric)
+                    .SetOnChangeHandler(s => leafNodeAttributes.ColorMetric = s)
                     .Build();
 
                 // Lower color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Lower color")
-                    .SetDefaultValue(leafNodeAttributes.colorRange.lower)
-                    .SetOnChangeHandler(c => leafNodeAttributes.colorRange.lower = c)
+                    .SetDefaultValue(leafNodeAttributes.ColorRange.lower)
+                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.lower = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Upper color")
-                    .SetDefaultValue(leafNodeAttributes.colorRange.upper)
-                    .SetOnChangeHandler(c => leafNodeAttributes.colorRange.upper = c)
+                    .SetDefaultValue(leafNodeAttributes.ColorRange.upper)
+                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.upper = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
@@ -316,13 +316,13 @@ namespace SEE.Game.UI.ConfigMenu
                 SliderBuilder.Init(controls.transform)
                     .SetLabel("# Colors")
                     .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(leafNodeAttributes.colorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => leafNodeAttributes.colorRange.NumberOfColors =
+                    .SetDefaultValue(leafNodeAttributes.ColorRange.NumberOfColors)
+                    .SetOnChangeHandler(f => leafNodeAttributes.ColorRange.NumberOfColors =
                                             (uint)Math.Round(f))
                     .SetRange((0, 15))
                     .Build();
 
-                CreateLabelSettingsInputs(controls, leafNodeAttributes.labelSettings);
+                CreateLabelSettingsInputs(controls, leafNodeAttributes.LabelSettings);
             }
         }
 
@@ -334,14 +334,14 @@ namespace SEE.Game.UI.ConfigMenu
 
             // FIXME: We can edit only the Unspecified domain. The concept of domains will
             // be dropped soon. So we will not invest any effort in this for the time being.
-            InnerNodeAttributes innerNodeAttributes = city.innerNodeAttributesPerKind;
+            InnerNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
             {
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
                     .SetAllowedValues(EnumToStr<InnerNodeKinds>())
-                    .SetDefaultValue(innerNodeAttributes.kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.kind))
+                    .SetDefaultValue(innerNodeAttributes.Kind.ToString())
+                    .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.Kind))
                     .SetComboSelectMode(ComboSelectMode.Restricted)
                     .Build();
 
@@ -349,31 +349,31 @@ namespace SEE.Game.UI.ConfigMenu
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Height")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(innerNodeAttributes.heightMetric)
-                    .SetOnChangeHandler(s => innerNodeAttributes.heightMetric = s)
+                    .SetDefaultValue(innerNodeAttributes.HeightMetric)
+                    .SetOnChangeHandler(s => innerNodeAttributes.HeightMetric = s)
                     .Build();
 
                 // Leaf style metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Style")
                     .SetAllowedValues(NumericAttributes)
-                    .SetDefaultValue(innerNodeAttributes.styleMetric)
-                    .SetOnChangeHandler(s => innerNodeAttributes.styleMetric = s)
+                    .SetDefaultValue(innerNodeAttributes.ColorMetric)
+                    .SetOnChangeHandler(s => innerNodeAttributes.ColorMetric = s)
                     .Build();
 
                 // Lower color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Lower color")
-                    .SetDefaultValue(innerNodeAttributes.colorRange.lower)
-                    .SetOnChangeHandler(c => innerNodeAttributes.colorRange.lower = c)
+                    .SetDefaultValue(innerNodeAttributes.ColorRange.lower)
+                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.lower = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Upper color")
-                    .SetDefaultValue(innerNodeAttributes.colorRange.upper)
-                    .SetOnChangeHandler(c => innerNodeAttributes.colorRange.upper = c)
+                    .SetDefaultValue(innerNodeAttributes.ColorRange.upper)
+                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.upper = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
@@ -381,17 +381,17 @@ namespace SEE.Game.UI.ConfigMenu
                 SliderBuilder.Init(controls.transform)
                     .SetLabel("# Colors")
                     .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(innerNodeAttributes.colorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => innerNodeAttributes.colorRange.NumberOfColors =
+                    .SetDefaultValue(innerNodeAttributes.ColorRange.NumberOfColors)
+                    .SetOnChangeHandler(f => innerNodeAttributes.ColorRange.NumberOfColors =
                                             (uint)Math.Round(f))
                     .SetRange((0, 15))
                     .Build();
 
-                CreateLabelSettingsInputs(controls, innerNodeAttributes.labelSettings);
+                CreateLabelSettingsInputs(controls, innerNodeAttributes.LabelSettings);
             }
         }
 
-        private void CreateLabelSettingsInputs(Transform parent, LabelSettings labelSettings)
+        private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
         {
             // Show labels
             SwitchBuilder.Init(parent)
@@ -438,50 +438,50 @@ namespace SEE.Game.UI.ConfigMenu
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Node layout")
                 .SetAllowedValues(EnumToStr<NodeLayoutKind>())
-                .SetDefaultValue(city.nodeLayoutSettings.kind.ToString())
-                .SetOnChangeHandler(s => Enum.TryParse(s, out city.nodeLayoutSettings.kind))
+                .SetDefaultValue(city.NodeLayoutSettings.Kind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.NodeLayoutSettings.Kind))
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
             // Layout file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Layout file")
-                .SetPathInstance(city.globalCityAttributes.layoutPath)
+                .SetPathInstance(city.NodeLayoutSettings.LayoutPath)
                 .Build();
 
             // Z-score scaling
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Z-score scaling")
-                .SetDefaultValue(city.nodeLayoutSettings.zScoreScale)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.zScoreScale = b)
+                .SetDefaultValue(city.ZScoreScale)
+                .SetOnChangeHandler(b => city.ZScoreScale = b)
                 .Build();
 
             // Leaf/inner node metric scaling
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Scale only leaf metrics")
-                .SetDefaultValue(city.nodeLayoutSettings.ScaleOnlyLeafMetrics)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.ScaleOnlyLeafMetrics = b)
+                .SetDefaultValue(city.ScaleOnlyLeafMetrics)
+                .SetOnChangeHandler(b => city.ScaleOnlyLeafMetrics = b)
                 .Build();
 
             // Show leaf erosions
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show leaf erosions")
-                .SetDefaultValue(city.nodeLayoutSettings.showLeafErosions)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.showLeafErosions = b)
+                .SetDefaultValue(city.ErosionSettings.ShowLeafErosions)
+                .SetOnChangeHandler(b => city.ErosionSettings.ShowLeafErosions = b)
                 .Build();
 
             // Show inner erosions
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Show inner erosions")
-                .SetDefaultValue(city.nodeLayoutSettings.showInnerErosions)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.showInnerErosions = b)
+                .SetDefaultValue(city.ErosionSettings.ShowInnerErosions)
+                .SetOnChangeHandler(b => city.ErosionSettings.ShowInnerErosions = b)
                 .Build();
 
             // loadDashboardMetrics
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Load dashboard metrics")
-                .SetDefaultValue(city.nodeLayoutSettings.loadDashboardMetrics)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.loadDashboardMetrics = b)
+                .SetDefaultValue(city.ErosionSettings.LoadDashboardMetrics)
+                .SetOnChangeHandler(b => city.ErosionSettings.LoadDashboardMetrics = b)
                 .Build();
 
             // FIXME: Provide an configuration input for city.nodeLayoutSettings.issuesAddedFromVersion.
@@ -490,16 +490,16 @@ namespace SEE.Game.UI.ConfigMenu
             // overrideMetrics
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Dashboard metrics override")
-                .SetDefaultValue(city.nodeLayoutSettings.overrideMetrics)
-                .SetOnChangeHandler(b => city.nodeLayoutSettings.overrideMetrics = b)
+                .SetDefaultValue(city.ErosionSettings.OverrideMetrics)
+                .SetOnChangeHandler(b => city.ErosionSettings.OverrideMetrics = b)
                 .Build();
 
             // Erosion scaling factor
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Erosion scaling factor")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(city.nodeLayoutSettings.erosionScalingFactor)
-                .SetOnChangeHandler(f => city.nodeLayoutSettings.erosionScalingFactor = f)
+                .SetDefaultValue(city.ErosionSettings.ErosionScalingFactor)
+                .SetOnChangeHandler(f => city.ErosionSettings.ErosionScalingFactor = f)
                 .SetRange((1, 10))
                 .Build();
         }
@@ -514,8 +514,8 @@ namespace SEE.Game.UI.ConfigMenu
             ComboSelectBuilder.Init(controls.transform)
                 .SetLabel("Edge layout")
                 .SetAllowedValues(EnumToStr<EdgeLayoutKind>())
-                .SetDefaultValue(city.edgeLayoutSettings.kind.ToString())
-                .SetOnChangeHandler(s => Enum.TryParse(s, out city.edgeLayoutSettings.kind))
+                .SetDefaultValue(city.EdgeLayoutSettings.Kind.ToString())
+                .SetOnChangeHandler(s => Enum.TryParse(s, out city.EdgeLayoutSettings.Kind))
                 .SetComboSelectMode(ComboSelectMode.Restricted)
                 .Build();
 
@@ -523,24 +523,24 @@ namespace SEE.Game.UI.ConfigMenu
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Edge width")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(city.edgeLayoutSettings.edgeWidth)
-                .SetOnChangeHandler(f => city.edgeLayoutSettings.edgeWidth = f)
+                .SetDefaultValue(city.EdgeLayoutSettings.EdgeWidth)
+                .SetOnChangeHandler(f => city.EdgeLayoutSettings.EdgeWidth = f)
                 .SetRange((0, 0.5f))
                 .Build();
 
             // Edges above block
             SwitchBuilder.Init(controls.transform)
                 .SetLabel("Edges above block")
-                .SetDefaultValue(city.edgeLayoutSettings.edgesAboveBlocks)
-                .SetOnChangeHandler(b => city.edgeLayoutSettings.edgesAboveBlocks = b)
+                .SetDefaultValue(city.EdgeLayoutSettings.EdgesAboveBlocks)
+                .SetOnChangeHandler(b => city.EdgeLayoutSettings.EdgesAboveBlocks = b)
                 .Build();
 
             // Bundling tension
             SliderBuilder.Init(controls.transform)
                 .SetLabel("Bundling tension")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(city.edgeLayoutSettings.tension)
-                .SetOnChangeHandler(f => city.edgeLayoutSettings.tension = f)
+                .SetDefaultValue(city.EdgeLayoutSettings.Tension)
+                .SetOnChangeHandler(f => city.EdgeLayoutSettings.Tension = f)
                 .SetRange((0, 1))
                 .Build();
 
@@ -564,8 +564,8 @@ namespace SEE.Game.UI.ConfigMenu
                 .SetLabel("LOD culling")
                 .SetMode(SliderMode.Float)
                 .SetRange((0f, 1f))
-                .SetDefaultValue(city.globalCityAttributes.lodCulling)
-                .SetOnChangeHandler(f => city.globalCityAttributes.lodCulling = f);
+                .SetDefaultValue(city.LODCulling)
+                .SetOnChangeHandler(f => city.LODCulling = f);
 
             // GXL file
             FilePickerBuilder.Init(controls.transform)

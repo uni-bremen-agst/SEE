@@ -944,7 +944,7 @@ namespace SEE.Game
                 EdgeMatcher(oldEdges, newEdges);
 
                 // Case distinction in case the layout does not need sample points.
-                if (graphRenderer.settings.edgeLayoutSettings.kind != EdgeLayoutKind.Straight && newEdges.Count() != 0)
+                if (graphRenderer.settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.Straight && newEdges.Count() != 0)
                 {
                     foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {

@@ -24,7 +24,7 @@ namespace SEE.Layout.NodeLayouts.Cose
     /// <summary>
     /// This class holds all settings for the cose layout
     /// </summary>
-    public class CoseGraphSettings
+    public class CoseGraphAttributes
     {
         /// <summary>
         /// The ideal length of the edge

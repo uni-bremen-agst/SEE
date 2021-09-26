@@ -204,8 +204,8 @@ namespace SEE.Controls.Actions
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.
-            return node.IsLeaf() && city.leafNodeAttributesPerKind.labelSettings.Show
-                || node.IsInnerNode() && city.innerNodeAttributesPerKind.labelSettings.Show;
+            return node.IsLeaf() && city.LeafNodeSettings.LabelSettings.Show
+                || node.IsInnerNode() && city.InnerNodeSettings.LabelSettings.Show;
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace SEE.Controls.Actions
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
                 startLabelPosition,
-                (isLeaf ? city.leafNodeAttributesPerKind.labelSettings : city.innerNodeAttributesPerKind.labelSettings).FontSize,
+                (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
                 textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
@@ -311,7 +311,7 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += (node.IsLeaf() ? city.leafNodeAttributesPerKind.labelSettings : city.innerNodeAttributesPerKind.labelSettings).Distance;
+            endLabelPosition.y += (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).Distance;
             // Due to the line not using world space, we need to transform its position accordingly
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
@@ -423,7 +423,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.leafNodeAttributesPerKind.labelSettings : city.innerNodeAttributesPerKind.labelSettings).AnimationDuration;
+            return (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
         }
 
         /// <summary>
