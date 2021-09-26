@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using SEE.Controls;
 using SEE.Game.UI.Menu;
 using SEE.GO;
@@ -142,7 +143,8 @@ namespace SEE.Game.UI.HelpSystem
             {
                 Headline.GetComponent<TextMeshProUGUI>().text = "placeholder";
             }
-            videoPlayer.url = videoPath;
+            videoPlayer.url = Path.Combine(Application.streamingAssetsPath,videoPath);
+            Debug.Log(videoPlayer.url);
             videoPlayer.Play();
             videoPlayer.SetDirectAudioMute(0, true);
             entry.IsPlaying = true;
