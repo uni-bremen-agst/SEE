@@ -81,11 +81,12 @@ namespace SEE.Controls
             if (CodeSpaces.ContainsKey(playerName))
             {
                 CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == title);
-                if(window != null)
+                if (window != null)
                 {
                     window.InsertChar(c, index);
                 }
             }
+            
         }
 
         /// <summary>
