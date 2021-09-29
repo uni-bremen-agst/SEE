@@ -63,7 +63,7 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file);
+                        //ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file);
                         if (CodeSpaceManager.ManagerInstance)
                         {
                             int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(prePosition, file), file);
