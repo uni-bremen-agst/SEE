@@ -85,8 +85,7 @@ namespace SEE.Controls
                 {
                     window.InsertChar(c, index);
                 }
-            }
-            
+            }        
         }
 
         /// <summary>

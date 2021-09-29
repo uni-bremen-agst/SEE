@@ -157,7 +157,7 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                     ICRDT.AddChar(input[0], TextMeshInputField.stringPosition -1, Title);
-                }
+                } 
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > TextMeshInputField.stringPosition && timeStamp <= Time.time)
                 {
