@@ -72,7 +72,7 @@ namespace SEE.Net
                                 return;
                             }
 
-                           // CodeSpaceManager.ManagerInstance.InsertChar(RequesterIPAddress, file, c, index);
+                            CodeSpaceManager.ManagerInstance.InsertChar(RequesterIPAddress, file, c, index); //das ist auch nicht das problem
 
                         }
                         break;

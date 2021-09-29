@@ -95,7 +95,7 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.AddString(Text, 0, Title);
                 }
             }
-            SEEInput.KeyboardShortcutsEnabled = false;
+            
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.
@@ -142,7 +142,7 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
-
+                SEEInput.KeyboardShortcutsEnabled = false;
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
 
@@ -207,7 +207,8 @@ namespace SEE.Game.UI.CodeWindow
                 }
                
             }
-            if(Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.W))
+            SEEInput.KeyboardShortcutsEnabled = true;
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.W))
             {
                 Debug.Log("FILE:; " + Title);
                 Debug.Log(ICRDT.PrintString(Title));
