@@ -208,9 +208,12 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                 }
-               
+
             }
-            SEEInput.KeyboardShortcutsEnabled = true;
+            else
+            {
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
             if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.W))
             {
                 Debug.Log("FILE:; " + Title);
