@@ -63,8 +63,8 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                       /* ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); //Das ist nicht das problem für den freeze
-                        if (CodeSpaceManager.ManagerInstance)
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); //Das ist nicht das problem für den freeze
+                        /*if (CodeSpaceManager.ManagerInstance)
                         {
                             int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(prePosition, file), file);
                             if(index == -1)
@@ -98,7 +98,7 @@ namespace SEE.Net
         public void DeleteChar(Identifier[] position, string file)
         {
             this.file = file;
-            //this.position = ICRDT.PositionToString(position, file);
+            this.position = ICRDT.PositionToString(position, file);
             state = RemoteAction.DelteChar;
             Execute(null);
         }
@@ -107,8 +107,8 @@ namespace SEE.Net
         {
             this.file = file;
             this.c = c;
-           // this.position = ICRDT.PositionToString(position, file);
-            //this.prePosition = ICRDT.PositionToString(prePosition, file);
+            this.position = ICRDT.PositionToString(position, file);
+            this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
         }
