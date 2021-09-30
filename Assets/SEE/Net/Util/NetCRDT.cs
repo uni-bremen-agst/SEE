@@ -98,7 +98,7 @@ namespace SEE.Net
         public void DeleteChar(Identifier[] position, string file)
         {
             this.file = file;
-            this.position = ICRDT.PositionToString(position, file);
+            //this.position = ICRDT.PositionToString(position, file);
             state = RemoteAction.DelteChar;
             Execute(null);
         }
@@ -107,8 +107,8 @@ namespace SEE.Net
         {
             this.file = file;
             this.c = c;
-            this.position = ICRDT.PositionToString(position, file);
-            this.prePosition = ICRDT.PositionToString(prePosition, file);
+           // this.position = ICRDT.PositionToString(position, file);
+            //this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
         }
