@@ -15,13 +15,13 @@ namespace SEE.Game
     public class SEECity : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="SEECity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECity.Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEECity.Save(ConfigWriter)"/> and
+        /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-        
+
         /// <summary>
-        /// The graph that is visualized in the scene and whose visualization settings are 
+        /// The graph that is visualized in the scene and whose visualization settings are
         /// managed here.
         /// We do not want to serialize it using Unity or Odin because both frameworks are
         /// insufficient for the highly recursive structure of all the graph objects.
@@ -29,16 +29,16 @@ namespace SEE.Game
         /// (1) in the editor mode or (2) during the game. If the graph is created in the
         /// editor mode by a graph renderer, the graph renderer will attached the NodeRefs
         /// to the game objects representing the nodes. So all the information about nodes
-        /// is available, for instance for the layouts or the inspector. During the game 
-        /// there are two different possible scenarios: (a) this SEECity is is created 
+        /// is available, for instance for the layouts or the inspector. During the game
+        /// there are two different possible scenarios: (a) this SEECity is is created
         /// and configured at runtime or (b) the SEECity was created in the editor and then
         /// the game is started. For scenario (a), we expect the graph to be loaded and
         /// all NodeRefs be defined accordingly. For scenario (b), the graph attribute
         /// will not be serialized and, hence, be null. In that case, we load the graph
-        /// from the GXL file, i.e., the GXL file is our persistent serialization we 
+        /// from the GXL file, i.e., the GXL file is our persistent serialization we
         /// use to re-create the graph. We need, however, to set the NodeRefs at runtime.
         /// All that is being done in Start() below.
-        /// 
+        ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
         [NonSerialized]
@@ -48,7 +48,7 @@ namespace SEE.Game
         /// The graph underlying this SEE city that was loaded from disk. May be null.
         /// If a new graph is assigned to this property, the selected node types will
         /// be updated, too.
-        /// 
+        ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
         public Graph LoadedGraph
@@ -185,7 +185,7 @@ namespace SEE.Game
                     edgeRef.Value = graph.GetEdge(child.name);
                     if (edgeRef.Value == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);          
+                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
                     }
                 }
 #if UNITY_EDITOR
@@ -224,12 +224,12 @@ namespace SEE.Game
                 Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
             }
             p.End();
-            
+
             // Substitute missing values from the dashboard
-            if (nodeLayoutSettings.loadDashboardMetrics)
+            if (ErosionSettings.LoadDashboardMetrics)
             {
-                MetricImporter.LoadDashboard(LoadedGraph, nodeLayoutSettings.overrideMetrics, 
-                nodeLayoutSettings.issuesAddedFromVersion).Forget();
+                MetricImporter.LoadDashboard(LoadedGraph, ErosionSettings.OverrideMetrics,
+                ErosionSettings.IssuesAddedFromVersion).Forget();
             }
         }
 
@@ -247,11 +247,11 @@ namespace SEE.Game
 
         /// <summary>
         /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
-        /// everything will be reset by calling <see cref="Reset"/>. 
+        /// everything will be reset by calling <see cref="Reset"/>.
         /// Second, the graph data from the GXL file with GXLPath() and the metrics
         /// from the CSV file with CSVPath() are loaded. The loaded graph is available
         /// in <see cref="LoadedGraph"/> afterwards.
-        /// 
+        ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         public virtual void LoadData()
@@ -285,7 +285,7 @@ namespace SEE.Game
                 if (LoadedGraph != null)
                 {
                     // This loop runs only once for the first hierarchical edge type
-                    // we encounter. There is no simple method to retrieve an 
+                    // we encounter. There is no simple method to retrieve an
                     // arbitrary element from a HashSet (the type of HierarchicalEdges).
                     foreach (string hierarchicalEdge in HierarchicalEdges)
                     {
@@ -343,7 +343,7 @@ namespace SEE.Game
 
         /// <summary>
         /// The graph renderer used to draw the city.
-        /// 
+        ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
         private GraphRenderer graphRenderer;
@@ -377,8 +377,8 @@ namespace SEE.Game
         /// </summary>
         public void SaveLayout()
         {
-            string path = globalCityAttributes.layoutPath.Path;
-            Debug.LogFormat("Saving layout data to {0}.\n", path);            
+            string path = NodeLayoutSettings.LayoutPath.Path;
+            Debug.Log($"Saving layout data to {path}.\n");
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
                 Layout.IO.GVLWriter.Save(path, loadedGraph.Name, AllNodeDescendants(gameObject));

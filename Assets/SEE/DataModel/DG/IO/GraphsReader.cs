@@ -37,9 +37,9 @@ namespace SEE.DataModel.DG.IO
         public readonly List<Graph> graphs = new List<Graph>();
 
         /// <summary>
-        /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many 
-        /// files) from <paramref name="directory"/> and saves these in <see cref="graphs"/>. 
-        /// 
+        /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many
+        /// files) from <paramref name="directory"/> and saves these in <see cref="graphs"/>.
+        ///
         /// For every GXL file, F.gxl , contained in <paramref name="directory"/>, the graph
         /// data therein will be loaded into a new graph that is then added to <see cref="graphs"/>.
         /// If there is a file F.csv contained in <paramref name="directory"/>, this file is assumed
@@ -49,8 +49,9 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="directory">the directory path where the GXL file are located in</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
-        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, int maxRevisionsToLoad)
+        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string rootName, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
@@ -63,32 +64,34 @@ namespace SEE.DataModel.DG.IO
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
-                // load graph (we can safely assume that the file exists because we retrieved its 
+                // load graph (we can safely assume that the file exists because we retrieved its
                 // name just from the directory
-                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes, rootName: gxlPath, logger: new SEELogger());
+                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes,
+                                                           rootName: rootName,
+                                                           logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
                 // if graph was loaded put in graph list
                 if (graph == null)
                 {
-                    Debug.LogError("graph " + gxlPath + " could not be loaded.\n");
+                    Debug.LogError($"Graph {gxlPath} could not be loaded.\n");
                 }
                 else
                 {
                     string csvFilename = Path.ChangeExtension(gxlPath, Filenames.CSVExtension);
                     if (File.Exists(csvFilename))
                     {
-                        Debug.LogFormat("Loading CSV file {0}.\n", csvFilename);
+                        Debug.Log($"Loading CSV file {csvFilename}.\n");
                         int numberOfErrors = MetricImporter.LoadCsv(graph, csvFilename, ';');
                         if (numberOfErrors > 0)
                         {
-                            Debug.LogErrorFormat("CSV file {0} has {1} many errors.\n", csvFilename, numberOfErrors);
+                            Debug.LogError($"CSV file {csvFilename} has {numberOfErrors} many errors.\n");
                         }
                     }
                     else
                     {
-                        Debug.LogWarningFormat("CSV file {0} does not exist.\n", csvFilename);
+                        Debug.LogWarning($"CSV file {csvFilename} does not exist.\n");
                     }
                     maxRevisionsToLoad--;
                     graphs.Add(graph);
@@ -99,7 +102,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
             p.End();
-            Debug.Log("Number of graphs loaded: " + graphs.Count + "\n");
+            Debug.Log($"Number of graphs loaded: {graphs.Count}\n");
         }
     }
 }

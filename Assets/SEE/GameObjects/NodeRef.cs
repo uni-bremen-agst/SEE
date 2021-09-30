@@ -7,6 +7,8 @@ namespace SEE.GO
 {
     /// <summary>
     /// A reference to a graph node that can be attached to a game object as a component.
+    /// In addition, a mapping of <see cref="Node"/>s onto <see cref="NodeRef"/>s is
+    /// maintained.
     /// </summary>
     public class NodeRef : GraphElementRef
     {
@@ -16,11 +18,16 @@ namespace SEE.GO
         [NonSerialized] private static readonly Dictionary<Node, NodeRef> nodeToNodeRefDict = new Dictionary<Node, NodeRef>();
 
         /// <summary>
-        /// The graph node this node reference is referring to. It will be set either
-        /// by a graph renderer while in editor mode or at runtime by way of an
-        /// AbstractSEECity object.
-        /// It will not be serialized to prevent duplicating and endless serialization
-        /// by both Unity and Odin.
+        /// The graph node this node reference is referring to, that is, is visualized
+        /// by this game object.
+        ///
+        /// As a side effect of assigning <see cref="Value"/>, <see cref="nodeToNodeRefDict"/>
+        /// will be updated, that is, the mapping of a <see cref="Node"/> onto the
+        /// <see cref="NodeRef"/> referring to this <see cref="Node"/>, which can be
+        /// retrieved by <see cref="Get(Node)"/>.
+        ///
+        /// Note: <see cref="Value"/> will not be serialized to prevent duplicating and
+        /// endless serialization by both Unity and Odin.
         /// </summary>
         public Node Value
         {
@@ -43,16 +50,41 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the NodeRef referring to <paramref name="node"/>.
+        /// Sets this <see cref="NodeRef"/> to referring to <paramref name="node"/>.
+        ///
+        /// Unlike, setting <see cref="Value"/>, this assignment will not alter the
+        /// mapping of <see cref="Node"/>s onto <see cref="NodeRef"/>s, in other words,
+        /// <see cref="nodeToNodeRefDict"/>. That is, the result of <see cref="Get(Node)"/>
+        /// does not depend upon this assignment.
         /// </summary>
-        /// <param name="node">node whose NodeRef is requested</param>
-        /// <returns>the NodeRef referring to <paramref name="node"/> or null if there is none</returns>
+        /// <param name="node">the graph node this <see cref="NodeRef"/> should be
+        /// referring to</param>
+        public void SetNode(Node node)
+        {
+            elem = node;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
+        /// <returns>the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none</returns>
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
             return nodeToNodeRefDict[node];
         }
 
+        /// <summary>
+        /// Retrieves the <see cref="nodeRef"/> referring to <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
+        /// <param name="nodeRef">the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none</param>
+        /// <returns>true if a <paramref name="nodeRef"/> corresponding to <paramref name="node"/>
+        /// could be found (is this returned value is false, <paramref name="nodeRef"/> will
+        /// be null)</returns>
         public static bool TryGet(Node node, out NodeRef nodeRef)
         {
             bool result = false;

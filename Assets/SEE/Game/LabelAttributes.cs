@@ -1,5 +1,4 @@
 ﻿using SEE.Utils;
-using System;
 using System.Collections.Generic;
 
 namespace SEE.Game
@@ -7,7 +6,7 @@ namespace SEE.Game
     /// <summary>
     /// Setting for labels to be shown above game nodes.
     /// </summary>
-    public class LabelSettings
+    public class LabelAttributes
     {
         /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
