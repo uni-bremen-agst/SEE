@@ -48,6 +48,7 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void StartDesktop()
         {
+            Debug.LogWarning("TEST1");
             if (Title == null || Text == null)
             {
                 Debug.LogError("Title and text must be defined when setting up CodeWindow!\n");
@@ -94,6 +95,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     ICRDT.AddString(Text, 0, Title);
                 }
+                Debug.LogWarning("TEST2");
             }
             
             // Register events to find out when window was scrolled in.
@@ -129,6 +131,7 @@ namespace SEE.Game.UI.CodeWindow
 
             // Animate scrollbar to scroll to desired line
             VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
+            Debug.LogWarning("TEST3");
         }
 
         /// <summary>
@@ -138,7 +141,7 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-
+            Debug.LogWarning("TEST4");
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
