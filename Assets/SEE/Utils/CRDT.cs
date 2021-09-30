@@ -130,6 +130,7 @@ namespace SEE.Utils
 
             if (prePosition != null && prePosition.Length > 0)
             {
+                Debug.LogWarning(PositionToString(position) + "  PREE " + PositionToString(prePosition));
                 (int, CharObj) found = Find(prePosition);
                 if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
                 {

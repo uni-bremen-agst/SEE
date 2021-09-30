@@ -48,7 +48,6 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void StartDesktop()
         {
-            Debug.LogWarning("TEST1");
             if (Title == null || Text == null)
             {
                 Debug.LogError("Title and text must be defined when setting up CodeWindow!\n");
@@ -91,11 +90,10 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
                                                //TextMeshInputField.caretPosition = 1;
-                if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
+                /*if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
                 {
                     ICRDT.AddString(Text, 0, Title);
-                }
-                Debug.LogWarning("TEST2");
+                } */
             }
             
             // Register events to find out when window was scrolled in.
@@ -131,7 +129,6 @@ namespace SEE.Game.UI.CodeWindow
 
             // Animate scrollbar to scroll to desired line
             VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
-            Debug.LogWarning("TEST3");
         }
 
         /// <summary>
@@ -141,7 +138,6 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            Debug.LogWarning("TEST4");
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
@@ -152,6 +148,7 @@ namespace SEE.Game.UI.CodeWindow
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 var input = Input.inputString;
+                int idx = TextMeshInputField.stringPosition;
                 //ignore null input to avoid unnecessary computation
                 if (!string.IsNullOrEmpty(input))
                 {
@@ -159,10 +156,10 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
-                    ICRDT.AddChar(input[0], TextMeshInputField.stringPosition -1, Title);
+                    ICRDT.AddChar(input[0], idx -1, Title);
                 } 
 
-                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > TextMeshInputField.stringPosition && timeStamp <= Time.time)
+                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
                 {
                     timeStamp = Time.time + 0.100000f;
                     if (selectedText != null)
@@ -171,11 +168,11 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteChar(TextMeshInputField.stringPosition, Title);
+                        ICRDT.DeleteChar(idx, Title);
                     }
                 }
 
-                if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && TextMeshInputField.stringPosition > 0)
+                if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
                     timeStamp = Time.time + 0.100000f;
                     Debug.LogWarning("DELETE");
@@ -185,7 +182,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteChar(TextMeshInputField.stringPosition+1, Title);
+                        ICRDT.DeleteChar(idx+1, Title);
                     }
 
                 }
@@ -197,7 +194,7 @@ namespace SEE.Game.UI.CodeWindow
                         {
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
-                        ICRDT.AddString(Clipboard.Paste<string>(), TextMeshInputField.stringPosition, Title);
+                        ICRDT.AddString(Clipboard.Paste<string>(), idx, Title);
 
                     }
                 }
