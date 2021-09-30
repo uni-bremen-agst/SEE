@@ -20,9 +20,7 @@ namespace SEE.Controls.Actions
         {
             if (!gameObject.TryGetComponent<InteractableObject>(out interactable))
             {
-                Debug.LogWarningFormat
-                    ("The game object {0} this InteractableObjectAction is attached to has no InteractableObject component.\n",
-                      name);
+                Debug.LogWarning($"Game object {name} has no {nameof(InteractableObject)} component.\n");
                 enabled = false;
             }
         }

@@ -24,43 +24,83 @@ namespace SEE.Game
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="Save(ConfigWriter)"/> and 
-        /// <see cref="Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="Save(ConfigWriter)"/> and
+        /// <see cref="Restore(Dictionary{string,object})"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// The global attributes.
+        /// The screen relative height to use for the culling a game node [0-1].
+        /// If the game node uses less than this percentage it will be culled.
         /// </summary>
-        public GlobalCityAttributes globalCityAttributes = new GlobalCityAttributes();
+        [Range(0.0f, 1.0f)]
+        public float LODCulling = 0.001f;
 
         /// <summary>
-        /// The attributes of the leaf nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
-        /// casted to an integer.
+        /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        public LeafNodeAttributes[] leafNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new LeafNodeAttributes());
+        [OdinSerialize]
+        public DataPath CityPath = new DataPath();
 
         /// <summary>
-        /// The attributes of the inner nodes per kind. They are indexed by <see cref="Node.NodeDomain"/>
-        /// casted to an integer.
+        /// The names of the edge types of hierarchical edges.
         /// </summary>
-        public InnerNodeAttributes[] innerNodeAttributesPerKind = ArrayUtils.New((int)Node.NodeDomain.Count, _ => new InnerNodeAttributes());
+        [OdinSerialize]
+        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
+
+        /// <summary>
+        /// A mapping of all node types of the nodes in the graph onto whether
+        /// they should be visualized or not.
+        /// </summary>
+        [NonSerialized, OdinSerialize]
+        public Dictionary<string, bool> SelectedNodeTypes = new Dictionary<string, bool>();
+
+        /// <summary>
+        /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
+        /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
+        /// </summary>
+        public bool ZScoreScale = true;
+
+        /// <summary>
+        /// If true, only the metrics of leaf nodes are scaled.
+        /// </summary>
+        public bool ScaleOnlyLeafMetrics = true;
+
+        /// <summary>
+        /// The attributes of the leaf nodes.
+        /// </summary>
+        public LeafNodeAttributes LeafNodeSettings = new LeafNodeAttributes();
+
+        /// <summary>
+        /// The attributes of the inner nodes.
+        /// </summary>
+        public InnerNodeAttributes InnerNodeSettings = new InnerNodeAttributes();
 
         /// <summary>
         /// The node layout settings.
         /// </summary>
-        public NodeLayoutSettings nodeLayoutSettings = new NodeLayoutSettings();
+        public NodeLayoutAttributes NodeLayoutSettings = new NodeLayoutAttributes();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
-        public EdgeLayoutSettings edgeLayoutSettings = new EdgeLayoutSettings();
+        public EdgeLayoutAttributes EdgeLayoutSettings = new EdgeLayoutAttributes();
+
+        /// <summary>
+        /// Attributes regarding the selection of edges.
+        /// </summary>
+        public EdgeSelectionAttributes EdgeSelectionSettings = new EdgeSelectionAttributes();
 
         /// <summary>
         /// The cose graph settings.
         /// </summary>
-        public CoseGraphSettings coseGraphSettings = new CoseGraphSettings(); // FIXME put into CitySettings.cs
+        public CoseGraphAttributes CoseGraphSettings = new CoseGraphAttributes(); // FIXME put into CitySettings.cs
+
+        /// <summary>
+        /// The metrics for the visualization of erosions.
+        /// </summary>
+        public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
@@ -101,12 +141,6 @@ namespace SEE.Game
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [OdinSerialize]
-        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
-
-        /// <summary>
-        /// The names of the edge types of hierarchical edges.
-        /// </summary>
         public static HashSet<string> Hierarchical_Edge_Types()
         {
             HashSet<string> result = new HashSet<string>
@@ -119,24 +153,8 @@ namespace SEE.Game
             return result;
         }
 
-        //---------------------------------
-        // Relevant node types
-        //---------------------------------
         /// <summary>
-        /// A mapping of all node types of the nodes in the graph onto whether
-        /// they should be visualized or not.
-        /// </summary>
-        [NonSerialized, OdinSerialize]
-        public Dictionary<string, bool> SelectedNodeTypes = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// The path where the settings (the attributes of this class) are stored.
-        /// </summary>
-        [OdinSerialize]
-        public DataPath CityPath = new DataPath();
-
-        /// <summary>
-        /// Resets everything that is specific to a given graph. Here: 
+        /// Resets everything that is specific to a given graph. Here:
         /// all game objects created for this city.
         /// </summary>
         public virtual void Reset()
@@ -154,8 +172,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Deletes all game objects that were created for rendering nodes or edges
-        /// of the graph or any decoration thereof. More precisely, all children of this 
-        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed 
+        /// of the graph or any decoration thereof. More precisely, all children of this
+        /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed
         /// (in editor mode or play mode).
         /// The underlying loaded graph is not deleted.
         /// </summary>
@@ -218,11 +236,11 @@ namespace SEE.Game
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
         /// Inspects the node types that occur in the graph and updates <see cref="SelectedNodeTypes"/>.
         /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
-        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's 
+        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's
         /// selection information will be re-used. If <see cref="SelectedNodeTypes"/> contains a node
         /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="SelectedNodeTypes"/>.
-        /// 
-        /// The node types can be retrieved and also be marked as irrelevant later via property 
+        ///
+        /// The node types can be retrieved and also be marked as irrelevant later via property
         /// <see cref="SelectedNodeTypes"/>.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
@@ -233,8 +251,8 @@ namespace SEE.Game
                 // The node types in the newly loaded graph.
                 HashSet<string> newTypes = new HashSet<string>();
                 foreach (Node node in graph.Nodes())
-                {                    
-                    newTypes.Add(node.Type);                    
+                {
+                    newTypes.Add(node.Type);
                 }
                 // nodeTypes contains the node types of the previously loaded graph.
                 // Node types in nodeTypes not in newTypes will disappear
@@ -258,8 +276,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns a subgraph of <paramref name="graph"/> where all nodes were 
-        /// removed that have a type considered to be irrelevant. If all node 
+        /// Returns a subgraph of <paramref name="graph"/> where all nodes were
+        /// removed that have a type considered to be irrelevant. If all node
         /// types are considered relevant, <paramref name="graph"/> will be returned.
         /// If not all types are considered relevant, a copied subgraph is returned.
         /// </summary>
@@ -281,55 +299,19 @@ namespace SEE.Game
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
-        /// DepthMetric, and LeafStyleMetric). 
+        /// DepthMetric, and LeafStyleMetric).
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
         public ICollection<string> AllLeafMetrics()
         {
-            List<string> result = new List<string>(leafNodeAttributesPerKind.Length * 4);
-            foreach (LeafNodeAttributes leafNodeAttributes in leafNodeAttributesPerKind)
-            {
-                result.Add(leafNodeAttributes.widthMetric);
-                result.Add(leafNodeAttributes.heightMetric);
-                result.Add(leafNodeAttributes.depthMetric);
-                result.Add(leafNodeAttributes.styleMetric);
-            }
+            List<string> result = new List<string>(4);
+            result.Add(LeafNodeSettings.WidthMetric);
+            result.Add(LeafNodeSettings.HeightMetric);
+            result.Add(LeafNodeSettings.DepthMetric);
+            result.Add(LeafNodeSettings.ColorMetric);
             return result;
         }
-
-        //--------------------------------------------------------
-        // Software erosion issues shown as icons above leaf nodes
-        //--------------------------------------------------------
-
-        /// <summary>
-        /// The attribute name of the metric representing architecture violations.
-        /// </summary>
-        public string ArchitectureIssue = NumericAttributeNames.Architecture_Violations.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing duplicated code.
-        /// </summary>
-        public string CloneIssue = NumericAttributeNames.Clone.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing cylces.
-        /// </summary>
-        public string CycleIssue = NumericAttributeNames.Cycle.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing dead code.
-        /// </summary>
-        public string Dead_CodeIssue = NumericAttributeNames.Dead_Code.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing metric violations.
-        /// </summary>
-        public string MetricIssue = NumericAttributeNames.Metric.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing code-style violations.
-        /// </summary>
-        public string StyleIssue = NumericAttributeNames.Style.Name(); // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing other kinds of violations.
-        /// </summary>
-        public string UniversalIssue = NumericAttributeNames.Universal.Name(); // serialized by Unity
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
@@ -339,56 +321,16 @@ namespace SEE.Game
         {
             List<string> result = new List<string>()
                {
-                  ArchitectureIssue,
-                  CloneIssue,
-                  CycleIssue,
-                  Dead_CodeIssue,
-                  MetricIssue,
-                  StyleIssue,
-                  UniversalIssue
+                  ErosionSettings.ArchitectureIssue,
+                  ErosionSettings.CloneIssue,
+                  ErosionSettings.CycleIssue,
+                  ErosionSettings.Dead_CodeIssue,
+                  ErosionSettings.MetricIssue,
+                  ErosionSettings.StyleIssue,
+                  ErosionSettings.UniversalIssue
                };
             return result;
         }
-
-        //-----------------------------------------------------------------------
-        // Software erosion issues shown as icons on Donut charts for inner nodes
-        //-----------------------------------------------------------------------
-        public const string SUM_Postfix = "_SUM";
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all architecture violations
-        /// for an inner node.
-        /// </summary>
-        public string ArchitectureIssue_SUM = NumericAttributeNames.Architecture_Violations.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all clones
-        /// for an inner node.
-        /// </summary>
-        public string CloneIssue_SUM = NumericAttributeNames.Clone.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all cycles
-        /// for an inner node.
-        /// </summary>
-        public string CycleIssue_SUM = NumericAttributeNames.Cycle.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all dead entities
-        /// for an inner node.
-        /// </summary>
-        public string Dead_CodeIssue_SUM = NumericAttributeNames.Dead_Code.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all metric violations
-        /// for an inner node.
-        /// </summary>
-        public string MetricIssue_SUM = NumericAttributeNames.Metric.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all style violations
-        /// for an inner node.
-        /// </summary>
-        public string StyleIssue_SUM = NumericAttributeNames.Style.Name() + SUM_Postfix; // serialized by Unity
-        /// <summary>
-        /// The attribute name of the metric representing the sum of all other kinds of
-        /// software erosions for an inner node.
-        /// </summary>
-        public string UniversalIssue_SUM = NumericAttributeNames.Universal.Name() + SUM_Postfix; // serialized by Unity
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions for inner
@@ -399,21 +341,16 @@ namespace SEE.Game
         {
             List<string> result = new List<string>
             {
-                  ArchitectureIssue_SUM,
-                  CloneIssue_SUM,
-                  CycleIssue_SUM,
-                  Dead_CodeIssue_SUM,
-                  MetricIssue_SUM,
-                  StyleIssue_SUM,
-                  UniversalIssue_SUM
+                  ErosionSettings.ArchitectureIssue_SUM,
+                  ErosionSettings. CloneIssue_SUM,
+                  ErosionSettings.CycleIssue_SUM,
+                  ErosionSettings.Dead_CodeIssue_SUM,
+                  ErosionSettings.MetricIssue_SUM,
+                  ErosionSettings.StyleIssue_SUM,
+                  ErosionSettings.UniversalIssue_SUM
                };
             return result;
         }
-
-        /// <summary>
-        /// The metric to be put in the inner circle of a Donut chart.
-        /// </summary>
-        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
         /// <summary>
         /// Returns the names of all node metric attributes that are visualized somehow.
@@ -428,29 +365,29 @@ namespace SEE.Game
             nodeMetrics.AddRange(AllInnerNodeMetrics());
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
-            nodeMetrics.Add(InnerDonutMetric);
+            nodeMetrics.Add(InnerNodeSettings.InnerDonutMetric);
             return nodeMetrics;
         }
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// Yields a mapping of all node attribute names that define erosion issues
         /// for leaf nodes in the GXL file onto the icons to be used for visualizing them.
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
         public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
             new Dictionary<string, IconFactory.Erosion>
             {
-                { ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
-                { CloneIssue, IconFactory.Erosion.Clone },
-                { CycleIssue, IconFactory.Erosion.Cycle },
-                { Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
-                { MetricIssue, IconFactory.Erosion.Metric },
-                { StyleIssue, IconFactory.Erosion.Style },
-                { UniversalIssue, IconFactory.Erosion.Universal }
+                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { ErosionSettings.CloneIssue, IconFactory.Erosion.Clone },
+                { ErosionSettings.CycleIssue, IconFactory.Erosion.Cycle },
+                { ErosionSettings.Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { ErosionSettings.MetricIssue, IconFactory.Erosion.Metric },
+                { ErosionSettings.StyleIssue, IconFactory.Erosion.Style },
+                { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal }
             };
 
         /// <summary>
-        /// Yields a mapping of all node attribute names that define erosion issues 
+        /// Yields a mapping of all node attribute names that define erosion issues
         /// for inner nodes onto the icons to be used for visualizing them.
         /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
         /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
@@ -468,29 +405,17 @@ namespace SEE.Game
         /// <returns>all metrics used for visual attributes of an inner node</returns>
         public ICollection<string> AllInnerNodeMetrics()
         {
-            return innerNodeAttributesPerKind.SelectMany(x => new[] {x.styleMetric, x.heightMetric}).ToList();
+            return new List<string>() { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
         }
-
-        //--------------------------------------
-        // Other visual attributes of leaf nodes
-        // -------------------------------------
-        /// <summary>
-        /// This parameter determines the minimal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be greater than MaximalBlockLength.
-        /// </summary>
-        public float MinimalBlockLength = 0.1f; // serialized by Unity
-
-        /// <summary>
-        /// This parameter determines the maximal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
-        /// </summary>
-        public float MaximalBlockLength = 100.0f; // serialized by Unity
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
+        /// <param name="filename">GXL filename from which to load the graph</param>
+        /// <param name="rootName">the name of the artifical root if any needs to be added;
+        /// if none is given, <paramref name="filename"/> will be used instead</param>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        public Graph LoadGraph(string filename)
+        public Graph LoadGraph(string filename, string rootName = "")
         {
             if (string.IsNullOrEmpty(filename))
             {
@@ -501,7 +426,9 @@ namespace SEE.Game
             if (File.Exists(filename))
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges, logger: new SEELogger());
+                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
+                                                           rootName: string.IsNullOrEmpty(rootName) ? filename : rootName,
+                                                           logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
                 p.End();
@@ -525,9 +452,9 @@ namespace SEE.Game
         /// <param name="graph"></param>
         public void LoadDataForGraphListing(Graph graph)
         {
-            if (nodeLayoutSettings.kind == NodeLayoutKind.CompoundSpringEmbedder)
+            if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
             {
-                Dictionary<string, bool> dirs = coseGraphSettings.ListInnerNodeToggle;
+                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
                 // the new directories
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
@@ -538,9 +465,9 @@ namespace SEE.Game
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, innerNodeAttributesPerKind[(int)node.Domain].kind);
+                        dirsShape.Add(node.ID, InnerNodeSettings.Kind);
                         dirsLocal.Add(node.ID, false);
-                        dirsLayout.Add(node.ID, nodeLayoutSettings.kind);
+                        dirsLayout.Add(node.ID, NodeLayoutSettings.Kind);
                     }
                 }
 
@@ -552,12 +479,12 @@ namespace SEE.Game
 
                 if (dirs.Count != dirsLocal.Count || diff1 || diff2)
                 {
-                    coseGraphSettings.InnerNodeShape = dirsShape;
-                    coseGraphSettings.InnerNodeLayout = dirsLayout;
-                    coseGraphSettings.ListInnerNodeToggle = dirsLocal;
+                    CoseGraphSettings.InnerNodeShape = dirsShape;
+                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
+                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                coseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
+                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
                                                                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
         }
