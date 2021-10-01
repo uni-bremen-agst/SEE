@@ -33,6 +33,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public float timeStamp = 0; //Time.time;
 
+        int idx = 0; //ONLY FOR COMMANDLINE EDITOR
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
         /// </summary>
@@ -148,7 +149,7 @@ namespace SEE.Game.UI.CodeWindow
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 var input = Input.inputString;
-                int idx = TextMeshInputField.stringPosition;
+                //int idx = TextMeshInputField.stringPosition;
                 //ignore null input to avoid unnecessary computation
                 if (!string.IsNullOrEmpty(input))
                 {
