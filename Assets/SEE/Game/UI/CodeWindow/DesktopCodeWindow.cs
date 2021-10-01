@@ -91,10 +91,10 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
                                                //TextMeshInputField.caretPosition = 1;
-                /*if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
+                if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
                 {
                     ICRDT.AddString(Text, 0, Title);
-                } */
+                } 
             }
             
             // Register events to find out when window was scrolled in.
