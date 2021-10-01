@@ -218,8 +218,8 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     idx++;
                 }
-                ICRDT.PrintString(Title);
-                ICRDT.ToString(Title);
+                Debug.Log(ICRDT.PrintString(Title));
+                Debug.Log(ICRDT.ToString(Title));
 
             }
             else

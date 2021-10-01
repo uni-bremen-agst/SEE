@@ -140,9 +140,6 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="index">The index at which the Char should be added</param>
         public void InsertChar(char c, int index)
         {
-            Debug.Log("CHAR " + c + " inde " + index);
-            Debug.Log("TMP " + TextMeshInputField.text);
-            Debug.Log("TMPs " + TextMeshInputField);
             TextMeshInputField.text.Insert(index, c.ToString());
         }
 
