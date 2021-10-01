@@ -185,7 +185,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteChar(idx+1, Title);
+                        ICRDT.DeleteChar(idx -1/*+1*/, Title);
                         idx--; //only for command line editor
                     }
 
