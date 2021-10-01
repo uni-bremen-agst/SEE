@@ -90,7 +90,7 @@ namespace SEE.Game.UI.CodeWindow
 
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
-                                               //TextMeshInputField.caretPosition = 1;
+                
                 /*if(ICRDT.PrintString(Title) == null || ICRDT.PrintString(Title) == "")
                 {
                     ICRDT.AddString(Text, 0, Title);
@@ -178,7 +178,6 @@ namespace SEE.Game.UI.CodeWindow
                 if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
                     timeStamp = Time.time + 0.100000f;
-                    Debug.LogWarning("DELETE");
                     if (selectedText != null)
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
