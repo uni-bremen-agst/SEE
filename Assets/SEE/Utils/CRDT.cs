@@ -130,7 +130,6 @@ namespace SEE.Utils
 
             if (prePosition != null && prePosition.Length > 0)
             {
-                Debug.LogWarning(PositionToString(position) + "  PREE " + PositionToString(prePosition));
                 (int, CharObj) found = Find(prePosition);
                 if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
                 {
@@ -279,7 +278,6 @@ namespace SEE.Utils
         /// <returns>-1 if o1 < o2; 0 if o1 == o2; 1 if o1 > o2</o2>  </returns>
         public int ComparePosition(Identifier[] o1, Identifier[] o2)
         {
-            Debug.Log("O1 " + o1.ToString() + " O2 " );
             for (int i = 0; i < Mathf.Min(o1.Length, o2.Length); i++)
             {
                 int cmp = CompareIdentifier(o1[i], o2[i]);
