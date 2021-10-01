@@ -26,7 +26,8 @@ namespace SEE.Utils
             }
             else
             {
-                crdts.Add(file, new CRDT(new Guid().ToString(), file));
+                Guid guid =  Guid.NewGuid();
+                crdts.Add(file, new CRDT(guid.ToString(), file));
                 return crdts[file];
             }
         }
