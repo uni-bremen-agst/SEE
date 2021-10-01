@@ -156,7 +156,8 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
-                    ICRDT.AddChar(input[0], idx -1, Title);
+                    ICRDT.AddChar(input[0], idx /*-1*/, Title);
+                    idx++; //only for command line editor
                 } 
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
@@ -169,6 +170,7 @@ namespace SEE.Game.UI.CodeWindow
                     else
                     {
                         ICRDT.DeleteChar(idx, Title);
+                        idx--; //only for command line editor
                     }
                 }
 
@@ -183,6 +185,7 @@ namespace SEE.Game.UI.CodeWindow
                     else
                     {
                         ICRDT.DeleteChar(idx+1, Title);
+                        idx--; //only for command line editor
                     }
 
                 }
@@ -195,6 +198,7 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
                         ICRDT.AddString(Clipboard.Paste<string>(), idx, Title);
+                        idx = idx + Clipboard.Paste<string>().Length ; //only for command line editor
 
                     }
                 }
@@ -205,6 +209,16 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                 }
+                if(Input.GetKeyDown(KeyCode.LeftArrow) && idx > 0)
+                {
+                    idx--;
+                }
+                if (Input.GetKeyDown(KeyCode.RightArrow) && idx < ICRDT.PrintString(Title).Length)
+                {
+                    idx++;
+                }
+                ICRDT.PrintString(Title);
+                ICRDT.ToString(Title);
 
             }
             else
