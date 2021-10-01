@@ -66,7 +66,7 @@ namespace SEE.Net
                         ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
                         if (CodeSpaceManager.ManagerInstance)
                         {
-                            int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(prePosition, file), file);
+                            int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(position, file), file);
                             if(index == -1)
                             {
                                 return;
