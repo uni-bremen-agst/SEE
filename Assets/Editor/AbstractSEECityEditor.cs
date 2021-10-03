@@ -23,7 +23,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether the foldout for the global attributes of the city should be expanded.
         /// </summary>
-        private bool showGlobalAttributes = false;
+        private bool showGeneralAttributes = false;
 
         /// <summary>
         /// Whether the leaf node attribute foldout should be expanded.
@@ -111,8 +111,8 @@ namespace SEEEditor
         /// </summary>
         private void GlobalAttributes()
         {
-            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "General", true, EditorStyles.foldoutHeader);
-            if (showGlobalAttributes)
+            showGeneralAttributes = EditorGUILayout.Foldout(showGeneralAttributes, "General", true, EditorStyles.foldoutHeader);
+            if (showGeneralAttributes)
             {
                 city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
@@ -341,6 +341,8 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
+                settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
+                settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
                 EditorGUI.EndDisabledGroup();
                 LabelSettings(ref settings.LabelSettings);
 
