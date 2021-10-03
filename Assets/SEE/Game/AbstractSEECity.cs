@@ -60,7 +60,7 @@ namespace SEE.Game
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        public bool ZScoreScale = true;
+        public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
