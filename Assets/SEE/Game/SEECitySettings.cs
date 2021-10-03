@@ -142,7 +142,7 @@ namespace SEE.Game
         /// This parameter determines the minimal width, breadth, and height of each block
         /// representing a graph node visually. Must not be greater than MaximalBlockLength.
         /// </summary>
-        public float MinimalBlockLength = 0.01f; // serialized by Unity
+        public float MinimalBlockLength = 0.001f; // serialized by Unity
         /// <summary>
         /// This parameter determines the maximal width, breadth, and height of each block
         /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
