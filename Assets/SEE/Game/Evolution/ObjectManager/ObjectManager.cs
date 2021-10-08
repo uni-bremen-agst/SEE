@@ -366,7 +366,6 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Destroys all game objects created for edges.
-        /// Postcondition:
         /// </summary>
         private void ClearEdges()
         {
