@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -15,14 +16,19 @@ namespace SEE.Layout
         /// Target of the edge.
         /// </summary>
         public ILayoutNode Target;
-        /// <summary>
-        /// The points of the polygone for rendering the edge.
-        /// </summary>
-        public Vector3[] Points;
-        /// <summary>
-        /// The control points of the polygon for rendering the edge.
-        /// </summary>
-        public Vector3[] ControlPoints;
+
+        public TinySpline.BSpline Spline { get; set; } = new TinySpline.BSpline();
+
+        public Vector3[] ControlPoints
+        {
+            get { return ListToVectors( Spline.ControlPoints ); }
+        }
+
+        public Vector3[] Points
+        {
+            // Todo RDP
+            get { return ListToVectors( Spline.Sample(100) ); }
+        }
 
         /// <summary>
         /// Constructor.
@@ -33,6 +39,34 @@ namespace SEE.Layout
         {
             Source = source;
             Target = target;
+        }
+
+        public static IList<double> VectorsToList(IList<Vector3> vectors)
+        {
+            List<double> list = new List<double>();
+            foreach (Vector3 vector in vectors)
+            {
+                list.Add(vector.x);
+                list.Add(vector.y);
+                list.Add(vector.z);
+            }
+            return list;
+        }
+
+        public static Vector3[] ListToVectors(IList<double> values)
+        {
+            Debug.Assert(values.Count % 3 == 0,
+                    "Expecting three-dimensional points");
+            Vector3[] vectors = new Vector3[values.Count / 3];
+            for (int i = 0; i < vectors.Length; i++)
+            {
+                int idx = i * 3;
+                vectors[i] = new Vector3(
+                    (float) values[idx],
+                    (float) values[idx + 1],
+                    (float) values[idx + 2]);
+            }
+            return vectors;
         }
     }
 }
