@@ -21,7 +21,7 @@ namespace SEEEditor
         private AbstractSEECity city;
 
         /// <summary>
-        /// Whether the foldout for the global attributes of the city should be expanded.
+        /// Whether the foldout for the general attributes of the city should be expanded.
         /// </summary>
         private bool showGeneralAttributes = false;
 
