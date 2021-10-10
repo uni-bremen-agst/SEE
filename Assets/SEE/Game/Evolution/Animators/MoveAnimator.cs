@@ -39,11 +39,11 @@ namespace SEE.Game.Evolution
         { }
 
         /// <summary>
-        /// Moves the game object to its target location through animation. The scale and style are instantly applied.
-        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
-        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as
-        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
-        /// equals null, no callback happens.
+        /// Moves the game object to its target location through animation. The scale and style
+        /// are instantly applied.
+        /// At the end of the animation, the <see cref="Action"/> <paramref name="callback"/>
+        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callback"/>
+        /// is not null. If <paramref name="callback"/> equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transform to be applied</param>
