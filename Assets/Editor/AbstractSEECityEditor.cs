@@ -237,6 +237,9 @@ namespace SEEEditor
             }
         }
 
+        /// <summary>
+        /// Renders the GUI for attributes for the edge selection.
+        /// </summary>
         private void EdgeSelection()
         {
             showEdgeSelection = EditorGUILayout.Foldout(showEdgeSelection, "Edge selection", true, EditorStyles.foldoutHeader);
@@ -351,15 +354,15 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
+        /// Allows the user to set the attributes of <paramref name="labelAttributes"/>.
         /// </summary>
-        /// <param name="labelSettings">settings to be retrieved from the user</param>
-        private static void LabelSettings(ref LabelAttributes labelSettings)
+        /// <param name="labelAttributes">settings regarding the label above game nodes to be retrieved from the user</param>
+        private static void LabelSettings(ref LabelAttributes labelAttributes)
         {
-            labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
-            labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
-            labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
-            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelSettings.AnimationDuration);
+            labelAttributes.Show = EditorGUILayout.Toggle("Show labels", labelAttributes.Show);
+            labelAttributes.Distance = EditorGUILayout.FloatField("Label distance", labelAttributes.Distance);
+            labelAttributes.FontSize = EditorGUILayout.FloatField("Label font size", labelAttributes.FontSize);
+            labelAttributes.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelAttributes.AnimationDuration);
         }
     }
 }
