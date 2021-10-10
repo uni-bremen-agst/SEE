@@ -31,7 +31,7 @@ namespace SEE.Game
         /// extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// The screen relative height to use for the culling a game node [0-1].
+        /// The screen relative height to use for culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
         [Range(0.0f, 1.0f)]
@@ -47,7 +47,7 @@ namespace SEE.Game
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
-        public HashSet<string> HierarchicalEdges = Hierarchical_Edge_Types(); // serialized by Odin
+        public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes(); // serialized by Odin
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
@@ -141,7 +141,7 @@ namespace SEE.Game
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        public static HashSet<string> Hierarchical_Edge_Types()
+        public static HashSet<string> HierarchicalEdgeTypes()
         {
             HashSet<string> result = new HashSet<string>
             {
@@ -317,9 +317,8 @@ namespace SEE.Game
         /// Returns all attribute names of the different kinds of software erosions.
         /// </summary>
         /// <returns>all attribute names of the different kinds of software erosions</returns>
-        public IList<string> AllLeafIssues()
-        {
-            List<string> result = new List<string>()
+        public IList<string> AllLeafIssues() =>
+            new List<string>()
                {
                   ErosionSettings.ArchitectureIssue,
                   ErosionSettings.CloneIssue,
@@ -329,17 +328,14 @@ namespace SEE.Game
                   ErosionSettings.StyleIssue,
                   ErosionSettings.UniversalIssue
                };
-            return result;
-        }
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions for inner
         /// nodes (the sums of their descendants).
         /// </summary>
         /// <returns>all attribute names of the different kinds of software erosions for inner nodes</returns>
-        public IList<string> AllInnerNodeIssues()
-        {
-            List<string> result = new List<string>
+        public IList<string> AllInnerNodeIssues() =>
+            new List<string>
             {
                   ErosionSettings.ArchitectureIssue_SUM,
                   ErosionSettings. CloneIssue_SUM,
@@ -349,8 +345,6 @@ namespace SEE.Game
                   ErosionSettings.StyleIssue_SUM,
                   ErosionSettings.UniversalIssue_SUM
                };
-            return result;
-        }
 
         /// <summary>
         /// Returns the names of all node metric attributes that are visualized somehow.
