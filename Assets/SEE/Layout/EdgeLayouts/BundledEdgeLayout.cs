@@ -104,8 +104,7 @@ namespace SEE.Layout.EdgeLayouts
 
                 foreach (ILayoutEdge edge in edges)
                 {
-                    edge.Spline = CreateSpline(edge.Source, edge.Target, lca, maxLevel)
-                        .Tension(tension);
+                    edge.Spline = CreateSpline(edge.Source, edge.Target, lca, maxLevel);
                 }
             }
         }
@@ -300,7 +299,7 @@ namespace SEE.Layout.EdgeLayouts
                         return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
                         {
                             ControlPoints = TinySplineInterop.VectorsToList(controlPoints)
-                        };
+                        }.Tension(tension);
                     }
                 }
             }
