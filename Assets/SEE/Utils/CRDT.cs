@@ -209,11 +209,9 @@ namespace SEE.Utils
         /// <param name="startIdx">The start index of the string in the file</param>
         public void AddString(string s, int startIdx)
         {
-            int idx = startIdx;
-            foreach (Char c in s)
+            for (int i = 0; i < s.Length; i++)
             {
-                AddChar(c, idx);
-                idx++;
+                AddChar(s[i], i + startIdx);
             }
         }
 
