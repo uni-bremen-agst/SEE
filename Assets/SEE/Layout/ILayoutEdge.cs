@@ -12,12 +12,22 @@ namespace SEE.Layout
         /// Source of the edge.
         /// </summary>
         public ILayoutNode Source;
+
         /// <summary>
         /// Target of the edge.
         /// </summary>
         public ILayoutNode Target;
 
-        public TinySpline.BSpline Spline { get; set; } = new TinySpline.BSpline();
+        /// <summary>
+        /// The shaping spline of the edge. The default spline is a line
+        /// (i.e., a spline of degree 1 with 2 control points) connecting the
+        /// points (0, 0, 0) and (1, 1, 1).
+        /// </summary>
+        public TinySpline.BSpline Spline { get; set; } =
+            new TinySpline.BSpline(2, 3, 1)
+            {
+                ControlPoints = {0, 0, 0, 1, 1, 1}
+            };
 
         public Vector3[] ControlPoints
         {
