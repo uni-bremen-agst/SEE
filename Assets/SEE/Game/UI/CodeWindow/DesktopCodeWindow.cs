@@ -10,6 +10,7 @@ using Sirenix.Utilities.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.CodeWindow
@@ -19,6 +20,7 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
+
         /// <summary>
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
@@ -32,6 +34,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Saves the Current time for the Cooldown
         /// </summary>
         public float timeStamp = 0; //Time.time;
+        public float timeDebug = 0; //Time.time;
 
         int idx = 0; //ONLY FOR COMMANDLINE EDITOR
         /// <summary>
@@ -91,10 +94,10 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
                 
-                //if(ICRDT.PrintString(Title) == "") //REPLACE WITH IS EMPTY
-              //  {
-                //    ICRDT.AddString(Text, 0, Title);
-             //   } 
+                if(ICRDT.PrintString(Title) == "") //REPLACE WITH IS EMPTY
+                {
+                    ICRDT.AddString(Text, 0, Title);
+                } 
             }
             
             // Register events to find out when window was scrolled in.
@@ -139,8 +142,9 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
+            Profiler.BeginSample("test");
             //Input Handling
-            if (TextMeshInputField.isFocused)
+            if (!TextMeshInputField.isFocused)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
@@ -191,6 +195,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
+                    timeDebug = Time.time;
                     if (Clipboard.CanPaste<string>())
                     {
                         if (selectedText != null)
@@ -201,6 +206,7 @@ namespace SEE.Game.UI.CodeWindow
                         idx = idx + Clipboard.Paste<string>().Length ; //only for command line editor
 
                     }
+                    Debug.Log(Time.time - timeDebug);
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
@@ -217,8 +223,8 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     idx++;
                 }
-                Debug.Log(ICRDT.PrintString(Title));
-                Debug.Log(ICRDT.ToString(Title));
+                //Debug.Log(ICRDT.PrintString(Title));
+               // Debug.Log(ICRDT.ToString(Title));
 
             }
             else
@@ -260,6 +266,7 @@ namespace SEE.Game.UI.CodeWindow
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
             }
+            Profiler.EndSample();
         }
 
         /// <summary>

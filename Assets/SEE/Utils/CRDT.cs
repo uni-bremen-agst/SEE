@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 // Based on the explenaitions and code from https://digitalfreepen.com/2017/10/06/simple-real-time-collaborative-text-editor.html
 namespace SEE.Utils
@@ -209,10 +210,12 @@ namespace SEE.Utils
         /// <param name="startIdx">The start index of the string in the file</param>
         public void AddString(string s, int startIdx)
         {
+            Profiler.BeginSample("ADDSTRING");
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx);
             }
+            Profiler.EndSample();
         }
 
         /// <summary>
