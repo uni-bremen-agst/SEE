@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+
 /// <summary>
 /// Utility functions for interoperability between TinySpline and Unity.
 /// </summary>
