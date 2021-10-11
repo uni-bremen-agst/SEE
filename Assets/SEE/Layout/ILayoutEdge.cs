@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Layout.Utils;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -29,16 +29,11 @@ namespace SEE.Layout
                 ControlPoints = {0, 0, 0, 1, 1, 1}
             };
 
-        public Vector3[] ControlPoints
-        {
-            get { return ListToVectors( Spline.ControlPoints ); }
-        }
+        public Vector3[] ControlPoints =>
+            TinySplineInterop.ListToVectors(Spline.ControlPoints);
 
-        public Vector3[] Points
-        {
-            // Todo RDP
-            get { return ListToVectors( Spline.Sample(100) ); }
-        }
+        public Vector3[] Points =>
+            TinySplineInterop.ListToVectors(Spline.Sample(100));
 
         /// <summary>
         /// Constructor.
@@ -49,39 +44,6 @@ namespace SEE.Layout
         {
             Source = source;
             Target = target;
-        }
-
-        public static IList<double> VectorsToList(IList<Vector3> vectors)
-        {
-            List<double> list = new List<double>();
-            foreach (Vector3 vector in vectors)
-            {
-                list.Add(vector.x);
-                list.Add(vector.y);
-                list.Add(vector.z);
-            }
-            return list;
-        }
-
-        public static IList<double> VectorsToList(params Vector3[] vectors)
-        {
-            return VectorsToList(new List<Vector3>(vectors));
-        }
-
-        public static Vector3[] ListToVectors(IList<double> values)
-        {
-            Debug.Assert(values.Count % 3 == 0,
-                    "Expecting three-dimensional points");
-            Vector3[] vectors = new Vector3[values.Count / 3];
-            for (int i = 0; i < vectors.Length; i++)
-            {
-                int idx = i * 3;
-                vectors[i] = new Vector3(
-                    (float) values[idx],
-                    (float) values[idx + 1],
-                    (float) values[idx + 2]);
-            }
-            return vectors;
         }
     }
 }
