@@ -63,6 +63,11 @@ namespace SEE.Layout
             return list;
         }
 
+        public static IList<double> VectorsToList(params Vector3[] vectors)
+        {
+            return VectorsToList(new List<Vector3>(vectors));
+        }
+
         public static Vector3[] ListToVectors(IList<double> values)
         {
             Debug.Assert(values.Count % 3 == 0,
