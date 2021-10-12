@@ -94,7 +94,7 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList();
                 TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
                 
-                if(ICRDT.IsEmpty(Title)) //REPLACE WITH IS EMPTY
+                if(ICRDT.IsEmpty(Title))
                 {
                     ICRDT.AddString(Text, 0, Title);
                 } 
