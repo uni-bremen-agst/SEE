@@ -33,8 +33,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Saves the Current time for the Cooldown
         /// </summary>
-        public float timeStamp = 0; //Time.time;
-        public float timeDebug = 0; //Time.time;
+        public float timeStamp = 0;
 
         int idx = 0; //ONLY FOR COMMANDLINE EDITOR
         /// <summary>
@@ -195,7 +194,6 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
-                    timeDebug = Time.time;
                     if (Clipboard.CanPaste<string>())
                     {
                         if (selectedText != null)
@@ -206,7 +204,6 @@ namespace SEE.Game.UI.CodeWindow
                         idx = idx + Clipboard.Paste<string>().Length ; //only for command line editor
 
                     }
-                    Debug.Log(Time.time - timeDebug);
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
