@@ -414,7 +414,6 @@ namespace SEE.Utils
             {
                 return (find, crdt[find]);
             }
-            Debug.Log("NUUUUUULLL");
             return (-1, null);
         }
 
@@ -573,19 +572,11 @@ namespace SEE.Utils
         /// <returns>The index at which the position is placed or -1 if the position is not contained in the CRDT</returns>
         private int BinarySearch(Identifier[] position, int start, int end)
         {
-            /* int i = 0;
-             foreach(CharObj c in crdt)
-             {
-                 if (ComparePosition(c.GetIdentifier(), position) == 0) return i;
-                 i++;
-             }
-             return -1; 
-            */
-            if (start <= end)
+            if (start < end)
             {
-                int length = end - start;
+                int length = end - start + 1;
                 int mid = 0;
-                mid = (length + start) / 2;
+                mid = length / 2 + start;
                 if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
                 {
                     return mid;
@@ -598,6 +589,10 @@ namespace SEE.Utils
                 {
                     return BinarySearch(position, mid + 1, end);
                 }
+            }
+            if (start < crdt.Count && ComparePosition(crdt[start].GetIdentifier(), position) == 0)
+            {
+                return start;
             }
             return -1;
         }
