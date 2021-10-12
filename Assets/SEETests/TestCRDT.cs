@@ -228,11 +228,22 @@ namespace SEETests
 
         }
 
+        [Test]
+        public void testIsEmpty()
+        {
+            CRDT crdt = new CRDT("test", "test");
+            Assert.IsTrue(crdt.IsEmpty());
+            crdt.AddChar('c', 0);
+            Assert.IsFalse(crdt.IsEmpty());
+        }
+
         private void print(CRDT crdt)
         {
             Debug.LogWarning("CRDT: " + crdt.ToString());
             Debug.LogWarning(crdt.PrintString());
         }
+
+
 
     }
 }
