@@ -444,12 +444,11 @@ namespace SEE.Utils
         private Identifier[] FromIEnumToIdentifier(IEnumerable<Identifier> ienum)
         {
             Identifier[] ret = new Identifier[ienum.Count()];
-            int i = 0;
-            foreach (Identifier elm in ienum)
+            for(int i = 0; i < ienum.Count() ; i++)
             {
-                ret[i] = elm;
-                i++;
+                ret[i] = ienum.ElementAt(i); 
             }
+            
             return ret;
         }
 
@@ -724,6 +723,15 @@ namespace SEE.Utils
                 }
             }
             return ret;
+        }
+
+        /// <summary>
+        /// Tests if the CRDT is empyt
+        /// </summary>
+        /// <returns>True if the CRDT is empty, false if not</returns>
+        public bool IsEmpty()
+        {
+            return crdt.Count < 1;
         }
     }
 }

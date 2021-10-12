@@ -84,6 +84,11 @@ namespace SEE.Utils
         {
             return GetInstanceByName(file).PositionToString(position);
         }
+
+        public static bool IsEmpty(string file)
+        {
+            return GetInstanceByName(file).IsEmpty();
+        }
         //TODO COMPLETE
     }
 }
