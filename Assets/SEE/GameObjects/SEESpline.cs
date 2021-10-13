@@ -7,27 +7,27 @@ namespace Assets.SEE.GameObjects
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
     /// B-Splines and a serializable version that can be used in subclasses of
-    /// <see cref="MonoBehaviour"/>. Note that the properties related to Unity
-    /// (e.g., <see cref="ControlPoints"/>) are read-only. These properties
-    /// must be updated via setting <see cref="Spline"/>.
+    /// <see cref="MonoBehaviour"/>. Note that the attributes related to Unity
+    /// (e.g., <see cref="ControlPoints"/>) must not be set directly. Instead,
+    /// they must be updated via setting <see cref="Spline"/>.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
     {
         /// <summary>
         /// Degree of the piecewise polynomials.
         /// </summary>
-        public uint Degree { get; private set; }
+        public uint Degree;
 
         /// <summary>
-        /// The control points of a spline are decisive for its path.
+        /// The control points of a spline are decisive for its shape.
         /// </summary>
-        public Vector3[] ControlPoints { get; private set; }
+        public Vector3[] ControlPoints;
 
         /// <summary>
         /// Weighting factors of the <see cref="ControlPoints"/>. Can also be
         /// used change the shape of a spline, but is less intuitive.
         /// </summary>
-        public Vector3[] Knots { get; private set; }
+        public float[] Knots;
 
         public TinySpline.BSpline Spline
         {
@@ -36,14 +36,14 @@ namespace Assets.SEE.GameObjects
                 return new TinySpline.BSpline((uint)ControlPoints.Length, 3, Degree)
                 {
                     ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
-                    Knots = TinySplineInterop.VectorsToList(Knots)
+                    Knots = TinySplineInterop.ArrayToList(Knots)
                 };
             }
             set
             {
                 Degree = (uint)value.Degree;
                 ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
-                Knots = TinySplineInterop.ListToVectors(value.Knots);
+                Knots = TinySplineInterop.ListToArray(value.Knots);
             }
         }
     }
@@ -108,6 +108,36 @@ namespace Assets.SEE.GameObjects
                     (float)values[idx + 2]);
             }
             return vectors;
+        }
+
+        /// <summary>
+        /// Converts the given list of doubles to a float array.
+        /// </summary>
+        /// <param name="values">Values to be converted</param>
+        /// <returns><paramref name="values"/> as float array</returns>
+        public static float[] ListToArray(IList<double> values)
+        {
+            float[] array = new float[values.Count];
+            for (int i = 0; i < values.Count; i++)
+            {
+                array[i] = (float)values[i];
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// Converts the given float array to a list of doubles.
+        /// </summary>
+        /// <param name="values">Values to be converted</param>
+        /// <returns><paramref name="values"/> as list of doubles</returns>
+        public static IList<double> ArrayToList(float[] values)
+        {
+            IList<double> list = new List<double>(values.Length);
+            foreach (float val in values)
+            {
+                list.Add(val);
+            }
+            return list;
         }
     }
 }
