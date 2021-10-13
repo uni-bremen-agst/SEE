@@ -1,4 +1,5 @@
-﻿using SEE.Layout.Utils;
+﻿using Assets.SEE.GameObjects;
+using SEE.Layout.Utils;
 using UnityEngine;
 
 namespace SEE.Layout
