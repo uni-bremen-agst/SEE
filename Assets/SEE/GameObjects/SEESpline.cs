@@ -1,11 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using OdinSerializer;
+using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Utility functions for interoperability between TinySpline and Unity.
-/// </summary>
-namespace SEE.Layout.Utils
+namespace Assets.SEE.GameObjects
 {
+    /// <summary>
+    /// This class serves as a bridge between TinySpline's representation of
+    /// B-Splines and a serializable version that can be used in subclasses of
+    /// <see cref="MonoBehaviour"/>. Note that the properties related to Unity
+    /// (e.g., <see cref="ControlPoints"/>) are read-only. These properties
+    /// must be updated via setting <see cref="Spline"/>.
+    /// </summary>
+    public class SEESpline : SerializedMonoBehaviour
+    {
+        /// <summary>
+        /// Degree of the piecewise polynomials.
+        /// </summary>
+        public uint Degree { get; private set; }
+
+        /// <summary>
+        /// The control points of a spline are decisive for its path.
+        /// </summary>
+        public Vector3[] ControlPoints { get; private set; }
+
+        /// <summary>
+        /// Weighting factors of the <see cref="ControlPoints"/>. Can also be
+        /// used change the shape of a spline, but is less intuitive.
+        /// </summary>
+        public Vector3[] Knots { get; private set; }
+
+        public TinySpline.BSpline Spline
+        {
+            get
+            {
+                return new TinySpline.BSpline((uint)ControlPoints.Length, 3, Degree)
+                {
+                    ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
+                    Knots = TinySplineInterop.VectorsToList(Knots)
+                };
+            }
+            set
+            {
+                Degree = (uint)value.Degree;
+                ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
+                Knots = TinySplineInterop.ListToVectors(value.Knots);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Utility functions for interoperability between TinySpline and Unity.
+    /// </summary>
     class TinySplineInterop
     {
         /// <summary>
@@ -28,7 +73,7 @@ namespace SEE.Layout.Utils
         }
 
         /// <summary>
-        /// Converts the given Unity Vector3 to a list of doubles
+        /// Converts the given Unity Vector3s to a list of doubles
         /// (TinySpline's representation of points).
         /// </summary>
         /// <param name="vectors">Vectors to be converted</param>
