@@ -1,4 +1,5 @@
 ﻿using OdinSerializer;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,12 @@ namespace Assets.SEE.GameObjects
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
     {
+        /// <summary>
+        /// What the names says.
+        /// </summary>
+        [NonSerialized]
+        const float PI2 = Mathf.PI * 2f;
+
         /// <summary>
         /// Degree of the piecewise polynomials.
         /// </summary>
@@ -29,22 +36,147 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         public float[] Knots;
 
+        /// <summary>
+        /// Internal cache for <see cref="Spline"/>.
+        /// </summary>
+        [NonSerialized]
+        private TinySpline.BSpline Cache;
+
+        /// <summary>
+        /// TinySpline's representation of a B-Spline. Note that this property
+        /// is cached. It is therefore necessary to propagate back any changes
+        /// applied to the returned instance (e.g., when changing the knot
+        /// vector of a spline) by calling this property with the updated
+        /// spline. If changes are not propagated back, the serialization
+        /// attributes (e.g., <see cref="Knots"/>) might be out of sync with
+        /// the internal state of <see cref="Spline"/>.
+        /// </summary>
         public TinySpline.BSpline Spline
         {
             get
             {
-                return new TinySpline.BSpline((uint)ControlPoints.Length, 3, Degree)
+                if (Cache is null)
                 {
-                    ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
-                    Knots = TinySplineInterop.ArrayToList(Knots)
-                };
+                    Cache = new TinySpline.BSpline((uint)ControlPoints.Length, 3, Degree)
+                    {
+                        ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
+                        Knots = TinySplineInterop.ArrayToList(Knots)
+                    };
+                }
+                return Cache;
             }
             set
             {
                 Degree = (uint)value.Degree;
                 ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
                 Knots = TinySplineInterop.ListToArray(value.Knots);
+                Cache = Spline;
             }
+        }
+
+        /// <summary>
+        /// Approximates <see cref="Spline"/> as poly line. The greater
+        /// <paramref name="num"/>, the more accurate the approximation.
+        /// The poly line can be visualized with <see cref="LineRenderer"/>.
+        /// </summary>
+        /// <param name="num">Number of vertecies in the poly line</param>
+        /// <returns>A poly line approximating <see cref="Spline"/></returns>
+        public Vector3[] PolyLine(int num = 100)
+        {
+            return TinySplineInterop.ListToVectors(Spline.Sample((uint)num));
+        }
+
+        /// <summary>
+        /// Approximates <see cref="Spline"/> as tubular mesh.
+        /// </summary>
+        /// <param name="radius">Radius of tube</param>
+        /// <param name="markDynamic">If true, the created mesh is marked
+        /// dynamic (<see cref="Mesh.MarkDynamic"/>)</param>
+        /// <param name="tubularSegments">Number of "rings" along the tube</param>
+        /// <param name="radialSegments">Number of vertecies per "ring"</param>
+        /// <returns>A tubular mesh approximating <see cref="Spline"/></returns>
+        public Mesh Mesh(float radius,
+            bool markDynamic = true,
+            int tubularSegments = 50,
+            int radialSegments = 8)
+        {
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var tangents = new List<Vector4>();
+            var uvs = new List<Vector2>();
+            var indices = new List<int>();
+
+            // TODO: See todos below
+            var rv = Spline.UniformKnotSeq((uint) tubularSegments + 1);
+            var frames = Spline.ComputeRMF((TinySpline.RealVector)rv);
+
+            void GenerateSegment(int i)
+            {
+                var fr = frames.At((uint)i);
+
+                var p = TinySplineInterop.VectorToVector(fr.Position());
+                var N = TinySplineInterop.VectorToVector(fr.Normal());
+                var B = TinySplineInterop.VectorToVector(fr.Binormal());
+
+                for (int j = 0; j <= radialSegments; j++)
+                {
+                    float v = 1f * j / radialSegments * PI2;
+                    var sin = Mathf.Sin(v);
+                    var cos = Mathf.Cos(v);
+
+                    Vector3 normal = (cos * N + sin * B).normalized;
+                    vertices.Add(p + radius * normal);
+                    normals.Add(normal);
+
+                    var tangent = TinySplineInterop.VectorToVector(fr.Tangent());
+                    tangents.Add(new Vector4(tangent.x, tangent.y, tangent.z, 0f));
+                }
+            }
+
+            for (int i = 0; i < tubularSegments; i++)
+            {
+                GenerateSegment(i);
+            }
+            // TODO: Isn't this one too many?
+            GenerateSegment(tubularSegments);
+
+            // TODO: Isn't this one too many?
+            for (int i = 0; i <= tubularSegments; i++)
+            {
+                for (int j = 0; j <= radialSegments; j++)
+                {
+                    float u = 1f * j / radialSegments;
+                    float v = 1f * i / tubularSegments;
+                    uvs.Add(new Vector2(u, v));
+                }
+            }
+
+            for (int j = 1; j <= tubularSegments; j++)
+            {
+                for (int i = 1; i <= radialSegments; i++)
+                {
+                    int a = (radialSegments + 1) * (j - 1) + (i - 1);
+                    int b = (radialSegments + 1) * j + (i - 1);
+                    int c = (radialSegments + 1) * j + i;
+                    int d = (radialSegments + 1) * (j - 1) + i;
+
+                    // faces
+                    indices.Add(a); indices.Add(d); indices.Add(b);
+                    indices.Add(b); indices.Add(d); indices.Add(c);
+                }
+            }
+
+            var mesh = new Mesh();
+            if (markDynamic)
+            {
+                mesh.MarkDynamic();
+            }
+            mesh.vertices = vertices.ToArray();
+            mesh.normals = normals.ToArray();
+            mesh.tangents = tangents.ToArray();
+            mesh.uv = uvs.ToArray();
+            mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+            return mesh;
         }
     }
 
@@ -138,6 +270,19 @@ namespace Assets.SEE.GameObjects
                 list.Add(val);
             }
             return list;
+        }
+
+        /// <summary>
+        /// Converts TinySpline's Vector3 to Unity's Vector3.
+        /// </summary>
+        /// <param name="vec3">Vector to be converted</param>
+        /// <returns>A Unity Vector3</returns>
+        public static Vector3 VectorToVector(TinySpline.Vector3 vec3)
+        {
+            return new Vector3(
+                (float)vec3.X(),
+                (float)vec3.Y(),
+                (float)vec3.Z());
         }
     }
 }
