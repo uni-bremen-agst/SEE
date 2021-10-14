@@ -582,7 +582,6 @@ namespace SEE.DataModel.DG
         /// </summary>
         internal void FinalizeNodeHierarchy()
         {
-            Assert.IsTrue(NodeHierarchyHasChanged);
             GatherRoots();
             CalculateLevels();
             maxDepth = CalcMaxDepth(roots, -1);
@@ -820,7 +819,7 @@ namespace SEE.DataModel.DG
         /// <param name="relevantTypes">the node types that should be kept</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
-        private static void AddToSubGraph (Graph subgraph, ICollection<string> relevantTypes, 
+        private static void AddToSubGraph (Graph subgraph, ICollection<string> relevantTypes,
                                            IDictionary<Node, Node> mapsTo, Node parent)
         {
             foreach (Node child in parent.Children())
@@ -887,7 +886,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Traverses the given graph. On every root node rootAction is called.
         /// On every node that is a leaf, leafAction is called, otherwise innerNodeAction is called.
-        /// If an action ist null, it just won't be called.
+        /// If an action is null, it just won't be called.
         /// </summary>
         /// <param name="rootAction">Function that is called on root nodes.</param>
         /// <param name="innerNodeAction">Function that is called when node is not a leaf.</param>
