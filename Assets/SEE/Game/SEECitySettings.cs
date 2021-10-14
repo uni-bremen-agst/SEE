@@ -88,7 +88,6 @@ namespace SEE.Game
         /// <summary>
         /// The name of the metric determining the style (color) of a node.
         /// </summary>
-        ///
         public string ColorMetric = "";
         /// <summary>
         /// The range of colors for the style metric.
@@ -140,12 +139,12 @@ namespace SEE.Game
         public string DepthMetric = NumericAttributeNames.LOC.Name();
         /// <summary>
         /// This parameter determines the minimal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be greater than MaximalBlockLength.
+        /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
         /// </summary>
         public float MinimalBlockLength = 0.001f; // serialized by Unity
         /// <summary>
         /// This parameter determines the maximal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be smaller than MinimalBlockLength.
+        /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
         /// </summary>
         public float MaximalBlockLength = 5.0f; // serialized by Unity
         /// <summary>
@@ -277,7 +276,7 @@ namespace SEE.Game
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
         /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates.
-        /// Otherwise is our own layout format SDL is expected, which saves the complete Transform
+        /// Otherwise our own layout format SDL is expected, which saves the complete Transform
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
@@ -324,7 +323,7 @@ namespace SEE.Game
         /// <summary>
         /// Orientation of the edges;
         /// if false, the edges are drawn below the houses;
-        /// if true, the edges are drawn above the houses;
+        /// if true, the edges are drawn above the houses.
         /// </summary>
         public bool EdgesAboveBlocks = true;
         /// <summary>
@@ -337,7 +336,7 @@ namespace SEE.Game
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are
         /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
-        /// stores the epsilon parameter of the Ramer–Douglas–Peucker algorithm which
+        /// stores the epsilon parameter of the RamerÂ–DouglasÂ–Peucker algorithm which
         /// is used to identify and remove points based on their distances to the line
         /// drawn between their neighbors.
         /// </summary>
@@ -393,7 +392,7 @@ namespace SEE.Game
         /// </summary>
         public int RadialSegments = 8;
         /// <summary>
-        /// // Whether the edges are selectable or not.
+        /// Whether the edges are selectable or not.
         /// </summary>
         public bool AreSelectable = true;
 
