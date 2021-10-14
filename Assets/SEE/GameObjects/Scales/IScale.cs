@@ -109,7 +109,7 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogError("Attempt to retrieve the normalized maximum of metric {metric} that is not known.\n");
+                Debug.LogError($"Attempt to retrieve the normalized maximum of metric {metric} that is not known.\n");
                 Debug.Log("The available normalized metric maxima are as follows:\n");
                 DumpMetricMaxima(metricMaxima);
                 throw new Exception("A metric named " + metric + " does not exist.");
