@@ -24,7 +24,7 @@ public class SyncCodeWindowInput : AbstractAction
     /// <summary>
     /// The character that should be added
     /// </summary>
-    char c;
+    public char c;
 
     /// <summary>
     /// Enum to control wether a new char should be added or an existing deleted
@@ -69,12 +69,13 @@ public class SyncCodeWindowInput : AbstractAction
                 case Mode.insert:
                     if (CodeSpaceManager.ManagerInstance)
                     {
+
                         int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(position, file), file);
                         if (index == -1)
                         {
                             return;
                         }
-
+                        Debug.Log("NETZWERK LÖPT!" + file + " " + c + " " + c + " " + RequesterIPAddress);
                         CodeSpaceManager.ManagerInstance.InsertChar(RequesterIPAddress, file, c, index);
 
                     }
