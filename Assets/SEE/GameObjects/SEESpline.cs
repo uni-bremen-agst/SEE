@@ -32,7 +32,8 @@ namespace Assets.SEE.GameObjects
 
         /// <summary>
         /// Weighting factors of the <see cref="ControlPoints"/>. Can also be
-        /// used change the shape of a spline, but is less intuitive.
+        /// used to shape a spline, but is less intuitive. We usually don't
+        /// care about the values.
         /// </summary>
         public float[] Knots;
 
