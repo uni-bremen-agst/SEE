@@ -64,31 +64,12 @@ namespace SEE.Net
                 {
                     case RemoteAction.AddChar:
                         ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
-                       /* if (CodeSpaceManager.ManagerInstance)
-                        {
-                            int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(position, file), file);
-                            if(index == -1)
-                            {
-                                return;
-                            }
-
-                            CodeSpaceManager.ManagerInstance.InsertChar(RequesterIPAddress, file, c, index); 
-
-                        }*/
+                    
                         break;
 
                     case RemoteAction.DelteChar:
                         ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position, file), file);
-                        if (CodeSpaceManager.ManagerInstance)
-                        {
-                            int index = ICRDT.GetIndexByPosition(ICRDT.StringToPosition(position, file), file);
-                            if (index == -1)
-                            {
-                                return;
-                            }
-
-                            CodeSpaceManager.ManagerInstance.DeleteChar(RequesterIPAddress, file, index);
-                        }
+                        
                         break;
                 }
 
