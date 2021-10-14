@@ -36,7 +36,7 @@ namespace SEE.Game
             leafNodeFactory = this.settings.LeafNodeSettings.Kind switch
             {
                 LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
-                _ => throw new Exception("Unhandled GraphSettings.LeafNodeKinds")
+                _ => throw new Exception($"Unhandled {nameof(LeafNodeKinds)}")
             };
 
             ColorRange innerColorRange = this.settings.InnerNodeSettings.ColorRange;
@@ -59,7 +59,7 @@ namespace SEE.Game
                     innerNodeFactory = new CubeFactory(ShaderType, innerColorRange);
                     break;
                 default:
-                    throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
+                    throw new Exception($"Unhandled {nameof(InnerNodeKinds)}");
             }
             this.graph = graph;
             if (this.graph != null)
@@ -261,7 +261,7 @@ namespace SEE.Game
         /// edges are added to <paramref name="parent"/> as children.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="parent">the object the new edges are to become children</param>
+        /// <param name="parent">the object the new edges are to become children of</param>
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent, bool draw = true)
@@ -275,7 +275,7 @@ namespace SEE.Game
         /// edges are added to <paramref name="parent"/> as children.
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="parent">the object the new edges are to become children</param>
+        /// <param name="parent">the object the new edges are to become children of</param>
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, GameObject parent, bool draw = true)
@@ -1308,7 +1308,7 @@ namespace SEE.Game
             }
             else
             {
-                if (!node.TryGetNumeric(colorMetric, out float v))
+                if (!node.TryGetNumeric(colorMetric, out float _))
                 {
                     Debug.LogWarning($"value of color metric {colorMetric} for node {node.ID} is undefined.\n");
                     return 0;
@@ -1551,12 +1551,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="value">value to be clamped</param>
         /// <returns>clamped value</returns>
-        private float WithinLimits(float value)
-        {
-            return Mathf.Clamp(value,
-                               settings.LeafNodeSettings.MinimalBlockLength,
-                               settings.LeafNodeSettings.MaximalBlockLength);
-        }
+        private float WithinLimits(float value) =>
+            Mathf.Clamp(value,
+                        settings.LeafNodeSettings.MinimalBlockLength,
+                        settings.LeafNodeSettings.MaximalBlockLength);
 
         /// <summary>
         /// Adjusts the scale of every node such that the maximal extent of each node is one.
