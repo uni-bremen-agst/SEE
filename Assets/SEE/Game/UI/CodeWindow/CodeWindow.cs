@@ -140,8 +140,13 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="index">The index at which the Char should be added</param>
         public void InsertChar(char c, int index)
         {
-            Debug.Log(c + " index " + index);
-            TextMeshInputField.text.Insert(index, c.ToString());
+            if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
+            {
+
+
+                Debug.Log(c + " index " + index);
+                TextMeshInputField.text.Insert(index, c.ToString());
+            }
         }
 
         /// <summary>

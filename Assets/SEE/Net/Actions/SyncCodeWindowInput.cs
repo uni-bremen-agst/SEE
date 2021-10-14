@@ -75,7 +75,7 @@ public class SyncCodeWindowInput : AbstractAction
                         {
                             return;
                         }
-                        Debug.Log("NETZWERK LÖPT!" + file + " " + c + " " + c + " " + RequesterIPAddress);
+                        Debug.Log("NETZWERK LÖPT!" + file + " " + c + " " + index + " " + RequesterIPAddress);
                         CodeSpaceManager.ManagerInstance.InsertChar(RequesterIPAddress, file, c, index);
 
                     }
