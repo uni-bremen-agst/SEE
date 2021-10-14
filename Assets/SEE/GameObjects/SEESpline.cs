@@ -15,7 +15,7 @@ namespace Assets.SEE.GameObjects
     public class SEESpline : SerializedMonoBehaviour
     {
         /// <summary>
-        /// What the names says.
+        /// What the name says.
         /// </summary>
         [NonSerialized]
         const float PI2 = Mathf.PI * 2f;
