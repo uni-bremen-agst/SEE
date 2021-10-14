@@ -177,7 +177,7 @@ namespace SEE.Game
                     nodeRef.Value = graph.GetNode(child.name);
                     if (nodeRef.Value == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve node reference {0}.\n", child.name);
+                        Debug.LogWarning($"Could not resolve node reference {child.name}.\n");
                     }
                 }
                 else if (child.TryGetComponent(out EdgeRef edgeRef))
@@ -185,13 +185,13 @@ namespace SEE.Game
                     edgeRef.Value = graph.GetEdge(child.name);
                     if (edgeRef.Value == null)
                     {
-                        Debug.LogWarningFormat("Could not resolve edge reference {0}.\n", child.name);
+                        Debug.LogWarning($"Could not resolve edge reference {child.name}.\n");
                     }
                 }
 #if UNITY_EDITOR
                 else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
                 {
-                    Debug.LogWarningFormat("Game object {0} has neither node nor edge reference.\n", child.name);
+                    Debug.LogWarning("Game object {child.name} has neither node nor edge reference.\n");
                 }
 #endif
                 SetNodeEdgeRefs(graph, child);
