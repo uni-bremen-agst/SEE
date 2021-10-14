@@ -52,17 +52,14 @@ namespace SEE.GO
         /// <summary>
         /// Sets this <see cref="NodeRef"/> to referring to <paramref name="node"/>.
         ///
-        /// Unlike, setting <see cref="Value"/>, this assignment will not alter the
+        /// Unlike setting <see cref="Value"/>, this assignment will not alter the
         /// mapping of <see cref="Node"/>s onto <see cref="NodeRef"/>s, in other words,
         /// <see cref="nodeToNodeRefDict"/>. That is, the result of <see cref="Get(Node)"/>
         /// does not depend upon this assignment.
         /// </summary>
         /// <param name="node">the graph node this <see cref="NodeRef"/> should be
         /// referring to</param>
-        public void SetNode(Node node)
-        {
-            elem = node;
-        }
+        public void SetNode(Node node) => elem = node;
 
         /// <summary>
         /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.
