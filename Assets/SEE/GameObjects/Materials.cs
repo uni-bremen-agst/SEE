@@ -133,7 +133,7 @@ namespace SEE.GO
         /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
         /// The larger the offset, the later the object will be rendered. An object drawn later
         /// will cover objects drawn earlier.
-        /// Precondition: 0 <= degree <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
+        /// Precondition: 0 <= index <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
         /// <param name="renderQueueOffset">offset for the render queue</param>
         /// <param name="index">index of the material (color) in the range [0, numberOfColors-1]</param>
@@ -150,7 +150,7 @@ namespace SEE.GO
             }
             if (renderQueueOffset >= materials.Count)
             {
-                // there are not materials for this renderQueueOffset; we need to create these first
+                // there are no materials for this renderQueueOffset; we need to create these first
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
                     materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
@@ -186,7 +186,7 @@ namespace SEE.GO
             Material material = new Material(prefab)
             {
                 // FIXME this is not a good solution. we may want to add an enum or something for
-                // possible materials, such that we can ensure the correct renderQueue. That would
+                // possible materials, such that we can ensure the correct renderQueue. That would make
                 // adding new materials make easier as well.
                 renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent
                                                                   : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
