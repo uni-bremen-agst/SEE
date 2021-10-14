@@ -11,7 +11,7 @@ namespace SEE.Game
         private abstract class AnimationWatchDog
         {
             /// <summary>
-            /// The number of outstanding animation that need to be awaited before
+            /// The number of outstanding animations that need to be awaited before
             /// a particular method can be called.
             /// </summary>
             protected int outstandingAnimations;
@@ -120,7 +120,7 @@ namespace SEE.Game
 
         /// <summary>
         /// A watchdog awaiting all animations of the second phase to be finished. The second
-        /// phase is dedicated to the drawing all graph elements present in the graph next to
+        /// phase is dedicated to drawing all graph elements present in the graph next to
         /// be drawn.When all deletion animations have completed, <see cref="OnAnimationsFinished"/>
         /// will be called.
         /// </summary>
