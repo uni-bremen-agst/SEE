@@ -93,7 +93,7 @@ namespace SEE.Utils
         {
             if (callback != null)
             {
-                gameObject.transform.DOScale(localScale, duration).OnComplete(()=>{callback?.Invoke(gameObject);});
+                gameObject.transform.DOScale(localScale, duration).OnComplete(()=>{callback(gameObject);});
             }
             else
             {
