@@ -45,26 +45,26 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Defines the default time an animation takes in seconds.
         /// </summary>
-        public const int DefaultAnimationTime = 2;
+        public const float DefaultAnimationTime = 2.0f;
 
         /// <summary>
         /// Defines the maximum time an animation is allowed to take in seconds.
         /// </summary>
-        private float _maxAnimationTime;
+        private float maxAnimationTime;
         /// <summary>
         /// If true animations are skipped and the new values are applied instantly.
         /// </summary>
-        private bool _animationsDisabled = false;
+        private bool animationsDisabled = false;
 
         /// <summary>
         /// Defines the maximum time an animation is allowed to take in seconds.
         /// </summary>
-        public float MaxAnimationTime { get => _maxAnimationTime; set => _maxAnimationTime = value; }
+        public float MaxAnimationTime { get => maxAnimationTime; set => maxAnimationTime = value; }
 
         /// <summary>
         /// If set to true animations are skipped and the new values are applied instantly.
         /// </summary>
-        public bool AnimationsDisabled { get => _animationsDisabled; set => _animationsDisabled = value; }
+        public bool AnimationsDisabled { get => animationsDisabled; set => animationsDisabled = value; }
 
         /// <summary>
         /// Creates a new animator with a given maximal animation time.

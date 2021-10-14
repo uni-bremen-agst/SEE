@@ -119,11 +119,6 @@ namespace SEE.Game
         private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// Shortest time period in which an animation can be run in seconds.
-        /// </summary>
-        private const float MinimalWaitTimeForNextRevision = 0.1f;
-
-        /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
         /// graph has changed.
         /// </summary>
@@ -134,19 +129,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// An event fired upon the start of an animation.
-        /// </summary>
-        public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
-
-        /// <summary>
         /// An event fired upon the end of an animation.
         /// </summary>
-        public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
-
-        /// <summary>
-        /// Used to store whether a node has been born or changed.
-        /// </summary>
-        private enum MarkerType { Changed, Born }
+        private readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
         /// <summary>
         /// The animator used when an inner node is removed from the scene
@@ -156,8 +141,8 @@ namespace SEE.Game
         /// removing nodes and the second phase of drawing the nodes of
         /// the next graph.
         /// </summary>
-        protected readonly AbstractAnimator moveAnimator
-            = new MoveAnimator(AbstractAnimator.DefaultAnimationTime / 2);
+        private readonly AbstractAnimator moveAnimator
+            = new MoveAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
         /// An animator used for all other occasions (new nodes, existing nodes, changed nodes).
@@ -166,8 +151,8 @@ namespace SEE.Game
         /// removing nodes and the second phase of drawing the nodes of
         /// the next graph.
         /// </summary>
-        protected AbstractAnimator changeAndBirthAnimator
-            = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2);
+        private AbstractAnimator changeAndBirthAnimator
+            = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
         /// Whether the edge animation is ongoing.
@@ -198,19 +183,19 @@ namespace SEE.Game
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float _animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
+        private float animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
 
         /// <summary>
         /// The duration of an animation.
         /// </summary>
         public float AnimationDuration
         {
-            get => _animationDuration;
+            get => animationDuration;
             set
             {
                 if (value >= 0)
                 {
-                    _animationDuration = value;
+                    animationDuration = value;
                     animators.ForEach(animator =>
                     {
                         animator.MaxAnimationTime = value;
@@ -223,17 +208,7 @@ namespace SEE.Game
         /// <summary>
         /// The city (graph + layout) currently shown.
         /// </summary>
-        private LaidOutGraph _currentCity;  // not serialized by Unity
-
-        /// <summary>
-        /// The underlying graph of the city currently shown.
-        /// </summary>
-        protected Graph CurrentGraphShown => _currentCity?.Graph;
-        /// <summary>
-        /// The layout of the city currently shown. The layout is a mapping of the graph
-        /// nodes' IDs onto their layout nodes.
-        /// </summary>
-        protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
+        private LaidOutGraph currentCity;  // not serialized by Unity
 
         /// <summary>
         /// Evaluates the performance of the edge animation.
@@ -248,20 +223,13 @@ namespace SEE.Game
         /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
-        private LaidOutGraph _nextCity;  // not serialized by Unity
-        /// <summary>
-        /// The next city (graph + layout) to be shown.
-        /// Note: 'next' does not necessarily mean that it is a graph coming later in the
-        /// series of the graph evolution. It just means that this is the next graph to
-        /// be shown. If the user goes backward in time, _nextCity is actually an older
-        /// graph.
-        /// </summary>
-        protected Graph NextGraphToBeShown => _nextCity?.Graph;  // not serialized by Unity
+        private LaidOutGraph nextCity;  // not serialized by Unity
+
         /// <summary>
         /// The layout of _nextGraph. The layout is a mapping of the graph
         /// nodes' IDs onto their ILayoutNodes.
         /// </summary>
-        protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;  // not serialized by Unity
+        private Dictionary<string, ILayoutNode> NextLayoutToBeShown => nextCity?.Layout;  // not serialized by Unity
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -448,7 +416,7 @@ namespace SEE.Game
             // may still be contained in the scene and objectManager. We need to clean up
             // first.
             objectManager?.Clear();
-            RenderGraph(_currentCity, graph);
+            RenderGraph(currentCity, graph);
         }
 
         /// <summary>
@@ -482,7 +450,6 @@ namespace SEE.Game
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
             marker.Clear();
-            AnimationStartedEvent.Invoke();
             Phase1RemoveDeletedGraphElements(current, next);
         }
 
@@ -552,7 +519,7 @@ namespace SEE.Game
         /// Implements the second phase in the transition from the current to the <paramref name="next"/>
         /// graph. In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
         /// either new or existing nodes (the latter being nodes that have been present in the
-        /// currently drawn graph. When this phase has been completed, <see cref="OnAnimationsFinished"/>
+        /// currently drawn graph). When this phase has been completed, <see cref="OnAnimationsFinished"/>
         /// will be called eventually.
         ///
         /// To make sure that <see cref="OnAnimationsFinished"/> is called only when all nodes
@@ -572,7 +539,7 @@ namespace SEE.Game
         {
             /// We need to assign _nextCity because the callbacks <see cref="RenderPlane"/>
             /// and <see cref="RenderNode(Node)"/> will access it.
-            _nextCity = next;
+            nextCity = next;
 
             phase2AnimationWatchDog.Await(next.Graph.NodeCount);
             // Draw all nodes of next graph.
@@ -589,7 +556,7 @@ namespace SEE.Game
             objectManager.NegligibleNodes = negligibleNodes;
 
             // We have made the transition to the next graph.
-            _currentCity = next;
+            currentCity = next;
             MoveEdges();
 
             /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="phase2AnimationWatchDog"/>
@@ -601,6 +568,7 @@ namespace SEE.Game
         /// completed, in which the necessary nodes and edges are deleted.
         /// </summary>
         private Phase1AnimationWatchDog phase1AnimationWatchDog;
+
         /// <summary>
         /// Watchdog triggering <see cref="OnAnimationsFinished"/> when phase 2 has been
         /// completed, in which the nodes and edges of the next graph to be shown are drawn.
@@ -875,7 +843,7 @@ namespace SEE.Game
         /// so they can be updated accordingly.
         /// </summary>
         /// <param name="animators">list of animators to be informed</param>
-        protected virtual void RegisterAllAnimators(IList<AbstractAnimator> animators)
+        private void RegisterAllAnimators(IList<AbstractAnimator> animators)
         {
             animators.Add(changeAndBirthAnimator);
             animators.Add(moveAnimator);
@@ -884,7 +852,7 @@ namespace SEE.Game
         /// <summary>
         /// Renders a plane enclosing all game objects of the currently shown graph.
         /// </summary>
-        protected virtual void RenderPlane()
+        private void RenderPlane()
         {
             bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
             if (!isPlaneNew)
@@ -903,7 +871,7 @@ namespace SEE.Game
         /// <param name="left">First edge to be checked</param>
         /// <param name="right">Second edge to be checked</param>
         /// <returns>true if both edges are equal</returns>
-        protected virtual bool AreEqualGameEdges(GameObject left, GameObject right)
+        private bool AreEqualGameEdges(GameObject left, GameObject right)
         {
             return left.TryGetComponent(out EdgeRef leftEdgeRef)
                 && right.TryGetComponent(out EdgeRef rightEdgeRef)
@@ -916,7 +884,7 @@ namespace SEE.Game
         /// <param name="oldEdges">List of currently drawn edges</param>
         /// <param name="newEdges">List of new edges to be drawn</param>
         /// <returns>List of related edges</returns>
-        protected virtual void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        private void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
         {
             matchedEdges = new List<(GameObject, GameObject)>();
             foreach (GameObject newEdge in newEdges)
@@ -932,7 +900,7 @@ namespace SEE.Game
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them.
         /// </summary>
-        protected virtual void MoveEdges()
+        private void MoveEdges()
         {
             try
             {
@@ -1076,23 +1044,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Event function that adjusts the given <paramref name="gameNode"/>
-        /// according to is attached node's color (style) metric.
-        /// It will be called as a callback after the animation of a node to be
-        /// rendered has been finished (see RenderNode()). The animation will
-        /// adjust the game object's scale and position, but not its style.
-        /// Here we adjust the style.
-        /// </summary>
-        /// <param name="gameNode">game node object that was just modified by the animation</param>
-        public void OnRenderNodeFinishedAnimation(object gameNode)
-        {
-            if (gameNode is GameObject node)
-            {
-                graphRenderer.AdjustStyle(node);
-            }
-        }
-
-        /// <summary>
         /// Returns true if the x and z co-ordindates of the two vectors are approximately equal.
         /// </summary>
         /// <param name="v1">First vector</param>
@@ -1116,7 +1067,7 @@ namespace SEE.Game
         /// layouts).
         /// </summary>
         /// <param name="node">node to be displayed</param>
-        protected void IgnoreNode(Node node)
+        private void IgnoreNode(Node node)
         {
             // intentionally left blank
             phase2AnimationWatchDog.Finished();
@@ -1127,7 +1078,7 @@ namespace SEE.Game
         /// by creating a copy of the GameObject that is used during the animation.
         /// </summary>
         /// <param name="graphNode">graph node to be displayed</param>
-        protected virtual void RenderNode(Node graphNode)
+        private void RenderNode(Node graphNode)
         {
             // The layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
@@ -1189,6 +1140,13 @@ namespace SEE.Game
             changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
         }
 
+        /// <summary>
+        /// Removes <paramref name="currentGameNode"/> from the game-object hierarchy,
+        /// that is, its parent will be set to <code>null</code> and all its immediate
+        /// children tagged by <see cref="Tags.Node"/> will no longer be its children,
+        /// that is, their parent is set to <code>null</code>, too.
+        /// </summary>
+        /// <param name="currentGameNode">a game node to be removed from the game-object hierarchy</param>
         private static void RemoveFromNodeHierarchy(GameObject currentGameNode)
         {
             currentGameNode.transform.SetParent(null);
@@ -1272,7 +1230,6 @@ namespace SEE.Game
         /// just be set to null.
         /// </summary>
         /// <param name="gameObject">object to be destroyed</param>
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DestroyGameObject(object gameObject)
         {
             if (gameObject is GameObject go)
@@ -1294,7 +1251,7 @@ namespace SEE.Game
         /// destroyed when the animation has finished.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
-        protected virtual void RenderRemovedNode(Node node)
+        private void RenderRemovedNode(Node node)
         {
             if (objectManager.RemoveNode(node, out GameObject block))
             {
@@ -1326,7 +1283,7 @@ namespace SEE.Game
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        protected virtual void RenderRemovedEdge(Edge edge)
+        private void RenderRemovedEdge(Edge edge)
         {
             objectManager.RemoveEdge(edge);
             phase1AnimationWatchDog.Finished();
@@ -1384,23 +1341,23 @@ namespace SEE.Game
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay;  // not serialized by Unity
+        private bool isAutoplay;  // not serialized by Unity
 
         /// <summary>
         /// Whether the user has selected reverse auto-play mode.
         /// </summary>
-        private bool _isAutoplayReverse;  // not serialized by Unity
+        private bool isAutoplayReverse;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.
         /// </summary>
         public bool IsAutoPlay
         {
-            get => _isAutoplay;
+            get => isAutoplay;
             private set
             {
                 shownGraphHasChangedEvent.Invoke();
-                _isAutoplay = value;
+                isAutoplay = value;
             }
         }
 
@@ -1409,11 +1366,11 @@ namespace SEE.Game
         /// </summary>
         public bool IsAutoPlayReverse
         {
-            get => _isAutoplayReverse;
+            get => isAutoplayReverse;
             private set
             {
                 shownGraphHasChangedEvent.Invoke();
-                _isAutoplayReverse = value;
+                isAutoplayReverse = value;
             }
         }
 
@@ -1436,8 +1393,8 @@ namespace SEE.Game
         public void ShowGraphEvolution()
         {
             CurrentGraphIndex = 0;
-            _currentCity = null;
-            _nextCity = null;
+            currentCity = null;
+            nextCity = null;
 
             graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
@@ -1685,7 +1642,7 @@ namespace SEE.Game
         /// the currently shown graph remains visible.
         /// </summary>
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
-        internal void SetAutoPlayReverse(bool enabled)
+        private void SetAutoPlayReverse(bool enabled)
         {
             IsAutoPlayReverse = enabled;
             if (IsAutoPlayReverse)
