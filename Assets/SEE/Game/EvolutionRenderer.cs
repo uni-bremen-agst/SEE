@@ -576,23 +576,25 @@ namespace SEE.Game
         private Phase2AnimationWatchDog phase2AnimationWatchDog;
 
         /// <summary>
-        /// Updates the hierarchy of game nodes such that is isomorphic to the node
+        /// Updates the hierarchy of game nodes so that it is isomorphic to the node
         /// hierarchy of the underlying graph.
         /// </summary>
         private void UpdateGameNodeHierarchy()
         {
             Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
             CollectNodes(gameObject, nodeMap);
-            Check(nodeMap);
+            // Check(nodeMap);
             GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
         }
 
         /// <summary>
         /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
-        /// members of the same graph.
+        /// members of the same graph. Emits warnings and asserts that they are all in
+        /// the same graph.
+        /// Used only for debugging.
         /// </summary>
         /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
-        private void Check(Dictionary<Node, GameObject> nodeMap)
+        private static void Check(Dictionary<Node, GameObject> nodeMap)
         {
             HashSet<Graph> graphs = new HashSet<Graph>();
 
@@ -624,7 +626,7 @@ namespace SEE.Game
         /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
         /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
         /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
-        private static void CollectNodes(GameObject root, Dictionary<Node, GameObject> nodeMap)
+        private static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
         {
             if (root != null)
             {
@@ -632,7 +634,7 @@ namespace SEE.Game
                 {
                     GameObject child = childTransform.gameObject;
                     /// If a game node was deleted, it was marked inactive in
-                    /// <see cref="OnRemovedNodeFinishedAnimation"/>. We need to ignored such
+                    /// <see cref="OnRemovedNodeFinishedAnimation"/>. We need to ignore such
                     /// game nodes.
                     if (child.activeInHierarchy && child.CompareTag(Tags.Node))
                     {
@@ -1329,7 +1331,7 @@ namespace SEE.Game
             bool hasLayout = TryGetLayout(graph, out Dictionary<string, ILayoutNode> layout);
             if (layout == null || !hasLayout)
             {
-                Debug.LogError($"There is no layout available for graph with index {index}");
+                Debug.LogError($"There is no layout available for graph with index {index}\n");
                 return false;
             }
             laidOutGraph = new LaidOutGraph(graph, layout);
