@@ -47,23 +47,13 @@ namespace SEE.Utils
             GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static void AddString(string s, int startIdx, string file)
+        public static void AddString(string s, int startIdx, string file, bool dontSyncCodeWindowChars = false)
         {
-            GetInstanceByName(file).AddString(s, startIdx);
+            GetInstanceByName(file).AddString(s, startIdx, dontSyncCodeWindowChars);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
             GetInstanceByName(file).DeleteString(startIdx, endIdx);
-        }
-
-        public static void DeleteChar(int index, string file)
-        {
-            GetInstanceByName(file).DeleteChar(index);
-        }
-
-        public static void AddChar(char c, int idx, string file)
-        {
-            GetInstanceByName(file).AddChar(c, idx);
         }
 
         public static string PrintString(string file)

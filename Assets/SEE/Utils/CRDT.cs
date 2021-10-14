@@ -131,9 +131,9 @@ namespace SEE.Utils
 
             if (prePosition != null && prePosition.Length > 0)
             {
-                (int, CharObj) found = Find(prePosition);
-                if (ComparePosition(found.Item2.GetIdentifier(), position) < 0)
+                if (ComparePosition(prePosition, position) < 0)
                 {
+                    (int, CharObj) found = Find(prePosition);
                     crdt.Insert(found.Item1 + 1, new CharObj(c, position));
                 }
                 else
@@ -194,6 +194,7 @@ namespace SEE.Utils
         {
             if (crdt.Count() > index && index > -1)
             {
+                new SyncCodeWindowInput().DeleteChar(crdt[index].GetIdentifier(), filename);
                 new NetCRDT().DeleteChar(crdt[index].GetIdentifier(), filename);
                 crdt.RemoveAt(index);
             }
@@ -208,14 +209,13 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        public void AddString(string s, int startIdx)
+        /// <param name="dontSyncCodeWindowChars"></param>
+        public void AddString(string s, int startIdx, bool dontSyncCodeWindowChars = false)
         {
-            Profiler.BeginSample("ADDSTRING");
             for (int i = 0; i < s.Length; i++)
             {
-                AddChar(s[i], i + startIdx);
+                AddChar(s[i], i + startIdx, dontSyncCodeWindowChars);
             }
-            Profiler.EndSample();
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="index">The index in the local string</param>
-        public void AddChar(char c, int index)
+        public void AddChar(char c, int index, bool dontSyncCodeWindowChars)
         {
             Identifier[] position;
             if (index - 1 >= 0 && crdt.Count > index)
@@ -259,6 +259,10 @@ namespace SEE.Utils
             {
                 new NetCRDT().AddChar(c, position, null, filename);
             }
+            if (!dontSyncCodeWindowChars)
+            {
+                new SyncCodeWindowInput().InsertChar(c, position, filename);
+            }   
         }
 
         /// <summary>

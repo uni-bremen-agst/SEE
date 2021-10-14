@@ -70,8 +70,9 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh)
             && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
-                //TextMesh.text = Text;
+                TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
+
 
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
@@ -90,12 +91,16 @@ namespace SEE.Game.UI.CodeWindow
                                                                            return cleanLine;
                                                                        }
 
-                                                                   }).ToList();
-                TextMeshInputField.text = Text;//string.Join("\n", textWitzhOutNumbers); 
-                
-                if(ICRDT.IsEmpty(Title))
+                                                                   }).ToList(); 
+                TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
+                //Debug.Log(string.Join("\n", textWitzhOutNumbers));
+                Debug.Log(GetCleanLine(1)); 
+                List<string> cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index);  }).ToList();
+                //Debug.Log(string.Join("\n", cleanText));
+
+                if (ICRDT.IsEmpty(Title))
                 {
-                    ICRDT.AddString(Text, 0, Title);
+                    ICRDT.AddString(Text, 0, Title, true);
                 } 
             }
             
@@ -140,10 +145,9 @@ namespace SEE.Game.UI.CodeWindow
         private Tooltip.Tooltip issueTooltip;
 
         protected override void UpdateDesktop()
-        {
-            Profiler.BeginSample("test");
+        { 
             //Input Handling
-            if (!TextMeshInputField.isFocused)
+            if (TextMeshInputField.isFocused)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
@@ -153,6 +157,7 @@ namespace SEE.Game.UI.CodeWindow
                 //get the input
                 var input = Input.inputString;
                 //int idx = TextMeshInputField.stringPosition;
+                Debug.Log(TextMeshInputField.caretPosition);
                 //ignore null input to avoid unnecessary computation
                 if (!string.IsNullOrEmpty(input))
                 {
@@ -160,7 +165,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
-                    ICRDT.AddChar(input[0], idx /*-1*/, Title);
+                    ICRDT.AddString(input, idx /*-1*/, Title);
                     idx++; //only for command line editor
                 } 
 
@@ -173,7 +178,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteChar(idx, Title);
+                        ICRDT.DeleteString(idx, idx, Title);
                         idx--; //only for command line editor
                     }
                 }
@@ -187,7 +192,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteChar(idx -1/*+1*/, Title);
+                        ICRDT.DeleteString(idx -1/*+1*/, idx - 1 /* +1*/, Title);
                         idx--; //only for command line editor
                     }
 
@@ -220,8 +225,6 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     idx++;
                 }
-                //Debug.Log(ICRDT.PrintString(Title));
-               // Debug.Log(ICRDT.ToString(Title));
 
             }
             else
@@ -234,10 +237,6 @@ namespace SEE.Game.UI.CodeWindow
                 Debug.Log(ICRDT.PrintString(Title));
                
             }
-            
-          
-            //Debug.Log("FILE:; " + Title);
-            // Debug.Log(ICRDT.PrintString(Title));
 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
@@ -263,7 +262,6 @@ namespace SEE.Game.UI.CodeWindow
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
             }
-            Profiler.EndSample();
         }
 
         /// <summary>
