@@ -1129,21 +1129,21 @@ namespace SEE.Game
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
-        /// <param name="to_layout_node">a mapping from graph nodes onto their corresponding layout node</param>
+        /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<GameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes,
-             NodeFactory leafNodeFactories,
-             NodeFactory innerNodeFactories,
-             Dictionary<Node, ILayoutNode> to_layout_node)
+             NodeFactory leafNodeFactory,
+             NodeFactory innerNodeFactory,
+             Dictionary<Node, ILayoutNode> toLayoutNode)
         {
             IList<GameNode> result = new List<GameNode>(gameNodes.Count);
 
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                NodeFactory factory = node.IsLeaf() ? leafNodeFactories : innerNodeFactories;
-                result.Add(new GameNode(to_layout_node, gameObject, factory));
+                NodeFactory factory = node.IsLeaf() ? leafNodeFactory : innerNodeFactory;
+                result.Add(new GameNode(toLayoutNode, gameObject, factory));
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
             return result;
@@ -1525,6 +1525,7 @@ namespace SEE.Game
         /// If <paramref name="metricName"/> is the name of a metric, the corresponding
         /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
         /// can be parsed as a number instead, the parsed number is returned.
+        /// The result is clamped into [MinimalBlockLength, MaximalBlockLength].
         /// </summary>
         /// <param name="node">node whose metric is to be returned</param>
         /// <param name="metricName">the name of a node metric or a number</param>
@@ -1540,21 +1541,10 @@ namespace SEE.Game
             {
                 result = scaler.GetNormalizedValue(metricName, node);
             }
-            return WithinLimits(result);
-        }
-
-        /// <summary>
-        /// Clamps value within range [minimalLength, maximalLength], that is,
-        /// if minimalLength &lt;= value &lt;= maximalLength, value is returned;
-        /// if value is less than minimalLength, minimalLength is returned;
-        /// if maximalLength is less than value, maximalLength is returned.
-        /// </summary>
-        /// <param name="value">value to be clamped</param>
-        /// <returns>clamped value</returns>
-        private float WithinLimits(float value) =>
-            Mathf.Clamp(value,
+            return Mathf.Clamp(result,
                         settings.LeafNodeSettings.MinimalBlockLength,
                         settings.LeafNodeSettings.MaximalBlockLength);
+        }
 
         /// <summary>
         /// Adjusts the scale of every node such that the maximal extent of each node is one.
