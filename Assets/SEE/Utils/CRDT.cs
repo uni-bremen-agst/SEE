@@ -261,6 +261,7 @@ namespace SEE.Utils
             }
             if (!dontSyncCodeWindowChars)
             {
+                Debug.Log("NETWORTK IS CALLING");
                 new SyncCodeWindowInput().InsertChar(c, position, filename);
             }   
         }
