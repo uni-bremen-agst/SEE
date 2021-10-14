@@ -30,9 +30,6 @@ namespace SEE.Layout
                 ControlPoints = {0, 0, 0, 1, 1, 1}
             };
 
-        public Vector3[] ControlPoints =>
-            TinySplineInterop.ListToVectors(Spline.ControlPoints);
-
         public Vector3[] Points =>
             TinySplineInterop.ListToVectors(Spline.Sample(100));
 
