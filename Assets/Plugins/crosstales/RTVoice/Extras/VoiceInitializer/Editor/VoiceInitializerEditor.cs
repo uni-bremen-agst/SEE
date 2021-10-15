@@ -17,7 +17,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       #region Editor methods
 
-      public void OnEnable()
+      private void OnEnable()
       {
          script = (Tool.VoiceInitializer)target;
       }
@@ -28,7 +28,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
          if (script.isActiveAndEnabled)
          {
-            if (script.AllVoices || script.VoiceNames != null && script.VoiceNames.Length > 0)
+            if (script.AllVoices || script.VoiceNames?.Length > 0)
             {
                if (!Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
                {

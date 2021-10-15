@@ -53,7 +53,7 @@ namespace Crosstales.RTVoice.UI
                   text = inputComponent.placeholder.GetComponent<Text>().text;
                }
 
-               uid = speak(ClearTags ? Util.Helper.ClearTags(text) : text);
+               uid = speak(ClearTags ? text.CTClearTags() : text);
                elapsedTime = 0f;
             }
          }

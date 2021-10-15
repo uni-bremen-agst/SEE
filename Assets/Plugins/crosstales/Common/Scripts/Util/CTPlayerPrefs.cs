@@ -343,7 +343,7 @@ namespace Crosstales.Common.Util
 
       /// <summary>Allows to set a SystemLanguage for a key.</summary>
       /// <param name="key">Key for the PlayerPrefs.</param>
-      /// <param name="value">Value for the PlayerPrefs.</param>
+      /// <param name="language">Value for the PlayerPrefs.</param>
       public static void SetLanguage(string key, SystemLanguage language)
       {
          SetString(key, language.ToString());

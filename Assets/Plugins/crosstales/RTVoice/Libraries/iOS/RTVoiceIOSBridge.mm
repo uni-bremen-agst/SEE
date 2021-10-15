@@ -1,6 +1,6 @@
 //
 //  RTVoiceIOSBridge.mm
-//  Version 2021.2.5
+//  Version 2021.3.2
 //
 //  Acts as a handler for all TTS functions called by RT-Voice on iOS.
 //
@@ -173,7 +173,10 @@ static NSArray *_voices;
     NSLog(@"willSpeakRangeOfSpeechString");
 #endif
 
-    UnitySendMessage("RTVoice", "WordSpoken", "w");//[substringcutout UTF8String]);
+	NSString *word = NSStringFromRange(characterRange);
+
+    //UnitySendMessage("RTVoice", "WordSpoken", "w");//[substringcutout UTF8String]);
+	UnitySendMessage("RTVoice", "WordSpoken", [word UTF8String]);
 }
 
 /**

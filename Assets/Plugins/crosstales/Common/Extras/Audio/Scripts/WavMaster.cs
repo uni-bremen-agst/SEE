@@ -140,14 +140,12 @@ namespace Crosstales.Common.Audio
       /// <returns>AudioClip as byte-array.</returns>
       public static byte[] FromAudioClip(AudioClip audioClip, string filepath, bool saveAsFile = true)
       {
-         byte[] bytes = null;
-
          using (MemoryStream stream = new MemoryStream())
          {
             const int headerSize = 44;
 
             // get bit depth
-            ushort bitDepth = 16; //BitDepth (audioClip);
+            const ushort bitDepth = 16; //BitDepth (audioClip);
 
             // NB: Only supports 16 bit
 
@@ -161,7 +159,7 @@ namespace Crosstales.Common.Audio
             // data chunks (data)
             writeFileData(stream, audioClip);
 
-            bytes = stream.ToArray();
+            byte[] bytes = stream.ToArray();
 
             // Validate total bytes
             Debug.AssertFormat(bytes.Length == fileSize, "Unexpected AudioClip to wav format byte count: {0} == {1}", bytes.Length, fileSize);
@@ -179,9 +177,9 @@ namespace Crosstales.Common.Audio
                   //Debug.Log ("Auto-saved .wav file: " + filepath);
                }
             }
-         }
 
-         return bytes;
+            return bytes;
+         }
       }
 
       /// <summary>Calculates the bit depth of an AudioClip.</summary>
@@ -207,7 +205,7 @@ namespace Crosstales.Common.Audio
 
          float[] data = new float[wavSize];
 
-         sbyte maxValue = sbyte.MaxValue;
+         const sbyte maxValue = sbyte.MaxValue;
 
          for (int ii = 0; ii < wavSize; ii++)
          {
@@ -223,12 +221,12 @@ namespace Crosstales.Common.Audio
          headerOffset += sizeof(int);
          Debug.AssertFormat(wavSize > 0 && wavSize == dataSize, "Failed to get valid 16-bit wav size: {0} from data bytes: {1} at offset: {2}", wavSize, dataSize, headerOffset);
 
-         int x = sizeof(Int16); // block size = 2
+         const int x = sizeof(short); // block size = 2
          int convertedSize = wavSize / x;
 
          float[] data = new float[convertedSize];
 
-         Int16 maxValue = Int16.MaxValue;
+         const short maxValue = short.MaxValue;
 
          for (int ii = 0; ii < convertedSize; ii++)
          {
@@ -247,10 +245,10 @@ namespace Crosstales.Common.Audio
          headerOffset += sizeof(int);
          Debug.AssertFormat(wavSize > 0 && wavSize == dataSize, "Failed to get valid 24-bit wav size: {0} from data bytes: {1} at offset: {2}", wavSize, dataSize, headerOffset);
 
-         int x = 3; // block size = 3
+         const int x = 3; // block size = 3
          int convertedSize = wavSize / x;
 
-         int maxValue = Int32.MaxValue;
+         const int maxValue = int.MaxValue;
 
          float[] data = new float[convertedSize];
 
@@ -274,10 +272,10 @@ namespace Crosstales.Common.Audio
          headerOffset += sizeof(int);
          Debug.AssertFormat(wavSize > 0 && wavSize == dataSize, "Failed to get valid 32-bit wav size: {0} from data bytes: {1} at offset: {2}", wavSize, dataSize, headerOffset);
 
-         int x = sizeof(float); //  block size = 4
+         const int x = sizeof(float); //  block size = 4
          int convertedSize = wavSize / x;
 
-         Int32 maxValue = Int32.MaxValue;
+         const int maxValue = int.MaxValue;
 
          float[] data = new float[convertedSize];
 
@@ -295,7 +293,7 @@ namespace Crosstales.Common.Audio
       private static int writeFileHeader(MemoryStream stream, int fileSize)
       {
          int count = 0;
-         int total = 12;
+         const int total = 12;
 
          // riff chunk id
          byte[] riff = Encoding.ASCII.GetBytes("RIFF");
@@ -317,7 +315,7 @@ namespace Crosstales.Common.Audio
       private static int writeFileFormat(MemoryStream stream, int channels, int sampleRate, ushort bitDepth)
       {
          int count = 0;
-         int total = 24;
+         const int total = 24;
 
          byte[] id = Encoding.ASCII.GetBytes("fmt ");
          count += writeBytesToMemoryStream(stream, id);
@@ -325,7 +323,7 @@ namespace Crosstales.Common.Audio
          int subchunk1Size = 16; // 24 - 8
          count += writeBytesToMemoryStream(stream, BitConverter.GetBytes(subchunk1Size));
 
-         ushort audioFormat = 1;
+         const ushort audioFormat = 1;
          count += writeBytesToMemoryStream(stream, BitConverter.GetBytes(audioFormat));
 
          ushort numChannels = Convert.ToUInt16(channels);
@@ -350,7 +348,7 @@ namespace Crosstales.Common.Audio
       private static int writeFileData(MemoryStream stream, AudioClip audioClip)
       {
          int count = 0;
-         int total = 8;
+         const int total = 8;
 
          // Copy float[] data from AudioClip
          float[] data = new float[audioClip.samples * audioClip.channels];
@@ -378,26 +376,24 @@ namespace Crosstales.Common.Audio
 
       private static byte[] convertAudioClipDataToInt16ByteArray(float[] data)
       {
-         byte[] bytes = null;
-
          using (MemoryStream dataStream = new MemoryStream())
          {
-            int x = sizeof(Int16);
+            const int x = sizeof(short);
 
-            Int16 maxValue = Int16.MaxValue;
+            const short maxValue = short.MaxValue;
 
             foreach (float d in data)
             {
                dataStream.Write(BitConverter.GetBytes(Convert.ToInt16(d * maxValue)), 0, x);
             }
 
-            bytes = dataStream.ToArray();
+            byte[] bytes = dataStream.ToArray();
 
             // Validate converted bytes
             Debug.AssertFormat(data.Length * x == bytes.Length, "Unexpected float[] to Int16 to byte[] size: {0} == {1}", data.Length * x, bytes.Length);
-         }
 
-         return bytes;
+            return bytes;
+         }
       }
 
       private static int writeBytesToMemoryStream(MemoryStream stream, byte[] bytes)
@@ -413,21 +409,22 @@ namespace Crosstales.Common.Audio
          return bitDepth / 8;
       }
 
+/*
       private static int BlockSize(ushort bitDepth)
       {
          switch (bitDepth)
          {
             case 32:
-               return sizeof(Int32); // 32-bit -> 4 bytes (Int32)
+               return sizeof(int); // 32-bit -> 4 bytes (Int32)
             case 16:
-               return sizeof(Int16); // 16-bit -> 2 bytes (Int16)
+               return sizeof(short); // 16-bit -> 2 bytes (Int16)
             case 8:
                return sizeof(sbyte); // 8-bit -> 1 byte (sbyte)
             default:
                throw new Exception(bitDepth + " bit depth is not supported.");
          }
       }
-
+*/
       private static string formatCode(ushort code)
       {
          switch (code)

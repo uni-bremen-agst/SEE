@@ -14,7 +14,7 @@ namespace Crosstales.RTVoice.Provider
 
       private const int defaultRate = 175;
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
       private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
 #endif
 
@@ -107,7 +107,7 @@ namespace Crosstales.RTVoice.Provider
 
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -125,7 +125,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -201,7 +201,7 @@ namespace Crosstales.RTVoice.Provider
                   string voiceName = getVoiceName(wrapper);
                   int calculatedRate = calculateRate(wrapper.Rate);
                   string outputFile = getOutputFile(wrapper.Uid);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -223,7 +223,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = Util.Config.TTS_MACOS;
                      process.StartInfo.Arguments = args;
 
-                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                      worker.Start();
 
                      silence = false;
@@ -290,7 +290,7 @@ namespace Crosstales.RTVoice.Provider
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
                string outputFile = getOutputFile(wrapper.Uid);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -312,7 +312,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -394,7 +394,7 @@ namespace Crosstales.RTVoice.Provider
       private IEnumerator getVoices()
       {
 #if UNITY_STANDALONE || UNITY_EDITOR
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
          using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -499,7 +499,7 @@ namespace Crosstales.RTVoice.Provider
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
                string outputFile = getOutputFile(wrapper.Uid);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -521,7 +521,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -569,7 +569,7 @@ namespace Crosstales.RTVoice.Provider
             {
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -587,7 +587,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -633,7 +633,7 @@ namespace Crosstales.RTVoice.Provider
 
       private void getVoicesInEditor()
       {
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
          using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())

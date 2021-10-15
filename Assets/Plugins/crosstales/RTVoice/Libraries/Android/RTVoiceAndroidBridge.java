@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 /**
  * RTVoiceAndroidBridge.java
- * Version 2021.2.5
+ * Version 2021.3.0
  * 
  * Acts as a handler for all TTS functions called by RT-Voice on Android.
  *
@@ -33,8 +33,6 @@ import java.util.ArrayList;
 public class RTVoiceAndroidBridge {
 
     //region Variables
-
-    public static final String VERSION = "2021.2.0";
 
     //Context to instantiate TTS engine
     private static Context appContext;
@@ -124,11 +122,15 @@ public class RTVoiceAndroidBridge {
      */
     public static void Shutdown() {
         if (tts != null) {
-            tts.shutdown();
-            initialized = false;
+			try {         
+				tts.shutdown();
+				initialized = false;
 
-            if (DEBUG) 
-                Log.d(TAG, "TTS engine shutdown complete!");
+				if (DEBUG) 
+					Log.d(TAG, "TTS engine shutdown complete!");
+			} catch (Exception ex) {
+				Log.e(TAG, "Shutdown of TTS engine failed: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+			}
         } else {
             Log.w(TAG, "tts is null!");
         }
@@ -155,7 +157,7 @@ public class RTVoiceAndroidBridge {
             if (DEBUG) 
                 Log.d(TAG, "TTS engine initialized!");
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Voice voiceResult = null;
 
                 if (voiceName != null) {
@@ -229,7 +231,7 @@ public class RTVoiceAndroidBridge {
         String result = null;
 
         if (tts != null && initialized) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Voice voiceResult = null;
 
                 if (voiceName != null) {
@@ -267,9 +269,9 @@ public class RTVoiceAndroidBridge {
 
     /**
      * Checks if the TTS engine is initialized:
-     * - if SDK >= Lollipop:
+     * - if SDK >= M:
      * Looks for installed voices on the Android device and use their names to generate a for RTVoice readable list.
-     * - if SDK < Lollipop:
+     * - if SDK < M:
      * Looks for installed locales on the Android device, check each if they have an available voice to them and use their names and languages to generate a for RTVoice readable list.
      *
      * It returns a String array when the tasks are done, not immediately.
@@ -280,7 +282,7 @@ public class RTVoiceAndroidBridge {
         String[] result = null;
 
         if (tts != null && initialized) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 List<String> list = new ArrayList<String>();
 
                 for (Voice voice : voices) {
@@ -313,15 +315,19 @@ public class RTVoiceAndroidBridge {
         String[] result = null;
 
         if (tts != null && initialized) {
-            List<TextToSpeech.EngineInfo> engines = tts.getEngines();
+            try {
+				List<TextToSpeech.EngineInfo> engines = tts.getEngines();
 
-            result = new String[engines.size()];
-            int zz = 0;
+				result = new String[engines.size()];
+				int zz = 0;
 
-            for (TextToSpeech.EngineInfo engine : engines) {
-                result[zz] = engine.name + ";" + engine.label;
-                zz++;
-            }
+				for (TextToSpeech.EngineInfo engine : engines) {
+					result[zz] = engine.name + ";" + engine.label;
+					zz++;
+				}
+			} catch (Exception ex) {
+				Log.e(TAG, "Error getting engines: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+			}
         } else {
             Log.e(TAG, "TTS-system not initialized!");
         }
@@ -347,72 +353,78 @@ public class RTVoiceAndroidBridge {
     private static TextToSpeech createTTS(String engine) {
         return new TextToSpeech(RTVoiceAndroidBridge.appContext, new TextToSpeech.OnInitListener() {
             public void onInit(int status) {
-                //DEBUG
                 if (status == TextToSpeech.SUCCESS) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS successfully executed!");
+					try {
+						if (DEBUG)
+							Log.d(TAG, "Code " + status + ": TTS successfully executed!");
 
-                    tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                        @Override
-                        public void onStart(String s) {
-                            if (DEBUG) 
-                                Log.d(TAG, "TTS: Starting Utterance");
-                            working = true; //reassure it's still true
-                        }
+						tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+							@Override
+							public void onStart(String s) {
+								if (DEBUG) 
+									Log.d(TAG, "TTS: Starting Utterance");
+								working = true; //reassure it's still true
+							}
 
-                        @Override
-                        public void onDone(String s) {
-                            if (DEBUG) 
-                                Log.d(TAG, "TTS: Utterance completed");
-                            working = false;
-                        }
+							@Override
+							public void onDone(String s) {
+								if (DEBUG) 
+									Log.d(TAG, "TTS: Utterance completed");
+								working = false;
+							}
 
-                        @Override
-                        public void onError(String s) {
-                            if (DEBUG) 
-                                Log.d(TAG, "TTS: A error occurred.");
-                            working = false;
-                        }
-                    });
+							@Override
+							public void onError(String s) {
+								if (DEBUG) 
+									Log.d(TAG, "TTS: A error occurred.");
+								working = false;
+							}
+						});
 
-                    voices = tts.getVoices();
-                    initialized = true;
-
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+							voices = tts.getVoices();
+						}
+						initialized = true;
+					} catch (Exception ex) {
+						Log.e(TAG, "Could not start utterance: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+					}
                 } else {
                     Log.e(TAG, "Error Code " + status + "");
-                }
-                if (status == TextToSpeech.ERROR_NETWORK) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS encountered a network problem!");
-                }
-                if (status == TextToSpeech.ERROR_NETWORK_TIMEOUT) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS encountered a network timeout!");
-                }
-                if (status == TextToSpeech.ERROR_NOT_INSTALLED_YET) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS doesn't have the requested voice data!");
-                }
-                if (status == TextToSpeech.ERROR_OUTPUT) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS encountered an error with the output device/file!");
-                }
-                if (status == TextToSpeech.ERROR_SERVICE) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS encountered a service error!");
-                }
-                if (status == TextToSpeech.LANG_MISSING_DATA) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS error: Language data is missing!");
-                }
-                if (status == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS error: Chosen language is not supported!");
-                }
-                if (status == TextToSpeech.ERROR_INVALID_REQUEST) {
-                    if (DEBUG)
-                        Log.d(TAG, "Error Code " + status + ": TTS error: Invalid request!");
-                }
+					
+					if (status == TextToSpeech.ERROR_NETWORK) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS encountered a network problem!");
+					}
+					if (status == TextToSpeech.ERROR_NETWORK_TIMEOUT) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS encountered a network timeout!");
+					}
+					if (status == TextToSpeech.ERROR_NOT_INSTALLED_YET) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS doesn't have the requested voice data!");
+					}
+					if (status == TextToSpeech.ERROR_OUTPUT) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS encountered an error with the output device/file!");
+					}
+					if (status == TextToSpeech.ERROR_SERVICE) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS encountered a service error!");
+					}
+					if (status == TextToSpeech.LANG_MISSING_DATA) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS error: Language data is missing!");
+					}
+					if (status == TextToSpeech.LANG_NOT_SUPPORTED) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS error: Chosen language is not supported!");
+					}
+					if (status == TextToSpeech.ERROR_INVALID_REQUEST) {
+						if (DEBUG)
+							Log.d(TAG, "Error Code " + status + ": TTS error: Invalid request!");
+					}
+				}
+				
             }
         }, engine);
     }
@@ -440,7 +452,7 @@ public class RTVoiceAndroidBridge {
                 if (isLocaleSupported)
                     locales.add(currentLocale);
             } catch (Exception ex) {
-                Log.e(TAG, "Error checking if language is available for TTS (currentLocale=" + currentLocale + "): " + ex.getClass().getSimpleName() + "-" + ex.getMessage());
+                Log.e(TAG, "Error checking if language is available for TTS (currentLocale=" + currentLocale + "): " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
             }
         }
     }
@@ -463,13 +475,13 @@ public class RTVoiceAndroidBridge {
 
     private static String generateAudio(String SpeechText) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 new AsyncTtf().execute(SpeechText);
             } else {
                 new AsyncTtfDeprecated().execute(SpeechText);
             }
         } catch (Exception ex) {
-            Log.e(TAG, "Error generating audio file: " + ex.getClass().getSimpleName() + "-" + ex.getMessage());
+            Log.e(TAG, "Error generating audio file: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         }
 
         return outputFile;
@@ -477,13 +489,13 @@ public class RTVoiceAndroidBridge {
 
     private static void speakNative(String SpeechText) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 new AsyncTts().execute(SpeechText);
             } else {
                 new AsyncTtsDeprecated().execute(SpeechText);
             }
         } catch (Exception ex) {
-            Log.e(TAG, "Error speaking native: " + ex.getClass().getSimpleName() + "-" + ex.getMessage());
+            Log.e(TAG, "Error speaking native: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         }
     }
 
@@ -527,7 +539,7 @@ public class RTVoiceAndroidBridge {
 
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.M)
     private static class AsyncTtf extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
@@ -558,7 +570,7 @@ public class RTVoiceAndroidBridge {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.M)
     private static class AsyncTts extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
