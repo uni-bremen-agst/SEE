@@ -26,7 +26,22 @@ namespace InControl
 
 		InputControlSource[] controlSourceByTarget;
 
-		float lastSetLightColorTime;
+
+		bool sendVibrate;
+		float lastTimeVibrateWasSent;
+		Vector2 vibrateToSend;
+
+		bool sendVibrateTriggers;
+		float lastTimeVibrateTriggersWasSent;
+		Vector2 vibrateTriggersToSend;
+
+		bool sendLightColor;
+		float lastTimeLightColorWasSent;
+		Vector3 lightColorToSend;
+
+		bool sendLightFlash;
+		float lastTimeLightFlashWasSent;
+		Vector2 lightFlashToSend;
 
 
 		internal NativeInputDevice() {}
@@ -115,6 +130,8 @@ namespace InControl
 
 		public override void Update( ulong updateTick, float deltaTime )
 		{
+			SendStatusUpdates();
+
 			if (skipUpdateFrames > 0)
 			{
 				skipUpdateFrames -= 1;
@@ -201,29 +218,77 @@ namespace InControl
 
 		public override void Vibrate( float leftMotor, float rightMotor )
 		{
-			Native.SetHapticState( Handle, FloatToByte( leftMotor ), FloatToByte( rightMotor ) );
+			sendVibrate = true;
+			vibrateToSend = new Vector2( leftMotor, rightMotor );
+			// Native.SetHapticState( Handle, FloatToByte( leftMotor ), FloatToByte( rightMotor ) );
 		}
 
 
 		public override void VibrateTriggers( float leftTrigger, float rightTrigger )
 		{
-			Native.SetTriggersHapticState( Handle, FloatToByte( leftTrigger ), FloatToByte( rightTrigger ) );
+			sendVibrateTriggers = true;
+			vibrateTriggersToSend = new Vector2( leftTrigger, rightTrigger );
+			// Native.SetTriggersHapticState( Handle, FloatToByte( leftTrigger ), FloatToByte( rightTrigger ) );
 		}
 
 
 		public override void SetLightColor( float red, float green, float blue )
 		{
-			if (InputManager.CurrentTime - lastSetLightColorTime > 0.05f)
-			{
-				Native.SetLightColor( Handle, FloatToByte( red ), FloatToByte( green ), FloatToByte( blue ) );
-				lastSetLightColorTime = InputManager.CurrentTime;
-			}
+			sendLightColor = true;
+			lightColorToSend = new Vector3( red, green, blue );
+			// Native.SetLightColor( Handle, FloatToByte( red ), FloatToByte( green ), FloatToByte( blue ) );
 		}
 
 
 		public override void SetLightFlash( float flashOnDuration, float flashOffDuration )
 		{
-			Native.SetLightFlash( Handle, FloatToByte( flashOnDuration ), FloatToByte( flashOffDuration ) );
+			sendLightFlash = true;
+			lightFlashToSend = new Vector2( flashOnDuration, flashOffDuration );
+			// Native.SetLightFlash( Handle, FloatToByte( flashOnDuration ), FloatToByte( flashOffDuration ) );
+		}
+
+
+		void SendStatusUpdates()
+		{
+			// This ensures we're not overloading the controller with too many status updates.
+			// Otherwise, on some platforms/drivers, it creates huge latency until effects happen.
+			const float statusUpdateInterval = 0.02f;
+
+			if (sendVibrate &&
+			    InputManager.CurrentTime - lastTimeVibrateWasSent > statusUpdateInterval)
+			{
+				Native.SetHapticState( Handle, FloatToByte( vibrateToSend.x ), FloatToByte( vibrateToSend.y ) );
+				sendVibrate = false;
+				lastTimeVibrateWasSent = InputManager.CurrentTime;
+				vibrateToSend = Vector2.zero;
+			}
+
+			if (sendVibrateTriggers &&
+			    InputManager.CurrentTime - lastTimeVibrateTriggersWasSent > statusUpdateInterval)
+			{
+				Native.SetTriggersHapticState( Handle, FloatToByte( vibrateTriggersToSend.x ), FloatToByte( vibrateTriggersToSend.y ) );
+				sendVibrateTriggers = false;
+				lastTimeVibrateTriggersWasSent = InputManager.CurrentTime;
+				vibrateTriggersToSend = Vector2.zero;
+			}
+
+			if (sendLightColor &&
+			    InputManager.CurrentTime - lastTimeLightColorWasSent > statusUpdateInterval)
+			{
+				Native.SetLightColor( Handle, FloatToByte( lightColorToSend.x ), FloatToByte( lightColorToSend.y ), FloatToByte( lightColorToSend.z ) );
+				sendLightColor = false;
+				lastTimeLightColorWasSent = InputManager.CurrentTime;
+				lightColorToSend = Vector3.zero;
+			}
+
+			if (sendLightFlash &&
+			    InputManager.CurrentTime - lastTimeLightFlashWasSent > statusUpdateInterval)
+			{
+				Native.SetLightFlash( Handle, FloatToByte( lightFlashToSend.x ), FloatToByte( lightFlashToSend.y ) );
+				sendLightFlash = false;
+				lastTimeLightFlashWasSent = InputManager.CurrentTime;
+				lightFlashToSend = Vector2.zero;
+			}
 		}
 
 

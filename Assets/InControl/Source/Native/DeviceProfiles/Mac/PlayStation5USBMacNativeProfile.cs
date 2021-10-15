@@ -6,7 +6,7 @@ namespace InControl.NativeDeviceProfiles
 {
 	// @cond nodoc
 	[Preserve, NativeInputDeviceProfile]
-	public class PlayStation5MacNativeProfile : InputDeviceProfile
+	public class PlayStation5USBMacNativeProfile : InputDeviceProfile
 	{
 		public override void Define()
 		{
@@ -28,6 +28,7 @@ namespace InControl.NativeDeviceProfiles
 				new InputDeviceMatcher
 				{
 					DriverType = InputDeviceDriverType.HID,
+					TransportType = InputDeviceTransportType.USB,
 					VendorID = 0x54c,
 					ProductID = 0xce6,
 				},

@@ -302,8 +302,10 @@ namespace InControl
 				if (InputManager.NativeInputEnableMFi)
 				{
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.XboxOneSBluetoothMacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.XboxSeriesXBluetoothMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation4MacNativeProfile) );
-					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation5MacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation5USBMacNativeProfile) );
+					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.PlayStation5BluetoothMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.SteelseriesNimbusMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.HoriPadUltimateMacNativeProfile) );
 					InputManager.HideDevicesWithProfile( typeof(NativeDeviceProfiles.NintendoSwitchProMacNativeProfile) );

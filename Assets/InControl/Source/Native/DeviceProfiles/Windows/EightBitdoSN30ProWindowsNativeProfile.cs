@@ -6,18 +6,17 @@ namespace InControl.NativeDeviceProfiles
 {
 	// @cond nodoc
 	[Preserve, NativeInputDeviceProfile]
-	public class PlayStation4WindowsNativeProfile : InputDeviceProfile
+	public class EightBitdoSN30ProWindowsNativeProfile : InputDeviceProfile
 	{
 		public override void Define()
 		{
 			base.Define();
 
-			DeviceName = "PlayStation 4 Controller";
-			DeviceNotes = "PlayStation 4 Controller on Windows";
-			// Link = "http://www.amazon.com/DualShock-Wireless-Controller-PlayStation-Black-4/dp/B00BGA9X9W";
+			DeviceName = "8Bitdo SN30 Pro Controller";
+			DeviceNotes = "8Bitdo SN30 Pro Controller on Windows";
 
 			DeviceClass = InputDeviceClass.Controller;
-			DeviceStyle = InputDeviceStyle.PlayStation4;
+			DeviceStyle = InputDeviceStyle.NintendoNES;
 
 			IncludePlatforms = new[]
 			{
@@ -29,20 +28,17 @@ namespace InControl.NativeDeviceProfiles
 				new InputDeviceMatcher
 				{
 					DriverType = InputDeviceDriverType.DirectInput,
-					VendorID = 0x54c,
-					ProductID = 0x5c4,
+					VendorID = 0x2dc8,
+					ProductID = 0x6101,
 				},
+			};
+
+			LastResortMatchers = new[]
+			{
 				new InputDeviceMatcher
 				{
 					DriverType = InputDeviceDriverType.DirectInput,
-					VendorID = 0x54c,
-					ProductID = 0x9cc,
-				},
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.DirectInput,
-					VendorID = 0x54c,
-					ProductID = 0xba0,
+					VendorID = 0x2dc8,
 				},
 			};
 
@@ -50,25 +46,25 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputControlMapping
 				{
-					Name = "Cross",
+					Name = "B",
 					Target = InputControlType.Action1,
 					Source = Button( 1 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Circle",
+					Name = "A",
 					Target = InputControlType.Action2,
-					Source = Button( 2 ),
-				},
-				new InputControlMapping
-				{
-					Name = "Square",
-					Target = InputControlType.Action3,
 					Source = Button( 0 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Triangle",
+					Name = "Y",
+					Target = InputControlType.Action3,
+					Source = Button( 4 ),
+				},
+				new InputControlMapping
+				{
+					Name = "X",
 					Target = InputControlType.Action4,
 					Source = Button( 3 ),
 				},
@@ -76,49 +72,49 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "L1",
 					Target = InputControlType.LeftBumper,
-					Source = Button( 4 ),
+					Source = Button( 6 ),
 				},
 				new InputControlMapping
 				{
 					Name = "R1",
 					Target = InputControlType.RightBumper,
-					Source = Button( 5 ),
+					Source = Button( 7 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Share",
-					Target = InputControlType.Share,
+					Name = "L2",
+					Target = InputControlType.LeftTrigger,
 					Source = Button( 8 ),
 				},
 				new InputControlMapping
 				{
-					Name = "Options",
-					Target = InputControlType.Options,
+					Name = "R2",
+					Target = InputControlType.RightTrigger,
 					Source = Button( 9 ),
+				},
+				new InputControlMapping
+				{
+					Name = "Select",
+					Target = InputControlType.Select,
+					Source = Button( 10 ),
+				},
+				new InputControlMapping
+				{
+					Name = "Start",
+					Target = InputControlType.Start,
+					Source = Button( 11 ),
 				},
 				new InputControlMapping
 				{
 					Name = "Left Stick Button",
 					Target = InputControlType.LeftStickButton,
-					Source = Button( 10 ),
+					Source = Button( 13 ),
 				},
 				new InputControlMapping
 				{
 					Name = "Right Stick Button",
 					Target = InputControlType.RightStickButton,
-					Source = Button( 11 ),
-				},
-				new InputControlMapping
-				{
-					Name = "System",
-					Target = InputControlType.System,
-					Source = Button( 12 ),
-				},
-				new InputControlMapping
-				{
-					Name = "Touch Pad Tap",
-					Target = InputControlType.TouchPadButton,
-					Source = Button( 13 ),
+					Source = Button( 14 ),
 				},
 			};
 
@@ -186,22 +182,6 @@ namespace InControl.NativeDeviceProfiles
 					Target = InputControlType.LeftStickRight,
 					Source = Analog( 3 ),
 					SourceRange = InputRangeType.ZeroToOne,
-					TargetRange = InputRangeType.ZeroToOne,
-				},
-				new InputControlMapping
-				{
-					Name = "L2",
-					Target = InputControlType.LeftTrigger,
-					Source = Analog( 5 ),
-					SourceRange = InputRangeType.MinusOneToOne,
-					TargetRange = InputRangeType.ZeroToOne,
-				},
-				new InputControlMapping
-				{
-					Name = "R2",
-					Target = InputControlType.RightTrigger,
-					Source = Analog( 4 ),
-					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
 				new InputControlMapping

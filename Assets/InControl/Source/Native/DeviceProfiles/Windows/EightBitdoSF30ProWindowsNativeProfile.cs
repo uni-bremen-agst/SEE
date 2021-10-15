@@ -27,20 +27,14 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.DirectInput,
 					VendorID = 0x2dc8,
 					ProductID = 0x6000,
-					// VersionNumber = 0x0,
 				},
 			};
 
 			ButtonMappings = new[]
 			{
-				new InputControlMapping
-				{
-					Name = "A",
-					Target = InputControlType.Action2,
-					Source = Button( 0 ),
-				},
 				new InputControlMapping
 				{
 					Name = "B",
@@ -49,15 +43,21 @@ namespace InControl.NativeDeviceProfiles
 				},
 				new InputControlMapping
 				{
-					Name = "X",
-					Target = InputControlType.Action4,
-					Source = Button( 3 ),
+					Name = "A",
+					Target = InputControlType.Action2,
+					Source = Button( 0 ),
 				},
 				new InputControlMapping
 				{
 					Name = "Y",
 					Target = InputControlType.Action3,
 					Source = Button( 4 ),
+				},
+				new InputControlMapping
+				{
+					Name = "X",
+					Target = InputControlType.Action4,
+					Source = Button( 3 ),
 				},
 				new InputControlMapping
 				{
