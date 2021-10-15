@@ -5,12 +5,7 @@ namespace CurvedUI
 {
     public class CUI_CameraController : MonoBehaviour
     {
-
-
-
-
-        public static CUI_CameraController instance;
-
+        //settings
 #pragma warning disable 0649
         [SerializeField]
         Transform CameraObject;
@@ -21,25 +16,28 @@ namespace CurvedUI
         [SerializeField]
         bool runInEditorOnly = true;
 #pragma warning restore 0649
+        
+        //variables
+        public static CUI_CameraController Instance;
 
+        
         // Use this for initialization
         void Awake()
         {
-            instance = this;
+            Instance = this;
         }
-
-
+        
         #if UNITY_EDITOR
         // Update is called once per frame
         void Update()
         {
             if((Application.isEditor || !runInEditorOnly) && !UnityEngine.XR.XRSettings.enabled)
             {
-                CameraObject.localEulerAngles = new Vector3(Input.mousePosition.y.Remap(0, Screen.height, rotationMargin, -rotationMargin),
-                                                       Input.mousePosition.x.Remap(0, Screen.width, -rotationMargin, rotationMargin),
-                                                          0);
+                var mouse = CurvedUIInputModule.MousePosition;
+                CameraObject.localEulerAngles 
+                    = new Vector3(mouse.y.Remap(0, Screen.height, rotationMargin, -rotationMargin),
+                    mouse.x.Remap(0, Screen.width, -rotationMargin, rotationMargin), 0);
             }
-            
         }
         #endif
     }

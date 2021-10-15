@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
 #if CURVEDUI_TMP || TMP_PRESENT
 using TMPro;
 #endif
+[assembly: CurvedUI.OptionalDependency("TMPro.TextMeshProUGUI", "CURVEDUI_TMP")]
+
 
 //To use this class you have to add CURVEDUI_TMP to your define symbols. You can do it in project settings.
 //To learn how to do it visit http://docs.unity3d.com/Manual/PlatformDependentCompilation.html and search for "Platform Custom Defines"
