@@ -49,9 +49,9 @@ namespace SEE.Utils
             GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static void AddString(string s, int startIdx, string file, bool dontSyncCodeWindowChars = false)
+        public static void AddString(string s, int startIdx, string file)
         {
-            GetInstanceByName(file).AddString(s, startIdx, dontSyncCodeWindowChars);
+            GetInstanceByName(file).AddString(s, startIdx);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
