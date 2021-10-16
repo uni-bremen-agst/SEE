@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions
 
         public override HashSet<string> GetChangedObjects()
         {
-            // Changes to the code space are handled and synced by ourself, so we won't include them here.
+            // Changes to the code space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
 
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions
                 }
                 if (selectedPath == null)
                 {
-                    ShowNotification.Info("No associated code", 
+                    ShowNotification.Warn("No associated code", 
                                           $"Selected node '{selectedNode.Value.SourceName}' has no source code "
                                           + "associated with it.");
                     return false;
