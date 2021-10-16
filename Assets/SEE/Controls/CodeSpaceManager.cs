@@ -70,46 +70,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Inserts a Char at the given index in the given CodeWindow
-        /// </summary>
-        /// <param name="playerName">The name of the player whose code space should be updated.</param>
-        /// <param name="title">The Title of the code window that should be updated.</param>
-        /// <param name="c">The Char that should be inserted.</param>
-        /// <param name="index">The index at which the Char should be inserted.</param>
-        public void InsertChar(string playerName, string title, char c, int index)
-        {
-            if (CodeSpaces.ContainsKey(playerName))
-            {
-                Debug.Log("WWW");
-                CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == title);
-                if (window != null)
-                {
-                    Debug.Log("CID");
-                    window.InsertChar(c, index);
-                }
-            }        
-        }
-
-        /// <summary>
-        /// Deletes a Char in a given CodeWindow at the given index
-        /// </summary>
-        /// <param name="playerName">The name of the player whose code space should be updated.</param>
-        /// <param name="title">The Title of the code window that should be updated.</param>
-        /// <param name="index">The index at which the Char should be deleted.</param>
-        public void DeleteChar(string playerName, string title, int index)
-        {
-            if (CodeSpaces.ContainsKey(playerName))
-            {
-                CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == title);
-                if (window != null)
-                {
-                    window.DeletChar(index);
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Updates the code space of the player specified by <paramref name="playerName"/> using the values
         /// from <paramref name="valueObject"/>.
         /// </summary>

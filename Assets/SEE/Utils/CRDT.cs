@@ -208,7 +208,6 @@ namespace SEE.Utils
         {
             if (crdt.Count() > index && index > -1)
             {
-                new SyncCodeWindowInput().DeleteChar(crdt[index].GetIdentifier(), filename);
                 new NetCRDT().DeleteChar(crdt[index].GetIdentifier(), filename);
                 crdt.RemoveAt(index);
             }
@@ -224,11 +223,11 @@ namespace SEE.Utils
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
         /// <param name="dontSyncCodeWindowChars"></param>
-        public void AddString(string s, int startIdx, bool dontSyncCodeWindowChars = false)
+        public void AddString(string s, int startIdx)
         {
             for (int i = 0; i < s.Length; i++)
             {
-                AddChar(s[i], i + startIdx, dontSyncCodeWindowChars);
+                AddChar(s[i], i + startIdx);
             }
         }
 
@@ -237,7 +236,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="index">The index in the local string</param>
-        public void AddChar(char c, int index, bool dontSyncCodeWindowChars)
+        public void AddChar(char c, int index)
         {
             Identifier[] position;
             if (index - 1 >= 0 && crdt.Count > index)
@@ -273,11 +272,6 @@ namespace SEE.Utils
             {
                 new NetCRDT().AddChar(c, position, null, filename);
             }
-            if (!dontSyncCodeWindowChars)
-            {
-                Debug.Log("NETWORTK IS CALLING");
-                new SyncCodeWindowInput().InsertChar(c, position, filename);
-            }   
         }
 
         /// <summary>
