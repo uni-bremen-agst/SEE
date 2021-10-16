@@ -16,7 +16,7 @@ namespace InControl.NativeDeviceProfiles
 			DeviceNotes = "Sony DualSense Controller on iOS / tvOS / macOS";
 
 			DeviceClass = InputDeviceClass.Controller;
-			DeviceStyle = InputDeviceStyle.PlayStation4;
+			DeviceStyle = InputDeviceStyle.PlayStation5;
 
 			IncludePlatforms = new[]
 			{

@@ -10,8 +10,7 @@ namespace Crosstales.RTVoice.Tool
    {
       #region Variables
 
-      [Header("Configuration")]
-      [UnityEngine.Serialization.FormerlySerializedAsAttribute("TextFiles")] [Tooltip("Text files to generate."), SerializeField]
+      [Header("Configuration")] [UnityEngine.Serialization.FormerlySerializedAsAttribute("TextFiles")] [Tooltip("Text files to generate."), SerializeField]
       private TextAsset[] textFiles;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("FileInsideAssets")] [Tooltip("Are the specified file paths inside the Assets-folder (current project)? If this option is enabled, it prefixes the path with 'Application.dataPath' (default: true)."), SerializeField]
@@ -35,7 +34,7 @@ namespace Crosstales.RTVoice.Tool
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("GenerateOnStart")] [Header("Behaviour Settings"), Tooltip("Enable generating of the texts on start (default: false)."), SerializeField]
       private bool generateOnStart;
 
-      private static readonly char[] splitChar = {';'};
+      private static readonly char[] splitChar = { ';' };
 
       private string lastUid = "crosstales";
 
@@ -352,7 +351,7 @@ namespace Crosstales.RTVoice.Tool
 
       private Model.Wrapper prepare(string[] args, string speech)
       {
-         Model.Wrapper wrapper = new Model.Wrapper {Text = args[0]};
+         Model.Wrapper wrapper = new Model.Wrapper { Text = args[0] };
 
          if (fileInsideAssets)
          {

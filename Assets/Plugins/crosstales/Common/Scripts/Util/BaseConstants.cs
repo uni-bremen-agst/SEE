@@ -117,6 +117,18 @@ namespace Crosstales.Common.Util
       //public static readonly System.Text.RegularExpressions.Regex REGEX_REALNUMBER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]*\.?[0-9]+)");
       //public static readonly System.Text.RegularExpressions.Regex REGEX_SIGNED_INTEGER = new System.Text.RegularExpressions.Regex(@"([-+]?[0-9]+)");
 
+      //public static readonly Regex cleanStringRegex = new Regex(@"([^a-zA-Z0-9 ]|[ ]{2,})");
+      public static readonly System.Text.RegularExpressions.Regex REGEX_CLEAN_SPACES = new System.Text.RegularExpressions.Regex(@"\s+");
+
+      public static readonly System.Text.RegularExpressions.Regex REGEX_CLEAN_TAGS = new System.Text.RegularExpressions.Regex(@"<.*?>");
+      //public static readonly System.Text.RegularExpressions.Regex asciiOnlyRegex = new System.Text.RegularExpressions.Regex(@"[^\u0000-\u00FF]+");
+
+      public const string LATIN_ABC_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      public const string LATIN_ABC_LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+      public const string LATIN_ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+      public const string NUMBERS = "0123456789";
+
       #endregion
 
 
@@ -132,8 +144,8 @@ namespace Crosstales.Common.Util
       public static string TEXT_TOSTRING_DELIMITER_END = "'";
 
       // Prefixes for URLs and paths
-      public static string PREFIX_HTTP = "http://";
-      public static string PREFIX_HTTPS = "https://";
+      public const string PREFIX_HTTP = "http://";
+      public const string PREFIX_HTTPS = "https://";
 
       /// <summary>Kill processes after 5000 milliseconds.</summary>
       public static int PROCESS_KILL_TIME = 5000;

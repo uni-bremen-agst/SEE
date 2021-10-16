@@ -149,52 +149,52 @@ namespace SEE.Net
             //DepthMetric = city.leafNodeAttributes.depthMetric;
             //LeafStyleMetric = city.leafNodeAttributes.styleMetric;
 
-            ArchitectureIssue = city.ArchitectureIssue;
-            CloneIssue = city.CloneIssue;
-            CycleIssue = city.CycleIssue;
-            Dead_CodeIssue = city.Dead_CodeIssue;
-            MetricIssue = city.MetricIssue;
-            StyleIssue = city.StyleIssue;
-            UniversalIssue = city.UniversalIssue;
+            ArchitectureIssue = city.ErosionSettings.ArchitectureIssue;
+            CloneIssue = city.ErosionSettings.CloneIssue;
+            CycleIssue = city.ErosionSettings.CycleIssue;
+            Dead_CodeIssue = city.ErosionSettings.Dead_CodeIssue;
+            MetricIssue = city.ErosionSettings.MetricIssue;
+            StyleIssue = city.ErosionSettings.StyleIssue;
+            UniversalIssue = city.ErosionSettings.UniversalIssue;
 
-            ArchitectureIssue_SUM = city.ArchitectureIssue_SUM;
-            CloneIssue_SUM = city.CloneIssue_SUM;
-            CycleIssue_SUM = city.CycleIssue_SUM;
-            Dead_CodeIssue_SUM = city.Dead_CodeIssue_SUM;
-            MetricIssue_SUM = city.MetricIssue_SUM;
-            StyleIssue_SUM = city.StyleIssue_SUM;
-            UniversalIssue_SUM = city.UniversalIssue_SUM;
+            ArchitectureIssue_SUM = city.ErosionSettings.ArchitectureIssue_SUM;
+            CloneIssue_SUM = city.ErosionSettings.CloneIssue_SUM;
+            CycleIssue_SUM = city.ErosionSettings.CycleIssue_SUM;
+            Dead_CodeIssue_SUM = city.ErosionSettings.Dead_CodeIssue_SUM;
+            MetricIssue_SUM = city.ErosionSettings.MetricIssue_SUM;
+            StyleIssue_SUM = city.ErosionSettings.StyleIssue_SUM;
+            UniversalIssue_SUM = city.ErosionSettings.UniversalIssue_SUM;
 
-            InnerDonutMetric = city.InnerDonutMetric;
+            InnerDonutMetric = city.InnerNodeSettings.InnerDonutMetric;
 
             //InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
 
-            MinimalBlockLength = city.MinimalBlockLength;
-            MaximalBlockLength = city.MaximalBlockLength;
+            MinimalBlockLength = city.LeafNodeSettings.MinimalBlockLength;
+            MaximalBlockLength = city.LeafNodeSettings.MaximalBlockLength;
 
             //LeafObjects = city.nodeLayoutSettings.leafKind;
             //InnerNodeObjects = city.nodeLayoutSettings.innerKind;
 
-            NodeLayout = city.nodeLayoutSettings.kind;
-            EdgeLayout = city.edgeLayoutSettings.kind;
-            ZScoreScale = city.nodeLayoutSettings.zScoreScale;
-            ScaleOnlyLeafMetrics = city.nodeLayoutSettings.ScaleOnlyLeafMetrics;
+            NodeLayout = city.NodeLayoutSettings.Kind;
+            EdgeLayout = city.EdgeLayoutSettings.Kind;
+            ZScoreScale = city.ZScoreScale;
+            ScaleOnlyLeafMetrics = city.ScaleOnlyLeafMetrics;
 
-            EdgeWidth = city.edgeLayoutSettings.edgeWidth;
-            ShowInnerErosions = city.nodeLayoutSettings.showInnerErosions;
-            ShowLeafErosions = city.nodeLayoutSettings.showLeafErosions;
-            LoadDashboardMetrics = city.nodeLayoutSettings.loadDashboardMetrics;
-            IssuesAddedFromVersion = city.nodeLayoutSettings.issuesAddedFromVersion;
-            OverrideMetrics = city.nodeLayoutSettings.overrideMetrics;
-            ErosionScalingFactor = city.nodeLayoutSettings.erosionScalingFactor;
-            EdgesAboveBlocks = city.edgeLayoutSettings.edgesAboveBlocks;
-            Tension = city.edgeLayoutSettings.tension;
-            RDP = city.edgeLayoutSettings.rdp;
+            EdgeWidth = city.EdgeLayoutSettings.EdgeWidth;
+            ShowInnerErosions = city.ErosionSettings.ShowInnerErosions;
+            ShowLeafErosions = city.ErosionSettings.ShowLeafErosions;
+            LoadDashboardMetrics = city.ErosionSettings.LoadDashboardMetrics;
+            IssuesAddedFromVersion = city.ErosionSettings.IssuesAddedFromVersion;
+            OverrideMetrics = city.ErosionSettings.OverrideMetrics;
+            ErosionScalingFactor = city.ErosionSettings.ErosionScalingFactor;
+            EdgesAboveBlocks = city.EdgeLayoutSettings.EdgesAboveBlocks;
+            Tension = city.EdgeLayoutSettings.Tension;
+            RDP = city.EdgeLayoutSettings.RDP;
 
-            TubularSegments = city.edgeLayoutSettings.tubularSegments;
-            Radius = city.edgeLayoutSettings.radius;
-            RadialSegments = city.edgeLayoutSettings.radialSegments;
-            isEdgeSelectable = city.edgeLayoutSettings.isEdgeSelectable;
+            TubularSegments = city.EdgeSelectionSettings.TubularSegments;
+            Radius = city.EdgeSelectionSettings.Radius;
+            RadialSegments = city.EdgeSelectionSettings.RadialSegments;
+            isEdgeSelectable = city.EdgeSelectionSettings.AreSelectable;
 
 
             if (city.GetType() == typeof(SEECity))
@@ -224,8 +224,6 @@ namespace SEE.Net
                 innerNodeConstraint = ((SEECityRandom)city).InnerNodeConstraint;
             }
         }
-
-
 
         protected override void ExecuteOnServer()
         {
@@ -285,52 +283,52 @@ namespace SEE.Net
             //city.leafNodeAttributes.depthMetric = DepthMetric;
             //city.leafNodeAttributes.styleMetric = LeafStyleMetric;
 
-            city.ArchitectureIssue = ArchitectureIssue;
-            city.CloneIssue = CloneIssue;
-            city.CycleIssue = CycleIssue;
-            city.Dead_CodeIssue = Dead_CodeIssue;
-            city.MetricIssue = MetricIssue;
-            city.StyleIssue = StyleIssue;
-            city.UniversalIssue = UniversalIssue;
+            city.ErosionSettings.ArchitectureIssue = ArchitectureIssue;
+            city.ErosionSettings.CloneIssue = CloneIssue;
+            city.ErosionSettings.CycleIssue = CycleIssue;
+            city.ErosionSettings.Dead_CodeIssue = Dead_CodeIssue;
+            city.ErosionSettings.MetricIssue = MetricIssue;
+            city.ErosionSettings.StyleIssue = StyleIssue;
+            city.ErosionSettings.UniversalIssue = UniversalIssue;
 
-            city.ArchitectureIssue_SUM = ArchitectureIssue_SUM;
-            city.CloneIssue_SUM = CloneIssue_SUM;
-            city.CycleIssue_SUM = CycleIssue_SUM;
-            city.Dead_CodeIssue_SUM = Dead_CodeIssue_SUM;
-            city.MetricIssue_SUM = MetricIssue_SUM;
-            city.StyleIssue_SUM = StyleIssue_SUM;
-            city.UniversalIssue_SUM = UniversalIssue_SUM;
+            city.ErosionSettings.ArchitectureIssue_SUM = ArchitectureIssue_SUM;
+            city.ErosionSettings.CloneIssue_SUM = CloneIssue_SUM;
+            city.ErosionSettings.CycleIssue_SUM = CycleIssue_SUM;
+            city.ErosionSettings.Dead_CodeIssue_SUM = Dead_CodeIssue_SUM;
+            city.ErosionSettings.MetricIssue_SUM = MetricIssue_SUM;
+            city.ErosionSettings.StyleIssue_SUM = StyleIssue_SUM;
+            city.ErosionSettings.UniversalIssue_SUM = UniversalIssue_SUM;
 
-            city.InnerDonutMetric = InnerDonutMetric;
+            city.InnerNodeSettings.InnerDonutMetric = InnerDonutMetric;
 
             //city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
 
-            city.MinimalBlockLength = MinimalBlockLength;
-            city.MaximalBlockLength = MaximalBlockLength;
+            city.LeafNodeSettings.MinimalBlockLength = MinimalBlockLength;
+            city.LeafNodeSettings.MaximalBlockLength = MaximalBlockLength;
 
             //city.nodeLayoutSettings.leafKind = LeafObjects;
             //city.nodeLayoutSettings.innerKind = InnerNodeObjects;
 
-            city.nodeLayoutSettings.kind = NodeLayout;
-            city.edgeLayoutSettings.kind = EdgeLayout;
-            city.nodeLayoutSettings.zScoreScale = ZScoreScale;
-            city.nodeLayoutSettings.ScaleOnlyLeafMetrics = ScaleOnlyLeafMetrics;
+            city.NodeLayoutSettings.Kind = NodeLayout;
+            city.EdgeLayoutSettings.Kind = EdgeLayout;
+            city.ZScoreScale = ZScoreScale;
+            city.ScaleOnlyLeafMetrics = ScaleOnlyLeafMetrics;
 
-            city.edgeLayoutSettings.edgeWidth = EdgeWidth;
-            city.nodeLayoutSettings.showInnerErosions = ShowInnerErosions;
-            city.nodeLayoutSettings.showLeafErosions = ShowLeafErosions;
-            city.nodeLayoutSettings.loadDashboardMetrics = LoadDashboardMetrics;
-            city.nodeLayoutSettings.issuesAddedFromVersion = IssuesAddedFromVersion;
-            city.nodeLayoutSettings.overrideMetrics = OverrideMetrics;
-            city.nodeLayoutSettings.erosionScalingFactor = ErosionScalingFactor;
-            city.edgeLayoutSettings.edgesAboveBlocks = EdgesAboveBlocks;
-            city.edgeLayoutSettings.tension = Tension;
-            city.edgeLayoutSettings.rdp = RDP;
+            city.EdgeLayoutSettings.EdgeWidth = EdgeWidth;
+            city.ErosionSettings.ShowInnerErosions = ShowInnerErosions;
+            city.ErosionSettings.ShowLeafErosions = ShowLeafErosions;
+            city.ErosionSettings.LoadDashboardMetrics = LoadDashboardMetrics;
+            city.ErosionSettings.IssuesAddedFromVersion = IssuesAddedFromVersion;
+            city.ErosionSettings.OverrideMetrics = OverrideMetrics;
+            city.ErosionSettings.ErosionScalingFactor = ErosionScalingFactor;
+            city.EdgeLayoutSettings.EdgesAboveBlocks = EdgesAboveBlocks;
+            city.EdgeLayoutSettings.Tension = Tension;
+            city.EdgeLayoutSettings.RDP = RDP;
 
-            city.edgeLayoutSettings.tubularSegments = TubularSegments;
-            city.edgeLayoutSettings.radius = Radius;
-            city.edgeLayoutSettings.radialSegments = RadialSegments;
-            city.edgeLayoutSettings.isEdgeSelectable = isEdgeSelectable;
+            city.EdgeSelectionSettings.TubularSegments = TubularSegments;
+            city.EdgeSelectionSettings.Radius = Radius;
+            city.EdgeSelectionSettings.RadialSegments = RadialSegments;
+            city.EdgeSelectionSettings.AreSelectable = isEdgeSelectable;
 
             if (t == typeof(SEECity))
             {

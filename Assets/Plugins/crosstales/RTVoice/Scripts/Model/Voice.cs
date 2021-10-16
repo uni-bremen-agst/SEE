@@ -55,7 +55,11 @@ namespace Crosstales.RTVoice.Model
          }
       }
 
-      /// <summary>Simpified culture of the voice.</summary>
+      /// <summary>Language of the voice.</summary>
+      public SystemLanguage Language => Util.Helper.ISO639ToLanguage(Culture);
+
+      /// <summary>Simplified culture of the voice.</summary>
+      [System.Xml.Serialization.XmlIgnoreAttribute]
       public string SimplifiedCulture
       {
          get => simplifiedCulture;
@@ -71,6 +75,12 @@ namespace Crosstales.RTVoice.Model
 
 
       #region Constructors
+
+      /// <summary>Default.</summary>
+      public Voice()
+      {
+         //empty
+      }
 
       /// <summary>Instantiate the class.</summary>
       /// <param name="name">Name of the voice.</param>
@@ -102,7 +112,7 @@ namespace Crosstales.RTVoice.Model
 
       public override string ToString()
       {
-         return Name + " (" + Culture + ", " + Gender + ")";
+         return $"{Name} ({Culture}, {Gender})";
       }
 
       public override bool Equals(object obj)

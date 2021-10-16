@@ -77,7 +77,7 @@ namespace Crosstales.Common.Util
          if (BaseConstants.DEV_DEBUG)
             Debug.Log($"onExited: {ExitCode}");
 
-         Exited?.Invoke(this, new System.EventArgs());
+         Exited?.Invoke(this, System.EventArgs.Empty);
       }
 
       #endregion
@@ -667,7 +667,7 @@ namespace Crosstales.Common.Util
 //#elif false
         #region macOS
 
-        [System.Runtime.InteropServices.DllImport("libProcessStart")]
+        [System.Runtime.InteropServices.DllImport("ProcessStart")]
         internal static extern System.IntPtr RunCommand(string command);
 
         #endregion

@@ -20,7 +20,7 @@ namespace InControl
 		Vector2 lastPosition;
 		Vector2 position;
 		Vector2 delta;
-		float scroll;
+		Vector2 scroll;
 
 
 		public void Setup()
@@ -49,7 +49,7 @@ namespace InControl
 				buttonPressed[(int) Mouse.Button5] = mouse.forwardButton.isPressed;
 				position = mouse.position.ReadValue();
 				delta = mouse.delta.ReadValue();
-				scroll = mouse.scroll.y.ReadValue() / 20.0f; // Old Unity input is 20 times less; scale for compatibility.
+				scroll = mouse.scroll.ReadValue() / 20.0f; // Old Unity input is 20 times less; scale for compatibility.
 			}
 			else
 			{
@@ -66,12 +66,10 @@ namespace InControl
 				buttonPressed[(int) Mouse.Button5] = SafeGetMouseButton( 4 );
 				buttonPressed[(int) Mouse.Button6] = SafeGetMouseButton( 5 );
 				buttonPressed[(int) Mouse.Button7] = SafeGetMouseButton( 6 );
-				buttonPressed[(int) Mouse.Button8] = SafeGetMouseButton( 7 );
-				buttonPressed[(int) Mouse.Button9] = SafeGetMouseButton( 8 );
 				lastPosition = position;
 				position = Input.mousePosition;
 				delta = new Vector2( Input.GetAxisRaw( mouseXAxis ), Input.GetAxisRaw( mouseYAxis ) );
-				scroll = Input.mouseScrollDelta.y;
+				scroll = Input.mouseScrollDelta;
 			}
 			else
 			{
@@ -82,15 +80,26 @@ namespace InControl
 
 
 		// Old Unity input doesn't allow mouse buttons above certain numbers on some platforms.
-		// For example, the limit on Windows 7 appears to be 6.
+		// For example, the limit on Windows and macOS appears to be 6.
+		static int maxSafeMouseButton = int.MaxValue;
+
+
 		// ReSharper disable once UnusedMember.Local
 		static bool SafeGetMouseButton( int button )
 		{
-			try
+			// We keep track of a known safe maximum because the limit may be lower on some platforms
+			// and we don't know it. Exceptions cause GC so we want to avoid that as much as possible.
+			if (button < maxSafeMouseButton)
 			{
-				return Input.GetMouseButton( button );
+				try
+				{
+					return Input.GetMouseButton( button );
+				}
+				catch (ArgumentException)
+				{
+					maxSafeMouseButton = Mathf.Min( button, maxSafeMouseButton );
+				}
 			}
-			catch (ArgumentException) {}
 
 			return false;
 		}
@@ -103,7 +112,7 @@ namespace InControl
 			lastPosition = Vector2.zero;
 			position = Vector2.zero;
 			delta = Vector2.zero;
-			scroll = 0.0f;
+			scroll = Vector2.zero;
 		}
 
 
@@ -131,7 +140,7 @@ namespace InControl
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public float GetDeltaScroll()
 		{
-			return scroll;
+			return Utility.Abs( scroll.x ) > Utility.Abs( scroll.y ) ? scroll.x : scroll.y;
 		}
 
 

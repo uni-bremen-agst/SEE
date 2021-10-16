@@ -1,43 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+namespace CurvedUI
+{
+    public class CUI_CameraRotationOnButtonHeld : MonoBehaviour {
 
+#pragma warning disable 414
+        //references
+        [SerializeField]
+        float Sensitivity = 0.5f;
+#pragma warning restore 414
+        
+        //variables
+        private Vector2 _oldMousePos;
 
-public class CUI_CameraRotationOnButtonHeld : MonoBehaviour {
-
-    [SerializeField]
-    float Sensitivity = 0.5f;
-
-    Vector3 oldMousePos;
-    bool move = true;
-
-	// Use this for initialization
-	void Start () {
-        oldMousePos = Input.mousePosition;
-
-    }
-
-#if UNITY_EDITOR
-    // Update is called once per frame
-    void Update() {
-
-        if (Input.GetButton("Fire2"))
-        {
-            move = true;
-
-
-        }
-        else
-            move = false;
-
-
-        if (move)
-        {
-            Vector2 mouseDelta = Input.mousePosition - oldMousePos;
-            this.transform.eulerAngles = this.transform.eulerAngles + new Vector3(mouseDelta.y, -mouseDelta.x, 0) * Sensitivity;
+        void Start () {
+            _oldMousePos = CurvedUIInputModule.MousePosition;
         }
 
-        oldMousePos = Input.mousePosition;
-    }
+#if UNITY_EDITOR && !CURVEDUI_UNITY_XR
+        void Update() {
+        
+            if (Input.GetButton("Fire2"))
+            {
+                var mouseDelta = CurvedUIInputModule.MousePosition - _oldMousePos;
+                this.transform.eulerAngles += new Vector3(mouseDelta.y, -mouseDelta.x, 0) * Sensitivity;
+            }
+
+            _oldMousePos = CurvedUIInputModule.MousePosition;
+        }
 #endif
+    }  
 }
+

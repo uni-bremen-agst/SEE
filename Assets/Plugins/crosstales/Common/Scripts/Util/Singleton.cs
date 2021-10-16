@@ -30,7 +30,7 @@ namespace Crosstales.Common.Util
       {
          get
          {
-            //if (!BaseHelper.isEditorMode && SingletonHelper.isQuitting) 
+            //if (!BaseHelper.isEditorMode && SingletonHelper.isQuitting)
             if (SingletonHelper.isQuitting)
             {
                //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
@@ -215,10 +215,10 @@ namespace Crosstales.Common.Util
 
          set
          {
-            //Debug.Log("SET isQuitting: " + value);
-
             if (value != quitting)
             {
+               //Debug.Log("SET isQuitting: " + value);
+
                quitting = value;
 
                Crosstales.Common.Util.CTPlayerPrefs.SetBool(key, value);
@@ -262,7 +262,7 @@ namespace Crosstales.Common.Util
 
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += onSceneLoaded;
             UnityEngine.SceneManagement.SceneManager.sceneUnloaded += onSceneUnloaded;
-			
+
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += onPlayModeStateChanged;
             UnityEditor.SceneManagement.EditorSceneManager.sceneClosing += onSceneClosing;
@@ -282,16 +282,20 @@ namespace Crosstales.Common.Util
 
       private static void onSceneUnloaded(UnityEngine.SceneManagement.Scene scene)
       {
+         //if (Util.BaseHelper.ApplicationIsPlaying)
+         //{
          //Debug.Log($"{Time.realtimeSinceStartup} - onSceneUnloaded");
 
          isQuitting = true;
          Util.BaseHelper.ApplicationIsPlaying = false;
+         //}
       }
 
 #if UNITY_EDITOR
       private static void onPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
       {
-         isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingEditMode || obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
+         //isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingEditMode || obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
+         isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
 
          //Debug.LogWarning($"{Time.realtimeSinceStartup} - onPlayModeStateChanged: {obj} - {isQuitting}");
       }
@@ -302,6 +306,7 @@ namespace Crosstales.Common.Util
 
          isQuitting = true;
       }
+
 /*
    private static void onSceneOpening(string path, UnityEditor.SceneManagement.OpenSceneMode mode)
    {

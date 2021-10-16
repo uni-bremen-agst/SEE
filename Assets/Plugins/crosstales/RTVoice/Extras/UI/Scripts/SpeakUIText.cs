@@ -40,7 +40,7 @@ namespace Crosstales.RTVoice.UI
                if (ChangeColor)
                   textComponent.color = TextColor;
 
-               uid = speak(ClearTags ? Util.Helper.ClearTags(textComponent.text) : textComponent.text);
+               uid = speak(ClearTags ? textComponent.text.CTClearTags() : textComponent.text);
                elapsedTime = 0f;
             }
          }

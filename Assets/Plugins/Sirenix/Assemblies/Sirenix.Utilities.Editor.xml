@@ -6651,6 +6651,11 @@
             Left aligned grey mini label style.
             </summary>
         </member>
+        <member name="P:Sirenix.Utilities.Editor.SirenixGUIStyles.LeftAlignedGreyLabel">
+            <summary>
+            Left aligned grey label style.
+            </summary>
+        </member>
         <member name="P:Sirenix.Utilities.Editor.SirenixGUIStyles.CenteredGreyMiniLabel">
             <summary>
             Centered grey mini label

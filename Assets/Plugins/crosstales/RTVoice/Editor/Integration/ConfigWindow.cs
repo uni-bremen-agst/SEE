@@ -54,23 +54,23 @@ namespace Crosstales.RTVoice.EditorIntegration
          if (window != null) window.tab = tab;
       }
 
-      public void OnEnable()
+      private void OnEnable()
       {
          titleContent = new GUIContent(Util.Constants.ASSET_NAME_SHORT, EditorHelper.Logo_Asset_Small);
 
          OnStopPlayback += silence;
       }
 
-      public void OnDisable()
+      private void OnDisable()
       {
          //Speaker.Instance.Silence();
 
          OnStopPlayback -= silence;
       }
 
-      public void OnGUI()
+      private void OnGUI()
       {
-         tab = GUILayout.Toolbar(tab, new[] {"Config", "Prefabs", "TD", "Help", "About"});
+         tab = GUILayout.Toolbar(tab, new[] { "Config", "Prefabs", "TD", "Help", "About" });
 
          if (tab != lastTab)
          {
@@ -123,7 +123,7 @@ namespace Crosstales.RTVoice.EditorIntegration
          }
       }
 
-      public void OnInspectorUpdate()
+      private void OnInspectorUpdate()
       {
          Repaint();
       }

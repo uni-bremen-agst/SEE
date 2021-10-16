@@ -58,7 +58,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void Update()
       {
-         if (Util.Helper.hasActiveClip(source))
+         if (source.CTHasActiveClip())
          {
             if (stopped)
             {

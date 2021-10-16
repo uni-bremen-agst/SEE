@@ -31,8 +31,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       private int aboutTab;
 
-      private static readonly System.Random rnd = new System.Random();
-
+      //private static readonly System.Random rnd = new System.Random();
       //private readonly int adRnd1 = rnd.Next(0, 8);
 
       private const int maxChars = 16000;
@@ -383,7 +382,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
          EditorHelper.SeparatorUI();
 
-         aboutTab = GUILayout.Toolbar(aboutTab, new[] {"Readme", "Versions", "SSML", "EML", "Update"});
+         aboutTab = GUILayout.Toolbar(aboutTab, new[] { "Readme", "Versions", "SSML", "EML", "Update" });
 
          switch (aboutTab)
          {

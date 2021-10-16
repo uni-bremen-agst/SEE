@@ -10,7 +10,6 @@ namespace Crosstales.Common.Util
       /// <param name="filename">File name of the XML.</param>
       public static void SerializeToFile<T>(T obj, string filename)
       {
-#if !UNITY_WEBGL || UNITY_EDITOR
          if (null == obj)
             throw new System.ArgumentNullException(nameof(obj));
 
@@ -25,9 +24,6 @@ namespace Crosstales.Common.Util
          {
             Debug.LogError($"Could not serialize the object to a file: {ex}");
          }
-#else
-         Debug.LogWarning("'SerializeToFile' is not supported under WebGL!");
-#endif
       }
 
       /// <summary>Deserialize a XML-file to an object.</summary>
@@ -36,24 +32,33 @@ namespace Crosstales.Common.Util
       /// <returns>Object</returns>
       public static T DeserializeFromFile<T>(string filename, bool skipBOM = false)
       {
-#if !UNITY_WEBGL || UNITY_EDITOR
          if (filename == null)
             throw new System.ArgumentNullException(nameof(filename));
 
          try
          {
             if (System.IO.File.Exists(filename))
-               return DeserializeFromString<T>(System.IO.File.ReadAllText(filename), skipBOM);
+            {
+               string data = System.IO.File.ReadAllText(filename);
 
-            Debug.LogError($"File doesn't exist: {filename}");
+               if (string.IsNullOrEmpty(data))
+               {
+                  Debug.LogWarning($"Data was null: {filename}");
+               }
+               else
+               {
+                  return DeserializeFromString<T>(System.IO.File.ReadAllText(filename), skipBOM);
+               }
+            }
+            else
+            {
+               Debug.LogError($"File does not exist: {filename}");
+            }
          }
          catch (System.Exception ex)
          {
             Debug.LogError($"Could not deserialize the object from a file: {ex}");
          }
-#else
-         Debug.LogWarning("'DeserializeFromFile' is not supported under WebGL!");
-#endif
 
          return default;
       }

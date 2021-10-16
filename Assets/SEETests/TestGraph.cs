@@ -13,7 +13,6 @@ namespace SEE.DataModel.DG
             Node result = new Node();
             result.ID = id;
             result.Type = type;
-            result.Domain = Node.NodeDomain.Implementation;
             graph.AddNode(result);
             return result;
         }
@@ -108,7 +107,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Tests primarily the following operations when a node is removed that has 
+        /// Tests primarily the following operations when a node is removed that has
         /// outgoing and incoming edges:
         ///   graph.RemoveNode
         ///   graph.RemoveEdge
@@ -236,7 +235,7 @@ namespace SEE.DataModel.DG
             string t = "Routine";
 
             Graph g = new Graph();
-            Assert.AreEqual(0, g.MaxDepth);            
+            Assert.AreEqual(0, g.MaxDepth);
 
             Node a = NewNode(g, "a", t);
             Node b = NewNode(g, "b", t);
@@ -279,7 +278,7 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(1, a.Depth());
             Assert.AreEqual(0, b.Level);
             Assert.AreEqual(1, b.Depth());
-            Assert.AreEqual(0, bc.Level);            
+            Assert.AreEqual(0, bc.Level);
             Assert.AreEqual(1, bc.Depth());
             Assert.AreEqual(1, g.MaxDepth);
 
@@ -311,12 +310,12 @@ namespace SEE.DataModel.DG
             bc.Reparent(ac);
             // hierarchy:
             //    a     b
-            //    |   
-            //    ac   
+            //    |
+            //    ac
             //  /   \
             //  |   |
             // acc bc
-            //      | 
+            //      |
             //     bcc
             Assert.AreEqual(0, a.Level);
             Assert.AreEqual(4, a.Depth());
