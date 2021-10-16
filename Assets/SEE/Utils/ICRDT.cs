@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using UnityEngine.Events;
+using static SEE.Game.UI.CodeWindow.CodeWindow;
 using static SEE.Utils.CRDT;
 
 namespace SEE.Utils
@@ -78,6 +80,11 @@ namespace SEE.Utils
         public static bool IsEmpty(string file)
         {
             return GetInstanceByName(file).IsEmpty();
+        }
+
+        public static UnityEvent<char, int, operationType> GetChangeEvent(string file)
+        {
+            return GetInstanceByName(file).changeEvent;
         }
         //TODO COMPLETE
     }

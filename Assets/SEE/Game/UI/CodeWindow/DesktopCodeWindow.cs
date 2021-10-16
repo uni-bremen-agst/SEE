@@ -35,6 +35,15 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public float timeStamp = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public enum operationType
+        {
+            Add,
+            Delete
+        }
+
         int idx = 0; //ONLY FOR COMMANDLINE EDITOR
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
@@ -91,19 +100,36 @@ namespace SEE.Game.UI.CodeWindow
                                                                            return cleanLine;
                                                                        }
 
-                                                                   }).ToList(); 
+                                                                   }).ToList();
                 TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
                 //Debug.Log(string.Join("\n", textWitzhOutNumbers));
-                Debug.Log(GetCleanLine(1)); 
-                List<string> cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index);  }).ToList();
+                Debug.Log(GetCleanText());
+                List<string> cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
                 //Debug.Log(string.Join("\n", cleanText));
 
                 if (ICRDT.IsEmpty(Title))
                 {
                     ICRDT.AddString(Text, 0, Title, true);
-                } 
+                }
+                ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
+                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
+                TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
+
+                //Updates the entries in the CodeWindow
+                void updateCodeWindow(char c, int idx, operationType type)
+                {
+                    switch (type)
+                    {
+                        case operationType.Add:
+                            TextMeshInputField.text = TextMeshInputField.text.Insert(idx, c.ToString());
+                            break;
+                        case operationType.Delete:
+                            TextMeshInputField.text = TextMeshInputField.text.Remove(idx);
+                            break;
+                    }
+                }
             }
-            
+
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.
@@ -145,13 +171,12 @@ namespace SEE.Game.UI.CodeWindow
         private Tooltip.Tooltip issueTooltip;
 
         protected override void UpdateDesktop()
-        { 
+        {
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
-                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
-                TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
+
 
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
@@ -165,9 +190,9 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
-                    ICRDT.AddString(input, idx -1, Title);
-                    
-                } 
+                    ICRDT.AddString(input, idx - 1, Title);
+
+                }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
                 {
@@ -182,7 +207,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
 
-                if (((Input.GetKey(KeyCode.Backspace)  && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
+                if (((Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
                     timeStamp = Time.time + 0.100000f;
                     if (selectedText != null)
@@ -191,7 +216,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx +1, idx+1, Title);
+                        ICRDT.DeleteString(idx + 1, idx + 1, Title);
                     }
 
                 }
@@ -204,7 +229,7 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
                         ICRDT.AddString(Clipboard.Paste<string>(), idx, Title);
-                        
+
 
                     }
                 }
@@ -215,7 +240,7 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                 }
-                if(Input.GetKeyDown(KeyCode.LeftArrow) && idx > 0)
+                if (Input.GetKeyDown(KeyCode.LeftArrow) && idx > 0)
                 {
                     idx--;
                 }
@@ -233,7 +258,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 Debug.Log("FILE:; " + Title);
                 Debug.Log(ICRDT.PrintString(Title));
-               
+
             }
 
             // Show issue info on click (on hover would be too expensive)
@@ -260,7 +285,12 @@ namespace SEE.Game.UI.CodeWindow
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
             }
+
+
         }
+
+
+
 
         /// <summary>
         /// Recalculates the <see cref="excessLines"/> using the current window height and line height of the text.

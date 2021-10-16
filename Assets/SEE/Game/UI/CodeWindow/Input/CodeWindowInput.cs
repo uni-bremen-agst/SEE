@@ -462,5 +462,15 @@ namespace SEE.Game.UI.CodeWindow
             new string(TextMesh.textInfo.characterInfo
                     .SkipWhile(x => x.lineNumber + 1 != lineNumber) 
                     .TakeWhile(x => x.lineNumber + 1 == lineNumber).Select(x => x.character).ToArray());
+
+        /// <summary>
+        /// Returns the Text without the XML Tags
+        /// </summary>
+        /// <returns></returns>
+        private string GetCleanText()
+        {
+            return TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
+;
+        }
     }
 }

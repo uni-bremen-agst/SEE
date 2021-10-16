@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Profiling;
+using static SEE.Game.UI.CodeWindow.CodeWindow;
 
 // Based on the explenaitions and code from https://digitalfreepen.com/2017/10/06/simple-real-time-collaborative-text-editor.html
 namespace SEE.Utils
@@ -106,6 +108,11 @@ namespace SEE.Utils
         private List<CharObj> crdt = new List<CharObj>();
 
         /// <summary>
+        /// Broadcasts if there is a change in the CRDT via the network.
+        /// </summary>
+        public UnityEvent<char,int, operationType> changeEvent = new UnityEvent<char, int, operationType>();
+
+        /// <summary>
         /// Constructs a CRDT
         /// </summary>
         /// <param name="siteID"></param>
@@ -128,17 +135,19 @@ namespace SEE.Utils
         /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
         public void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
         {
-
+            int insertIdx;
             if (prePosition != null && prePosition.Length > 0)
             {
                 if (ComparePosition(prePosition, position) < 0)
                 {
                     (int, CharObj) found = Find(prePosition);
                     crdt.Insert(found.Item1 + 1, new CharObj(c, position));
+                    insertIdx = found.Item1 + 1;
                 }
                 else
                 {
                     Debug.LogError("RemoteAddChar fehlgeschlagen! ");
+                    return;
                 }
 
             }
@@ -148,13 +157,16 @@ namespace SEE.Utils
                 if (idx < crdt.Count())
                 {
                     crdt.Insert(idx, new CharObj(c, position));
+                    insertIdx = idx;
                 }
                 else
                 {
                     crdt.Add(new CharObj(c, position));
+                    insertIdx = crdt.Count - 1;
                 }
 
             }
+            changeEvent.Invoke(c, insertIdx, operationType.Add);
         }
 
         /// <summary>
@@ -163,9 +175,11 @@ namespace SEE.Utils
         /// <param name="position">The position at which the Char should be deleted</param>
         public void RemoteDeleteChar(Identifier[] position) //TODO Maybe i need a version counter for every action!
         {
-            if (-1 < Find(position).Item1)
+            (int, CharObj) found = Find(position);
+            if (-1 < found.Item1)
             {
-                crdt.RemoveAt(Find(position).Item1);
+                changeEvent.Invoke(' ', found.Item1, operationType.Delete);
+                crdt.RemoveAt(found.Item1);
             }
             else
             {
