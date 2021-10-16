@@ -18,46 +18,6 @@ namespace SEE.DataModel.DG
         // Neither will its incoming and outgoing edges be copied.
 
         /// <summary>
-        /// The domain of a node regarding the architecture analysis, that is,
-        /// whether it belongs to the architecture, implementation, or
-        /// mapping between the two.
-        /// </summary>
-        public enum NodeDomain : byte
-        {
-            /// <summary>
-            /// Does not belong to any domain.
-            /// </summary>
-            Unspecified,
-            /// <summary>
-            /// Represents a fact retrieved from the implementation,
-            /// typically created by a static analysis.
-            /// </summary>
-            Implementation,
-            /// <summary>
-            /// Represents a concept in the architecture and was created
-            /// by the software architecture. It is part of the architecture
-            /// model.
-            /// </summary>
-            Architecture,
-            /// <summary>
-            /// Is part of the mapping from the implementation domain
-            /// onto the architecture domain.
-            /// </summary>
-            Mapping,
-            /// <summary>
-            /// The number of possible <see cref="NodeDomain"/>s. As more values are added above
-            /// this element, the integer value of this element will represent the number of
-            /// elements in this enum.
-            /// </summary>
-            Count
-        }
-
-        /// <summary>
-        /// The domain of the node.
-        /// </summary>
-        public NodeDomain Domain = NodeDomain.Unspecified;
-
-        /// <summary>
         /// The attribute name for unique identifiers (within a graph).
         /// </summary>
         public const string LinknameAttribute = "Linkage.Name";

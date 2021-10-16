@@ -28,7 +28,7 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogError($"{name} has no SEECity component attached to it. CityCursor will be disabled.\n");
+                Debug.LogWarning($"{name} has no SEECity component attached to it. {nameof(CityCursor)} will be disabled.\n");
                 enabled = false;
             }
         }

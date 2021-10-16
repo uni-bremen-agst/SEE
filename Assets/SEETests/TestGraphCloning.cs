@@ -12,7 +12,6 @@ namespace SEE.DataModel.DG
         {
             Node node = new Node();
             node.Type = "Routine";
-            node.Domain = Node.NodeDomain.Implementation;
             node.ID = linkname;
             node.SourceName = "Source_" + linkname;
             node.SetFloat("float", 1.0f);
@@ -31,14 +30,13 @@ namespace SEE.DataModel.DG
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
-            Assert.That(clone.Domain == original.Domain);
             Assert.That(clone.ID == original.ID);
             Assert.That(clone.SourceName == original.SourceName);
             Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
             Assert.That(clone.GetInt("int") == original.GetInt("int"));
             Assert.That(clone.GetString("string") == original.GetString("string"));
             Assert.That(clone.HasToggle("toggle"));
-            // Note: Hierarchy information (parent, children, level) is cloned only when a 
+            // Note: Hierarchy information (parent, children, level) is cloned only when a
             // graph is cloned.
             Assert.That(clone.Level == 0);
             Assert.That(clone.Parent, Is.Null);
@@ -53,7 +51,7 @@ namespace SEE.DataModel.DG
         private int edgeID = 1;
 
         private Edge NewEdge(Node source, Node target)
-        {            
+        {
             Edge edge = new Edge(edgeID.ToString());
             edgeID++;
             edge.Source = source;

@@ -16,15 +16,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
-        /// <param name="minimalLength">the minimal value that can be returned by this scaling</param>
-        /// <param name="minimalLength">the maximal value that can be returned by this scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        protected IScale(IEnumerable<Graph> graphs, IList<string> metrics, float minimalLength, float maximalLength,
-                         bool leavesOnly)
+        protected IScale(IEnumerable<Graph> graphs, IList<string> metrics, bool leavesOnly)
         {
             this.metrics = metrics;
-            this.minimalLength = minimalLength;
-            this.maximalLength = maximalLength;
             this.leavesOnly = leavesOnly;
             metricMaxima = new Dictionary<string, float>();
             metricLevelMaxima = new Dictionary<int, Dictionary<string, float>>();
@@ -47,28 +42,30 @@ namespace SEE.GO
         protected readonly Dictionary<int, Dictionary<string, float>> metricLevelMaxima;
 
         /// <summary>
-        /// the minimal value that can be returned by this scaling
-        /// </summary>
-        protected readonly float minimalLength;
-
-        /// <summary>
-        /// the maximal value that can be returned by this scaling
-        /// </summary>
-        protected readonly float maximalLength;
-
-        /// <summary>
         /// If true, the normalization is done only for leaf nodes.
         /// </summary>
         private readonly bool leavesOnly;
 
         /// <summary>
-        /// Yields a normalized value of the given node metric. The type of normalization
-        /// is determined by concrete subclasses.
+        /// Yields a normalized value of the value of given node <paramref name="metric"/>
+        /// of <paramref name="node"/>. The type of normalization is determined by concrete
+        /// subclasses. If the node does not have this <paramref name="metric"/>, 0 will
+        /// be returned.
         /// </summary>
         /// <param name="metric">name of the node metric</param>
         /// <param name="node">node for which to determine the normalized value</param>
         /// <returns>normalized value of node metric</returns>
-        public abstract float GetNormalizedValue(string metric, Node node);
+        public float GetNormalizedValue(string metric, Node node)
+        {
+            if (node.TryGetNumeric(metric, out float value))
+            {
+                return GetNormalizedValue(metric, value);
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
         /// <summary>
         /// Yields a normalized value of the given node metric. The type of normalization
@@ -87,9 +84,10 @@ namespace SEE.GO
         /// <param name="node">node for which to determine the normalized value relative to its level</param>
         /// <returns>normalized value of node metric relative to its level</returns>
         public abstract float GetNormalizedValueForLevel(string metric, Node node);
-        
+
         /// <summary>
-        /// Yields a normalized value of the given node metric relative to the given <paramref name="level"/>.
+        /// Yields a normalized value of the given node metric relative to the
+        /// given <paramref name="level"/>.
         /// The type of normalization is determined by concrete subclasses.
         /// </summary>
         /// <param name="metric">metric name</param>
@@ -111,13 +109,13 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogErrorFormat("Attempt to retrieve the normalized maximum of metric {0} that is not known.\n", metric);
+                Debug.LogError($"Attempt to retrieve the normalized maximum of metric {metric} that is not known.\n");
                 Debug.Log("The available normalized metric maxima are as follows:\n");
                 DumpMetricMaxima(metricMaxima);
                 throw new Exception("A metric named " + metric + " does not exist.");
             }
         }
-        
+
         /// <summary>
         /// Yields the normalized value of the maximum of the given metric within the given <paramref name="level"/>.
         /// </summary>
@@ -126,7 +124,7 @@ namespace SEE.GO
         /// <returns>normalized maximum</returns>
         public float GetNormalizedMaximumForLevel(string metric, int level)
         {
-            if (metricLevelMaxima.TryGetValue(level, out Dictionary<string, float> dictionary) 
+            if (metricLevelMaxima.TryGetValue(level, out Dictionary<string, float> dictionary)
                 && dictionary.TryGetValue(metric, out float value))
             {
                 return GetNormalizedValueForLevel(metric, value, level);
@@ -155,7 +153,7 @@ namespace SEE.GO
             float maximum = GetNormalizedMaximumForLevel(metric, node.Level);
             return maximum == 0 ? 0 : GetNormalizedValueForLevel(metric, node) / maximum;
         }
-        
+
         /// <summary>
         /// Returns the normalization value of given node <paramref name="metric"/> of
         /// <paramref name="node"/> set in relation to the maximum value of the

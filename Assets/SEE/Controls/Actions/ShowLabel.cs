@@ -12,7 +12,7 @@ using Valve.VR.InteractionSystem;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Shows the source name of the hovered or selected object as a text label above the 
+    /// Shows the source name of the hovered or selected object as a text label above the
     /// object. In between that label and the game object, a connecting bar
     /// will be shown.
     /// </summary>
@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/> 
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/>
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the label is destroyed unless the object is still selected.
         /// </summary>
@@ -204,8 +204,8 @@ namespace SEE.Controls.Actions
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.
-            return node.IsLeaf() && city.leafNodeAttributesPerKind[0].labelSettings.Show
-                || node.IsInnerNode() && city.innerNodeAttributesPerKind[0].labelSettings.Show;
+            return node.IsLeaf() && city.LeafNodeSettings.LabelSettings.Show
+                || node.IsInnerNode() && city.InnerNodeSettings.LabelSettings.Show;
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions
             if (city == null)
             {
                 // The game node is currently not part of a city. This may happen, for instance,
-                // if a node is just created and not yet added to a city. In this case, we 
+                // if a node is just created and not yet added to a city. In this case, we
                 // are not doing anything.
                 return;
             }
@@ -226,7 +226,7 @@ namespace SEE.Controls.Actions
             {
                 return;
             }
-            
+
             bool isLeaf = node.IsLeaf();
             if (!LabelsEnabled(city, node))
             {
@@ -256,11 +256,11 @@ namespace SEE.Controls.Actions
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
                 startLabelPosition,
-                (isLeaf ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).FontSize,
+                (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
                 textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
-            
+
             SetOutline();
 
             // Add connecting line between "roof" of object and text
@@ -311,7 +311,7 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).Distance;
+            endLabelPosition.y += (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).Distance;
             // Due to the line not using world space, we need to transform its position accordingly
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
@@ -325,7 +325,7 @@ namespace SEE.Controls.Actions
 
                 return;
             }
-            
+
             // We will play the animation backwards when going away, so we'll kill the tweens ourself.
             sequence = DOTween.Sequence();
             sequence.SetAutoKill(false);
@@ -390,7 +390,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Destroys the text label above the object if it exists.
-        /// 
+        ///
         /// <seealso cref="SelectionOn"/>
         /// </summary>
         private void Off()
@@ -423,7 +423,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int)node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int)node.Domain].labelSettings).AnimationDuration;
+            return (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
         }
 
         /// <summary>
