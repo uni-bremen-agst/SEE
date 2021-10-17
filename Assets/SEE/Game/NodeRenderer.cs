@@ -75,8 +75,22 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Create and returns a new game object for representing the given <paramref name="node"/>.
-        /// The exact kind of representation depends upon the leaf-node factory. The node is
+        /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>
+        /// of given <paramref name="gameNode"/> and lets refer the node reference
+        /// of it refer to <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">graph node represented by <paramref name="gameNode"/></param>
+        /// <param name="gameNode">game node representing <paramref name="node"/></param>
+        private static void SetGeneralNodeAttributes(Node node, GameObject gameNode)
+        {
+            gameNode.name = node.ID;
+            gameNode.tag = Tags.Node;
+            gameNode.AddComponent<NodeRef>().Value = node;
+        }
+
+        /// <summary>
+        /// Create and returns a new game object for representing the given <paramref name="node"/>
+        /// as a leaf node. The exact kind of representation depends upon the leaf-node factory. The node is
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
         /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
@@ -85,50 +99,16 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">leaf node</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
-        public GameObject DrawLeafNode(Node node)
+        private GameObject CreateLeafGameNode(Node node)
         {
-            Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
-
             // The deeper the node in the node hierarchy (quantified by a node's level), the
             // later it should be drawn, or in other words, the higher its offset in the
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-
-            int style = SelectStyle(node);
-            GameObject result = leafNodeFactory.NewBlock(style, node.ItsGraph.MaxDepth);
-            result.name = node.ID;
-            result.tag = Tags.Node;
-            result.AddComponent<NodeRef>().Value = node;
+            GameObject result = leafNodeFactory.NewBlock(SelectStyle(node), node.ItsGraph.MaxDepth);
+            SetGeneralNodeAttributes(node, result);
             AdjustScaleOfLeaf(result);
-            AddLOD(result);
-            InteractionDecorator.PrepareForInteraction(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new game object for an inner node using innerNodeFactory.
-        /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style and height of the resulting game
-        /// object are adjusted according to the selected InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
-        /// are not changed. In addition, level of details are added as well
-        /// as all components needed for interaction with this game object.
-        ///
-        /// Precondition: <paramref name="node"/> must be an inner node of the node
-        /// hierarchy.
-        /// </summary>
-        /// <param name="node">graph node for which to create the game node</param>
-        /// <returns>new game object for the inner node</returns>
-        public GameObject DrawInnerNode(Node node)
-        {
-            // The deeper the node in the node hierarchy (quantified by a node's level), the
-            // later it should be drawn, or in other words, the higher its offset in the
-            // render queue should be. We are assuming that the nodes are stacked on each
-            // other according to the node hierarchy. Leaves are on top of all other nodes.
-            GameObject result = CreateInnerGameObject(node);
-            AddLOD(result);
-            InteractionDecorator.PrepareForInteraction(result);
             return result;
         }
 
@@ -145,35 +125,89 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">graph node for which to create the game node</param>
         /// <returns>new game object for the inner node</returns>
-        private GameObject CreateInnerGameObject(Node node)
+        private GameObject CreateInnerGameNode(Node node)
         {
+            // The deeper the node in the node hierarchy (quantified by a node's level), the
+            // later it should be drawn, or in other words, the higher its offset in the
+            // render queue should be. We are assuming that the nodes are stacked on each
+            // other according to the node hierarchy. Leaves are on top of all other nodes.
             GameObject result = innerNodeFactory.NewBlock(style: SelectStyle(node), renderQueueOffset: node.Level);
-            result.name = node.ID;
-            result.tag = Tags.Node;
-            result.AddComponent<NodeRef>().Value = node;
+            SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
             return result;
         }
 
         /// <summary>
-        /// Re-draws <paramref name="gameNode"/> as an inner node.
+        /// Adds LOD to <paramref name="gameNode"/> and prepares it for interaction.
         /// </summary>
-        /// <param name="gameNode">node to be drawn as inner node</param>
-        public void RedrawAsInnerNode(GameObject gameNode)
+        /// <param name="gameNode">game node to be finished</param>
+        private void FinishGameNode(GameObject gameNode)
         {
-            // We create a new inner node and then "steal" its mesh.
+            AddLOD(gameNode);
+            InteractionDecorator.PrepareForInteraction(gameNode);
+        }
+
+        /// <summary>
+        /// Create and returns a new game object for representing the given <paramref name="node"/>.
+        /// The exact kind of representation depends upon the leaf-node factory. The node is
+        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
+        /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
+        /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
+        /// LOD is added and the resulting node is prepared for interaction.
+        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
+        /// </summary>
+        /// <param name="node">leaf node</param>
+        /// <returns>game object representing given <paramref name="node"/></returns>
+        public GameObject DrawLeafNode(Node node)
+        {
+            Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
+
+            GameObject result = CreateLeafGameNode(node);
+            FinishGameNode(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates a new game object for an inner node using innerNodeFactory.
+        /// The inner <paramref name="node"/> is attached to that new game object
+        /// via a NodeRef component. The style and height of the resulting game
+        /// object are adjusted according to the selected InnerNodeStyleMetric
+        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
+        /// are not changed. In addition, level of details are added as well
+        /// as all components needed for interaction with this game object.
+        /// LOD is added and the resulting node is prepared for interaction.
+        ///
+        /// Precondition: <paramref name="node"/> must be an inner node of the node
+        /// hierarchy.
+        /// </summary>
+        /// <param name="node">graph node for which to create the game node</param>
+        /// <returns>new game object for the inner node</returns>
+        public GameObject DrawInnerNode(Node node)
+        {
+            GameObject result = CreateInnerGameNode(node);
+            FinishGameNode(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Re-draws <paramref name="gameNode"/> as a leaf node.
+        ///
+        /// Precondition: <paramref name="gameNode"/> is an inner node.
+        /// Postcondition: <paramref name="gameNode"/> is a leaf node.
+        /// </summary>
+        /// <param name="gameNode">node to be drawn as leaf node</param>
+        public void RedrawAsLeafNode(GameObject gameNode)
+        {
+            // We create a new leaf node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject innerNode = CreateInnerGameObject(node);
-            Mesh newMesh = innerNode.GetComponent<MeshFilter>().mesh;
-            gameNode.GetComponent<MeshFilter>().mesh = newMesh;
+            GameObject leafNode = CreateLeafGameNode(node);
+            gameNode.GetComponent<MeshFilter>().mesh = leafNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
             Vector3 groundPosition = innerNodeFactory.Ground(gameNode);
-            /// We maintain the depth and width of gameNode, but adjust its height
-            /// according to the metric that determines the height of inner nodes.
-            /// The call to <see cref="CreateInnerGameObject"/> has set the height
-            /// of <see cref="innerNode"/> accordingly.
-            innerNodeFactory.SetHeight(gameNode, innerNode.transform.lossyScale.y);
+
+            // gameNode must be re-sized according to the metrics of the leaf node
+            innerNodeFactory.SetSize(gameNode, leafNode.transform.lossyScale);
 
             // Finally, because the height has changed, we need to adjust the position.
             innerNodeFactory.SetGroundPosition(gameNode, groundPosition);
@@ -190,6 +224,36 @@ namespace SEE.Game
             // MeshCollider. This method actually gets called automatically when
             // you set the .triangles, but not when you set the .vertices:
             //   newMesh.RecalculateBounds();
+
+            // leafNode is no longer needed; we have its mesh that is all we needed.
+            // It can be dismissed.
+            GameObject.Destroy(leafNode);
+        }
+
+        /// <summary>
+        /// Re-draws <paramref name="gameNode"/> as an inner node.
+        ///
+        /// Precondition: <paramref name="gameNode"/> is a leaf node.
+        /// Postcondition: <paramref name="gameNode"/> is an inner node.
+        /// </summary>
+        /// <param name="gameNode">node to be drawn as inner node</param>
+        public void RedrawAsInnerNode(GameObject gameNode)
+        {
+            // We create a new inner node and then "steal" its mesh.
+            Node node = gameNode.GetNode();
+            GameObject innerNode = CreateInnerGameNode(node);
+            gameNode.GetComponent<MeshFilter>().mesh = innerNode.GetComponent<MeshFilter>().mesh;
+
+            // The original ground position of gameNode.
+            Vector3 groundPosition = leafNodeFactory.Ground(gameNode);
+            /// We maintain the depth and width of gameNode, but adjust its height
+            /// according to the metric that determines the height of inner nodes.
+            /// The call to <see cref="CreateInnerGameNode"/> has set the height
+            /// of <see cref="innerNode"/> accordingly.
+            leafNodeFactory.SetHeight(gameNode, innerNode.transform.lossyScale.y);
+
+            // Finally, because the height has changed, we need to adjust the position.
+            leafNodeFactory.SetGroundPosition(gameNode, groundPosition);
 
             // innerNode is no longer needed; we have its mesh that is all we needed.
             // It can be dismissed.
