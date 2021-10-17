@@ -1,6 +1,6 @@
-﻿using SEE.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Will be called once when the action is started for the
-        /// first time. Intended for intialization purposes.
+        /// first time. Intended for initialization purposes.
         /// See <see cref="ReversibleAction.Awake"/>.
         /// </summary>
         public virtual void Awake()
@@ -126,10 +126,7 @@ namespace SEE.Controls.Actions
         /// Implements <see cref="ReversibleAction.CurrentProgress"/>.
         /// </summary>
         /// <returns>the current state of the action</returns>
-        public ReversibleAction.Progress CurrentProgress()
-        {
-            return currentState;
-        }
+        public ReversibleAction.Progress CurrentProgress() => currentState;
 
         /// <summary>
         /// Returns the IDs of all gameObjects manipulated by the specific action.
@@ -141,9 +138,6 @@ namespace SEE.Controls.Actions
         /// A getter for the ID of this action.
         /// </summary>
         /// <returns>The ID of this action as a string</returns>
-        public string GetId()
-        {
-            return id.ToString();
-        }
+        public string GetId() => id.ToString();
     }
 }

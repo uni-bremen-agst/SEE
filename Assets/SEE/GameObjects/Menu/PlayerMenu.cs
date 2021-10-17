@@ -8,7 +8,6 @@ using SEE.Game.UI.Notification;
 using SEE.Game.UI.StateIndicator;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Events;
 
 namespace SEE.GO.Menu
 {
@@ -42,55 +41,34 @@ namespace SEE.GO.Menu
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
 
-            // IMPORTANT NOTE: Because an ActionState.Type value will be used as an index into
+            // IMPORTANT NOTE: Because an ActionStateType value will be used as an index into
             // the following field of menu entries, the rank of an entry in this field of entry
-            // must correspond to the ActionState.Type value. If this is not the case, we will
+            // must correspond to the ActionStateType value. If this is not the case, we will
             // run into an endless recursion.
 
-            List<ToggleMenuEntry> entries = new List<ToggleMenuEntry>();
-            bool first = true;
-            foreach (ActionStateType type in ActionStateType.AllTypes)
-            {
-                UnityAction entryAction = () => GlobalActionHistory.Execute(type);
-                UnityAction exitAction = null;
+            ActionStateType firstType = ActionStateType.AllTypes.First();
+            List<ToggleMenuEntry> entries = ActionStateType.AllTypes.Select(ToModeMenuEntry).ToList();
 
-                //FIXME This is a bad hack and should be replaced with something proper for non-reversible actions.
-                // This currently just attaches the ShowCodeAction to the menu and registers entry/exitActions which
-                // will enable/disable the component. It should be replaced with something more generalizable.
-                // The current behavior also has a bug which doesn't properly leave an action when switching
-                // to the code action.
-                if (Equals(type, ActionStateType.ShowCode))
-                {
-                    // Attach ShowCodeAction
-                    ShowCodeAction action = modeMenuGO.AddComponent<ShowCodeAction>();
-                    entryAction = () => action.enabled = true;
-                    exitAction = () => action.enabled = false;
-                    action.enabled = false;
-                }
-                entries.Add(new ToggleMenuEntry(
-                    active: first,
-                    entryAction: entryAction,
-                    exitAction: exitAction,
-                    title: type.Name,
-                    description: type.Description,
-                    entryColor: type.Color,
-                    icon: Resources.Load<Sprite>(type.IconPath)
-                    ));
-                if (first)
-                {
-                    GlobalActionHistory.Execute(type);
-                    first = false;
-                }
-            }
+            // Initial state will be the first action state type
+            GlobalActionHistory.Execute(firstType);
 
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
-            foreach (ToggleMenuEntry entry in entries)
-            {
-                modeMenu.AddEntry(entry);
-            }
+            modeMenu.AddEntries(entries);
+            
             return modeMenu;
+
+            #region Local Functions
+
+            // Constructs a toggle menu entry for the mode menu from the given action state type.
+            ToggleMenuEntry ToModeMenuEntry(ActionStateType type) =>
+                new ToggleMenuEntry(active: Equals(type, firstType), 
+                                    entryAction: () => GlobalActionHistory.Execute(type), exitAction: null, 
+                                    title: type.Name, description: type.Description, entryColor: type.Color, 
+                                    icon: Resources.Load<Sprite>(type.IconPath));
+
+            #endregion
         }
 
         /// <summary>
@@ -172,6 +150,7 @@ namespace SEE.GO.Menu
                 }
                 GlobalActionHistory.Update();
             }
+            //TODO: This probably shouldn't catch *all* exceptions in this way.
             catch (Exception e)
             {
                 ShowNotification.Error("Action Error", e.Message);
@@ -190,13 +169,10 @@ namespace SEE.GO.Menu
             if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
-                playerMenu.ModeMenu.ActiveEntry
-                    = playerMenu.ModeMenu.Entries.First
-                         (x => x.Title.Equals(actionName));
+                playerMenu.ModeMenu.ActiveEntry = playerMenu.ModeMenu.Entries.First(x => x.Title.Equals(actionName));
             }
             foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.ModeMenu.Entries)
             {
-                // Hint (can be removed after review): we cannot use PlayerActionHistory.Current
                 if (toggleMenuEntry.Title.Equals(actionName))
                 {
                     playerMenu.ModeMenu.ActiveEntry = toggleMenuEntry;

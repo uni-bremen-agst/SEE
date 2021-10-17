@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
             new ActionStateType(8, "Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", null);
+                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
