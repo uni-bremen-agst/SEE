@@ -14,7 +14,6 @@ namespace SEE.Utils
         //private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
         private static Dictionary<string, CRDT> crdts = new Dictionary<string, CRDT>();
 
-
         /// <summary>
         /// Finds or creates an CRDT instance by the name of the file
         /// </summary>
