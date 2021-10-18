@@ -102,14 +102,13 @@ namespace SEE.Game.UI.CodeWindow
 
                                                                    }).ToList();
                 TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
-                //Debug.Log(string.Join("\n", textWitzhOutNumbers));
-                Debug.Log(GetCleanText());
-                List<string> cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
+                string cleanText = GetCleanText(); 
+                //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
                 //Debug.Log(string.Join("\n", cleanText));
 
                 if (ICRDT.IsEmpty(Title))
                 {
-                    ICRDT.AddString(Text, 0, Title);
+                    ICRDT.AddString(cleanText, 0, Title);
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
