@@ -109,7 +109,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (ICRDT.IsEmpty(Title))
                 {
-                    ICRDT.AddString(Text, 0, Title, true);
+                    ICRDT.AddString(Text, 0, Title);
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
