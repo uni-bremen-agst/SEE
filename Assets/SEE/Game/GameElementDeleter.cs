@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.GO;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,21 @@ namespace SEE.Game
     /// </summary>
     internal class GameElementDeleter
     {
+        /// <summary>
+        /// Removes the graph node associated with the given <paramref name="gameNode"/>
+        /// from its graph. <paramref name="gameNode"/> is not actually destroyed.
+        ///
+        /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
+        /// an exception will be thrown.
+        /// </summary>
+        /// <param name="gameNode">game node whose graph node is to be removed from the graph</param>
+        public static void RemoveFromGraph(GameObject gameNode)
+        {
+            Node node = gameNode.GetNode();
+            Graph graph = node.ItsGraph;
+            graph.RemoveNode(node);
+        }
+
         /// <summary>
         /// Deletes given  <paramref name="deletedObject"/> assumed to be either an
         /// edge or node. If it represents a node, its ancestors and any edges related
@@ -31,6 +47,7 @@ namespace SEE.Game
         /// neither a node nor an edge</exception>
         public static ISet<GameObject> Delete(GameObject deletedObject)
         {
+            Debug.Log($"GameElementDeleter.Delete({deletedObject.name})\n");
             if (deletedObject.CompareTag(Tags.Edge))
             {
                 ISet<GameObject> result = new HashSet<GameObject>() { deletedObject };
@@ -45,15 +62,37 @@ namespace SEE.Game
                 }
                 else
                 {
-                    // The selectedObject (a node) and its ancestors are not deleted immediately. Instead we
-                    // will run an animation that moves them into a garbage bin. Only when they arrive there,
-                    // we will actually delete them.
+                    MorphGameNodeIfNecessary(deletedObject);
                     return DeleteTree(deletedObject);
                 }
             }
             else
             {
                 throw new ArgumentException($"Game object {deletedObject.name} must be a node or edge.");
+            }
+        }
+
+        private static void MorphGameNodeIfNecessary(GameObject gameNode)
+        {
+            // FIXME: The graph nodes are not actually removed from the graph by Delete.
+            Node node = gameNode.GetNode();
+            Debug.Log($"GameElementDeleter.MorphGameNodeIfNecessary: parent has {node.Parent.NumberOfChildren()} children\n");
+            if (node.Parent != null && node.Parent.NumberOfChildren() == 1)
+            {
+                // node is a single child; removing it turns its parent into a leaf
+                GameObject parent = gameNode.transform.parent?.gameObject;
+                if (parent != null)
+                {
+                    SEECity city = parent.gameObject.ContainingCity();
+                    if (city != null)
+                    {
+                        city.Renderer.RedrawAsLeafNode(parent);
+                    }
+                    else
+                    {
+                        throw new Exception($"Parent node {parent.name} is not contained in a code city.");
+                    }
+                }
             }
         }
 

@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
             if (addedGameNode != null)
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
-                GameNodeAdder.Remove(addedGameNode);
+                GameElementDeleter.RemoveFromGraph(addedGameNode);
                 Destroyer.DestroyGameObject(addedGameNode);
                 addedGameNode = null;
             }
