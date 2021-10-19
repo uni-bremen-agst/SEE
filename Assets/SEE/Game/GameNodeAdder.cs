@@ -139,28 +139,5 @@ namespace SEE.Game
         {
             return start + 0.5f * (end - start);
         }
-
-        /// <summary>
-        /// Inverse operation of <see cref="AddChild(GameObject, Vector3, Vector3, string)"/>.
-        /// Removes the given <paramref name="gameNode"/> from the scene and its associated
-        /// graph node from its graph.
-        ///
-        /// Notes:
-        ///
-        /// <paramref name="gameNode"/> is not actually destroyed.
-        ///
-        /// If <paramref name="gameNode"/> represents an inner node of the node
-        /// hierarchy, its ancestors will not be deleted.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
-        /// an exception will be thrown.
-        /// </summary>
-        /// <param name="gameNode">game node to be removed</param>
-        public static void Remove(GameObject gameNode)
-        {
-            Node node = gameNode.GetNode();
-            Graph graph = node.ItsGraph;
-            graph.RemoveNode(node);
-        }
     }
 }
