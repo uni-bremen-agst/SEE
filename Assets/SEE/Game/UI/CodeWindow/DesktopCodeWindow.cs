@@ -87,7 +87,7 @@ namespace SEE.Game.UI.CodeWindow
                 TextMeshInputField.interactable = true;
                 int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
-                List<string> textWitzhOutNumbers = Text.Split('\n')
+               /* List<string> textWitzhOutNumbers = Text.Split('\n')
                                                                    .Select((x, i) =>
                                                                    {
                                                                        string cleanLine = GetCleanLine(i);
@@ -100,7 +100,7 @@ namespace SEE.Game.UI.CodeWindow
                                                                            return cleanLine;
                                                                        }
 
-                                                                   }).ToList();
+                                                                   }).ToList(); */
                 TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
                 string cleanText = GetCleanText(); 
                 //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
