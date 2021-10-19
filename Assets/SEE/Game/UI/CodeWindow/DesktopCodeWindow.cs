@@ -120,11 +120,11 @@ namespace SEE.Game.UI.CodeWindow
                     switch (type)
                     {
                         case operationType.Add:
-                            TextMeshInputField.text = TextMeshInputField.text.Insert(idx, c.ToString());
+                            TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             break;
                         case operationType.Delete:
-                            TextMeshInputField.text = TextMeshInputField.text.Remove(idx, 1);
+                            TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             break;
                     }
                 }
