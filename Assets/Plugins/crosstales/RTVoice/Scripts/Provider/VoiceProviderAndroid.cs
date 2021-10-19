@@ -334,8 +334,12 @@ namespace Crosstales.RTVoice.Provider
                      gender = Model.Enum.Gender.FEMALE;
                   }
 
-                  Model.Voice newVoice = new Model.Voice(currentVoiceData[0], "Android voice: " + voice, gender, "unknown", currentVoiceData[1]);
-                  voices.Add(newVoice);
+                  if (gender == Model.Enum.Gender.UNKNOWN)
+                  {
+                  }
+
+                  string name = currentVoiceData[0];
+                  voices.Add(new Model.Voice(name, "Android voice: " + voice, Util.Helper.AndroidVoiceNameToGender(name), "unknown", currentVoiceData[1]));
                }
             }
 
@@ -382,7 +386,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      private void initializeTTS()
+      private static void initializeTTS()
       {
          AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
          AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity");

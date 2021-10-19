@@ -122,7 +122,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
             this.settings = settings;
-            SetupGraphSettings(settings.coseGraphSettings);
+            SetupGraphSettings(settings.CoseGraphSettings);
         }
 
         /// <summary>
@@ -257,8 +257,8 @@ namespace SEE.Layout.NodeLayouts.Cose
             int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
             int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
 
-            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
-            settings.coseGraphSettings.EdgeLength = edgeLength;
+            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.CoseGraphSettings.EdgeLength = edgeLength;
 
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
@@ -334,8 +334,8 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
-            settings.coseGraphSettings.EdgeLength = edgeLength;
-            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.CoseGraphSettings.EdgeLength = edgeLength;
+            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
 
             StartLayoutProzess();
             SetCalculatedLayoutPositionToNodes();
@@ -368,7 +368,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// Values for Graph Layout Settings and Setup for Layouts
         /// </summary>
         /// <param name="settings">Graph Settings, choosed by user</param>
-        private void SetupGraphSettings(CoseGraphSettings settings)
+        private void SetupGraphSettings(CoseGraphAttributes settings)
         {
             CoseLayoutSettings.Edge_Length = settings.EdgeLength;
             CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation = settings.UseSmartIdealEdgeCalculation;

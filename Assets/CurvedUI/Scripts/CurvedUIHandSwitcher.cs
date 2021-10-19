@@ -150,22 +150,16 @@ namespace CurvedUI {
            bool pressed = false;
            if (CurvedUIInputModule.Instance.RightXRController != null && CurvedUIInputModule.Instance.UsedHand != CurvedUIInputModule.Hand.Right)
            {
-               //get pressed ui button state on right controller.
-               CurvedUIInputModule.Instance.RightXRController.inputDevice.IsPressed(CurvedUIInputModule.Instance.RightXRController.uiPressUsage,
-                   out pressed, CurvedUIInputModule.Instance.RightXRController.axisToPressThreshold);
+               CurvedUIInputModule.Instance.GetXrControllerButtonState(ref pressed, CurvedUIInputModule.Hand.Right);
 
-               if(pressed)
-                   SwitchHandTo(CurvedUIInputModule.Hand.Right);
+               if(pressed) SwitchHandTo(CurvedUIInputModule.Hand.Right);
            } 
                 
            if (CurvedUIInputModule.Instance.LeftXRController != null && CurvedUIInputModule.Instance.UsedHand != CurvedUIInputModule.Hand.Left)
            {
-               //get pressed ui button state on left controller.
-               CurvedUIInputModule.Instance.LeftXRController.inputDevice.IsPressed(CurvedUIInputModule.Instance.LeftXRController.uiPressUsage,
-                   out pressed, CurvedUIInputModule.Instance.LeftXRController.axisToPressThreshold);
+               CurvedUIInputModule.Instance.GetXrControllerButtonState(ref pressed, CurvedUIInputModule.Hand.Left);
 
-               if(pressed)
-                   SwitchHandTo(CurvedUIInputModule.Hand.Left);
+               if(pressed) SwitchHandTo(CurvedUIInputModule.Hand.Left);
            }
         }
 #endif

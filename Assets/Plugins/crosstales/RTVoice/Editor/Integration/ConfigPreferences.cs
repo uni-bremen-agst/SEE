@@ -27,7 +27,7 @@ namespace Crosstales.RTVoice.EditorIntegration
             cp = CreateInstance(typeof(ConfigPreferences)) as ConfigPreferences;
          }
 
-         tab = GUILayout.Toolbar(tab, new[] {"Configuration", "Help", "About"});
+         tab = GUILayout.Toolbar(tab, new[] { "Configuration", "Help", "About" });
 
          if (tab != lastTab)
          {

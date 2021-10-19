@@ -19,7 +19,6 @@ namespace Crosstales.RTVoice
       [FormerlySerializedAs("CustomMode")] [Tooltip("Enable or disable the custom provider (default: false)."), SerializeField]
       private bool customMode;
 
-
       [FormerlySerializedAs("ESpeakMode")] [Header("eSpeak Settings"), Tooltip("Enable or disable eSpeak for standalone platforms (default: false)."), SerializeField]
       private bool eSpeakMode;
 
@@ -70,7 +69,7 @@ namespace Crosstales.RTVoice
       private int busyCount;
       private bool deleted; //ignore in reset!
 
-      private static readonly char[] splitCharWords = {' '};
+      private static readonly char[] splitCharWords = { ' ' };
       private const float cleanUpTime = 5f; //in seconds
 
       private System.Threading.Thread deleteWorker;
@@ -476,6 +475,33 @@ namespace Crosstales.RTVoice
          }
       }
 
+      /// <summary>Get all available languages from the current TTS-system.</summary>
+      /// <returns>All available languages as a list.</returns>
+      public System.Collections.Generic.List<SystemLanguage> Languages
+      {
+         get
+         {
+            System.Collections.Generic.List<SystemLanguage> result = new System.Collections.Generic.List<SystemLanguage>();
+
+            if (voiceProvider != null)
+            {
+               foreach (string code in voiceProvider.Cultures)
+               {
+                  SystemLanguage lang = Util.Helper.ISO639ToLanguage(code);
+
+                  if (!result.Contains(lang))
+                     result.Add(lang);
+               }
+            }
+            else
+            {
+               logVPIsNull();
+            }
+
+            return result;
+         }
+      }
+
       /// <summary>Get all available speech engines (works only for Android).</summary>
       /// <returns>All available speech engines as a list.</returns>
       public System.Collections.Generic.List<string> Engines
@@ -517,6 +543,9 @@ namespace Crosstales.RTVoice
 
       /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
       public event SpeakCurrentWord OnSpeakCurrentWord;
+
+      /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
+      public event SpeakCurrentWordString OnSpeakCurrentWordString;
 
       /// <summary>An event triggered whenever a new phoneme is spoken (native, Windows only).</summary>
       public event SpeakCurrentPhoneme OnSpeakCurrentPhoneme;
@@ -577,7 +606,7 @@ namespace Crosstales.RTVoice
 
             if (genericSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null && source.Value.clip != null && !Common.Util.BaseHelper.hasActiveClip(source.Value)))
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
                {
                   removeSources.Add(source.Key, source.Value);
                }
@@ -593,7 +622,7 @@ namespace Crosstales.RTVoice
 
             if (providedSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null && source.Value.clip != null && !Common.Util.BaseHelper.hasActiveClip(source.Value)))
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
                {
                   //source.Value.clip = null; //remove clip
 
@@ -900,6 +929,15 @@ namespace Crosstales.RTVoice
          return VoicesForGender(gender, culture).Count > 0;
       }
 
+      /// <summary>Is a voice available for a given gender and language  from the current TTS-system?</summary>
+      /// <param name="gender">Gender of the voice</param>
+      /// <param name="language">Language of the voice</param>
+      /// <returns>True if a voice is available for a given gender and language.</returns>
+      public bool isVoiceForGenderAvailable(Model.Enum.Gender gender, SystemLanguage language)
+      {
+         return isVoiceForGenderAvailable(gender, Util.Helper.LanguageToISO639(language));
+      }
+
       /// <summary>Get all available voices for a given gender and optional culture from the current TTS-system.</summary>
       /// <param name="gender">Gender of the voice</param>
       /// <param name="culture">Culture of the voice (e.g. "en", optional)</param>
@@ -930,13 +968,23 @@ namespace Crosstales.RTVoice
          return voices;
       }
 
-      /// <summary>Get a voice from for a given gender and optional culture and optional index from the current TTS-system.</summary>
+      /// <summary>Get all available voices for a given gender and language from the current TTS-system.</summary>
+      /// <param name="gender">Gender of the voice</param>
+      /// <param name="language">Language of the voice</param>
+      /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or language (default: false, optional)</param>
+      /// <returns>All available voices (alphabetically ordered by 'Name') for a given gender and language as a list.</returns>
+      public System.Collections.Generic.List<Model.Voice> VoicesForGender(Model.Enum.Gender gender, SystemLanguage language, bool isFuzzy = false)
+      {
+         return VoicesForGender(gender, Util.Helper.LanguageToISO639(language), isFuzzy);
+      }
+
+      /// <summary>Get a voice from for a given gender, optional culture and optional index from the current TTS-system.</summary>
       /// <param name="gender">Gender of the voice</param>
       /// <param name="culture">Culture of the voice (e.g. "en", optional)</param>
       /// <param name="index">Index of the voice (default: 0, optional)</param>
       /// <param name="fallbackCulture">Fallback culture of the voice (default "en", optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or culture (default: false, optional)</param>
-      /// <returns>Voice for the given culture and index.</returns>
+      /// <returns>Voice for the given gender, culture and index.</returns>
       public Model.Voice VoiceForGender(Model.Enum.Gender gender, string culture = "", int index = 0, string fallbackCulture = "en", bool isFuzzy = false)
       {
          Model.Voice result = null;
@@ -975,12 +1023,31 @@ namespace Crosstales.RTVoice
          return result;
       }
 
+      /// <summary>Get a voice from for a given gender, language and index from the current TTS-system.</summary>
+      /// <param name="gender">Gender of the voice</param>
+      /// <param name="language">Language of the voice</param>
+      /// <param name="index">Index of the voice (default: 0, optional)</param>
+      /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or language (default: false, optional)</param>
+      /// <returns>Voice for the given gender, language and index.</returns>
+      public Model.Voice VoiceForGender(Model.Enum.Gender gender, SystemLanguage language, int index = 0, bool isFuzzy = false)
+      {
+         return VoiceForGender(gender, Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
+      }
+
       /// <summary>Is a voice available for a given culture from the current TTS-system?</summary>
       /// <param name="culture">Culture of the voice (e.g. "en")</param>
       /// <returns>True if a voice is available for a given culture.</returns>
       public bool isVoiceForCultureAvailable(string culture)
       {
          return VoicesForCulture(culture).Count > 0;
+      }
+
+      /// <summary>Is a voice available for a given language from the current TTS-system?</summary>
+      /// <param name="language">Language of the voice</param>
+      /// <returns>True if a voice is available for a given language.</returns>
+      public bool isVoiceForLanguageAvailable(SystemLanguage language)
+      {
+         return isVoiceForCultureAvailable(Util.Helper.LanguageToISO639(language));
       }
 
       /// <summary>Get all available voices for a given culture from the current TTS-system.</summary>
@@ -1009,6 +1076,15 @@ namespace Crosstales.RTVoice
          }
 
          return voices;
+      }
+
+      /// <summary>Get all available voices for a given language from the current TTS-system.</summary>
+      /// <param name="language">Language of the voice</param>
+      /// <param name="isFuzzy">Always returns voices if there is no match with the language (default: false, optional)</param>
+      /// <returns>All available voices (alphabetically ordered by 'Name') for a given language as a list.</returns>
+      public System.Collections.Generic.List<Model.Voice> VoicesForLanguage(SystemLanguage language, bool isFuzzy = false)
+      {
+         return VoicesForCulture(Util.Helper.LanguageToISO639(language), isFuzzy);
       }
 
       /// <summary>Get a voice from for a given culture and optional index from the current TTS-system.</summary>
@@ -1056,6 +1132,16 @@ namespace Crosstales.RTVoice
          }
 
          return result;
+      }
+
+      /// <summary>Get a voice from for a given language and optional index from the current TTS-system.</summary>
+      /// <param name="language">language of the voice</param>
+      /// <param name="index">Index of the voice (default: 0, optional)</param>
+      /// <param name="isFuzzy">Always returns voices if there is no match with the language (default: false, optional)</param>
+      /// <returns>Voice for the given language and index.</returns>
+      public Model.Voice VoiceForLanguage(SystemLanguage language, int index = 0, bool isFuzzy = false)
+      {
+         return VoiceForCulture(Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
       }
 
       /// <summary>Is a voice available for a given name from the current TTS-system?</summary>
@@ -1986,6 +2072,7 @@ namespace Crosstales.RTVoice
             CustomProvider.OnSpeakStart += onSpeakStart;
             CustomProvider.OnSpeakComplete += onSpeakComplete;
             CustomProvider.OnSpeakCurrentWord += onSpeakCurrentWord;
+            CustomProvider.OnSpeakCurrentWordString += onSpeakCurrentWordString;
             CustomProvider.OnSpeakCurrentPhoneme += onSpeakCurrentPhoneme;
             CustomProvider.OnSpeakCurrentViseme += onSpeakCurrentViseme;
             CustomProvider.OnSpeakAudioGenerationStart += onSpeakAudioGenerationStart;
@@ -2003,6 +2090,7 @@ namespace Crosstales.RTVoice
             CustomProvider.OnSpeakStart -= onSpeakStart;
             CustomProvider.OnSpeakComplete -= onSpeakComplete;
             CustomProvider.OnSpeakCurrentWord -= onSpeakCurrentWord;
+            CustomProvider.OnSpeakCurrentWordString -= onSpeakCurrentWordString;
             CustomProvider.OnSpeakCurrentPhoneme -= onSpeakCurrentPhoneme;
             CustomProvider.OnSpeakCurrentViseme -= onSpeakCurrentViseme;
             CustomProvider.OnSpeakAudioGenerationStart -= onSpeakAudioGenerationStart;
@@ -2019,6 +2107,7 @@ namespace Crosstales.RTVoice
             mainVoiceProvider.OnSpeakStart += onSpeakStart;
             mainVoiceProvider.OnSpeakComplete += onSpeakComplete;
             mainVoiceProvider.OnSpeakCurrentWord += onSpeakCurrentWord;
+            mainVoiceProvider.OnSpeakCurrentWordString += onSpeakCurrentWordString;
             mainVoiceProvider.OnSpeakCurrentPhoneme += onSpeakCurrentPhoneme;
             mainVoiceProvider.OnSpeakCurrentViseme += onSpeakCurrentViseme;
             mainVoiceProvider.OnSpeakAudioGenerationStart += onSpeakAudioGenerationStart;
@@ -2032,6 +2121,7 @@ namespace Crosstales.RTVoice
             customVoiceProvider.OnSpeakStart += onSpeakStart;
             customVoiceProvider.OnSpeakComplete += onSpeakComplete;
             customVoiceProvider.OnSpeakCurrentWord += onSpeakCurrentWord;
+            customVoiceProvider.OnSpeakCurrentWordString += onSpeakCurrentWordString;
             customVoiceProvider.OnSpeakCurrentPhoneme += onSpeakCurrentPhoneme;
             customVoiceProvider.OnSpeakCurrentViseme += onSpeakCurrentViseme;
             customVoiceProvider.OnSpeakAudioGenerationStart += onSpeakAudioGenerationStart;
@@ -2048,6 +2138,7 @@ namespace Crosstales.RTVoice
             mainVoiceProvider.OnSpeakStart -= onSpeakStart;
             mainVoiceProvider.OnSpeakComplete -= onSpeakComplete;
             mainVoiceProvider.OnSpeakCurrentWord -= onSpeakCurrentWord;
+            mainVoiceProvider.OnSpeakCurrentWordString -= onSpeakCurrentWordString;
             mainVoiceProvider.OnSpeakCurrentPhoneme -= onSpeakCurrentPhoneme;
             mainVoiceProvider.OnSpeakCurrentViseme -= onSpeakCurrentViseme;
             mainVoiceProvider.OnSpeakAudioGenerationStart -= onSpeakAudioGenerationStart;
@@ -2061,6 +2152,7 @@ namespace Crosstales.RTVoice
             customVoiceProvider.OnSpeakStart -= onSpeakStart;
             customVoiceProvider.OnSpeakComplete -= onSpeakComplete;
             customVoiceProvider.OnSpeakCurrentWord -= onSpeakCurrentWord;
+            customVoiceProvider.OnSpeakCurrentWordString -= onSpeakCurrentWordString;
             customVoiceProvider.OnSpeakCurrentPhoneme -= onSpeakCurrentPhoneme;
             customVoiceProvider.OnSpeakCurrentViseme -= onSpeakCurrentViseme;
             customVoiceProvider.OnSpeakAudioGenerationStart -= onSpeakAudioGenerationStart;
@@ -2134,6 +2226,11 @@ namespace Crosstales.RTVoice
          }
 #endif
          OnSpeakCurrentWord?.Invoke(wrapper, speechTextArray, wordIndex);
+      }
+
+      private void onSpeakCurrentWordString(Model.Wrapper wrapper, string word)
+      {
+         OnSpeakCurrentWordString?.Invoke(wrapper, word);
       }
 
       private void onSpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme)
@@ -2254,7 +2351,7 @@ namespace Crosstales.RTVoice
         /// <param name="voices">Current spoken word from iOS.</param>
         public void WordSpoken(string word)
         {
-            Provider.VoiceProviderIOS.WordSpoken();
+            Provider.VoiceProviderIOS.WordSpoken(word);
         }
 
         /// <summary>Sets the state from iOS.</summary>

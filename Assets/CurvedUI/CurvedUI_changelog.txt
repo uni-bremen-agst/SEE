@@ -1,6 +1,14 @@
 ﻿
 
 CurvedUI changelog--------------------------------//
+3.3
+New
+- Added support for Unity XR Toolkit v1.0 and ActionBasedControllers
+- Added support for new Input System with Unity XR
+Bugfixes
+- Improved multi-scene workflow.
+- Fixed issues with UI elements using UV2 and UV3 channels. 
+
 3.2
 Bugfixes
 - Fixed an issue where TMP Text would not clear properly. 

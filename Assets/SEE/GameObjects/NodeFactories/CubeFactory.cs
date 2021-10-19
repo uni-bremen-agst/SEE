@@ -112,7 +112,7 @@ namespace SEE.GO
             result.AddComponent<BoxCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = Materials.Get(renderQueueOffset, Mathf.Clamp(style, 0, (int)Materials.NumberOfMaterials - 1)); ;
+            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;

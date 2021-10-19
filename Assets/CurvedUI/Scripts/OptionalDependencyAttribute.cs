@@ -5,6 +5,7 @@ using System.Diagnostics;
 //Used in this project:
 //[assembly: CurvedUI.OptionalDependency("TMPro.TextMeshProUGUI", "CURVEDUI_TMP")]
 //[assembly: CurvedUI.OptionalDependency("Valve.VR.InteractionSystem.Player", "CURVEDUI_STEAMVR_INT")]
+//[assembly: CurvedUI.OptionalDependency("UnityEngine.InputSystem.UI.InputSystemUIInputModule", "CURVEDUI_NEW_INPUT_SYSTEM")]
 
 namespace CurvedUI
 {

@@ -234,45 +234,12 @@ namespace Crosstales.Common.EditorUtil
             AssetDatabase.Refresh(options);
       }
 
-      /// <summary>Invokes a public static method on a full qualified class.</summary>
-      /// <param name="className">Full qualified name of the class</param>
-      /// <param name="methodName">Public static method of the class to execute</param>
-      /// <param name="parameters">Parameters for the method (optional)</param>
-      public static void InvokeMethod(string className, string methodName, params object[] parameters)
-      {
-         if (string.IsNullOrEmpty(className))
-         {
-            Debug.LogWarning("'className' is null or empty; can not execute.");
-            return;
-         }
-
-         if (string.IsNullOrEmpty(methodName))
-         {
-            Debug.LogWarning("'methodName' is null or empty; can not execute.");
-            return;
-         }
-
-         foreach (System.Type type in System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
-         {
-            try
-            {
-               if (type.FullName?.Equals(className) == true)
-                  if (type.IsClass)
-                     type.GetMethod(methodName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).Invoke(null, parameters);
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogWarning($"Could not execute method call: {ex}");
-            }
-         }
-      }
-
       /// <summary>Returns the true if the BuildTarget is installed in Unity.</summary>
       /// <param name="target">BuildTarget to test</param>
       /// <returns>True if the BuildTarget is installed in Unity.</returns>
       public static bool isValidBuildTarget(BuildTarget target)
       {
-         return (bool)isPlatformSupportLoaded.Invoke(null, new object[] {(string)getTargetStringFromBuildTarget.Invoke(null, new object[] {target})});
+         return (bool)isPlatformSupportLoaded.Invoke(null, new object[] { (string)getTargetStringFromBuildTarget.Invoke(null, new object[] { target }) });
       }
 
       /*
@@ -289,26 +256,10 @@ namespace Crosstales.Common.EditorUtil
       }
       */
 
-      /// <summary>Returns an argument for a name from the command line.</summary>
-      /// <param name="name">Name for the argument</param>
-      /// <returns>True if the BuildTarget is installed in Unity.</returns>
-      public static string getCLIArgument(string name)
-      {
-         string[] args = System.Environment.GetCommandLineArgs();
-
-         for (int ii = 0; ii < args.Length; ii++)
-         {
-            if (name.CTEquals(args[ii]) && args.Length > ii + 1)
-               return args[ii + 1];
-         }
-
-         return null;
-      }
-
       /// <summary>Returns the BuildTarget for a build name, like 'win64'.</summary>
       /// <param name="build">Build name, like 'win64'</param>
       /// <returns>The BuildTarget for a build name.</returns>
-      public static BuildTarget getBuildTargetForBuildName(string build)
+      public static BuildTarget GetBuildTargetForBuildName(string build)
       {
          if ("win32".CTEquals(build) || "win".CTEquals(build))
             return BuildTarget.StandaloneWindows;
@@ -362,7 +313,7 @@ namespace Crosstales.Common.EditorUtil
       /// <summary>Returns the build name for a BuildTarget.</summary>
       /// <param name="build">BuildTarget for a build name</param>
       /// <returns>The build name for a BuildTarget.</returns>
-      public static string getBuildNameFromBuildTarget(BuildTarget build)
+      public static string GetBuildNameFromBuildTarget(BuildTarget build)
       {
          switch (build)
          {

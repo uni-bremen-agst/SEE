@@ -19,7 +19,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       #region Editor methods
 
-      public void OnEnable()
+      private void OnEnable()
       {
          script = (Tool.AudioFileGenerator)target;
       }
@@ -32,7 +32,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
          if (script.isActiveAndEnabled)
          {
-            if (script.TextFiles != null && script.TextFiles.Length > 0)
+            if (script.TextFiles?.Length > 0)
             {
                if (Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
                {

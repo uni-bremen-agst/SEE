@@ -22,9 +22,9 @@ namespace Crosstales.RTVoice.Provider
       private const string idViseme = "@VISEME:";
       private const string idStart = "@STARTED";
 
-      private static readonly char[] splitChar = {':'};
+      private static readonly char[] splitChar = { ':' };
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
       private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
 #endif
       private bool isLoading;
@@ -140,7 +140,7 @@ namespace Crosstales.RTVoice.Provider
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -154,14 +154,15 @@ namespace Crosstales.RTVoice.Provider
                      string[] speechTextArray = Util.Helper.CleanText(wrapper.Text, false)
                         .Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
                      int wordIndex = 0;
+                     string word = string.Empty;
                      int wordIndexCompare = 0;
                      string phoneme = string.Empty;
                      string viseme = string.Empty;
                      bool start = false;
 #if ENABLE_IL2CPP
-                     System.Threading.Thread worker = new System.Threading.Thread(() => readSpeakNativeStream(process, ref speechTextArray, out wordIndex, out phoneme, out viseme, out start, useVisemesAndPhonemesIL2CPP, useVisemesAndPhonemesIL2CPP)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => readSpeakNativeStream(process, ref speechTextArray, out wordIndex, out word, out phoneme, out viseme, out start, useVisemesAndPhonemesIL2CPP, useVisemesAndPhonemesIL2CPP)) {Name = wrapper.Uid};
 #else
-                     System.Threading.Thread worker = new System.Threading.Thread(() => readSpeakNativeStream(process, ref speechTextArray, out wordIndex, out phoneme, out viseme, out start)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => readSpeakNativeStream(process, ref speechTextArray, out wordIndex, out word, out phoneme, out viseme, out start)) { Name = wrapper.Uid };
 #endif
                      worker.Start();
 
@@ -174,6 +175,13 @@ namespace Crosstales.RTVoice.Provider
                      do
                      {
                         yield return null;
+
+                        if (!string.IsNullOrEmpty(word))
+                        {
+                           onSpeakCurrentWord(wrapper, word);
+
+                           word = string.Empty;
+                        }
 
                         if (wordIndex != wordIndexCompare)
                         {
@@ -205,6 +213,7 @@ namespace Crosstales.RTVoice.Provider
                      } while (worker.IsAlive || !process.HasExited);
 
                      // clear output
+                     onSpeakCurrentWord(wrapper, string.Empty); //TODO needed?
                      onSpeakCurrentPhoneme(wrapper, string.Empty);
                      onSpeakCurrentViseme(wrapper, string.Empty);
 #if ENABLE_IL2CPP
@@ -238,7 +247,7 @@ namespace Crosstales.RTVoice.Provider
                }
                else
                {
-                  string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+                  string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
                   Debug.LogError(errorMessage);
                   onErrorInfo(wrapper, errorMessage);
                }
@@ -287,7 +296,7 @@ namespace Crosstales.RTVoice.Provider
 
                      if (Util.Config.DEBUG)
                         Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                      using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                      using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -296,7 +305,7 @@ namespace Crosstales.RTVoice.Provider
                         process.StartInfo.FileName = applicationName;
                         process.StartInfo.Arguments = args;
 
-                        System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                        System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                         worker.Start();
 
                         silence = false;
@@ -337,7 +346,7 @@ namespace Crosstales.RTVoice.Provider
                   }
                   else
                   {
-                     string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+                     string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
                      Debug.LogError(errorMessage);
                      onErrorInfo(wrapper, errorMessage);
                   }
@@ -379,7 +388,7 @@ namespace Crosstales.RTVoice.Provider
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -388,7 +397,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = applicationName;
                      process.StartInfo.Arguments = args;
 
-                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                      worker.Start();
 
                      silence = false;
@@ -428,7 +437,7 @@ namespace Crosstales.RTVoice.Provider
                }
                else
                {
-                  string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+                  string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
                   Debug.LogError(errorMessage);
                   onErrorInfo(wrapper, errorMessage);
                }
@@ -476,7 +485,7 @@ namespace Crosstales.RTVoice.Provider
          if (System.IO.File.Exists(applicationName))
          {
             System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>();
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
             using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -548,7 +557,7 @@ namespace Crosstales.RTVoice.Provider
          }
          else
          {
-            string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+            string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
             Debug.LogError(errorMessage);
             onErrorInfo(null, errorMessage);
          }
@@ -559,12 +568,13 @@ namespace Crosstales.RTVoice.Provider
       }
 
 #if ENABLE_IL2CPP
-      private void readSpeakNativeStream(Common.Util.CTProcess process, ref string[] speechTextArray, out int wordIndex, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
+      private void readSpeakNativeStream(Common.Util.CTProcess process, ref string[] speechTextArray, out int wordIndex, out string word, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
 #else
-      private static void readSpeakNativeStream(System.Diagnostics.Process process, ref string[] speechTextArray, out int wordIndex, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
+      private static void readSpeakNativeStream(System.Diagnostics.Process process, ref string[] speechTextArray, out int wordIndex, out string word, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
 #endif
       {
          wordIndex = 0;
+         word = string.Empty;
          phoneme = string.Empty;
          viseme = string.Empty;
          start = false;
@@ -592,6 +602,11 @@ namespace Crosstales.RTVoice.Provider
                      {
                         if (reply.CTStartsWith(idWord))
                         {
+                           word = reply.Substring(idWord.Length + 1);
+
+                           //if (Util.Constants.DEV_DEBUG) //TODO comment!
+                           Debug.Log($"Word spoken: {word}");
+
                            if (wordIndex < speechTextArray.Length)
                            {
                               if (speechTextArray[wordIndex].Equals("-"))
@@ -604,22 +619,26 @@ namespace Crosstales.RTVoice.Provider
                         }
                         else if (reply.CTStartsWith(idPhoneme))
                         {
-                           string[] splittedString = reply.Split(splitChar,
-                              System.StringSplitOptions.RemoveEmptyEntries);
+                           string[] splittedString = reply.Split(splitChar, System.StringSplitOptions.RemoveEmptyEntries);
 
                            if (splittedString.Length > 1)
                            {
                               phoneme = splittedString[1];
+
+                              if (Util.Constants.DEV_DEBUG)
+                                 Debug.Log($"Phoneme spoken: {phoneme}");
                            }
                         }
                         else if (reply.CTStartsWith(idViseme))
                         {
-                           string[] splittedString = reply.Split(splitChar,
-                              System.StringSplitOptions.RemoveEmptyEntries);
+                           string[] splittedString = reply.Split(splitChar, System.StringSplitOptions.RemoveEmptyEntries);
 
                            if (splittedString.Length > 1)
                            {
                               viseme = splittedString[1];
+
+                              if (Util.Constants.DEV_DEBUG)
+                                 Debug.Log($"Viseme spoken: {viseme}");
                            }
                         }
                         else if (reply.Equals(idStart))
@@ -632,8 +651,7 @@ namespace Crosstales.RTVoice.Provider
                else
                {
                   if (process.StartInfo.RedirectStandardOutput)
-                     Debug.LogError("Unexpected process output: " + reply + System.Environment.NewLine +
-                                    streamReader.ReadToEnd());
+                     Debug.LogError($"Unexpected process output: {reply}{System.Environment.NewLine}{streamReader.ReadToEnd()}");
                }
             }
          }
@@ -647,26 +665,7 @@ namespace Crosstales.RTVoice.Provider
       {
          get
          {
-            string appName;
-
-/*            
-            if (Util.Helper.isEditor)
-            {
-               if (System.IntPtr.Size == 4)
-               {
-                  appName = dataPath + Util.Constants.TTS_WINDOWS_SUBPATH;
-               }
-               else
-               {
-                  appName = dataPath + Util.Constants.TTS_WINDOWS_SUBPATH;
-               }
-            }
-            else
-            {
-               appName = dataPath + Util.Config.TTS_WINDOWS_BUILD;
-            }
-*/
-            appName = System.IntPtr.Size == 4 ? dataPath + Util.Constants.TTS_WINDOWS_x86_SUBPATH : dataPath + Util.Constants.TTS_WINDOWS_SUBPATH;
+            string appName = System.IntPtr.Size == 4 ? dataPath + Util.Constants.TTS_WINDOWS_x86_SUBPATH : dataPath + Util.Constants.TTS_WINDOWS_SUBPATH;
 
             if (appName.Contains("'"))
             {
@@ -878,7 +877,7 @@ namespace Crosstales.RTVoice.Provider
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -887,7 +886,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = applicationName;
                      process.StartInfo.Arguments = args;
 
-                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                      worker.Start();
 
                      silence = false;
@@ -917,7 +916,7 @@ namespace Crosstales.RTVoice.Provider
                }
                else
                {
-                  string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+                  string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
                   Debug.LogError(errorMessage);
                   onErrorInfo(wrapper, errorMessage);
                }
@@ -953,7 +952,7 @@ namespace Crosstales.RTVoice.Provider
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -962,7 +961,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = applicationName;
                      process.StartInfo.Arguments = args;
 
-                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                      worker.Start();
 
                      silence = false;
@@ -1000,7 +999,7 @@ namespace Crosstales.RTVoice.Provider
                }
                else
                {
-                  string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+                  string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
                   Debug.LogError(errorMessage);
                   onErrorInfo(wrapper, errorMessage);
                }
@@ -1013,7 +1012,7 @@ namespace Crosstales.RTVoice.Provider
          if (System.IO.File.Exists(applicationName))
          {
             System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>();
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
             using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -1092,7 +1091,7 @@ namespace Crosstales.RTVoice.Provider
          }
          else
          {
-            string errorMessage = "Could not find the TTS-wrapper: '" + applicationName + "'";
+            string errorMessage = $"Could not find the TTS-wrapper: '{applicationName}'";
             Debug.LogError(errorMessage);
          }
 

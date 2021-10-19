@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace CurvedUI
 {
@@ -8,7 +7,6 @@ namespace CurvedUI
     /// </summary>
     public class CUI_GunMovement : MonoBehaviour
     {
-
 #pragma warning disable 0649
         [SerializeField]
         CurvedUISettings mySettings;
@@ -16,29 +14,29 @@ namespace CurvedUI
         Transform pivot;
         [SerializeField]
         float sensitivity = 0.1f;
-        Vector3 lastMouse;
+        Vector2 lastMouse;
 #pragma warning restore 0649
 
         // Use this for initialization
-        void Start()
+        private void Start()
         {
-            lastMouse = Input.mousePosition;
+            lastMouse = CurvedUIInputModule.MousePosition;
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-
-            Vector3 mouseDelta = Input.mousePosition - lastMouse;
-            lastMouse = Input.mousePosition;
+            //find mouse delta
+            Vector3 mouseDelta = CurvedUIInputModule.MousePosition - lastMouse;
+            lastMouse = CurvedUIInputModule.MousePosition;
+            
+            //adjust transform angle
             pivot.localEulerAngles += new Vector3(-mouseDelta.y, mouseDelta.x, 0) * sensitivity;
-
-
-            //pass ray to canvas
-            Ray myRay = new Ray(this.transform.position, this.transform.forward);
-
+            
+            //pass ray and button state to CurvedUIInputModule
+            var myRay = new Ray(this.transform.position, this.transform.forward);
             CurvedUIInputModule.CustomControllerRay = myRay;
-            CurvedUIInputModule.CustomControllerButtonState = Input.GetButton("Fire1");
+            CurvedUIInputModule.CustomControllerButtonState = CurvedUIInputModule.LeftMouseButton;
         }
     }
 }

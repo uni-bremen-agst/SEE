@@ -1,6 +1,6 @@
 //
 //  RTVoiceIOSBridge.h
-//  Version 2021.2.5
+//  Version 2021.3.2
 //
 //  © 2016-2021 crosstales LLC (https://www.crosstales.com)
 //

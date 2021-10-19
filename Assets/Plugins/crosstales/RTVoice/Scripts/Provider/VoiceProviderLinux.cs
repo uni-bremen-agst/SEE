@@ -18,7 +18,7 @@ namespace Crosstales.RTVoice.Provider
       private const int defaultPitch = 50;
 
       private readonly System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>(100);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
       private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
 #endif
       private bool isLoading;
@@ -124,7 +124,7 @@ namespace Crosstales.RTVoice.Provider
 
                if (Util.Config.DEBUG)
                   Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -133,7 +133,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Speaker.Instance.ESpeakApplication;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -220,7 +220,7 @@ namespace Crosstales.RTVoice.Provider
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                   using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -229,7 +229,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = Speaker.Instance.ESpeakApplication;
                      process.StartInfo.Arguments = args;
 
-                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                     System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                      worker.Start();
 
                      silence = false;
@@ -304,7 +304,7 @@ namespace Crosstales.RTVoice.Provider
 
                if (Util.Config.DEBUG)
                   Debug.Log("Process arguments: " + args);
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -313,7 +313,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Speaker.Instance.ESpeakApplication;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -358,7 +358,7 @@ namespace Crosstales.RTVoice.Provider
       {
          base.Silence();
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
          foreach (System.Collections.Generic.KeyValuePair<string, Common.Util.CTProcess> kvp in processCreators)
          {
              if (kvp.Value.isBusy)
@@ -406,9 +406,7 @@ namespace Crosstales.RTVoice.Provider
          if (Speaker.Instance.ESpeakModifier == Model.Enum.ESpeakModifiers.none)
          {
             if (wrapper.Voice.Gender == Model.Enum.Gender.FEMALE)
-            {
                return wrapper.Voice?.Name + Util.Constants.ESPEAK_FEMALE_MODIFIER;
-            }
 
             return wrapper.Voice?.Name;
          }
@@ -421,7 +419,7 @@ namespace Crosstales.RTVoice.Provider
          voices.Clear();
 
          string args = "--voices" + (string.IsNullOrEmpty(Speaker.Instance.ESpeakDataPath) ? string.Empty : " --path=\"" + Speaker.Instance.ESpeakDataPath + '"');
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
          using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -549,7 +547,7 @@ namespace Crosstales.RTVoice.Provider
                if (Util.Config.DEBUG)
                   Debug.Log("Process arguments: " + args);
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -558,7 +556,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Speaker.Instance.ESpeakApplication;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -621,7 +619,7 @@ namespace Crosstales.RTVoice.Provider
                if (Util.Config.DEBUG)
                   Debug.Log("Process arguments: " + args);
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
                using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
@@ -630,7 +628,7 @@ namespace Crosstales.RTVoice.Provider
                   process.StartInfo.FileName = Speaker.Instance.ESpeakApplication;
                   process.StartInfo.Arguments = args;
 
-                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) {Name = wrapper.Uid};
+                  System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
                   worker.Start();
 
                   silence = false;
@@ -678,7 +676,7 @@ namespace Crosstales.RTVoice.Provider
          cachedVoices.Clear();
          string args = "--voices" + (string.IsNullOrEmpty(Speaker.Instance.ESpeakDataPath) ? string.Empty : " --path=\"" + Speaker.Instance.ESpeakDataPath + '"');
 
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
          using (Common.Util.CTProcess process = new Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())

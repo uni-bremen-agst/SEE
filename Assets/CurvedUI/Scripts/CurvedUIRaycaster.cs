@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Text;
 using Selectable = UnityEngine.UI.Selectable;
 
 namespace CurvedUI
@@ -201,6 +202,13 @@ namespace CurvedUI
 #region PHYSICS RAYCASTING
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
+            // StringBuilder sb = new StringBuilder();
+            // sb.Append(" Raycast with eventdata:");
+            // sb.Append(" pos:" + eventData.position);
+            // sb.Append(" delta:" + eventData.delta);
+            // sb.Append(" pointer press go: " + eventData.pointerPress?.name ?? "none");
+            // Debug.Log(sb.ToString());
+
             if (mySettings == null)
             {
                 base.Raycast(eventData, resultAppendList);
@@ -216,20 +224,16 @@ namespace CurvedUI
                 Debug.LogWarning("CurvedUI: No WORLD CAMERA assigned to Canvas " + this.gameObject.name + " to use for event processing!", myCanvas.gameObject);
                 return;
             }
-
-
+            
             //get a ray to raycast with depending on the control method
             cachedRay = CurvedUIInputModule.Instance.GetEventRay(myCanvas.worldCamera);
-
 
             //special case for GAZE and WORLD MOUSE
             if (CurvedUIInputModule.ControlMethod == CurvedUIInputModule.CUIControlMethod.GAZE)
                 UpdateSelectedObjects(eventData);
             else if (CurvedUIInputModule.ControlMethod == CurvedUIInputModule.CUIControlMethod.WORLD_MOUSE)
                 cachedRay = new Ray(myCanvas.worldCamera.transform.position, (mySettings.CanvasToCurvedCanvas(CurvedUIInputModule.Instance.WorldSpaceMouseInCanvasSpace) - myCanvas.worldCamera.transform.position)); 
-
-
-
+            
             //Create a copy of the eventData to be used by this canvas. 
             if (curEventData == null)
                 curEventData = new PointerEventData(EventSystem.current);
@@ -293,7 +297,6 @@ namespace CurvedUI
 
                 //if we got here, it means user is pointing at this canvas.
                 pointingAtCanvas = true;
-
 
                 //Creating eventData for canvas Raycasting -------------------//
                 //Which eventData were going to use?

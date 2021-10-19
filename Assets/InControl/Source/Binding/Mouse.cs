@@ -1,3 +1,5 @@
+using System;
+
 namespace InControl
 {
 	public enum Mouse : int
@@ -16,7 +18,11 @@ namespace InControl
 		Button5,
 		Button6,
 		Button7,
+
+		[Obsolete( "Mouse.Button8 is no longer supported and will be removed in a future version." )]
 		Button8,
+
+		[Obsolete( "Mouse.Button9 is no longer supported and will be removed in a future version." )]
 		Button9
 	}
 }

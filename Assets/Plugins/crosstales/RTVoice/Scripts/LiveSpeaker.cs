@@ -8,7 +8,7 @@ namespace Crosstales.RTVoice
    [HelpURL("https://www.crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_r_t_voice_1_1_live_speaker.html")]
    public class LiveSpeaker : MonoBehaviour
    {
-      private static readonly char[] splitChar = {';'};
+      private static readonly char[] splitChar = { ';' };
 
 
       #region Public methods
@@ -38,7 +38,7 @@ namespace Crosstales.RTVoice
       /// <param name="args">Argument index: 0 = text, 1 = culture (optional), 2 = voiceName (optional), 3 = rate (optional), 4 = pitch (optional), 5 = volume (optional).</param>
       public void SpeakNativeLive(string[] args)
       {
-         if (args != null && args.Length >= 1)
+         if (args?.Length >= 1)
          {
             string text = args[0];
 
@@ -128,7 +128,7 @@ namespace Crosstales.RTVoice
       /// <param name="args">Argument index: 0 = text, 1 = culture (optional), 2 = voiceName (optional), 3 = rate (optional), 4 = pitch (optional), 5 = volume (optional).</param>
       public void SpeakLive(string[] args)
       {
-         if (args != null && args.Length >= 1)
+         if (args?.Length >= 1)
          {
             string text = args[0];
 

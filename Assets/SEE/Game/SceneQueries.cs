@@ -36,12 +36,12 @@ namespace SEE.Game
                     }
                     else
                     {
-                        Debug.LogWarningFormat("Game node {0} has a null node reference.\n", go.name);
+                        Debug.LogWarning($"Game node {go.name} has a null node reference.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
+                    Debug.LogWarning($"Game node {go.name} without node reference.\n");
                 }
             }
             return result;
@@ -160,13 +160,22 @@ namespace SEE.Game
             return null;
         }
 
+        /// <summary>
+        /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
+        /// <see cref="Tags.Node"/>.
+        /// </summary>
         /// <param name="cityChildTransform">The child transform, to find the root for.</param>
         /// <returns>The root transform of given child, so the highest transform with the tag
         /// <see cref="Tags.Node"/>.</returns>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="cityChildTransform"/> is <c>null</c></exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
+            if (cityChildTransform == null)
+            {
+                throw new ArgumentNullException();
+            }
             Transform result = cityChildTransform;
-            while (result.parent.CompareTag(Tags.Node))
+            while (result.parent != null && result.parent.CompareTag(Tags.Node))
             {
                 result = result.parent;
             }

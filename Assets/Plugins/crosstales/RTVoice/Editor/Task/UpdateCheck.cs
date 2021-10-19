@@ -17,7 +17,7 @@ namespace Crosstales.RTVoice.EditorTask
 
       private static UpdateStatus status = UpdateStatus.NOT_CHECKED;
 
-      private static readonly char[] splitChar = {';'};
+      private static readonly char[] splitChar = { ';' };
 
       #endregion
 

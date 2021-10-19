@@ -30,6 +30,8 @@
 
    public delegate void SpeakCurrentWord(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex);
 
+   public delegate void SpeakCurrentWordString(Model.Wrapper wrapper, string word);
+
    public delegate void SpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme);
 
    public delegate void SpeakCurrentViseme(Model.Wrapper wrapper, string viseme);
