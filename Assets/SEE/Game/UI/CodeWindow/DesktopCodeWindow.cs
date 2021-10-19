@@ -124,7 +124,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             break;
                         case operationType.Delete:
-                            TextMeshInputField.text = TextMeshInputField.text.Remove(idx);
+                            TextMeshInputField.text = TextMeshInputField.text.Remove(idx, 1);
                             break;
                     }
                 }
