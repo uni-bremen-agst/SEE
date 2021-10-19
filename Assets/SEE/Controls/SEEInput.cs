@@ -107,6 +107,24 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Un-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowUndo()
+        {
+            return !KeyboardShortcutsEnabled && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) && Input.GetKeyDown(KeyBindings.Undo);
+        }
+
+        /// <summary>
+        /// Re-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowRedo()
+        {
+            return !KeyboardShortcutsEnabled && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) && Input.GetKeyDown(KeyBindings.Redo);
+        }
+
+        /// <summary>
         /// Whether the left or right shift key was pressed down (and not again released).
         /// </summary>
         private static bool isModPressed = false;

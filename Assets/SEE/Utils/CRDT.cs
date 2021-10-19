@@ -91,6 +91,19 @@ namespace SEE.Utils
             }
 
         }
+        /// <summary>
+        /// The crdt history contains all local add and delete char operations, as well as the remote deleteChar operations, because that can blockade a inverse operation of a local add char
+        /// It contains a CharObj[] (char + position) and a operationType (add or delete or remoteDelete).
+        /// </summary>
+
+        private Stack<(CharObj[], operationType)> undoStack = new Stack<(CharObj[], operationType)>();
+        private Stack<(CharObj[], operationType)> redoStack = new Stack<(CharObj[], operationType)>();
+
+
+        /// <summary>
+        /// The size of the crdt history
+        /// </summary>
+        private int historySize = 200;
 
         /// <summary>
         /// The ID 
@@ -110,7 +123,7 @@ namespace SEE.Utils
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
         /// </summary>
-        public UnityEvent<char,int, operationType> changeEvent = new UnityEvent<char, int, operationType>();
+        public UnityEvent<char, int, operationType> changeEvent = new UnityEvent<char, int, operationType>();
 
         /// <summary>
         /// Constructs a CRDT
@@ -126,6 +139,8 @@ namespace SEE.Utils
         {
             return crdt;
         }
+
+
 
         /// <summary>
         /// The Remoteoperation to add a Char from another CRDT/client
@@ -194,10 +209,15 @@ namespace SEE.Utils
         /// <param name="endIdx">The end index</param>
         public void DeleteString(int startIdx, int endIdx)
         {
+            List<CharObj> charObjs = new List<CharObj>();
             for (int i = endIdx; i >= startIdx; i--)
             {
+                charObjs.Add(crdt[i]);
                 DeleteChar(i);
             }
+
+            undoStack.Push((charObjs.ToArray(), operationType.Delete));
+            redoStack.Clear();
         }
 
         /// <summary>
@@ -225,10 +245,14 @@ namespace SEE.Utils
         /// <param name="dontSyncCodeWindowChars"></param>
         public void AddString(string s, int startIdx)
         {
+            List<CharObj> charObjs = new List<CharObj>();
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx);
+                charObjs.Add(crdt[i]);
             }
+            undoStack.Push((charObjs.ToArray(), operationType.Add));
+            redoStack.Clear();
         }
 
         /// <summary>
@@ -456,11 +480,11 @@ namespace SEE.Utils
         private Identifier[] FromIEnumToIdentifier(IEnumerable<Identifier> ienum)
         {
             Identifier[] ret = new Identifier[ienum.Count()];
-            for(int i = 0; i < ienum.Count() ; i++)
+            for (int i = 0; i < ienum.Count(); i++)
             {
-                ret[i] = ienum.ElementAt(i); 
+                ret[i] = ienum.ElementAt(i);
             }
-            
+
             return ret;
         }
 
@@ -610,6 +634,94 @@ namespace SEE.Utils
             return -1;
         }
 
+
+        public void Undo()
+        {
+            if (undoStack.Count < 1) return;
+            (CharObj[], operationType) lastOperation = undoStack.Pop();
+            switch (lastOperation.Item2)
+            {
+                case operationType.Add:
+                    foreach (CharObj c in lastOperation.Item1)
+                    {
+                        int idx = GetIndexByPosition(c.GetIdentifier());
+                        if (idx > -1)
+                        {
+                            DeleteChar(idx);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Undo not possible, Char is already deleted!");
+                        }
+                    }
+                    redoStack.Push((lastOperation.Item1, operationType.Delete));
+                    break;
+                case operationType.Delete:
+                    foreach (CharObj c in lastOperation.Item1)
+                    {
+                        internalAddCharObj(c);
+                    }
+                    redoStack.Push((lastOperation.Item1, operationType.Add));
+                    break;
+            }
+        }
+
+        public void Redo()
+        {
+            if (redoStack.Count < 1) return;
+            (CharObj[], operationType) lastOperation = redoStack.Pop();
+            switch (lastOperation.Item2)
+            {
+                case operationType.Add:
+                    foreach (CharObj c in lastOperation.Item1)
+                    {
+                        int idx = GetIndexByPosition(c.GetIdentifier());
+                        if (idx > -1)
+                        {
+                            DeleteChar(idx);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Undo not possible, Char is already deleted!");
+                        }
+                    }
+                    undoStack.Push((lastOperation.Item1, operationType.Delete));
+                    break;
+                case operationType.Delete:
+                    foreach (CharObj c in lastOperation.Item1)
+                    {
+                        internalAddCharObj(c);
+                    }
+                    undoStack.Push((lastOperation.Item1, operationType.Add));
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// ReAdds a existing CharObj into the crdt, used for undo and redo
+        /// </summary>
+        /// <param name="c">The CharObj that should be added</param>
+        private void internalAddCharObj(CharObj c)
+        {
+            int index = FindNextFittingIndex(c.GetIdentifier(), 0);
+            if (index < crdt.Count)
+            {
+                crdt.Insert(index, c);
+            }
+            else
+            {
+                crdt.Add(c);
+            }
+
+            if (index - 1 >= 0)
+            {
+                new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), crdt[index - 1].GetIdentifier(), filename);
+            }
+            else
+            {
+                new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), null, filename);
+            }
+        }
         /// <summary>
         /// Transforms an string into a position
         /// </summary>

@@ -85,6 +85,15 @@ namespace SEE.Utils
         {
             return GetInstanceByName(file).changeEvent;
         }
-        //TODO COMPLETE
+        
+        public static void Undo(string file)
+        {
+            GetInstanceByName(file).Undo();
+        }
+
+        public static void Redo(string file)
+        {
+            GetInstanceByName(file).Redo();
+        }
     }
 }
