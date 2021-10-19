@@ -20,7 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.Evolution;
@@ -45,7 +45,7 @@ namespace SEE.Game
     /// Assumption: This EvolutionRenderer is attached to a game object representing a code
     /// city that has another component of type SEECityEvolution.
     /// </summary>
-    public class EvolutionRenderer : MonoBehaviour
+    public partial class EvolutionRenderer : MonoBehaviour
     {
         /// <summary>
         /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
@@ -65,14 +65,7 @@ namespace SEE.Game
                 Assert.IsNotNull(graphRenderer);
                 diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
-                Dictionary<Difference, Color> beamColor = new Dictionary<Difference, Color>
-                {
-                    { Difference.Added, cityEvolution.AdditionBeamColor },
-                    { Difference.Changed, cityEvolution.ChangeBeamColor },
-                    { Difference.Deleted, cityEvolution.DeletionBeamColor },
-                };
 
-                moveScaleShakeAnimator = new MoveScaleShakeAnimator(beamColor, beamScale);
                 objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
                 marker = new Marker(graphRenderer,
                                     markerWidth: cityEvolution.MarkerWidth,
@@ -82,6 +75,8 @@ namespace SEE.Game
                                     deletionColor: cityEvolution.DeletionBeamColor,
                                     duration: AnimationLag);
                 RegisterAllAnimators(animators);
+                phase1AnimationWatchDog = new Phase1AnimationWatchDog(this);
+                phase2AnimationWatchDog = new Phase2AnimationWatchDog(this);
             }
             else
             {
@@ -89,6 +84,12 @@ namespace SEE.Game
                 enabled = false;
             }
         }
+
+        /// <summary>
+        /// The y co-ordinate where to to move deleted nodes in world space. Deleted nodes will
+        /// be lifted to this level and then disappear.
+        /// </summary>
+        private const float SkyLevel = 2.0f;
 
         /// <summary>
         /// The graph renderer used to draw a single graph and the later added nodes and edges.
@@ -118,47 +119,6 @@ namespace SEE.Game
         private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The city evolution to be drawn by this renderer.
-        /// </summary>
-        //public SEECityEvolution CityEvolution
-        //{
-        //    set
-        //    {
-        //        if (gameObject.TryGetComponent<SEECityEvolution>(out SEECityEvolution cityEvolution))
-        //        {
-        //            // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-        //            // So we cannot make the following assignment in the constructor. Neither
-        //            // can we assign this value at the declaration of graphRenderer because
-        //            // we need the city argument, which comes only later. Anyhow, whenever we
-        //            // assign a new city, we also need a new graph renderer for that city.
-        //            // So in fact this is the perfect place to assign graphRenderer.
-        //            graphRenderer = new GraphRenderer(value, null);
-        //            Assert.IsNotNull(graphRenderer);
-        //            diff = new NumericAttributeDiff(value.AllMetricAttributes());
-        //            Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
-        //            objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
-        //            marker = new Marker(graphRenderer,
-        //                                markerWidth: cityEvolution.MarkerWidth,
-        //                                markerHeight: cityEvolution.MarkerHeight,
-        //                                additionColor: cityEvolution.AdditionBeamColor,
-        //                                changeColor: cityEvolution.ChangeBeamColor,
-        //                                deletionColor: cityEvolution.DeletionBeamColor,
-        //                                duration: AnimationLag);
-        //        }
-        //        else
-        //        {
-        //            Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
-        //            enabled = false;
-        //        }
-        //    }
-        //}
-
-        /// <summary>
-        /// Shortest time period in which an animation can be run in seconds.
-        /// </summary>
-        private const float MinimalWaitTimeForNextRevision = 0.1f;
-
-        /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
         /// graph has changed.
         /// </summary>
@@ -169,29 +129,30 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// An event fired upon the start of an animation.
-        /// </summary>
-        public readonly UnityEvent AnimationStartedEvent = new UnityEvent();
-
-        /// <summary>
         /// An event fired upon the end of an animation.
         /// </summary>
-        public readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
+        private readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
 
         /// <summary>
-        /// Used to store whether a node has been born or changed.
+        /// The animator used when an inner node is removed from the scene
+        /// and also for animating the new plane.
+        ///
+        /// Note: We split the animation in halves for the first phase of
+        /// removing nodes and the second phase of drawing the nodes of
+        /// the next graph.
         /// </summary>
-        private enum MarkerType { Changed, Born }
+        private readonly AbstractAnimator moveAnimator
+            = new MoveAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
-        /// The animator used when an inner node is removed from the scene.
+        /// An animator used for all other occasions (new nodes, existing nodes, changed nodes).
+        ///
+        /// Note: We split the animation in halves for the first phase of
+        /// removing nodes and the second phase of drawing the nodes of
+        /// the next graph.
         /// </summary>
-        protected readonly AbstractAnimator moveAnimator = new MoveAnimator();
-
-        /// <summary>
-        /// An animator used for all other occasions. Will be set in Start().
-        /// </summary>
-        protected AbstractAnimator moveScaleShakeAnimator;
+        private AbstractAnimator changeAndBirthAnimator
+            = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
         /// Whether the edge animation is ongoing.
@@ -222,19 +183,19 @@ namespace SEE.Game
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float _animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
+        private float animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
 
         /// <summary>
         /// The duration of an animation.
         /// </summary>
         public float AnimationDuration
         {
-            get => _animationDuration;
+            get => animationDuration;
             set
             {
                 if (value >= 0)
                 {
-                    _animationDuration = value;
+                    animationDuration = value;
                     animators.ForEach(animator =>
                     {
                         animator.MaxAnimationTime = value;
@@ -247,17 +208,7 @@ namespace SEE.Game
         /// <summary>
         /// The city (graph + layout) currently shown.
         /// </summary>
-        private LaidOutGraph _currentCity;  // not serialized by Unity
-
-        /// <summary>
-        /// The underlying graph of the city currently shown.
-        /// </summary>
-        protected Graph CurrentGraphShown => _currentCity?.Graph;
-        /// <summary>
-        /// The layout of the city currently shown. The layout is a mapping of the graph
-        /// nodes' IDs onto their layout nodes.
-        /// </summary>
-        protected Dictionary<string, ILayoutNode> CurrentLayoutShown => _currentCity?.Layout;  // not serialized by Unity
+        private LaidOutGraph currentCity;  // not serialized by Unity
 
         /// <summary>
         /// Evaluates the performance of the edge animation.
@@ -272,20 +223,13 @@ namespace SEE.Game
         /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
-        private LaidOutGraph _nextCity;  // not serialized by Unity
-        /// <summary>
-        /// The next city (graph + layout) to be shown.
-        /// Note: 'next' does not necessarily mean that it is a graph coming later in the
-        /// series of the graph evolution. It just means that this is the next graph to
-        /// be shown. If the user goes backward in time, _nextCity is actually an older
-        /// graph.
-        /// </summary>
-        protected Graph NextGraphToBeShown => _nextCity?.Graph;  // not serialized by Unity
+        private LaidOutGraph nextCity;  // not serialized by Unity
+
         /// <summary>
         /// The layout of _nextGraph. The layout is a mapping of the graph
         /// nodes' IDs onto their ILayoutNodes.
         /// </summary>
-        protected Dictionary<string, ILayoutNode> NextLayoutToBeShown => _nextCity?.Layout;  // not serialized by Unity
+        private Dictionary<string, ILayoutNode> NextLayoutToBeShown => nextCity?.Layout;  // not serialized by Unity
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -295,22 +239,7 @@ namespace SEE.Game
         /// <summary>
         /// Saves the names of the game objects representing nodes that were not moved during an iteration.
         /// </summary>
-        private ISet<string> negligibleNodes = new HashSet<string>();
-
-        /// <summary>
-        /// List for saving the copied nodes. Is used for animation.
-        /// </summary>
-        private readonly IList<GameObject> animationNodes = new List<GameObject>();
-
-        /// <summary>
-        /// List for saving the deactivated nodes. Is used for animation.
-        /// </summary>
-        private readonly IList<GameObject> currentNodes = new List<GameObject>();
-
-        /// <summary>
-        /// List to add markers to the animated nodes afterwards.
-        /// </summary>
-        private readonly IList<(GameObject, MarkerType)> animationMarker = new List<(GameObject, MarkerType)>();
+        private readonly ISet<string> negligibleNodes = new HashSet<string>();
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
@@ -396,6 +325,7 @@ namespace SEE.Game
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
             GraphRenderer.Fit(gameObject, layoutNodes);
+            GraphRenderer.Stack(gameObject, layoutNodes);
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to
@@ -486,7 +416,7 @@ namespace SEE.Game
             // may still be contained in the scene and objectManager. We need to clean up
             // first.
             objectManager?.Clear();
-            RenderGraph(_currentCity, graph);
+            RenderGraph(currentCity, graph);
         }
 
         /// <summary>
@@ -504,7 +434,6 @@ namespace SEE.Game
                 Debug.Log("Graph changes are blocked while animations are running.\n");
                 return;
             }
-            MoveScaleShakeAnimator.DeletePowerBeams();
             RenderGraph(current, next);
         }
 
@@ -517,33 +446,102 @@ namespace SEE.Game
         {
             negligibleNodes.Clear();
             next.AssertNotNull("next");
+
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
             marker.Clear();
-            AnimationStartedEvent.Invoke();
-            if (current != null)
-            {
-                // For all nodes of the current graph not in the next graph; that is, all
-                // nodes removed: remove those. Note: The comparison is based on the
-                // IDs of the nodes because nodes between two graphs must be different
-                // even if they denote the "logically same" node.
-                current.Graph?
-                    .Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList()
-                    .ForEach(node =>
-                    {
-                        RenderRemovedNode(node);
-                    });
+            Phase1RemoveDeletedGraphElements(current, next);
+        }
 
-                // For all edges of the current graph not in the next graph; that is, all
-                // edges removed: remove those. As above, edges are compared by their
-                // IDs.
-                current.Graph?
-                    .Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList()
-                    .ForEach(RenderRemovedOldEdge);
+        /// <summary>
+        /// Implements the first phase of the transition from the <paramref name="current"/> graph to
+        /// the <paramref name="next"/> graph in which nodes and edges present in <paramref name="current"/>
+        /// but not in <paramref name="next"/> (in other words, the deleted nodes and edges) are removed.
+        /// When all animations triggered in this first phase have completed, execution will continue with
+        /// <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/>.
+        ///
+        /// The mechanism to call <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/> is
+        /// as follows. The <see cref="phase1AnimationWatchDog"/> is set up to await the
+        /// deletion of nodes and edges in <paramref name="current"/> but not in <paramref name="next"/>.
+        /// Then the methods implementing this deletion will be called for each graph element to
+        /// be deleted; these are <see cref="RenderRemovedNode(Node)"/> and <see cref="RenderRemovedEdge(Edge)"/>,
+        /// respectively. When the animation of the deletion triggered by these has finished, each
+        /// will signal the <see cref="phase1AnimationWatchDog"/> its completion. The <see cref="phase1AnimationWatchDog"/>
+        /// awaits all outstanding deletions and then finally calls
+        /// <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/>.
+        ///
+        /// Note: <paramref name="next"/> will be a graph for the previous revision of
+        /// <paramref name="current"/> in the graph series when the evolution visualization
+        /// is played backward.
+        /// </summary>
+        /// <param name="current">the currently shown graph</param>
+        /// <param name="next">the next graph to be shown</param>
+        private void Phase1RemoveDeletedGraphElements(LaidOutGraph current, LaidOutGraph next)
+        {
+            if (current != null && current.Graph != null)
+            {
+                // The set of nodes of the current graph not in the other graph, in other words,
+                // the set of deleted nodes.
+                // Note: The comparison is based on the IDs of the nodes because nodes between
+                // two graphs must be different even if they denote the "logically same" node.
+                List<Node> deletedNodes = current.Graph.Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList();
+
+                // The set of edges of the current graph not in the next graph; that is, all
+                // edges removed. As above, edges are compared by their IDs.
+                List<Edge> deletedEdges = current.Graph.Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList();
+
+                int deletedGraphElements = deletedNodes.Count + deletedEdges.Count;
+                if (deletedGraphElements > 0)
+                {
+                    phase1AnimationWatchDog.Await(deletedGraphElements, next);
+
+                    // Remove those nodes.
+                    deletedNodes.ForEach(RenderRemovedNode);
+                    // Remove those edges.
+                    deletedEdges.ForEach(RenderRemovedEdge);
+                }
+                else
+                {
+                    // To trigger the next phase where new and existing edges are to be drawn.
+                    phase1AnimationWatchDog.Skip(next);
+                }
             }
-            // We need to assign _nextCity because the callback RenderPlane, RenderInnerNode, RenderLeaf, and
-            // RenderEdge will access it.
-            _nextCity = next;
+            else
+            {
+                // To trigger the next phase where new and existing edges are to be drawn.
+                phase1AnimationWatchDog.Skip(next);
+            }
+            /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
+            /// when phase 1 has completed (or skipped).
+        }
+
+        /// <summary>
+        /// Implements the second phase in the transition from the current to the <paramref name="next"/>
+        /// graph. In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
+        /// either new or existing nodes (the latter being nodes that have been present in the
+        /// currently drawn graph). When this phase has been completed, <see cref="OnAnimationsFinished"/>
+        /// will be called eventually.
+        ///
+        /// To make sure that <see cref="OnAnimationsFinished"/> is called only when all nodes
+        /// have been drawn, <see cref="phase2AnimationWatchDog"/> will be used. It will be
+        /// set up to await the number of nodes present in <paramref name="next"/>. Then
+        /// <see cref="RenderNode(Node)"/> or <see cref="IgnoreNode(Node)"/>, respectively, will be
+        /// called for each such node. These in turn will signal <see cref="phase2AnimationWatchDog"/>
+        /// when they have finished. When all outstanding node additions have been completed,
+        /// <see cref="phase2AnimationWatchDog"/> will call <see cref="OnAnimationsFinished"/>.
+        ///
+        /// Note: <paramref name="next"/> will be a graph for the previous revision of
+        /// the currently drawn graph in the graph series when the evolution visualization
+        /// is played backward.
+        /// </summary>
+        /// <param name="next">the next graph to be drawn</param>
+        private void Phase2AddNewAndExistingGraphElements(LaidOutGraph next)
+        {
+            /// We need to assign _nextCity because the callbacks <see cref="RenderPlane"/>
+            /// and <see cref="RenderNode(Node)"/> will access it.
+            nextCity = next;
+
+            phase2AnimationWatchDog.Await(next.Graph.NodeCount);
             // Draw all nodes of next graph.
             if (ignoreInnerNodes)
             {
@@ -556,13 +554,102 @@ namespace SEE.Game
             }
 
             objectManager.NegligibleNodes = negligibleNodes;
-            // FOR ANIMATION: next.Graph.Edges().ForEach(RenderEdge);
 
             // We have made the transition to the next graph.
-            _currentCity = next;
-            RenderPlane();
+            currentCity = next;
             MoveEdges();
-            Invoke("OnAnimationsFinished", Math.Max(AnimationDuration, MinimalWaitTimeForNextRevision));
+
+            /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="phase2AnimationWatchDog"/>
+            /// when phase 2 has completed.
+        }
+
+        /// <summary>
+        /// Watchdog triggering <see cref="Phase2AddNewAndExistingGraphElements"/> when phase 1 has been
+        /// completed, in which the necessary nodes and edges are deleted.
+        /// </summary>
+        private Phase1AnimationWatchDog phase1AnimationWatchDog;
+
+        /// <summary>
+        /// Watchdog triggering <see cref="OnAnimationsFinished"/> when phase 2 has been
+        /// completed, in which the nodes and edges of the next graph to be shown are drawn.
+        /// </summary>
+        private Phase2AnimationWatchDog phase2AnimationWatchDog;
+
+        /// <summary>
+        /// Updates the hierarchy of game nodes so that it is isomorphic to the node
+        /// hierarchy of the underlying graph.
+        /// </summary>
+        private void UpdateGameNodeHierarchy()
+        {
+            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
+            CollectNodes(gameObject, nodeMap);
+            // Check(nodeMap);
+            GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
+        }
+
+        /// <summary>
+        /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
+        /// members of the same graph. Emits warnings and asserts that they are all in
+        /// the same graph.
+        /// Used only for debugging.
+        /// </summary>
+        /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
+        private static void Check(Dictionary<Node, GameObject> nodeMap)
+        {
+            HashSet<Graph> graphs = new HashSet<Graph>();
+
+            foreach (GameObject go in nodeMap.Values)
+            {
+                graphs.Add(go.GetNode().ItsGraph);
+            }
+            foreach (Node node in nodeMap.Keys)
+            {
+                graphs.Add(node.ItsGraph);
+            }
+            if (graphs.Count > 1)
+            {
+                Debug.LogError("There are nodes from different graphs in the same game-node hierarchy!\n");
+                foreach (GameObject go in nodeMap.Values)
+                {
+                    Node node = go.GetNode();
+                    Debug.LogWarning($"Node {node.ID} contained in graph {node.ItsGraph.Name} from file {node.ItsGraph.Path}\n");
+                }
+            }
+            Assert.AreEqual(1, graphs.Count);
+        }
+
+        /// <summary>
+        /// Collects all graph nodes and their corresponding game nodes that are (transitive)
+        /// descendants of <paramref name="root"/>. The result is added to <paramref name="nodeMap"/>,
+        /// where the <paramref name="root"/> itself will not be added.
+        /// </summary>
+        /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
+        /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
+        /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
+        private static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
+        {
+            if (root != null)
+            {
+                foreach (Transform childTransform in root.transform)
+                {
+                    GameObject child = childTransform.gameObject;
+                    /// If a game node was deleted, it was marked inactive in
+                    /// <see cref="OnRemovedNodeFinishedAnimation"/>. We need to ignore such
+                    /// game nodes.
+                    if (child.activeInHierarchy && child.CompareTag(Tags.Node))
+                    {
+                        if (child.TryGetNodeRef(out NodeRef nodeRef))
+                        {
+                            nodeMap[nodeRef.Value] = child;
+                            CollectNodes(child, nodeMap);
+                        }
+                        else
+                        {
+                            throw new Exception($"Game node {child.name} without valid node reference.");
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -579,31 +666,6 @@ namespace SEE.Game
         /// </summary>
         private void OnAnimationsFinished()
         {
-            // Activates the nodes that were deactivated for the animation
-            foreach (GameObject currentNode in currentNodes)
-            {
-                currentNode.SetActive(true);
-            }
-            // Adds a marker to the nodes
-            foreach ((GameObject, MarkerType) nodeMarker in animationMarker)
-            {
-                switch (nodeMarker.Item2)
-                {
-                    case MarkerType.Changed:
-                        marker.MarkChanged(nodeMarker.Item1);
-                        break;
-                    case MarkerType.Born:
-                        marker.MarkBorn(nodeMarker.Item1);
-                        break;
-                    default:
-                        throw new NotImplementedException($"Unhandled case {nodeMarker.Item2}.");
-                }
-            }
-            // Clears all lists relevant for the animation of the nodes
-            animationNodes.Clear();
-            currentNodes.Clear();
-            animationMarker.Clear();
-
             // Destroy all previous edges and draw all edges of next graph. This can only
             // be done when nodes have reached their final position, that is, at the end
             // of the animation cycle.
@@ -611,15 +673,22 @@ namespace SEE.Game
 
             // Stops the edge animation
             moveEdges = false;
+
+            NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
+            nodeChangesBuffer.currentRevisionCounter = currentGraphRevisionCounter;
+            nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
+            nodeChangesBuffer.addedNodeIDs.Clear();
+            nodeChangesBuffer.changedNodeIDsCache = new List<string>(nodeChangesBuffer.changedNodeIDs);
+            nodeChangesBuffer.changedNodeIDs.Clear();
+            nodeChangesBuffer.removedNodeIDsCache = new List<string>(nodeChangesBuffer.removedNodeIDs);
+            nodeChangesBuffer.removedNodeIDs.Clear();
+
+            UpdateGameNodeHierarchy();
+            RenderPlane();
+            DestroyDeletedNodes();
+
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
-            NodeChangesBuffer.GetSingleton().currentRevisionCounter = currentGraphRevisionCounter;
-            NodeChangesBuffer.GetSingleton().addedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().addedNodeIDs);
-            NodeChangesBuffer.GetSingleton().addedNodeIDs.Clear();
-            NodeChangesBuffer.GetSingleton().changedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().changedNodeIDs);
-            NodeChangesBuffer.GetSingleton().changedNodeIDs.Clear();
-            NodeChangesBuffer.GetSingleton().removedNodeIDsCache = new List<string>(NodeChangesBuffer.GetSingleton().removedNodeIDs);
-            NodeChangesBuffer.GetSingleton().removedNodeIDs.Clear();
         }
 
         /// <summary>
@@ -627,16 +696,16 @@ namespace SEE.Game
         /// so they can be updated accordingly.
         /// </summary>
         /// <param name="animators">list of animators to be informed</param>
-        protected virtual void RegisterAllAnimators(IList<AbstractAnimator> animators)
+        private void RegisterAllAnimators(IList<AbstractAnimator> animators)
         {
-            animators.Add(moveScaleShakeAnimator);
+            animators.Add(changeAndBirthAnimator);
             animators.Add(moveAnimator);
         }
 
         /// <summary>
         /// Renders a plane enclosing all game objects of the currently shown graph.
         /// </summary>
-        protected virtual void RenderPlane()
+        private void RenderPlane()
         {
             bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
             if (!isPlaneNew)
@@ -644,9 +713,8 @@ namespace SEE.Game
                 // We are re-using the existing plane, hence, we animate its change
                 // (new position and new scale).
                 objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-
-                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime);
-                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime);
+                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime / 2);
+                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime / 2);
             }
         }
 
@@ -656,7 +724,7 @@ namespace SEE.Game
         /// <param name="left">First edge to be checked</param>
         /// <param name="right">Second edge to be checked</param>
         /// <returns>true if both edges are equal</returns>
-        protected virtual bool AreEqualGameEdges(GameObject left, GameObject right)
+        private bool AreEqualGameEdges(GameObject left, GameObject right)
         {
             return left.TryGetComponent(out EdgeRef leftEdgeRef)
                 && right.TryGetComponent(out EdgeRef rightEdgeRef)
@@ -669,7 +737,7 @@ namespace SEE.Game
         /// <param name="oldEdges">List of currently drawn edges</param>
         /// <param name="newEdges">List of new edges to be drawn</param>
         /// <returns>List of related edges</returns>
-        protected virtual void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
+        private void EdgeMatcher(IList<GameObject> oldEdges, IList<GameObject> newEdges)
         {
             matchedEdges = new List<(GameObject, GameObject)>();
             foreach (GameObject newEdge in newEdges)
@@ -685,7 +753,7 @@ namespace SEE.Game
         /// <summary>
         /// Calculates the control points of the edges of the next graph and generates their actual line points from them.
         /// </summary>
-        protected virtual void MoveEdges()
+        private void MoveEdges()
         {
             try
             {
@@ -697,7 +765,7 @@ namespace SEE.Game
                 EdgeMatcher(oldEdges, newEdges);
 
                 // Case distinction in case the layout does not need sample points.
-                if (graphRenderer.settings.edgeLayoutSettings.kind != EdgeLayoutKind.Straight && newEdges.Count() != 0)
+                if (graphRenderer.settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.Straight && newEdges.Count() != 0)
                 {
                     foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
@@ -829,23 +897,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Event function that adjusts the given <paramref name="gameNode"/>
-        /// according to is attached node's color (style) metric.
-        /// It will be called as a callback after the animation of a node to be
-        /// rendered has been finished (see RenderNode()). The animation will
-        /// adjust the game object's scale and position, but not its style.
-        /// Here we adjust the style.
-        /// </summary>
-        /// <param name="gameNode">game node object that was just modified by the animation</param>
-        public void OnRenderNodeFinishedAnimation(object gameNode)
-        {
-            if (gameNode is GameObject node)
-            {
-                graphRenderer.AdjustStyle(node);
-            }
-        }
-
-        /// <summary>
         /// Returns true if the x and z co-ordindates of the two vectors are approximately equal.
         /// </summary>
         /// <param name="v1">First vector</param>
@@ -869,9 +920,10 @@ namespace SEE.Game
         /// layouts).
         /// </summary>
         /// <param name="node">node to be displayed</param>
-        protected void IgnoreNode(Node node)
+        private void IgnoreNode(Node node)
         {
             // intentionally left blank
+            phase2AnimationWatchDog.Finished();
         }
 
         /// <summary>
@@ -879,21 +931,12 @@ namespace SEE.Game
         /// by creating a copy of the GameObject that is used during the animation.
         /// </summary>
         /// <param name="graphNode">graph node to be displayed</param>
-        protected virtual void RenderNode(Node graphNode)
+        private void RenderNode(Node graphNode)
         {
             // The layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
-
-            // Copy of the currentGameNode. This copy will be used during the animation on behalf of currentGameNode.
-            GameObject animationNode = Instantiate(currentGameNode);
-            // The copied node is added to list animationNodes so that it can be deleted after animation.
-            animationNodes.Add(animationNode);
-            // The actual node is added to list currentNodes so that it can be reactivated after animation.
-            currentNodes.Add(currentGameNode);
-            // Hide the actual node during the animation.
-            currentGameNode.SetActive(false);
 
             Difference difference;
             if (formerGraphNode == null)
@@ -909,12 +952,11 @@ namespace SEE.Game
                 // Revert the change to the y co-ordindate.
                 position.y += layoutNode.LocalScale.y;
                 layoutNode.CenterPosition = position;
-                animationMarker.Add((currentGameNode, MarkerType.Born));
                 difference = Difference.Added;
 
                 // Set the layout for the copied node.
-                animationNode.transform.localScale = layoutNode.LocalScale;
-                animationNode.transform.position = layoutNode.CenterPosition;
+                currentGameNode.transform.localScale = layoutNode.LocalScale;
+                currentGameNode.transform.position = layoutNode.CenterPosition;
             }
             else
             {
@@ -927,20 +969,68 @@ namespace SEE.Game
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {
                     difference = Difference.Changed;
-                    animationMarker.Add((currentGameNode, MarkerType.Changed));
                 }
                 else
                 {
                     difference = Difference.None;
                 }
-                // Set the layout for the copied node.
-                animationNode.transform.localScale = new Vector3(currentGameNode.transform.localScale.x, 0.0001f, currentGameNode.transform.localScale.z);
-                animationNode.transform.position = currentGameNode.transform.position;
             }
-            // The actual node is shifted to its new position.
-            graphRenderer.Apply(currentGameNode, gameObject, layoutNode);
-            // The copied node is animated.
-            moveScaleShakeAnimator.AnimateTo(animationNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
+            switch (difference)
+            {
+                case Difference.Changed:
+                    NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
+                    marker.MarkChanged(currentGameNode);
+                    break;
+                case Difference.Added:
+                    marker.MarkBorn(currentGameNode);
+                    break;
+            }
+            // we want the animator to move each node separately, which is why we
+            // remove each from the hierarchy; later the node hierarchy will be
+            // re-established
+            RemoveFromNodeHierarchy(currentGameNode);
+            // currentGameNode is shifted to its new position through the animator.
+            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
+        }
+
+        /// <summary>
+        /// Removes <paramref name="currentGameNode"/> from the game-object hierarchy,
+        /// that is, its parent will be set to <code>null</code> and all its immediate
+        /// children tagged by <see cref="Tags.Node"/> will no longer be its children,
+        /// that is, their parent is set to <code>null</code>, too.
+        /// </summary>
+        /// <param name="currentGameNode">a game node to be removed from the game-object hierarchy</param>
+        private static void RemoveFromNodeHierarchy(GameObject currentGameNode)
+        {
+            currentGameNode.transform.SetParent(null);
+            foreach (Transform child in currentGameNode.transform)
+            {
+                if (child.CompareTag(Tags.Node))
+                {
+                    child.SetParent(null);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The list of game nodes that were removed from the current graph to the next
+        /// graph. They will need to be destroyed at the end of phase 1 (or at the beginning
+        /// of phase 2, respectively).
+        /// <seealso cref="DestroyDeletedNodes"/>.
+        /// </summary>
+        private IList<GameObject> toBeDestroyed = new List<GameObject>();
+
+        /// <summary>
+        /// Destroys all game nodes in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
+        /// will be cleared at the end.
+        /// </summary>
+        private void DestroyDeletedNodes()
+        {
+            foreach (GameObject gameObject in toBeDestroyed)
+            {
+                DestroyGameObject(gameObject);
+            }
+            toBeDestroyed.Clear();
         }
 
         /// <summary>
@@ -951,48 +1041,85 @@ namespace SEE.Game
         /// <param name="gameObject">game object to be destroyed</param>
         private void OnRemovedNodeFinishedAnimation(object gameObject)
         {
-            DestroyGameObject(gameObject);
+            GameObject go = gameObject as GameObject;
+            /// The gameObject must not be destroyed immediately, because the animator still
+            /// accesses it. Therefore, we defer the destruction and just add it to
+            /// <see cref="toBeDestroyed"/>.
+            toBeDestroyed.Add(go);
+            /// We set the game object inactive. This will later be considered in
+            /// <see cref="CollectNodes(GameObject, Dictionary{Node, GameObject})"/>,
+            /// where inactive objects will be ignored (because they are considered
+            /// deleted).
+            go.SetActive(false);
+            phase1AnimationWatchDog.Finished();
         }
 
         /// <summary>
-        /// Event function that destroys the given <paramref name="gameObject"/>.
-        /// Called as a callback and deletes the <paramref name="gameObject"/>
-        /// after the animation is finished.
+        /// Event function that adds the given <paramref name="gameNode"/>
+        /// to <see cref="gameObject"/> as a child if <paramref name="gameNode"/>
+        /// is a <see cref="GameObject"/> and has no parent yet. Informs
+        /// <see cref="phase2AnimationWatchDog"/> that this animation has been finished.
+        /// Called as a callback when the animation of new and existing
+        /// nodes is finished. <see cref="RenderNode(Node)"/>.
         /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
-        private void OnAnimationNodeAnimationFinished(object gameObject)
+        /// <param name="gameNode">new or existing game object representing a graph node</param>
+        private void OnAnimationNodeAnimationFinished(object gameNode)
         {
-            DestroyGameObject(gameObject);
+            if (gameNode is GameObject go && go.transform.parent == null)
+            {
+                /// We will just put this game object under <see cref="gameObject"/>
+                /// (the game object representing the city as a whole) as a child. When
+                /// the animation is over and all nodes have reached their destination,
+                /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
+                /// actual logical game-node parent.
+                go.transform.SetParent(gameObject.transform);
+            }
+            phase2AnimationWatchDog.Finished();
         }
 
         /// <summary>
         /// Destroys <paramref name="gameObject"/> if it is an instance of <see cref="GameObject"/>.
+        /// The ancestors of <paramref name="gameObject"/> will not be destroyed; their parent will
+        /// just be set to null.
         /// </summary>
         /// <param name="gameObject">object to be destroyed</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void DestroyGameObject(object gameObject)
         {
             if (gameObject is GameObject go)
             {
+                foreach (Transform child in go.transform)
+                {
+                    if (child.CompareTag(Tags.Node))
+                    {
+                        child.SetParent(null);
+                    }
+                }
                 Destroy(go);
             }
         }
 
         /// <summary>
-        /// Removes the given node. The removal is animated by sinking the
-        /// node. The node is not destroyed.
+        /// Removes the given node. The removal is animated by raising the
+        /// node to <see cref="SkyLevel"/> (y dimension). The node is not
+        /// destroyed when the animation has finished.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
-        protected virtual void RenderRemovedNode(Node node)
+        private void RenderRemovedNode(Node node)
         {
             if (objectManager.RemoveNode(node, out GameObject block))
             {
-                // if the node needs to be removed, mark it dead and let it sink into the ground
+                Assert.IsNotNull(block);
+                block.transform.SetParent(null);
+                /// if the node needs to be removed, mark it dead and let it raise to <see cref="SkyLevel"/>
                 marker.MarkDead(block);
                 Vector3 newPosition = block.transform.position;
-                newPosition.y = -block.transform.localScale.y;
+                newPosition.y = SkyLevel;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveScaleShakeAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
+                moveAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
+            }
+            else
+            {
+                phase1AnimationWatchDog.Finished();
             }
         }
 
@@ -1009,9 +1136,10 @@ namespace SEE.Game
         /// Removes the given edge. The edge is not destroyed, however.
         /// </summary>
         /// <param name="edge"></param>
-        protected virtual void RenderRemovedOldEdge(Edge edge)
+        private void RenderRemovedEdge(Edge edge)
         {
             objectManager.RemoveEdge(edge);
+            phase1AnimationWatchDog.Finished();
         }
 
         // **********************************************************************
@@ -1066,23 +1194,23 @@ namespace SEE.Game
         /// <summary>
         /// Whether the user has selected auto-play mode.
         /// </summary>
-        private bool _isAutoplay;  // not serialized by Unity
+        private bool isAutoplay;  // not serialized by Unity
 
         /// <summary>
         /// Whether the user has selected reverse auto-play mode.
         /// </summary>
-        private bool _isAutoplayReverse;  // not serialized by Unity
+        private bool isAutoplayReverse;  // not serialized by Unity
 
         /// <summary>
         /// Returns true if automatic animations are active.
         /// </summary>
         public bool IsAutoPlay
         {
-            get => _isAutoplay;
+            get => isAutoplay;
             private set
             {
                 shownGraphHasChangedEvent.Invoke();
-                _isAutoplay = value;
+                isAutoplay = value;
             }
         }
 
@@ -1091,11 +1219,11 @@ namespace SEE.Game
         /// </summary>
         public bool IsAutoPlayReverse
         {
-            get => _isAutoplayReverse;
+            get => isAutoplayReverse;
             private set
             {
                 shownGraphHasChangedEvent.Invoke();
-                _isAutoplayReverse = value;
+                isAutoplayReverse = value;
             }
         }
 
@@ -1118,8 +1246,8 @@ namespace SEE.Game
         public void ShowGraphEvolution()
         {
             CurrentGraphIndex = 0;
-            _currentCity = null;
-            _nextCity = null;
+            currentCity = null;
+            nextCity = null;
 
             graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
@@ -1197,13 +1325,13 @@ namespace SEE.Game
             Graph graph = graphs[index];
             if (graph == null)
             {
-                Debug.LogErrorFormat("There ist no graph available for graph with index {0}\n", index);
+                Debug.LogError($"There is no graph available for graph with index {index}\n");
                 return false;
             }
             bool hasLayout = TryGetLayout(graph, out Dictionary<string, ILayoutNode> layout);
             if (layout == null || !hasLayout)
             {
-                Debug.LogErrorFormat("There ist no layout available for graph with index {0}", index);
+                Debug.LogError($"There is no layout available for graph with index {index}\n");
                 return false;
             }
             laidOutGraph = new LaidOutGraph(graph, layout);
@@ -1367,7 +1495,7 @@ namespace SEE.Game
         /// the currently shown graph remains visible.
         /// </summary>
         /// <param name="enabled"> Specifies whether reverse auto-play mode should be enabled. </param>
-        internal void SetAutoPlayReverse(bool enabled)
+        private void SetAutoPlayReverse(bool enabled)
         {
             IsAutoPlayReverse = enabled;
             if (IsAutoPlayReverse)
@@ -1420,6 +1548,11 @@ namespace SEE.Game
         /// </summary>
         private class AnimationNode : ILayoutNode
         {
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="centerPosition">position of the center in world space</param>
+            /// <param name="scale">local scale</param>
             public AnimationNode(Vector3 centerPosition, Vector3 scale)
             {
                 this.CenterPosition = centerPosition;

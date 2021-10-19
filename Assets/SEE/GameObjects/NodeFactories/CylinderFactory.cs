@@ -24,7 +24,7 @@ namespace SEE.GO
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.sharedMaterial = Materials.Get(renderQueueOffset, style);
+            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
@@ -34,7 +34,7 @@ namespace SEE.GO
         // ----------------------------------------------------------------------------------
         // The following code was downloaded (and slightly adjusted) from
         // https://github.com/doukasd/Unity-Components.
-        // The content of that repository is licensed under the terms of the Apache License, 
+        // The content of that repository is licensed under the terms of the Apache License,
         // Version 2.0.
         //----------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns a cylinder mesh.
         /// </summary>
-        /// <param name="radialSegments">the number circle segments of the cylinder 
+        /// <param name="radialSegments">the number circle segments of the cylinder
         /// (e.g., 3 gives you a triangle shape)</param>
         /// <param name="heightSegments">the number of height segments</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
@@ -125,7 +125,7 @@ namespace SEE.GO
                     // calculate angle for that vertex on the unit circle
                     float angle = i * angleStep;
 
-                    // "fold" the sheet around as a cylinder by placing the first and last 
+                    // "fold" the sheet around as a cylinder by placing the first and last
                     // vertex of each row at the same spot
                     if (i == numVertexColumns - 1)
                     {
@@ -140,7 +140,7 @@ namespace SEE.GO
                     // calculate UVs
                     UVs[j * numVertexColumns + i] = new Vector2(i * uvStepH, j * uvStepV);
 
-                    // create the tris				
+                    // create the tris
                     if (j == 0 || i >= numVertexColumns - 1)
                     {
                         // nothing to do on the first and last "floor" on the tris, capping
@@ -150,9 +150,9 @@ namespace SEE.GO
                     else
                     {
                         // create 2 tris below each vertex
-                        // 6 seems like a magic number. For every vertex we draw 2 tris in this 
+                        // 6 seems like a magic number. For every vertex we draw 2 tris in this
                         // for-loop, therefore we need 2*3=6 indices in the Tris array
-                        // offset the base by the number of slots we need for the bottom cap tris. 
+                        // offset the base by the number of slots we need for the bottom cap tris.
                         // Those will be populated once we draw the cap
                         int baseIndex = numCapTris * 3 + (j - 1) * radialSegments * 6 + i * 6;
 

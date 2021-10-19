@@ -5,9 +5,9 @@ using UnityEngine;
 namespace SEE.GO
 {
     /// <summary>
-    /// Scaling based on z-score. The z-score of a value v that is an element of 
-    /// a list of values V is defined as follows: (v-mean(V))/sd(V) where 
-    /// mean(V) is the mean value and sd(V) is the standard deviation of all values 
+    /// Scaling based on z-score. The z-score of a value v that is an element of
+    /// a list of values V is defined as follows: (v-mean(V))/sd(V) where
+    /// mean(V) is the mean value and sd(V) is the standard deviation of all values
     /// in V. The range of possible values of z-score is infinite, but generally
     /// in the range of [-30, 30]. It is obviously exactly 0 for v = mean(V).
     /// The z-score normalizes values by how far they deviate from the mean in terms
@@ -17,15 +17,13 @@ namespace SEE.GO
     public class ZScoreScale : IScale
     {
         /// <summary>
-        /// Constructor for z-score based scaling of node metrics. 
+        /// Constructor for z-score based scaling of node metrics.
         /// </summary>
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
-        /// <param name="minimalLength">the minimal value a node length can have</param>
-        /// <param name="maximalLength">the maximal value a node length can have</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        public ZScoreScale(ICollection<Graph> graphs, float minimalLength, float maximalLength, IList<string> metrics, 
-                           bool leavesOnly) : base(graphs, metrics, minimalLength, maximalLength, leavesOnly)
+        public ZScoreScale(ICollection<Graph> graphs, IList<string> metrics,  bool leavesOnly)
+            : base(graphs, metrics, leavesOnly)
         {
             DetermineStatistics(graphs, leavesOnly);
         }
@@ -111,7 +109,7 @@ namespace SEE.GO
                 }
             }
 
-            // Calculate standard deviation sd = sqrt(var(X)) where var(X) = S/n 
+            // Calculate standard deviation sd = sqrt(var(X)) where var(X) = S/n
             // is the variance of X = {x_1, ..., x_n} and S = sum((x_i - mean)^2) over all i in [1..n]
             foreach (string metric in metrics)
             {
@@ -150,27 +148,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Yields a z-score normalized value of the given node metric clamped
-        /// into the range [minimalLength, maximalLength].
-        /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="node">node for which to determine the normalized value</param>
-        /// <returns>normalized value of node metric</returns>
-        public override float GetNormalizedValue(string metric, Node node)
-        {
-            if (node.TryGetNumeric(metric, out float value))
-            {
-                return GetNormalizedValue(metric, value);
-            }
-            else
-            {
-                return minimalLength;
-            }
-        }
-
-        /// <summary>
-        /// Yields a z-score normalized value of the given node metric value
-        /// clamped into the range [minimalLength, maximalLength].
+        /// Yields a z-score normalized value of the given node metric value.
         /// </summary>
         /// <param name="metric">name of the node metric</param>
         /// <param name="value">value for which to determine the normalized value</param>
@@ -179,20 +157,17 @@ namespace SEE.GO
         {
             // We normalize x by z-score(x), which is defined as (x - mean)/sd where sd is
             // the standard deviation. The z-score can be viewed as a linear function
-            // 1/sd * x - mean/sd where z-score(mean) = 0. We want to map the average
-            // value onto the standard size of a building. That is why we add 1 to the
-            // factor by which we multiply the standard length. Thus, if the metric value
-            // is the means, the factor is 1.0.
+            // 1/sd * x - mean/sd where z-score(mean) = 0.
             // Note: There is no maximal value for z-score, but larger values get increasingly
             // unlikely.
             float sd = statistics[metric].standard_deviation;
             if (sd == 0.0f)
             {
-                return minimalLength;
+                return 0;
             }
             else
             {
-                return WithinLimits((value - statistics[metric].mean) / sd + 1.0f);
+                return (value - statistics[metric].mean) / sd;
             }
         }
 
@@ -206,19 +181,6 @@ namespace SEE.GO
         {
             //FIXME: Implement normalization per level
             throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Clamps value within range [minimalLength, maximalLength], that is,
-        /// if minimalLength &lt;= value &lt;= maximalLength, value is returned;
-        /// if value is less than minimalLength, minimalLength is returned;
-        /// if maximalLength is less than value, maximalLength is returned.
-        /// </summary>
-        /// <param name="value">value to be clamped</param>
-        /// <returns>clamped value</returns>
-        protected float WithinLimits(float value)
-        {
-            return Mathf.Clamp(value, minimalLength, maximalLength);
         }
     }
 }

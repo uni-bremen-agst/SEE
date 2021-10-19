@@ -60,6 +60,9 @@
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>1</int>
+      </attr>
+	  <attr name="Metric.Inner_Node_Depth">
+        <int>1</int>
       </attr>	  
     </node>
     <node id="N4">
@@ -102,7 +105,7 @@
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>2</int>
-      </attr>		  
+      </attr>	  
     </node>
     <node id="N6">
       <type xlink:href="Class"/>
@@ -123,7 +126,7 @@
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>3</int>
-      </attr>		  
+      </attr>
     </node>
     <node id="N7">
       <type xlink:href="Package"/>
@@ -135,6 +138,9 @@
       </attr>
 	  <attr name="Metric.Number_Of_Descendants">
         <int>3</int>
+      </attr>
+	  <attr name="Metric.Inner_Node_Depth">
+        <int>0</int>
       </attr>	
     </node>
 	<edge id="E1" from="N1" to="N3">

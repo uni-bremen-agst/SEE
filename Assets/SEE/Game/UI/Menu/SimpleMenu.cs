@@ -1,7 +1,7 @@
-﻿using SEE.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
@@ -190,6 +190,18 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
+        /// Adds <paramref name="menuEntries"/> to this menu's <see cref="entries"/>.
+        /// </summary>
+        /// <param name="menuEntries">The entries to add to this menu.</param>
+        public void AddEntries(IEnumerable<T> menuEntries)
+        {
+            foreach (T entry in menuEntries)
+            {
+                AddEntry(entry);
+            }
+        }
+
+        /// <summary>
         /// Removes the given <paramref name="entry"/> from the menu.
         /// If the <paramref name="entry"/> is not present in the menu, nothing will happen.
         /// </summary>
@@ -200,6 +212,19 @@ namespace SEE.Game.UI.Menu
             if (HasStarted)
             {
                 RemoveDesktopButton(entry);
+            }
+        }
+        
+        /// <summary>
+        /// Removes the given <paramref name="menuEntries"/> from the menu.
+        /// If the <paramref name="menuEntries"/> are not present in the menu, nothing will happen.
+        /// </summary>
+        /// <param name="menuEntries">The entries to remove from the menu</param>
+        public void RemoveEntries(IEnumerable<T> menuEntries)
+        {
+            foreach (T menuEntry in menuEntries)
+            {
+                RemoveEntry(menuEntry);
             }
         }
 
