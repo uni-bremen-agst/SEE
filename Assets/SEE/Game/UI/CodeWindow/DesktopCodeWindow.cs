@@ -40,7 +40,14 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public enum operationType
         {
+            /// <summary>
+            /// 
+            /// </summary>
             Add,
+
+            /// <summary>
+            /// 
+            /// </summary>
             Delete
         }
 
@@ -121,15 +128,17 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         case operationType.Add:
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
-                            if(TextMeshInputField.caretPosition < idx)
+                            if(TextMeshInputField.caretPosition > idx)
                             {
+                                Debug.Log("PLUS" + idx + " carret " + TextMeshInputField.caretPosition);
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             }
                             break;
                         case operationType.Delete:
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
-                            if (TextMeshInputField.caretPosition < idx)
+                            if (TextMeshInputField.caretPosition > idx)
                             {
+                                Debug.Log("MINUS");
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
                             }
                             break;
@@ -184,7 +193,14 @@ namespace SEE.Game.UI.CodeWindow
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
 
-
+                if (SEEInput.CodeWindowUndo())
+                {
+                    ICRDT.Undo(Title);
+                }
+                if (SEEInput.CodeWindowRedo())
+                {
+                    ICRDT.Redo(Title);
+                }
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 var input = Input.inputString;
