@@ -121,6 +121,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         case operationType.Add:
                             TextMeshInputField.text = TextMeshInputField.text.Insert(idx, c.ToString());
+                            TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             break;
                         case operationType.Delete:
                             TextMeshInputField.text = TextMeshInputField.text.Remove(idx);
