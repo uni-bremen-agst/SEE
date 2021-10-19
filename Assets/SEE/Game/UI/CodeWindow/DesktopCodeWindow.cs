@@ -181,8 +181,8 @@ namespace SEE.Game.UI.CodeWindow
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 var input = Input.inputString;
-                int idx = TextMeshInputField.stringPosition;
-                Debug.Log(TextMeshInputField.caretPosition);
+                int idx = TextMeshInputField.caretPosition; //TextMeshInputField.stringPosition;
+                //Debug.Log(TextMeshInputField.caretPosition);
                 //ignore null input to avoid unnecessary computation
                 if (!string.IsNullOrEmpty(input))
                 {
@@ -203,7 +203,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx -1, idx -1, Title);
+                        ICRDT.DeleteString(idx, idx, Title);
                     }
                 }
 
@@ -216,7 +216,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx -2, idx -2, Title);
+                        ICRDT.DeleteString(idx, idx, Title);
                     }
 
                 }
