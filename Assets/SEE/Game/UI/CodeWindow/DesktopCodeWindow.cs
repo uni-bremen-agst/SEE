@@ -190,7 +190,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
-                    ICRDT.AddString(input, idx /*- 1*/, Title);
+                    ICRDT.AddString(input, idx - 1, Title);
 
                 }
 
@@ -203,7 +203,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx, idx, Title);
+                        ICRDT.DeleteString(idx -1, idx -1, Title);
                     }
                 }
 
@@ -216,7 +216,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx -1, idx -1, Title);
+                        ICRDT.DeleteString(idx -2, idx -2, Title);
                     }
 
                 }
