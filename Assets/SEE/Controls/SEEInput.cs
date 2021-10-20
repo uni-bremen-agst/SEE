@@ -112,7 +112,26 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool CodeWindowUndo()
         {
-            return !KeyboardShortcutsEnabled && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) && Input.GetKeyDown(KeyBindings.Undo);
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
+#endif
+#if UNITY_EDITOR == true
+            //ctrl keys replaced with f5 in the editor
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                return !KeyboardShortcutsEnabled;
+            }
+#endif
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
+#if UNITY_EDITOR == false
+            } 
+            else
+            {
+                return false;
+            }
+#endif
         }
 
         /// <summary>
@@ -121,8 +140,28 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool CodeWindowRedo()
         {
-            return !KeyboardShortcutsEnabled && (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) && Input.GetKeyDown(KeyBindings.Redo);
-        }
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
+#endif
+#if UNITY_EDITOR == true
+            //ctrl keys replaced with F6 in the editor
+            if (Input.GetKeyDown(KeyCode.F6))
+            {
+                return !KeyboardShortcutsEnabled;
+            }
+
+#endif
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+#if UNITY_EDITOR == false
+            } 
+            else
+            {
+                return false;
+            }
+#endif
+            }
 
         /// <summary>
         /// Whether the left or right shift key was pressed down (and not again released).

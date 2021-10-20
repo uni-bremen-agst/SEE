@@ -215,7 +215,6 @@ namespace SEE.Utils
                 charObjs.Add(crdt[i]);
                 DeleteChar(i);
             }
-
             undoStack.Push((charObjs.ToArray(), operationType.Delete));
             redoStack.Clear();
         }
@@ -243,16 +242,20 @@ namespace SEE.Utils
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
         /// <param name="dontSyncCodeWindowChars"></param>
-        public void AddString(string s, int startIdx)
+        public void AddString(string s, int startIdx, bool startUp = false)
         {
             List<CharObj> charObjs = new List<CharObj>();
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx);
-                charObjs.Add(crdt[i]);
+                charObjs.Add(crdt[i +startIdx]);
             }
-            undoStack.Push((charObjs.ToArray(), operationType.Add));
-            redoStack.Clear();
+            if (!startUp)
+            {
+                CharObj[] charArr = charObjs.ToArray();
+                undoStack.Push((charArr, operationType.Add));
+                redoStack.Clear();
+            }
         }
 
         /// <summary>
@@ -637,7 +640,11 @@ namespace SEE.Utils
 
         public void Undo()
         {
-            if (undoStack.Count < 1) return;
+            if (undoStack.Count < 1)
+            {
+                Debug.LogWarning("Undo Stack is empty!");
+                return;
+            }
             (CharObj[], operationType) lastOperation = undoStack.Pop();
             switch (lastOperation.Item2)
             {
@@ -647,6 +654,7 @@ namespace SEE.Utils
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
+                            changeEvent.Invoke(' ', idx, operationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -668,7 +676,11 @@ namespace SEE.Utils
 
         public void Redo()
         {
-            if (redoStack.Count < 1) return;
+            if (redoStack.Count < 1)
+            {
+                Debug.LogWarning("Redo Stack Empty!");
+                return;
+            }
             (CharObj[], operationType) lastOperation = redoStack.Pop();
             switch (lastOperation.Item2)
             {
@@ -678,6 +690,7 @@ namespace SEE.Utils
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
+                            changeEvent.Invoke(' ', idx, operationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -721,6 +734,7 @@ namespace SEE.Utils
             {
                 new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), null, filename);
             }
+            changeEvent.Invoke(c.GetValue(), index, operationType.Add);
         }
         /// <summary>
         /// Transforms an string into a position

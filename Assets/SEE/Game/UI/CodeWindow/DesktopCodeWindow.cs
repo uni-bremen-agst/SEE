@@ -115,7 +115,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (ICRDT.IsEmpty(Title))
                 {
-                    ICRDT.AddString(cleanText, 0, Title);
+                    ICRDT.AddString(cleanText, 0, Title, true);
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
@@ -138,7 +138,6 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                Debug.Log("MINUS");
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
                             }
                             break;
