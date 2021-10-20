@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using OdinSerializer;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game

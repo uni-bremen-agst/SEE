@@ -17,12 +17,12 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game
@@ -36,7 +36,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
-        /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>,
+        /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>

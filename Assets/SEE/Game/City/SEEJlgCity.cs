@@ -20,9 +20,9 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -36,7 +36,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEEJlgCity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEEJlgCity.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
