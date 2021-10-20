@@ -223,9 +223,6 @@ namespace SEETests
             Assert.AreEqual(crdt.getCRDT()[7], crdt.Find(crdt.getCRDT()[7].GetIdentifier()).Item2);
             Assert.AreEqual(crdt.getCRDT()[8], crdt.Find(crdt.getCRDT()[8].GetIdentifier()).Item2);
             Assert.AreEqual(null, crdt.Find(wrong).Item2);
-
-
-
         }
 
         [Test]

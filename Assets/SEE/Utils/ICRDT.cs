@@ -48,9 +48,9 @@ namespace SEE.Utils
             GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static void AddString(string s, int startIdx, string file)
+        public static void AddString(string s, int startIdx, string file, bool startUp = false)
         {
-            GetInstanceByName(file).AddString(s, startIdx);
+            GetInstanceByName(file).AddString(s, startIdx, startUp);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
