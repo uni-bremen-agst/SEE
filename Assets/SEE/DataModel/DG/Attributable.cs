@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
-        public ICollection<string> ToggleAttributes => toggleAttributes;
+        public ISet<string> ToggleAttributes => toggleAttributes;
 
         public void SetToggle(string attributeName)
         {

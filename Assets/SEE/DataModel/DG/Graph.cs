@@ -509,17 +509,98 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Merges the <paramref name="other"/> graph into this one.
+        /// This is done by copying the attributes, nodes, and edges from the other graph into this one.
+        /// For the nodes and edges of the other graph, we append the given <paramref name="idSuffix"/> to avoid
+        /// any collisions. The hierarchy of the nodes will be preserved.
+        /// 
+        /// Deep copies are used for nodes, edges, and the graph itself, so that neither this nor the
+        /// <paramref name="other"/> graph (nor their nodes and edges) will be changed in any way. 
+        ///
+        /// Iff an attribute from the <paramref name="other"/> graph has the same name as an attribute from
+        /// this graph, the other graph's attribute will be ignored and this graph's attribute will be used.
+        /// Since we can't differentiate whether a property has been intentionally unset when it's a toggle attribute,
+        /// we ignore the toggle attributes of the other graph.
+        /// 
+        /// Pre-conditions:
+        /// <ul>
+        /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
+        /// <li> The <paramref name="idSuffix"/> must be chosen such that by appending it to each node's and edge's ID
+        /// from the <paramref name="other"/> graph, no ID collision with any ID from this graph will occur.</li>
+        /// </ul>
+        /// </summary>
+        /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one</param>
+        /// <param name="idSuffix">String suffixed to the ID of each of the <paramref name="other"/> graph's
+        /// nodes and edges</param>
+        /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="other"/> or <paramref name="idSuffix"/>
+        /// is <c>null</c></exception>
+        public Graph MergeWith(Graph other, string idSuffix = "-X")
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            } 
+            else if (idSuffix == null)
+            {
+                throw new ArgumentNullException(nameof(idSuffix));
+            }
+            
+            // We need to create two copies because we'll mess with the graph's nodes and edges,
+            // and don't want to leave a mangled mess.
+            Graph mergedGraph = Clone() as Graph;
+            Assert.IsNotNull(mergedGraph);
+            Graph otherGraph = other.Clone() as Graph;
+            Assert.IsNotNull(otherGraph);
+            
+            // Name and Path are implicitly taken from this graph.
+            // We now merge the other's attributes into this graph's attributes (ignoring toggle attributes).
+            foreach (KeyValuePair<string, float> attribute in otherGraph.FloatAttributes)
+            {
+                if (!mergedGraph.FloatAttributes.ContainsKey(attribute.Key))
+                {
+                    mergedGraph.FloatAttributes[attribute.Key] = attribute.Value;
+                }
+            }
+            foreach (KeyValuePair<string, int> attribute in otherGraph.IntAttributes)
+            {
+                if (!mergedGraph.IntAttributes.ContainsKey(attribute.Key))
+                {
+                    mergedGraph.IntAttributes[attribute.Key] = attribute.Value;
+                }
+            }
+            foreach (KeyValuePair<string, string> attribute in otherGraph.StringAttributes)
+            {
+                if (!mergedGraph.StringAttributes.ContainsKey(attribute.Key))
+                {
+                    mergedGraph.StringAttributes[attribute.Key] = attribute.Value;
+                }
+            }
+            
+            // Copy edges and nodes along with their hierarchy
+            otherGraph.CopyNodesTo(mergedGraph, idSuffix);
+            otherGraph.CopyEdgesTo(mergedGraph, idSuffix);
+            CopyHierarchy(otherGraph, mergedGraph);
+
+            // Finalize hierarchy now that it's changed
+            mergedGraph.NodeHierarchyHasChanged = true;
+            mergedGraph.FinalizeNodeHierarchy();
+            
+            return mergedGraph;
+        }
+
+        /// <summary>
         /// Returns all edges of graph whose source and target is contained in
         /// selectedNodes.
         /// </summary>
         /// <param name="graph">graph whose edges are to be filtered</param>
         /// <param name="selectedNodes">source and target nodes of required edges</param>
         /// <returns>all edges of graph whose source and target is contained in selectedNodes</returns>
-        public IList<Edge> ConnectingEdges(ICollection<Node> selectedNodes)
+        public IList<Edge> ConnectingEdges(IEnumerable<Node> selectedNodes)
         {
-            HashSet<Node> nodes = new HashSet<Node>(selectedNodes);
+            HashSet<Node> nodeSet = new HashSet<Node>(selectedNodes);
 
-            return Edges().Where(edge => nodes.Contains(edge.Source) && nodes.Contains(edge.Target)).ToList();
+            return Edges().Where(edge => nodeSet.Contains(edge.Source) && nodeSet.Contains(edge.Target)).ToList();
         }
 
         /// <summary>
@@ -529,7 +610,7 @@ namespace SEE.DataModel.DG
         /// <param name="nodes">nodes for which to determine the depth</param>
         /// <param name="currentDepth">the current depth of the given <paramref name="nodes"/></param>
         /// <returns></returns>
-        private static int CalcMaxDepth(IList<Node> nodes, int currentDepth)
+        private static int CalcMaxDepth(IEnumerable<Node> nodes, int currentDepth)
         {
             return nodes.Select(node => CalcMaxDepth(node.Children(), currentDepth + 1))
                         .Prepend(currentDepth+1).Max();
@@ -550,11 +631,11 @@ namespace SEE.DataModel.DG
             // its nodes
             foreach (Node node in nodes.Values)
             {
-                result += node + ",\n";
+                result += $"{node},\n";
             }
             foreach (Edge edge in edges.Values)
             {
-                result += edge + ",\n";
+                result += $"{edge},\n";
             }
             result += "}\n";
             return result;
@@ -636,7 +717,7 @@ namespace SEE.DataModel.DG
         /// subclass that adds fields that should be cloned, too.
         ///
         /// IMPORTANT NOTE: Cloning a graph means to create deep copies of
-        /// its node and children, too. The hierarchy will be isomporph.
+        /// its node and children, too. The hierarchy will be isomorphic.
         /// </summary>
         /// <param name="clone">the clone receiving the copied attributes</param>
         protected override void HandleCloned(object clone)
@@ -652,17 +733,21 @@ namespace SEE.DataModel.DG
             target.FinalizeNodeHierarchy();
         }
 
-        private void CopyNodesTo(Graph target)
+        private void CopyNodesTo(Graph target, string idSuffix = null)
         {
             target.nodes = new Dictionary<string, Node>();
             foreach (KeyValuePair<string, Node> entry in nodes)
             {
                 Node node = (Node)entry.Value.Clone();
+                if (idSuffix != null)
+                {
+                    node.ID += idSuffix;
+                }
                 target.AddNode(node);
             }
         }
 
-        private void CopyEdgesTo(Graph target)
+        private void CopyEdgesTo(Graph target, string idSuffix = null)
         {
             target.edges = new Dictionary<string, Edge>();
             foreach (KeyValuePair<string, Edge> entry in edges)
@@ -686,6 +771,11 @@ namespace SEE.DataModel.DG
                 else
                 {
                     throw new Exception("target graph does not have a node with ID " + edge.Target.ID);
+                }
+
+                if (idSuffix != null)
+                {
+                    clone.ID += idSuffix;
                 }
                 target.AddEdge(clone);
             }
