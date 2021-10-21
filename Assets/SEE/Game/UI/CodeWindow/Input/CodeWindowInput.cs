@@ -452,6 +452,17 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
+        /// Returns the clean index for a given rich index
+        /// See also <see cref="GetRichIndex(int)"/>
+        /// </summary>
+        /// <param name="richIndex"></param>
+        /// <returns>clean index</returns>
+        private int GetCleanIndex(int richIndex)
+        {
+            return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index == richIndex).idx;
+        }
+
+        /// <summary>
         /// Returns the line at the given <paramref name="lineNumber"/> from the <see cref="TextMesh"/>
         /// without any XML tags.
         /// </summary>
