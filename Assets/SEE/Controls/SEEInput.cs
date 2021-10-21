@@ -135,6 +135,34 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Saves the changes made in an active code window
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool SaveCodeWindow()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
+#endif
+#if UNITY_EDITOR == true
+            //ctrl keys replaced with f5 in the editor
+            if (Input.GetKeyDown(KeyCode.F7))
+            {
+                return !KeyboardShortcutsEnabled;
+            }
+#endif
+            return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
+#if UNITY_EDITOR == false
+            } 
+            else
+            {
+                return false;
+            }
+#endif
+        }
+
+        /// <summary>
         /// Re-does the last change in the CodeWindow
         /// </summary>
         /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>

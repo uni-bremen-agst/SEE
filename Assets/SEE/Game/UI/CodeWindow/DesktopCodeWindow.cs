@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
@@ -190,7 +191,25 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
+                Debug.Log(FilePath);
                 SEEInput.KeyboardShortcutsEnabled = false;
+                if (SEEInput.SaveCodeWindow())
+                {
+                    string textToSave = ICRDT.PrintString(Title);
+                    try
+                    {
+
+                        File.WriteAllText(FilePath, textToSave);
+                        ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
+                    }
+                    catch(Exception e) when (e is DirectoryNotFoundException)    //TODO Besrtimmte exceptions catchen https://docs.microsoft.com/en-us/dotnet/api/system.io.file.writealltext?view=net-5.0
+                    { 
+                        ShowNotification.Error("Saving Failed", e.Message);
+                    }
+                    //TODO REMOVE LINE NUMBERS
+                    //TODO User Notification
+                    //TODO Try Catch
+                }
 
                 if (SEEInput.CodeWindowUndo())
                 {
@@ -202,7 +221,11 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
-                var input = Input.inputString;
+                string input = Input.inputString;
+                if(input.Contains("\b"))
+                {
+                    input = input.Replace("\b", "");
+                }
                 int idx = TextMeshInputField.caretPosition; //TextMeshInputField.stringPosition;
                 //Debug.Log(TextMeshInputField.caretPosition);
                 //ignore null input to avoid unnecessary computation
