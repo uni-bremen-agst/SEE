@@ -210,6 +210,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     if (selectedText != null)
                     {
+                        Debug.Log("TEST" +selectedText.Item1 + " es " + selectedText.Item2);
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                     }
                     ICRDT.AddString(input, idx - 1, Title);
@@ -238,7 +239,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     else
                     {
-                        ICRDT.DeleteString(idx, idx, Title);
+                        ICRDT.DeleteString(idx +1, idx+1, Title);
                     }
 
                 }
