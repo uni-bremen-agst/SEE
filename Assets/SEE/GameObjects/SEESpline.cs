@@ -1,6 +1,7 @@
 ﻿using OdinSerializer;
 using System;
 using System.Collections.Generic;
+using TinySpline;
 using UnityEngine;
 
 namespace Assets.SEE.GameObjects
@@ -41,7 +42,7 @@ namespace Assets.SEE.GameObjects
         /// Internal cache for <see cref="Spline"/>.
         /// </summary>
         [NonSerialized]
-        private TinySpline.BSpline Cache;
+        private BSpline Cache;
 
         /// <summary>
         /// TinySpline's representation of a B-Spline. Note that this property
@@ -52,13 +53,13 @@ namespace Assets.SEE.GameObjects
         /// attributes (e.g., <see cref="Knots"/>) might be out of sync with
         /// the internal state of <see cref="Spline"/>.
         /// </summary>
-        public TinySpline.BSpline Spline
+        public BSpline Spline
         {
             get
             {
                 if (Cache is null)
                 {
-                    Cache = new TinySpline.BSpline((uint)ControlPoints.Length, 3, Degree)
+                    Cache = new BSpline((uint)ControlPoints.Length, 3, Degree)
                     {
                         ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
                         Knots = TinySplineInterop.ArrayToList(Knots)
@@ -109,7 +110,7 @@ namespace Assets.SEE.GameObjects
 
             // TODO: See todos below
             var rv = Spline.UniformKnotSeq((uint) tubularSegments + 1);
-            var frames = Spline.ComputeRMF((TinySpline.RealVector)rv);
+            var frames = Spline.ComputeRMF(rv);
 
             void GenerateSegment(int i)
             {
@@ -274,11 +275,11 @@ namespace Assets.SEE.GameObjects
         }
 
         /// <summary>
-        /// Converts TinySpline's Vector3 to Unity's Vector3.
+        /// Converts TinySpline's Vec3 to Unity's Vector3.
         /// </summary>
         /// <param name="vec3">Vector to be converted</param>
         /// <returns>A Unity Vector3</returns>
-        public static Vector3 VectorToVector(TinySpline.Vector3 vec3)
+        public static Vector3 VectorToVector(Vec3 vec3)
         {
             return new Vector3(
                 (float)vec3.X(),
