@@ -95,5 +95,9 @@ namespace SEE.Utils
         {
             GetInstanceByName(file).Redo();
         }
+        public static void RemoteAddString(string text, string file)
+        {
+            GetInstanceByName(file).RemoteAddString(text);
+        }
     }
 }

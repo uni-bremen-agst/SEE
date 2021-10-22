@@ -119,7 +119,7 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.AddString(cleanText, 0, Title, true);
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
-                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(start, end); });
+                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
 
                 //Updates the entries in the CodeWindow

@@ -99,11 +99,10 @@ namespace SEE.Utils
         private Stack<(CharObj[], operationType)> undoStack = new Stack<(CharObj[], operationType)>();
         private Stack<(CharObj[], operationType)> redoStack = new Stack<(CharObj[], operationType)>();
 
-
         /// <summary>
-        /// The size of the crdt history
+        /// A buffer to reduce the initial network traffic than oppening a file
         /// </summary>
-        private int historySize = 200;
+        public List<(char, Identifier[], Identifier[], string)> networkbuffer = new System.Collections.Generic.List<(char, Identifier[], Identifier[], string)>();
 
         /// <summary>
         /// The ID 
@@ -118,7 +117,9 @@ namespace SEE.Utils
         /// <summary>
         /// The chars of the CRDT with their positions
         /// </summary>
-        private List<CharObj> crdt = new List<CharObj>();
+        private List<CharObj> crdt = new List<CharObj>(5000);
+
+        //private LinkedList<CharObj> crdt = new LinkedList<CharObj>();
 
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
@@ -140,7 +141,49 @@ namespace SEE.Utils
             return crdt;
         }
 
-
+        /// <summary>
+        /// Expects a string in the following format(| is not in the string only here for the readability): Char|PositionAsString|/|PositionAsString|\n|nextLine
+        /// PositionAsString can be null (\0);
+        /// Adds the string to the CRDT only for remote use
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="file"></param>
+        public void RemoteAddString(string text)
+        {
+            bool CharSet = false;
+            char ch;
+            Identifier[] pos1 = null;
+            Identifier[] pos2 = null;
+            string tmpPos = "";
+            foreach (char c in text)
+            {
+                if (!CharSet)
+                {
+                    ch = c;
+                    CharSet = true;
+                }
+                else
+                {
+                    if (c == '/')
+                    {
+                        pos1 = StringToPosition(tmpPos);
+                        tmpPos = "";
+                        return;
+                    }
+                    if (c == '\n')
+                    {
+                        pos2 = StringToPosition(tmpPos);
+                        tmpPos = "";
+                        RemoteAddChar(ch, pos1, pos2);
+                        pos1 = null;
+                        pos2 = null;
+                        ch ='\0';
+                        CharSet = false;
+                    }
+                    tmpPos += c;
+                }
+            }
+        }
 
         /// <summary>
         /// The Remoteoperation to add a Char from another CRDT/client
@@ -247,14 +290,18 @@ namespace SEE.Utils
             List<CharObj> charObjs = new List<CharObj>();
             for (int i = 0; i < s.Length; i++)
             {
-                AddChar(s[i], i + startIdx);
-                charObjs.Add(crdt[i +startIdx]);
+                AddChar(s[i], i + startIdx, startUp);
+                charObjs.Add(crdt[i + startIdx]);
             }
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
                 undoStack.Push((charArr, operationType.Add));
                 redoStack.Clear();
+            }
+            else
+            {
+                new NetCRDT().AddString(networkbuffer);
             }
         }
 
@@ -263,7 +310,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="index">The index in the local string</param>
-        public void AddChar(char c, int index)
+        public void AddChar(char c, int index, bool startUp = false)
         {
             Identifier[] position;
             if (index - 1 >= 0 && crdt.Count > index)
@@ -291,13 +338,29 @@ namespace SEE.Utils
             {
                 crdt.Add(new CharObj(c, position));
             }
+
+
             if (index - 1 >= 0)
             {
-                new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier(), filename);
+                if (startUp)
+                {
+                    networkbuffer.Add((c, position, crdt[index - 1].GetIdentifier(), filename));
+                }
+                else
+                {
+                    new NetCRDT().AddChar(c, position, crdt[index - 1].GetIdentifier(), filename);
+                }
             }
             else
             {
-                new NetCRDT().AddChar(c, position, null, filename);
+                if (startUp)
+                {
+                    networkbuffer.Add((c, position, null, filename));
+                }
+                else
+                {
+                    new NetCRDT().AddChar(c, position, null, filename);
+                }
             }
         }
 

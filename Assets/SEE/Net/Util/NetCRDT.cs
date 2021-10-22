@@ -1,5 +1,6 @@
 using SEE.Controls;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 using static SEE.Utils.CRDT;
 
@@ -27,6 +28,11 @@ namespace SEE.Net
             /// In this state a RemoteAddChar() should be executed on each client.
             /// </summary>
             AddChar,
+
+            /// <summary>
+            /// Adds a List of single char operation to the crdt to save network load
+            /// </summary>
+            AddString,
         };
 
         /// <summary>
@@ -38,6 +44,7 @@ namespace SEE.Net
         public string position;
         public string prePosition;
         public string file;
+        public string listAsString;
 
 
         public NetCRDT() : base()
@@ -71,6 +78,9 @@ namespace SEE.Net
                         ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position, file), file);
                         
                         break;
+                    case RemoteAction.AddString:
+                        ICRDT.RemoteAddString(listAsString, file);
+                        break;
                 }
 
             }
@@ -92,6 +102,21 @@ namespace SEE.Net
             this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
+        }
+
+        public void AddString(List<(char, Identifier[], Identifier[], string)> text)
+        {
+            string listAsString = "";
+            foreach((char, Identifier[], Identifier[], string) c in text)
+            {
+                listAsString += c.Item1 + ICRDT.PositionToString(c.Item2, c.Item4) +
+                    "/" + ICRDT.PositionToString(c.Item3, c.Item4) + "\n";
+            }
+            this.file = text[0].Item4;
+            state = RemoteAction.AddString;
+            this.listAsString = listAsString;
+            Execute(null);
+
         }
     }
 }
