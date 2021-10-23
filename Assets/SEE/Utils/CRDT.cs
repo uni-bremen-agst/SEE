@@ -151,7 +151,7 @@ namespace SEE.Utils
         public void RemoteAddString(string text)
         {
             bool CharSet = false;
-            char ch;
+            char ch ='\0';
             Identifier[] pos1 = null;
             Identifier[] pos2 = null;
             string tmpPos = "";
