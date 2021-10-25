@@ -580,7 +580,7 @@ namespace SEE.DataModel.DG
             // Copy edges and nodes along with their hierarchy
             otherGraph.CopyNodesTo(mergedGraph, idSuffix);
             otherGraph.CopyEdgesTo(mergedGraph, idSuffix);
-            CopyHierarchy(otherGraph, mergedGraph);
+            CopyHierarchy(otherGraph, mergedGraph, idSuffix);
 
             // Finalize hierarchy now that it's changed
             mergedGraph.NodeHierarchyHasChanged = true;
@@ -747,6 +747,21 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Copies the edges from this graph to the <paramref name="target"/> graph, matching nodes by
+        /// ID + <paramref name="idSuffix"/>, if the latter is present.
+        /// 
+        /// The nodes in this graph which have edges attached to them must also exist in the <paramref name="target"/>
+        /// graph, i.e. nodes with the same ID must exist.
+        /// However, if a non-null <paramref name="idSuffix"/> is given, then instead nodes with the idSuffix
+        /// appended to the same ID must exist.
+        /// 
+        /// </summary>
+        /// <param name="target">The graph to which the edges of this graph shall be copied.</param>
+        /// <param name="idSuffix">Suffix to append to the new edge IDs and which node IDs in the
+        /// <paramref name="target"/> graph are required to have.</param>
+        /// <exception cref="InvalidOperationException">When edge-attached nodes couldn't be found in the target graph.
+        /// </exception>
         private void CopyEdgesTo(Graph target, string idSuffix = null)
         {
             target.edges = new Dictionary<string, Edge>();
@@ -755,22 +770,22 @@ namespace SEE.DataModel.DG
                 Edge edge = entry.Value;
                 Edge clone = (Edge)edge.Clone();
                 // set corresponding source
-                if (target.TryGetNode(edge.Source.ID, out Node from))
+                if (target.TryGetNode(edge.Source.ID + (idSuffix ?? ""), out Node from))
                 {
                     clone.Source = from;
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with ID " + edge.Source.ID);
+                    throw new InvalidOperationException($"Target graph does not have a node with ID {edge.Source.ID}");
                 }
                 // set corresponding target
-                if (target.TryGetNode(edge.Target.ID, out Node to))
+                if (target.TryGetNode(edge.Target.ID + (idSuffix ?? ""), out Node to))
                 {
                     clone.Target = to;
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with ID " + edge.Target.ID);
+                    throw new InvalidOperationException($"Target graph does not have a node with ID {edge.Target.ID}");
                 }
 
                 if (idSuffix != null)
@@ -781,17 +796,24 @@ namespace SEE.DataModel.DG
             }
         }
 
-        private static void CopyHierarchy(Graph fromGraph, Graph toGraph)
+        /// <summary>
+        /// Copies the hierarchy from <paramref name="fromGraph"/> to <paramref name="toGraph"/>.
+        /// </summary>
+        /// <param name="fromGraph">The graph to copy the hierarchy from.</param>
+        /// <param name="toGraph">The graph to apply the hierarchy to.</param>
+        /// <param name="idSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
+        /// have this string appended to their IDs</param>
+        private static void CopyHierarchy(Graph fromGraph, Graph toGraph, string idSuffix = null)
         {
             foreach (Node fromRoot in fromGraph.GetRoots())
             {
-                if (toGraph.TryGetNode(fromRoot.ID, out Node toRoot))
+                if (toGraph.TryGetNode(fromRoot.ID + (idSuffix ?? ""), out Node toRoot))
                 {
-                    CopyHierarchy(fromRoot, toRoot, toGraph);
+                    CopyHierarchy(fromRoot, toRoot, toGraph, idSuffix);
                 }
                 else
                 {
-                    throw new Exception("target graph does not have a node with ID " + fromRoot.ID);
+                    throw new InvalidOperationException($"Target graph does not have a node with ID {fromRoot.ID}");
                 }
             }
         }
@@ -802,21 +824,23 @@ namespace SEE.DataModel.DG
         /// <param name="fromParent">a parent node in the original graph</param>
         /// <param name="toParent">a parent node in copied graph (toGraph) whose children are to be added</param>
         /// <param name="toGraph">the graph copy containing toParent and its children</param>
-        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph)
+        /// <param name="idSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
+        /// have this string appended to their IDs</param>
+        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph, string idSuffix = null)
         {
             foreach (Node fromChild in fromParent.Children())
             {
                 // Get the node in toGraph corresponding to fromChild.
-                if (toGraph.TryGetNode(fromChild.ID, out Node toChild))
+                if (toGraph.TryGetNode(fromChild.ID + (idSuffix ?? ""), out Node toChild))
                 {
                     // fromChild is a parent of fromParent and
                     // toChild must become a child of toParent
                     toParent.AddChild(toChild);
-                    CopyHierarchy(fromChild, toChild, toGraph);
+                    CopyHierarchy(fromChild, toChild, toGraph, idSuffix);
                 }
                 else
                 {
-                    throw new Exception($"target graph does not have a node with ID {fromChild.ID}");
+                    throw new InvalidOperationException($"Target graph does not have a node with ID {fromChild.ID}");
                 }
             }
         }
