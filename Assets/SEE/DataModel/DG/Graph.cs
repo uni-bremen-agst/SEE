@@ -526,7 +526,8 @@ namespace SEE.DataModel.DG
         /// <ul>
         /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
         /// <li> The <paramref name="idSuffix"/> must be chosen such that by appending it to each node's and edge's ID
-        /// from the <paramref name="other"/> graph, no ID collision with any ID from this graph will occur.</li>
+        /// from the <paramref name="other"/> graph, no ID collision with any ID from this graph will occur. If
+        /// <paramref name="idSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
         /// </ul>
         /// </summary>
         /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one</param>
@@ -535,16 +536,12 @@ namespace SEE.DataModel.DG
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="other"/> or <paramref name="idSuffix"/>
         /// is <c>null</c></exception>
-        public Graph MergeWith(Graph other, string idSuffix = "-X")
+        public Graph MergeWith(Graph other, string idSuffix = null)
         {
             if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
             } 
-            else if (idSuffix == null)
-            {
-                throw new ArgumentNullException(nameof(idSuffix));
-            }
             
             // We need to create two copies because we'll mess with the graph's nodes and edges,
             // and don't want to leave a mangled mess.
@@ -726,7 +723,9 @@ namespace SEE.DataModel.DG
             Graph target = (Graph)clone;
             target.Name = Name;
             target.Path = Path;
+            target.nodes = null;
             CopyNodesTo(target);
+            target.edges = null;
             CopyEdgesTo(target);
             CopyHierarchy(this, target);
             target.NodeHierarchyHasChanged = true;
@@ -735,7 +734,7 @@ namespace SEE.DataModel.DG
 
         private void CopyNodesTo(Graph target, string idSuffix = null)
         {
-            target.nodes = new Dictionary<string, Node>();
+            target.nodes ??= new Dictionary<string, Node>();
             foreach (KeyValuePair<string, Node> entry in nodes)
             {
                 Node node = (Node)entry.Value.Clone();
@@ -764,7 +763,7 @@ namespace SEE.DataModel.DG
         /// </exception>
         private void CopyEdgesTo(Graph target, string idSuffix = null)
         {
-            target.edges = new Dictionary<string, Edge>();
+            target.edges ??= new Dictionary<string, Edge>();
             foreach (KeyValuePair<string, Edge> entry in edges)
             {
                 Edge edge = entry.Value;

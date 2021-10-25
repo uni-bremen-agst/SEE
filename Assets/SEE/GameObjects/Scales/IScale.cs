@@ -216,7 +216,7 @@ namespace SEE.GO
             }
 
             // Set default maxima for metricLevelMaxima (for each level and each metric where it no maximum has been set)
-            foreach (int level in Enumerable.Range(0, metricLevelMaxima.Keys.Max() + 1))
+            foreach (int level in Enumerable.Range(0, (metricLevelMaxima.Keys.Any() ? metricLevelMaxima.Keys.Max() : 0) + 1))
             {
                 if (!metricLevelMaxima.ContainsKey(level))
                 {
