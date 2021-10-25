@@ -67,7 +67,7 @@ namespace SEE.Game
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        public Graph VisualizedSubGraph
+        private Graph VisualizedSubGraph
         {
             get
             {
@@ -101,7 +101,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogError($"SEECity.Awake: Could not load GXL file {GXLPath.Path} of city {name}.\n");
+                Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
             }
             RemoveTransparency();
         }
@@ -167,7 +167,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph giving us the nodes/edges who should be the
         /// target of the NodeRefs and EdgeRefs, respectively</param>
-        protected void SetNodeEdgeRefs(Graph graph, GameObject parent)
+        protected static void SetNodeEdgeRefs(Graph graph, GameObject parent)
         {
             foreach (Transform childTransform in parent.transform)
             {
@@ -191,7 +191,7 @@ namespace SEE.Game
 #if UNITY_EDITOR
                 else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
                 {
-                    Debug.LogWarning("Game object {child.name} has neither node nor edge reference.\n");
+                    Debug.LogWarning($"Game object {child.name} has neither node nor edge reference.\n");
                 }
 #endif
                 SetNodeEdgeRefs(graph, child);
@@ -200,6 +200,7 @@ namespace SEE.Game
 
         /// <summary>
         /// The path to the GXL file containing the graph data.
+        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
         public DataPath GXLPath = new DataPath();
 

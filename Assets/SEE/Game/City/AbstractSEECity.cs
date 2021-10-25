@@ -291,7 +291,7 @@ namespace SEE.Game
             }
             else
             {
-                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
+                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value)
                   .Select(pair => pair.Key).ToList();
                 return graph.Subgraph(matches);
             }
@@ -303,22 +303,21 @@ namespace SEE.Game
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
-        public ICollection<string> AllLeafMetrics()
-        {
-            List<string> result = new List<string>(4);
-            result.Add(LeafNodeSettings.WidthMetric);
-            result.Add(LeafNodeSettings.HeightMetric);
-            result.Add(LeafNodeSettings.DepthMetric);
-            result.Add(LeafNodeSettings.ColorMetric);
-            return result;
-        }
+        public ICollection<string> AllLeafMetrics() =>
+            new List<string>(4)
+            {
+                LeafNodeSettings.WidthMetric,
+                LeafNodeSettings.HeightMetric,
+                LeafNodeSettings.DepthMetric,
+                LeafNodeSettings.ColorMetric
+            };
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
         /// </summary>
         /// <returns>all attribute names of the different kinds of software erosions</returns>
         public IList<string> AllLeafIssues() =>
-            new List<string>()
+            new List<string>
                {
                   ErosionSettings.ArchitectureIssue,
                   ErosionSettings.CloneIssue,
