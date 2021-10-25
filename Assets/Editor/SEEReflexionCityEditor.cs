@@ -34,6 +34,7 @@ namespace SEEEditor
                 city.GxlMappingPath = DataPathEditor.GetDataPath("GXL file (Mapping)",
                                                                  city.GxlMappingPath,
                                                                  Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                city.CityName = EditorGUILayout.TextField("City Name", city.CityName);
             }
         }
     }
