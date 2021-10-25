@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
     /// <summary>
     /// A code city that supports architectural mappings from
     /// implementation nodes onto architecture nodes.
-    /// 
-    /// FIXME: Should this class rather derive from <see cref="SEECity"/>?
     /// </summary>
-    public class SEECityReflexion : AbstractSEECity
+    public class SEECityReflexion : SEECity
     {
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
@@ -29,33 +26,15 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
         public DataPath GxlMappingPath = new DataPath();
-        
-        /// <summary>
-        /// The mapping of implementation nodes onto architecture nodes.
-        /// Will be created from the three sub-graphs implementation, architecture and mapping.
-        /// </summary>
-        private Graph FullGraph = null;
 
         /// <summary>
-        /// Redraws the full graph by first deleting its contents and then drawing it again.
-        /// </summary>
-        public void ReDrawGraph()
-        {
-            Assert.IsNotNull(FullGraph);
-
-            DeleteGraphGameObjects();
-            DrawGraph();
-        }
-
-        /// <summary>
-        /// First, if a graph was already loaded (<see cref="FullGraph"/> is not null),
-        /// everything will be reset by calling <see cref="Reset"/>.
+        /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
         /// Second, the graph data from the three GXL files are loaded. The loaded graph is available
-        /// in <see cref="FullGraph"/> afterwards.
+        /// in <see cref="LoadedGraph"/> afterwards.
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
-        public void LoadData()
+        public override void LoadData()
         {
             if (string.IsNullOrEmpty(GxlArchitecturePath.Path))
             {
@@ -65,21 +44,26 @@ namespace SEE.Game.City
             {
                 Debug.LogError("Implementation graph path is empty.\n");
             }
-            else if (string.IsNullOrEmpty(GxlMappingPath.Path))
-            {
-                //TODO: Allow empty path to create mapping from scratch
-                Debug.LogError("Mapping graph path is empty.\n");
-            }
             else
             {
-                if (FullGraph != null)
+                if (LoadedGraph != null)
                 {
                     Reset();
                 }
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path);
                 Graph ImplementationGraph = LoadGraph(GxlImplementationPath.Path);
-                Graph MappingGraph = LoadGraph(GxlMappingPath.Path);
-                FullGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph);
+                Graph MappingGraph;
+                if (string.IsNullOrEmpty(GxlMappingPath.Path))
+                {
+                    Debug.LogWarning("Mapping graph path is empty. Will create new mapping from scratch.\n");
+                    MappingGraph = new Graph();
+                }
+                else
+                {
+                     MappingGraph = LoadGraph(GxlMappingPath.Path);
+                }
+                LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph);
+                Debug.Log($"Loaded graph {LoadedGraph.Name}");
             }
         }
 
@@ -102,30 +86,16 @@ namespace SEE.Game.City
 
             return ImplementationGraph.MergeWith(ArchitectureGraph, "-A").MergeWith(MappingGraph, "-M");
         }
-        
-        /// <summary>
-        /// Resets everything that is specific to a given graph, including all three sub-graphs.
-        /// </summary>
-        public override void Reset()
+
+        public override void SaveData()
         {
-            base.Reset();
-            // Delete the underlying graph.
-            FullGraph?.Destroy();
-            FullGraph = null;
+            //TODO
+            throw new NotImplementedException();
         }
         
         //------------------------------------------------
         // TODO: Anything below this line not yet updated.
         //------------------------------------------------
-
-        public void DrawGraph()
-        {
-            Assert.IsNotNull(FullGraph);
-            //TODO: Load
-
-            // TODO: Draw the cities next to each other.
-            new GraphRenderer(this, FullGraph).Draw(gameObject);
-        }
 
         //--------------------------------
         // Configuration file input/output
