@@ -127,27 +127,31 @@ namespace SEE.GO
                 Points p = gameEdge.AddComponent<Points>();
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
-                // gameEdge does not yet have a renderer; we add a new one
                 // Add a line renderer which serves as a preview in the Unity
                 // editor. The line renderer will be replaced with a mesh
                 // renderer at runtime (i.e., when starting the application).
                 LineRenderer line = gameEdge.AddComponent<LineRenderer>();
-                // use sharedMaterial if changes to the original material should affect all
-                // objects using this material; renderer.material instead will create a copy
-                // of the material and will not be affected by changes of the original material
+
+                // Use sharedMaterial if changes to the original material
+                // should affect all objects using this material;
+                // renderer.material instead will create a copy of the
+                // material and will not be affected by changes of the
+                // original material.
                 line.sharedMaterial = defaultLineMaterial;
 
                 LineFactory.SetDefaults(line);
                 LineFactory.SetWidth(line, edgeWidth);
 
-                // If enabled, the lines are defined in world space.
-                // This means the object's position is ignored and the lines are rendered around 
-                // world origin.
+                // If enabled, the lines are defined in world space. This
+                // means the object's position is ignored and the lines are
+                // rendered around world origin.
                 line.useWorldSpace = false;
 
-                Vector3[] points = layoutEdge.Points;
-                line.positionCount = points.Length; // number of vertices
-                line.SetPositions(points);
+                // Draw spline as poly line.
+                SEESpline spline = gameEdge.GetComponent<SEESpline>();
+                Vector3[] positions = spline.PolyLine();
+                line.positionCount = positions.Length; // number of vertices
+                line.SetPositions(positions);
             }
             return result;
         }

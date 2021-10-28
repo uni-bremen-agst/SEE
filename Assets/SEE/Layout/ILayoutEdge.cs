@@ -1,6 +1,4 @@
-﻿using Assets.SEE.GameObjects;
-using TinySpline;
-using UnityEngine;
+﻿using TinySpline;
 
 namespace SEE.Layout
 {
@@ -29,12 +27,6 @@ namespace SEE.Layout
             {
                 ControlPoints = {0, 0, 0, 1, 1, 1}
             };
-
-        /// <summary>
-        /// Approximates <see cref="Spline"/> as polyline.
-        /// </summary>
-        public Vector3[] Points =>
-            TinySplineInterop.ListToVectors(Spline.Sample(100));
 
         /// <summary>
         /// Constructor.
