@@ -1,5 +1,5 @@
 ﻿using Assets.SEE.GameObjects;
-using SEE.Layout.Utils;
+using TinySpline;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -24,12 +24,15 @@ namespace SEE.Layout
         /// (i.e., a spline of degree 1 with 2 control points) connecting the
         /// points (0, 0, 0) and (1, 1, 1).
         /// </summary>
-        public TinySpline.BSpline Spline { get; set; } =
-            new TinySpline.BSpline(2, 3, 1)
+        public BSpline Spline { get; set; } =
+            new BSpline(2, 3, 1)
             {
                 ControlPoints = {0, 0, 0, 1, 1, 1}
             };
 
+        /// <summary>
+        /// Approximates <see cref="Spline"/> as polyline.
+        /// </summary>
         public Vector3[] Points =>
             TinySplineInterop.ListToVectors(Spline.Sample(100));
 

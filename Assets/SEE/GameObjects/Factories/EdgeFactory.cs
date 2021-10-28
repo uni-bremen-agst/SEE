@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Assets.SEE.GameObjects;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
@@ -89,10 +90,15 @@ namespace SEE.GO
                 isStatic = false,
                 name = layoutEdge.ItsEdge.ID
             };
+
             EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
             edgeRef.Value = layoutEdge.ItsEdge;
             edgeRef.SourceNodeID = layoutEdge.Source.ID;
             edgeRef.TargetNodeID = layoutEdge.Source.ID;
+
+            SEESpline spline = gameEdge.AddComponent<SEESpline>();
+            spline.Spline = layoutEdge.Spline;
+
             return gameEdge;
         }
 
@@ -122,6 +128,9 @@ namespace SEE.GO
                 p.controlPoints = layoutEdge.ControlPoints;
                 p.linePoints = layoutEdge.Points;
                 // gameEdge does not yet have a renderer; we add a new one
+                // Add a line renderer which serves as a preview in the Unity
+                // editor. The line renderer will be replaced with a mesh
+                // renderer at runtime (i.e., when starting the application).
                 LineRenderer line = gameEdge.AddComponent<LineRenderer>();
                 // use sharedMaterial if changes to the original material should affect all
                 // objects using this material; renderer.material instead will create a copy
@@ -139,22 +148,6 @@ namespace SEE.GO
                 Vector3[] points = layoutEdge.Points;
                 line.positionCount = points.Length; // number of vertices
                 line.SetPositions(points);
-
-                // The mesh for the collider is created only if "isSelectbale" is set in the inspector.
-                if (isEdgeSelectable)
-                {
-                    MeshCollider meshCollider = gameEdge.AddComponent<MeshCollider>();
-
-                    // Build tubular mesh with Curve
-                    const bool closed = false; // closed curve or not
-                    Mesh mesh = Tubular.Tubular.Build(new Curve.CatmullRomCurve(layoutEdge.Points.ToList()),
-                                                      tubularSegments, radius, radialSegments, closed);
-
-                    // visualize mesh
-                    MeshFilter filter = gameEdge.AddComponent<MeshFilter>();
-                    filter.sharedMesh = mesh;
-                    meshCollider.sharedMesh = mesh;
-                }
             }
             return result;
         }
