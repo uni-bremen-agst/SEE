@@ -78,6 +78,9 @@ namespace Lean.Touch
 
 		private bool oldPointSet;
 
+		[System.NonSerialized]
+		private Canvas cachedCanvas;
+
 		/// <summary>This method allows you to increase the <b>Angle</b> value from an external event (e.g. UI button click).</summary>
 		public void IncrementAngle(float delta)
 		{
@@ -161,23 +164,41 @@ namespace Lean.Touch
 
 		private Vector2 GetPoint(Vector2 screenPoint)
 		{
-			// Make sure the camera exists
-			var camera = LeanHelper.GetCamera(_camera, gameObject);
+			var rectTransform = transform as RectTransform;
 
-			if (camera != null)
+			if (rectTransform != null)
 			{
-				var rectTransform = transform as RectTransform;
+				var worldPoint = default(Vector3);
 
-				if (rectTransform != null)
+				if (cachedCanvas == null)
 				{
-					var worldPoint = default(Vector3);
+					cachedCanvas = GetComponentInParent<Canvas>();
+				}
 
-					if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, screenPoint, camera, out worldPoint) == true)
+				if (cachedCanvas != null)
+				{
+					if (cachedCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
 					{
-						return Quaternion.LookRotation(axis) * transform.InverseTransformPoint(worldPoint);
+						if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, screenPoint, default(Camera), out worldPoint) == true)
+						{
+							return Quaternion.LookRotation(axis) * transform.InverseTransformPoint(worldPoint);
+						}
+					}
+					else
+					{
+						if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, screenPoint, cachedCanvas.worldCamera, out worldPoint) == true)
+						{
+							return Quaternion.LookRotation(axis) * transform.InverseTransformPoint(worldPoint);
+						}
 					}
 				}
-				else
+			}
+			else
+			{
+				// Make sure the camera exists
+				var camera = LeanHelper.GetCamera(_camera, gameObject);
+
+				if (camera != null)
 				{
 					var ray      = camera.ScreenPointToRay(screenPoint);
 					var plane    = new Plane(transform.TransformDirection(axis), transform.position);
@@ -188,10 +209,10 @@ namespace Lean.Touch
 						return Quaternion.Inverse(Quaternion.LookRotation(axis)) * transform.InverseTransformPoint(ray.GetPoint(distance));
 					}
 				}
-			}
-			else
-			{
-				Debug.LogError("Failed to find camera. Either tag your cameras MainCamera, or set one in this component.", this);
+				else
+				{
+					Debug.LogError("Failed to find camera. Either tag your cameras MainCamera, or set one in this component.", this);
+				}
 			}
 
 			return oldPoint;
