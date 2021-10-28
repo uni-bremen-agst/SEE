@@ -170,7 +170,7 @@ namespace Lean.Touch
 				{
 					var mask = 1 << i;
 
-					if ((RequiredMouseButtons & mask) != 0 && LeanInput.GetMousePressed(i) == false)
+					if ((RequiredMouseButtons & mask) != 0 && LeanInput.GetMousePressed(i) == false && LeanInput.GetMouseUp(i) == false)
 					{
 						filteredFingers.Clear();
 					}
