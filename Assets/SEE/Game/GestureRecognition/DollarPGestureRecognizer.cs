@@ -156,7 +156,7 @@ namespace SEE.Game.GestureRecognition
             for (int i = 0; i < candidate.Length; i += step)
             {
                 float d1 = CloudDistance(candidate, template, n, i);
-                float d2 = CloudDistance(candidate, template, n, i);
+                float d2 = CloudDistance(template, candidate, n, i);
                 minimum = Math.Min(minimum, d1);
                 minimum = Math.Min(minimum, d2);
             }
