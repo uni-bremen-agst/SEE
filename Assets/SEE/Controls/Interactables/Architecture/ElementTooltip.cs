@@ -40,11 +40,11 @@ namespace SEE.Controls.Architecture
             {
                 interactionObject.controller.PointerTooltipUpdated?.Invoke(null);
             }
-            else if (gameObject.TryGetNode(out Node node))
+            else if (initiator.TryGetNode(out Node node))
             {
                 interactionObject.controller.PointerTooltipUpdated?.Invoke($"{node.SourceName}");
             }
-            else if (gameObject.TryGetEdge(out Edge edge))
+            else if (initiator.TryGetEdge(out Edge edge))
             {  
                 interactionObject.controller.PointerTooltipUpdated?.Invoke($"{edge.Source.SourceName}][{edge.Target.SourceName}");
             }

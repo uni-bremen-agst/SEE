@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -20,10 +21,9 @@ namespace SEE.Controls.Architecture
         /// </summary>
         public Tooltip tooltip;
         public string TooltipMessage;
-        public Vector2 offset = new Vector2(-50, 0);
+        public Vector2 offset = new Vector2(-60, 0);
         public PenInteractionController Controller;
         public Vector2 pointerPosition;
-        public GameObject element;
 
 
 
@@ -37,18 +37,18 @@ namespace SEE.Controls.Architecture
             {
                 TooltipMessage = msg;
             };
+            
+            
         }
 
-        
-        
-        private void LateUpdate()
+        private void Update()
         {
-            
             pointerPosition = Pointer.current.position.ReadValue();
             transform.position = pointerPosition + offset;
-            
+
             if (!string.IsNullOrEmpty(TooltipMessage))
             {
+                Debug.Log(TooltipMessage);
                 Controller.Show(tooltip);
                 TooltipText.text = TooltipMessage;
             }
