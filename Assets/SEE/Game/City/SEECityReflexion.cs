@@ -13,8 +13,6 @@ namespace SEE.Game.City
     /// </summary>
     public class SEECityReflexion : SEECity
     {
-        private const string ArchitectureAttributeLabel = "Architecture";
-
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
         /// </summary>
@@ -80,7 +78,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
         /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
-        /// the result.
+        /// the result. Note that the name of the three graphs may be modified.
         /// 
         /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
@@ -95,45 +93,50 @@ namespace SEE.Game.City
                                             + "the full graph.");
             }
 
-            foreach (Node node in ArchitectureGraph.Nodes())
-            {
-                node.ToggleAttributes.Add(ArchitectureAttributeLabel);
-            }
-
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;
 
             // We merge architecture and implementation first.
             // If there are duplicate IDs, try to remedy this by appending a suffix to the ID.
-            string archSuffix = GraphsOverlap(ImplementationGraph, ArchitectureGraph) ? "-A" : null;
+            List<string> graphsOverlap = GraphsOverlap(ImplementationGraph, ArchitectureGraph);
+            string archSuffix = null;
+            if (graphsOverlap.Count > 0)
+            {
+                archSuffix = "-A";
+                Debug.LogWarning($"Overlapping graph elements found, will append '{archSuffix}' suffix."
+                                 + $"Offending elements: {string.Join(", ", graphsOverlap)}");
+            }
             Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, archSuffix);
             
             // Then we add the mappings, again checking if any IDs overlap.
-            string mapSuffix = GraphsOverlap(mergedGraph, MappingGraph) ? "-M" : null;
+            graphsOverlap = GraphsOverlap(mergedGraph, MappingGraph);
+            string mapSuffix = null;
+            if (graphsOverlap.Count > 0)
+            {
+                mapSuffix = "-M";
+                Debug.LogWarning($"Overlapping graph elements found, will append '{mapSuffix}' suffix."
+                                 + $"Offending elements: {string.Join(", ", graphsOverlap)}");
+            }
             return mergedGraph.MergeWith(MappingGraph, mapSuffix);
 
+            
             #region Local Functions
 
-            // Checks if the given graphs share any IDs in nodes or edges
-            bool GraphsOverlap(Graph aGraph, Graph anotherGraph) => 
-                NodesOverlap(aGraph, anotherGraph) || EdgesOverlap(aGraph, anotherGraph);
+            // Returns any intersecting elements (node IDs, edge IDs) between the two given graphs.
+            List<string> GraphsOverlap(Graph aGraph, Graph anotherGraph) => NodeIntersection(aGraph, anotherGraph).Concat(EdgeIntersection(aGraph, anotherGraph)).ToList();
 
-            // Checks if the given graphs share any node IDs
-            bool NodesOverlap(Graph aGraph, Graph anotherGraph) => 
-                new HashSet<string>(aGraph.Nodes().Select(x => x.ID))
-                    .Overlaps(anotherGraph.Nodes().Select(x => x.ID));
-            
-            // Checks if the given graphs share any edge IDs
-            bool EdgesOverlap(Graph aGraph, Graph anotherGraph) => 
-                new HashSet<string>(aGraph.Edges().Select(x => x.ID))
-                    .Overlaps(anotherGraph.Nodes().Select(x => x.ID));
+            // Returns the intersection of the node IDs of the two graphs.
+            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
+
+            // Returns the intersection of the edge IDs of the two graphs.
+            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
             
             #endregion
         }
 
         private static (Graph, Graph, Graph) DisassembleFullGraph(Graph FullGraph)
         {
-            //TODO
+            //TODO: How do we differentiate between the three graphs, assuming all three can be freely edited/appended?
             throw new NotImplementedException();
         }
 
