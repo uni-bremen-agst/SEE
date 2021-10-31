@@ -883,7 +883,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="nodeTypes">the node types that should be kept</param>
         /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
-        public Graph Subgraph(ICollection<string> nodeTypes)
+        public Graph Subgraph(IEnumerable<string> nodeTypes)
         {
             Graph subgraph = new Graph();
             HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
@@ -899,7 +899,7 @@ namespace SEE.DataModel.DG
         /// <param name="subgraph">subgraph where to add the nodes</param>
         /// <param name="relevantTypes">the node types that should be kept</param>
         /// <returns>a mapping of nodes from this graph onto the subgraph's nodes</returns>
-        private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, HashSet<string> relevantTypes)
+        private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, ICollection<string> relevantTypes)
         {
             Dictionary<Node, Node> mapsTo = new Dictionary<Node, Node>();
             foreach (Node root in GetRoots())
