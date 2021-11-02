@@ -293,7 +293,7 @@ namespace SEE.Game
             {
                 ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value)
                   .Select(pair => pair.Key).ToList();
-                return graph.Subgraph(matches);
+                return graph.SubgraphByNodeType(matches);
             }
         }
 
