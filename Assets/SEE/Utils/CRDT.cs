@@ -116,9 +116,10 @@ namespace SEE.Utils
         private string filename;
 
         /// <summary>
-        /// The chars of the CRDT with their positions
+        /// The size of the CRDT at the start
         /// </summary>
-        private List<CharObj> crdt = new List<CharObj>(5000);
+        private  int size;
+        
 
         //private LinkedList<CharObj> crdt = new LinkedList<CharObj>();
 
@@ -131,11 +132,17 @@ namespace SEE.Utils
         /// Constructs a CRDT
         /// </summary>
         /// <param name="siteID"></param>
-        public CRDT(string siteID, string filename)
+        public CRDT(string siteID, string filename, int size = 5000)
         {
             this.siteID = siteID;
             this.filename = filename;
+            this.size = size;
         }
+
+        /// <summary>
+        /// The chars of the CRDT with their positions
+        /// </summary>
+        private List<CharObj> crdt = new List<CharObj>(capacity: 5000);
 
         public List<CharObj> getCRDT()
         {
@@ -289,12 +296,16 @@ namespace SEE.Utils
         /// <param name="dontSyncCodeWindowChars"></param>
         public void AddString(string s, int startIdx, bool startUp = false)
         {
-            List<CharObj> charObjs = new List<CharObj>();
+            startUp = false;
+            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            Performance p = Performance.Begin("addString");
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx, startUp);
                 charObjs.Add(crdt[i + startIdx]);
             }
+            p.End();
+            Debug.Log("ADD STRING " + p.GetElapsedTime());
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
@@ -303,7 +314,10 @@ namespace SEE.Utils
             }
             else
             {
+                Performance b = Performance.Begin("NET");
                 new NetCRDT().AddString(networkbuffer);
+                b.End();
+                Debug.Log("NET " + b.GetElapsedTime());
             }
         }
 
@@ -314,7 +328,9 @@ namespace SEE.Utils
         /// <param name="index">The index in the local string</param>
         public void AddChar(char c, int index, bool startUp = false)
         {
+            startUp = false;
             Identifier[] position;
+            Performance p = Performance.Begin("ADDCHAR");
             if (index - 1 >= 0 && crdt.Count > index)
             {
                 position = GeneratePositionBetween(crdt[index - 1].GetIdentifier(), crdt[index].GetIdentifier(), siteID);
@@ -331,6 +347,8 @@ namespace SEE.Utils
             {
                 position = GeneratePositionBetween(null, null, siteID);
             }
+            p.End();
+            Debug.Log("GENERATE " + p.GetElapsedTime());
 
             if (crdt.Count > index)
             {
@@ -870,6 +888,7 @@ namespace SEE.Utils
         /// <returns>A string of a position</returns>
         public string PositionToString(Identifier[] position)
         {
+            Performance p = Performance.Begin("TOSTRIN");
             string ret = "";
             bool fst = true;
             if (position == null) return null;
@@ -885,6 +904,8 @@ namespace SEE.Utils
                 }
                 ret += i.ToString();
             }
+            p.End();
+            Debug.Log("POStoSTRING " + p.GetElapsedTime());
             return ret;
         }
 
