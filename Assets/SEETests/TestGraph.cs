@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace SEE.DataModel.DG
 {
@@ -382,7 +382,7 @@ namespace SEE.DataModel.DG
             };
 
             HashSet<string> relevantNodeTypes = new HashSet<string>() { r };
-            Graph subgraph = g.Subgraph(relevantNodeTypes);
+            Graph subgraph = g.SubgraphByNodeType(relevantNodeTypes);
             // Nodes in subgraph must have a relevant node type.
             foreach (Node node in subgraph.Nodes())
             {

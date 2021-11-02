@@ -843,28 +843,64 @@ namespace SEE.DataModel.DG
                 }
             }
         }
-
         /// <summary>
         /// Yields a subgraph of given graph that contains only nodes with one of the given
         /// <paramref name="nodeTypes"/>. The edges of this graph are "lifted" in the subgraph.
+        /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
+        /// </summary>
+        /// <param name="nodeTypes">the node types that should be kept</param>
+        /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
+        public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes)
+        {
+            HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
+            return SubgraphBy(element =>
+            {
+                if (element is Node node)
+                {
+                    return relevantTypes.Contains(node.Type);
+                }
+                else
+                {
+                    // Edges (attached to these nodes) shall be included
+                    return true;
+                }
+            });
+        }
+
+        /// <summary>
+        /// Yields a subgraph of given graph that contains only nodes and edges which have all the given
+        /// <paramref name="toggleAttributes"/>. The edges of this graph are "lifted" in the subgraph.
+        /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
+        /// </summary>
+        /// <param name="toggleAttributes">Toggle attribute a node or edge must have to be kept</param>
+        /// <returns>
+        /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
+        /// </returns>
+        public Graph SubgraphByToggleAttribute(IEnumerable<string> toggleAttributes) => 
+            SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
+
+        /// <summary>
+        /// Yields a subgraph of given graph that contains only nodes and edges for which
+        /// <paramref name="includeElement"/> returns true. The edges of this graph are "lifted" in the subgraph.
         /// More precisely, let mapsTo be a mapping of nodes from this graph onto nodes in
         /// in the resulting subgraph defined as follows (for every node N in this graph):
-        /// (A) if N has a type in <paramref name="nodeTypes"/>,
+        /// (A) if <paramref name="includeElement"/>(N) == true,
         ///     then N has a clone N' in the subgraph and mapsTo[N] = N'
-        /// (B) if N has no type in <paramref name="nodeTypes"/>,
+        /// (B) if <paramref name="includeElement"/>(N) == false,
         ///     then N has no clone in subgraph and
-        ///     (1) if N has a nearest ancestor A that has a type in <paramref name="nodeTypes"/>,
+        ///     (1) if N has a nearest ancestor A for which <paramref name="includeElement"/>(A) == true,
         ///         then mapsTo[N] = mapsTo[A]
         ///     or
-        ///     (2) none of the ancestors of N has a type in <paramref name="nodeTypes"/>,
+        ///     (2) none of the ancestors of N fulfill this condition,
         ///         then mapsTo[N] = null
         ///
         /// Given this mapping mapsTo, edges in the resulting subgraph are present as follows.
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
-        /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
+        /// if and only if <paramref name="includeElement"/>(E) == true and
+        /// mapsTo[E.Source] != null and mapsTo[E.Target] != null where
         /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
         /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
-        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propatated
+        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propagated
         /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
         ///
         /// Notes:
@@ -873,40 +909,42 @@ namespace SEE.DataModel.DG
         /// shared. Graph elements in the resulting subgraph can be mapped onto their original
         /// corresponding graph elements in this graph by way of their ID.
         ///
-        /// The resulting subgraph may have fewer edges: if an edge of this graph has a
+        /// The resulting subgraph may have fewer edges even if <paramref name="includeElement"/>
+        /// returns true for all edges: if an edge of this graph has a
         /// source or target, N, for which mapsTo[N] = null, it will be lost.
         ///
         /// An edge, E, is not propagated to a pair of nodes that already have an edge, E',
         /// independent of the types of E and E'. As a consequence, there can only be one
         /// propagated edge from one node to another node. Because the edge types are
-        /// neglected, we loose information. On the other hand, we reduce the number of edges.
+        /// neglected, we lose information. On the other hand, we reduce the number of edges.
         /// </summary>
-        /// <param name="nodeTypes">the node types that should be kept</param>
-        /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
-        public Graph Subgraph(IEnumerable<string> nodeTypes)
+        /// <param name="includeElement">function determining whether a given node or edge shall be kept</param>
+        /// <returns>
+        /// subgraph containing only nodes and edges for which <paramref name="includeElement"/> returns true.
+        /// </returns>
+        public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
         {
             Graph subgraph = new Graph();
-            HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
-            Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, relevantTypes);
-            AddEdgesToSubgraph(subgraph, mapsTo);
+            Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
+            AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
             return subgraph;
         }
 
         /// <summary>
-        /// Recursively adds all nodes to <paramref name="subgraph"/> if their type is one of
-        /// <paramref name="relevantTypes"/>. Starts at the roots and traverses all nodes in this graph.
+        /// Recursively adds all nodes to <paramref name="subgraph"/> if <paramref name="includeElement"/> returns
+        /// <c>true</c> for this element. Starts at the roots and traverses all nodes in this graph.
         /// </summary>
         /// <param name="subgraph">subgraph where to add the nodes</param>
-        /// <param name="relevantTypes">the node types that should be kept</param>
+        /// <param name="includeElement">function returning true if node shall be added</param>
         /// <returns>a mapping of nodes from this graph onto the subgraph's nodes</returns>
-        private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, ICollection<string> relevantTypes)
+        private Dictionary<Node, Node> AddNodesToSubgraph(Graph subgraph, Func<GraphElement, bool> includeElement)
         {
             Dictionary<Node, Node> mapsTo = new Dictionary<Node, Node>();
             foreach (Node root in GetRoots())
             {
                 // the node that corresponds to root in subgraph (may be null if
                 // there is no corresponding node)
-                if (relevantTypes.Contains(root.Type))
+                if (includeElement(root))
                 {
                     // root must be kept => a corresponding node is added to subgraph
                     // and root is mapped onto that node
@@ -918,26 +956,26 @@ namespace SEE.DataModel.DG
                 {
                     mapsTo[root] = null;
                 }
-                AddToSubGraph(subgraph, relevantTypes, mapsTo, root);
+                AddToSubGraph(subgraph, includeElement, mapsTo, root);
             }
             return mapsTo;
         }
 
         /// <summary>
-        /// Adds all ancestors of <paramref name="parent"/> to <paramref name="subgraph"/> if their
-        /// type is one of <paramref name="relevantTypes"/>. The mapping <paramref name="mapsTo"/>
+        /// Adds all ancestors of <paramref name="parent"/> to <paramref name="subgraph"/> if
+        /// <paramref name="includeElement"/> returns true for the ancestor. The mapping <paramref name="mapsTo"/>
         /// is updated accordingly.
         /// </summary>
         /// <param name="subgraph">subgraph where to add the nodes</param>
-        /// <param name="relevantTypes">the node types that should be kept</param>
+        /// <param name="includeElement">function returning true if node shall be added</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
-        private static void AddToSubGraph (Graph subgraph, ICollection<string> relevantTypes,
+        private static void AddToSubGraph (Graph subgraph, Func<GraphElement, bool> includeElement,
                                            IDictionary<Node, Node> mapsTo, Node parent)
         {
             foreach (Node child in parent.Children())
             {
-                if (relevantTypes.Contains(child.Type))
+                if (includeElement(child))
                 {
                     // The child must be kept => a corresponding node is created
                     // in the subgraph and child is mapped onto that node
@@ -948,20 +986,20 @@ namespace SEE.DataModel.DG
                     // corresponding to the parent (i.e., mapsTo[parent]) if
                     // one exists; it may happen that parent has no corresponding
                     // node in the subgraph if and only if either the parent is
-                    // a root with a type to be ignored or if all its ascendants
-                    // have a type to be ignored.
+                    // a root to be ignored (i.e., due to includeElement returning false)
+                    // or if all its ascendants are to be ignored.
                     Node parentInSubgraph = mapsTo[parent];
                     parentInSubgraph?.AddChild(childInSubgraph);
-                    AddToSubGraph(subgraph, relevantTypes, mapsTo, child);
+                    AddToSubGraph(subgraph, includeElement, mapsTo, child);
                 }
                 else
                 {
-                    // The child has a type to be ignored. Hence, no corresponding node
+                    // The child is to be ignored. Hence, no corresponding node
                     // is added in the subgraph for it. That means, it must be mapped
                     // onto mapsTo[parent]. There are cases in which mapsTo[parent]
                     // may be null, but that is OK: We allow null values in the mapping.
                     mapsTo[child] = mapsTo[parent];
-                    AddToSubGraph(subgraph, relevantTypes, mapsTo, child);
+                    AddToSubGraph(subgraph, includeElement, mapsTo, child);
                 }
             }
         }
@@ -969,15 +1007,18 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Propagates edge from this graph onto <paramref name="subgraph"/> as follows:
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
-        /// if and only if mapsTo[E.Source] != null and mapsTo[E.Target] != null where
+        /// if and only if <paramref name="includeElement"/>(E) == true
+        /// and mapsTo[E.Source] != null and mapsTo[E.Target] != null where
         /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
         /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
-        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propatated
+        /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propagated
         /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
         /// </summary>
-        /// <param name="subgraph">graph where to propagate the edges too</param>
+        /// <param name="subgraph">graph to propagate the edges to</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
-        private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo)
+        /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
+        private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo, 
+                                        Func<GraphElement, bool> includeElement)
         {
             foreach (Edge edge in Edges())
             {
@@ -985,7 +1026,7 @@ namespace SEE.DataModel.DG
                 Node targetInSubgraph = mapsTo[edge.Target];
 
                 if (sourceInSubgraph != null && targetInSubgraph != null
-                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type))
+                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
                 {
                     Edge edgeInSubgraph = (Edge)edge.Clone();
                     edgeInSubgraph.Source = sourceInSubgraph;

@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
-using SEE.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using SEE.Tools;
 using UnityEngine;
-using Constraint = SEE.Tools.Constraint;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -55,7 +54,7 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Test for a simple artifically created graph.
+        /// Test for a simple artificially created graph.
         /// </summary>
         [Test]
         public void TestGraphWriter()
@@ -144,7 +143,7 @@ namespace SEE.DataModel.DG.IO
             Graph inGraph = LoadGraph(filename);
             Assert.AreEqual(filename, inGraph.Path);
 
-            // Write the loaded saved inital graph again as a backup
+            // Write the loaded saved initial graph again as a backup
             string backupFilename = basename + backupSuffix + extension;
             GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
