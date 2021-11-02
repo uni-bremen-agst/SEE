@@ -51,6 +51,14 @@ namespace SEE.DataModel.DG
             }
         }
 
+        public void UnsetToggle(string attributeName)
+        {
+            if (toggleAttributes.Contains(attributeName))
+            {
+                toggleAttributes.Remove(attributeName);
+            }
+        }
+
         public bool HasToggle(string attributeName)
         {
             return toggleAttributes.Contains(attributeName);
