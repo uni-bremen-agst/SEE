@@ -110,13 +110,19 @@ namespace SEE.Game.UI.CodeWindow
 
                                                                    }).ToList(); */
                 TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
-                string cleanText = GetCleanText(); 
+
+                Performance p = Performance.Begin("GET CLEAN TEXT");
+
+                string cleanText = GetCleanText();
                 //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
                 //Debug.Log(string.Join("\n", cleanText));
-
+                p.End();
                 if (ICRDT.IsEmpty(Title))
                 {
+                    Performance pp = Performance.Begin("ADD-String");
+
                     ICRDT.AddString(cleanText, 0, Title, true);
+                    pp.End();
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
@@ -131,7 +137,6 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             if(TextMeshInputField.caretPosition > idx)
                             {
-                                Debug.Log("PLUS" + idx + " carret " + TextMeshInputField.caretPosition);
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             }
                             break;
@@ -191,7 +196,6 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
-                Debug.Log(FilePath);
                 SEEInput.KeyboardShortcutsEnabled = false;
                 if (SEEInput.SaveCodeWindow())
                 {

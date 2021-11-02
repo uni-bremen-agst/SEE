@@ -1,3 +1,4 @@
+using SEE.Game.UI.Notification;
 using SEE.Net;
 using System;
 using System.Collections.Generic;
@@ -102,7 +103,7 @@ namespace SEE.Utils
         /// <summary>
         /// A buffer to reduce the initial network traffic than oppening a file
         /// </summary>
-        public List<(char, Identifier[], Identifier[], string)> networkbuffer = new System.Collections.Generic.List<(char, Identifier[], Identifier[], string)>();
+        public List<(char, Identifier[], Identifier[], string)> networkbuffer = new List<(char, Identifier[], Identifier[], string)>();
 
         /// <summary>
         /// The ID 
@@ -168,7 +169,7 @@ namespace SEE.Utils
                     {
                         pos1 = StringToPosition(tmpPos);
                         tmpPos = "";
-                        return;
+                        continue;
                     }
                     if (c == '\n')
                     {
@@ -179,6 +180,7 @@ namespace SEE.Utils
                         pos2 = null;
                         ch ='\0';
                         CharSet = false;
+                        continue;
                     }
                     tmpPos += c;
                 }
@@ -203,8 +205,8 @@ namespace SEE.Utils
                     insertIdx = found.Item1 + 1;
                 }
                 else
-                {
-                    Debug.LogError("RemoteAddChar fehlgeschlagen! ");
+                { 
+                    ShowNotification.Error("Failure during remote change","RemoteAddChar failed! Something is wrong with the order of the Chars.");
                     return;
                 }
 
@@ -705,7 +707,7 @@ namespace SEE.Utils
         {
             if (undoStack.Count < 1)
             {
-                Debug.LogWarning("Undo Stack is empty!");
+                ShowNotification.Info("Undo Failure","Undo Stack is empty!");
                 return;
             }
             (CharObj[], operationType) lastOperation = undoStack.Pop();
@@ -722,7 +724,7 @@ namespace SEE.Utils
                         }
                         else
                         {
-                            Debug.LogWarning("Undo not possible, Char is already deleted!");
+                           ShowNotification.Warn("Undo Failure","Undo not possible, Char is already deleted!");
                         }
                     }
                     redoStack.Push((lastOperation.Item1, operationType.Delete));
@@ -741,7 +743,7 @@ namespace SEE.Utils
         {
             if (redoStack.Count < 1)
             {
-                Debug.LogWarning("Redo Stack Empty!");
+                ShowNotification.Info("Redo Failure", "Redo Stack is empty!");
                 return;
             }
             (CharObj[], operationType) lastOperation = redoStack.Pop();
@@ -758,7 +760,7 @@ namespace SEE.Utils
                         }
                         else
                         {
-                            Debug.LogWarning("Undo not possible, Char is already deleted!");
+                            ShowNotification.Warn("Redo Failure", "Redo not possible, Char is already deleted!");
                         }
                     }
                     undoStack.Push((lastOperation.Item1, operationType.Delete));
