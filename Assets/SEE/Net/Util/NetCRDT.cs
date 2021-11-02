@@ -96,26 +96,38 @@ namespace SEE.Net
 
         public void AddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
+            Performance p = Performance.Begin("NE");
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
             this.prePosition = ICRDT.PositionToString(prePosition, file);
+            p.End();
+            Debug.Log("STRING PARS" + p.GetElapsedTime());
+            Performance b = Performance.Begin("D");
             state = RemoteAction.AddChar;
             Execute(null);
+            b.End();
+            Debug.Log("REST " + b.GetElapsedTime());
         }
 
         public void AddString(List<(char, Identifier[], Identifier[], string)> text)
         {
             string listAsString = "";
+            Performance p = Performance.Begin("NE");
             foreach((char, Identifier[], Identifier[], string) c in text)
             {
                 listAsString += c.Item1 + ICRDT.PositionToString(c.Item2, c.Item4) +
                     "/" + ICRDT.PositionToString(c.Item3, c.Item4) + "\n";
             }
+            p.End();
+            Debug.Log("STRING PARS" + p.GetElapsedTime());
+            Performance b = Performance.Begin("D");
             this.file = text[0].Item4;
             state = RemoteAction.AddString;
             this.listAsString = listAsString;
             Execute(null);
+            b.End();
+            Debug.Log("REST " + b.GetElapsedTime());
 
         }
     }

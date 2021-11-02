@@ -18,8 +18,9 @@ namespace SEE.Utils
         /// Finds or creates an CRDT instance by the name of the file
         /// </summary>
         /// <param name="file">The name of the file</param>
+        /// <param name="size">optinal File Size for more effizient sizing of the CRDT</param>
         /// <returns>A crdt instance</returns>
-        private static CRDT GetInstanceByName(string file)
+        private static CRDT GetInstanceByName(string file, int size = 1000)
         {
             if(crdts != null && crdts.Count > 0 && crdts.ContainsKey(file))
             {
@@ -28,7 +29,7 @@ namespace SEE.Utils
             else
             {
                 Guid guid =  Guid.NewGuid();
-                crdts.Add(file, new CRDT(guid.ToString(), file));
+                crdts.Add(file, new CRDT(guid.ToString(), file, size));
                 return crdts[file];
             }
         }
@@ -50,7 +51,7 @@ namespace SEE.Utils
 
         public static void AddString(string s, int startIdx, string file, bool startUp = false)
         {
-            GetInstanceByName(file).AddString(s, startIdx, startUp);
+            GetInstanceByName(file, s.Length).AddString(s, startIdx, startUp);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
@@ -97,7 +98,7 @@ namespace SEE.Utils
         }
         public static void RemoteAddString(string text, string file)
         {
-            GetInstanceByName(file).RemoteAddString(text);
+            GetInstanceByName(file, text.Length).RemoteAddString(text);
         }
     }
 }

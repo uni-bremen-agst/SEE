@@ -7,7 +7,6 @@ using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
-using Sirenix.Utilities.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -117,13 +116,15 @@ namespace SEE.Game.UI.CodeWindow
                 //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
                 //Debug.Log(string.Join("\n", cleanText));
                 p.End();
+                Performance pp = Performance.Begin("ADD-String");
                 if (ICRDT.IsEmpty(Title))
                 {
-                    Performance pp = Performance.Begin("ADD-String");
+                    
 
                     ICRDT.AddString(cleanText, 0, Title, true);
                     pp.End();
                 }
+                Debug.Log("p " + p.GetElapsedTime() + " dd" + pp.GetElapsedTime());
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
@@ -272,7 +273,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
-                    if (Clipboard.CanPaste<string>())
+                  /*  if (Clipboard.CanPaste<string>())
                     {
                         if (selectedText != null)
                         {
@@ -281,7 +282,7 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.AddString(Clipboard.Paste<string>(), idx, Title);
 
 
-                    }
+                    } */
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
