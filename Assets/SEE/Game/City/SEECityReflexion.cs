@@ -167,6 +167,7 @@ namespace SEE.Game.City
         {
             //TODO
             throw new NotImplementedException();
+            //TODO: Also write test for reading three GXLs as reflexion city, then writing them, then reading them again
         }
 
         //------------------------------------------------
