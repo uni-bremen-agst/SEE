@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
         {
             if (interactable == null)
             {
-                Debug.LogError($"HighlightErosion.OnEnable for {name} has NO interactable.\n");
+                Debug.LogError($"HighlightErosion.OnEnable for {name} has no interactable.\n");
                 enabled = false;
             }
             else if ((nodeRef != null || gameObject.TryGetComponent(out nodeRef)) && nodeRef.Value != null)
@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"HighlightErosion.OnEnable for {name} has NO valid node reference.\n");
+                Debug.LogError($"HighlightErosion.OnEnable for {name} has no valid node reference.\n");
                 enabled = false;
             }
         }
