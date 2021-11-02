@@ -10,9 +10,14 @@ namespace SEE.Game.City
     /// <summary>
     /// A code city that supports architectural mappings from
     /// implementation nodes onto architecture nodes.
+    /// NOTE: It is assumed the implementation and architecture graphs are not edited!
+    /// TODO: In fact, we should disallow this programmatically, too.
     /// </summary>
     public class SEECityReflexion : SEECity
     {
+        private const string ArchitectureLabel = "Architecture";
+        private const string ImplementationLabel = "Implementation";
+
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
         /// </summary>
@@ -70,8 +75,26 @@ namespace SEE.Game.City
                     MappingGraph = LoadGraph(GxlMappingPath.Path);
                 }
 
+                // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
+                MarkGraphNodes(ArchitectureGraph, ArchitectureLabel);
+                MarkGraphNodes(ImplementationGraph, ImplementationLabel);
+                
                 LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}");
+            }
+        }
+        
+        /// <summary>
+        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of the given <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
+        /// <param name="label">The value of the toggle attribute</param>
+        public static void MarkGraphNodes(Graph graph, string label)
+        {
+            IEnumerable<GraphElement> graphElements = graph.Nodes().Concat<GraphElement>(graph.Edges());
+            foreach (GraphElement graphElement in graphElements)
+            {
+                graphElement.SetToggle(label);
             }
         }
 
@@ -136,7 +159,7 @@ namespace SEE.Game.City
 
         private static (Graph, Graph, Graph) DisassembleFullGraph(Graph FullGraph)
         {
-            //TODO: How do we differentiate between the three graphs, assuming all three can be freely edited/appended?
+            //TODO: Graph.Subgraph() should also work with toggle labels, not just types
             throw new NotImplementedException();
         }
 
