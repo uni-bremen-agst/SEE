@@ -160,17 +160,19 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string>() { hierarchicalEdgeType });
+            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType });
             graphReader.Load();
             return graphReader.GetGraph();
         }
 
         private static Node NewNode(Graph graph, string linkname)
         {
-            Node result = new Node();
-            result.ID = linkname;
-            result.SourceName = linkname;
-            result.Type = "Routine";
+            Node result = new Node
+            {
+                ID = linkname,
+                SourceName = linkname,
+                Type = "Routine"
+            };
             result.SetToggle("Linkage.Is_Definition");
             result.SetString("stringAttribute", "somestring");
             result.SetFloat("Metric.Halstead.Volume", 49.546f);
@@ -181,10 +183,12 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge(type + "#" + from.ID + "#" + to.ID);
-            result.Type = type;
-            result.Source = from;
-            result.Target = to;
+            Edge result = new Edge($"{type}#{from.ID}#{to.ID}")
+            {
+                Type = type,
+                Source = from,
+                Target = to
+            };
             result.SetToggle("Is Real");
             result.SetString("Source.Path", "path");
             result.SetFloat("Pi", 3.14f);
