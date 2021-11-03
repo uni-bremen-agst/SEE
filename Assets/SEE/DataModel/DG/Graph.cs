@@ -876,7 +876,7 @@ namespace SEE.DataModel.DG
         /// <returns>
         /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
         /// </returns>
-        public Graph SubgraphByToggleAttribute(IEnumerable<string> toggleAttributes) => 
+        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) => 
             SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
 
         /// <summary>

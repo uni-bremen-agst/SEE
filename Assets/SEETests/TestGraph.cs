@@ -555,7 +555,7 @@ namespace SEE.DataModel.DG
             TestSubGraphBy(x => x.SetToggle(relevantToggleType), 
                            x => x.UnsetToggle(relevantToggleType),
                 x => x.HasToggle(relevantToggleType),
-                g => g.SubgraphByToggleAttribute(new [] {relevantToggleType}));
+                g => g.SubgraphByToggleAttributes(new [] {relevantToggleType}));
         }
         
         [Test]
@@ -573,7 +573,7 @@ namespace SEE.DataModel.DG
                            // it suffices to unset a single toggle to make the element irrelevant
                            x => x.UnsetToggle(relevantToggleTypes.First()),
                            x => relevantToggleTypes.All(x.HasToggle),
-                           g => g.SubgraphByToggleAttribute(relevantToggleTypes));
+                           g => g.SubgraphByToggleAttributes(relevantToggleTypes));
         }
 
         private static bool HasEdge(Node source, Node target, string edgeType = null)

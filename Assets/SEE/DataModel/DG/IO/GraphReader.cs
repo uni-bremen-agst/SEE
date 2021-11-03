@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG.IO
         private readonly string rootName;
 
         /// <summary>
-        /// Loads the graph from the GXL file and adds an artifical root node if requested
+        /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
         public override void Load()

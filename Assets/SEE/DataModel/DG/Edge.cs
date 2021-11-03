@@ -61,7 +61,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The name of the toggle attribute that marks edges that where lifted from
         /// lower level nodes to higher level nodes rather than being part of the 
-        /// original graph loaded. Such edges are introduced artifically.
+        /// original graph loaded. Such edges are introduced artificially.
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
 

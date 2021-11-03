@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -279,19 +280,9 @@ namespace SEE.Game
             {
                 Debug.LogError("Empty graph path.\n");
             }
-            else
+            else if (LoadedGraph != null)
             {
-                if (LoadedGraph != null)
-                {
-                    // This loop runs only once for the first hierarchical edge type
-                    // we encounter. There is no simple method to retrieve an
-                    // arbitrary element from a HashSet (the type of HierarchicalEdges).
-                    foreach (string hierarchicalEdge in HierarchicalEdges)
-                    {
-                        GraphWriter.Save(GXLPath.Path, LoadedGraph, hierarchicalEdge);
-                        break;
-                    }
-                }
+                GraphWriter.Save(GXLPath.Path, LoadedGraph, HierarchicalEdges.First());
             }
         }
 
