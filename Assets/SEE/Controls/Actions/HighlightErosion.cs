@@ -44,7 +44,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable != null && (nodeRef != null || gameObject.TryGetComponent(out nodeRef)) && nodeRef.Value != null)
+            if (interactable == null)
+            {
+                Debug.LogError($"HighlightErosion.OnEnable for {name} has NO interactable.\n");
+                enabled = false;
+            }
+            else if ((nodeRef != null || gameObject.TryGetComponent(out nodeRef)) && nodeRef.Value != null)
             {
                 interactable.SelectIn += SelectionOn;
                 interactable.SelectOut += SelectionOff;
@@ -53,7 +58,8 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnEnable for {name} has NO interactable.\n");
+                Debug.LogError($"HighlightErosion.OnEnable for {name} has NO valid node reference.\n");
+                enabled = false;
             }
         }
 
@@ -71,7 +77,8 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnDisable for {name} has NO interactable.\n");
+                Debug.LogError($"HighlightErosion.OnDisable for {name} has NO interactable.\n");
+                enabled = false;
             }
         }
 
@@ -135,7 +142,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/> 
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/>
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the highlight is disabled unless the object is still selected.
         /// </summary>
@@ -178,7 +185,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int) node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int) node.Domain].labelSettings).AnimationDuration;
+            return (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
         }
 
         private void On()

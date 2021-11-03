@@ -11,9 +11,9 @@ using UnityEngine.Assertions;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Implements the architectural mapping for the reflexion analysis. 
+    /// Implements the architectural mapping for the reflexion analysis.
     /// This action assumes that it is attached to a game object representing
-    /// the reflexion analysis during the game. 
+    /// the reflexion analysis during the game.
     /// </summary>
     public class MappingAction : Observer, ReversibleAction
     {
@@ -33,44 +33,45 @@ namespace SEE.Controls.Actions
 
         private MappingAction()
         {
-            mapping = new Graph();
-            Graph impl = (Graph)SceneQueries.FindImplementation().LoadedGraph.Clone();
-            Graph arch = (Graph)SceneQueries.FindArchitecture().LoadedGraph.Clone();
-            string mappingName = "Mapping#" + impl.Name + "#" + arch.Name;
-            mapping.Name = mappingName;
-            foreach (Node n in impl.Nodes())
-            {
-                n.Domain |= Node.NodeDomain.Implementation;
-            }
-            foreach (Node n in arch.Nodes())
-            {
-                n.Domain |= Node.NodeDomain.Architecture;
-            }
-            Node mappingRoot = new Node
-            {
-                ID = mappingName,
-                SourceName = mappingName,
-                Domain = Node.NodeDomain.Mapping,
-                Type = "Mapping",
-                Parent = null
-            };
-            List<Node> implRoots = impl.GetRoots();
-            List<Node> archRoots = arch.GetRoots();
-            Assert.IsTrue(implRoots.Count == 1);
-            Assert.IsTrue(archRoots.Count == 1);
-            mappingRoot.AddChild(implRoots[0]);
-            mappingRoot.AddChild(archRoots[0]);
+            // FIXME
+            //mapping = new Graph();
+            //Graph impl = (Graph)SceneQueries.FindImplementation().LoadedGraph.Clone();
+            //Graph arch = (Graph)SceneQueries.FindArchitecture().LoadedGraph.Clone();
+            //string mappingName = "Mapping#" + impl.Name + "#" + arch.Name;
+            //mapping.Name = mappingName;
+            //foreach (Node n in impl.Nodes())
+            //{
+            //    n.Domain |= Node.NodeDomain.Implementation;
+            //}
+            //foreach (Node n in arch.Nodes())
+            //{
+            //    n.Domain |= Node.NodeDomain.Architecture;
+            //}
+            //Node mappingRoot = new Node
+            //{
+            //    ID = mappingName,
+            //    SourceName = mappingName,
+            //    Domain = Node.NodeDomain.Mapping,
+            //    Type = "Mapping",
+            //    Parent = null
+            //};
+            //List<Node> implRoots = impl.GetRoots();
+            //List<Node> archRoots = arch.GetRoots();
+            //Assert.IsTrue(implRoots.Count == 1);
+            //Assert.IsTrue(archRoots.Count == 1);
+            //mappingRoot.AddChild(implRoots[0]);
+            //mappingRoot.AddChild(archRoots[0]);
 
-            void _AddNodesToMappingRecursively(Node node)
-            {
-                node.ItsGraph = null;
-                mapping.AddNode(node);
-                foreach (Node child in node.Children())
-                {
-                    _AddNodesToMappingRecursively(child);
-                }
-            }
-            _AddNodesToMappingRecursively(mappingRoot);
+            //void _AddNodesToMappingRecursively(Node node)
+            //{
+            //    node.ItsGraph = null;
+            //    mapping.AddNode(node);
+            //    foreach (Node child in node.Children())
+            //    {
+            //        _AddNodesToMappingRecursively(child);
+            //    }
+            //}
+            //_AddNodesToMappingRecursively(mappingRoot);
 
             lastSelection = null;
         }
@@ -173,18 +174,19 @@ namespace SEE.Controls.Actions
             {
                 if (replaced[0].TryGetNode(out Node srcNode) && by[0].TryGetNode(out Node dstNode))
                 {
-                    Node.NodeDomain srcKind = srcNode.Domain;
-                    Node.NodeDomain dstKind = dstNode.Domain;
-                    // Note: Arch elems should not be moved into impl elems
-                    if (!srcNode.ID.Equals(dstNode.ID) && !(srcKind == Node.NodeDomain.Architecture && dstKind == Node.NodeDomain.Implementation) && !srcNode.IsRoot())
-                    {
-                        Node src = mapping.GetNode(srcNode.ID);
-                        Node dst = mapping.GetNode(dstNode.ID);
-                        src.Reparent(dst);
-                        SEECity city = SceneQueries.FindMapping();
-                        city.LoadedGraph = mapping;
-                        city.ReDrawGraph();
-                    }
+                    // FIXME
+                    //Node.NodeDomain srcKind = srcNode.Domain;
+                    //Node.NodeDomain dstKind = dstNode.Domain;
+                    //// Note: Arch elems should not be moved into impl elems
+                    //if (!srcNode.ID.Equals(dstNode.ID) && !(srcKind == Node.NodeDomain.Architecture && dstKind == Node.NodeDomain.Implementation) && !srcNode.IsRoot())
+                    //{
+                    //    Node src = mapping.GetNode(srcNode.ID);
+                    //    Node dst = mapping.GetNode(dstNode.ID);
+                    //    src.Reparent(dst);
+                    //    SEECity city = SceneQueries.FindMapping();
+                    //    city.LoadedGraph = mapping;
+                    //    city.ReDrawGraph();
+                    //}
                 }
             }
         }

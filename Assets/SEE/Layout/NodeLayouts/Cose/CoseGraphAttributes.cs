@@ -22,9 +22,9 @@ using SEE.Utils;
 namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
-    /// This class holds all settings for the cose layout
+    /// This class holds all attributes for the COSE layout
     /// </summary>
-    public class CoseGraphSettings
+    public class CoseGraphAttributes
     {
         /// <summary>
         /// The ideal length of the edge
@@ -111,7 +111,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         private const string RepulsionStrengthLabel = "RepulsionStrength";
         private const string MultiLevelScalingLabel = "MultiLevelScaling";
         private const string ListInnerNodeToggleLabel = "ListInnerNodeToggle";
-        private const string InnerNodeLayoutLabel = "InnerNodeLayout"; 
+        private const string InnerNodeLayoutLabel = "InnerNodeLayout";
         private const string InnerNodeShapeLabel = "InnerNodeShape";
         private const string LoadedForNodeTypesLabel = "LoadedForNodeTypes";
         private const string UseCalculationParameterLabel = "UseCalculationParameter";
@@ -121,7 +121,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             writer.BeginGroup(label);
             writer.Save(EdgeLength, EdgeLengthLabel);
-            writer.Save(UseSmartIdealEdgeCalculation, UseSmartIdealEdgeCalculationLabel);            
+            writer.Save(UseSmartIdealEdgeCalculation, UseSmartIdealEdgeCalculationLabel);
             writer.Save(UseSmartMultilevelScaling, UseSmartMultilevelScalingLabel);
             writer.Save(PerLevelIdealEdgeLengthFactor, PerLevelIdealEdgeLengthFactorLabel);
             writer.Save(UseSmartRepulsionRangeCalculation, UseSmartRepulsionRangeCalculationLabel);
@@ -160,7 +160,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                     ConfigIO.Restore(values, UseCalculationParameterLabel, ref UseCalculationParameter);
                     ConfigIO.Restore(values, UseIterativeCalculationLabel, ref UseIterativeCalculation);
                 }
-            }            
+            }
         }
     }
 }
