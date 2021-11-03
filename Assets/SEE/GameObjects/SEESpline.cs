@@ -116,9 +116,9 @@ namespace Assets.SEE.GameObjects
             {
                 var fr = frames.At((uint)i);
 
-                var p = TinySplineInterop.VectorToVector(fr.Position());
-                var N = TinySplineInterop.VectorToVector(fr.Normal());
-                var B = TinySplineInterop.VectorToVector(fr.Binormal());
+                var p = TinySplineInterop.VectorToVector(fr.Position);
+                var N = TinySplineInterop.VectorToVector(fr.Normal);
+                var B = TinySplineInterop.VectorToVector(fr.Binormal);
 
                 for (int j = 0; j <= radialSegments; j++)
                 {
@@ -130,7 +130,7 @@ namespace Assets.SEE.GameObjects
                     vertices.Add(p + radius * normal);
                     normals.Add(normal);
 
-                    var tangent = TinySplineInterop.VectorToVector(fr.Tangent());
+                    var tangent = TinySplineInterop.VectorToVector(fr.Tangent);
                     tangents.Add(new Vector4(tangent.x, tangent.y, tangent.z, 0f));
                 }
             }
@@ -282,9 +282,9 @@ namespace Assets.SEE.GameObjects
         public static Vector3 VectorToVector(Vec3 vec3)
         {
             return new Vector3(
-                (float)vec3.X(),
-                (float)vec3.Y(),
-                (float)vec3.Z());
+                (float)vec3.X,
+                (float)vec3.Y,
+                (float)vec3.Z);
         }
     }
 }
