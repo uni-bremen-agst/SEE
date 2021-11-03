@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Assets.SEE.GameObjects;
+﻿using Assets.SEE.GameObjects;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.GO
@@ -124,9 +124,6 @@ namespace SEE.GO
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
 
-                Points p = gameEdge.AddComponent<Points>();
-                p.controlPoints = layoutEdge.ControlPoints;
-                p.linePoints = layoutEdge.Points;
                 // Add a line renderer which serves as a preview in the Unity
                 // editor. The line renderer will be replaced with a mesh
                 // renderer at runtime (i.e., when starting the application).
@@ -176,10 +173,6 @@ namespace SEE.GO
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
-
-                Points p = gameEdge.AddComponent<Points>();
-                p.controlPoints = layoutEdge.ControlPoints;
-                p.linePoints = layoutEdge.Points;
             }
             return result;
         }
