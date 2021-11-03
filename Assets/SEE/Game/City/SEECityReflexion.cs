@@ -16,7 +16,14 @@ namespace SEE.Game.City
     /// </summary>
     public class SEECityReflexion : SEECity
     {
+        /// <summary>
+        /// Label for the architecture toggle added to each graph element of the architecture city.
+        /// </summary>
         private const string ArchitectureLabel = "Architecture";
+        
+        /// <summary>
+        /// Label for the implementation toggle added to each graph element of the implementation city.
+        /// </summary>
         private const string ImplementationLabel = "Implementation";
 
         /// <summary>
@@ -195,31 +202,48 @@ namespace SEE.Game.City
                 GraphWriter.Save(GxlMappingPath.Path, mapping, hierarchicalType);
                 Debug.Log("Three graphs written to disk.\n");
             }
-            //TODO: Also write test for reading three GXLs as reflexion city, then writing them, then reading them again
         }
-
-        //------------------------------------------------
-        // TODO: Anything below this line not yet updated.
-        //------------------------------------------------
 
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
 
+        /// <summary>
+        /// Label of attribute <see cref="GxlArchitecturePath"/> in the configuration file.
+        /// </summary>
+        private const string GxlArchitectureLabel = "ArchitectureGXL";
+        
+        /// <summary>
+        /// Label of attribute <see cref="GxlImplementationPath"/> in the configuration file.
+        /// </summary>
+        private const string GxlImplementationLabel = "ImplementationGXL";
+        
+        /// <summary>
+        /// Label of attribute <see cref="GxlMappingPath"/> in the configuration file.
+        /// </summary>
+        private const string GxlMappingLabel = "MappingGXL";
+
+        /// <summary>
+        /// Label of attribute <see cref="CityName"/> in the configuration file.
+        /// </summary>
+        private const string CityNameLabel = "CityName";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            // If any attribute is added to this class that should be contained in the
-            // configuration file, then do not forget to add the necessary
-            // statements here.
+            GxlArchitecturePath.Save(writer, GxlArchitectureLabel);
+            GxlImplementationPath.Save(writer, GxlImplementationLabel);
+            GxlMappingPath.Save(writer, GxlMappingLabel);
+            writer.Save(CityName, CityNameLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            // If any attribute is added to this class that should be restored from the
-            // configuration file, then do not forget to add the necessary
-            // statements here.
+            GxlArchitecturePath.Restore(attributes, GxlArchitectureLabel);
+            GxlImplementationPath.Restore(attributes, GxlImplementationLabel);
+            GxlMappingPath.Restore(attributes, GxlMappingLabel);
+            ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
         }
     }
 }
