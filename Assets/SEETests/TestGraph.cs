@@ -33,6 +33,35 @@ namespace SEE.DataModel.DG
             return result;
         }
 
+        private bool HasEdge(Node source, Node target, string edgeType)
+        {
+            foreach (Edge outgoing in source.Outgoings)
+            {
+                if (outgoing.Type == edgeType && outgoing.Target == target)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void AssertHasChild(Graph subgraph, Node parent, Node child)
+        {
+            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
+        }
+
+        private Node Pendant(Graph subgraph, Node baa)
+        {
+            return subgraph.GetNode(baa.ID);
+        }
+
+        private static Node Child(Graph g, Node parent, string id, string nodeType)
+        {
+            Node child = NewNode(g, id, nodeType);
+            parent.AddChild(child);
+            return child;
+        }
+
         /// <summary>
         /// Tests the following operations:
         ///   graph.AddNode
@@ -98,7 +127,6 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1 }, AsSet(n1.From_To(n1, "call")));
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n2, "use")));
             Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
-
         }
 
         private HashSet<Edge> AsSet(List<Edge> edges)
@@ -445,35 +473,6 @@ namespace SEE.DataModel.DG
             Assert.That(HasEdge(BDAA, BDAA, edgeType));
             Assert.That(HasEdge(BDAA, BD, edgeType));
             Assert.That(HasEdge(C, E, edgeType));
-        }
-
-        private bool HasEdge(Node source, Node target, string edgeType)
-        {
-            foreach (Edge outgoing in source.Outgoings)
-            {
-                if (outgoing.Type == edgeType && outgoing.Target == target)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void AssertHasChild(Graph subgraph, Node parent, Node child)
-        {
-            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
-        }
-
-        private Node Pendant(Graph subgraph, Node baa)
-        {
-            return subgraph.GetNode(baa.ID);
-        }
-
-        private static Node Child(Graph g, Node parent, string id, string nodeType)
-        {
-            Node child = NewNode(g, id, nodeType);
-            parent.AddChild(child);
-            return child;
         }
     }
 }
