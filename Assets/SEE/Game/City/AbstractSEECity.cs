@@ -405,10 +405,10 @@ namespace SEE.Game
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
         /// <param name="filename">GXL filename from which to load the graph</param>
-        /// <param name="rootName">the name of the artifical root if any needs to be added;
-        /// if none is given, <paramref name="filename"/> will be used instead</param>
+        /// <param name="rootName">the name of the artificial root if any needs to be added;
+        /// if null is given, <paramref name="filename"/> will be used instead</param>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        public Graph LoadGraph(string filename, string rootName = "")
+        protected Graph LoadGraph(string filename, string rootName = null)
         {
             if (string.IsNullOrEmpty(filename))
             {
@@ -420,7 +420,7 @@ namespace SEE.Game
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
-                                                           rootName: string.IsNullOrEmpty(rootName) ? filename : rootName,
+                                                           rootName: rootName ?? filename,
                                                            logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
