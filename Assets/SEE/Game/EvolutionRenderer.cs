@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Assets.SEE.GameObjects;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.Evolution;
@@ -701,11 +702,11 @@ namespace SEE.Game
                 {
                     foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                     {
-                        oldEdge.TryGetComponent(out Points oP);
-                        newEdge.TryGetComponent(out Points nP);
+                        oldEdge.TryGetComponent(out SEESpline oP);
+                        newEdge.TryGetComponent(out SEESpline nP);
 
                         // Approximates the length of the edge over the control points to save computing power.
-                        float dist = Vector3.Distance(nP.controlPoints[0], nP.controlPoints[nP.controlPoints.Count() - 1]);
+                        float dist = Vector3.Distance(nP.ControlPoints[0], nP.ControlPoints[nP.ControlPoints.Count() - 1]);
 
                         // The AdjustedSamplerate is determined by the performance of the last animation
                         // and tries to achieve a balance between performance and aesthetics
@@ -725,13 +726,13 @@ namespace SEE.Game
                         adjustedSampleRate = Math.Min(Math.Max(adjustedSampleRate, 2), 75);
 
                         // Creates new line points from the control points
-                        oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint)adjustedSampleRate);
-                        nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint)adjustedSampleRate);
+                        //oP.linePoints = LinePoints.BSplineLinePointsSampleRate(oP.controlPoints, (uint)adjustedSampleRate);
+                        //nP.linePoints = LinePoints.BSplineLinePointsSampleRate(nP.controlPoints, (uint)adjustedSampleRate);
 
                         // Saves the new line points to the LineRenderer
-                        oldEdge.TryGetComponent(out LineRenderer lineRenderer);
-                        lineRenderer.positionCount = oP.linePoints.Count();
-                        lineRenderer.SetPositions(oP.linePoints);
+                        //oldEdge.TryGetComponent(out LineRenderer lineRenderer);
+                        //lineRenderer.positionCount = oP.linePoints.Count();
+                        //lineRenderer.SetPositions(oP.linePoints);
                     }
                 }
                 // Sets the timer for the animation to zero
@@ -747,6 +748,7 @@ namespace SEE.Game
             }
         }
 
+        /*
         /// <summary>
         /// Reduces the number of points on the edge by half to improve performance in particularly complex cases.
         /// </summary>
@@ -781,6 +783,7 @@ namespace SEE.Game
                 return false;
             }
         }
+        */
 
         /// <summary>
         /// Interpolates the points of the old edges with those of the new edges over time.
@@ -804,7 +807,7 @@ namespace SEE.Game
                 // If the performance drops too much, we halve the number of points to be drawn by half.
                 if (edgeAnimationPerfScore < -200)
                 {
-                    DynamicSampleRateReduction();
+                    //DynamicSampleRateReduction();
 
                 }
                 RedrawEdges();
@@ -815,12 +818,13 @@ namespace SEE.Game
                 foreach ((GameObject oldEdge, GameObject newEdge) in matchedEdges)
                 {
                     if (oldEdge.TryGetComponent(out LineRenderer lineRenderer)
-                        && newEdge.TryGetComponent(out Points newLinePoints))
+                        && newEdge.TryGetComponent(out SEESpline spline))
                     {
+                        Vector3[] polyLine = spline.PolyLine(lineRenderer.positionCount);
                         for (int i = 0; i < lineRenderer.positionCount; i++)
                         {
                             lineRenderer.SetPosition(i, Vector3.Lerp(lineRenderer.GetPosition(i),
-                                                                     newLinePoints.linePoints[i],
+                                                                     polyLine[i],
                                                                      timer / AnimationDuration));
                         }
                     }
