@@ -16,7 +16,7 @@ namespace SEE.Game
     /// <summary>
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
-    /// 
+    ///
     /// This part contains the animation code.
     /// </summary>
     public partial class SEEJlgCity
@@ -55,7 +55,7 @@ namespace SEE.Game
 
         /// <summary>
         /// If true we always move to the next/previous call statement in the execution
-        /// (depending upon whether the execution is forward or backward, respectively), 
+        /// (depending upon whether the execution is forward or backward, respectively),
         /// that is, only interprocedural control flow will be shown.
         /// </summary>
         public bool ShowOnlyCalls = false;
@@ -65,13 +65,13 @@ namespace SEE.Game
         //-------------------------------------------------------
 
         /// <summary>
-        /// This name will be added at the end of every game object representing a 
+        /// This name will be added at the end of every game object representing a
         /// source-code viewer for an executed node.
         /// </summary>
         private const string FileContentNamePostfix = "FileContent";
-        
+
         /// <summary>
-        /// A ParsedJLG object that contains a parsed JLG file. This object contains all 
+        /// A ParsedJLG object that contains a parsed JLG file. This object contains all
         /// information needed for the visualization of a debugging process.
         /// </summary>
         //[NonSerialized, OdinSerialize]
@@ -95,9 +95,9 @@ namespace SEE.Game
             private uint value;
             private readonly uint maxValue;
 
-            public int Value 
-            { 
-                get => (int)value; 
+            public int Value
+            {
+                get => (int)value;
                 set
                 {
                     if (value >= 0 && value <= maxValue)
@@ -138,7 +138,7 @@ namespace SEE.Game
         private string labelText = "";
 
         /// <summary>
-        /// Time value in seconds. At this point in time (running time) the next or 
+        /// Time value in seconds. At this point in time (running time) the next or
         /// previous statement will be visualized, depending on the playing direction.
         /// </summary>
         private float nextUpdateTime = 1.0f;
@@ -174,7 +174,7 @@ namespace SEE.Game
         private bool lastDirectionWasForward = true;
 
         /// <summary>
-        /// The GameObject that represents the class the current statement belongs to. 
+        /// The GameObject that represents the class the current statement belongs to.
         /// </summary>
         private GameObject currentGO;
 
@@ -297,7 +297,7 @@ namespace SEE.Game
             if (SEEInput.ToggleExecutionOrder())
             {
                 // Reversing the order of execution.
-                updateInterval = 1;                
+                updateInterval = 1;
                 showLabelUntil = Time.time + 1f;
 
                 playingForward = !playingForward;
@@ -429,13 +429,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Checks if <see cref="currentGO"/> is the game object of the currently 
+        /// Checks if <see cref="currentGO"/> is the game object of the currently
         /// statement (indexed by <see cref="statementCounter"/>). If not, <see cref="currentGO"/>
         /// is updated to the next game objects containing the statement we are currently
         /// executing. If we switch from game node to another one, that means we have
         /// an interprocedural control flow in which case we create a visualization of
         /// a call.
-        /// 
+        ///
         /// Note: This will generate a visual representation of a call if we hit an
         /// entry statement. If we instead hit an exit statement, that means we would
         /// leave the callee. This case will be handled later in <see cref="UpdateStacks"/>.
@@ -445,7 +445,7 @@ namespace SEE.Game
             if (!NodeRepresentsStatementLocation(statementCounter.Value, currentGO))
             {
                 GameObject nodeForStatement = GetNodeForStatement(statementCounter.Value);
-                if (playingForward && statementCounter.Value > 0 
+                if (playingForward && statementCounter.Value > 0
                     && parsedJLG.AllStatements[statementCounter.Value].StatementType == StatementKind.Entry)
                 {
                     CreateFunctionCall(currentGO, nodeForStatement);
@@ -489,7 +489,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Using the GenerateFunctionCalls method from Runtime.cs but with some adjustments so it better works in this Visualization. Only using the spheres 
+        /// Using the GenerateFunctionCalls method from Runtime.cs but with some adjustments so it better works in this Visualization. Only using the spheres
         /// and saving the complete FunctionCall Gameobject instead of just the actual FunctionCallSimulator component.
         /// </summary>
         /// <param name="currentGO"></param>
@@ -516,12 +516,12 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This method generates a new ScrollableTextMeshProWindow above the code city. 
-        /// This method assumes that the game object this JLGVisualizer is attached to is 
-        /// an immediate child of the code-city object. Hence, the parent of 
-        /// <see cref="gameObject"/> identifies the code-city object. Also it fills the 
-        /// Textfield with the written code saved in the file, that belongs to this node 
-        /// aka the "FileContent". Lastly it creates a visual line between the 
+        /// This method generates a new ScrollableTextMeshProWindow above the code city.
+        /// This method assumes that the game object this JLGVisualizer is attached to is
+        /// an immediate child of the code-city object. Hence, the parent of
+        /// <see cref="gameObject"/> identifies the code-city object. Also it fills the
+        /// Textfield with the written code saved in the file, that belongs to this node
+        /// aka the "FileContent". Lastly it creates a visual line between the
         /// TextWindow and the <see cref="gameObject"/>.
         /// </summary>
         private void GenerateScrollableTextWindow()
@@ -537,7 +537,7 @@ namespace SEE.Game
                 Vector3 cityExtent = referencePlane.transform.lossyScale / 2.0f;
 
                 Vector3 windowPosition = referencePlane.position;
-                // the position of the textWindow rectangle is the 
+                // the position of the textWindow rectangle is the
                 windowPosition.y += DistanceAboveCity - textWindowHeight / 2;
                 windowPosition.z += cityExtent.z + DistanceBehindCity; // at the back edge of the city
                 textWindow.transform.position = windowPosition;
@@ -567,9 +567,9 @@ namespace SEE.Game
         {
             if (textWindow.TryGetComponent(out RectTransform rectTransform))
             {
-                // Each corner provides its world space value. The returned array of 4 vertices 
+                // Each corner provides its world space value. The returned array of 4 vertices
                 // is clockwise. It starts bottom left and rotates to top left, then top right,
-                // and finally bottom right. Note that bottom left, for example, is an (x, y, z) 
+                // and finally bottom right. Note that bottom left, for example, is an (x, y, z)
                 // vector with x being left and y being bottom.
                 Vector3[] corners = new Vector3[4];
                 rectTransform.GetWorldCorners(corners);
@@ -584,7 +584,7 @@ namespace SEE.Game
         /// <summary>
         /// Returns the transform of the plane underlying the game objects forming the code city
         /// if it exists; otherwise the transform of the code-city object is returned.
-        /// 
+        ///
         /// Assumption: The plane is an immediate child of the code-city object, named "Plane"
         /// and tagged by Tags.Decoration.
         /// </summary>
@@ -633,7 +633,7 @@ namespace SEE.Game
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Source code file {0} not found for game object {1}.\n", p, go.name);
+                        Debug.LogError($"Source code file {p} not found for game object {go.name}.\n");
                         return "1. // empty" + Environment.NewLine;
                     }
                 }
@@ -642,9 +642,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Gets a GameObject tagged with Node from this objects list of GameObjects (nodesGos) that matches 
+        /// Gets a GameObject tagged with Node from this objects list of GameObjects (nodesGos) that matches
         /// the location of the statement represented by <paramref name="index"/>.
-        /// A node matches the location of a statement if the class name of the location equals 
+        /// A node matches the location of a statement if the class name of the location equals
         /// the node's name.
         /// </summary>
         /// <param name="index">the index of the statement in this <see cref="parsedJLG.allstatements"/></param>
@@ -666,7 +666,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns true if <see cref="go"/> is a node and the class it is representing is the class of 
+        /// Returns true if <see cref="go"/> is a node and the class it is representing is the class of
         /// the given statement.
         /// </summary>
         /// <param name="stmtIndex">index of the Java statement in parsedJLGs JavaStatement list</param>
@@ -689,12 +689,12 @@ namespace SEE.Game
             GameObject fileContent = GetFileContentGOForNode(currentGO);
             fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text
                 = parsedJLG.CreateStatementInfoString(statementCounter.Value, true);
-            
+
             if (statementCounter.UpperBound())
             {
                 Debug.Log($"End of execution trace reached. Press '{KeyBindings.PreviousStatement}' to start playing backward.\n");
                 inAutomaticMode = false;
-                playingForward = false;                
+                playingForward = false;
             }
             else
             {
@@ -713,7 +713,7 @@ namespace SEE.Game
             // The info text is built in the parsedJLG object and then returned to the
             // TMPro text component.
             GameObject fileContent = GetFileContentGOForNode(currentGO);
-            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text 
+            fileContent.transform.GetChild(1).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text
                 = parsedJLG.CreateStatementInfoString(statementCounter.Value, false);
 
             if (statementCounter.LowerBound())
@@ -730,8 +730,8 @@ namespace SEE.Game
 
         /// <summary>
         /// If <see cref="ShowOnlyCalls"/> is true, the <see cref="statementCounter"/> is increased
-        /// until either the very last statement or an interprocedural control-flow 
-        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false, 
+        /// until either the very last statement or an interprocedural control-flow
+        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false,
         /// the <see cref="statementCounter"/> is increased by one.
         /// </summary>
         private void MoveForwardToNextStatement()
@@ -748,8 +748,8 @@ namespace SEE.Game
 
         /// <summary>
         /// If <see cref="ShowOnlyCalls"/> is true, the <see cref="statementCounter"/> is decreased
-        /// until either the very first statement or an interprocedural control-flow 
-        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false, 
+        /// until either the very first statement or an interprocedural control-flow
+        /// statement (entry or exit) is reached. If <see cref="ShowOnlyCalls"/> is false,
         /// the <see cref="statementCounter"/> is decreased by one.
         /// </summary>
         private void MoveBackwardToPreviousStatement()
@@ -761,7 +761,7 @@ namespace SEE.Game
                 {
                     statementCounter.Decrease();
                 }
-            }     
+            }
         }
 
         /// <summary>
@@ -799,14 +799,14 @@ namespace SEE.Game
             {
                 // Executing forward.
 
-                // If previous statement exited a class, metaphorically remove the statements class from the callstack 
+                // If previous statement exited a class, metaphorically remove the statements class from the callstack
                 // by disabling its functionCall and coloring it back to normal.
                 // FIXME: statementCounter.Value - 1 makes no sense if ShowOnlyCalls.
                 if (statementCounter.Value > 0 // not at the first statement
                         && parsedJLG.AllStatements[statementCounter.Value - 1].StatementType == StatementKind.Exit)
                 {
                     // caller
-                    
+
                     GameObject nodeForPreviousStatement = GetNodeForStatement(statementCounter.Value - 1);
 
                     if (currentGO != nodeForPreviousStatement)
@@ -866,8 +866,8 @@ namespace SEE.Game
         private GameObject FindFunctionCallForGameObjects(GameObject dstGO, GameObject srcGO, bool active)
         {
             // The enumerator of a stack iterates from the top element to the very first element added to the stack.
-            return functionCalls.FirstOrDefault(go => go.activeSelf == active && 
-                                                      go.GetComponent<FunctionCallSimulator>().src == srcGO && 
+            return functionCalls.FirstOrDefault(go => go.activeSelf == active &&
+                                                      go.GetComponent<FunctionCallSimulator>().src == srcGO &&
                                                       go.GetComponent<FunctionCallSimulator>().dst == dstGO);
         }
 
@@ -1025,7 +1025,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// This Method jumps to the next Breakpoint. If the Breakpoint is more 
+        /// This Method jumps to the next Breakpoint. If the Breakpoint is more
         /// than 200 Statements ahead, it only visualizes the last 150 steps.
         /// </summary>
         /// <returns></returns>
@@ -1080,7 +1080,7 @@ namespace SEE.Game
         /// Adjusts the <see cref="statementCounter"/> to refer to the next statement
         /// to be executed and then triggers the visualization.
         /// </summary>
-        /// <param name="direction">the direction where we should be executing, 
+        /// <param name="direction">the direction where we should be executing,
         /// true for forward, false for backward</param>
         private void OneStep(bool direction)
         {
@@ -1116,7 +1116,7 @@ namespace SEE.Game
                     statementCounter.Decrease(); // Move one step back
                     // Move one more step back (and possibly more to reach the next interprocedural
                     // control flow statement if only the calls are to be shown).
-                    MoveBackwardToPreviousStatement();  
+                    MoveBackwardToPreviousStatement();
                 }
             }
             UpdateVisualization();

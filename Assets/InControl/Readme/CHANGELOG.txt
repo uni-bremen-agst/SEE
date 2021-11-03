@@ -1,3 +1,16 @@
+### v1.8.7
+* Fixed `UnityMouseProvider` to include horizontal scroll value in `GetDeltaScroll()`
+* Fixed an issue causing GC alloc in `UnityMouseProvider`.
+* Various fixes to 8Bitdo controller profiles.
+* Potential fix for crash when disconnecting controllers on macOS with MFi enabled.
+
+### v1.8.6
+* Added rate throttling for haptic and light updates in native plugin to help mitigate latency buildup.
+* Added build post-processor for Apple platforms to include CoreHaptics.framework, which is now required.
+* Fixed switched triggers on DualSense (PS5) controllers connected over bluetooth in Windows in native input.
+* Fixed DualSense (PS5) incorrectly having `PlayStation4` device style set on Apple platforms with native input and MFi enabled.
+* Fixed DualSense (PS5) incorrect d-pad mappings when connected over bluetooth with native input enabled and MFi disabled.
+
 ### v1.8.5
 * Added support for additional Game Controller framework (MFi) controllers.
 * Added vibration support for Game Controller framework (MFi).

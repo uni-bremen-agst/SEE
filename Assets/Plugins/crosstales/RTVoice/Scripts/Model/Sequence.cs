@@ -138,27 +138,27 @@ namespace Crosstales.RTVoice.Model
          if (obj == null || GetType() != obj.GetType())
             return false;
 
-         Sequence o = (Sequence)obj;
+         Sequence other = (Sequence)obj;
 
-         return text == o.text &&
-                voices == o.voices &&
+         return Text == other.Text &&
+                (Voices == null || Voices.Equals(other.Voices)) &&
                 //Source == o.Source &&
-                System.Math.Abs(Rate - o.Rate) < Util.Constants.FLOAT_TOLERANCE &&
-                System.Math.Abs(Pitch - o.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
-                System.Math.Abs(Volume - o.Volume) < Util.Constants.FLOAT_TOLERANCE;
+                System.Math.Abs(Rate - other.Rate) < Util.Constants.FLOAT_TOLERANCE &&
+                System.Math.Abs(Pitch - other.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
+                System.Math.Abs(Volume - other.Volume) < Util.Constants.FLOAT_TOLERANCE;
       }
 
       public override int GetHashCode()
       {
          int hash = 0;
 
-         if (text != null)
-            hash += text.GetHashCode();
-         if (voices != null)
-            hash += voices.GetHashCode();
-         hash += (int)(rate * 100) * 17;
-         hash += (int)(pitch * 100) * 17;
-         hash += (int)(volume * 100) * 17;
+         if (Text != null)
+            hash += Text.GetHashCode();
+         if (Voices != null)
+            hash += Voices.GetHashCode();
+         hash += (int)(Rate * 100) * 17;
+         hash += (int)(Pitch * 100) * 17;
+         hash += (int)(Volume * 100) * 17;
 
          return hash;
       }

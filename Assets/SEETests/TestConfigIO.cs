@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools;
 using UnityEngine;
 
@@ -10,7 +12,7 @@ namespace SEE.Utils
     /// Test cases for ConfigIO.
     /// </summary>
     internal class TestConfigIO
-    {        
+    {
         [Test]
         public void TestConfigParseInteger1()
         {
@@ -230,7 +232,7 @@ namespace SEE.Utils
                 { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
             };
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("list : [ []; [1;]; [1; 2;];];"));
-        }        
+        }
 
         /// <summary>
         /// Test for SEECity.
@@ -243,7 +245,7 @@ namespace SEE.Utils
             SEECity savedCity = NewVanillaSEECity<SEECity>();
             savedCity.Save(filename);
 
-            // Create a new city with all its default values and then 
+            // Create a new city with all its default values and then
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEECity loadedCity = NewVanillaSEECity<SEECity>();
@@ -251,7 +253,7 @@ namespace SEE.Utils
             // Load the saved attributes from the configuration file.
             loadedCity.Load(filename);
 
-            SEECityAttributesAreEqual(savedCity, loadedCity);                     
+            SEECityAttributesAreEqual(savedCity, loadedCity);
         }
 
         /// <summary>
@@ -265,7 +267,7 @@ namespace SEE.Utils
             SEECityEvolution savedCity = NewVanillaSEECity<SEECityEvolution>();
             savedCity.Save(filename);
 
-            // Create a new city with all its default values and then 
+            // Create a new city with all its default values and then
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEECityEvolution loadedCity = NewVanillaSEECity<SEECityEvolution>();
@@ -287,7 +289,7 @@ namespace SEE.Utils
             SEECityRandom savedCity = NewVanillaSEECity<SEECityRandom>();
             savedCity.Save(filename);
 
-            // Create a new city with all its default values and then 
+            // Create a new city with all its default values and then
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEECityRandom loadedCity = NewVanillaSEECity<SEECityRandom>();
@@ -309,7 +311,7 @@ namespace SEE.Utils
             SEEDynCity savedCity = NewVanillaSEECity<SEEDynCity>();
             savedCity.Save(filename);
 
-            // Create a new city with all its default values and then 
+            // Create a new city with all its default values and then
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEEDynCity loadedCity = NewVanillaSEECity<SEEDynCity>();
@@ -331,7 +333,7 @@ namespace SEE.Utils
             SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
             savedCity.Save(filename);
 
-            // Create a new city with all its default values and then 
+            // Create a new city with all its default values and then
             // wipe out all its attributes to see whether they are correctly
             // restored from the saved configuration file.
             SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
@@ -347,7 +349,7 @@ namespace SEE.Utils
         //--------------------------------------------------------
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
@@ -360,21 +362,21 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
         private void SEERandomCityAttributesAreEqual(SEECityRandom expected, SEECityRandom actual)
         {
-            SEECityAttributesAreEqual(expected, actual);            
+            SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.LeafConstraint, actual.LeafConstraint);
             AreEqual(expected.InnerNodeConstraint, actual.InnerNodeConstraint);
             AreEqual(expected.LeafAttributes, actual.LeafAttributes);
         }
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
@@ -386,7 +388,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
@@ -441,7 +443,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
@@ -459,83 +461,21 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and 
+        /// Checks whether the configuration attributes of <paramref name="expected"/> and
         /// <paramref name="actual"/> are equal.
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
         private void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
-            // FIXME reintroduce tests
-#if false
-            Assert.AreEqual(expected.LODCulling, actual.LODCulling);
-            AreEqual(expected.LayoutPath, actual.LayoutPath);
-            CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
-            CollectionAssert.AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
-            AreEqual(expected.CityPath, actual.CityPath);
-            AreEqual(expected.LeafNodeColorRange, actual.LeafNodeColorRange);
-            AreEqual(expected.InnerNodeColorRange, actual.InnerNodeColorRange);
-            Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
-            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
-            Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
-            Assert.AreEqual(expected.LeafStyleMetric, actual.LeafStyleMetric);
-            AreEqual(expected.LeafLabelSettings, actual.LeafLabelSettings);
-            AreEqual(expected.InnerNodeLabelSettings, actual.InnerNodeLabelSettings);
-
-            Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
-            Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
-            Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
-            Assert.AreEqual(expected.Dead_CodeIssue, actual.Dead_CodeIssue);
-            Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
-            Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
-            Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
-
-            Assert.AreEqual(expected.StyleIssue_SUM, actual.StyleIssue_SUM);
-            Assert.AreEqual(expected.UniversalIssue_SUM, actual.UniversalIssue_SUM);
-            Assert.AreEqual(expected.MetricIssue_SUM, actual.MetricIssue_SUM);
-            Assert.AreEqual(expected.Dead_CodeIssue_SUM, actual.Dead_CodeIssue_SUM);
-            Assert.AreEqual(expected.CycleIssue_SUM, actual.CycleIssue_SUM);
-            Assert.AreEqual(expected.CloneIssue_SUM, actual.CloneIssue_SUM);
-            Assert.AreEqual(expected.ArchitectureIssue_SUM, actual.ArchitectureIssue_SUM);
-
-            Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
-            Assert.AreEqual(expected.InnerNodeHeightMetric, actual.InnerNodeHeightMetric);
-
-            Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
-            Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
-
-            Assert.AreEqual(expected.LeafObjects, actual.LeafObjects);
-            Assert.AreEqual(expected.InnerNodeObjects, actual.InnerNodeObjects);
-
-            Assert.AreEqual(expected.NodeLayout, actual.NodeLayout);
-            Assert.AreEqual(expected.EdgeLayout, actual.EdgeLayout);
-
-            Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
-            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
-            Assert.AreEqual(expected.ShowErosions, actual.ShowErosions);
-            Assert.AreEqual(expected.MaxErosionWidth, actual.MaxErosionWidth); //FIXME: Name changed
-            Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
-            Assert.AreEqual(expected.Tension, actual.Tension);
-            Assert.AreEqual(expected.RDP, actual.RDP);
-
-            // CoseGraphSettings
-            Assert.AreEqual(expected.coseGraphSettings.EdgeLength, actual.coseGraphSettings.EdgeLength);
-            Assert.AreEqual(expected.coseGraphSettings.UseSmartIdealEdgeCalculation, actual.coseGraphSettings.UseSmartIdealEdgeCalculation);
-            Assert.AreEqual(expected.coseGraphSettings.UseSmartMultilevelScaling, actual.coseGraphSettings.UseSmartMultilevelScaling);
-            Assert.AreEqual(expected.coseGraphSettings.PerLevelIdealEdgeLengthFactor, actual.coseGraphSettings.PerLevelIdealEdgeLengthFactor);
-            Assert.AreEqual(expected.coseGraphSettings.UseSmartRepulsionRangeCalculation, actual.coseGraphSettings.UseSmartRepulsionRangeCalculation);
-            Assert.AreEqual(expected.coseGraphSettings.GravityStrength, actual.coseGraphSettings.GravityStrength);
-            Assert.AreEqual(expected.coseGraphSettings.CompoundGravityStrength, actual.coseGraphSettings.CompoundGravityStrength);
-            Assert.AreEqual(expected.coseGraphSettings.RepulsionStrength, actual.coseGraphSettings.RepulsionStrength);
-            Assert.AreEqual(expected.coseGraphSettings.MultiLevelScaling, actual.coseGraphSettings.MultiLevelScaling);
-            Assert.AreEqual(expected.coseGraphSettings.MultiLevelScaling, actual.coseGraphSettings.MultiLevelScaling);
-            CollectionAssert.AreEquivalent(expected.coseGraphSettings.ListInnerNodeToggle, actual.coseGraphSettings.ListInnerNodeToggle);
-            CollectionAssert.AreEquivalent(expected.coseGraphSettings.InnerNodeLayout, actual.coseGraphSettings.InnerNodeLayout);
-            CollectionAssert.AreEquivalent(expected.coseGraphSettings.InnerNodeShape, actual.coseGraphSettings.InnerNodeShape);
-            CollectionAssert.AreEquivalent(expected.coseGraphSettings.LoadedForNodeTypes, actual.coseGraphSettings.LoadedForNodeTypes);
-            Assert.AreEqual(expected.coseGraphSettings.UseCalculationParameter, actual.coseGraphSettings.UseCalculationParameter);
-            Assert.AreEqual(expected.coseGraphSettings.UseIterativeCalculation, actual.coseGraphSettings.UseIterativeCalculation);
-#endif
+            AreEqualSharedAttributes(expected, actual);
+            AreEqualLeafNodeSettings(expected.LeafNodeSettings, actual.LeafNodeSettings);
+            AreEqualInnerNodeSettings(expected.InnerNodeSettings, actual.InnerNodeSettings);
+            AreEqualNodeLayoutSettings(expected.NodeLayoutSettings, actual.NodeLayoutSettings);
+            AreEqualEdgeLayoutSettings(expected.EdgeLayoutSettings, actual.EdgeLayoutSettings);
+            AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
+            AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
+            AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
         }
 
         /// <summary>
@@ -544,7 +484,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected label setting</param>
         /// <param name="actual">actual label setting</param>
-        private void AreEqual(LabelSettings expected, LabelSettings actual)
+        private void AreEqual(LabelAttributes expected, LabelAttributes actual)
         {
             Assert.AreEqual(expected.Show, actual.Show);
             Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
@@ -589,7 +529,7 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.Root, actual.Root);
             Assert.AreEqual(expected.RelativePath, actual.RelativePath);
-            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);            
+            Assert.AreEqual(expected.AbsolutePath, actual.AbsolutePath);
         }
 
         //--------------------------------------------------------
@@ -659,7 +599,7 @@ namespace SEE.Utils
             city.ChangeBeamColor = Color.clear;
             city.DeletionBeamColor = Color.clear;
         }
-        
+
         /// <summary>
         /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
         /// different from their default values.
@@ -667,83 +607,225 @@ namespace SEE.Utils
         /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
-            // FIXME reintroduce tests
-#if false
+            WipeOutSharedAttributes(city);
+            WipeOutLeafNodeSettings(city);
+            WipeOutInnerNodeSettings(city);
+            WipeOutNodeLayoutSettings(city);
+            WipeOutEdgeLayoutSettings(city);
+            WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
+            WipeOutErosionSettings(city);
+            WipeOutCoseGraphSettings(city);
+        }
+
+        private static void WipeOutCoseGraphSettings(AbstractSEECity city)
+        {
+            // CoseGraphSettings
+            city.CoseGraphSettings.EdgeLength++;
+            city.CoseGraphSettings.UseSmartIdealEdgeCalculation = !city.CoseGraphSettings.UseSmartIdealEdgeCalculation;
+            city.CoseGraphSettings.UseSmartMultilevelScaling = !city.CoseGraphSettings.UseSmartMultilevelScaling;
+            city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor++;
+            city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = !city.CoseGraphSettings.UseSmartRepulsionRangeCalculation;
+            city.CoseGraphSettings.GravityStrength++;
+            city.CoseGraphSettings.CompoundGravityStrength++;
+            city.CoseGraphSettings.RepulsionStrength++;
+            city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
+            city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
+            city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
+            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, InnerNodeKinds>() { { "ID1", InnerNodeKinds.Blocks }, { "ID2", InnerNodeKinds.Circles } };
+            city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
+            city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
+            city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
+        }
+
+        private void AreEqualCoseGraphSettings(CoseGraphAttributes expected, CoseGraphAttributes actual)
+        {
+            // CoseGraphSettings
+            Assert.AreEqual(expected.EdgeLength, actual.EdgeLength);
+            Assert.AreEqual(expected.UseSmartIdealEdgeCalculation, actual.UseSmartIdealEdgeCalculation);
+            Assert.AreEqual(expected.UseSmartMultilevelScaling, actual.UseSmartMultilevelScaling);
+            Assert.AreEqual(expected.PerLevelIdealEdgeLengthFactor, actual.PerLevelIdealEdgeLengthFactor);
+            Assert.AreEqual(expected.UseSmartRepulsionRangeCalculation, actual.UseSmartRepulsionRangeCalculation);
+            Assert.AreEqual(expected.GravityStrength, actual.GravityStrength);
+            Assert.AreEqual(expected.CompoundGravityStrength, actual.CompoundGravityStrength);
+            Assert.AreEqual(expected.RepulsionStrength, actual.RepulsionStrength);
+            Assert.AreEqual(expected.MultiLevelScaling, actual.MultiLevelScaling);
+            CollectionAssert.AreEquivalent(expected.ListInnerNodeToggle, actual.ListInnerNodeToggle);
+            CollectionAssert.AreEquivalent(expected.InnerNodeLayout, actual.InnerNodeLayout);
+            CollectionAssert.AreEquivalent(expected.InnerNodeShape, actual.InnerNodeShape);
+            CollectionAssert.AreEquivalent(expected.LoadedForNodeTypes, actual.LoadedForNodeTypes);
+            Assert.AreEqual(expected.UseCalculationParameter, actual.UseCalculationParameter);
+            Assert.AreEqual(expected.UseIterativeCalculation, actual.UseIterativeCalculation);
+        }
+
+        static void WipeOutErosionSettings(AbstractSEECity city)
+        {
+            city.ErosionSettings.ShowInnerErosions = !city.ErosionSettings.ShowInnerErosions;
+            city.ErosionSettings.ShowLeafErosions = !city.ErosionSettings.ShowLeafErosions;
+            city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
+            city.ErosionSettings.IssuesAddedFromVersion = "XXX";
+            city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
+            city.ErosionSettings.ErosionScalingFactor++;
+
+            city.ErosionSettings.StyleIssue = "X";
+            city.ErosionSettings.UniversalIssue = "X";
+            city.ErosionSettings.MetricIssue = "X";
+            city.ErosionSettings.Dead_CodeIssue = "X";
+            city.ErosionSettings.CycleIssue = "X";
+            city.ErosionSettings.CloneIssue = "X";
+            city.ErosionSettings.ArchitectureIssue = "X";
+
+            city.ErosionSettings.StyleIssue_SUM = "X";
+            city.ErosionSettings.UniversalIssue_SUM = "X";
+            city.ErosionSettings.MetricIssue_SUM = "X";
+            city.ErosionSettings.Dead_CodeIssue_SUM = "X";
+            city.ErosionSettings.CycleIssue_SUM = "X";
+            city.ErosionSettings.CloneIssue_SUM = "X";
+            city.ErosionSettings.ArchitectureIssue_SUM = "X";
+        }
+
+        private void AreEqualErosionSettings(ErosionAttributes expected, ErosionAttributes actual)
+        {
+            Assert.AreEqual(expected.ShowInnerErosions, actual.ShowInnerErosions);
+            Assert.AreEqual(expected.ShowLeafErosions, actual.ShowLeafErosions);
+            Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
+            Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
+            Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
+            Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
+
+            Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
+            Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
+            Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
+            Assert.AreEqual(expected.Dead_CodeIssue, actual.Dead_CodeIssue);
+            Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
+            Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
+            Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
+
+            Assert.AreEqual(expected.StyleIssue_SUM, actual.StyleIssue_SUM);
+            Assert.AreEqual(expected.UniversalIssue_SUM, actual.UniversalIssue_SUM);
+            Assert.AreEqual(expected.MetricIssue_SUM, actual.MetricIssue_SUM);
+            Assert.AreEqual(expected.Dead_CodeIssue_SUM, actual.Dead_CodeIssue_SUM);
+            Assert.AreEqual(expected.CycleIssue_SUM, actual.CycleIssue_SUM);
+            Assert.AreEqual(expected.CloneIssue_SUM, actual.CloneIssue_SUM);
+            Assert.AreEqual(expected.ArchitectureIssue_SUM, actual.ArchitectureIssue_SUM);
+        }
+
+        private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)
+        {
+            city.EdgeLayoutSettings.Kind = EdgeLayoutKind.None;
+            city.EdgeLayoutSettings.EdgeWidth++;
+            city.EdgeLayoutSettings.EdgesAboveBlocks = !city.EdgeLayoutSettings.EdgesAboveBlocks;
+            city.EdgeLayoutSettings.Tension = 0;
+            city.EdgeLayoutSettings.RDP = 0;
+        }
+
+        private static void WipeOutEdgeSelectionSettings(EdgeSelectionAttributes edgeSelectionSettings)
+        {
+            edgeSelectionSettings.TubularSegments = 0;
+            edgeSelectionSettings.Radius = 0;
+            edgeSelectionSettings.RadialSegments = 0;
+            edgeSelectionSettings.AreSelectable = !edgeSelectionSettings.AreSelectable;
+        }
+
+        private void AreEqualEdgeLayoutSettings(EdgeLayoutAttributes expected, EdgeLayoutAttributes actual)
+        {
+            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
+            Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
+            Assert.AreEqual(expected.Tension, actual.Tension);
+            Assert.AreEqual(expected.RDP, actual.RDP);
+        }
+
+        private void AreEqualEdgeSelectionSettings(EdgeSelectionAttributes expected, EdgeSelectionAttributes actual)
+        {
+            Assert.AreEqual(expected.TubularSegments, actual.TubularSegments);
+            Assert.AreEqual(expected.Radius, actual.Radius);
+            Assert.AreEqual(expected.RadialSegments, actual.RadialSegments);
+            Assert.AreEqual(expected.AreSelectable, actual.AreSelectable);
+        }
+
+        private static void WipeOutNodeLayoutSettings(AbstractSEECity city)
+        {
+            city.NodeLayoutSettings.Kind = NodeLayoutKind.CompoundSpringEmbedder;
+            city.NodeLayoutSettings.LayoutPath.Set("no path found");
+        }
+
+        private void AreEqualNodeLayoutSettings(NodeLayoutAttributes expected, NodeLayoutAttributes actual)
+        {
+            Assert.AreEqual(expected.Kind, actual.Kind);
+            AreEqual(expected.LayoutPath, actual.LayoutPath);
+        }
+
+        private static void WipeOutInnerNodeSettings(AbstractSEECity city)
+        {
+            city.InnerNodeSettings.Kind = InnerNodeKinds.Donuts;
+            city.InnerNodeSettings.HeightMetric = "X";
+            city.InnerNodeSettings.ColorMetric = "X";
+            city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
+            city.InnerNodeSettings.InnerDonutMetric = "X";
+            WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
+        }
+
+        private void AreEqualInnerNodeSettings(InnerNodeAttributes expected, InnerNodeAttributes actual)
+        {
+            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
+            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
+            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
+            Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
+            AreEqual(expected.LabelSettings, actual.LabelSettings);
+        }
+
+        private static void WipeOutLeafNodeSettings(AbstractSEECity city)
+        {
+            city.LeafNodeSettings.Kind = LeafNodeKinds.Blocks;
+            city.LeafNodeSettings.HeightMetric = "X";
+            city.LeafNodeSettings.WidthMetric = "X";
+            city.LeafNodeSettings.DepthMetric = "X";
+            city.LeafNodeSettings.ColorMetric = "X";
+            city.LeafNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
+            city.LeafNodeSettings.MinimalBlockLength = 90000;
+            city.LeafNodeSettings.MaximalBlockLength = 1000000;
+            WipeOutLabelSettings(ref city.LeafNodeSettings.LabelSettings);
+        }
+
+        private void AreEqualLeafNodeSettings(LeafNodeAttributes expected, LeafNodeAttributes actual)
+        {
+            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
+            Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
+            Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
+            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
+            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
+            Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
+            Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
+            AreEqual(expected.LabelSettings, actual.LabelSettings);
+        }
+
+        private static void WipeOutSharedAttributes(AbstractSEECity city)
+        {
             city.LODCulling++;
-            city.LayoutPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gvl");
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
             city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
             city.CityPath.Set("C:/MyAbsoluteDirectory/config.cfg");
-            city.LeafNodeColorRange = new ColorRange(Color.clear, Color.clear, 2);
-            city.InnerNodeColorRange = new ColorRange(Color.clear, Color.clear, 10);
-            city.WidthMetric = "M1";
-            city.HeightMetric = "M2";
-            city.DepthMetric = "M3";
-            city.LeafStyleMetric = "M4";
-
-            city.StyleIssue = "X";
-            city.UniversalIssue = "X";
-            city.MetricIssue = "X";
-            city.Dead_CodeIssue = "X";
-            city.CycleIssue = "X";
-            city.CloneIssue = "X";
-            city.ArchitectureIssue = "X";
-
-            city.StyleIssue_SUM = "X";
-            city.UniversalIssue_SUM = "X";
-            city.MetricIssue_SUM = "X";
-            city.Dead_CodeIssue_SUM = "X";
-            city.CycleIssue_SUM = "X";
-            city.CloneIssue_SUM = "X";
-            city.ArchitectureIssue_SUM = "X";
-
-            city.InnerDonutMetric = "X";
-            city.InnerNodeHeightMetric = "X";
-            city.InnerNodeStyleMetric = "X";
-
-            city.MinimalBlockLength++;
-            city.MaximalBlockLength++;
-            city.LeafObjects = AbstractSEECity.LeafNodeKinds.Blocks;
-            city.InnerNodeObjects = AbstractSEECity.InnerNodeKinds.Empty;
-
-            city.NodeLayout = NodeLayoutKind.CompoundSpringEmbedder;
-            city.EdgeLayout = Layout.EdgeLayouts.EdgeLayoutKind.Straight;
-
             city.ZScoreScale = !city.ZScoreScale;
-            city.EdgeWidth++;
-            city.ShowErosions = !city.ShowErosions;
-            city.MaxErosionWidth++; //FIXME: Name changed
-            city.EdgesAboveBlocks = !city.EdgesAboveBlocks;
-            city.Tension = 0.0f;
-            city.RDP = 10;
+            city.ScaleOnlyLeafMetrics = !city.ScaleOnlyLeafMetrics;
+        }
 
-            WipeOutLabelSettings(ref city.LeafLabelSettings);
-            WipeOutLabelSettings(ref city.InnerNodeLabelSettings);
-
-            // CoseGraphSettings
-            city.coseGraphSettings.EdgeLength++;
-            city.coseGraphSettings.UseSmartIdealEdgeCalculation = !city.coseGraphSettings.UseSmartIdealEdgeCalculation;
-            city.coseGraphSettings.UseSmartMultilevelScaling = !city.coseGraphSettings.UseSmartMultilevelScaling;
-            city.coseGraphSettings.PerLevelIdealEdgeLengthFactor++;
-            city.coseGraphSettings.UseSmartRepulsionRangeCalculation = !city.coseGraphSettings.UseSmartRepulsionRangeCalculation;
-            city.coseGraphSettings.GravityStrength++;
-            city.coseGraphSettings.CompoundGravityStrength++;
-            city.coseGraphSettings.RepulsionStrength++;
-            city.coseGraphSettings.MultiLevelScaling = !city.coseGraphSettings.MultiLevelScaling;
-            city.coseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
-            city.coseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
-            city.coseGraphSettings.InnerNodeShape = new Dictionary<string, AbstractSEECity.InnerNodeKinds>() { { "ID1", AbstractSEECity.InnerNodeKinds.Blocks }, { "ID2", AbstractSEECity.InnerNodeKinds.Circles } };
-            city.coseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
-            city.coseGraphSettings.UseCalculationParameter = !city.coseGraphSettings.UseCalculationParameter;
-            city.coseGraphSettings.UseIterativeCalculation = !city.coseGraphSettings.UseIterativeCalculation;
-#endif
+        private void AreEqualSharedAttributes(AbstractSEECity expected, AbstractSEECity actual)
+        {
+            Assert.AreEqual(expected.LODCulling, actual.LODCulling);
+            CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
+            CollectionAssert.AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
+            AreEqual(expected.CityPath, actual.CityPath);
+            Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
+            Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
         }
 
         /// <summary>
         /// Modifies all attributes of <paramref name="settings"/>.
         /// </summary>
         /// <param name="settings">settings whose attributes are to be modified</param>
-        private static void WipeOutLabelSettings(ref LabelSettings settings)
+        private static void WipeOutLabelSettings(ref LabelAttributes settings)
         {
             settings.AnimationDuration++;
             settings.Show = !settings.Show;

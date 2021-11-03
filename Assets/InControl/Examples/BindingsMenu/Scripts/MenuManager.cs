@@ -72,7 +72,11 @@ public class MenuManager : MonoBehaviour
 	// This project uses the experimental fast enter play mode options with domain reloading disabled,
 	// so we need to reinitialize our static variables.
 	// https://docs.unity3d.com/Manual/DomainReloading.html
+	#if UNITY_2019_1_OR_NEWER
 	[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.SubsystemRegistration )]
+	#else
+	[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.AfterSceneLoad )]
+	#endif
 	static void Init()
 	{
 		instance = null;
@@ -110,3 +114,4 @@ public class MenuManager : MonoBehaviour
 
 	#endregion
 }
+

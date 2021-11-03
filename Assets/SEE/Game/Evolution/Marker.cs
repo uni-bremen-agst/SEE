@@ -10,7 +10,7 @@ namespace SEE.Game.Evolution
     /// A factory for markers to highlight added, changed, and deleted nodes.
     /// The visual appearance of the markers are cylinders above the marked game objects.
     /// Their color depends upon whether they were added, deleted, or changed.
-    /// The markers appear as beams with emissive light growing from 0 to the 
+    /// The markers appear as beams with emissive light growing from 0 to the
     /// requested maximal marker height in a requested time.
     /// </summary>
     public class Marker
@@ -77,14 +77,14 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// The height of the beam markers used to mark new, changed, and deleted 
+        /// The height of the beam markers used to mark new, changed, and deleted
         /// objects from one version to the next one.
         /// </summary>
         private readonly float markerHeight;
 
         /// <summary>
-        /// The width (x and z lengths) of the beam markers used to mark new, changed, 
-        /// and deleted objects from one version 
+        /// The width (x and z lengths) of the beam markers used to mark new, changed,
+        /// and deleted objects from one version
         /// to the next one.
         /// </summary>
         private readonly float markerWidth;
@@ -116,7 +116,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a beam marker on top
-        /// of its roof. 
+        /// of its roof.
         /// </summary>
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">the factory to create the beam marker</param>
@@ -125,13 +125,14 @@ namespace SEE.Game.Evolution
         {
             // The marker should be drawn in front of the block, hence, its render
             // queue offset must be greater than the one of the block.
-            GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+            //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+            GameObject beamMarker = NewBeam(factory, 0);
 
             // FIXME: These kinds of beam markers make sense only for leaf nodes.
             // Could we better use some kind of blinking now that the cities
             // are drawn in miniature?
 
-            beamMarker.tag = Tags.Decoration;            
+            beamMarker.tag = Tags.Decoration;
             Vector3 position = graphRenderer.GetRoof(gameNode);
 
             Vector3 beamScale;
@@ -157,7 +158,7 @@ namespace SEE.Game.Evolution
         /// Emissive light is added to it. Its strength is defined by <see cref="EmissionStrength"/>.
         /// </summary>
         /// <param name="factory">the factory to create the beam marker</param>
-        /// <param name="renderQueueOffset">offset in the render queue</param>        
+        /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new beam marker</returns>
         private static GameObject NewBeam(CylinderFactory factory, int renderQueueOffset)
         {
@@ -173,10 +174,10 @@ namespace SEE.Game.Evolution
         /// Adds emission strength to the given <paramref name="gameObject"/>.
         /// This strength defines the intensity of the emitted light. The
         /// strength is defined by <see cref="EmissionStrength"/>.
-        /// 
+        ///
         /// Note: The sharedMaterial will be changed. That means all other objects
         /// having the same material will be affected, too.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a render whose
         /// material has a property _EmissionStrength.
         /// </summary>
@@ -200,6 +201,7 @@ namespace SEE.Game.Evolution
         {
             GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
             beamMarker.name = "dead " + gameNode.name;
+            beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
         }
 
@@ -218,6 +220,7 @@ namespace SEE.Game.Evolution
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);
+            beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
         }
 
@@ -253,7 +256,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// The behaviour to grow a beam until it reaches its target height over
-        /// multiple frames. This component is assumed to be attached to a 
+        /// multiple frames. This component is assumed to be attached to a
         /// marker. The width and depth of all markers will be maintained to WidthDepth.
         /// </summary>
         private class BeamRaiser : MonoBehaviour
@@ -309,7 +312,7 @@ namespace SEE.Game.Evolution
             {
                 if (transform.lossyScale != targetScale)
                 {
-                    // Resize gameObject independent of parent so that the scale relates to 
+                    // Resize gameObject independent of parent so that the scale relates to
                     // world space. This can be done by first unparenting the gameObject.
                     Transform parent = transform.parent;
                     transform.parent = null;
@@ -318,7 +321,7 @@ namespace SEE.Game.Evolution
                     // The relative time spent so far in relation to the requested duration.
                     float relativeTime = Mathf.Min(timeSinceStart / duration, 1.0f);
 
-                    // The height is further increased as a linear interpolation 
+                    // The height is further increased as a linear interpolation
                     // between the initial and final height relative to the time so far.
                     Vector3 newScale = targetScale;
                     newScale.y = Mathf.Lerp(initialHeight, targetScale.y, relativeTime);

@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 namespace Crosstales.RTVoice.EditorUtil
 {
@@ -68,7 +67,7 @@ namespace Crosstales.RTVoice.EditorUtil
       public static Texture2D Store_LipSync => loadImage(ref store_LipSync, "Store_LipSync.png");
 
       public static Texture2D Store_Naninovel => loadImage(ref store_Naninovel, "Store_Naninovel.png");
-      
+
       public static Texture2D Store_NPC_Chat => loadImage(ref store_NPC_Chat, "Store_NPC_Chat.png");
 
       public static Texture2D Store_QuestSystem => loadImage(ref store_QuestSystem, "Store_QuestSystem.png");

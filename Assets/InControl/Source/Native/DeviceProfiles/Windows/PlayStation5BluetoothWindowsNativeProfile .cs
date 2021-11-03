@@ -27,6 +27,7 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.DirectInput,
 					VendorID = 0x54c,
 					ProductID = 0xce6,
 					TransportType = InputDeviceTransportType.Bluetooth,
@@ -179,7 +180,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "L2",
 					Target = InputControlType.LeftTrigger,
-					Source = Analog( 4 ),
+					Source = Analog( 5 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
@@ -187,7 +188,7 @@ namespace InControl.NativeDeviceProfiles
 				{
 					Name = "R2",
 					Target = InputControlType.RightTrigger,
-					Source = Analog( 5 ),
+					Source = Analog( 4 ),
 					SourceRange = InputRangeType.MinusOneToOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},

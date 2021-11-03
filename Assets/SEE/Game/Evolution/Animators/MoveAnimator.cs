@@ -26,42 +26,38 @@ namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Animates the move of a given GameObject over the full <see cref="AbstractAnimator.MaxAnimationTime"/>.
-    /// The scale and style are instantly applied.
+    /// The scale is instantly applied.
     /// </summary>
     public class MoveAnimator : AbstractAnimator
     {
         /// <summary>
-        /// Moves the game object to its target location through animation. The scale and style are instantly applied.
-        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
-        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as 
-        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
-        /// equals null, no callback happens.
+        /// Creates a new animator with a given maximal animation time.
+        /// </summary>
+        /// <param name="maxAnimationTime">The maximum time the animation is allowed to run.</param>
+        public MoveAnimator(float maxAnimationTime = DefaultAnimationTime)
+            : base (maxAnimationTime)
+        { }
+
+        /// <summary>
+        /// Moves the game object to its target location through animation. The scale and style
+        /// are instantly applied.
+        /// At the end of the animation, the <see cref="Action"/> <paramref name="callback"/>
+        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callback"/>
+        /// is not null. If <paramref name="callback"/> equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transform to be applied</param>
-        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added, 
+        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added,
         /// modified, or deleted w.r.t. to the previous graph</param>
-        /// <param name="callBackTarget">an optional game object that should receive the callback</param>
-        /// <param name="callbackName">the method name of the callback</param>
+        /// <param name="callback">method to be called when the animation has finished</param>
         protected override void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
                    Difference difference,
-                   GameObject callBackTarget,
-                   string callbackName,
                    Action<object> callback)
         {
             gameObject.transform.localScale = layout.LocalScale;
-
-            if (callBackTarget != null)
-            {
-                Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime);
-                callback?.Invoke(gameObject);
-            }
-            else
-            {
-                Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime);
-            }
+            Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime, callback);
         }
     }
 }

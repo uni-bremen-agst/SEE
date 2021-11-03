@@ -1,4 +1,4 @@
-﻿// ReSharper disable StringLiteralTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedType.Global
@@ -29,9 +29,9 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.DirectInput,
 					VendorID = 0x79,
 					ProductID = 0x11,
-					// VersionNumber = 0x0,
 				},
 			};
 

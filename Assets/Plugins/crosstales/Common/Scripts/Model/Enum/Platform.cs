@@ -10,7 +10,7 @@
       Android,
       WSA,
       Web,
-      Unsupported,
+      Unsupported
       //MaryTTS
    }
 }

@@ -19,7 +19,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       #region Editor methods
 
-      public void OnEnable()
+      private void OnEnable()
       {
          script = (Tool.ChangeGender)target;
       }

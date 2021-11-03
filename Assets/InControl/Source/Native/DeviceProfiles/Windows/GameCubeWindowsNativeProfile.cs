@@ -27,9 +27,9 @@ namespace InControl.NativeDeviceProfiles
 			{
 				new InputDeviceMatcher
 				{
+					DriverType = InputDeviceDriverType.DirectInput,
 					VendorID = 0x79,
 					ProductID = 0x1846,
-					// VersionNumber = 0x0,
 				},
 			};
 

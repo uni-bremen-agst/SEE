@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -18,11 +19,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void Awake()
         {
-            if (!gameObject.TryGetComponent<InteractableObject>(out interactable))
+            if (!gameObject.TryGetComponentOrLog(out interactable))
             {
-                Debug.LogWarningFormat
-                    ("The game object {0} this InteractableObjectAction is attached to has no InteractableObject component.\n",
-                      name);
                 enabled = false;
             }
         }

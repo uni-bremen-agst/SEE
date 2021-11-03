@@ -17,17 +17,15 @@ namespace Crosstales.RTVoice.EditorExtension
 
       #region Editor methods
 
-      public void OnEnable()
+      private void OnEnable()
       {
          script = (Tool.Paralanguage)target;
       }
 
-      public void OnDisable()
+      private void OnDisable()
       {
          if (Util.Helper.isEditorMode)
-         {
             Speaker.Instance.Silence();
-         }
       }
 
       public override void OnInspectorGUI()

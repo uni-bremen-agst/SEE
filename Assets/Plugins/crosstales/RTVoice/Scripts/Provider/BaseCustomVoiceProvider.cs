@@ -35,6 +35,9 @@ namespace Crosstales.RTVoice.Provider
       /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
       public event SpeakCurrentWord OnSpeakCurrentWord;
 
+      /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
+      public event SpeakCurrentWordString OnSpeakCurrentWordString;
+
       /// <summary>An event triggered whenever a new phoneme is spoken (native mode, Windows only).</summary>
       public event SpeakCurrentPhoneme OnSpeakCurrentPhoneme;
 
@@ -169,7 +172,7 @@ namespace Crosstales.RTVoice.Provider
                do
                {
                   yield return null;
-               } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+               } while (!silence && wrapper.Source.CTHasActiveClip());
 
                if (Util.Config.DEBUG)
                   Debug.Log("Text spoken: " + wrapper.Text);
@@ -248,7 +251,7 @@ namespace Crosstales.RTVoice.Provider
                   do
                   {
                      yield return null;
-                  } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+                  } while (!silence && wrapper.Source.CTHasActiveClip());
 
                   if (Util.Config.DEBUG)
                      Debug.Log("Text spoken: " + wrapper.Text, this);
@@ -359,7 +362,7 @@ namespace Crosstales.RTVoice.Provider
                               do
                               {
                                  yield return null;
-                              } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+                              } while (!silence && wrapper.Source.CTHasActiveClip());
 
                               if (Util.Config.DEBUG)
                                  Debug.Log($"Text spoken: {wrapper.Text}", this);
@@ -562,6 +565,14 @@ namespace Crosstales.RTVoice.Provider
          {
             Debug.LogWarning("Word index is larger than the speech text word count: " + wordIndex + "/" + speechTextArray.Length, this);
          }
+      }
+
+      protected void onSpeakCurrentWord(Model.Wrapper wrapper, string word)
+      {
+         if (Util.Config.DEBUG)
+            Debug.Log("onSpeakCurrentWord: " + word + System.Environment.NewLine + wrapper);
+
+         OnSpeakCurrentWordString?.Invoke(wrapper, word);
       }
 
       protected void onSpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme)
