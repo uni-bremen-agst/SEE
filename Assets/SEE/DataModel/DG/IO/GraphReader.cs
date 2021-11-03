@@ -25,7 +25,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="filename">the name of the GXL file</param>
         /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-        /// <param name="rootName">name of the artifical root node if required</param>
+        /// <param name="rootName">name of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
         public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null)
             : base(filename, logger)
