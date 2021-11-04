@@ -520,7 +520,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="rootNode">the root of the node hierarchy to be collected</param>
         /// <returns>all descendents of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
-        public static IList<GameObject> AllDescendents(this GameObject rootNode)
+        public static IList<GameObject> AllDescendants(this GameObject rootNode)
         {
             IList<GameObject> result = new List<GameObject>() { rootNode };
             AllDescendents(rootNode, result);

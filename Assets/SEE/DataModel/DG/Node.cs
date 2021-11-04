@@ -666,7 +666,7 @@ namespace SEE.DataModel.DG
         /// <returns>all deleted nodes and edges including this node</returns>
         public SubgraphMemento DeleteTree()
         {
-            SubgraphMemento result = new SubgraphMemento(this);
+            SubgraphMemento result = new SubgraphMemento(ItsGraph);
             foreach (Node node in PostOrderDescendants())
             {
                 result.Parents[node] = node.Parent;
