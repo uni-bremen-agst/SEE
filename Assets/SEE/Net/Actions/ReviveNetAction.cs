@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,7 +37,7 @@ namespace SEE.Net
         /// a node or edge that have to be revived</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
-        public ReviveNetAction(List<string> gameObjectIDs) : base()
+        public ReviveNetAction(GraphElementsMemento subgraph, List<string> gameObjectIDs) : base()
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
         }
@@ -59,7 +60,7 @@ namespace SEE.Net
             {
                 ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
                 ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-                GameElementDeleter.Revive(gameObjects);
+                GameElementDeleter.Revive(null, gameObjects); // FIXME
             }
         }
     }
