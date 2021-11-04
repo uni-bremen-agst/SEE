@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Net;
 using System;
@@ -288,22 +289,25 @@ namespace SEE.Utils
             }
         }
 
+
         /// <summary>
         /// Adds a string to the CRDT at the startIdx
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
         /// <param name="dontSyncCodeWindowChars"></param>
-        public void AddString(string s, int startIdx, bool startUp = false)
+        public async UniTask AddString(string s, int startIdx, bool startUp = false)
         {
-            startUp = false;
+            startUp = true;
             List<CharObj> charObjs = new List<CharObj>(s.Length);
             Performance p = Performance.Begin("addString");
+            await UniTask.SwitchToThreadPool();
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx, startUp);
                 charObjs.Add(crdt[i + startIdx]);
             }
+            await UniTask.SwitchToMainThread();
             p.End();
             Debug.Log("ADD STRING " + p.GetElapsedTime());
             if (!startUp)
@@ -315,7 +319,7 @@ namespace SEE.Utils
             else
             {
                 Performance b = Performance.Begin("NET");
-                new NetCRDT().AddString(networkbuffer);
+                await new NetCRDT().AddString(networkbuffer); ;
                 b.End();
                 Debug.Log("NET " + b.GetElapsedTime());
             }
@@ -328,7 +332,7 @@ namespace SEE.Utils
         /// <param name="index">The index in the local string</param>
         public void AddChar(char c, int index, bool startUp = false)
         {
-            startUp = false;
+            startUp = true;
             Identifier[] position;
             Performance p = Performance.Begin("ADDCHAR");
             if (index - 1 >= 0 && crdt.Count > index)
@@ -888,7 +892,7 @@ namespace SEE.Utils
         /// <returns>A string of a position</returns>
         public string PositionToString(Identifier[] position)
         {
-            Performance p = Performance.Begin("TOSTRIN");
+            //Performance p = Performance.Begin("TOSTRIN");
             string ret = "";
             bool fst = true;
             if (position == null) return null;
@@ -904,8 +908,8 @@ namespace SEE.Utils
                 }
                 ret += i.ToString();
             }
-            p.End();
-            Debug.Log("POStoSTRING " + p.GetElapsedTime());
+           // p.End();
+           // Debug.Log("POStoSTRING " + p.GetElapsedTime());
             return ret;
         }
 

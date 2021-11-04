@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SEE.Net;
 using System;
 using System.Collections.Generic;
@@ -74,9 +75,9 @@ namespace SEE.Utils
             GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static void AddString(string s, int startIdx, string file, bool startUp = false)
+        public static async UniTask AddString(string s, int startIdx, string file, bool startUp = false)
         {
-            GetInstanceByName(file, s.Length).AddString(s, startIdx, startUp);
+            await GetInstanceByName(file, s.Length).AddString(s, startIdx, startUp);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {

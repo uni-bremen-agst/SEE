@@ -480,10 +480,12 @@ namespace SEE.Game.UI.CodeWindow
         /// Returns the Text without the XML Tags
         /// </summary>
         /// <returns></returns>
-        private string GetCleanText()
+        private async UniTask<string> GetCleanText()
         {
-            return TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
-;
+            await UniTask.SwitchToThreadPool();
+            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
+            await UniTask.SwitchToMainThread();
+            return ret;
         }
     }
 }
