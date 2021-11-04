@@ -1,6 +1,7 @@
 using SEE.Controls;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using static SEE.Utils.CRDT;
 
@@ -33,6 +34,17 @@ namespace SEE.Net
             /// Adds a List of single char operation to the crdt to save network load
             /// </summary>
             AddString,
+
+            /// <summary>
+            /// For ID requesting from the server
+            /// </summary>
+            RequestID,
+
+            /// <summary>
+            /// The return of the IP from the Server
+            /// </summary>
+            SetID,
+
         };
 
         /// <summary>
@@ -45,7 +57,7 @@ namespace SEE.Net
         public string prePosition;
         public string file;
         public string listAsString;
-
+        public int id;
 
         public NetCRDT() : base()
         {
@@ -57,7 +69,12 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            // Intentionally left blank.
+            if (state.Equals(RemoteAction.RequestID))
+            {
+                int id = ICRDT.RequestID();
+                new NetCRDT().SetID(GetRequester(), id);
+                state = RemoteAction.Init;
+            }
         }
 
         /// <summary>
@@ -83,6 +100,11 @@ namespace SEE.Net
                         break;
                 }
 
+            }
+
+            if (state.Equals(RemoteAction.SetID))
+            {
+                ICRDT.SetLocalID(id);
             }
         }
 
@@ -129,6 +151,20 @@ namespace SEE.Net
             b.End();
             Debug.Log("REST " + b.GetElapsedTime());
 
+        }
+
+        public void RequestID()
+        {
+            state = RemoteAction.RequestID;
+            Execute(null);
+        }
+
+        public void SetID(IPEndPoint player, int id)
+        {
+            IPEndPoint[] playerArr = { player };
+            this.id = id;
+            state = RemoteAction.SetID;
+            Execute(playerArr);
         }
     }
 }

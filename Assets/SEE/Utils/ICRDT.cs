@@ -1,6 +1,8 @@
+using SEE.Net;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Game.UI.CodeWindow.CodeWindow;
 using static SEE.Utils.CRDT;
@@ -14,6 +16,8 @@ namespace SEE.Utils
         //private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
         private static Dictionary<string, CRDT> crdts = new Dictionary<string, CRDT>();
 
+        private static PlayerIdManager playerIdManager = new PlayerIdManager();
+
         /// <summary>
         /// Finds or creates an CRDT instance by the name of the file
         /// </summary>
@@ -22,16 +26,37 @@ namespace SEE.Utils
         /// <returns>A crdt instance</returns>
         private static CRDT GetInstanceByName(string file, int size = 1000)
         {
+            
             if(crdts != null && crdts.Count > 0 && crdts.ContainsKey(file))
             {
                 return crdts[file];
             }
             else
             {
-                Guid guid =  Guid.NewGuid();
-                crdts.Add(file, new CRDT(guid.ToString(), file, size));
+                // Guid guid =  Guid.NewGuid();
+                Performance p = Performance.Begin("REQUEST IP");
+                new NetCRDT().RequestID();
+                Debug.Log(playerIdManager.GetClientID());
+                crdts.Add(file, new CRDT(/*guid.ToString()*/ playerIdManager.GetClientID().ToString(), file, size));
+                p.End();
+                Debug.Log(p.GetElapsedTime() + "REQUEST ID");
                 return crdts[file];
             }
+        }
+
+        /// <summary>
+        /// ATTANTION ONLY FOR THE USE IN EXECUTE ON SERVER
+        /// </summary>
+        /// <returns>The requested id</returns>
+
+        public static int RequestID()
+        {
+            return playerIdManager.RequestID();
+        }
+
+        public static void SetLocalID(int id)
+        {
+            playerIdManager.SetClientID(id);
         }
 
         public static int GetIndexByPosition(Identifier[] position, string file)
@@ -100,5 +125,33 @@ namespace SEE.Utils
         {
             GetInstanceByName(file, text.Length).RemoteAddString(text);
         }
+    }
+
+    class  PlayerIdManager
+    {
+        private int playerIDcounter = 0;
+
+        private int clientID = 0;
+        /// <summary>
+        /// Generates the new Player ID
+        /// </summary>
+        /// <returns>The Id for the user</returns>
+        public int RequestID()
+        {
+            return ++playerIDcounter;
+        }
+
+        public void SetClientID(int id)
+        {
+            clientID = id;
+        }
+
+        public int GetClientID()
+        {
+            return clientID;
+        }
+
+
+
     }
 }
