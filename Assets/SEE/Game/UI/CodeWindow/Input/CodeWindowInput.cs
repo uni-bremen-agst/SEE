@@ -461,7 +461,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             Debug.Log(richIndex);
             Debug.Log(TextMesh.textInfo.characterInfo.Max(x => x.index));
-            return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index == richIndex).idx;
+            return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
         }
 
         /// <summary>

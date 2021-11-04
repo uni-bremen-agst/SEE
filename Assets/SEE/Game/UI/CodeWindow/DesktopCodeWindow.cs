@@ -10,7 +10,6 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.CodeWindow
@@ -119,8 +118,6 @@ namespace SEE.Game.UI.CodeWindow
                 Performance pp = Performance.Begin("ADD-String");
                 if (ICRDT.IsEmpty(Title))
                 {
-                    
-
                     ICRDT.AddString(cleanText, 0, Title, true);
                     pp.End();
                 }
@@ -239,7 +236,7 @@ namespace SEE.Game.UI.CodeWindow
                     if (selectedText != null)
                     {
                         Debug.Log("TEST" +selectedText.Item1 + " es " + selectedText.Item2);
-                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
                     }
                     ICRDT.AddString(input, idx - 1, Title);
 
@@ -273,16 +270,16 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
-                  /*  if (Clipboard.CanPaste<string>())
+                  if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
                         if (selectedText != null)
                         {
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
-                        ICRDT.AddString(Clipboard.Paste<string>(), idx, Title);
+                        ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
 
 
-                    } */
+                    }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
