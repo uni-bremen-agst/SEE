@@ -9,24 +9,13 @@ namespace SEE.DataModel.DG
     ///
     /// Assumption: All nodes and edges in this memento are from the same graph.
     /// </summary>
-    public class SubgraphMemento
+    public class SubgraphMemento : GraphElementsMemento
     {
-        public SubgraphMemento(Node root)
-        {
-            Root = root;
-            ItsGraph = root.ItsGraph;
-        }
-
-        public SubgraphMemento(Graph graph)
-        {
-            Root = null;
-            ItsGraph = graph;
-        }
-
         /// <summary>
-        /// The graph from which the nodes and edges of this subgraph memento stem.
+        /// Constructor setting <see cref="ItsGraph"/> to <paramref name="graph"/>.
         /// </summary>
-        public readonly Graph ItsGraph;
+        /// <param name="graph">graph from which the memorized graph elements stem</param>
+        public SubgraphMemento(Graph graph) : base(graph) { }
 
         /// <summary>
         /// Edges of this subgraph memento. These can be edges whose source and target
@@ -36,21 +25,18 @@ namespace SEE.DataModel.DG
         public readonly ISet<Edge> Edges = new HashSet<Edge>();
 
         /// <summary>
-        /// The root of the subgraph. This may be null in case the subgraph has only
-        /// edges.
-        /// </summary>
-        public readonly Node Root;
-
-        /// <summary>
         /// A mapping of every node in this subgraph memento onto its original parent.
         /// <see cref="Parents.Keys"/> constitute the subgraph. Note: There may be
         /// one node in <see cref="Parents.Values"/> not contained in <see cref="Parents.Keys"/>;
-        /// this node would be <see cref="Root"/> whose parent is not contained in this
+        /// this node would be the root of the deleted subgraph whose parent is not contained in this
         /// subgraph.
         /// </summary>
         public readonly IDictionary<Node, Node> Parents = new Dictionary<Node, Node>();
 
-        public void Restore()
+        /// <summary>
+        /// Restores all nodes and edges and the node hierarchy in <see cref="ItsGraph"/>.
+        /// </summary>
+        public override void Restore()
         {
             if (Parents.Count > 0)
             {
