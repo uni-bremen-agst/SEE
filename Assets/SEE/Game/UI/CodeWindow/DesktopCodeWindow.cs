@@ -109,19 +109,15 @@ namespace SEE.Game.UI.CodeWindow
                                                                    }).ToList(); */
                 TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
 
-                Performance p = Performance.Begin("GET CLEAN TEXT");
 
-                string cleanText = GetCleanText();
                 //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
                 //Debug.Log(string.Join("\n", cleanText));
-                p.End();
-                Performance pp = Performance.Begin("ADD-String");
+
                 if (ICRDT.IsEmpty(Title))
                 {
-                    ICRDT.AddString(cleanText, 0, Title, true);
-                    pp.End();
+                    TextMeshInputField.enabled = false;
+                    AddStringStart().Forget();
                 }
-                Debug.Log("p " + p.GetElapsedTime() + " dd" + pp.GetElapsedTime());
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
@@ -238,7 +234,7 @@ namespace SEE.Game.UI.CodeWindow
                         Debug.Log("TEST" +selectedText.Item1 + " es " + selectedText.Item2);
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
                     }
-                    ICRDT.AddString(input, idx - 1, Title);
+                    AddString(input, idx - 1).Forget();
 
                 }
 
@@ -276,9 +272,7 @@ namespace SEE.Game.UI.CodeWindow
                         {
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
-                        ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
-
-
+                        AddString(GUIUtility.systemCopyBuffer, idx).Forget();
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
@@ -334,7 +328,12 @@ namespace SEE.Game.UI.CodeWindow
                 issueTooltip.Hide();
             }
 
-
+            async UniTask AddString(string text, int index)
+            {
+                TextMeshInputField.enabled = false;
+                await ICRDT.AddString(text, index, Title);
+                TextMeshInputField.enabled = true;
+            }
         }
 
 
@@ -361,6 +360,12 @@ namespace SEE.Game.UI.CodeWindow
             {
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }
+        }
+        private async UniTask AddStringStart() 
+        {
+            string  cleanText = await GetCleanText();
+            await ICRDT.AddString(cleanText, 0, Title, true);
+            TextMeshInputField.enabled = true;
         }
     }
 }

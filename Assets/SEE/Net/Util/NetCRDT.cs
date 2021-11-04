@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -132,15 +133,17 @@ namespace SEE.Net
             Debug.Log("REST " + b.GetElapsedTime());
         }
 
-        public void AddString(List<(char, Identifier[], Identifier[], string)> text)
+        public async UniTask AddString(List<(char, Identifier[], Identifier[], string)> text)
         {
             string listAsString = "";
             Performance p = Performance.Begin("NE");
+            await UniTask.SwitchToThreadPool();
             foreach((char, Identifier[], Identifier[], string) c in text)
             {
                 listAsString += c.Item1 + ICRDT.PositionToString(c.Item2, c.Item4) +
                     "/" + ICRDT.PositionToString(c.Item3, c.Item4) + "\n";
             }
+            await UniTask.SwitchToMainThread();
             p.End();
             Debug.Log("STRING PARS" + p.GetElapsedTime());
             Performance b = Performance.Begin("D");
