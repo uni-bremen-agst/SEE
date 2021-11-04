@@ -22,7 +22,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         private static int edgeID = 1;
 
-        private static Edge NewEdge(Graph graph, Node from, Node to, string type)
+        private static Edge NewEdge(Graph graph, Node from, Node to, string type = "call")
         {
             edgeID++;
             Edge result = new Edge(edgeID.ToString());
@@ -55,7 +55,7 @@ namespace SEE.DataModel.DG
             return subgraph.GetNode(baa.ID);
         }
 
-        private static Node Child(Graph g, Node parent, string id, string nodeType)
+        private static Node Child(Graph g, Node parent, string id, string nodeType = "Routine")
         {
             Node child = NewNode(g, id, nodeType);
             parent.AddChild(child);
@@ -255,6 +255,45 @@ namespace SEE.DataModel.DG
                             new HashSet<Edge>() { });
             Assert.AreEqual(n3.Incomings,
                             new HashSet<Edge>() { });
+        }
+
+        [Test]
+        public void RemoveOrphansBecomeChildren()
+        {
+            Graph g = new Graph();
+
+            Node r = NewNode(g, "root");
+            Node d = Child(g, r, "toBeDeleted");
+            Node o1 = Child(g, d, "orphan1");
+            Node o2 = Child(g, d, "orphan2");
+
+            g.RemoveNode(d, orphansBecomeRoots: false);
+
+            AssertHasChild(g, parent: r, child: o1);
+            AssertHasChild(g, parent: r, child: o2);
+            Assert.IsNull(d.ItsGraph);
+            Assert.IsNull(d.Parent);
+            Assert.AreEqual(0, d.NumberOfChildren());
+        }
+
+        [Test]
+        public void RemoveOrphansBecomeRoots()
+        {
+            Graph g = new Graph();
+
+            Node r = NewNode(g, "root");
+            Node d = Child(g, r, "toBeDeleted");
+            Node o1 = Child(g, d, "orphan1");
+            Node o2 = Child(g, d, "orphan2");
+
+            g.RemoveNode(d, orphansBecomeRoots: true);
+
+            Assert.AreEqual(0, r.NumberOfChildren());
+            Assert.IsNull(o1.Parent);
+            Assert.IsNull(o2.Parent);
+            Assert.IsNull(d.ItsGraph);
+            Assert.IsNull(d.Parent);
+            Assert.AreEqual(0, d.NumberOfChildren());
         }
 
         [Test]
@@ -473,6 +512,113 @@ namespace SEE.DataModel.DG
             Assert.That(HasEdge(BDAA, BDAA, edgeType));
             Assert.That(HasEdge(BDAA, BD, edgeType));
             Assert.That(HasEdge(C, E, edgeType));
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of only a single node.
+        /// </summary>
+        [Test]
+        public void TestDeleteTreeSingleNode()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a");
+            SubgraphMemento subgraph = a.DeleteTree();
+            Assert.IsNull(a.ItsGraph);
+            Assert.AreEqual(0, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(1, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of only a single node
+        /// and a self loop.
+        /// </summary>
+        [Test]
+        public void TestDeleteTreeSingleNodeAndEdge()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a");
+            Edge e = NewEdge(g, a, a);
+            SubgraphMemento subgraph = a.DeleteTree();
+            Assert.IsNull(a.ItsGraph);
+            Assert.IsNull(e.ItsGraph);
+            Assert.AreEqual(0, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, e.ItsGraph);
+            Assert.AreEqual(1, g.NodeCount);
+            Assert.AreEqual(1, g.EdgeCount);
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of multiple nested
+        /// nodes and several incoming, outgoing, and internal edges in
+        /// the node hierarchy to be deleted.
+        /// </summary>
+        [Test]
+        public void TestDeleteTree()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a");  // root
+            Node b = Child(g, a, "b"); // child of a, but not descendant of c
+            Node c = Child(g, a, "c"); // root of subtree to be deleted
+            Node d = Child(g, c, "d"); // descendant of c
+            Node e = Child(g, c, "e"); // descendant of c
+            Node f = Child(g, e, "f"); // descendant of c
+
+            List<Node> subgraphNodes = new List<Node>() { c, d, e, f };
+
+            Edge e1 = NewEdge(g, a, b); // outside
+            Edge e2 = NewEdge(g, b, a); // outside
+            Edge e3 = NewEdge(g, a, e); // incoming
+            Edge e4 = NewEdge(g, d, b); // outgoing
+            Edge e5 = NewEdge(g, d, e); // internal
+            Edge e6 = NewEdge(g, f, d); // internal
+            Edge e7 = NewEdge(g, a, c); // incoming
+            Edge e8 = NewEdge(g, c, a); // outgoing
+
+            List<Edge> subgraphEdges = new List<Edge> {e3, e4, e5, e6, e7, e8 };
+
+            SubgraphMemento subgraph = c.DeleteTree();
+
+            // a and b are still in the graph, but all other nodes are removed
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, b.ItsGraph);
+            foreach (Node node in subgraphNodes)
+            {
+                Assert.IsNull(node.ItsGraph);
+            }
+            // e1 and e2 are still in the graph, but all other edges are removed
+            Assert.AreEqual(g, e1.ItsGraph);
+            Assert.AreEqual(g, e2.ItsGraph);
+            foreach (Edge edge in subgraphEdges)
+            {
+                Assert.IsNull(edge.ItsGraph);
+            }
+            Assert.AreEqual(2, g.NodeCount);
+            Assert.AreEqual(2, g.EdgeCount);
+
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, b.ItsGraph);
+            foreach (Node node in subgraphNodes)
+            {
+                Assert.AreEqual(g, node.ItsGraph);
+            }
+            Assert.AreEqual(g, e1.ItsGraph);
+            Assert.AreEqual(g, e2.ItsGraph);
+            foreach (Edge edge in subgraphEdges)
+            {
+                Assert.AreEqual(g, edge.ItsGraph);
+            }
+            Assert.AreEqual(subgraphNodes.Count + 2, g.NodeCount);
+            Assert.AreEqual(subgraphEdges.Count + 2, g.EdgeCount);
         }
     }
 }
