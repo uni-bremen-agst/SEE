@@ -137,6 +137,12 @@ namespace SEE.DataModel.DG.IO
         {
             string filename = basename + extension;
 
+            // We need to finalize the node hierarchy so that the integer node attribute
+            // Metric.Level is calculated for outgraph. Otherwise its node would not have
+            // this attribute, but the nodes loaded from the saved graph would, which would
+            // lead to an artifical discrepancy.
+            outGraph.FinalizeNodeHierarchy();
+
             // Write outGraph
             GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
 
@@ -150,7 +156,7 @@ namespace SEE.DataModel.DG.IO
 
             // Read the backup graph again
             Graph backupGraph = LoadGraph(backupFilename);
-            // The path of backupGraph will be backupFilename. 
+            // The path of backupGraph will be backupFilename.
             Assert.AreEqual(backupFilename, backupGraph.Path);
             // For the comparison, we need to reset the path.
             backupGraph.Path = inGraph.Path;
