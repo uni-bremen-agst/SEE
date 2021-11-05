@@ -335,10 +335,10 @@ namespace SEE.Controls
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
                 {
-                    if (HoveredObjectWithWorldFlag != null)
-                    {
-                        Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
-                    }
+                    //if (HoveredObjectWithWorldFlag != null)
+                    //{
+                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
+                    //}
                     HoveredObjectWithWorldFlag = this;
                 }
             }
@@ -356,7 +356,10 @@ namespace SEE.Controls
                 HoveredObjects.Remove(this);
                 if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
                 {
-                    Assert.IsNotNull(HoveredObjectWithWorldFlag);
+                    //if (HoveredObjectWithWorldFlag != null)
+                    //{
+                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
+                    //}
                     HoveredObjectWithWorldFlag = null;
                 }
             }
