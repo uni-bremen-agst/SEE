@@ -161,7 +161,6 @@ namespace SEE.Game
             Dictionary<string, GameObject> idToEdge = new Dictionary<string, GameObject>();
             foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
             {
-                Debug.Log($"Scene edge {edge.name}.\n");
                 idToEdge[edge.name] = edge;
             }
 
@@ -169,18 +168,14 @@ namespace SEE.Game
             /// to result.
             foreach (GameObject descendant in descendants)
             {
-                Debug.Log($"Handling descendant {descendant.name}.\n");
                 if (descendant.TryGetComponentOrLog(out NodeRef nodeRef))
                 {
-                    Debug.Log($"Descendant {descendant.name} has a node reference.\n");
-                    foreach (string edgeID in nodeRef.GetEdgeIds())
+                    foreach (string edgeID in nodeRef.GetIdsOfIncomingOutgoingEdges())
                     {
-                        Debug.Log($"Looking for edge {edgeID}.\n");
                         // descendant may have an edge that is currently inactive because it
                         // was deleted, in which case it does not show up in idToEdge.
                         if (idToEdge.TryGetValue(edgeID, out GameObject edge))
                         {
-                            Debug.Log($"Found edge {edgeID}.\n");
                             result.Add(edge);
                         }
                     }
@@ -221,7 +216,6 @@ namespace SEE.Game
         {
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
-                Debug.Log($"Deleting {nodeOrEdge.name}.\n");
                 GameObjectFader.FadingOut(nodeOrEdge, SetInactive);
             }
         }
@@ -237,13 +231,131 @@ namespace SEE.Game
         /// <param name="graph">the graph to which all <paramref name="nodesOrEdges"/> need to be
         /// re-added</param>
         /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
-        public static void Revive(GraphElementsMemento graph, ISet<GameObject> nodesOrEdges)
+        public static void Revive(ISet<GameObject> nodesOrEdges)
         {
-            graph.Restore();
+            RestoreGraph(nodesOrEdges);
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
                 SetActive(nodeOrEdge);
                 GameObjectFader.FadingIn(nodeOrEdge, null);
+            }
+        }
+
+        /// <summary>
+        /// Restores the subgraph defined by the given <paramref name="nodesOrEdges"/>.
+        /// All nodes and edges in <paramref name="nodesOrEdges"/> will re-added to
+        /// the underlying graph; in addition, the parentship will be restored, too,
+        /// according to the game-node hierarchy.
+        ///
+        /// Assumption: all <paramref name="nodesOrEdges"/> belong to the same graph.
+        /// </summary>
+        /// <param name="nodesOrEdges">nodes and edges to be re-added to the graph</param>
+        private static void RestoreGraph(ISet<GameObject> nodesOrEdges)
+        {
+            Graph graph = null; // The graph all nodes and edges belong to.
+            IList<GameObject> edges = new List<GameObject>();
+            IList<GameObject> nodes = new List<GameObject>();
+            // We will first just add the nodes before we establish their parents and edges
+            // so that all necessary nodes exist in the graph.
+            foreach (GameObject nodeOrEdge in nodesOrEdges)
+            {
+                if (nodeOrEdge.TryGetComponent(out NodeRef nodeRef))
+                {
+                    Node node = nodeRef.Value;
+                    if (node != null)
+                    {
+                        if (graph == null)
+                        {
+                            // The node is not contained in a graph. We need to retrieve its graph
+                            // from one of its ancestors.
+                            graph = GetGraphOfNode(nodeOrEdge.transform.parent.gameObject);
+                            if (graph == null)
+                            {
+                                throw new Exception($"Graph for node {nodeOrEdge.name} could not be retrieved.");
+                            }
+                        }
+                        // assert: graph != null
+                        graph.AddNode(node);
+                        nodes.Add(nodeOrEdge);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Node {nodeOrEdge.name} to be revived has no valid node reference.\n");
+                    }
+                }
+                else
+                {
+                    // It is an edge.
+                    edges.Add(nodeOrEdge);
+                }
+            }
+            // Now we re-establish the parentship.
+            // Assert: Every gameNode has a valid node reference.
+            foreach (GameObject gameNode in nodes)
+            {
+                // Retrieve the parent graph node from the parent game node.
+                GameObject parentGameNode = gameNode.transform.parent?.gameObject;
+                if (parentGameNode != null && parentGameNode.TryGetComponent(out NodeRef parentNodeRef))
+                {
+                    parentNodeRef.Value.AddChild(gameNode.GetNode());
+                }
+            }
+            // Finally, we add the edges back to the graph.
+            foreach (GameObject gameEdge in edges)
+            {
+                if (gameEdge.TryGetComponentOrLog(out EdgeRef edgeRef))
+                {
+                    Edge edge = edgeRef.Value;
+                    if (edge != null)
+                    {
+                        // In case we need to revive only edges, but no nodes, graph will still
+                        // be null. In that case, we need to retrieve the graph from source/target
+                        // of the edge.
+                        if (graph == null)
+                        {
+                            // The assumption here is that the source of the edge is already in the graph.
+                            graph = edge.Source.ItsGraph;
+
+                        }
+                        graph.AddEdge(edge);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Edge {gameEdge.name} to be revived has no valid edge reference.\n");
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Retrieves the graph to which the given <see cref="gameNode"/> should
+            /// be added by walking up the game-node hierarchy until a game node is
+            /// reached whose associated graph node has a valid graph reference.
+            /// If no such game node can be found, null is returned.
+            /// </summary>
+            /// <param name="gameNode">the game node for which to look up the graph</param>
+            /// <return>corresponding graph or null</return>
+            Graph GetGraphOfNode(GameObject gameNode)
+            {
+                while (gameNode != null)
+                {
+                    if (gameNode.CompareTag(Tags.Node) && gameNode.TryGetComponentOrLog(out NodeRef nodeRef))
+                    {
+                        Node node = nodeRef.Value;
+                        if (node != null)
+                        {
+                            if (node.ItsGraph != null)
+                            {
+                                return node.ItsGraph;
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError($"Node {gameNode.name} has no valid node reference.\n");
+                        }
+                    }
+                    gameNode = gameNode.transform.parent.gameObject;
+                }
+                return null;
             }
         }
     }

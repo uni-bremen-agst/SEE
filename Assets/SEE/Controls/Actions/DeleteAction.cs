@@ -146,8 +146,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            GameElementDeleter.Revive(deletedSubgraph, deletedGameObjects);
-            new ReviveNetAction(deletedSubgraph, (from go in deletedGameObjects select go.name).ToList()).Execute();
+            GameElementDeleter.Revive(deletedGameObjects);
+            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
         }
 
         /// <summary>
