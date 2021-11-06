@@ -515,35 +515,35 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns all active descendents of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
+        /// Returns all active descendants of given <paramref name="rootNode"/> tagged by <see cref="Tags.Node"/>
         /// including <paramref name="rootNode"/> itself.
         /// </summary>
         /// <param name="rootNode">the root of the node hierarchy to be collected</param>
-        /// <returns>all descendents of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
+        /// <returns>all descendants of <paramref name="rootNode"/> including <paramref name="rootNode"/></returns>
         public static IList<GameObject> AllDescendants(this GameObject rootNode)
         {
             IList<GameObject> result = new List<GameObject>() { rootNode };
-            AllDescendents(rootNode, result);
+            AllDescendants(rootNode, result);
             return result;
         }
 
         /// <summary>
-        /// Adds all active descendents of <paramref name="root"/> to <paramref name="result"/>
+        /// Adds all active descendants of <paramref name="root"/> to <paramref name="result"/>
         /// (only if tagged by <see cref="Tags.Node"/>).
         ///
         /// Note: <paramref name="root"/> is assumed to be contained in <paramref name="result"/>
         /// already.
         /// </summary>
         /// <param name="root">the root of the game-object hierarchy to be collected</param>
-        /// <param name="result">where to add the descendents</param>
-        private static void AllDescendents(GameObject root, IList<GameObject> result)
+        /// <param name="result">where to add the descendants</param>
+        private static void AllDescendants(GameObject root, IList<GameObject> result)
         {
             foreach (Transform child in root.transform)
             {
                 if (child.gameObject.activeInHierarchy && child.gameObject.CompareTag(Tags.Node))
                 {
                     result.Add(child.gameObject);
-                    AllDescendents(child.gameObject, result);
+                    AllDescendants(child.gameObject, result);
                 }
             }
         }

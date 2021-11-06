@@ -39,10 +39,10 @@ namespace SEE.Game
         ///
         /// Precondition: <paramref name="deletedObject"/> != null.
         /// </summary>
-        /// <param name="deletedObject">the game object that along with its descendents and
+        /// <param name="deletedObject">the game object that along with its descendants and
         /// their edges should be removed</param>
         /// <returns>the graph from which <paramref name="deletedObject"/> were removed
-        /// along with all descendents of <paramref name="deletedObject"/> and their incoming
+        /// along with all descendants of <paramref name="deletedObject"/> and their incoming
         /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
         /// <exception cref="Exception">thrown if <paramref name="deletedObject"/> is a root</exception>
         /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
