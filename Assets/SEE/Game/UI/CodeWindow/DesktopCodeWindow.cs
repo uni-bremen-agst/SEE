@@ -91,9 +91,8 @@ namespace SEE.Game.UI.CodeWindow
 
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
-                int neededPadding = 1; // TODO: Use real padding
                 //FIXME: startIndex too big
-               /* List<string> textWitzhOutNumbers = Text.Split('\n')
+                /*List<string> textWitzhOutNumbers = Text.Split('\n')
                                                                    .Select((x, i) =>
                                                                    {
                                                                        string cleanLine = GetCleanLine(i);
@@ -193,7 +192,18 @@ namespace SEE.Game.UI.CodeWindow
                 SEEInput.KeyboardShortcutsEnabled = false;
                 if (SEEInput.SaveCodeWindow())
                 {
-                    string textToSave = ICRDT.PrintString(Title);
+                    //Remove line numbers
+                    string textToSave = string.Join("\n", ICRDT.PrintString(Title).Split('\n').Select((x, i) =>{
+                        if (x.Length > 0)
+                        {
+                            return x.Substring(neededPadding);
+                        }
+                        else
+                        {
+                            return x;
+                        }
+                    }).ToList());
+
                     try
                     {
 
@@ -204,8 +214,7 @@ namespace SEE.Game.UI.CodeWindow
                     { 
                         ShowNotification.Error("Saving Failed", e.Message);
                     }
-                    //TODO REMOVE LINE NUMBERS
-                    //TODO User Notification
+
                     //TODO Try Catch
                 }
 
@@ -234,8 +243,7 @@ namespace SEE.Game.UI.CodeWindow
                         Debug.Log("TEST" +selectedText.Item1 + " es " + selectedText.Item2);
                         ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
                     }
-                    AddString(input, idx - 1).Forget();
-
+                    ICRDT.AddString(input, idx - 1, Title);
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
@@ -272,7 +280,7 @@ namespace SEE.Game.UI.CodeWindow
                         {
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
-                        AddString(GUIUtility.systemCopyBuffer, idx).Forget();
+                        ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
@@ -327,13 +335,6 @@ namespace SEE.Game.UI.CodeWindow
                 // Hide tooltip by right-clicking
                 issueTooltip.Hide();
             }
-
-            async UniTask AddString(string text, int index)
-            {
-                TextMeshInputField.enabled = false;
-                await ICRDT.AddString(text, index, Title);
-                TextMeshInputField.enabled = true;
-            }
         }
 
 
@@ -363,9 +364,11 @@ namespace SEE.Game.UI.CodeWindow
         }
         private async UniTask AddStringStart() 
         {
+            ShowNotification.Info("Loading editor", "The Editable file is loading, please wait", 10);
             string  cleanText = await GetCleanText();
-            await ICRDT.AddString(cleanText, 0, Title, true);
+            await ICRDT.AsyncAddString(cleanText, 0, Title, true);
             TextMeshInputField.enabled = true;
+            ShowNotification.Info("Editor ready", "You now can use the editor");
         }
     }
 }

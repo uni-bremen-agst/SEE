@@ -18,6 +18,16 @@ namespace SEE.Game.UI.CodeWindow
     public partial class CodeWindow
     {
         /// <summary>
+        /// The needed padding for the line numbers
+        /// </summary>
+        private int neededPadding = 0;
+
+        /// <summary>
+        /// The text without the syntax highlitign
+        /// </summary>
+        private string cleanText;
+
+        /// <summary>
         /// A dictionary mapping each link ID to its issues.
         /// </summary>
         private readonly Dictionary<char, List<Issue>> issueDictionary = new Dictionary<char, List<Issue>>();
@@ -71,7 +81,7 @@ namespace SEE.Game.UI.CodeWindow
                                + TokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
                                           .Aggregate(0, (l, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
-            int neededPadding = assumedLines.ToString().Length;
+             neededPadding = assumedLines.ToString().Length;
 
             Text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
@@ -290,7 +300,7 @@ namespace SEE.Game.UI.CodeWindow
                 throw new ArgumentException("Given text must not be empty or null.\n");
             }
 
-            int neededPadding = $"{text.Length}".Length;
+            neededPadding = $"{text.Length}".Length;
             Text = "";
             for (int i = 0; i < text.Length; i++)
             {

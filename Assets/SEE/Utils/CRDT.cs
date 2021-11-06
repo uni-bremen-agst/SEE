@@ -119,8 +119,8 @@ namespace SEE.Utils
         /// <summary>
         /// The size of the CRDT at the start
         /// </summary>
-        private  int size;
-        
+        private int size;
+
 
         //private LinkedList<CharObj> crdt = new LinkedList<CharObj>();
 
@@ -160,7 +160,7 @@ namespace SEE.Utils
         public void RemoteAddString(string text)
         {
             bool CharSet = false;
-            char ch ='\0';
+            char ch = '\0';
             Identifier[] pos1 = null;
             Identifier[] pos2 = null;
             string tmpPos = "";
@@ -186,7 +186,7 @@ namespace SEE.Utils
                         RemoteAddChar(ch, pos1, pos2);
                         pos1 = null;
                         pos2 = null;
-                        ch ='\0';
+                        ch = '\0';
                         CharSet = false;
                         continue;
                     }
@@ -213,8 +213,8 @@ namespace SEE.Utils
                     insertIdx = found.Item1 + 1;
                 }
                 else
-                { 
-                    ShowNotification.Error("Failure during remote change","RemoteAddChar failed! Something is wrong with the order of the Chars.");
+                {
+                    ShowNotification.Error("Failure during remote change", "RemoteAddChar failed! Something is wrong with the order of the Chars.");
                     return;
                 }
 
@@ -288,24 +288,53 @@ namespace SEE.Utils
                 throw new DeleteNotPossibleException("Index is out of range!");
             }
         }
+        /// <summary>
+        /// Adds a string to the CRDT at the startIdx | for the small data changes
+        /// </summary>
+        /// <param name="s">The string that should be added</param>
+        /// <param name="startIdx">The start index of the string in the file</param>
+        public void AddString(string s, int startIdx)
+        {
+            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            for (int i = 0; i < s.Length; i++)
+            {
+                AddChar(s[i], i + startIdx);
+                charObjs.Add(crdt[i + startIdx]);
+            }
 
+            CharObj[] charArr = charObjs.ToArray();
+            undoStack.Push((charArr, operationType.Add));
+            redoStack.Clear();
+
+        }
 
         /// <summary>
-        /// Adds a string to the CRDT at the startIdx
+        /// Adds a string to the CRDT at the startIdx this is for huge datastream in async mode
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
         /// <param name="dontSyncCodeWindowChars"></param>
-        public async UniTask AddString(string s, int startIdx, bool startUp = false)
+        public async UniTask AsyncAddString(string s, int startIdx, bool startUp = false)
         {
-            startUp = true;
-            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            startUp = false;
             Performance p = Performance.Begin("addString");
             await UniTask.SwitchToThreadPool();
-            for (int i = 0; i < s.Length; i++)
+            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            if (!startUp)
             {
-                AddChar(s[i], i + startIdx, startUp);
-                charObjs.Add(crdt[i + startIdx]);
+                
+                for (int i = 0; i < s.Length; i++)
+                {
+                    AddChar(s[i], i + startIdx, startUp);
+                    charObjs.Add(crdt[i + startIdx]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < s.Length; i++)
+                {
+                    AddChar(s[i], i + startIdx, startUp);
+                }
             }
             await UniTask.SwitchToMainThread();
             p.End();
@@ -332,7 +361,6 @@ namespace SEE.Utils
         /// <param name="index">The index in the local string</param>
         public void AddChar(char c, int index, bool startUp = false)
         {
-            startUp = true;
             Identifier[] position;
             Performance p = Performance.Begin("ADDCHAR");
             if (index - 1 >= 0 && crdt.Count > index)
@@ -729,7 +757,7 @@ namespace SEE.Utils
         {
             if (undoStack.Count < 1)
             {
-                ShowNotification.Info("Undo Failure","Undo Stack is empty!");
+                ShowNotification.Info("Undo Failure", "Undo Stack is empty!");
                 return;
             }
             (CharObj[], operationType) lastOperation = undoStack.Pop();
@@ -746,7 +774,7 @@ namespace SEE.Utils
                         }
                         else
                         {
-                           ShowNotification.Warn("Undo Failure","Undo not possible, Char is already deleted!");
+                            ShowNotification.Warn("Undo Failure", "Undo not possible, Char is already deleted!");
                         }
                     }
                     redoStack.Push((lastOperation.Item1, operationType.Delete));
@@ -908,8 +936,8 @@ namespace SEE.Utils
                 }
                 ret += i.ToString();
             }
-           // p.End();
-           // Debug.Log("POStoSTRING " + p.GetElapsedTime());
+            // p.End();
+            // Debug.Log("POStoSTRING " + p.GetElapsedTime());
             return ret;
         }
 
