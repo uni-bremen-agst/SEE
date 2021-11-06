@@ -151,6 +151,10 @@ namespace SEE.Controls
             {
                 return !KeyboardShortcutsEnabled;
             }
+            else
+            {
+                return false;
+            }
 #endif
             return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
 #if UNITY_EDITOR == false

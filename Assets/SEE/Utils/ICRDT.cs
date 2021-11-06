@@ -75,9 +75,13 @@ namespace SEE.Utils
             GetInstanceByName(file).RemoteDeleteChar(position);
         }
 
-        public static async UniTask AddString(string s, int startIdx, string file, bool startUp = false)
+        public static void AddString(string s, int startIdx, string file)
         {
-            await GetInstanceByName(file, s.Length).AddString(s, startIdx, startUp);
+             GetInstanceByName(file, s.Length).AddString(s, startIdx);
+        } 
+        public static async UniTask AsyncAddString(string s, int startIdx, string file, bool startUp = false)
+        {
+            await GetInstanceByName(file, s.Length).AsyncAddString(s, startIdx, startUp);
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
