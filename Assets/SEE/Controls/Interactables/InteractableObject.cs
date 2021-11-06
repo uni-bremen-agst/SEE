@@ -335,6 +335,8 @@ namespace SEE.Controls
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
                 {
+                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
+                    // investigation.
                     //if (HoveredObjectWithWorldFlag != null)
                     //{
                     //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
@@ -356,6 +358,8 @@ namespace SEE.Controls
                 HoveredObjects.Remove(this);
                 if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
                 {
+                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
+                    // investigation.
                     //if (HoveredObjectWithWorldFlag != null)
                     //{
                     //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
