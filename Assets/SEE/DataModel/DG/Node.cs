@@ -164,22 +164,22 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns all transitive descendents of this node in a post-order traversal of the
+        /// Returns all transitive descendants of this node in a post-order traversal of the
         /// node hierarchy rooted by this node, including this node itself (will be the last node
         /// in the returned ordered list).
         /// </summary>
-        /// <returns>transitive descendents of this node in post order</returns>
+        /// <returns>transitive descendants of this node in post order</returns>
         public IList<Node> PostOrderDescendants()
         {
             IList<Node> result = new List<Node>();
-            PostOrderDescendents(this);
+            PostOrderDescendants(this);
             return result;
 
-            void PostOrderDescendents(Node parent)
+            void PostOrderDescendants(Node parent)
             {
                 foreach (Node child in parent.Children())
                 {
-                    PostOrderDescendents(child);
+                    PostOrderDescendants(child);
                 }
                 result.Add(parent);
             }
