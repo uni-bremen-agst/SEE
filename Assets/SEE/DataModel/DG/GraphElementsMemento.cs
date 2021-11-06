@@ -20,7 +20,8 @@
         public readonly Graph ItsGraph;
 
         /// <summary>
-        /// Restores the graph, that is, re-adds the elements to <see cref="ItsGraph"/>.
+        /// Restores the graph, that is, re-adds the memorized elements
+        /// to <see cref="ItsGraph"/>.
         /// </summary>
         public abstract void Restore();
     }
