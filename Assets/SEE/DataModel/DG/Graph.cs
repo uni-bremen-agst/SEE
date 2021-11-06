@@ -161,6 +161,11 @@ namespace SEE.DataModel.DG
                 throw new Exception($"Node {node} is not contained in this graph {Name}.");
             }
 
+            /// <summary>
+            /// Reparents all <see cref="children"/> to new <see cref="parent"/>.
+            /// </summary>
+            /// <param name="children">children to be re-parented</param>
+            /// <param name="parent">new parent of <see cref="children"/></param>
             void Reparent(Node[] children, Node parent)
             {
                 foreach (Node child in children)
