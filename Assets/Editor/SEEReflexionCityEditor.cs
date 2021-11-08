@@ -10,7 +10,7 @@ namespace SEEEditor
     /// The reflection city is constructed by loading three separate files -- one for the implementation,
     /// one for the architecture, and one for the mapping from implementation nodes to architecture nodes.
     /// </summary>
-    [CustomEditor(typeof(SEECityReflexion))]
+    [CustomEditor(typeof(SEEReflexionCity))]
     [CanEditMultipleObjects]
     public class SEEReflexionCityEditor : SEECityEditor
     {
@@ -19,22 +19,22 @@ namespace SEEEditor
         /// </summary>
         protected override void Attributes()
         {
-            SEECityReflexion city = target as SEECityReflexion;
-            Assert.IsNotNull(city);
+            SEEReflexionCity reflexionCity = target as SEEReflexionCity;
+            Assert.IsNotNull(reflexionCity);
             showDataFiles = EditorGUILayout.Foldout(showDataFiles,
                                                     "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
-                city.GxlArchitecturePath = DataPathEditor.GetDataPath("GXL file (Architecture)",
-                                                                      city.GxlArchitecturePath,
+                reflexionCity.GxlArchitecturePath = DataPathEditor.GetDataPath("GXL file (Architecture)",
+                                                                      reflexionCity.GxlArchitecturePath,
                                                                       Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                city.GxlImplementationPath = DataPathEditor.GetDataPath("GXL file (Implementation)",
-                                                                        city.GxlImplementationPath,
+                reflexionCity.GxlImplementationPath = DataPathEditor.GetDataPath("GXL file (Implementation)",
+                                                                        reflexionCity.GxlImplementationPath,
                                                                         Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                city.GxlMappingPath = DataPathEditor.GetDataPath("GXL file (Mapping)",
-                                                                 city.GxlMappingPath,
+                reflexionCity.GxlMappingPath = DataPathEditor.GetDataPath("GXL file (Mapping)",
+                                                                 reflexionCity.GxlMappingPath,
                                                                  Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                city.CityName = EditorGUILayout.TextField("City Name", city.CityName);
+                reflexionCity.CityName = EditorGUILayout.TextField("City Name", reflexionCity.CityName);
             }
         }
     }

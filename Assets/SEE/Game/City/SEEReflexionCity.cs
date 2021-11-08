@@ -14,7 +14,7 @@ namespace SEE.Game.City
     /// NOTE: It is assumed the implementation and architecture graphs are not edited!
     /// TODO: In fact, we should disallow this programmatically, too.
     /// </summary>
-    public class SEECityReflexion : SEECity
+    public class SEEReflexionCity : SEECity
     {
         /// <summary>
         /// Label for the architecture toggle added to each graph element of the architecture city.
