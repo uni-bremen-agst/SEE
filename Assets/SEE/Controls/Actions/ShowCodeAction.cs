@@ -43,6 +43,10 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
+            if(ICRDT.GetLocalID() == 0)
+            {
+                new NetCRDT().RequestID();
+            }
             const string title = "Code Space Manager";
             GameObject gameObject = GameObject.Find(title) ?? new GameObject(title);
             if (!gameObject.TryGetComponent(out spaceManager))
