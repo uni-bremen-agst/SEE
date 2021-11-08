@@ -75,24 +75,23 @@ namespace SEE.DataModel.DG
         ///   (3) a node with node.ID must not have been added before
         ///   (4) node must not be contained in another graph
         /// </summary>
-        /// <param name="node"></param>
         public void AddNode(Node node)
         {
             if (node == null)
             {
-                throw new Exception("A node added to a graph must not be null.");
+                throw new ArgumentNullException(nameof(node));
             }
             if (string.IsNullOrEmpty(node.ID))
             {
-                throw new Exception("ID of a node must neither be null nor empty.");
+                throw new ArgumentException("ID of a node must neither be null nor empty.");
             }
             if (nodes.ContainsKey(node.ID))
             {
-                throw new Exception($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
+                throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
             }
             if (node.ItsGraph != null)
             {
-                throw new Exception($"Node {node.ID} is already in a graph {node.ItsGraph.Name}.");
+                throw new InvalidOperationException($"Node {node.ID} is already in a graph {node.ItsGraph.Name}.");
             }
 
             nodes[node.ID] = node;
@@ -511,8 +510,10 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Merges the <paramref name="other"/> graph into this one.
         /// This is done by copying the attributes, nodes, and edges from the other graph into this one.
-        /// For the nodes and edges of the other graph, we append the given <paramref name="idSuffix"/> to avoid
-        /// any collisions. The hierarchy of the nodes will be preserved.
+        /// For the nodes and edges of the other graph, we append the given <paramref name="nodeIdSuffix"/>
+        /// or <paramref name="edgeIdSuffix"/> to avoid any collisions. In case a given id suffix is <c>null</c>,
+        /// an exception will be thrown when a duplicate element ID is encountered.
+        /// The hierarchy of the nodes will be preserved.
         /// 
         /// Deep copies are used for nodes, edges, and the graph itself, so that neither this nor the
         /// <paramref name="other"/> graph (nor their nodes and edges) will be changed in any way. 
@@ -525,18 +526,20 @@ namespace SEE.DataModel.DG
         /// Pre-conditions:
         /// <ul>
         /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
-        /// <li> The <paramref name="idSuffix"/> must be chosen such that by appending it to each node's and edge's ID
-        /// from the <paramref name="other"/> graph, no ID collision with any ID from this graph will occur. If
-        /// <paramref name="idSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
+        /// <li> The <paramref name="nodeIdSuffix"/> must be chosen such that by appending it to each node's ID
+        /// from the <paramref name="other"/> graph, no ID collision with any node's ID from this graph will occur. If
+        /// <paramref name="nodeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
+        /// <li> The <paramref name="edgeIdSuffix"/> must be chosen such that by appending it to each edge's ID
+        /// from the <paramref name="other"/> graph, no ID collision with any edge's ID from this graph will occur. If
+        /// <paramref name="edgeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
         /// </ul>
         /// </summary>
         /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one</param>
-        /// <param name="idSuffix">String suffixed to the ID of each of the <paramref name="other"/> graph's
-        /// nodes and edges</param>
+        /// <param name="nodeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's nodes</param>
+        /// <param name="edgeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's edges</param>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> or <paramref name="idSuffix"/>
-        /// is <c>null</c></exception>
-        public Graph MergeWith(Graph other, string idSuffix = null)
+        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
+        public Graph MergeWith(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null)
         {
             if (other == null)
             {
@@ -575,9 +578,9 @@ namespace SEE.DataModel.DG
             }
             
             // Copy edges and nodes along with their hierarchy
-            otherGraph.CopyNodesTo(mergedGraph, idSuffix);
-            otherGraph.CopyEdgesTo(mergedGraph, idSuffix);
-            CopyHierarchy(otherGraph, mergedGraph, idSuffix);
+            otherGraph.CopyNodesTo(mergedGraph, nodeIdSuffix);
+            otherGraph.CopyEdgesTo(mergedGraph, edgeIdSuffix);
+            CopyHierarchy(otherGraph, mergedGraph, nodeIdSuffix);
 
             // Finalize hierarchy now that it's changed
             mergedGraph.NodeHierarchyHasChanged = true;
@@ -732,15 +735,15 @@ namespace SEE.DataModel.DG
             target.FinalizeNodeHierarchy();
         }
 
-        private void CopyNodesTo(Graph target, string idSuffix = null)
+        private void CopyNodesTo(Graph target, string nodeIdSuffix = null)
         {
             target.nodes ??= new Dictionary<string, Node>();
             foreach (KeyValuePair<string, Node> entry in nodes)
             {
                 Node node = (Node)entry.Value.Clone();
-                if (idSuffix != null)
+                if (nodeIdSuffix != null)
                 {
-                    node.ID += idSuffix;
+                    node.ID += nodeIdSuffix;
                 }
                 target.AddNode(node);
             }
@@ -748,20 +751,21 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Copies the edges from this graph to the <paramref name="target"/> graph, matching nodes by
-        /// ID + <paramref name="idSuffix"/>, if the latter is present.
+        /// ID + <paramref name="nodeIdSuffix"/>, if the latter is present.
         /// 
         /// The nodes in this graph which have edges attached to them must also exist in the <paramref name="target"/>
         /// graph, i.e. nodes with the same ID must exist.
-        /// However, if a non-null <paramref name="idSuffix"/> is given, then instead nodes with the idSuffix
+        /// However, if a non-null <paramref name="nodeIdSuffix"/> is given, then instead nodes with the nodeIdSuffix
         /// appended to the same ID must exist.
         /// 
         /// </summary>
         /// <param name="target">The graph to which the edges of this graph shall be copied.</param>
-        /// <param name="idSuffix">Suffix to append to the new edge IDs and which node IDs in the
-        /// <paramref name="target"/> graph are required to have.</param>
+        /// <param name="nodeIdSuffix">Suffix which node IDs in the <paramref name="target"/>
+        /// graph are required to have.</param>
+        /// <param name="edgeIdSuffix">Suffix to append to the new edge IDs</param>
         /// <exception cref="InvalidOperationException">When edge-attached nodes couldn't be found in the target graph.
         /// </exception>
-        private void CopyEdgesTo(Graph target, string idSuffix = null)
+        private void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
         {
             target.edges ??= new Dictionary<string, Edge>();
             foreach (KeyValuePair<string, Edge> entry in edges)
@@ -769,7 +773,7 @@ namespace SEE.DataModel.DG
                 Edge edge = entry.Value;
                 Edge clone = (Edge)edge.Clone();
                 // set corresponding source
-                if (target.TryGetNode(edge.Source.ID + (idSuffix ?? ""), out Node from))
+                if (target.TryGetNode(edge.Source.ID + (nodeIdSuffix ?? ""), out Node from))
                 {
                     clone.Source = from;
                 }
@@ -778,7 +782,7 @@ namespace SEE.DataModel.DG
                     throw new InvalidOperationException($"Target graph does not have a node with ID {edge.Source.ID}");
                 }
                 // set corresponding target
-                if (target.TryGetNode(edge.Target.ID + (idSuffix ?? ""), out Node to))
+                if (target.TryGetNode(edge.Target.ID + (nodeIdSuffix ?? ""), out Node to))
                 {
                     clone.Target = to;
                 }
@@ -787,9 +791,9 @@ namespace SEE.DataModel.DG
                     throw new InvalidOperationException($"Target graph does not have a node with ID {edge.Target.ID}");
                 }
 
-                if (idSuffix != null)
+                if (edgeIdSuffix != null)
                 {
-                    clone.ID += idSuffix;
+                    clone.ID += edgeIdSuffix;
                 }
                 target.AddEdge(clone);
             }
@@ -800,15 +804,15 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="fromGraph">The graph to copy the hierarchy from.</param>
         /// <param name="toGraph">The graph to apply the hierarchy to.</param>
-        /// <param name="idSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
+        /// <param name="nodeIdSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
         /// have this string appended to their IDs</param>
-        private static void CopyHierarchy(Graph fromGraph, Graph toGraph, string idSuffix = null)
+        private static void CopyHierarchy(Graph fromGraph, Graph toGraph, string nodeIdSuffix = null)
         {
             foreach (Node fromRoot in fromGraph.GetRoots())
             {
-                if (toGraph.TryGetNode(fromRoot.ID + (idSuffix ?? ""), out Node toRoot))
+                if (toGraph.TryGetNode(fromRoot.ID + (nodeIdSuffix ?? ""), out Node toRoot))
                 {
-                    CopyHierarchy(fromRoot, toRoot, toGraph, idSuffix);
+                    CopyHierarchy(fromRoot, toRoot, toGraph, nodeIdSuffix);
                 }
                 else
                 {
@@ -823,19 +827,19 @@ namespace SEE.DataModel.DG
         /// <param name="fromParent">a parent node in the original graph</param>
         /// <param name="toParent">a parent node in copied graph (toGraph) whose children are to be added</param>
         /// <param name="toGraph">the graph copy containing toParent and its children</param>
-        /// <param name="idSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
+        /// <param name="nodeIdSuffix">If non-null, all nodes in <paramref name="toGraph"/> are assumed to
         /// have this string appended to their IDs</param>
-        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph, string idSuffix = null)
+        private static void CopyHierarchy(Node fromParent, Node toParent, Graph toGraph, string nodeIdSuffix = null)
         {
             foreach (Node fromChild in fromParent.Children())
             {
                 // Get the node in toGraph corresponding to fromChild.
-                if (toGraph.TryGetNode(fromChild.ID + (idSuffix ?? ""), out Node toChild))
+                if (toGraph.TryGetNode(fromChild.ID + (nodeIdSuffix ?? ""), out Node toChild))
                 {
                     // fromChild is a parent of fromParent and
                     // toChild must become a child of toParent
                     toParent.AddChild(toChild);
-                    CopyHierarchy(fromChild, toChild, toGraph, idSuffix);
+                    CopyHierarchy(fromChild, toChild, toGraph, nodeIdSuffix);
                 }
                 else
                 {
