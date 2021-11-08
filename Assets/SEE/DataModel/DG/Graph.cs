@@ -512,7 +512,8 @@ namespace SEE.DataModel.DG
         /// This is done by copying the attributes, nodes, and edges from the other graph into this one.
         /// For the nodes and edges of the other graph, we append the given <paramref name="nodeIdSuffix"/>
         /// or <paramref name="edgeIdSuffix"/> to avoid any collisions. In case a given id suffix is <c>null</c>,
-        /// an exception will be thrown when a duplicate element ID is encountered.
+        /// two nodes with the same ID will be merged into one, combining the attributes of them, unless they
+        /// both have an attribute whose value differs between them, in which case an exception will be thrown.
         /// The hierarchy of the nodes will be preserved.
         /// 
         /// Deep copies are used for nodes, edges, and the graph itself, so that neither this nor the
@@ -527,8 +528,9 @@ namespace SEE.DataModel.DG
         /// <ul>
         /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
         /// <li> The <paramref name="nodeIdSuffix"/> must be chosen such that by appending it to each node's ID
-        /// from the <paramref name="other"/> graph, no ID collision with any node's ID from this graph will occur. If
-        /// <paramref name="nodeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
+        /// from the <paramref name="other"/> graph, no collision with any node's ID from this graph will occur. If
+        /// <paramref name="nodeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown if
+        /// the two nodes can't be merged into one (i.e., if they have a differing attribute).</li>
         /// <li> The <paramref name="edgeIdSuffix"/> must be chosen such that by appending it to each edge's ID
         /// from the <paramref name="other"/> graph, no ID collision with any edge's ID from this graph will occur. If
         /// <paramref name="edgeIdSuffix"/> is <c>null</c> and an ID collision occurs, an exception will be thrown.</li>
@@ -745,7 +747,63 @@ namespace SEE.DataModel.DG
                 {
                     node.ID += nodeIdSuffix;
                 }
-                target.AddNode(node);
+
+                if (target.nodes.ContainsKey(node.ID))
+                {
+                    MergeNodeAttributes(target.nodes[node.ID], node);
+                }
+                else
+                {
+                    target.AddNode(node);
+                }
+            }
+
+            void MergeNodeAttributes(Node targetNode, Node sourceNode)
+            {
+                foreach (KeyValuePair<string, float> attribute in sourceNode.FloatAttributes)
+                {
+                    if (!targetNode.TryGetFloat(attribute.Key, out float value))
+                    {
+                        targetNode.SetFloat(attribute.Key, attribute.Value);
+                    }
+                    else if (!Mathf.Approximately(value, attribute.Value))
+                    {
+                        throw new InvalidOperationException($"Node attribute {attribute.Key} differs in nodes "
+                                                            + $"{targetNode} and {sourceNode}");
+                    }
+                }
+                
+                foreach (KeyValuePair<string, int> attribute in sourceNode.IntAttributes)
+                {
+                    if (!targetNode.TryGetInt(attribute.Key, out int value))
+                    {
+                        targetNode.SetInt(attribute.Key, attribute.Value);
+                    }
+                    // Level may change when merging two graphs into one
+                    else if (value != attribute.Value && attribute.Key != "Metric.Level")
+                    {
+                        throw new InvalidOperationException($"Node attribute {attribute.Key} differs in nodes "
+                                                            + $"{targetNode} and {sourceNode}");
+                    }
+                }
+                
+                foreach (KeyValuePair<string, string> attribute in sourceNode.StringAttributes)
+                {
+                    if (!targetNode.TryGetString(attribute.Key, out string value))
+                    {
+                        targetNode.SetString(attribute.Key, attribute.Value);
+                    }
+                    else if (value != attribute.Value)
+                    {
+                        throw new InvalidOperationException($"Node attribute {attribute.Key} differs in nodes "
+                                                            + $"{targetNode} and {sourceNode}");
+                    }
+                }
+                
+                foreach (string attribute in sourceNode.ToggleAttributes)
+                {
+                    targetNode.SetToggle(attribute);
+                }
             }
         }
 
