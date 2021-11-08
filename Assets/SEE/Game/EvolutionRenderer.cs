@@ -23,6 +23,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
+using SEE.Game.City;
 using SEE.Game.Evolution;
 using SEE.GO;
 using SEE.Layout;

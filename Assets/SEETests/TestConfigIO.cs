@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools;
 using UnityEngine;

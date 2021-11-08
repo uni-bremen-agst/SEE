@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
@@ -28,7 +29,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(AbstractSEECity settings, Graph graph)
+        public GraphRenderer(City.AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
 
@@ -94,7 +95,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly AbstractSEECity settings;
+        public readonly City.AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.

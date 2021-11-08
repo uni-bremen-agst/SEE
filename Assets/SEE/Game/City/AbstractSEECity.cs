@@ -12,7 +12,7 @@ using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Common abstract superclass of SEECity and SEECityEvolution.
@@ -25,8 +25,8 @@ namespace SEE.Game
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
-        /// <see cref="Save(ConfigWriter)"/> and
-        /// <see cref="Restore(Dictionary{string,object})"/>,
+        /// <see cref="AbstractSEECity.Save"/> and
+        /// <see cref="AbstractSEECity.Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
@@ -396,10 +396,8 @@ namespace SEE.Game
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of an inner node</returns>
-        public ICollection<string> AllInnerNodeMetrics()
-        {
-            return new List<string>() { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
-        }
+        public ICollection<string> AllInnerNodeMetrics() => 
+            new List<string> { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
