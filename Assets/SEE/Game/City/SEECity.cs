@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -216,20 +217,42 @@ namespace SEE.Game.City
         /// </summary>
         private void LoadMetrics()
         {
-            string filename = CSVPath.Path;
-            Performance p = Performance.Begin("loading metric data data from CSV file " + filename);
-            int numberOfErrors = MetricImporter.LoadCsv(LoadedGraph, filename);
+            LoadGraphMetrics(LoadedGraph, CSVPath.Path, ErosionSettings).Forget();
+        }
+
+        /// <summary>
+        /// Loads the metrics available at the CSV file <paramref name="csvPath"/> into the given
+        /// <paramref name="graph"/>. Depending on <paramref name="erosionSettings"/>, metrics will also be integrated
+        /// from the Axivion Dashboard.
+        /// </summary>
+        /// <param name="graph">The graph into which the metrics shall be loaded</param>
+        /// <param name="csvPath">The CSV file containing the metrics for the given <paramref name="graph"/></param>
+        /// <param name="erosionSettings">
+        /// Will be used to determine whether metric data from the Axivion Dashboard shall be imported into the graph.
+        /// For this, <see cref="ErosionAttributes.LoadDashboardMetrics"/>,
+        /// <see cref="ErosionAttributes.OverrideMetrics"/>, and <see cref="erosionSettings.IssuesAddedFromVersion"/>
+        /// will be used.
+        /// </param>
+        /// <remarks>
+        /// Note that the import of metrics from the dashboard will happen asynchronously due to
+        /// involving a network call. If you simply want to call it synchronously without querying the dashboard,
+        /// set <paramref name="erosionSettings"/> to an appropriate value and use <c>LoadGraphMetrics.Forget()</c>.
+        /// </remarks>
+        protected static async UniTask LoadGraphMetrics(Graph graph, string csvPath, ErosionAttributes erosionSettings)
+        {
+            Performance p = Performance.Begin($"loading metric data data from CSV file {csvPath}");
+            int numberOfErrors = MetricImporter.LoadCsv(graph, csvPath);
             if (numberOfErrors > 0)
             {
-                Debug.LogWarning($"CSV file {filename} has {numberOfErrors} many errors.\n");
+                Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
             }
             p.End();
 
             // Substitute missing values from the dashboard
-            if (ErosionSettings.LoadDashboardMetrics)
+            if (erosionSettings.LoadDashboardMetrics)
             {
-                MetricImporter.LoadDashboard(LoadedGraph, ErosionSettings.OverrideMetrics,
-                ErosionSettings.IssuesAddedFromVersion).Forget();
+                await MetricImporter.LoadDashboard(graph, erosionSettings.OverrideMetrics,
+                                                   erosionSettings.IssuesAddedFromVersion);
             }
         }
 
