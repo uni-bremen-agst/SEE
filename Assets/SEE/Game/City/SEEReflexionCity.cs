@@ -160,33 +160,40 @@ namespace SEE.Game.City
             ImplementationGraph.Name = Name;
 
             // We merge architecture and implementation first.
-            // If there are duplicate IDs, try to remedy this by appending a suffix to the ID.
-            List<string> graphsOverlap = GraphsOverlap(ImplementationGraph, ArchitectureGraph);
-            string archSuffix = null;
-            if (graphsOverlap.Count > 0)
+            // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
+            List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
+            List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
+            string suffix = null;
+            if (nodesOverlap.Count > 0)
             {
-                archSuffix = "-A";
-                Debug.LogWarning($"Overlapping graph elements found, will append '{archSuffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", graphsOverlap)}");
+                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
             }
-            Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, archSuffix);
+            if (edgesOverlap.Count > 0)
+            {
+                suffix = "-A";
+                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
+                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
+            }
+            Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
             
             // Then we add the mappings, again checking if any IDs overlap.
-            graphsOverlap = GraphsOverlap(mergedGraph, MappingGraph);
-            string mapSuffix = null;
-            if (graphsOverlap.Count > 0)
+            nodesOverlap = NodeIntersection(mergedGraph, MappingGraph).ToList();
+            edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
+            suffix = null;
+            if (nodesOverlap.Count > 0)
             {
-                mapSuffix = "-M";
-                Debug.LogWarning($"Overlapping graph elements found, will append '{mapSuffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", graphsOverlap)}");
+                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
             }
-            return mergedGraph.MergeWith(MappingGraph, mapSuffix);
+            if (edgesOverlap.Count > 0)
+            {
+                suffix = "-A";
+                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
+                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
+            }
+            return mergedGraph.MergeWith(MappingGraph, suffix);
 
             
             #region Local Functions
-
-            // Returns any intersecting elements (node IDs, edge IDs) between the two given graphs.
-            List<string> GraphsOverlap(Graph aGraph, Graph anotherGraph) => NodeIntersection(aGraph, anotherGraph).Concat(EdgeIntersection(aGraph, anotherGraph)).ToList();
 
             // Returns the intersection of the node IDs of the two graphs.
             IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
