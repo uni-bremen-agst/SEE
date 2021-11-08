@@ -13,7 +13,6 @@ namespace SEE.Utils
     public static class ICRDT
     {
 
-
         //private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
         private static Dictionary<string, CRDT> crdts = new Dictionary<string, CRDT>();
 
@@ -35,12 +34,14 @@ namespace SEE.Utils
             else
             {
                 // Guid guid =  Guid.NewGuid();
-                Performance p = Performance.Begin("REQUEST IP");
-                new NetCRDT().RequestID();
-                Debug.Log(playerIdManager.GetClientID());
+                //Performance p = Performance.Begin("REQUEST IP");
+                
+                
+                Debug.Log("ID REEAL " + playerIdManager.GetClientID());
+                
                 crdts.Add(file, new CRDT(/*guid.ToString()*/ playerIdManager.GetClientID().ToString(), file, size));
-                p.End();
-                Debug.Log(p.GetElapsedTime() + "REQUEST ID");
+                //p.End();
+               // Debug.Log(p.GetElapsedTime() + "REQUEST ID");
                 return crdts[file];
             }
         }
@@ -53,6 +54,11 @@ namespace SEE.Utils
         public static int RequestID()
         {
             return playerIdManager.RequestID();
+        }
+
+        public static int GetLocalID()
+        {
+            return playerIdManager.GetClientID();
         }
 
         public static void SetLocalID(int id)

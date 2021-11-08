@@ -119,18 +119,14 @@ namespace SEE.Net
 
         public void AddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
-            Performance p = Performance.Begin("NE");
+            
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
             this.prePosition = ICRDT.PositionToString(prePosition, file);
-            p.End();
-            Debug.Log("STRING PARS" + p.GetElapsedTime());
-            Performance b = Performance.Begin("D");
             state = RemoteAction.AddChar;
             Execute(null);
-            b.End();
-            Debug.Log("REST " + b.GetElapsedTime());
+           
         }
 
         public async UniTask AddString(List<(char, Identifier[], Identifier[], string)> text)

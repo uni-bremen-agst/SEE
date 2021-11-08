@@ -338,7 +338,7 @@ namespace SEE.Utils
             }
             await UniTask.SwitchToMainThread();
             p.End();
-            Debug.Log("ADD STRING " + p.GetElapsedTime());
+            //Debug.Log("ADD STRING " + p.GetElapsedTime());
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
@@ -350,7 +350,7 @@ namespace SEE.Utils
                 Performance b = Performance.Begin("NET");
                 await new NetCRDT().AddString(networkbuffer); ;
                 b.End();
-                Debug.Log("NET " + b.GetElapsedTime());
+                //Debug.Log("NET " + b.GetElapsedTime());
             }
         }
 
@@ -380,7 +380,7 @@ namespace SEE.Utils
                 position = GeneratePositionBetween(null, null, siteID);
             }
             p.End();
-            Debug.Log("GENERATE " + p.GetElapsedTime());
+            //Debug.Log("GENERATE " + p.GetElapsedTime());
 
             if (crdt.Count > index)
             {
