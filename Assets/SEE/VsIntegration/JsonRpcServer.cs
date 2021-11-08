@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StreamJsonRpc;
+using StreamRpc;
 
 namespace Assets.SEE.VsIntegration
 {
     public abstract class JsonRpcServer : IDisposable
     {
-        JsonRpc Rpc;
+        protected JsonRpc Rpc;
         protected object Target;
         protected Task Server;
 
