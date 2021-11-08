@@ -4,7 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// The kinds of node layouts available.

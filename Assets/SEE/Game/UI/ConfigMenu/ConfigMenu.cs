@@ -20,14 +20,15 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Michsky.UI.ModernUIPack;
-using SEE.Controls;
-using SEE.DataModel.DG;
-using SEE.GO;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Michsky.UI.ModernUIPack;
+using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;

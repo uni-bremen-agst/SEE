@@ -5,7 +5,7 @@ using SEE.DataModel.DG;
 using SEE.Tools;
 using SEE.Utils;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Manages settings for generating random graphs.
@@ -83,7 +83,7 @@ namespace SEE.Game
         private const string LeafAttributesLabel = "LeafAttributes";
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// <see cref="City.AbstractSEECity.Save(ConfigWriter)"/>
         /// </summary>
         protected override void Save(ConfigWriter writer)
         {
@@ -94,7 +94,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// <see cref="City.AbstractSEECity.Restore(Dictionary{string, object})"/>.
         /// </summary>
         protected override void Restore(Dictionary<string, object> attributes)
         {

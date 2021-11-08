@@ -25,7 +25,7 @@ using SEE.Game.Evolution;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// A SEECityEvolution combines all necessary components for the animations
@@ -40,7 +40,7 @@ namespace SEE.Game
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// Sets the maximum number of revsions to load.
+        /// Sets the maximum number of revisions to load.
         /// </summary>
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
@@ -94,10 +94,10 @@ namespace SEE.Game
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
-        /// <returns>the current or new evolution renderder attached to this city</returns>
+        /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            if (!gameObject.TryGetComponent<EvolutionRenderer>(out EvolutionRenderer result))
+            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
             }
@@ -139,7 +139,7 @@ namespace SEE.Game
             }
             else
             {
-                Graph graph = graphs.First<Graph>();
+                Graph graph = graphs.First();
                 graph = RelevantGraph(graph);
                 return graph;
             }

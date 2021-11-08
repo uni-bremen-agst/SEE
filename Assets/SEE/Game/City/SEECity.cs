@@ -7,7 +7,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Manages settings of the graph data showing a single version of a software
