@@ -70,7 +70,7 @@ namespace SEE.Game.City
             {
                 Debug.LogError("Architecture graph path is empty.\n");
             }
-            else if (string.IsNullOrEmpty(GxlImplementationPath.Path))
+            else if (string.IsNullOrEmpty(GxlImplementationPath.RootPath))
             {
                 Debug.LogError("Implementation graph path is empty.\n");
             }
@@ -219,20 +219,25 @@ namespace SEE.Game.City
 
         public override void SaveData()
         {
-            if (string.IsNullOrEmpty(GxlArchitecturePath.Path)
-                || string.IsNullOrEmpty(GxlImplementationPath.Path)
-                || string.IsNullOrEmpty(GxlMappingPath.Path))
+            IList<string> NoPathGraphs = new[]
             {
-                Debug.LogError("Empty graph path.\n");
+                GxlArchitecturePath.Path, GxlImplementationPath.Path, GxlMappingPath.Path
+            }.Where(string.IsNullOrEmpty).ToList();
+            if (NoPathGraphs.Count > 0)
+            {
+                Debug.LogError($"Couldn't find any graph at path{(NoPathGraphs.Count > 1 ? "s" : "")} " +
+                    string.Join(", ", NoPathGraphs) + ".\n");
             }
             else
             {
                 string hierarchicalType = HierarchicalEdges.First();
                 (Graph implementation, Graph architecture, Graph mapping) = DisassembleFullGraph(LoadedGraph);
-                GraphWriter.Save(GxlImplementationPath.Path, implementation, hierarchicalType);
                 GraphWriter.Save(GxlArchitecturePath.Path, architecture, hierarchicalType);
+                Debug.Log($"Architecture graph saved at {GxlArchitecturePath.Path}.\n");
+                GraphWriter.Save(GxlImplementationPath.Path, implementation, hierarchicalType);
+                Debug.Log($"Implementation graph saved at {GxlImplementationPath.Path}.\n");
                 GraphWriter.Save(GxlMappingPath.Path, mapping, hierarchicalType);
-                Debug.Log("Three graphs written to disk.\n");
+                Debug.Log($"Mapping graph saved at {GxlMappingPath.Path}.\n");
             }
         }
 
