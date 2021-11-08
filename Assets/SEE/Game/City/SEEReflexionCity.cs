@@ -160,6 +160,8 @@ namespace SEE.Game.City
             ImplementationGraph.Name = Name;
 
             // We merge architecture and implementation first.
+            // Duplicate node IDs between architecture and implementation are not allowed.
+            // Any duplicate nodes in the mapping graph are merged into the full graph.
             // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
             List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
             List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
@@ -176,17 +178,12 @@ namespace SEE.Game.City
             }
             Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
             
-            // Then we add the mappings, again checking if any IDs overlap.
-            nodesOverlap = NodeIntersection(mergedGraph, MappingGraph).ToList();
+            // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
             edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
             suffix = null;
-            if (nodesOverlap.Count > 0)
-            {
-                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
-            }
             if (edgesOverlap.Count > 0)
             {
-                suffix = "-A";
+                suffix = "-M";
                 Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
