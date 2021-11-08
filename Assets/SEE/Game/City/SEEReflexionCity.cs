@@ -118,7 +118,7 @@ namespace SEE.Game.City
                 await UniTask.WhenAll(tasks);
                 
                 LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
-                Debug.Log($"Loaded graph {LoadedGraph.Name}");
+                Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             }
 
             #endregion
@@ -256,6 +256,16 @@ namespace SEE.Game.City
         private const string GxlMappingLabel = "MappingGXL";
 
         /// <summary>
+        /// Label of attribute <see cref="CsvArchitecturePath"/> in the configuration file.
+        /// </summary>
+        private const string CsvArchitectureLabel = "ArchitectureCSV";
+        
+        /// <summary>
+        /// Label of attribute <see cref="CsvImplementationPath"/> in the configuration file.
+        /// </summary>
+        private const string CsvImplementationLabel = "ImplementationCSV";
+
+        /// <summary>
         /// Label of attribute <see cref="CityName"/> in the configuration file.
         /// </summary>
         private const string CityNameLabel = "CityName";
@@ -266,6 +276,8 @@ namespace SEE.Game.City
             GxlArchitecturePath.Save(writer, GxlArchitectureLabel);
             GxlImplementationPath.Save(writer, GxlImplementationLabel);
             GxlMappingPath.Save(writer, GxlMappingLabel);
+            CsvArchitecturePath.Save(writer, CsvArchitectureLabel);
+            CsvImplementationPath.Save(writer, CsvImplementationLabel);
             writer.Save(CityName, CityNameLabel);
         }
 
@@ -275,6 +287,8 @@ namespace SEE.Game.City
             GxlArchitecturePath.Restore(attributes, GxlArchitectureLabel);
             GxlImplementationPath.Restore(attributes, GxlImplementationLabel);
             GxlMappingPath.Restore(attributes, GxlMappingLabel);
+            CsvArchitecturePath.Restore(attributes, CsvArchitectureLabel);
+            CsvImplementationPath.Restore(attributes, CsvImplementationLabel);
             ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
         }
     }
