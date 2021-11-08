@@ -26,7 +26,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
+        public static async UniTask LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
             IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
@@ -120,7 +120,7 @@ namespace SEE.DataModel.DG.IO
             static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, state: Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)

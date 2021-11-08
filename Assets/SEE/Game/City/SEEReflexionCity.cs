@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
@@ -40,6 +41,16 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
         public DataPath GxlMappingPath = new DataPath();
+        
+        /// <summary>
+        /// The path to the CSV file containing the implementation metric data.
+        /// </summary>
+        public DataPath CsvImplementationPath = new DataPath();
+
+        /// <summary>
+        /// The path to the CSV file containing the architecture metric data.
+        /// </summary>
+        public DataPath CsvArchitecturePath = new DataPath();
 
         /// <summary>
         /// Name of this code city.
@@ -70,6 +81,13 @@ namespace SEE.Game.City
                     Reset();
                 }
 
+                LoadAllGraphs().Forget(); // needs to be async call due to metric retrieval
+            }
+
+            #region Local Functions
+            
+            async UniTaskVoid LoadAllGraphs()
+            {
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
                 Graph ImplementationGraph = LoadGraph(GxlImplementationPath.Path, "");
                 Graph MappingGraph;
@@ -86,10 +104,24 @@ namespace SEE.Game.City
                 // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
                 MarkGraphNodes(ArchitectureGraph, ArchitectureLabel);
                 MarkGraphNodes(ImplementationGraph, ImplementationLabel);
+
+                // We collect the tasks here so we can wait on them both at the same time instead of sequentially
+                IList<UniTask> tasks = new List<UniTask>();
+                if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
+                {
+                    tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                }
+                if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
+                {
+                    tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                }
+                await UniTask.WhenAll(tasks);
                 
                 LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}");
             }
+
+            #endregion
         }
         
         /// <summary>
@@ -97,7 +129,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
         /// <param name="label">The value of the toggle attribute</param>
-        public static void MarkGraphNodes(Graph graph, string label)
+        private static void MarkGraphNodes(Graph graph, string label)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes().Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)

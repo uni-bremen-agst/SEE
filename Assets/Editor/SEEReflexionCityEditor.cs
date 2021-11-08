@@ -34,6 +34,12 @@ namespace SEEEditor
                 reflexionCity.GxlMappingPath = DataPathEditor.GetDataPath("GXL file (Mapping)",
                                                                  reflexionCity.GxlMappingPath,
                                                                  Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
+                reflexionCity.CsvArchitecturePath = DataPathEditor.GetDataPath("CSV file (Architecture)",
+                                                                      reflexionCity.CsvArchitecturePath,
+                                                                      Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+                reflexionCity.CsvImplementationPath = DataPathEditor.GetDataPath("CSV file (Implementation)",
+                                                                        reflexionCity.CsvImplementationPath,
+                                                                        Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
                 reflexionCity.CityName = EditorGUILayout.TextField("City Name", reflexionCity.CityName);
             }
         }
