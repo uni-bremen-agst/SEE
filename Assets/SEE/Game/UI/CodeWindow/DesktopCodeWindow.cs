@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game.UI.Notification;
@@ -91,26 +92,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
-                //FIXME: startIndex too big
-                /*List<string> textWitzhOutNumbers = Text.Split('\n')
-                                                                   .Select((x, i) =>
-                                                                   {
-                                                                       string cleanLine = GetCleanLine(i);
-                                                                       if (cleanLine.Length > 0)
-                                                                       {
-                                                                           return cleanLine.Substring(neededPadding);
-                                                                       }
-                                                                       else
-                                                                       {
-                                                                           return cleanLine;
-                                                                       }
-
-                                                                   }).ToList(); */
-                TextMeshInputField.text = Text; //string.Join("\n", textWitzhOutNumbers); 
-
-
-                //cleanText = Text.Split('\n').Select((line, index) => { return GetCleanLine(index); }).ToList();
-                //Debug.Log(string.Join("\n", cleanText));
+                TextMeshInputField.text = Text; 
 
                 if (ICRDT.IsEmpty(Title))
                 {
@@ -203,19 +185,16 @@ namespace SEE.Game.UI.CodeWindow
                             return x;
                         }
                     }).ToList());
-
                     try
                     {
-
                         File.WriteAllText(FilePath, textToSave);
                         ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
                     }
-                    catch(Exception e) when (e is DirectoryNotFoundException)    //TODO Besrtimmte exceptions catchen https://docs.microsoft.com/en-us/dotnet/api/system.io.file.writealltext?view=net-5.0
+                    catch(Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException 
+                    ||e is NotSupportedException || e is ArgumentNullException || e is UnauthorizedAccessException || e is SecurityException )
                     { 
                         ShowNotification.Error("Saving Failed", e.Message);
                     }
-
-                    //TODO Try Catch
                 }
 
                 if (SEEInput.CodeWindowUndo())
@@ -226,6 +205,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     ICRDT.Redo(Title);
                 }
+
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 string input = Input.inputString;
