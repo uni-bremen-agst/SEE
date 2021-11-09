@@ -114,7 +114,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the depth of the object (y axis) to the given value in Unity worldspace units.
+        /// Sets the depth of the object (z axis) to the given value in Unity worldspace units.
         /// </summary>
         /// <param name="block">block to be adjusted</param>
         /// <param name="value">new value for depth in worldspace</param>
