@@ -10,13 +10,13 @@ namespace SEE.Game
     /// <summary>
     /// Allows to delete nodes and edges.
     /// </summary>
-    internal class GameElementDeleter
+    internal static class GameElementDeleter
     {
         /// <summary>
         /// Removes the graph node associated with the given <paramref name="gameNode"/>
         /// from its graph. <paramref name="gameNode"/> is not actually destroyed.
         ///
-        /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
+        /// Precondition: <paramref name="gameNode"/> must have a valid <see cref="NodeRef"/>; otherwise
         /// an exception will be thrown.
         /// </summary>
         /// <param name="gameNode">game object whose graph node is to be removed from the graph</param>
@@ -41,7 +41,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="deletedObject">the game object that along with its descendants and
         /// their edges should be removed</param>
-        /// <returns>the graph from which <paramref name="deletedObject"/> were removed
+        /// <returns>the graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
         /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
         /// <exception cref="Exception">thrown if <paramref name="deletedObject"/> is a root</exception>
@@ -79,7 +79,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Deletes the given <paramref name="gameEdge"/>, that is, removes the associated
-        /// graph edge from its graph, lets <paramref name="gameEdge"/> fading out, and
+        /// graph edge from its graph, lets <paramref name="gameEdge"/> fade out, and
         /// finally sets it inactive. The result is the memorized removed associated
         /// graph edge and <paramref name="gameEdge"/> itself.
         ///
@@ -212,7 +212,7 @@ namespace SEE.Game
         /// from their graph.
         /// </summary>
         /// <param name="nodesOrEdges">nodes and/or edges to be marked as deleted</param>
-        private static void Delete(ISet<GameObject> nodesOrEdges)
+        private static void Delete(IEnumerable<GameObject> nodesOrEdges)
         {
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
@@ -237,20 +237,20 @@ namespace SEE.Game
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
                 SetActive(nodeOrEdge);
-                GameObjectFader.FadingIn(nodeOrEdge, null);
+                GameObjectFader.FadingIn(nodeOrEdge);
             }
         }
 
         /// <summary>
         /// Restores the subgraph defined by the given <paramref name="nodesOrEdges"/>.
-        /// All nodes and edges in <paramref name="nodesOrEdges"/> will re-added to
+        /// All nodes and edges in <paramref name="nodesOrEdges"/> will be re-added to
         /// the underlying graph; in addition, the parentship will be restored, too,
         /// according to the game-node hierarchy.
         ///
         /// Assumption: all <paramref name="nodesOrEdges"/> belong to the same graph.
         /// </summary>
         /// <param name="nodesOrEdges">nodes and edges to be re-added to the graph</param>
-        private static void RestoreGraph(ISet<GameObject> nodesOrEdges)
+        private static void RestoreGraph(IEnumerable<GameObject> nodesOrEdges)
         {
             Graph graph = null; // The graph all nodes and edges belong to.
             IList<GameObject> edges = new List<GameObject>();
@@ -311,12 +311,8 @@ namespace SEE.Game
                         // In case we need to revive only edges, but no nodes, graph will still
                         // be null. In that case, we need to retrieve the graph from source/target
                         // of the edge.
-                        if (graph == null)
-                        {
-                            // The assumption here is that the source of the edge is already in the graph.
-                            graph = edge.Source.ItsGraph;
-
-                        }
+                        // The assumption here is that the source of the edge is already in the graph.
+                        graph ??= edge.Source.ItsGraph;
                         graph.AddEdge(edge);
                     }
                     else
