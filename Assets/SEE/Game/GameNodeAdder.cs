@@ -75,58 +75,69 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates and returns a new game node as a child of <paramref name="parent"/> having
-        /// a nodeRef referencing <paramref name="node"/> at the given <paramref name="position"/>
-        /// with the given <paramref name="worldSpaceScale"/>.
+        /// Creates and returns a new game node as a child of <paramref name="parent"/> at the
+        /// given <paramref name="position"/> with the given <paramref name="worldSpaceScale"/>.
         ///
         /// Precondition: <paramref name="parent"/> must have a valid node reference.
         /// </summary>
         /// <param name="parent">parent of the new node</param>
-        /// <param name="node">the graph node that is represented by the new node</param>
         /// <param name="position">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
         /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
+        /// <exception cref="Exception">thrown if <paramref name="parent"/> is not contained in a code city</exception>
+        public static GameObject AddChild(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
         {
             SEECity city = parent.ContainingCity();
             if (city != null)
             {
+                bool wasLeaf = parent.IsLeaf();
                 Node node = NewGraphNode(nodeID);
                 AddNodeToGraph(parent.GetNode(), node);
+
+                if (wasLeaf)
+                {
+                    // Note: new graph node must already be a child of parent in the
+                    // graph, so that the following call works.
+                    city.Renderer.RedrawAsInnerNode(parent);
+                    // We need to make sure that the new child always fits into the
+                    // parent's area. We should not center the new child within its
+                    // parent if there are incoming/outgoing edges because they
+                    // origin at the parent's center, too. That would then be misleading.
+                    // We know that parent was a leaf, so the new child cannot collide
+                    // with any child of parent (because none exists).
+                    position = FindPlace(parent.transform.position, position);
+
+                    // If parent has incoming/outgoing edges, they need to be adjusted
+                    // because quite likely, the height of parent has changed.
+                    GameEdgeMover.MoveAllConnectingEdgesOfNode(parent);
+                }
+
                 GameObject result = city.Renderer.DrawLeafNode(node);
                 result.transform.localScale = worldSpaceScale;
-                result.transform.position = position;
+                result.transform.position = new Vector3(position.x, parent.transform.position.y + worldSpaceScale.y / 2, position.z);
                 result.transform.SetParent(parent.transform);
+                Portal.SetPortal(city.gameObject, gameObject: result);
                 return result;
             }
             else
             {
-                return null;
+                throw new Exception($"Parent node {parent.name} is not contained in a code city.");
             }
         }
 
         /// <summary>
-        /// Inverse operation of <see cref="Add(GameObject, Vector3, Vector3, string)"/>.
-        /// Removes the given <paramref name="gameNode"/> from the scene and its associated
-        /// graph node from its graph.
-        ///
-        /// Notes:
-        ///
-        /// <paramref name="gameNode"/> is not actually destroyed.
-        ///
-        /// If <paramref name="gameNode"/> represents an inner node of the node
-        /// hierarchy, its ancestors will not be deleted.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
-        /// an exception will be thrown.
+        /// Returns the position inbetween <paramref name="start"/> and <paramref name="end"/>.
+        /// More precisely, let L be the line from <paramref name="start"/> to <paramref name="end"/>.
+        /// Then the point on L is returned whose distance to <paramref name="start"/> equals the
+        /// distance to <paramref name="end"/>.
         /// </summary>
-        /// <param name="gameNode">game node to be removed</param>
-        public static void Remove(GameObject gameNode)
+        /// <param name="start">start position</param>
+        /// <param name="end">end position</param>
+        /// <returns>mid point inbetween <paramref name="start"/> and <paramref name="end"/></returns>
+        private static Vector3 FindPlace(Vector3 start, Vector3 end)
         {
-            Node node = gameNode.GetNode();
-            Graph graph = node.ItsGraph;
-            graph.RemoveNode(node);
+            return start + 0.5f * (end - start);
         }
     }
 }

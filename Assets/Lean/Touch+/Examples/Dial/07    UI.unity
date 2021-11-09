@@ -167,12 +167,12 @@ MonoBehaviour:
       m_Calls: []
   ScreenQuery:
     Method: 0
-    Search: 1
-    RequiredTag: 
-    Camera: {fileID: 0}
     Layers:
       serializedVersion: 2
       m_Bits: 4294967291
+    Search: 1
+    RequiredTag: 
+    Camera: {fileID: 0}
     Distance: 50
   deselectWithFingers: 1
   onSelectedFinger:
@@ -430,7 +430,7 @@ GameObject:
   - component: {fileID: 893944898}
   - component: {fileID: 893944897}
   - component: {fileID: 893944896}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Dial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -520,14 +520,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea7c15b8a8bca724b8540e2ca46f60a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Camera: {fileID: 0}
-  Tilt: {x: 0, y: 0, z: 0}
-  Axis: {x: 0, y: 0, z: 1}
+  _camera: {fileID: 0}
+  tilt: {x: 0, y: 0, z: 0}
+  axis: {x: 0, y: 0, z: 1}
   angle: 40.19
-  Clamp: 0
-  ClampMin: -45
-  ClampMax: 45
-  Triggers: []
+  clamp: 0
+  clampMin: -45
+  clampMax: 45
+  triggers: []
   onAngleChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -550,9 +550,7 @@ MonoBehaviour:
   onDeselected:
     m_PersistentCalls:
       m_Calls: []
-  deselectOnUp: 0
   use: 0
-  isolateSelectingFingers: 0
   onSelectedFinger:
     m_PersistentCalls:
       m_Calls: []
@@ -570,7 +568,7 @@ GameObject:
   - component: {fileID: 1016396378}
   - component: {fileID: 1016396380}
   - component: {fileID: 1016396379}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -780,11 +778,12 @@ PrefabInstance:
     - target: {fileID: 114457744909205792, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}
       propertyPath: m_Text
-      value: This shows you how the <color=#0FF>PressUI</color> demo scene can be
-        modified to allow drag rotation around a custom axis. This is done by adding
-        the <color=#0FF>LeanSelectableDial</color> component to your selectable GameObject.
-        Keep in mind the <color=#0FF>Axis</color> setting must be set to <color=#0FF>0,
-        0, 1</color> for UI elements, so it rotates around the Z axis.
+      value: This shows you how the <color=#0FF>LeanSelectableDial</color> component
+        can be made to work on UI elements. This is done by changing the <color=#0FF>Axis</color>
+        setting to <color=#0FF>0, 0, 1</color>, so it rotates around the Z axis.
+        Keep in mind that by default Lean Touch ignores all touches that begin on
+        top of the UI, so you should change your UI elements to a different GameObject
+        layer.
       objectReference: {fileID: 0}
     - target: {fileID: 224356063559649096, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}
@@ -894,12 +893,12 @@ PrefabInstance:
     - target: {fileID: 3842902602399203594, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 8.42
       objectReference: {fileID: 0}
     - target: {fileID: 3842902602399203594, guid: 8df6337a574cdad4bb6ec66cc50c6c2b,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -30
+      value: -5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8df6337a574cdad4bb6ec66cc50c6c2b, type: 3}
@@ -933,16 +932,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fc98219a83dff145947365dc914d06e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  listenForInput: 1
-  TapThreshold: 0.5
-  SwipeThreshold: 50
-  ReferenceDpi: 200
-  GuiLayers:
+  tapThreshold: 0.5
+  swipeThreshold: 50
+  referenceDpi: 200
+  guiLayers:
     serializedVersion: 2
     m_Bits: 32
-  RecordFingers: 1
-  RecordThreshold: 5
-  RecordLimit: 0
+  useTouch: 1
+  useHover: 1
+  useMouse: 1
+  useSimulator: 1
+  recordFingers: 1
+  recordThreshold: 5
+  recordLimit: 0
 --- !u!4 &1650081526
 Transform:
   m_ObjectHideFlags: 0

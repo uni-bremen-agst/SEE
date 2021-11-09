@@ -14,8 +14,20 @@ namespace Lean.Touch
 		[System.Serializable] public class Vector3Event : UnityEvent<Vector3> {}
 		[System.Serializable] public class Vector2Event : UnityEvent<Vector2> {}
 
+		[System.Flags]
+		public enum ButtonTypes
+		{
+			LeftMouse   = 1 << 0,
+			RightMouse  = 1 << 1,
+			MiddleMouse = 1 << 2,
+			Touch       = 1 << 5
+		}
+
 		/// <summary>Ignore fingers with StartedOverGui?</summary>
 		public bool IgnoreStartedOverGui { set { ignoreStartedOverGui = value; } get { return ignoreStartedOverGui; } } [FSA("IgnoreStartedOverGui")] [SerializeField] private bool ignoreStartedOverGui = true;
+
+		/// <summary>Which inputs should this component react to?</summary>
+		public ButtonTypes RequiredButtons { set { requiredButtons = value; } get { return requiredButtons; } } [SerializeField] private ButtonTypes requiredButtons = (ButtonTypes)~0;
 
 		/// <summary>If the specified object is set and isn't selected, then this component will do nothing.</summary>
 		public LeanSelectable RequiredSelectable { set { requiredSelectable = value; } get { return requiredSelectable; } } [FSA("RequiredSelectable")] [SerializeField] private LeanSelectable requiredSelectable;
@@ -66,6 +78,11 @@ namespace Lean.Touch
 				return;
 			}
 
+			if (RequiredButtonPressed(finger) == false)
+			{
+				return;
+			}
+
 			if (requiredSelectable != null && requiredSelectable.IsSelected == false)
 			{
 				return;
@@ -88,6 +105,36 @@ namespace Lean.Touch
 				onScreen.Invoke(finger.ScreenPosition);
 			}
 		}
+
+		private bool RequiredButtonPressed(LeanFinger finger)
+		{
+			if (finger.Index < 0)
+			{
+				if (LeanInput.GetMouseExists() == true)
+				{
+					if ((requiredButtons & ButtonTypes.LeftMouse) != 0 && LeanInput.GetMousePressed(0) == true)
+					{
+						return true;
+					}
+
+					if ((requiredButtons & ButtonTypes.RightMouse) != 0 && LeanInput.GetMousePressed(1) == true)
+					{
+						return true;
+					}
+
+					if ((requiredButtons & ButtonTypes.MiddleMouse) != 0 && LeanInput.GetMousePressed(2) == true)
+					{
+						return true;
+					}
+				}
+			}
+			else if ((requiredButtons & ButtonTypes.Touch) != 0)
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }
 
@@ -105,6 +152,7 @@ namespace Lean.Touch.Editor
 			TARGET tgt; TARGET[] tgts; GetTargets(out tgt, out tgts);
 
 			Draw("ignoreStartedOverGui", "Ignore fingers with StartedOverGui?");
+			Draw("requiredButtons", "Which inputs should this component react to?");
 			Draw("requiredSelectable", "If the specified object is set and isn't selected, then this component will do nothing.");
 
 			Separator();

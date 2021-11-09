@@ -36,9 +36,12 @@ namespace Lean.Common
 			LeanSelectable.OnAnyDeselected += HandleAnyA;
 			LeanSelectable.OnAnyEnabled    += HandleAnyB;
 			LeanSelectable.OnAnyDisabled   += HandleAnyB;
+
+			UpdateState();
 		}
 		protected virtual void OnDisable()
 		{
+			LeanSelectable.OnAnySelected   -= HandleAnyA;
 			LeanSelectable.OnAnySelected   -= HandleAnyA;
 			LeanSelectable.OnAnyEnabled    -= HandleAnyB;
 			LeanSelectable.OnAnyDisabled   -= HandleAnyB;

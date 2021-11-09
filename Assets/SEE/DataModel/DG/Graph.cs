@@ -104,10 +104,16 @@ namespace SEE.DataModel.DG
         /// Removes the given node from the graph. Its incoming and outgoing edges are removed
         /// along with it.
         ///
+        /// If <paramref name="orphansBecomeRoots"/> is true, the children of <paramref name="node"/>
+        /// become root nodes. Otherwise they become children of the parent of <paramref name="node"/>
+        /// if there is a parent.
+        ///
         /// Precondition: node must not be null and must be contained in this graph.
         /// </summary>
         /// <param name="node">node to be removed</param>
-        public void RemoveNode(Node node)
+        /// <param name="orphansBecomeRoots">if true, the children of <paramref name="node"/> become root nodes;
+        /// otherwise they become children of the parent of <paramref name="node"/> (if any)</param>
+        public void RemoveNode(Node node, bool orphansBecomeRoots = true)
         {
             if (node == null)
             {
@@ -132,41 +138,40 @@ namespace SEE.DataModel.DG
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
+                    outgoing.ItsGraph = null;
                 }
                 foreach (Edge incoming in node.Incomings)
                 {
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
+                    incoming.ItsGraph = null;
                 }
-                node.RemoveAllEdges();
                 // Adjust the node hierarchy.
                 if (node.NumberOfChildren() > 0)
                 {
-                    if (node.Parent == null)
-                    {
-                        // All children of node become roots now.
-                        foreach (Node child in node.Children())
-                        {
-                            child.Parent = null;
-                        }
-                    }
-                    else
-                    {
-                        // The father of node now becomes the father of all children of node.
-                        foreach (Node child in node.Children())
-                        {
-                            child.Parent = null;
-                            node.Parent.AddChild(child);
-                        }
-                    }
+                    Reparent(node.Children().ToArray(),
+                             orphansBecomeRoots ? null : node.Parent);
                 }
-                node.ItsGraph = null;
+                node.Reset();
                 NodeHierarchyHasChanged = true;
             }
             else
             {
                 throw new Exception($"Node {node} is not contained in this graph {Name}.");
+            }
+
+            /// <summary>
+            /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
+            /// </summary>
+            /// <param name="children">children to be re-parented</param>
+            /// <param name="parent">new parent of <see cref="children"/></param>
+            void Reparent(Node[] children, Node parent)
+            {
+                foreach (Node child in children)
+                {
+                    child.Reparent(parent);
+                }
             }
         }
 
@@ -580,7 +585,7 @@ namespace SEE.DataModel.DG
         /// Note: This method should be called only by <see cref="Node"/> and
         /// <see cref="SEE.DataModel.DG.IO.GraphReader"/>.
         /// </summary>
-        internal void FinalizeNodeHierarchy()
+        public void FinalizeNodeHierarchy()
         {
             GatherRoots();
             CalculateLevels();
