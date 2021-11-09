@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.SEE.VsIntegration
+namespace Assets.SEE.IdeIntegration
 {
-    class VsRemoteCommands
+    class RemoteCommands
     {
         public int Add(int a, int b)
         {
