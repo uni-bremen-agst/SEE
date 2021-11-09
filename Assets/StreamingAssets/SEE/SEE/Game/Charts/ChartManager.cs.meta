@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 53cb5a8e6bc0725438bb23481a15975f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - buildingHighlightMaterial: {fileID: 2100000, guid: 9d631e931375b5242b8903c497a12c74,
+      type: 2}
+  - buildingHighlightMaterialAccentuated: {fileID: 2100000, guid: 47a608dbb7b25de439f92bacb8350815,
+      type: 2}
+  - chartsPrefab: {fileID: 753839275229978629, guid: 87467f28fd5c34148a88077659a86497,
+      type: 3}
+  - maximizedSprite: {fileID: 21300000, guid: 3dd8a1777d7c2dd4f9faf31f3a995232, type: 3}
+  - minimizedSprite: {fileID: 21300000, guid: 582af9fbe4fe81b4680058a1f0485806, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 4fa6d0738e3769c45af1ccc31859ba9f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - AxisDropdownX: {instanceID: 0}
+  - AxisDropdownY: {instanceID: 0}
+  - markerPrefab: {fileID: 7900548257253700385, guid: 1b7447dbbbeee5b459fcbc17d2feae1c,
+      type: 3}
+  - entries: {instanceID: 0}
+  - minX: {instanceID: 0}
+  - maxX: {instanceID: 0}
+  - minY: {instanceID: 0}
+  - maxY: {instanceID: 0}
+  - parent: {instanceID: 0}
+  - dataPanel: {instanceID: 0}
+  - labelsPanel: {instanceID: 0}
+  - physicalOpen: {instanceID: 0}
+  - physicalClosed: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
