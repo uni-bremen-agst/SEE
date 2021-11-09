@@ -250,7 +250,7 @@ namespace SEE.Game
         /// Assumption: all <paramref name="nodesOrEdges"/> belong to the same graph.
         /// </summary>
         /// <param name="nodesOrEdges">nodes and edges to be re-added to the graph</param>
-        private static void RestoreGraph(ISet<GameObject> nodesOrEdges)
+        private static void RestoreGraph(IEnumerable<GameObject> nodesOrEdges)
         {
             Graph graph = null; // The graph all nodes and edges belong to.
             IList<GameObject> edges = new List<GameObject>();
