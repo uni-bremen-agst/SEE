@@ -104,7 +104,9 @@ namespace SEE.Utils
         /// <summary>
         /// A buffer to reduce the initial network traffic than oppening a file
         /// </summary>
-        public List<(char, Identifier[], Identifier[], string)> networkbuffer = new List<(char, Identifier[], Identifier[], string)>();
+        //public List<(char, Identifier[], Identifier[], string)> networkbuffer = new List<(char, Identifier[], Identifier[], string)>();
+
+        public string networkbuffer = "";
 
         /// <summary>
         /// The ID 
@@ -348,7 +350,7 @@ namespace SEE.Utils
             else
             {
                 Performance b = Performance.Begin("NET");
-                await new NetCRDT().AddString(networkbuffer); ;
+                new NetCRDT().AddString(networkbuffer, filename); ;
                 b.End();
                 //Debug.Log("NET " + b.GetElapsedTime());
             }
@@ -396,7 +398,8 @@ namespace SEE.Utils
             {
                 if (startUp)
                 {
-                    networkbuffer.Add((c, position, crdt[index - 1].GetIdentifier(), filename));
+                    //networkbuffer.Add((c, position, crdt[index - 1].GetIdentifier(), filename));
+                    networkbuffer += c + PositionToString(position) + "/" + PositionToString(crdt[index - 1].GetIdentifier()) + "\n";
                 }
                 else
                 {
@@ -407,7 +410,9 @@ namespace SEE.Utils
             {
                 if (startUp)
                 {
-                    networkbuffer.Add((c, position, null, filename));
+                    //networkbuffer.Add((c, position, null, filename));
+                    networkbuffer += c + PositionToString(position) + "/" + null + "\n";
+
                 }
                 else
                 {

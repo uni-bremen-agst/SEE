@@ -129,11 +129,11 @@ namespace SEE.Net
            
         }
 
-        public async UniTask AddString(List<(char, Identifier[], Identifier[], string)> text)
+        public void AddString(string text, string filename)//List<(char, Identifier[], Identifier[], string)> text)
         {
-            string listAsString = "";
+            //string listAsString = "";
             Performance p = Performance.Begin("NE");
-            await UniTask.SwitchToThreadPool();
+            /* await UniTask.SwitchToThreadPool();
             foreach((char, Identifier[], Identifier[], string) c in text)
             {
                 listAsString += c.Item1 + ICRDT.PositionToString(c.Item2, c.Item4) +
@@ -145,10 +145,13 @@ namespace SEE.Net
             Performance b = Performance.Begin("D");
             this.file = text[0].Item4;
             state = RemoteAction.AddString;
-            this.listAsString = listAsString;
+            this.listAsString = listAsString; */
+            this.file = filename;
+            this.listAsString = text;
+            this.state = RemoteAction.AddString;
             Execute(null);
-            b.End();
-            Debug.Log("REST " + b.GetElapsedTime());
+            p.End();
+            Debug.Log("REST " + p.GetElapsedTime());
 
         }
 
