@@ -243,7 +243,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Restores the subgraph defined by the given <paramref name="nodesOrEdges"/>.
-        /// All nodes and edges in <paramref name="nodesOrEdges"/> will re-added to
+        /// All nodes and edges in <paramref name="nodesOrEdges"/> will be re-added to
         /// the underlying graph; in addition, the parentship will be restored, too,
         /// according to the game-node hierarchy.
         ///
