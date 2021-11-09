@@ -1,9 +1,9 @@
-﻿using SEE.GO;
-using SEE.Utils;
+﻿using System.Collections.Generic;
 using SEE.Game;
-using UnityEngine;
+using SEE.GO;
 using SEE.Net;
-using System.Collections.Generic;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {

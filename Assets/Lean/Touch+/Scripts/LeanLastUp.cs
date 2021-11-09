@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.Events;
 using System.Collections.Generic;
 using Lean.Common;
+using UnityEngine;
+using UnityEngine.Events;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Touch

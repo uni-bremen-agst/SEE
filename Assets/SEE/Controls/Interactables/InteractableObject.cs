@@ -1,10 +1,10 @@
-﻿using Microsoft.MixedReality.Toolkit.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;

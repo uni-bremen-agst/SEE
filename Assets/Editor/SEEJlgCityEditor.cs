@@ -22,9 +22,9 @@
 
 #if UNITY_EDITOR
 
-using UnityEditor;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.Utils;
+using UnityEditor;
 
 namespace SEEEditor
 {    

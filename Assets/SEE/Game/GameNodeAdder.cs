@@ -1,6 +1,7 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
-using System;
 using UnityEngine;
 
 namespace SEE.Game

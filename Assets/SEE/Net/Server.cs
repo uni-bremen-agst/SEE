@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Game.City;
 using UnityEngine;
-using SEE.Net.Util;
 
 namespace SEE.Net
 {
@@ -191,7 +191,7 @@ namespace SEE.Net
                         }
                         if (Network.LoadCityOnStart)
                         {
-                            foreach (Game.AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<Game.AbstractSEECity>())
+                            foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
                             {
                                 new LoadCityAction(city).Execute(recipient);
                             }

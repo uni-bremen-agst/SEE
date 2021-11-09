@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Class with properties for a nodelayout.

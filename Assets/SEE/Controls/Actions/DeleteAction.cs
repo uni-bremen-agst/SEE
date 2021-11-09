@@ -1,10 +1,10 @@
-﻿using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 

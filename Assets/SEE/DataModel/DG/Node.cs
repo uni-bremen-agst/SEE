@@ -31,14 +31,17 @@ namespace SEE.DataModel.DG
         /// This will only set the id attribute, but does not alter the
         /// hashed ids of the underlying graph. If the node was already
         /// added to a graph, you cannot change the ID anymore.
-        /// Otherwise expect inconsistencies. If the node has not been added
-        /// to a graph, however, setting this property is safe.
+        /// If the node has not been added to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID
         {
             get => id;
             set
             {
+                if (ItsGraph != null)
+                {
+                    throw new InvalidOperationException("ID must not be changed once added to graph.");
+                }
                 id = value;
                 SetString(LinknameAttribute, id);
             }

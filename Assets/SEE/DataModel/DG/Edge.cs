@@ -5,7 +5,7 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Directed and typed edges of the graph with source and target node.
     /// </summary>
-    public class Edge : GraphElement
+    public sealed class Edge : GraphElement
     {
         // IMPORTANT NOTES:
         //
@@ -22,8 +22,8 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the edge</param>
         public Edge(string ID, Node source, Node target, string type)
         {
-            this.source = source;
-            this.target = target;
+            this.Source = source;
+            this.Target = target;
             Type = type;
             id = ID;
         }
@@ -35,8 +35,8 @@ namespace SEE.DataModel.DG
         /// <param name="target">target of the edge</param>
         public Edge(Node source, Node target)
         {
-            this.source = source;
-            this.target = target;
+            this.Source = source;
+            this.Target = target;
             id = Guid.NewGuid().ToString();
         }
 
@@ -61,43 +61,19 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The name of the toggle attribute that marks edges that where lifted from
         /// lower level nodes to higher level nodes rather than being part of the
-        /// original graph loaded. Such edges are introduced artifically.
+        /// original graph loaded. Such edges are introduced artificially.
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
 
         /// <summary>
         /// The source of the edge.
-        /// </summary
-        private Node source;
-
-        /// <summary>
-        /// The source of the edge.
         /// </summary>
-        public Node Source
-        {
-            get => source;
-            set
-            {
-                source = value;
-            }
-        }
+        public Node Source { get; set; }
 
         /// <summary>
         /// The target of the edge.
         /// </summary>
-        private Node target;
-
-        /// <summary>
-        /// The target of the edge.
-        /// </summary>
-        public Node Target
-        {
-            get => target;
-            set
-            {
-                target = value;
-            }
-        }
+        public Node Target { get; set; }
 
         /// <summary>
         /// Returns true if <paramref name="other"/> meets all of the following conditions:
@@ -112,7 +88,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
@@ -121,8 +97,8 @@ namespace SEE.DataModel.DG
             else
             {
                 Edge otherEdge = other as Edge;
-                bool equal = target.ID == otherEdge.target.ID
-                    && source.ID == otherEdge.source.ID;
+                bool equal = Target.ID == otherEdge.Target.ID
+                    && Source.ID == otherEdge.Source.ID;
                 if (!equal)
                 {
                     Report(ID + ": Source or target are different.");
@@ -153,10 +129,10 @@ namespace SEE.DataModel.DG
         protected override void HandleCloned(object clone)
         {
             base.HandleCloned(clone);
-            Edge target = (Edge)clone;
-            target.id = id;
-            target.source = source;
-            target.target = this.target;
+            Edge cloned = (Edge)clone;
+            cloned.id = id;
+            cloned.Source = Source;
+            cloned.Target = Target;
         }
 
         public override string ToString()
@@ -164,8 +140,8 @@ namespace SEE.DataModel.DG
             string result = "{\n";
             result += " \"kind\": edge,\n";
             result += " \"id\":  \"" + ID + "\",\n";
-            result += " \"source\":  \"" + source.ID + "\",\n";
-            result += " \"target\": \"" + target.ID + "\",\n";
+            result += " \"source\":  \"" + Source.ID + "\",\n";
+            result += " \"target\": \"" + Target.ID + "\",\n";
             result += base.ToString();
             result += "}";
             return result;
@@ -182,7 +158,15 @@ namespace SEE.DataModel.DG
         public override string ID
         {
             get => id;
-            set => throw new InvalidOperationException(); // ID must not be changed
+            set 
+            {
+                if (ItsGraph != null)
+                {
+                    throw new InvalidOperationException("ID must not be changed once added to graph.");
+                }
+                
+                id = value;
+            }
         }
 
         /// <summary>

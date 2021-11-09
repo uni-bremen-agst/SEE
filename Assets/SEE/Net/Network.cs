@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.Net.Util;
 using UnityEngine;
 using UnityEngine.Assertions;

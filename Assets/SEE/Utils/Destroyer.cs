@@ -1,8 +1,6 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.GO;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils

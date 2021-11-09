@@ -1,6 +1,6 @@
+using Lean.Common;
 using UnityEngine;
 using UnityEngine.Events;
-using Lean.Common;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Touch
