@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c31f9f3bdfe447a4d8bf56e001bf1285
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - chartPrefab: {fileID: 4785276354945708473, guid: 7845d136e1a6173458ce440b23366580,
+      type: 3}
+  - chartsCanvas: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

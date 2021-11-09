@@ -1,0 +1,20 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>NetworkComms.Net Help</title>
+</head>
+<body class="vendor-book">
+    <div class="details">
+        <span class="vendor">NetworkCommsNet</span>
+        <span class="locale">en-us</span>
+        <span class="product">NetworkComms.Net Help</span>
+        <span class="name">NetworkComms.Net Help</span>
+    </div>
+    <div class="package-list">
+        <div class="package">
+            <!-- NOTE: The "name" span value cannot contain any periods! -->
+            <span class="name">NetworkCommsDotNet_API</span>
+            <a class="current-link" href="NetworkCommsDotNet_API.mshc">NetworkCommsDotNet_API.mshc</a>
+        </div>
+    </div>
+</body>
+</html>
