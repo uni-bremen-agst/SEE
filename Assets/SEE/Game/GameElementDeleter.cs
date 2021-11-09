@@ -311,12 +311,8 @@ namespace SEE.Game
                         // In case we need to revive only edges, but no nodes, graph will still
                         // be null. In that case, we need to retrieve the graph from source/target
                         // of the edge.
-                        if (graph == null)
-                        {
-                            // The assumption here is that the source of the edge is already in the graph.
-                            graph = edge.Source.ItsGraph;
-
-                        }
+                        // The assumption here is that the source of the edge is already in the graph.
+                        graph ??= edge.Source.ItsGraph;
                         graph.AddEdge(edge);
                     }
                     else
