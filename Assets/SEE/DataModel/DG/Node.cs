@@ -690,7 +690,7 @@ namespace SEE.DataModel.DG
         /// according to <paramref name="subgraph.Parents"/>.
         /// </summary>
         /// <param name="subgraph">subgraph to be re-added</param>
-        public void RestoreTree(SubgraphMemento subgraph)
+        public static void RestoreTree(SubgraphMemento subgraph)
         {
             if (subgraph == null)
             {
