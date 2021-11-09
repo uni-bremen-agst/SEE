@@ -327,7 +327,7 @@ namespace SEE.Game
             }
 
             /// <summary>
-            /// Retrieves the graph to which the given <see cref="gameNode"/> should
+            /// Retrieves the graph to which the given <paramref name="gameNode"/> should
             /// be added by walking up the game-node hierarchy until a game node is
             /// reached whose associated graph node has a valid graph reference.
             /// If no such game node can be found, null is returned.
