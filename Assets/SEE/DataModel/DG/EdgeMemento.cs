@@ -17,7 +17,7 @@
         /// <summary>
         /// Memorized edge.
         /// </summary>
-        private Edge edge;
+        private readonly Edge edge;
 
         /// <summary>
         /// Re-adds the memorized edge to <see cref="ItsGraph"/>.
