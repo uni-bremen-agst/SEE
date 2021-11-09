@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;

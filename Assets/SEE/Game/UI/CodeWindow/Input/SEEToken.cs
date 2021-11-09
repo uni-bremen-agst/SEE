@@ -103,15 +103,30 @@ namespace SEE.Game.UI.CodeWindow
         /// <li>Each token will be created by using <see cref="fromAntlrToken"/>.</li>
         /// </ul>
         /// </remarks>
-        public static IEnumerable<SEEToken> fromFile(string filename)
+        public static IList<SEEToken> fromFile(string filename)
         {
             TokenLanguage language = TokenLanguage.fromFileExtension(Path.GetExtension(filename)?.Substring(1));
             Lexer lexer = language.CreateLexer(File.ReadAllText(filename));
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
-            IList<SEEToken> tokenList = tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
-            return tokenList;
+            return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="SEEToken"/>s created by parsing the given <paramref name="text"/>, assuming
+        /// it's in the given <paramref name="language"/>.
+        /// </summary>
+        /// <param name="text">Text from which the token stream shall be created.</param>
+        /// <param name="language">Language the given <paramref name="text"/> is written in</param>
+        /// <returns>A list of tokens created from the source code file.</returns>
+        public static IList<SEEToken> fromString(string text, TokenLanguage language)
+        {
+            Lexer lexer = language.CreateLexer(text);
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            tokenStream.Fill();
+            // Generate list of SEETokens using the token stream and its language
+            return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
         }
 
         /// <summary>

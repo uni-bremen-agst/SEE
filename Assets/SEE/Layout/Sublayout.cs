@@ -15,13 +15,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout

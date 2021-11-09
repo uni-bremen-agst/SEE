@@ -3,7 +3,7 @@
 using System;
 using System.Linq;
 using SEE.DataModel;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.Net.Dashboard;
 using UnityEditor;
 using UnityEngine;

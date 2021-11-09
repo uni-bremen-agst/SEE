@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -30,7 +30,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// the city to display
+        /// The city to display
         /// </summary>
         private SEECity seeCity;
 
@@ -38,7 +38,7 @@ namespace SEEEditor
         /// key: inner-node ids, value: bool, if true the inner node is shown in the foldout, if false the
         /// section foldout is collapsed
         /// </summary>
-        private Dictionary<string, bool> ShowFoldout = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> ShowFoldout = new Dictionary<string, bool>();
 
         private void CoseSettings(SEECity city)
         {
@@ -201,7 +201,7 @@ namespace SEEEditor
         /// </summary>
         /// <param name="nodeLayout"></param>
         /// <param name="node"></param>
-        private void ShowInnerNodesEnum(NodeLayoutKind nodeLayout, Node node)
+        private void ShowInnerNodesEnum(NodeLayoutKind nodeLayout, GraphElement node)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
@@ -226,7 +226,7 @@ namespace SEEEditor
         /// <param name="nodeLayout"></param>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowSublayoutEnum(NodeLayoutKind nodeLayout, Node root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
+        private void ShowSublayoutEnum(NodeLayoutKind nodeLayout, GraphElement root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
@@ -267,7 +267,7 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading and deleting a city.
         /// </summary>
-        protected void Buttons()
+        protected virtual void Buttons()
         {
             SEECity seeCity = target as SEECity;
             EditorGUILayout.BeginHorizontal();
@@ -310,7 +310,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether the foldout for the data-file attributes of the city should be expanded.
         /// </summary>
-        private bool showDataFiles = false;
+        protected bool showDataFiles = false;
 
         /// <summary>
         /// Shows and sets the attributes of the SEECity managed here.

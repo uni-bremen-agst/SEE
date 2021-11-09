@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
@@ -28,7 +29,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(AbstractSEECity settings, Graph graph)
+        public GraphRenderer(City.AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
 
@@ -80,6 +81,11 @@ namespace SEE.Game
         /// the ground level of the nodes
         /// </summary>
         private const float GroundLevel = 0.0f;
+        
+        /// <summary>
+        /// Type of the artificial root node, if one has to be added.
+        /// </summary>
+        public const string RootType = "ROOTTYPE";
 
         /// <summary>
         /// The graph to be rendered.
@@ -89,7 +95,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly AbstractSEECity settings;
+        public readonly City.AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -412,7 +418,7 @@ namespace SEE.Game
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
             ICollection<GameNode> gameNodes = new List<GameNode>();
             // the artificial unique graph root we add if the graph has more than one root
-            Node artificalRoot = null;
+            Node artificialRoot = null;
             // the plane upon which the game objects will be placed
             GameObject plane;
 
@@ -422,9 +428,9 @@ namespace SEE.Game
                 try
                 {
                     ICollection<SublayoutNode> sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-                    artificalRoot = AddRootIfNecessary(graph, nodeMap);
+                    artificialRoot = AddRootIfNecessary(graph, nodeMap);
                     gameNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
 
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
@@ -473,7 +479,7 @@ namespace SEE.Game
                 {
                     // If we added an artificial root node to the graph, we must remove it again
                     // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
                 }
             }
             else
@@ -484,8 +490,8 @@ namespace SEE.Game
                     {
                         // for a hierarchical layout, we need to add the game objects for inner nodes
                         DrawInnerNodes(nodeMap, nodes);
-                        artificalRoot = AddRootIfNecessary(graph, nodeMap);
-                        if (artificalRoot != null)
+                        artificialRoot = AddRootIfNecessary(graph, nodeMap);
+                        if (artificialRoot != null)
                         {
                             Debug.Log("Artificial unique root was added.\n");
                         }
@@ -493,7 +499,7 @@ namespace SEE.Game
 
                     // calculate and apply the node layout
                     gameNodes = ToLayoutNodes(nodeMap.Values);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
 
                     // 1) Calculate the layout
                     p = Performance.Begin("node layout " + settings.NodeLayoutSettings.Kind + " for " + gameNodes.Count + " nodes");
@@ -524,9 +530,9 @@ namespace SEE.Game
                 }
                 finally
                 {
-                    // If we added an artifical root node to the graph, we must remove it again
+                    // If we added an artificial root node to the graph, we must remove it again
                     // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
                 }
             }
 
@@ -805,7 +811,7 @@ namespace SEE.Game
 
         /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
-        /// an artifical root is created and added to both the <paramref name="graph"/>
+        /// an artificial root is created and added to both the <paramref name="graph"/>
         /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game
         /// object for inner nodes). All true roots of <paramref name="graph"/> will
         /// become children of this artificial root.
@@ -813,8 +819,8 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">graph where a unique root node should be added</param>
         /// <param name="nodeMap">mapping of nodes onto game objects, which will be updated
-        /// when a new artifical root is added</param>
-        /// <returns>the new artifical root or null if <paramref name="graph"/> has
+        /// when a new artificial root is added</param>
+        /// <returns>the new artificial root or null if <paramref name="graph"/> has
         /// already a single root</returns>
         private Node AddRootIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
         {
@@ -827,19 +833,19 @@ namespace SEE.Game
 
             if (roots.Count > 1)
             {
-                Node artificalRoot = new Node
+                Node artificialRoot = new Node
                 {
                     ID = graph.Name + "#ROOT",
                     SourceName = graph.Name + "#ROOT",
-                    Type = "ROOTTYPE"
+                    Type = RootType
                 };
-                graph.AddNode(artificalRoot);
+                graph.AddNode(artificialRoot);
                 foreach (Node root in roots)
                 {
-                    artificalRoot.AddChild(root);
+                    artificialRoot.AddChild(root);
                 }
-                nodeMap[artificalRoot] = DrawInnerNode(artificalRoot);
-                return artificalRoot;
+                nodeMap[artificialRoot] = DrawInnerNode(artificialRoot);
+                return artificialRoot;
             }
 
             return null;
@@ -851,7 +857,7 @@ namespace SEE.Game
         /// <paramref name="root"/> will be null afterward.
         /// Note: This method is the counterpart to AddRootIfNecessary.
         /// </summary>
-        /// <param name="root">artifical root node to be removed (created by AddRootIfNecessary) or null;
+        /// <param name="root">artificial root node to be removed (created by AddRootIfNecessary) or null;
         /// will be null afterward</param>
         /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
         /// <param name="nodeMap">mapping of nodes onto game objects from which to remove

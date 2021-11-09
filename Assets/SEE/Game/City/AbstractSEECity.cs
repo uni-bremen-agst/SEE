@@ -12,7 +12,7 @@ using SEE.Tools;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Common abstract superclass of SEECity and SEECityEvolution.
@@ -25,8 +25,8 @@ namespace SEE.Game
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
-        /// <see cref="Save(ConfigWriter)"/> and
-        /// <see cref="Restore(Dictionary{string,object})"/>,
+        /// <see cref="AbstractSEECity.Save"/> and
+        /// <see cref="AbstractSEECity.Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
 
@@ -291,9 +291,9 @@ namespace SEE.Game
             }
             else
             {
-                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value == true)
+                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value)
                   .Select(pair => pair.Key).ToList();
-                return graph.Subgraph(matches);
+                return graph.SubgraphByNodeType(matches);
             }
         }
 
@@ -303,22 +303,21 @@ namespace SEE.Game
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
-        public ICollection<string> AllLeafMetrics()
-        {
-            List<string> result = new List<string>(4);
-            result.Add(LeafNodeSettings.WidthMetric);
-            result.Add(LeafNodeSettings.HeightMetric);
-            result.Add(LeafNodeSettings.DepthMetric);
-            result.Add(LeafNodeSettings.ColorMetric);
-            return result;
-        }
+        public ICollection<string> AllLeafMetrics() =>
+            new List<string>(4)
+            {
+                LeafNodeSettings.WidthMetric,
+                LeafNodeSettings.HeightMetric,
+                LeafNodeSettings.DepthMetric,
+                LeafNodeSettings.ColorMetric
+            };
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
         /// </summary>
         /// <returns>all attribute names of the different kinds of software erosions</returns>
         public IList<string> AllLeafIssues() =>
-            new List<string>()
+            new List<string>
                {
                   ErosionSettings.ArchitectureIssue,
                   ErosionSettings.CloneIssue,
@@ -397,19 +396,17 @@ namespace SEE.Game
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of an inner node</returns>
-        public ICollection<string> AllInnerNodeMetrics()
-        {
-            return new List<string>() { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
-        }
+        public ICollection<string> AllInnerNodeMetrics() => 
+            new List<string> { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
         /// </summary>
         /// <param name="filename">GXL filename from which to load the graph</param>
-        /// <param name="rootName">the name of the artifical root if any needs to be added;
-        /// if none is given, <paramref name="filename"/> will be used instead</param>
+        /// <param name="rootName">the name of the artificial root if any needs to be added;
+        /// if null is given, <paramref name="filename"/> will be used instead</param>
         /// <returns>the loaded graph (may be empty if a graph could not be loaded)</returns>
-        public Graph LoadGraph(string filename, string rootName = "")
+        protected Graph LoadGraph(string filename, string rootName = null)
         {
             if (string.IsNullOrEmpty(filename))
             {
@@ -421,7 +418,7 @@ namespace SEE.Game
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
-                                                           rootName: string.IsNullOrEmpty(rootName) ? filename : rootName,
+                                                           rootName: rootName ?? filename,
                                                            logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
