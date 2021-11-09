@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Collections.Generic;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Common
@@ -171,8 +171,6 @@ namespace Lean.Common.Editor
 	[UnityEditor.CustomEditor(typeof(TARGET))]
 	public class LeanDelayedValue_Editor : LeanEditor
 	{
-		private bool showUnusedEvents;
-
 		protected override void OnInspector()
 		{
 			TARGET tgt; TARGET[] tgts; GetTargets(out tgt, out tgts);

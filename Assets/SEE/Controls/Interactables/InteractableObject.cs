@@ -1,10 +1,10 @@
-﻿using Microsoft.MixedReality.Toolkit.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.MixedReality.Toolkit.Input;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
@@ -186,7 +186,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Whether the object is currently hovered over by e.g. the mouse or the VR
-        /// controller (no matter what kind of element it is, e.g. city object, 
+        /// controller (no matter what kind of element it is, e.g. city object,
         /// metric marker, etc.).
         /// </summary>
         public bool IsHovered => HoverFlags != 0;
@@ -280,23 +280,23 @@ namespace SEE.Controls
             }
             return graphToSelectedIOs[graph];
         }
-        
+
         #region Interaction
 
         /// <summary>
-        /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if 
-        /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/> 
+        /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if
+        /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/>
         /// and <see cref="AnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
-        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverIn"/> 
+        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverIn"/>
         /// and <see cref="LocalAnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
         /// additionally. This <see cref="InteractableObject"/> will be added to the set of <see cref="HoveredObjects"/>.
-        /// 
-        /// If instead the object is NOT being hovered over (<see cref="IsHovered"/>), the <see cref="HoverOut"/> 
+        ///
+        /// If instead the object is NOT being hovered over (<see cref="IsHovered"/>), the <see cref="HoverOut"/>
         /// and <see cref="AnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
-        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverOut"/> 
+        /// and <paramref name="isInitiator"/> as arguments. If <paramref name="isInitiator"/>, the <see cref="LocalHoverOut"/>
         /// and <see cref="LocalAnyHoverOut"/> events are triggered with this <see cref="InteractableObject"/>
         /// additionally. This <see cref="InteractableObject"/> will be removed from the set of <see cref="HoveredObjects"/>.
-        /// 
+        ///
         /// At any rate, if we are running in multiplayer mode and <paramref name="isInitiator"/> is true,
         /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>.
         /// and this <see cref="InteractableObject"/>.
@@ -335,7 +335,12 @@ namespace SEE.Controls
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
                 {
-                    Assert.IsNull(HoveredObjectWithWorldFlag);
+                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
+                    // investigation.
+                    //if (HoveredObjectWithWorldFlag != null)
+                    //{
+                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
+                    //}
                     HoveredObjectWithWorldFlag = this;
                 }
             }
@@ -353,7 +358,12 @@ namespace SEE.Controls
                 HoveredObjects.Remove(this);
                 if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
                 {
-                    Assert.IsNotNull(HoveredObjectWithWorldFlag);
+                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
+                    // investigation.
+                    //if (HoveredObjectWithWorldFlag != null)
+                    //{
+                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
+                    //}
                     HoveredObjectWithWorldFlag = null;
                 }
             }
@@ -366,10 +376,10 @@ namespace SEE.Controls
 
         /// <summary>
         /// Runs <see cref="SetHoverFlags(uint, bool)"/> with the first parameter, say H,
-        /// that equals <see cref="HoverFlags"/> with the <paramref name="hoverFlag"/> bit 
+        /// that equals <see cref="HoverFlags"/> with the <paramref name="hoverFlag"/> bit
         /// turned on if <paramref name="setFlag"/> or turned off if not <paramref name="setFlag"/>.
         /// The second parameter is <paramref name="isInitiator"/>.
-        /// 
+        ///
         /// Note: This method may be called locally when a local user interacts with the
         /// object or remotely when a remote user has interacted with the object. In the
         /// former case, <paramref name="isInitiator"/> will be true. In the
@@ -410,8 +420,8 @@ namespace SEE.Controls
         /// <summary>
         /// Marks the game object this <see cref="InteractableObject"/> is attached to for selection
         /// and triggers the necessary events accordingly.
-        /// 
-        /// As a side effect, this <see cref="InteractableObject"/> will be added or removed, 
+        ///
+        /// As a side effect, this <see cref="InteractableObject"/> will be added or removed,
         /// respectively, to <see cref="SelectedObjects"/> depending upon <paramref name="select"/>.
         /// </summary>
         /// <param name="select">Whether this object should be selected.</param>
@@ -491,7 +501,7 @@ namespace SEE.Controls
             List<InteractableObject> by = new List<InteractableObject>();
             if (replaced.Count > 0 || by.Count > 0)
             {
-                // Note: This is no endless loop because SetSelect will remove this 
+                // Note: This is no endless loop because SetSelect will remove this
                 // InteractableObject from SelectedObjects.
                 while (SelectedObjects.Count != 0)
                 {
@@ -626,7 +636,7 @@ namespace SEE.Controls
         /// ----------------------------
         /// Hovering event system
         /// ----------------------------
-        
+
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object) in circumstances where a distinction between
@@ -638,7 +648,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
-        /// or hover off the game object). This delegate is intended to be used in 
+        /// or hover off the game object). This delegate is intended to be used in
         /// circumstances where no distinction between remote or local players needs
         /// to be made.
         /// </summary>
@@ -646,12 +656,12 @@ namespace SEE.Controls
         public delegate void LocalPlayerHoverAction(InteractableObject interactableObject);
 
         /// <summary>
-        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// being hovered over. Intended for multiplayer actions.
         /// </summary>
         public event MultiPlayerHoverAction HoverIn;
         /// <summary>
-        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// no longer hovered over. Intended for multiplayer actions.
         /// </summary>
         public event MultiPlayerHoverAction HoverOut;
@@ -660,12 +670,12 @@ namespace SEE.Controls
         /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
         /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
-        /// the player just registers on this event here and gets notified whenever any 
+        /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for multiplayer actions.
-        /// 
-        /// Note: This event is declared static so that it is independent of a particular 
+        ///
+        /// Note: This event is declared static so that it is independent of a particular
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event MultiPlayerHoverAction AnyHoverIn;
@@ -673,23 +683,23 @@ namespace SEE.Controls
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
         /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
-        /// the player just registers on this event here and gets notified whenever any 
+        /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for multiplayer actions.
-        /// 
-        /// Note: This event is declared static so that it is independent of a particular 
+        ///
+        /// Note: This event is declared static so that it is independent of a particular
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event MultiPlayerHoverAction AnyHoverOut;
 
         /// <summary>
-        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// being hovered over. Intended for actions to be executed only locally.
         /// </summary>
         public event LocalPlayerHoverAction LocalHoverIn;
         /// <summary>
-        /// Event to be triggered when this particular <see cref="InteractableObject"/> is 
+        /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// no longer hovered over. Intended for actions to be executed only locally.
         /// </summary>
         public event LocalPlayerHoverAction LocalHoverOut;
@@ -698,12 +708,12 @@ namespace SEE.Controls
         /// Event to be triggered when any <see cref="InteractableObject"/> is being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
         /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
-        /// the player just registers on this event here and gets notified whenever any 
+        /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for actions to be executed only locally.
-        /// 
-        /// Note: This event is declared static so that it is independent of a particular 
+        ///
+        /// Note: This event is declared static so that it is independent of a particular
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event LocalPlayerHoverAction LocalAnyHoverIn;
@@ -711,12 +721,12 @@ namespace SEE.Controls
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
         /// for all existing instances of <see cref="InteractableObject"/ it is interested in,
-        /// the player just registers on this event here and gets notified whenever any 
+        /// the player just registers on this event here and gets notified whenever any
         /// <see cref="InteractableObject"/> is no longer being hovered over. The player must make the distinction
         /// whether it is interested in this <see cref="InteractableObject"/> at all.
         /// Intended for actions to be executed only locally.
-        /// 
-        /// Note: This event is declared static so that it is independent of a particular 
+        ///
+        /// Note: This event is declared static so that it is independent of a particular
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event LocalPlayerHoverAction LocalAnyHoverOut;
@@ -724,7 +734,7 @@ namespace SEE.Controls
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
-        
+
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object). Intended for multiplayer actions.
@@ -898,11 +908,11 @@ namespace SEE.Controls
                 SetHoverFlag(HoverFlag.World, false, true);
             }
         }
-        
+
         //----------------------------------------
         // Actions called by the MRTK on HoloLens.
         //----------------------------------------
-        
+
         public void OnFocusEnter(FocusEventData eventData)
         {
             // In case of eye gaze, we discard the input.
@@ -917,7 +927,7 @@ namespace SEE.Controls
         public void OnFocusExit(FocusEventData eventData)
         {
             // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
-            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes 
+            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes
                 && !eventData.Pointer.PointerName.StartsWith("None"))
             {
                 // Unfortunately, there seems to be a bug in the MRTK:

@@ -132,7 +132,6 @@ namespace SEE.DataModel.DG
         public int Depth()
         {
             int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
-
             return maxDepth + 1;
         }
 
@@ -165,6 +164,28 @@ namespace SEE.DataModel.DG
                 cursor = cursor.Parent;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns all transitive descendants of this node in a post-order traversal of the
+        /// node hierarchy rooted by this node, including this node itself (will be the last node
+        /// in the returned ordered list).
+        /// </summary>
+        /// <returns>transitive descendants of this node in post order</returns>
+        public IList<Node> PostOrderDescendants()
+        {
+            IList<Node> result = new List<Node>();
+            PostOrderDescendants(this);
+            return result;
+
+            void PostOrderDescendants(Node parent)
+            {
+                foreach (Node child in parent.Children())
+                {
+                    PostOrderDescendants(child);
+                }
+                result.Add(parent);
+            }
         }
 
         /// <summary>
@@ -340,15 +361,19 @@ namespace SEE.DataModel.DG
         public List<Edge> Outgoings { get; private set; } = new List<Edge>();
 
         /// <summary>
-        /// Removes all incoming and outgoing edges from this node.
+        /// Resets this node, i.e., removes all incoming and outgoing edges
+        /// and children from this node. Resets its graph and parent to null.
         ///
         /// IMPORTANT NOTE: This method is reserved for Graph and should not
         /// be used by any other client.
         /// </summary>
-        public void RemoveAllEdges()
+        public void Reset()
         {
             Outgoings.Clear();
             incomings.Clear();
+            children.Clear();
+            Reparent(null);
+            ItsGraph = null;
         }
 
         /// <summary>
@@ -627,9 +652,39 @@ namespace SEE.DataModel.DG
             return Outgoings.Any(outgoing => outgoing.Target == other && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType));
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="node"/> is not null.
+        /// </summary>
+        /// <param name="node">node to be compared</param>
         public static implicit operator bool(Node node)
         {
             return node != null;
+        }
+
+        /// <summary>
+        /// Removes this node and all its descendants in the node hierarchy
+        /// including their incoming and outgoing edges from the graph.
+        /// All deleted nodes and edges are returned in the result.
+        /// </summary>
+        /// <returns>all deleted nodes and edges including this node</returns>
+        public SubgraphMemento DeleteTree()
+        {
+            SubgraphMemento result = new SubgraphMemento(ItsGraph);
+            foreach (Node node in PostOrderDescendants())
+            {
+                result.Parents[node] = node.Parent;
+                foreach (Edge edge in node.Outgoings)
+                {
+                    result.Edges.Add(edge);
+                }
+                foreach (Edge edge in node.Incomings)
+                {
+                    result.Edges.Add(edge);
+                }
+                // Removing a node will also remove all its incoming and outgoing edges.
+                ItsGraph.RemoveNode(node);
+            }
+            return result;
         }
     }
 }

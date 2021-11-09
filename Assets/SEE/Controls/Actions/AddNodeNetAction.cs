@@ -5,8 +5,8 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for adding a node via network from one client to all others and 
-    /// to the server. 
+    /// This class is responsible for adding a node via network from one client to all others and
+    /// to the server.
     /// </summary>
     public class AddNodeNetAction : AbstractAction
     {
@@ -72,9 +72,9 @@ namespace SEE.Controls.Actions
                 GameObject parent = GameObject.Find(ParentID);
                 if (parent == null)
                 {
-                    throw new System.Exception($"There is no node with the ID {ParentID}");
+                    throw new System.Exception($"There is no node with the ID {ParentID}.");
                 }
-                GameNodeAdder.Add(parent, Position, Scale, NewNodeID);
+                GameNodeAdder.AddChild(parent, Position, Scale, NewNodeID);
             }
         }
     }

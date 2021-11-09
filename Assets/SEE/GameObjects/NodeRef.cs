@@ -98,7 +98,7 @@ namespace SEE.GO
         /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
         /// </summary>
         /// <returns>IDs of all incoming and outgoing edges</returns>
-        public ISet<string> GetEdgeIds()
+        public ISet<string> GetIdsOfIncomingOutgoingEdges()
         {
             HashSet<string> edgeIDs = new HashSet<string>();
             foreach (Edge edge in Value.Outgoings)
