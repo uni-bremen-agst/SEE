@@ -89,7 +89,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Create and returns a new game object for representing the given <paramref name="node"/>
+        /// Creates and returns a new game object for representing the given <paramref name="node"/>
         /// as a leaf node. The exact kind of representation depends upon the leaf-node factory. The node is
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
         /// Its style is determined by LeafNodeStyleMetric (linear interpolation of a color gradient).
