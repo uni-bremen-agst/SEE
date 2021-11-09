@@ -79,7 +79,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Deletes the given <paramref name="gameEdge"/>, that is, removes the associated
-        /// graph edge from its graph, lets <paramref name="gameEdge"/> fading out, and
+        /// graph edge from its graph, lets <paramref name="gameEdge"/> fade out, and
         /// finally sets it inactive. The result is the memorized removed associated
         /// graph edge and <paramref name="gameEdge"/> itself.
         ///
