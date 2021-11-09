@@ -10,7 +10,7 @@ namespace SEE.Game
     /// <summary>
     /// Allows to delete nodes and edges.
     /// </summary>
-    internal class GameElementDeleter
+    internal static class GameElementDeleter
     {
         /// <summary>
         /// Removes the graph node associated with the given <paramref name="gameNode"/>
