@@ -681,7 +681,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes as a child.
+        /// Adds the source name as a label to the center of the given game nodes as a child
+        /// for all given <paramref name="gameNodes"/> except for the root (its label would
+        /// be too large and is not really neeed anyway).
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         /// <param name="innerNodeFactory">inner node factory</param>
@@ -692,15 +694,18 @@ namespace SEE.Game
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
-                Node theNode = node.GetComponent<NodeRef>().Value;
-                Vector3 size = innerNodeFactory.GetSize(node);
-                float length = Mathf.Min(size.x, size.z);
-                // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
-                                                               node.transform.position, length * 0.3f);
-                text.transform.SetParent(node.transform);
-                codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
-                Portal.SetPortal(codeCity, text);
+                Node theNode = node.GetNode();
+                if (!theNode.IsRoot())
+                {
+                    Vector3 size = innerNodeFactory.GetSize(node);
+                    float length = Mathf.Min(size.x, size.z);
+                    // The text may occupy up to 30% of the length.
+                    GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
+                                                                   node.transform.position, length * 0.3f);
+                    text.transform.SetParent(node.transform);
+                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    Portal.SetPortal(codeCity, text);
+                }
             }
         }
     }
