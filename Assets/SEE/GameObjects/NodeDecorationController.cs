@@ -358,7 +358,7 @@ namespace SEE.GO
         {
             GraphRenderer renderer = new GraphRenderer(settings, hiddenNodesGraph);
             GameObject empty = new GameObject("TopSurfaceTreemap");
-            renderer.Draw(empty);
+            renderer.DrawGraph(empty);
             empty.transform.localScale = new Vector3(packedBlockDimensions.x, treemapDecoratorHeight, packedBlockDimensions.z);
             empty.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y + packedBlockDimensions.y / 2 - empty.transform.localScale.y / 2, packedBlockLocation.z);
             empty.transform.SetParent(treemapParent.transform);
@@ -386,7 +386,7 @@ namespace SEE.GO
             // North
             GameObject planeN = new GameObject();
             planeN.name = "northTreemap";
-            renderer.Draw(planeN);
+            renderer.DrawGraph(planeN);
             planeN.transform.localScale = new Vector3(packedBlockDimensions.y, treemapDecoratorHeight, packedBlockDimensions.z);
             planeN.transform.localPosition = new Vector3(packedBlockLocation.x + packedBlockDimensions.x / 2 - planeN.transform.localScale.y / 2, packedBlockLocation.y, packedBlockLocation.z);
             planeN.transform.rotation = Quaternion.Euler(0f, 0f, -90f);
@@ -394,7 +394,7 @@ namespace SEE.GO
             // South
             GameObject planeS = new GameObject();
             planeS.name = "southTreemap";
-            renderer.Draw(planeS);
+            renderer.DrawGraph(planeS);
             planeS.transform.localScale = new Vector3(packedBlockDimensions.y, treemapDecoratorHeight, packedBlockDimensions.z);
             planeS.transform.localPosition = new Vector3(packedBlockLocation.x - packedBlockDimensions.x / 2 + planeN.transform.localScale.y / 2, packedBlockLocation.y, packedBlockLocation.z);
             planeS.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
@@ -402,7 +402,7 @@ namespace SEE.GO
             // West
             GameObject planeW = new GameObject();
             planeW.name = "westTreemap";
-            renderer.Draw(planeW);
+            renderer.DrawGraph(planeW);
             planeW.transform.localScale = new Vector3(packedBlockDimensions.z, treemapDecoratorHeight, packedBlockDimensions.y);
             planeW.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z + packedBlockDimensions.z / 2 - planeN.transform.localScale.y / 2);
             planeW.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -410,7 +410,7 @@ namespace SEE.GO
             // East
             GameObject planeE = new GameObject();
             planeE.name = "eastTreemap";
-            renderer.Draw(planeE);
+            renderer.DrawGraph(planeE);
             planeE.transform.localScale = new Vector3(packedBlockDimensions.z, treemapDecoratorHeight, packedBlockDimensions.y);
             planeE.transform.localPosition = new Vector3(packedBlockLocation.x, packedBlockLocation.y, packedBlockLocation.z - packedBlockDimensions.z / 2 + planeN.transform.localScale.y / 2);
             planeE.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);

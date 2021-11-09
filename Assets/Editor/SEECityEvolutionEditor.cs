@@ -81,7 +81,7 @@ namespace SEEEditor
             GraphRenderer graphRenderer = new GraphRenderer(city, graph);
             // We assume here that this SEECity instance was added to a game object as
             // a component. The inherited attribute gameObject identifies this game object.
-            graphRenderer.Draw(city.gameObject);
+            graphRenderer.DrawGraph(city.gameObject);
         }
 
         /// <summary>
