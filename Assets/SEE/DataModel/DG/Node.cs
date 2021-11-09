@@ -683,32 +683,5 @@ namespace SEE.DataModel.DG
             }
             return result;
         }
-
-        /// <summary>
-        /// Re-adds all nodes and edges in <paramref name="subgraph"/> to
-        /// <paramref name="subgraph.ItsGraph"/> and restores the node hierarchy
-        /// according to <paramref name="subgraph.Parents"/>.
-        /// </summary>
-        /// <param name="subgraph">subgraph to be re-added</param>
-        public static void RestoreTree(SubgraphMemento subgraph)
-        {
-            if (subgraph == null)
-            {
-                return;
-            }
-            foreach (Node node in subgraph.Parents.Keys)
-            {
-                subgraph.ItsGraph.AddNode(node);
-            }
-            foreach (KeyValuePair<Node, Node> node in subgraph.Parents)
-            {
-                Node parent = node.Value;
-                parent?.AddChild(node.Key);
-            }
-            foreach (Edge edge in subgraph.Edges)
-            {
-                subgraph.ItsGraph.AddEdge(edge);
-            }
-        }
     }
 }
