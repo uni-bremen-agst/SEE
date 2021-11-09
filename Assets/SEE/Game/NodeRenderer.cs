@@ -76,7 +76,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>
-        /// of given <paramref name="gameNode"/> and lets refer the node reference
+        /// of given <paramref name="gameNode"/> and lets the node reference
         /// of it refer to <paramref name="node"/>.
         /// </summary>
         /// <param name="node">graph node represented by <paramref name="gameNode"/></param>
