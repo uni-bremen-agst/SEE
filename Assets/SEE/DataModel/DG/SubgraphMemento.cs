@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG
             if (Parents.Count > 0)
             {
                 // The subgraph has at least one node.
-                Parents.Keys.FirstOrDefault().RestoreTree(this);
+                Parents.Keys.First().RestoreTree(this);
             }
             else
             {
