@@ -237,7 +237,7 @@ namespace SEE.Game
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
                 SetActive(nodeOrEdge);
-                GameObjectFader.FadingIn(nodeOrEdge, null);
+                GameObjectFader.FadingIn(nodeOrEdge);
             }
         }
 
