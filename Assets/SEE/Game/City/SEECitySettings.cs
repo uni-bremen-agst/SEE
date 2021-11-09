@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using OdinSerializer;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// The kinds of node layouts available.

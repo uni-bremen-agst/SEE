@@ -11,7 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Configuration of a code city for the visualization of dynamic data in
