@@ -21,7 +21,7 @@ namespace SEE.Game
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
         /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
-        /// 
+        ///
         /// This method is expected to be called at every Update().
         /// </summary>
         /// <param name="movingObject">the object to be moved.</param>
@@ -40,16 +40,16 @@ namespace SEE.Game
         /// Finalizes the position of the <paramref name="movingObject"/>. If the current
         /// pointer of the user is pointing at a game object with a NodeRef the final
         /// position of <paramref name="movingObject"/> will be the game object with a NodeRef
-        /// that is at the deepest level of the node hierarchy (the pointer may actually 
-        /// hit multiple nested nodes), in the following called target parent. The 
+        /// that is at the deepest level of the node hierarchy (the pointer may actually
+        /// hit multiple nested nodes), in the following called target parent. The
         /// <paramref name="movingObject"/> will then be placed onto the roof of the target
         /// parent and its associated graph node will be become a child of the graph node
         /// associated with the target parent and <paramref name="movingObject"/> becomes
         /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
-        /// must be in sync). 
-        /// 
-        /// If no such target node can be identified, the <paramref name="movingObject"/> will 
-        /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy 
+        /// must be in sync).
+        ///
+        /// If no such target node can be identified, the <paramref name="movingObject"/> will
+        /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy
         /// nor the game-node hierarchy will be changed.
         ///
         /// </summary>
@@ -71,7 +71,7 @@ namespace SEE.Game
             // Hence, we need to identify the node in the node hierarchy that
             // is at the lowest level in the tree (more precisely, the one with
             // the greatest value of the node attribute Level; Level counting
-            // starts at the root and increases downward into the tree).            
+            // starts at the root and increases downward into the tree).
             foreach (RaycastHit hit in Physics.RaycastAll(UserPointsTo()))
             {
                 // Must be different from the movingObject itself
@@ -139,7 +139,7 @@ namespace SEE.Game
         /// <param name="parent">parent</param>
         private static void PutOn(Transform child, GameObject parent)
         {
-            // FIXME: child may not actually fit into parent, in which we should 
+            // FIXME: child may not actually fit into parent, in which we should
             // downscale it until it fits
             Vector3 childCenter = child.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
@@ -154,9 +154,9 @@ namespace SEE.Game
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
         /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
-        /// 
+        ///
         /// This method is expected to be called at every Update().
-        /// 
+        ///
         /// You can lock any of the three axes.
         /// </summary>
         /// <param name="movingObject">the object to be moved</param>
@@ -200,10 +200,10 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the position of the tip of the ray drawn from the camera towards
-        /// the position the user is currently pointing to. The distance of that 
+        /// the position the user is currently pointing to. The distance of that
         /// point along this ray is the distance between the camera from which the
         /// ray originated and the position of the given <paramref name="selectedObject"/>.
-        /// 
+        ///
         /// That means, the selected object moves on a sphere around the camera
         /// at the distance of the selected object.
         /// </summary>
@@ -211,8 +211,7 @@ namespace SEE.Game
         /// <returns>tip of the ray</returns>
         private static Vector3 TipOfRayPosition(GameObject selectedObject)
         {
-            Ray ray = UserPointsTo();
-            return ray.GetPoint(Vector3.Distance(ray.origin, selectedObject.transform.position));
+            return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
         }
     }
 }
