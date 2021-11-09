@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StreamRpc;
 
-namespace Assets.SEE.VsIntegration
+namespace Assets.SEE.IdeIntegration
 {
     public abstract class JsonRpcServer : IDisposable
     {
