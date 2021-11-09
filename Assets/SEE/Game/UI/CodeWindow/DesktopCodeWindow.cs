@@ -261,6 +261,18 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
                         }
                         ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
+                        string textToSave = string.Join("\n", ICRDT.PrintString(Title).Split('\n').Select((x, i) => {
+                            if (x.Length > 0)
+                            {
+                                return x.Substring(neededPadding);
+                            }
+                            else
+                            {
+                                return x;
+                            }
+                        }).ToList());
+                        EnterFromTokens( SEEToken.fromString(textToSave, TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                        TextMeshInputField.text = TextMesh.text;
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
@@ -345,7 +357,7 @@ namespace SEE.Game.UI.CodeWindow
         private async UniTask AddStringStart() 
         {
             ShowNotification.Info("Loading editor", "The Editable file is loading, please wait", 10);
-            string  cleanText = await GetCleanText();
+            string  cleanText = await AsyncGetCleanText();
             await ICRDT.AsyncAddString(cleanText, 0, Title, true);
             TextMeshInputField.enabled = true;
             ShowNotification.Info("Editor ready", "You now can use the editor");
