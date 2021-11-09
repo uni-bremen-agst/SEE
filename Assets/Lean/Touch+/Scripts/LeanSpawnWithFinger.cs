@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
 using Lean.Common;
+using UnityEngine;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Touch
@@ -36,7 +36,12 @@ namespace Lean.Touch
 		/// <summary>If the spawned object is dropped on top of the wrong GameObject (e.g. UI), destroy it?</summary>
 		public bool DestroyIfBlocked { set { destroyIfBlocked = value; } get { return destroyIfBlocked; } } [SerializeField] private bool destroyIfBlocked;
 
-		public LeanScreenQuery ScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast);
+		public LeanScreenQuery BlockedScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast);
+
+		/// <summary>If the spawned object isn't dropped on top of the specified GameObjects, destroy it?</summary>
+		public bool DestroyIfMissing { set { destroyIfMissing = value; } get { return destroyIfMissing; } } [SerializeField] private bool destroyIfMissing;
+
+		public LeanScreenQuery MissingScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast);
 
 		/// <summary>If the specified prefab is selectable, select it when spawned?</summary>
 		public bool SelectOnSpawn { set { selectOnSpawn = value; } get { return selectOnSpawn; } } [SerializeField] private bool selectOnSpawn;
@@ -215,11 +220,16 @@ namespace Lean.Touch
 
 			if (fingerData != null && fingerData.Clone != null)
 			{
-				if (destroyIfBlocked == true)
+				if (destroyIfBlocked == true || destroyIfMissing == true)
 				{
 					LeanScreenQuery.ChangeLayers(fingerData.Clone.gameObject, false, true);
 
-					if (ScreenQuery.Query<Component>(gameObject, finger.ScreenPosition) == null)
+					if (destroyIfBlocked == true && BlockedScreenQuery.Query<Component>(gameObject, finger.ScreenPosition) != null)
+					{
+						Destroy(fingerData.Clone.gameObject);
+					}
+
+					if (destroyIfMissing == true && MissingScreenQuery.Query<Component>(gameObject, finger.ScreenPosition) == null)
 					{
 						Destroy(fingerData.Clone.gameObject);
 					}
@@ -254,11 +264,19 @@ namespace Lean.Touch.Editor
 			if (Any(tgts, t => t.DragAfterSpawn == true))
 			{
 				BeginIndent();
+					Draw("ScreenDepth");
 					Draw("destroyIfBlocked", "If the spawned object is dropped on top of the wrong GameObject (e.g. UI), destroy it?");
 					if (Any(tgts, t => t.DestroyIfBlocked == true))
 					{
 						BeginIndent();
-							Draw("ScreenQuery");
+							Draw("BlockedScreenQuery");
+						EndIndent();
+					}
+					Draw("destroyIfMissing", "If the spawned object isn't dropped on top of the specified GameObjects, destroy it?");
+					if (Any(tgts, t => t.DestroyIfMissing == true))
+					{
+						BeginIndent();
+							Draw("MissingScreenQuery");
 						EndIndent();
 					}
 				EndIndent();
@@ -271,7 +289,6 @@ namespace Lean.Touch.Editor
 					Draw("deselectOnUp", "If the selecting finger goes up, deselect the object?");
 				EndIndent();
 			}
-			Draw("ScreenDepth");
 
 			Separator();
 
