@@ -486,11 +486,21 @@ namespace SEE.Game.UI.CodeWindow
                     .SkipWhile(x => x.lineNumber + 1 != lineNumber) 
                     .TakeWhile(x => x.lineNumber + 1 == lineNumber).Select(x => x.character).ToArray());
 
+
         /// <summary>
         /// Returns the Text without the XML Tags
         /// </summary>
         /// <returns></returns>
-        private async UniTask<string> GetCleanText()
+        private  string GetCleanText()
+        {
+            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
+            return ret;
+        }
+        /// <summary>
+        /// Returns the Text without the XML Tags
+        /// </summary>
+        /// <returns></returns>
+        private async UniTask<string> AsyncGetCleanText()
         {
             await UniTask.SwitchToThreadPool();
             string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
