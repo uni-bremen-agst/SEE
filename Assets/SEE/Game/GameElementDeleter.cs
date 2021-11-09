@@ -212,7 +212,7 @@ namespace SEE.Game
         /// from their graph.
         /// </summary>
         /// <param name="nodesOrEdges">nodes and/or edges to be marked as deleted</param>
-        private static void Delete(ISet<GameObject> nodesOrEdges)
+        private static void Delete(IEnumerable<GameObject> nodesOrEdges)
         {
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
