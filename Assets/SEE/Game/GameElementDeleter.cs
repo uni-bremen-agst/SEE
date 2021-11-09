@@ -224,12 +224,10 @@ namespace SEE.Game
         /// Marks all elements in <paramref name="nodesOrEdges"/> by way of
         /// <see cref="GameObjectFader"/> as alive again. That means to let
         /// them be set active, fade in and blink. All <paramref name="nodesOrEdges"/>
-        /// are re-added to <paramref name="graph"/>.
+        /// are re-added to their original graph.
         ///
         /// Assumption: The objects were set inactive.
         /// </summary>
-        /// <param name="graph">the graph to which all <paramref name="nodesOrEdges"/> need to be
-        /// re-added</param>
         /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
         public static void Revive(ISet<GameObject> nodesOrEdges)
         {
