@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace SEE.DataModel.DG
 {
@@ -40,8 +39,8 @@ namespace SEE.DataModel.DG
         {
             if (Parents.Count > 0)
             {
-                // The subgraph has at least one node.
-                Parents.Keys.First().RestoreTree(this);
+                // We have nodes in this subgraph.
+                RestoreTree(this);
             }
             else
             {
@@ -50,6 +49,33 @@ namespace SEE.DataModel.DG
                 {
                     ItsGraph.AddEdge(edge);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Re-adds all nodes and edges in <paramref name="subgraph"/> to
+        /// <paramref name="subgraph.ItsGraph"/> and restores the node hierarchy
+        /// according to <paramref name="subgraph.Parents"/>.
+        /// </summary>
+        /// <param name="subgraph">subgraph to be restored</param>
+        private static void RestoreTree(SubgraphMemento subgraph)
+        {
+            if (subgraph == null)
+            {
+                return;
+            }
+            foreach (Node node in subgraph.Parents.Keys)
+            {
+                subgraph.ItsGraph.AddNode(node);
+            }
+            foreach (KeyValuePair<Node, Node> node in subgraph.Parents)
+            {
+                Node parent = node.Value;
+                parent?.AddChild(node.Key);
+            }
+            foreach (Edge edge in subgraph.Edges)
+            {
+                subgraph.ItsGraph.AddEdge(edge);
             }
         }
     }
