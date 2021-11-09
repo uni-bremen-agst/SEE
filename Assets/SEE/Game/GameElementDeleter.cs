@@ -16,7 +16,7 @@ namespace SEE.Game
         /// Removes the graph node associated with the given <paramref name="gameNode"/>
         /// from its graph. <paramref name="gameNode"/> is not actually destroyed.
         ///
-        /// Precondition: <paramref name="gameNode"/> must have a valid NodeRef; otherwise
+        /// Precondition: <paramref name="gameNode"/> must have a valid <see cref="NodeRef"/>; otherwise
         /// an exception will be thrown.
         /// </summary>
         /// <param name="gameNode">game object whose graph node is to be removed from the graph</param>
