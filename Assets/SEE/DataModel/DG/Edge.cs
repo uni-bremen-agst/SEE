@@ -60,7 +60,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The name of the toggle attribute that marks edges that where lifted from
-        /// lower level nodes to higher level nodes rather than being part of the 
+        /// lower level nodes to higher level nodes rather than being part of the
         /// original graph loaded. Such edges are introduced artifically.
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
@@ -107,7 +107,7 @@ namespace SEE.DataModel.DG
         /// (4) has the same type name
         /// (5) the ID of its source is the same as the ID of the source of this edge
         /// (6) the ID of its target is the same as the ID of the target of this edge
-        /// 
+        ///
         /// Note: This edge and the other edge may or may not be in the same graph.
         /// </summary>
         /// <param name="other">to be compared to</param>
@@ -143,9 +143,9 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
-        /// 
+        ///
         /// IMPORTANT NOTE: Cloning an edge means only to create deep copies of its
         /// type and attributes. The source and target node will be shallow copies.
         /// </summary>
@@ -185,6 +185,10 @@ namespace SEE.DataModel.DG
             set => throw new InvalidOperationException(); // ID must not be changed
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is not null.
+        /// </summary>
+        /// <param name="edge">edge to be compared</param>
         public static implicit operator bool(Edge edge)
         {
             return edge != null;

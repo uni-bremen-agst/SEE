@@ -30,7 +30,7 @@ namespace SEE.Game
         {
             Assert.IsNotNull(mappingGraph);
 
-            new GraphRenderer(this, mappingGraph).Draw(gameObject);
+            new GraphRenderer(this, mappingGraph).DrawGraph(gameObject);
         }
 
         //--------------------------------

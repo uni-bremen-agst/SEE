@@ -88,7 +88,7 @@ namespace SEE.Utils
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
-                ISet<string> edgeIDs = nodeRef.GetEdgeIds();
+                ISet<string> edgeIDs = nodeRef.GetIdsOfIncomingOutgoingEdges();
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {

@@ -8,7 +8,9 @@ namespace Lean.Common
 	/// <summary>This is the base class for all inspectors.</summary>
 	public abstract class LeanEditor : UnityEditor.Editor
 	{
-		private static SerializedObject data;
+		private static SerializedObject dataA;
+
+		private static SerializedProperty dataB;
 
 		private static GUIContent customContent = new GUIContent();
 
@@ -27,7 +29,20 @@ namespace Lean.Common
 
 		public static void SetData(SerializedObject newData)
 		{
-			data = newData;
+			dataA = newData;
+			dataB = null;
+		}
+
+		public static void SetData(SerializedProperty newData)
+		{
+			dataA = null;
+			dataB = newData;
+		}
+
+		public static void ClearData()
+		{
+			dataA = null;
+			dataB = null;
 		}
 
 		public override void OnInspectorGUI()
@@ -44,7 +59,7 @@ namespace Lean.Common
 
 			serializedObject.ApplyModifiedProperties();
 
-			data = null;
+			ClearData();
 		}
 
 		public virtual void OnSceneGUI()
@@ -393,6 +408,22 @@ namespace Lean.Common
 			return false;
 		}
 
+		public static SerializedProperty GetProperty(string propertyPath)
+		{
+			var property = default(SerializedProperty);
+			
+			if (dataA != null)
+			{
+				property = dataA.FindProperty(propertyPath);
+			}
+			else if (dataB != null)
+			{
+				property = dataB.FindPropertyRelative(propertyPath);
+			}
+
+			return property;
+		}
+
 		protected void DirtyAndUpdate()
 		{
 			for (var i = targets.Length - 1; i >= 0; i--)
@@ -405,10 +436,10 @@ namespace Lean.Common
 
 		private static SerializedProperty GetPropertyAndSetCustomContent(string propertyPath, string overrideTooltip, string overrideText)
 		{
-			var property = data.FindProperty(propertyPath);
+			var property = GetProperty(propertyPath);
 
-			customContent.text    = string.IsNullOrEmpty(overrideText   ) == false ? overrideText    : property.displayName;
-			customContent.tooltip = string.IsNullOrEmpty(overrideTooltip) == false ? overrideTooltip : property.tooltip;
+			customContent.text    = string.IsNullOrEmpty(overrideText   ) == false || property == null ? overrideText    : property.displayName;
+			customContent.tooltip = string.IsNullOrEmpty(overrideTooltip) == false || property == null ? overrideTooltip : property.tooltip;
 			customContent.tooltip = StripRichText(customContent.tooltip); // Tooltips can't display rich text for some reason, so strip it
 
 			return property;
@@ -416,7 +447,12 @@ namespace Lean.Common
 
 		private static string StripRichText(string s)
 		{
-			return s.Replace("<b>", "").Replace("</b>", "");
+			if (s != null)
+			{
+				s = s.Replace("<b>", "").Replace("</b>", "");
+			}
+
+			return s;
 		}
 
 		protected virtual void OnInspector()

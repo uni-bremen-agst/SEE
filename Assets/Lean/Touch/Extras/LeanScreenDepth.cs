@@ -23,6 +23,7 @@ namespace Lean.Touch
 		/// FixedDistance = A point will be projected out from the camera.
 		/// DepthIntercept = A point will be intercepted out from the camera on a surface lying flat on the XY plane.
 		/// PhysicsRaycast = A ray will be cast from the camera.
+		/// PlaneIntercept = A point will be intercepted out from the camera to the closest point on the specified plane.
 		/// PathClosest = A point will be intercepted out from the camera to the closest point on the specified path.
 		/// AutoDistance = A point will be projected out from the camera based on the current Transform depth.
 		/// HeightIntercept = A point will be intercepted out from the camera on a surface lying flat on the XZ plane.</summary>
@@ -317,7 +318,7 @@ namespace Lean.Touch.Editor
 
 			rect.height = height;
 
-			DrawProperty(ref rect, property, label, "Conversion", label.text, "The method used to convert between screen coordinates, and world coordinates.\n\nFixedDistance = A point will be projected out from the camera.\n\nDepthIntercept = A point will be intercepted out from the camera on a surface lying flat on the XY plane.\n\nPhysicsRaycast = A ray will be cast from the camera.\n\nPathClosest = A point will be intercepted out from the camera to the closest point on the specified path.\n\nAutoDistance = A point will be projected out from the camera based on the current Transform depth.\n\nHeightIntercept = A point will be intercepted out from the camera on a surface lying flat on the XZ plane.");
+			DrawProperty(ref rect, property, label, "Conversion", label.text, "The method used to convert between screen coordinates, and world coordinates.\n\nFixedDistance = A point will be projected out from the camera.\n\nDepthIntercept = A point will be intercepted out from the camera on a surface lying flat on the XY plane.\n\nPhysicsRaycast = A ray will be cast from the camera.\n\nPlaneIntercept = A point will be intercepted out from the camera to the closest point on the specified plane.\n\nPathClosest = A point will be intercepted out from the camera to the closest point on the specified path.\n\nAutoDistance = A point will be projected out from the camera based on the current Transform depth.\n\nHeightIntercept = A point will be intercepted out from the camera on a surface lying flat on the XZ plane.");
 
 			EditorGUI.indentLevel++;
 			{
@@ -342,7 +343,7 @@ namespace Lean.Touch.Editor
 					case LeanScreenDepth.ConversionType.PhysicsRaycast:
 					{
 						LeanEditor.BeginError(property.FindPropertyRelative("Layers").intValue == 0);
-							DrawProperty(ref rect, property, label, "Layers", "The layers used in the raycast.");
+							DrawProperty(ref rect, property, label, "Layers", "Layers", "The layers used in the raycast.");
 						LeanEditor.EndError();
 						DrawProperty(ref rect, property, label, "Distance", "Offset", "The world space offset from the raycast hit point.");
 					}
