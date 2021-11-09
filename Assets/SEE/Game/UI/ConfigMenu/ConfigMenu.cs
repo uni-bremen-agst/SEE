@@ -63,15 +63,21 @@ namespace SEE.Game.UI.ConfigMenu
                 .Select(x => x.Name())
                 .ToList();
 
+        private static List<EditableInstance> editableInstances;
         /// <summary>
         /// The list of SEECity instances this menu can manipulate.
         /// </summary>
-        private static readonly List<EditableInstance> EditableInstances =
-            new List<EditableInstance>
+        private static List<EditableInstance> EditableInstances
+        {
+            get
             {
-                EditableInstance.Architecture,
-                EditableInstance.Implementation
-            };
+                if (editableInstances == null)
+                {
+                    editableInstances = EditableInstance.AllEditableCodeCities();
+                }
+                return editableInstances;
+            }
+        }
 
         private const string PagePrefabPath = "Prefabs/UI/Page";
         private const string TabButtonPrefabPath = "Prefabs/UI/TabButton";
@@ -101,10 +107,27 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The currently edited SEECity instance.
         /// </summary>
-        public EditableInstance CurrentlyEditing = EditableInstance.Implementation;
+        public EditableInstance CurrentlyEditing = null;
+
+        /// <summary>
+        /// The default editable instance. This is simply the first element of
+        /// <see cref="EditableInstances"/> or null if it is empty.
+        /// </summary>
+        /// <returns>default editable instance</returns>
+        public static EditableInstance DefaultEditableInstance()
+        {
+            return EditableInstances.FirstOrDefault();
+        }
 
         private void Start()
         {
+            CurrentlyEditing = DefaultEditableInstance();
+            if (CurrentlyEditing == null)
+            {
+                Debug.LogWarning("There is no SEECity that can be configured in the scene.\n");
+                enabled = false;
+                return;
+            }
             SetupCity(CurrentlyEditing);
             MustGetChild("Canvas/TabNavigation/TabOutlet", out tabOutlet);
             MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out tabButtons);
@@ -144,7 +167,7 @@ namespace SEE.Game.UI.ConfigMenu
             }
             else
             {
-                Debug.LogError("Did not find a city instance.\n");
+                Debug.LogError($"Did not find a city instance with name '{instanceToEdit.GameObjectName}'.\n");
             }
         }
 
@@ -636,7 +659,14 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         public void On()
         {
-            canvas.gameObject.SetActive(true);
+            if (canvas == null)
+            {
+                Debug.LogError("Canvas is null.\n");
+            }
+            else
+            {
+                canvas.gameObject.SetActive(true);
+            }
         }
     }
 }
