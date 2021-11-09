@@ -318,7 +318,6 @@ namespace SEE.Utils
         /// <param name="dontSyncCodeWindowChars"></param>
         public async UniTask AsyncAddString(string s, int startIdx, bool startUp = false)
         {
-            startUp = false;
             Performance p = Performance.Begin("addString");
             await UniTask.SwitchToThreadPool();
             List<CharObj> charObjs = new List<CharObj>(s.Length);
