@@ -1,8 +1,6 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using System.Collections.Generic;
+using SEE.DataModel;
 using SEE.GO;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -88,7 +86,7 @@ namespace SEE.Utils
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
-                ISet<string> edgeIDs = nodeRef.GetEdgeIds();
+                ISet<string> edgeIDs = nodeRef.GetIdsOfIncomingOutgoingEdges();
 
                 foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
                 {

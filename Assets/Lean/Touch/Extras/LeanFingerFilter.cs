@@ -1,6 +1,7 @@
-using UnityEngine;
 using System.Collections.Generic;
 using Lean.Common;
+using UnityEditor;
+using UnityEngine;
 
 namespace Lean.Touch
 {
@@ -170,7 +171,7 @@ namespace Lean.Touch
 				{
 					var mask = 1 << i;
 
-					if ((RequiredMouseButtons & mask) != 0 && LeanInput.GetMousePressed(i) == false)
+					if ((RequiredMouseButtons & mask) != 0 && LeanInput.GetMousePressed(i) == false && LeanInput.GetMouseUp(i) == false)
 					{
 						filteredFingers.Clear();
 					}
@@ -205,8 +206,6 @@ namespace Lean.Touch
 #if UNITY_EDITOR
 namespace Lean.Touch.Editor
 {
-	using UnityEditor;
-
 	[CustomPropertyDrawer(typeof(LeanFingerFilter))]
 	public class LeanFingerFilter_Drawer : PropertyDrawer
 	{

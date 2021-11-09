@@ -269,13 +269,23 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   destroyIfBlocked: 1
-  ScreenQuery:
+  BlockedScreenQuery:
     Method: 0
     Layers:
       serializedVersion: 2
       m_Bits: 4294967291
     Search: 1
     RequiredTag: 
+    Camera: {fileID: 0}
+    Distance: 50
+  destroyIfMissing: 1
+  MissingScreenQuery:
+    Method: 0
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    Search: 1
+    RequiredTag: Player
     Camera: {fileID: 0}
     Distance: 50
   selectOnSpawn: 1
@@ -765,13 +775,23 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   destroyIfBlocked: 1
-  ScreenQuery:
+  BlockedScreenQuery:
     Method: 0
     Layers:
       serializedVersion: 2
       m_Bits: 4294967291
     Search: 1
     RequiredTag: 
+    Camera: {fileID: 0}
+    Distance: 50
+  destroyIfMissing: 1
+  MissingScreenQuery:
+    Method: 0
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    Search: 1
+    RequiredTag: Finish
     Camera: {fileID: 0}
     Distance: 50
   selectOnSpawn: 1
@@ -1867,13 +1887,23 @@ MonoBehaviour:
   rotateTo: 0
   dragAfterSpawn: 1
   destroyIfBlocked: 1
-  ScreenQuery:
+  BlockedScreenQuery:
     Method: 0
     Layers:
       serializedVersion: 2
       m_Bits: 4294967291
     Search: 1
     RequiredTag: 
+    Camera: {fileID: 0}
+    Distance: 50
+  destroyIfMissing: 1
+  MissingScreenQuery:
+    Method: 0
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967291
+    Search: 1
+    RequiredTag: Respawn
     Camera: {fileID: 0}
     Distance: 50
   selectOnSpawn: 1

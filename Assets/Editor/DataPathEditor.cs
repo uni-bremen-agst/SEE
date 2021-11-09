@@ -21,12 +21,13 @@ namespace SEEEditor
         /// <returns>the resulting data specified as selected  by the user</returns>
         public static DataPath GetDataPath(string label, DataPath dataPath, string extension = "", bool fileDialogue = true)
         {
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+            // The label on a line of its own.
+            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
             GUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(label);
-
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
+            // The pop-up for the directory.
             dataPath.Root = (DataPath.RootKind)EditorGUILayout.EnumPopup(dataPath.Root, GUILayout.Width(100));
+            // The text field for the path.
             if (dataPath.Root == DataPath.RootKind.Absolute)
             {
                 dataPath.AbsolutePath = EditorGUILayout.TextField(dataPath.AbsolutePath);
@@ -35,6 +36,7 @@ namespace SEEEditor
             {
                 dataPath.RelativePath = EditorGUILayout.TextField(dataPath.RelativePath);
             }
+            // The file selector.
             if (GUILayout.Button("...", GUILayout.Width(20)))
             {
                 string selectedPath = fileDialogue ?
@@ -46,11 +48,10 @@ namespace SEEEditor
                 }
             }
             EditorGUILayout.EndHorizontal();
-
+            // The resulting absolute path, just to inform the user. Cannot be changed.
             EditorGUILayout.LabelField(dataPath.Path);
             EditorGUILayout.EndVertical();
 
-            EditorGUILayout.EndHorizontal();
             return dataPath;
         }
     }
