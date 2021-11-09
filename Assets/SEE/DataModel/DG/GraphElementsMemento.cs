@@ -9,7 +9,7 @@
         /// Constructor setting <see cref="ItsGraph"/> to given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">graph from which the graph elements memorized stem</param>
-        public GraphElementsMemento(Graph graph)
+        protected GraphElementsMemento(Graph graph)
         {
             ItsGraph = graph;
         }
