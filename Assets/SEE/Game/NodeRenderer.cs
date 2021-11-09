@@ -428,7 +428,6 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                Node node = nodeRef.Value;
                 float value = GetMetricValue(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
@@ -514,6 +513,10 @@ namespace SEE.Game
                         float widthOfSquare = Mathf.Sqrt(scale.x);
                         Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare) * NodeFactory.Unit;
                         leafNodeFactory.SetSize(gameNode, targetScale);
+                    }
+                    else
+                    {
+                        leafNodeFactory.SetSize(gameNode, scale);
                     }
                 }
                 else
