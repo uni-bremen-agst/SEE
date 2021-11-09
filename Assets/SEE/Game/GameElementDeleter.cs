@@ -44,7 +44,7 @@ namespace SEE.Game
         /// <returns>the graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
         /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
-        /// <exception cref="Exception">thrown if <paramref name="deletedObject"/> is a root</exception>
+        /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
         /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
         /// neither a node nor an edge</exception>
         public static (GraphElementsMemento, ISet<GameObject>) Delete(GameObject deletedObject)
@@ -58,7 +58,7 @@ namespace SEE.Game
                 Node deletedNode = deletedObject.GetNode();
                 if (deletedNode.IsRoot())
                 {
-                    throw new Exception("A root shall not be deleted.\n");
+                    throw new InvalidOperationException("A root shall not be deleted.\n");
                 }
                 else
                 {
@@ -119,9 +119,10 @@ namespace SEE.Game
             if (node.Parent != null && node.Parent.NumberOfChildren() == 1)
             {
                 // node is a single child; removing it turns its parent into a leaf
-                GameObject parent = gameNode.transform.parent?.gameObject;
-                if (parent != null)
+                Transform parentTransform = gameNode.transform.parent;
+                if (parentTransform != null)
                 {
+                    GameObject parent = parentTransform?.gameObject;
                     SEECity city = parent.ContainingCity();
                     if (city != null)
                     {
@@ -292,7 +293,7 @@ namespace SEE.Game
             foreach (GameObject gameNode in nodes)
             {
                 // Retrieve the parent graph node from the parent game node.
-                GameObject parentGameNode = gameNode.transform.parent?.gameObject;
+                Transform parentGameNode = gameNode.transform.parent;
                 if (parentGameNode != null && parentGameNode.TryGetComponent(out NodeRef parentNodeRef))
                 {
                     parentNodeRef.Value.AddChild(gameNode.GetNode());
