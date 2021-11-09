@@ -162,7 +162,7 @@ namespace SEE.DataModel.DG
             }
 
             /// <summary>
-            /// Reparents all <see cref="children"/> to new <see cref="parent"/>.
+            /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
             /// </summary>
             /// <param name="children">children to be re-parented</param>
             /// <param name="parent">new parent of <see cref="children"/></param>
