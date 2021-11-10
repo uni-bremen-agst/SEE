@@ -346,13 +346,14 @@ namespace SEE.Game.City
                };
 
         /// <summary>
-        /// Returns the names of all node metric attributes that are visualized somehow.
+        /// Returns the names of all node metrics that are known by default.
+        /// They may or may not exist in the underlying graph.
         /// More precisely, the resulting list consists of the following metrics:
         /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
         /// AllInnerNodeIssues(), and InnerDonutMetric.
         /// </summary>
-        /// <returns>all node metric attributes</returns>
-        public List<string> AllMetricAttributes()
+        /// <returns>all node metric names</returns>
+        public List<string> AllDefaultMetrics()
         {
             List<string> nodeMetrics = new List<string>(AllLeafMetrics());
             nodeMetrics.AddRange(AllInnerNodeMetrics());
@@ -361,6 +362,14 @@ namespace SEE.Game.City
             nodeMetrics.Add(InnerNodeSettings.InnerDonutMetric);
             return nodeMetrics;
         }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph, that is, there is at least one node in the graph that has this
+        /// metric.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        public abstract List<string> AllExistingMetrics();
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues
@@ -396,7 +405,7 @@ namespace SEE.Game.City
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of an inner node</returns>
-        public ICollection<string> AllInnerNodeMetrics() => 
+        public ICollection<string> AllInnerNodeMetrics() =>
             new List<string> { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
 
         /// <summary>
@@ -418,7 +427,7 @@ namespace SEE.Game.City
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
-                                                           rootName: rootName ?? filename,
+                                                           rootID: rootName ?? filename,
                                                            logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
