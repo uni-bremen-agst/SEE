@@ -80,7 +80,7 @@ namespace SEE.Game
         /// the ground level of the nodes
         /// </summary>
         private const float GroundLevel = 0.0f;
-        
+
         /// <summary>
         /// Type of the artificial root node, if one has to be added.
         /// </summary>
@@ -772,7 +772,7 @@ namespace SEE.Game
                 Node artificialRoot = new Node
                 {
                     ID = graph.Name + "#ROOT",
-                    SourceName = graph.Name + "#ROOT",
+                    SourceName = "ROOT",
                     Type = RootType
                 };
                 graph.AddNode(artificialRoot);
