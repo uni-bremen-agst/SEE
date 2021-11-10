@@ -520,15 +520,15 @@ namespace SEE.DataModel.DG
         /// two nodes with the same ID will be merged into one, combining the attributes of them, unless they
         /// both have an attribute whose value differs between them, in which case an exception will be thrown.
         /// The hierarchy of the nodes will be preserved.
-        /// 
+        ///
         /// Deep copies are used for nodes, edges, and the graph itself, so that neither this nor the
-        /// <paramref name="other"/> graph (nor their nodes and edges) will be changed in any way. 
+        /// <paramref name="other"/> graph (nor their nodes and edges) will be changed in any way.
         ///
         /// Iff an attribute from the <paramref name="other"/> graph has the same name as an attribute from
         /// this graph, the other graph's attribute will be ignored and this graph's attribute will be used.
         /// Since we can't differentiate whether a property has been intentionally unset when it's a toggle attribute,
         /// we ignore the toggle attributes of the other graph.
-        /// 
+        ///
         /// Pre-conditions:
         /// <ul>
         /// <li> The <paramref name="other"/> graph must not be <c>null</c>.</li>
@@ -551,15 +551,15 @@ namespace SEE.DataModel.DG
             if (other == null)
             {
                 throw new ArgumentNullException(nameof(other));
-            } 
-            
+            }
+
             // We need to create two copies because we'll mess with the graph's nodes and edges,
             // and don't want to leave a mangled mess.
             Graph mergedGraph = Clone() as Graph;
             Assert.IsNotNull(mergedGraph);
             Graph otherGraph = other.Clone() as Graph;
             Assert.IsNotNull(otherGraph);
-            
+
             // Name and Path are implicitly taken from this graph.
             // We now merge the other's attributes into this graph's attributes (ignoring toggle attributes).
             foreach (KeyValuePair<string, float> attribute in otherGraph.FloatAttributes)
@@ -583,7 +583,7 @@ namespace SEE.DataModel.DG
                     mergedGraph.StringAttributes[attribute.Key] = attribute.Value;
                 }
             }
-            
+
             // Copy edges and nodes along with their hierarchy
             otherGraph.CopyNodesTo(mergedGraph, nodeIdSuffix);
             otherGraph.CopyEdgesTo(mergedGraph, edgeIdSuffix);
@@ -592,7 +592,7 @@ namespace SEE.DataModel.DG
             // Finalize hierarchy now that it's changed
             mergedGraph.NodeHierarchyHasChanged = true;
             mergedGraph.FinalizeNodeHierarchy();
-            
+
             return mergedGraph;
         }
 
@@ -777,7 +777,7 @@ namespace SEE.DataModel.DG
                                                             + $"{targetNode} and {sourceNode}");
                     }
                 }
-                
+
                 foreach (KeyValuePair<string, int> attribute in sourceNode.IntAttributes)
                 {
                     if (!targetNode.TryGetInt(attribute.Key, out int value))
@@ -791,7 +791,7 @@ namespace SEE.DataModel.DG
                                                             + $"{targetNode} and {sourceNode}");
                     }
                 }
-                
+
                 foreach (KeyValuePair<string, string> attribute in sourceNode.StringAttributes)
                 {
                     if (!targetNode.TryGetString(attribute.Key, out string value))
@@ -804,7 +804,7 @@ namespace SEE.DataModel.DG
                                                             + $"{targetNode} and {sourceNode}");
                     }
                 }
-                
+
                 foreach (string attribute in sourceNode.ToggleAttributes)
                 {
                     targetNode.SetToggle(attribute);
@@ -815,12 +815,12 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Copies the edges from this graph to the <paramref name="target"/> graph, matching nodes by
         /// ID + <paramref name="nodeIdSuffix"/>, if the latter is present.
-        /// 
+        ///
         /// The nodes in this graph which have edges attached to them must also exist in the <paramref name="target"/>
         /// graph, i.e. nodes with the same ID must exist.
         /// However, if a non-null <paramref name="nodeIdSuffix"/> is given, then instead nodes with the nodeIdSuffix
         /// appended to the same ID must exist.
-        /// 
+        ///
         /// </summary>
         /// <param name="target">The graph to which the edges of this graph shall be copied.</param>
         /// <param name="nodeIdSuffix">Suffix which node IDs in the <paramref name="target"/>
@@ -943,7 +943,7 @@ namespace SEE.DataModel.DG
         /// <returns>
         /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
         /// </returns>
-        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) => 
+        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) =>
             SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
 
         /// <summary>
@@ -1084,7 +1084,7 @@ namespace SEE.DataModel.DG
         /// <param name="subgraph">graph to propagate the edges to</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
-        private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo, 
+        private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo,
                                         Func<GraphElement, bool> includeElement)
         {
             foreach (Edge edge in Edges())
@@ -1263,6 +1263,18 @@ namespace SEE.DataModel.DG
         public List<string> AllFloatNodeAttributes()
         {
             return AllNodeAttributes(AllFloatAttributeNames);
+        }
+
+        /// <summary>
+        /// Returns the concatenation of <see cref="AllFloatNodeAttributes()"/>
+        /// and <see cref="AllIntNodeAttributes()"/>.
+        /// </summary>
+        /// <returns>names of all numeric (int or float) node attributes</returns>
+        public List<string> AllNumericNodeAttributes()
+        {
+            List<string> result = AllIntNodeAttributes();
+            result.AddRange(AllFloatNodeAttributes());
+            return result;
         }
 
         /// <summary>
