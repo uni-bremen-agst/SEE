@@ -11,27 +11,27 @@ namespace SEE.DataModel.DG.IO
     public class GraphReader : GXLParser
     {
         /// <summary>
-        /// Constructor. If <paramref name="rootName"/> is neither null nor the empty string and if
+        /// Constructor. If <paramref name="rootID"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
-        /// that becomes the parent of all other original roots. The <paramref name="rootName"/>
+        /// that becomes the parent of all other original roots. The <paramref name="rootID"/>
         /// determines both Source.Name, Linkage.Name, and Type of that artificial root. If
-        /// <paramref name="rootName"/> is null or the empty string or has a single root, the graph
+        /// <paramref name="rootID"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file.
         ///
         /// When the graph is loaded, the node levels are calculated.
         ///
-        /// Precondition: <paramref name="rootName"/> must be unique.
+        /// Precondition: <paramref name="rootID"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
         /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-        /// <param name="rootName">name of the artificial root node if required</param>
+        /// <param name="rootID">unique ID of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null)
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootID = "", SEE.Utils.ILogger logger = null)
             : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
-            this.rootName = string.IsNullOrEmpty(rootName) ? "" : rootName;
+            this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace SEE.DataModel.DG.IO
                     {
                         Type = Graph.UnknownType,
                         ID = rootName,
-                        SourceName = rootName
+                        SourceName = ""
                     };
                     graph.AddNode(singleRoot);
                     foreach (Node root in roots)
