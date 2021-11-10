@@ -404,6 +404,26 @@ namespace SEE.Game.City
             LoadedGraph = null;
         }
 
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph, that is, there is at least one node in the graph that has this
+        /// metric.
+        ///
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        public override List<string> AllExistingMetrics()
+        {
+            if (loadedGraph == null)
+            {
+                return new List<string>();
+            }
+            else
+            {
+                return loadedGraph.AllNumericNodeAttributes();
+            }
+        }
+
         //--------------------------------
         // Configuration file input/output
         //--------------------------------

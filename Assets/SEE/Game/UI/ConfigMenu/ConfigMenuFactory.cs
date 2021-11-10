@@ -49,6 +49,12 @@ namespace SEE.Game.UI.ConfigMenu
             configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
             BuildConfigMenu(ConfigMenu.DefaultEditableInstance(), false);
         }
+        /// <summary>
+        /// Creates a new configuration menu for <paramref name="instanceToEdit"/>. If
+        /// <paramref name="turnMenuOn"/>, the configuration menu will be turned on.
+        /// </summary>
+        /// <param name="instanceToEdit">the code city to be configured</param>
+        /// <param name="turnMenuOn">whether the configuration menu should be turned on</param>
         private void BuildConfigMenu(EditableInstance instanceToEdit, bool turnMenuOn)
         {
             GameObject configMenuGo = Instantiate(configMenuPrefab);

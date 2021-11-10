@@ -64,7 +64,7 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
+                diff = new NumericAttributeDiff(cityEvolution.AllDefaultMetrics());
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
@@ -1539,6 +1539,28 @@ namespace SEE.Game
             if (!ShowPreviousIfPossible())
             {
                 ToggleAutoPlayReverse();
+            }
+        }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph currently shown, that is, there is at least one node in the graph
+        /// that has this metric.
+        ///
+        /// The metric names are derived from the graph currently drawn by the
+        /// evolution renderer.
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        internal List<string> AllExistingMetrics()
+        {
+            if (currentCity == null || currentCity.Graph == null)
+            {
+                return new List<string>();
+            }
+            else
+            {
+                return currentCity.Graph.AllNumericNodeAttributes();
             }
         }
 
