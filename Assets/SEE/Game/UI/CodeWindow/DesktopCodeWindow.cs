@@ -254,7 +254,7 @@ namespace SEE.Game.UI.CodeWindow
                     timeStamp = Time.time + 0.100000f;
                     if (!deleteSelectedText())
                     {
-                        ICRDT.DeleteString(idx, idx, Title);
+                        ICRDT.DeleteString(idx -1, idx-1, Title);
                     }
 
                 }
