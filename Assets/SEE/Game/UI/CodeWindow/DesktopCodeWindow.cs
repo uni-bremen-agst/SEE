@@ -252,9 +252,10 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
 
-                if (((Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
+                if (((Input.GetKey(KeyCode.Backspace) && string.IsNullOrEmpty(changedText) /*timeStamp <= Time.time */) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
-                    timeStamp = Time.time + 0.300000f;
+                    //timeStamp = Time.time + 0.300000f;
+                    changedText =""
                     if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx -1, idx-1, Title);
