@@ -235,14 +235,14 @@ namespace SEE.Game.UI.CodeWindow
 
                 if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
                 {
-                    timeStamp = Time.time + 0.100000f;
+                    timeStamp = Time.time + 0.200000f;
                     deleteSelectedText();
                     ICRDT.AddString("\n", idx - 2, Title);
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
                 {
-                    timeStamp = Time.time + 0.100000f;
+                    timeStamp = Time.time + 0.200000f;
                     if (!deleteSelectedText())
                     { 
                         ICRDT.DeleteString(idx -1, idx-1, Title);
@@ -251,7 +251,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (((Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
-                    timeStamp = Time.time + 0.100000f;
+                    timeStamp = Time.time + 0.200000f;
                     if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx -1, idx-1, Title);
