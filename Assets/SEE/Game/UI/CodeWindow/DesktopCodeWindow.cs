@@ -258,7 +258,9 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     oldIDX = idx;
                     deleteSelectedText();
-                    ICRDT.AddString("\n", idx - 2, Title);
+                    TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string(' ', neededPadding));
+                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + neededPadding;
+                    ICRDT.AddString("\n" + new string(' ', neededPadding), idx - 2, Title);
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
