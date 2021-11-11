@@ -290,10 +290,6 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         deleteSelectedText();
                         ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
-                        
-
-                        EnterFromTokens( SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1)))) ;
-                        TextMeshInputField.text = TextMesh.text = Text;
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
