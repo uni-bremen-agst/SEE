@@ -101,7 +101,8 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    TextMeshInputField.text = ICRDT.PrintString(Title);
+                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    TextMeshInputField.text = TextMesh.text = Text;
                 }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
@@ -113,8 +114,10 @@ namespace SEE.Game.UI.CodeWindow
                     switch (type)
                     {
                         case operationType.Add:
-                            TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx),"\n");
+                            //TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx),"\n");
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
+                            Debug.Log("STRUBG " + c.ToString());
+                            if (c.ToString().Equals("\n")) Debug.Log("NEW LINE");
                             if(TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
@@ -218,28 +221,31 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\b", "");
                 }
+                if (input.Contains("\n")) //Mal auf \r testen?
+                {
+                    Debug.Log("new lind");
+                }
                 int idx = TextMeshInputField.caretPosition; //TextMeshInputField.stringPosition;
                 //Debug.Log(TextMeshInputField.caretPosition);
                 //ignore null input to avoid unnecessary computation
                 if (!string.IsNullOrEmpty(input))
                 {
-                    if (selectedText != null)
-                    {
-                        Debug.Log("TEST" +selectedText.Item1 + " es " + selectedText.Item2);
-                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
-                    }
+                    deleteSelectedText();
                     ICRDT.AddString(input, idx - 1, Title);
+                }
+
+                if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                {
+                    timeStamp = Time.time + 0.100000f;
+                    deleteSelectedText();
+                    ICRDT.AddString("\n", idx - 1, Title);
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
                 {
                     timeStamp = Time.time + 0.100000f;
-                    if (selectedText != null)
-                    {
-                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
-                    }
-                    else
-                    {
+                    if (!deleteSelectedText())
+                    { 
                         ICRDT.DeleteString(idx, idx, Title);
                     }
                 }
@@ -247,11 +253,7 @@ namespace SEE.Game.UI.CodeWindow
                 if (((Input.GetKey(KeyCode.Backspace) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
                 {
                     timeStamp = Time.time + 0.100000f;
-                    if (selectedText != null)
-                    {
-                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
-                    }
-                    else
+                    if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx +1, idx+1, Title);
                     }
@@ -261,32 +263,17 @@ namespace SEE.Game.UI.CodeWindow
                 {
                   if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
-                        if (selectedText != null)
-                        {
-                            ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
-                        }
+                        deleteSelectedText();
                         ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
-                        string textToSave = string.Join("\n", ICRDT.PrintString(Title).Split('\n').Select((x, i) => {
-                            if (x.Length > 0)
-                            {
-                                return x.Substring(neededPadding);
-                            }
-                            else
-                            {
-                                return x;
-                            }
-                        }).ToList());
-                        EnterFromTokens( SEEToken.fromString(textToSave, TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
-                        TextMeshInputField.text = TextMesh.text;
-                        ShowNotification.Info("Test", "TEST");
+                        
+
+                        EnterFromTokens( SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1)))) ;
+                        TextMeshInputField.text = TextMesh.text = Text;
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
-                    if (selectedText != null)
-                    {
-                        ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
-                    }
+                    deleteSelectedText();
                 }
                 if (Input.GetKeyDown(KeyCode.LeftArrow) && idx > 0)
                 {
@@ -367,6 +354,32 @@ namespace SEE.Game.UI.CodeWindow
             await ICRDT.AsyncAddString(cleanText, 0, Title, true);
             TextMeshInputField.enabled = true;
             ShowNotification.Info("Editor ready", "You now can use the editor");
+        }
+
+        private string removeLineNumbers(string textWithNumbers)
+        {
+            string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) => {
+                if (x.Length > 0)
+                {
+                    return x.Substring(neededPadding);
+                }
+                else
+                {
+                    return x;
+                }
+            }).ToList());
+
+            return textWithOutNumbers;
+        }
+
+        private bool deleteSelectedText()
+        {
+            if (selectedText != null)
+            {
+                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                return true;
+            }
+            return false;
         }
     }
 }
