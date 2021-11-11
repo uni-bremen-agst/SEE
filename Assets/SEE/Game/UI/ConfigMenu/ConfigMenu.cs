@@ -112,7 +112,7 @@ namespace SEE.Game.UI.ConfigMenu
             if (CurrentlyEditing == null)
             {
                 Debug.LogWarning("There is no SEECity that can be configured in the scene.\n");
-                enabled = false;
+                gameObject.SetActive(false);
                 return;
             }
             SetupCity(CurrentlyEditing);
