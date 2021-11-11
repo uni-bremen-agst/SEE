@@ -20,7 +20,7 @@
         <int>5</int>
       </attr>
       <attr name="Metric.McCabe_Complexity">
-        <int>1</int>
+        <int>0</int>
       </attr>	  
     </node>
 	  <node id="N2">
