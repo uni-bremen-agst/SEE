@@ -99,6 +99,10 @@ namespace SEE.Game.UI.CodeWindow
                     TextMeshInputField.enabled = false;
                     AddStringStart().Forget();
                 }
+                else
+                {
+                    TextMeshInputField.text = ICRDT.PrintString(Title);
+                }
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
