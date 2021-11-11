@@ -120,7 +120,7 @@ namespace SEE.Game.UI.CodeWindow
                             }
                             break;
                         case operationType.Delete:
-                            TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
+                            TextMeshInputField.text = TextMeshInputField.text.Remove(/*GetRichIndex(idx)*/idx, 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
