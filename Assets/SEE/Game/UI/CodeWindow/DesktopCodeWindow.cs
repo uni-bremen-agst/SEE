@@ -113,7 +113,7 @@ namespace SEE.Game.UI.CodeWindow
                     switch (type)
                     {
                         case operationType.Add:
-                            TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
+                            TextMeshInputField.text = TextMeshInputField.text.Insert(/*GetRichIndex(idx)*/ idx, c.ToString());
                             if(TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
