@@ -64,7 +64,6 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(cityEvolution.AllDefaultMetrics());
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
@@ -113,7 +112,7 @@ namespace SEE.Game
         private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The kind of comparison to determine whether there any differences between
+        /// The kind of comparison to determine whether there are any differences between
         /// two corresponding graph elements (corresponding by their ID) in
         /// two different graphs of the graph series.
         /// </summary>
@@ -262,10 +261,13 @@ namespace SEE.Game
         {
             // Determine the layouts of all loaded graphs upfront.
             Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
+            ISet<string> numericNodeAttributes = new HashSet<string>();
             graphs.ForEach(graph =>
             {
                 Layouts[graph] = CalculateLayout(graph);
+                numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
             });
+            diff = new NumericAttributeDiff(numericNodeAttributes);
             objectManager.Clear();
             p.End(true);
         }
@@ -981,6 +983,12 @@ namespace SEE.Game
                 case Difference.Changed:
                     NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
                     marker.MarkChanged(currentGameNode);
+                    // There is a change. It may or may not be the metric determining the style.
+                    // We will not further check that and just call the following method.
+                    // If there is no change, this method does not to be called because then
+                    // we know that the metric values determining the style of the former and
+                    // the new graph node are the same.
+                    graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
                     marker.MarkBorn(currentGameNode);
