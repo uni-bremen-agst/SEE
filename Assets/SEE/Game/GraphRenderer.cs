@@ -409,7 +409,6 @@ namespace SEE.Game
             }
             // game objects for the leaves
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
-            AdjustScaleBetweenNodeKinds(nodeMap);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
 
