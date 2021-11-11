@@ -142,6 +142,16 @@ namespace SEE.Utils
             this.size = size;
         }
 
+        public string getId()
+        {
+            return siteID;
+        }
+
+        public void setId(string id)
+        {
+            siteID = id;
+        }
+
         /// <summary>
         /// The chars of the CRDT with their positions
         /// </summary>

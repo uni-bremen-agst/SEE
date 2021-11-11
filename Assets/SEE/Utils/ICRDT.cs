@@ -33,16 +33,23 @@ namespace SEE.Utils
             }
             else
             {
-                // Guid guid =  Guid.NewGuid();
-                //Performance p = Performance.Begin("REQUEST IP");
-                
-                
                 Debug.Log("ID REEAL " + playerIdManager.GetClientID());
-                
-                crdts.Add(file, new CRDT(/*guid.ToString()*/ playerIdManager.GetClientID().ToString(), file, size));
-                //p.End();
-               // Debug.Log(p.GetElapsedTime() + "REQUEST ID");
+                crdts.Add(file, new CRDT(playerIdManager.GetClientID().ToString(), file, size));
                 return crdts[file];
+            }
+        }
+
+        public static void UpdateAlleCRDTids()
+        {
+            if(crdts.Count > 0)
+            {
+                foreach(KeyValuePair<string, CRDT> entry in crdts)
+                {
+                    if(entry.Value.getId() == "0")
+                    {
+                        entry.Value.setId(playerIdManager.GetClientID().ToString());
+                    }
+                }
             }
         }
 

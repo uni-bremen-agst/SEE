@@ -273,6 +273,7 @@ namespace SEE.Game.UI.CodeWindow
                         }).ToList());
                         EnterFromTokens( SEEToken.fromString(textToSave, TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                         TextMeshInputField.text = TextMesh.text;
+                        ShowNotification.Info("Test", "TEST");
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
