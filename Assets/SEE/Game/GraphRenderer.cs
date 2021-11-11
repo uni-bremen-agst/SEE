@@ -28,7 +28,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(City.AbstractSEECity settings, Graph graph)
+        public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
 
@@ -281,7 +281,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
+        /// <param name="draw">decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, GameObject parent, bool draw = true)
         {
