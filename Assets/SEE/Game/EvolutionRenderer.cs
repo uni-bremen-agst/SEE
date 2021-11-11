@@ -991,7 +991,7 @@ namespace SEE.Game
             // re-established
             RemoveFromNodeHierarchy(currentGameNode);
             // currentGameNode is shifted to its new position through the animator.
-            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
+            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, OnAnimationNodeAnimationFinished);
         }
 
         /// <summary>
@@ -1116,7 +1116,7 @@ namespace SEE.Game
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = SkyLevel;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
+                moveAnimator.AnimateTo(block, nodeTransform, OnRemovedNodeFinishedAnimation);
             }
             else
             {
