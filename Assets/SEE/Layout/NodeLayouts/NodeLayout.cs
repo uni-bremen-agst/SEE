@@ -326,9 +326,9 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Applys the Nodetransfrom values to its corresponding layoutNode
+        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
         /// </summary>
-        /// <param name="layout">the calculated layout</param>
+        /// <param name="layout">the calculated layout to be applied</param>
         private void ApplyLayoutNodeTransform(Dictionary<ILayoutNode, NodeTransform> layout)
         {
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
