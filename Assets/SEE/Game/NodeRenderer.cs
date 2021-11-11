@@ -366,7 +366,7 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                float value = GetMetricValue(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
+                float value = GetMetricValueOfLeaf(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
             else
@@ -424,7 +424,7 @@ namespace SEE.Game
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
-                    Vector3 scale = GetScale(node);
+                    Vector3 scale = GetScaleOfLeaf(node);
 
                     // Scale according to the metrics.
                     if (settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
@@ -470,41 +470,59 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the scale of the given <paramref name="node"/> as requested by the user's
-        /// settings, i.e., what the use specified for the width, height, and depth of nodes.
+        /// settings, i.e., what the use specified for the width, height, and depth of leaf nodes.
+        ///
+        /// Precondition: <paramref name="node"/> is a leaf.
         /// </summary>
-        /// <param name="node">node whose scale is requested</param>
+        /// <param name="node">leaf node whose scale is requested</param>
         /// <returns>requested absolute scale in world space</returns>
-        private Vector3 GetScale(Node node)
+        private Vector3 GetScaleOfLeaf(Node node)
         {
+            Assert.IsTrue(node.IsLeaf());
             LeafNodeAttributes attribs = settings.LeafNodeSettings;
-            return new Vector3(GetMetricValue(node, attribs.WidthMetric),
-                               GetMetricValue(node, attribs.HeightMetric),
-                               GetMetricValue(node, attribs.DepthMetric));
+            return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
+                               GetMetricValueOfLeaf(node, attribs.HeightMetric),
+                               GetMetricValueOfLeaf(node, attribs.DepthMetric));
         }
 
         /// <summary>
         /// If <paramref name="metricName"/> is the name of a metric, the corresponding
         /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
         /// can be parsed as a number instead, the parsed number is returned.
-        /// The result is clamped into [MinimalBlockLength, MaximalBlockLength].
+        /// The result is clamped into [MinimalBlockLength, MaximalBlockLength] where
+        /// MinimalBlockLength is the minimal length for leaf nodes specified by the user and
+        /// MaximalBlockLength is the maximal length for leaf nodes specified by the user.
+        ///
+        /// Precondition: <paramref name="node"/> is a leaf.
+        /// </summary>
+        /// <param name="node">leaf node whose metric is to be returned</param>
+        /// <param name="metricName">the name of a leaf node metric or a number</param>
+        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        private float GetMetricValueOfLeaf(Node node, string metricName)
+        {
+            return Mathf.Clamp(GetMetricValue(node, metricName),
+                        settings.LeafNodeSettings.MinimalBlockLength,
+                        settings.LeafNodeSettings.MaximalBlockLength);
+        }
+
+        /// <summary>
+        /// If <paramref name="metricName"/> is the name of a metric, the corresponding
+        /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
+        /// can be parsed as a number instead, the parsed number is returned.
         /// </summary>
         /// <param name="node">node whose metric is to be returned</param>
         /// <param name="metricName">the name of a node metric or a number</param>
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
         private float GetMetricValue(Node node, string metricName)
         {
-            float result;
             if (TryGetFloat(metricName, out float value))
             {
-                result = value;
+                return value;
             }
             else
             {
-                result = scaler.GetNormalizedValue(metricName, node);
+                return scaler.GetNormalizedValue(metricName, node);
             }
-            return Mathf.Clamp(result,
-                        settings.LeafNodeSettings.MinimalBlockLength,
-                        settings.LeafNodeSettings.MaximalBlockLength);
         }
 
         /// <summary>
