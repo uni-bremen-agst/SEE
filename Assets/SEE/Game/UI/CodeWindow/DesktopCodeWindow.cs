@@ -114,7 +114,6 @@ namespace SEE.Game.UI.CodeWindow
                     switch (type)
                     {
                         case operationType.Add:
-                            //TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx),"\n");
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             Debug.Log("STRUBG " + c.ToString());
                             if (c.ToString().Equals("\n")) Debug.Log("NEW LINE");
@@ -231,14 +230,14 @@ namespace SEE.Game.UI.CodeWindow
                 if (!string.IsNullOrEmpty(input))
                 {
                     deleteSelectedText();
-                    ICRDT.AddString(input, idx - 1, Title);
+                    ICRDT.AddString(input, idx - 2, Title);
                 }
 
                 if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     timeStamp = Time.time + 0.100000f;
                     deleteSelectedText();
-                    ICRDT.AddString("\n", idx - 1, Title);
+                    ICRDT.AddString("\n", idx - 2, Title);
                 }
 
                 if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
@@ -255,7 +254,7 @@ namespace SEE.Game.UI.CodeWindow
                     timeStamp = Time.time + 0.100000f;
                     if (!deleteSelectedText())
                     {
-                        ICRDT.DeleteString(idx +1, idx+1, Title);
+                        ICRDT.DeleteString(idx +2, idx+1, Title);
                     }
 
                 }
@@ -274,14 +273,6 @@ namespace SEE.Game.UI.CodeWindow
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
                     deleteSelectedText();
-                }
-                if (Input.GetKeyDown(KeyCode.LeftArrow) && idx > 0)
-                {
-                    idx--;
-                }
-                if (Input.GetKeyDown(KeyCode.RightArrow) && idx < ICRDT.PrintString(Title).Length)
-                {
-                    idx++;
                 }
 
             }
