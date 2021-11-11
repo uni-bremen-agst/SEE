@@ -138,7 +138,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, style) for given <paramref name="graph"/>
+        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose node metrics are to be scaled</param>
