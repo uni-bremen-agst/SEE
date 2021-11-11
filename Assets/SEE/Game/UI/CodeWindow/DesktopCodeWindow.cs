@@ -35,24 +35,36 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public float timeStamp = 0;
 
-        private string changedText = "";
         /// <summary>
-        /// 
+        /// The old index, if changes happens faster than the carret moves
+        /// </summary>
+        private int oldIDX = -1;
+
+        /// <summary>
+        /// If a change has been made the syntax highliting should be recalculated
+        /// </summary>
+        private bool recalculadeSyntax = false;
+
+        /// <summary>
+        /// Indicates that a changes was made in the CodeWindow and the inputlistener has to react
+        /// </summary>
+        private bool valueHasChanged = false;
+        /// <summary>
+        /// The Type of a remote operation
         /// </summary>
         public enum operationType
         {
             /// <summary>
-            /// 
+            /// Add a char to the codewindow
             /// </summary>
             Add,
 
             /// <summary>
-            /// 
+            /// Remove a char from the CodeWindow
             /// </summary>
             Delete
         }
 
-        int idx = 0; //ONLY FOR COMMANDLINE EDITOR
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
         /// </summary>
@@ -87,13 +99,9 @@ namespace SEE.Game.UI.CodeWindow
             if (codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMesh)
             && codeWindow.transform.Find("Content/Scrollable/Code").gameObject.TryGetComponentOrLog(out TextMeshInputField))
             {
-                TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
-
-
-                TextMeshInputField.enabled = true;
                 TextMeshInputField.interactable = true;
-                TextMeshInputField.text = Text; 
+                TextMeshInputField.text = TextMesh.text = Text; 
 
                 if (ICRDT.IsEmpty(Title))
                 {
@@ -105,10 +113,12 @@ namespace SEE.Game.UI.CodeWindow
                     EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
+
+                //Change Listener
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
-                TextMeshInputField.onValueChanged.AddListener((text) => {changedText = text; });
+                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;  recalculadeSyntax = true; });
 
                 //Updates the entries in the CodeWindow
                 void updateCodeWindow(char c, int idx, operationType type)
@@ -134,6 +144,8 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
             }
+            //Initial cooldown for a recalculating of the highliting
+            timeStamp = Time.time + 5.0f;
 
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
@@ -183,20 +195,9 @@ namespace SEE.Game.UI.CodeWindow
                 SEEInput.KeyboardShortcutsEnabled = false;
                 if (SEEInput.SaveCodeWindow())
                 {
-                    //Remove line numbers
-                    string textToSave = string.Join("\n", ICRDT.PrintString(Title).Split('\n').Select((x, i) =>{
-                        if (x.Length > 0)
-                        {
-                            return x.Substring(neededPadding);
-                        }
-                        else
-                        {
-                            return x;
-                        }
-                    }).ToList());
                     try
                     {
-                        File.WriteAllText(FilePath, textToSave);
+                        File.WriteAllText(FilePath, removeLineNumbers(ICRDT.PrintString(Title)));
                         ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
                     }
                     catch(Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException 
@@ -215,6 +216,19 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
+                if (recalculadeSyntax && Time.time > timeStamp)
+                {
+                    timeStamp = Time.time + 5.0f;
+                    recalculadeSyntax = false;
+                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    TextMeshInputField.text = TextMesh.text = Text;
+                }
+                else if(Time.time > timeStamp)
+                {
+                    timeStamp = Time.time + 5.0f;
+                }
+
+
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 string input = Input.inputString;
@@ -222,40 +236,48 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\b", "");
                 }
-                if (input.Contains("\n")) //Mal auf \r testen?
+                int idx = TextMeshInputField.caretPosition; 
+                if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
-                    Debug.Log("new lind");
-                }
-                int idx = TextMeshInputField.caretPosition; //TextMeshInputField.stringPosition;
-                //Debug.Log(TextMeshInputField.caretPosition);
-                //ignore null input to avoid unnecessary computation
-                if (!string.IsNullOrEmpty(input))
-                {
+                    valueHasChanged = false;
+                    if(idx == oldIDX)
+                    {
+                        idx++;
+                    }
+                    oldIDX = idx;
                     deleteSelectedText();
                     ICRDT.AddString(input, idx - 2, Title);
                 }
 
-                if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) && timeStamp <= Time.time) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) &&  valueHasChanged)
                 {
-                    timeStamp = Time.time + 0.300000f;
+                    valueHasChanged = false;
+                    if (idx == oldIDX)
+                    {
+                        idx++;
+                    }
+                    oldIDX = idx;
                     deleteSelectedText();
                     ICRDT.AddString("\n", idx - 2, Title);
                 }
 
-                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && string.IsNullOrEmpty(changedText) )//&& timeStamp <= Time.time)
+                if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
                 {
-                    //timeStamp = Time.time + 0.300000f;
-                    changedText = "";
+                    valueHasChanged = false;
                     if (!deleteSelectedText())
                     { 
                         ICRDT.DeleteString(idx -1, idx-1, Title);
                     }
                 }
 
-                if (((Input.GetKey(KeyCode.Backspace) && string.IsNullOrEmpty(changedText) /*timeStamp <= Time.time */) || Input.GetKeyDown(KeyCode.Backspace)) && idx > 0)
+                if (Input.GetKey(KeyCode.Backspace) && valueHasChanged )
                 {
-                    //timeStamp = Time.time + 0.300000f;
-                    changedText = "";
+                    if(oldIDX == idx)
+                    {
+                        idx--;
+                    }
+                    oldIDX = idx;
+                    valueHasChanged = false;
                     if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx -1, idx-1, Title);
@@ -290,6 +312,8 @@ namespace SEE.Game.UI.CodeWindow
                 Debug.Log(ICRDT.PrintString(Title));
 
             }
+
+            valueHasChanged = false;
 
             // Show issue info on click (on hover would be too expensive)
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
