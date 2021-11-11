@@ -35,6 +35,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         public float timeStamp = 0;
 
+        private string changedText = "";
         /// <summary>
         /// 
         /// </summary>
@@ -107,6 +108,7 @@ namespace SEE.Game.UI.CodeWindow
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
+                TextMeshInputField.onValueChanged.AddListener((text) => {changedText = text; });
 
                 //Updates the entries in the CodeWindow
                 void updateCodeWindow(char c, int idx, operationType type)
@@ -240,9 +242,10 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.AddString("\n", idx - 2, Title);
                 }
 
-                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && timeStamp <= Time.time)
+                if (Input.GetKey(KeyCode.Delete) && ICRDT.PrintString(Title).Length > idx && string.IsNullOrEmpty(changedText) )//&& timeStamp <= Time.time)
                 {
-                    timeStamp = Time.time + 0.300000f;
+                    //timeStamp = Time.time + 0.300000f;
+                    changedText = "";
                     if (!deleteSelectedText())
                     { 
                         ICRDT.DeleteString(idx -1, idx-1, Title);
