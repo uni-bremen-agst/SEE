@@ -110,8 +110,9 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
-                    TextMeshInputField.text = TextMesh.text = Text;
+                    ICRDT.PrintString(Title);
+                    //EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    //TextMeshInputField.text = TextMesh.text = Text;
                 }
 
                 //Change Listener
@@ -220,8 +221,8 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     timeStamp = Time.time + 5.0f;
                     recalculadeSyntax = false;
-                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
-                    TextMeshInputField.text = TextMesh.text = Text;
+                    //EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    //TextMeshInputField.text = TextMesh.text = Text;
                 }
                 else if(Time.time > timeStamp)
                 {
@@ -258,7 +259,9 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     oldIDX = idx;
                     deleteSelectedText();
-                    TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string(' ', neededPadding));
+                    Debug.Log("ALLLAAAARMMMMM");
+                    TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string('x', neededPadding));
+                    Debug.Log("TEST " + new string('x', neededPadding));
                     TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + neededPadding;
                     ICRDT.AddString("\n" + new string(' ', neededPadding), idx - 2, Title);
                 }
