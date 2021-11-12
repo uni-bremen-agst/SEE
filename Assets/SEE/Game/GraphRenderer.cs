@@ -28,7 +28,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
-        public GraphRenderer(City.AbstractSEECity settings, Graph graph)
+        public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
 
@@ -124,7 +124,7 @@ namespace SEE.Game
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            List<string> nodeMetrics = settings.AllMetricAttributes();
+            List<string> nodeMetrics = settings.AllDefaultMetrics();
 
             if (settings.ZScoreScale)
             {
@@ -138,7 +138,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, style) for given <paramref name="graph"/>
+        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose node metrics are to be scaled</param>
@@ -281,7 +281,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
+        /// <param name="draw">decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, GameObject parent, bool draw = true)
         {
@@ -409,7 +409,6 @@ namespace SEE.Game
             }
             // game objects for the leaves
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
-            AdjustScaleBetweenNodeKinds(nodeMap);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
 

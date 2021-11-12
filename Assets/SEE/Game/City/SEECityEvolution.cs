@@ -200,6 +200,21 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph, that is, there is at least one node in the graph that has this
+        /// metric.
+        ///
+        /// The metric names are derived from the graph currently drawn by the
+        /// evolution renderer.
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        public override List<string> AllExistingMetrics()
+        {
+            return evolutionRenderer.AllExistingMetrics();
+        }
+
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
