@@ -50,19 +50,6 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ConfigMenu : DynamicUIBehaviour
     {
-        /// <summary>
-        /// A list of numeric attributes digestible by the ComboSelect component.
-        ///
-        /// FIXME: NumericAttributes is just a list of predefined metric names. They
-        /// may or may not exist in the graph. We need to retrieve the set of metrics
-        /// from the graph.
-        /// </summary>
-        private static readonly List<string> NumericAttributes =
-            Enum.GetValues(typeof(NumericAttributeNames))
-                .Cast<NumericAttributeNames>()
-                .Select(x => x.Name())
-                .ToList();
-
         private static List<EditableInstance> editableInstances;
         /// <summary>
         /// The list of SEECity instances this menu can manipulate.
@@ -125,7 +112,7 @@ namespace SEE.Game.UI.ConfigMenu
             if (CurrentlyEditing == null)
             {
                 Debug.LogWarning("There is no SEECity that can be configured in the scene.\n");
-                enabled = false;
+                gameObject.SetActive(false);
                 return;
             }
             SetupCity(CurrentlyEditing);
@@ -262,21 +249,26 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupPages()
         {
-            SetupLeafNodesPage();
-            SetupInnerNodesPage();
+            List<string> metricNames = city.AllExistingMetrics();
+            SetupLeafNodesPage(metricNames);
+            SetupInnerNodesPage(metricNames);
             SetupNodesLayoutPage();
             SetupEdgesLayoutPage();
             SetupMiscellaneousPage();
         }
 
-        private void SetupLeafNodesPage()
+        /// <summary>
+        /// Sets up the controls for selecting the metrics responsible for shape, height,
+        /// and color of leaf nodes as well as the label settings.
+        /// </summary>
+        /// <param name="metricNames">the names of the metrics that can be selected
+        /// for these visual attributes</param>
+        private void SetupLeafNodesPage(List<string> metricNames)
         {
             CreateAndInsertTabButton("Leaf nodes", TabButtonState.InitialActive);
             GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            // FIXME: We can edit only the Unspecified domain. The concept of domains will
-            // be dropped soon. So we will not invest any effort in this for the time being.
             LeafNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
             {
                 // Shape type for leaf nodes
@@ -291,7 +283,7 @@ namespace SEE.Game.UI.ConfigMenu
                 // Width metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Width")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(leafNodeAttributes.WidthMetric)
                     .SetOnChangeHandler(s => leafNodeAttributes.WidthMetric = s)
                     .Build();
@@ -299,7 +291,7 @@ namespace SEE.Game.UI.ConfigMenu
                 // Height metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Height")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(leafNodeAttributes.HeightMetric)
                     .SetOnChangeHandler(s => leafNodeAttributes.HeightMetric = s)
                     .Build();
@@ -307,15 +299,15 @@ namespace SEE.Game.UI.ConfigMenu
                 // Height metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Depth")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(leafNodeAttributes.DepthMetric)
                     .SetOnChangeHandler(s => leafNodeAttributes.DepthMetric = s)
                     .Build();
 
                 // Leaf style metric
                 ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Style")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetLabel("Color")
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(leafNodeAttributes.ColorMetric)
                     .SetOnChangeHandler(s => leafNodeAttributes.ColorMetric = s)
                     .Build();
@@ -350,14 +342,18 @@ namespace SEE.Game.UI.ConfigMenu
             }
         }
 
-        private void SetupInnerNodesPage()
+        /// <summary>
+        /// Sets up the controls for selecting the metrics responsible for shape, height,
+        /// and color of inner nodes as well as the label settings.
+        /// </summary>
+        /// <param name="metricNames">the names of the metrics that can be selected
+        /// for these visual attributes</param>
+        private void SetupInnerNodesPage(List<string> metricNames)
         {
             CreateAndInsertTabButton("Inner nodes");
             GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            // FIXME: We can edit only the Unspecified domain. The concept of domains will
-            // be dropped soon. So we will not invest any effort in this for the time being.
             InnerNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
             {
                 // Shape type for inner nodes
@@ -372,15 +368,15 @@ namespace SEE.Game.UI.ConfigMenu
                 // Height metric
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Height")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(innerNodeAttributes.HeightMetric)
                     .SetOnChangeHandler(s => innerNodeAttributes.HeightMetric = s)
                     .Build();
 
                 // Leaf style metric
                 ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Style")
-                    .SetAllowedValues(NumericAttributes)
+                    .SetLabel("Color")
+                    .SetAllowedValues(metricNames)
                     .SetDefaultValue(innerNodeAttributes.ColorMetric)
                     .SetOnChangeHandler(s => innerNodeAttributes.ColorMetric = s)
                     .Build();

@@ -67,7 +67,7 @@ namespace SEE.DataModel.DG.IO
                 // load graph (we can safely assume that the file exists because we retrieved its
                 // name just from the directory
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes,
-                                                           rootName: rootName,
+                                                           rootID: rootName,
                                                            logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();

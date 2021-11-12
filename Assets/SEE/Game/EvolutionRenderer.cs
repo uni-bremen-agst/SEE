@@ -66,7 +66,6 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
-                diff = new NumericAttributeDiff(cityEvolution.AllMetricAttributes());
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
@@ -115,7 +114,7 @@ namespace SEE.Game
         private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The kind of comparison to determine whether there any differences between
+        /// The kind of comparison to determine whether there are any differences between
         /// two corresponding graph elements (corresponding by their ID) in
         /// two different graphs of the graph series.
         /// </summary>
@@ -264,10 +263,13 @@ namespace SEE.Game
         {
             // Determine the layouts of all loaded graphs upfront.
             Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
+            ISet<string> numericNodeAttributes = new HashSet<string>();
             graphs.ForEach(graph =>
             {
                 Layouts[graph] = CalculateLayout(graph);
+                numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
             });
+            diff = new NumericAttributeDiff(numericNodeAttributes);
             objectManager.Clear();
             p.End(true);
         }
@@ -986,6 +988,12 @@ namespace SEE.Game
                 case Difference.Changed:
                     NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
                     marker.MarkChanged(currentGameNode);
+                    // There is a change. It may or may not be the metric determining the style.
+                    // We will not further check that and just call the following method.
+                    // If there is no change, this method does not to be called because then
+                    // we know that the metric values determining the style of the former and
+                    // the new graph node are the same.
+                    graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
                     marker.MarkBorn(currentGameNode);
@@ -996,7 +1004,7 @@ namespace SEE.Game
             // re-established
             RemoveFromNodeHierarchy(currentGameNode);
             // currentGameNode is shifted to its new position through the animator.
-            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, difference, OnAnimationNodeAnimationFinished);
+            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, OnAnimationNodeAnimationFinished);
         }
 
         /// <summary>
@@ -1121,7 +1129,7 @@ namespace SEE.Game
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = SkyLevel;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveAnimator.AnimateTo(block, nodeTransform, Difference.Deleted, OnRemovedNodeFinishedAnimation);
+                moveAnimator.AnimateTo(block, nodeTransform, OnRemovedNodeFinishedAnimation);
             }
             else
             {
@@ -1544,6 +1552,28 @@ namespace SEE.Game
             if (!ShowPreviousIfPossible())
             {
                 ToggleAutoPlayReverse();
+            }
+        }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph currently shown, that is, there is at least one node in the graph
+        /// that has this metric.
+        ///
+        /// The metric names are derived from the graph currently drawn by the
+        /// evolution renderer.
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        internal List<string> AllExistingMetrics()
+        {
+            if (currentCity == null || currentCity.Graph == null)
+            {
+                return new List<string>();
+            }
+            else
+            {
+                return currentCity.Graph.AllNumericNodeAttributes();
             }
         }
 

@@ -6,8 +6,6 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
-using SEE.Layout;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,66 +13,6 @@ namespace SEE.Game
 {
     public partial class GraphRenderer
     {
-        /// <summary>
-        /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
-        /// i.e., sets its size and position according to the <paramref name="layout"/> and
-        /// possibly rotates it. The game node can represent a leaf or inner node of the node
-        /// hierarchy.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
-        /// graph node.
-        /// </summary>
-        /// <param name="gameNode">the game node the layout should be applied to</param>
-        /// <param name="layout">layout to be applied to the game node</param>
-        public void Apply(GameObject gameNode, GameObject itsParent, ILayoutNode layout)
-        {
-            Node node = gameNode.GetComponent<NodeRef>().Value;
-
-            if (node.IsLeaf())
-            {
-                // Leaf nodes were created as blocks by leaveNodeFactory.
-                // We need to first scale the game node and only afterwards set its
-                // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            else
-            {
-                // Inner nodes were created by innerNodeFactory.
-                innerNodeFactory.SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                innerNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            // Rotate the game object.
-            if (node.IsLeaf())
-            {
-                leafNodeFactory.Rotate(gameNode, layout.Rotation);
-            }
-            else
-            {
-                innerNodeFactory.Rotate(gameNode, layout.Rotation);
-            }
-
-            // fit layoutNodes into parent
-            //Fit(itsParent, layoutNodes); // FIXME
-
-            // Stack the node onto its parent (maintaining its x and z co-ordinates)
-            Vector3 levelIncrease = gameNode.transform.position;
-            levelIncrease.y = itsParent.transform.position.y + itsParent.transform.lossyScale.y / 2.0f + LevelDistance;
-            gameNode.transform.position = levelIncrease;
-
-            // Add the node to the node hierarchy
-            gameNode.transform.SetParent(itsParent.transform);
-
-            // Prepare the node for interactions
-            InteractionDecorator.PrepareForInteraction(gameNode);
-
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            AddDecorations(gameNode);
-        }
-
         /// <summary>
         /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>
         /// of given <paramref name="gameNode"/> and lets the node reference
@@ -428,7 +366,7 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                float value = GetMetricValue(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
+                float value = GetMetricValueOfLeaf(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
             else
@@ -486,7 +424,7 @@ namespace SEE.Game
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
-                    Vector3 scale = GetScale(node);
+                    Vector3 scale = GetScaleOfLeaf(node);
 
                     // Scale according to the metrics.
                     if (settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
@@ -501,7 +439,7 @@ namespace SEE.Game
                         // That is, M mapped onto the rectangle area.
                         // The area of a rectangle is the product of the lengths of its two sides.
                         // That is why we need to take the square root of M for the lengths, because
-                        // sqrt(M) * sqrt(M) = M. If were instead using M as width and depth of the
+                        // sqrt(M) * sqrt(M) = M. If we were instead using M as width and depth of the
                         // rectangle, the area would be M^2, which would skew the visual impression
                         // in the eye of the beholder. Nodes with larger values of M would have a
                         // disproportionally larger area.
@@ -532,55 +470,58 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the scale of the given <paramref name="node"/> as requested by the user's
-        /// settings, i.e., what the use specified for the width, height, and depth of nodes.
+        /// settings, i.e., what the use specified for the width, height, and depth of leaf nodes.
+        ///
+        /// Precondition: <paramref name="node"/> is a leaf.
         /// </summary>
-        /// <param name="node"></param>
+        /// <param name="node">leaf node whose scale is requested</param>
         /// <returns>requested absolute scale in world space</returns>
-        private Vector3 GetScale(Node node)
+        private Vector3 GetScaleOfLeaf(Node node)
         {
+            Assert.IsTrue(node.IsLeaf());
             LeafNodeAttributes attribs = settings.LeafNodeSettings;
-            return new Vector3(GetMetricValue(node, attribs.WidthMetric),
-                               GetMetricValue(node, attribs.HeightMetric),
-                               GetMetricValue(node, attribs.DepthMetric));
+            return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
+                               GetMetricValueOfLeaf(node, attribs.HeightMetric),
+                               GetMetricValueOfLeaf(node, attribs.DepthMetric));
         }
 
         /// <summary>
         /// If <paramref name="metricName"/> is the name of a metric, the corresponding
         /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
         /// can be parsed as a number instead, the parsed number is returned.
-        /// The result is clamped into [MinimalBlockLength, MaximalBlockLength].
+        /// The result is clamped into [MinimalBlockLength, MaximalBlockLength] where
+        /// MinimalBlockLength is the minimal length for leaf nodes specified by the user and
+        /// MaximalBlockLength is the maximal length for leaf nodes specified by the user.
+        ///
+        /// Precondition: <paramref name="node"/> is a leaf.
+        /// </summary>
+        /// <param name="node">leaf node whose metric is to be returned</param>
+        /// <param name="metricName">the name of a leaf node metric or a number</param>
+        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        private float GetMetricValueOfLeaf(Node node, string metricName)
+        {
+            return Mathf.Clamp(GetMetricValue(node, metricName),
+                        settings.LeafNodeSettings.MinimalBlockLength,
+                        settings.LeafNodeSettings.MaximalBlockLength);
+        }
+
+        /// <summary>
+        /// If <paramref name="metricName"/> is the name of a metric, the corresponding
+        /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
+        /// can be parsed as a number instead, the parsed number is returned.
         /// </summary>
         /// <param name="node">node whose metric is to be returned</param>
         /// <param name="metricName">the name of a node metric or a number</param>
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
         private float GetMetricValue(Node node, string metricName)
         {
-            float result;
             if (TryGetFloat(metricName, out float value))
             {
-                result = value;
+                return value;
             }
             else
             {
-                result = scaler.GetNormalizedValue(metricName, node);
-            }
-            return Mathf.Clamp(result,
-                        settings.LeafNodeSettings.MinimalBlockLength,
-                        settings.LeafNodeSettings.MaximalBlockLength);
-        }
-
-        /// <summary>
-        /// Adjusts the scale of every node such that the maximal extent of each node is one.
-        /// </summary>
-        /// <param name="nodeMap">The nodes to scale.</param>
-        private static void AdjustScaleBetweenNodeKinds(Dictionary<Node, GameObject> nodeMap)
-        {
-            Vector3 denominator = Vector3.negativeInfinity;
-            IList<KeyValuePair<Node, GameObject>> nodeMapMatchingDomain = nodeMap.ToList();
-            denominator = nodeMapMatchingDomain.Aggregate(denominator, (current, pair) => Vector3.Max(current, pair.Value.transform.localScale));
-            foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
-            {
-                pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
+                return scaler.GetNormalizedValue(metricName, node);
             }
         }
 
