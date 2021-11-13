@@ -49,6 +49,8 @@ namespace SEE.Game.UI.CodeWindow
         /// Indicates that a changes was made in the CodeWindow and the inputlistener has to react
         /// </summary>
         private bool valueHasChanged = false;
+
+        private float oldIDXCoolDown = 0f;
         /// <summary>
         /// The Type of a remote operation
         /// </summary>
@@ -119,7 +121,7 @@ namespace SEE.Game.UI.CodeWindow
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
-                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;  recalculadeSyntax = true; });
+                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;  recalculadeSyntax = true;});
 
                 //Updates the entries in the CodeWindow
                 void updateCodeWindow(char c, int idx, operationType type)
@@ -128,8 +130,6 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         case operationType.Add:
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
-                            Debug.Log("STRUBG " + c.ToString());
-                            if (c.ToString().Equals("\n")) Debug.Log("NEW LINE");
                             if(TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
@@ -193,6 +193,11 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
+                 if(Time.time > oldIDXCoolDown)
+                {
+                    oldIDX = -1;
+                }
+                Debug.Log("IDX " + TextMeshInputField.caretPosition);
                 SEEInput.KeyboardShortcutsEnabled = false;
                 if (SEEInput.SaveCodeWindow())
                 {
@@ -229,7 +234,7 @@ namespace SEE.Game.UI.CodeWindow
                     timeStamp = Time.time + 5.0f;
                 }
 
-
+                int idx = TextMeshInputField.caretPosition;
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 string input = Input.inputString;
@@ -237,7 +242,13 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\b", "");
                 }
-                int idx = TextMeshInputField.caretPosition; 
+
+                if (input.Contains("\r"))
+                {
+                    input = input.Replace("\r", "");//"\n" + new string('x', neededPadding));
+                    //TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string('x', neededPadding));
+                }
+                
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
                     valueHasChanged = false;
@@ -246,8 +257,9 @@ namespace SEE.Game.UI.CodeWindow
                         idx++;
                     }
                     oldIDX = idx;
+                    oldIDXCoolDown = Time.time + 0.1f;
                     deleteSelectedText();
-                    ICRDT.AddString(input, idx - 2, Title);
+                    ICRDT.AddString(input, idx - 1, Title);
                 }
 
                 if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) &&  valueHasChanged)
@@ -258,20 +270,19 @@ namespace SEE.Game.UI.CodeWindow
                         idx++;
                     }
                     oldIDX = idx;
+                    oldIDXCoolDown = Time.time + 0.1f;
                     deleteSelectedText();
-                    Debug.Log("ALLLAAAARMMMMM");
-                    TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string('x', neededPadding));
-                    Debug.Log("TEST " + new string('x', neededPadding));
-                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + neededPadding;
-                    ICRDT.AddString("\n" + new string(' ', neededPadding), idx - 2, Title);
-                }
+                    TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string('x', neededPadding));
+                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + (neededPadding + 500);
+                    ICRDT.AddString("\n" + new string('x', neededPadding), idx - 1, Title);
+                } 
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
                 {
                     valueHasChanged = false;
                     if (!deleteSelectedText())
                     { 
-                        ICRDT.DeleteString(idx -1, idx-1, Title);
+                        ICRDT.DeleteString(idx , idx, Title);
                     }
                 }
 
@@ -279,13 +290,18 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     if(oldIDX == idx)
                     {
+                        if(idx == 0)
+                        {
+                            return;
+                        }
                         idx--;
                     }
                     oldIDX = idx;
+                    oldIDXCoolDown = Time.time + 0.1f; 
                     valueHasChanged = false;
                     if (!deleteSelectedText())
                     {
-                        ICRDT.DeleteString(idx -1, idx-1, Title);
+                        ICRDT.DeleteString(idx , idx, Title);
                     }
 
                 }
@@ -294,7 +310,7 @@ namespace SEE.Game.UI.CodeWindow
                   if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
                         deleteSelectedText();
-                        ICRDT.AddString(GUIUtility.systemCopyBuffer, idx, Title);
+                        ICRDT.AddString(GUIUtility.systemCopyBuffer, idx - GUIUtility.systemCopyBuffer.Length, Title);
                     }
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
@@ -396,7 +412,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             if (selectedText != null)
             {
-                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2, Title);
+                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
                 return true;
             }
             return false;
