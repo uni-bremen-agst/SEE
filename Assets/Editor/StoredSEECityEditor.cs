@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Game.City;
 using UnityEditor;
 
 namespace SEEEditor

@@ -2,7 +2,7 @@
 using System.Linq;
 using SEE.Utils;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Configuration attribute input/output for AbstractSEECity.
