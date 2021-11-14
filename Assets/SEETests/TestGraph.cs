@@ -1,5 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 
 namespace SEE.DataModel.DG
 {
@@ -10,9 +12,11 @@ namespace SEE.DataModel.DG
     {
         private static Node NewNode(Graph graph, string id, string type = "Routine")
         {
-            Node result = new Node();
-            result.ID = id;
-            result.Type = type;
+            Node result = new Node
+            {
+                ID = id,
+                Type = type
+            };
             graph.AddNode(result);
             return result;
         }
@@ -22,15 +26,36 @@ namespace SEE.DataModel.DG
         /// </summary>
         private static int edgeID = 1;
 
-        private static Edge NewEdge(Graph graph, Node from, Node to, string type)
+        private static Edge NewEdge(Graph graph, Node from, Node to, string type = "call")
         {
             edgeID++;
-            Edge result = new Edge(edgeID.ToString());
-            result.Type = type;
-            result.Source = from;
-            result.Target = to;
+            Edge result = new Edge(edgeID.ToString())
+            {
+                Type = type,
+                Source = from,
+                Target = to
+            };
             graph.AddEdge(result);
             return result;
+        }
+
+        private bool HasEdge(Node source, Node target, string edgeType = null)
+        {
+            return source.Outgoings.Any(outgoing => outgoing.Target == target && (edgeType == null || outgoing.Type == edgeType));
+        }
+
+        private void AssertHasChild(Graph subgraph, Node parent, Node child)
+        {
+            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
+        }
+
+        private Node Pendant(Graph subgraph, Node baa) => subgraph.GetNode(baa.ID);
+
+        private static Node Child(Graph g, Node parent, string id, string nodeType = "Routine")
+        {
+            Node child = NewNode(g, id, nodeType);
+            parent.AddChild(child);
+            return child;
         }
 
         /// <summary>
@@ -52,32 +77,32 @@ namespace SEE.DataModel.DG
             Node n3 = NewNode(g, "n3");
 
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.Outgoings));
-            Edge call_n1_n1 = NewEdge(g, n1, n1, "call");
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1 }, AsSet(n1.Outgoings));
-            Edge call_n1_n2 = NewEdge(g, n1, n2, "call");
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2 }, AsSet(n1.Outgoings));
-            Edge call_n1_n3 = NewEdge(g, n1, n3, "call");
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3 }, AsSet(n1.Outgoings));
+            Edge call_n1_n1 = NewEdge(g, n1, n1);
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.Outgoings));
+            Edge call_n1_n2 = NewEdge(g, n1, n2);
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2 }, AsSet(n1.Outgoings));
+            Edge call_n1_n3 = NewEdge(g, n1, n3);
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3 }, AsSet(n1.Outgoings));
             Edge use_n1_n3_a = NewEdge(g, n1, n3, "use");
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
             Edge use_n1_n3_b = NewEdge(g, n1, n3, "use");
             // We have overridden Equals() for edges so that they are considered the same if
             // they have the same type, same source and target linknames, and same attributes.
             // Based on this comparison, use_n1_n3_a and use_n1_n3_b are equal. To make them different,
             // we set an attribute for the latter.
             use_n1_n3_b.SetToggle("Duplicated");
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b }, AsSet(n1.Outgoings));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b }, AsSet(n1.Outgoings));
 
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n3, "none")));
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge>() { use_n1_n3_a, use_n1_n3_b }, AsSet(n1.From_To(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a, use_n1_n3_b }, AsSet(n1.From_To(n3, "use")));
 
-            Edge call_n2_n3 = NewEdge(g, n2, n3, "call");
+            Edge call_n2_n3 = NewEdge(g, n2, n3);
 
-            Edge call_n2_n2 = NewEdge(g, n2, n2, "call");
+            Edge call_n2_n2 = NewEdge(g, n2, n2);
 
-            HashSet<Node> nodes = new HashSet<Node>() { n1, n2, n3 };
-            HashSet<Edge> edges = new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b, call_n2_n3, call_n2_n2 };
+            HashSet<Node> nodes = new HashSet<Node> { n1, n2, n3 };
+            HashSet<Edge> edges = new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b, call_n2_n3, call_n2_n2 };
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -86,22 +111,21 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(edges, g.Edges());
 
             g.RemoveEdge(use_n1_n3_b);
-            edges = new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, call_n2_n3, call_n2_n2 };
+            edges = new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, call_n2_n3, call_n2_n2 };
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
             Assert.AreEqual(nodes, g.Nodes());
             Assert.AreEqual(edges, g.Edges());
 
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge>() { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n2 }, AsSet(n1.From_To(n2, "call")));
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1 }, AsSet(n1.From_To(n1, "call")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n2 }, AsSet(n1.From_To(n2, "call")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.From_To(n1, "call")));
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n2, "use")));
-            Assert.AreEqual(new HashSet<Edge>() { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
-
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
         }
 
-        private HashSet<Edge> AsSet(List<Edge> edges)
+        private static HashSet<Edge> AsSet(IEnumerable<Edge> edges)
         {
             return new HashSet<Edge>(edges);
         }
@@ -121,20 +145,23 @@ namespace SEE.DataModel.DG
             Node n2 = NewNode(g, "n2");
             Node n3 = NewNode(g, "n3");
 
-            Edge call_n1_n2 = NewEdge(g, n1, n2, "call");
+            Edge call_n1_n2 = NewEdge(g, n1, n2);
             Edge use_n1_n2 = NewEdge(g, n1, n2, "use");
 
-            Edge call_n2_n3 = NewEdge(g, n2, n3, "call");
+            Edge call_n2_n3 = NewEdge(g, n2, n3);
             Edge use_n2_n3 = NewEdge(g, n2, n3, "use");
-            Edge call_n2_n2 = NewEdge(g, n2, n2, "call");
+            Edge call_n2_n2 = NewEdge(g, n2, n2);
             Edge use_n2_n2 = NewEdge(g, n2, n2, "use");
 
-            Edge call_n1_n3 = NewEdge(g, n1, n3, "call");
-            Edge call_n3_n1 = NewEdge(g, n3, n1, "call");
+            Edge call_n1_n3 = NewEdge(g, n1, n3);
+            Edge call_n3_n1 = NewEdge(g, n3, n1);
 
-            HashSet<Node> nodes = new HashSet<Node>() { n1, n2, n3 };
-            HashSet<Edge> edges = new HashSet<Edge>() { call_n1_n2, use_n1_n2, call_n2_n3, use_n2_n3, call_n2_n2, use_n2_n2,
-                                                        call_n1_n3, call_n3_n1};
+            HashSet<Node> nodes = new HashSet<Node> { n1, n2, n3 };
+            HashSet<Edge> edges = new HashSet<Edge>
+            {
+                call_n1_n2, use_n1_n2, call_n2_n3, use_n2_n3, call_n2_n2, use_n2_n2,
+                call_n1_n3, call_n3_n1
+            };
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -143,26 +170,26 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(edges, g.Edges());
 
             Assert.AreEqual(n1.Outgoings,
-                            new HashSet<Edge>() { call_n1_n2, use_n1_n2, call_n1_n3 });
+                            new HashSet<Edge> { call_n1_n2, use_n1_n2, call_n1_n3 });
             Assert.AreEqual(n1.Incomings,
-                            new HashSet<Edge>() { call_n3_n1 });
+                            new HashSet<Edge> { call_n3_n1 });
 
             Assert.AreEqual(n2.Outgoings,
-                            new HashSet<Edge>() { call_n2_n3, use_n2_n3, call_n2_n2, use_n2_n2 });
+                            new HashSet<Edge> { call_n2_n3, use_n2_n3, call_n2_n2, use_n2_n2 });
             Assert.AreEqual(n2.Incomings,
-                            new HashSet<Edge>() { call_n1_n2, use_n1_n2, call_n2_n2, use_n2_n2 });
+                            new HashSet<Edge> { call_n1_n2, use_n1_n2, call_n2_n2, use_n2_n2 });
 
             Assert.AreEqual(n3.Outgoings,
-                            new HashSet<Edge>() { call_n3_n1 });
+                            new HashSet<Edge> { call_n3_n1 });
             Assert.AreEqual(n3.Incomings,
-                            new HashSet<Edge>() { call_n2_n3, use_n2_n3, call_n1_n3 });
+                            new HashSet<Edge> { call_n2_n3, use_n2_n3, call_n1_n3 });
 
             // If a node is removed, all its incoming and outgoing edges must
             // be removed, too, and its successors and predecessors must be adjusted, too.
 
             g.RemoveNode(n2);
-            nodes = new HashSet<Node>() { n1, n3 };
-            edges = new HashSet<Edge>() { call_n1_n3, call_n3_n1 };
+            nodes = new HashSet<Node> { n1, n3 };
+            edges = new HashSet<Edge> { call_n1_n3, call_n3_n1 };
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -171,25 +198,25 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(edges, g.Edges());
 
             Assert.AreEqual(n1.Outgoings,
-                            new HashSet<Edge>() { call_n1_n3 });
+                            new HashSet<Edge> { call_n1_n3 });
             Assert.AreEqual(n1.Incomings,
-                            new HashSet<Edge>() { call_n3_n1 });
+                            new HashSet<Edge> { call_n3_n1 });
 
             Assert.AreEqual(n2.Outgoings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
             Assert.AreEqual(n2.Incomings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
 
             Assert.AreEqual(n3.Outgoings,
-                            new HashSet<Edge>() { call_n3_n1 });
+                            new HashSet<Edge> { call_n3_n1 });
             Assert.AreEqual(n3.Incomings,
-                            new HashSet<Edge>() { call_n1_n3 });
+                            new HashSet<Edge> { call_n1_n3 });
 
             // If an edge is removed, it must be removed from the incoming and outgoing
             // edges of its source and target, respectively.
             g.RemoveEdge(call_n3_n1);
-            nodes = new HashSet<Node>() { n1, n3 };
-            edges = new HashSet<Edge>() { call_n1_n3 };
+            nodes = new HashSet<Node> { n1, n3 };
+            edges = new HashSet<Edge> { call_n1_n3 };
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -198,19 +225,19 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(edges, g.Edges());
 
             Assert.AreEqual(n1.Outgoings,
-                            new HashSet<Edge>() { call_n1_n3 });
+                            new HashSet<Edge> { call_n1_n3 });
             Assert.AreEqual(n1.Incomings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
 
             Assert.AreEqual(n3.Outgoings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
             Assert.AreEqual(n3.Incomings,
-                            new HashSet<Edge>() { call_n1_n3 });
+                            new HashSet<Edge> { call_n1_n3 });
 
             // After removing n3, the graph should have only a single node left.
             g.RemoveNode(n3);
-            nodes = new HashSet<Node>() { n1 };
-            edges = new HashSet<Edge>() { };
+            nodes = new HashSet<Node> { n1 };
+            edges = new HashSet<Edge>();
 
             Assert.AreEqual(nodes.Count, g.NodeCount);
             Assert.AreEqual(edges.Count, g.EdgeCount);
@@ -219,14 +246,53 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(edges, g.Edges());
 
             Assert.AreEqual(n1.Outgoings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
             Assert.AreEqual(n1.Incomings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
 
             Assert.AreEqual(n3.Outgoings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
             Assert.AreEqual(n3.Incomings,
-                            new HashSet<Edge>() { });
+                            new HashSet<Edge>());
+        }
+
+        [Test]
+        public void RemoveOrphansBecomeChildren()
+        {
+            Graph g = new Graph();
+
+            Node r = NewNode(g, "root");
+            Node d = Child(g, r, "toBeDeleted");
+            Node o1 = Child(g, d, "orphan1");
+            Node o2 = Child(g, d, "orphan2");
+
+            g.RemoveNode(d, orphansBecomeRoots: false);
+
+            AssertHasChild(g, parent: r, child: o1);
+            AssertHasChild(g, parent: r, child: o2);
+            Assert.IsNull(d.ItsGraph);
+            Assert.IsNull(d.Parent);
+            Assert.AreEqual(0, d.NumberOfChildren());
+        }
+
+        [Test]
+        public void RemoveOrphansBecomeRoots()
+        {
+            Graph g = new Graph();
+
+            Node r = NewNode(g, "root");
+            Node d = Child(g, r, "toBeDeleted");
+            Node o1 = Child(g, d, "orphan1");
+            Node o2 = Child(g, d, "orphan2");
+
+            g.RemoveNode(d, orphansBecomeRoots: true);
+
+            Assert.AreEqual(0, r.NumberOfChildren());
+            Assert.IsNull(o1.Parent);
+            Assert.IsNull(o2.Parent);
+            Assert.IsNull(d.ItsGraph);
+            Assert.IsNull(d.Parent);
+            Assert.AreEqual(0, d.NumberOfChildren());
         }
 
         [Test]
@@ -332,65 +398,147 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(4, g.MaxDepth);
         }
 
-        [Test]
-        public void TestSubGraph()
+        /// <summary>
+        /// Tests subgraph creation by marking some nodes as relevant and some as irrelevant, then constructing the
+        /// subgraph using the given functions.
+        /// Note: While for any graph element X, makeRelevant(X) MUST imply isRelevant(x), on the other hand
+        /// makeIrrelevant(X) doesn't necessarily have to imply NOT(isRelevant(x)).
+        /// For example, SubGraphByNodeType doesn't care about edges, so isRelevant returns true for all edges,
+        /// regardless of whether makeIrrelevant had been applied to the edges.
+        /// </summary>
+        private void TestSubGraphBy(Action<GraphElement> makeRelevant, Action<GraphElement> makeIrrelevant,
+                                   Func<GraphElement, bool> isRelevant, Func<Graph, Graph> makeSubgraph)
         {
+            // Note: This test is rather imperfect and may be improved in the future.
             Graph g = new Graph();
-            string r = "relevant";
-            string i = "irrelevant";
 
-            Node a = NewNode(g, "a", i);
-            Node b = NewNode(g, "b", i);
-            Node ba = Child(g, b, "ba", i);
-            Node baa = Child(g, ba, "baa", r);
-            Node baaa = Child(g, baa, "baaa", i);
-            Node baaaa = Child(g, baaa, "baaaa", r);
-            Node bb = Child(g, b, "bb", r);
-            Node bba = Child(g, bb, "bba", r);
-            Node bbaa = Child(g, bba, "bbaa", i);
-            Node bc = Child(g, b, "bc", i);
-            Node bca = Child(g, bc, "bca", r);
-            Node bcaa = Child(g, bca, "bcaa", r);
-            Node bcab = Child(g, bca, "bcab", r);
-            Node bcb = Child(g, bc, "bcb", i);
-            Node bcba = Child(g, bcb, "bcba", r);
-            Node bd = Child(g, b, "bd", r);
-            Node bda = Child(g, bd, "bda", i);
-            Node bdaa = Child(g, bda, "bdaa", r);
-            Node c = NewNode(g, "c", r);
-            Node d = NewNode(g, "d", i);
-            Node da = Child(g, d, "da", r);
-            Node e = NewNode(g, "e", r);
-            Node ea = Child(g, e, "ea", i);
-
-            string edgeType = "call";
-            List<Edge> edges = new List<Edge>()
+            Node a = NewNode(g, "a");
+            makeIrrelevant(a);
+            Node b = NewNode(g, "b");
+            makeIrrelevant(b);
+            Node ba = Child(g, b, "ba");
+            makeIrrelevant(ba);
+            Node baa = Child(g, ba, "baa");
+            makeRelevant(baa);
+            Assert.IsTrue(isRelevant(baa));
+            Node baaa = Child(g, baa, "baaa");
+            makeIrrelevant(baaa);
+            Node baaaa = Child(g, baaa, "baaaa");
+            makeRelevant(baaaa);
+            Assert.IsTrue(isRelevant(baaaa));
+            Node bb = Child(g, b, "bb");
+            makeRelevant(bb);
+            Assert.IsTrue(isRelevant(bb));
+            Node bba = Child(g, bb, "bba");
+            makeRelevant(bba);
+            Assert.IsTrue(isRelevant(bba));
+            Node bbaa = Child(g, bba, "bbaa");
+            makeIrrelevant(bbaa);
+            Node bc = Child(g, b, "bc");
+            makeIrrelevant(bc);
+            Node bca = Child(g, bc, "bca");
+            makeRelevant(bca);
+            Assert.IsTrue(isRelevant(bca));
+            Node bcaa = Child(g, bca, "bcaa");
+            makeRelevant(bcaa);
+            Assert.IsTrue(isRelevant(bcaa));
+            Node bcab = Child(g, bca, "bcab");
+            makeRelevant(bcab);
+            Assert.IsTrue(isRelevant(bcab));
+            Node bcb = Child(g, bc, "bcb");
+            makeIrrelevant(bcb);
+            Node bcba = Child(g, bcb, "bcba");
+            makeRelevant(bcba);
+            Assert.IsTrue(isRelevant(bcba));
+            Node bd = Child(g, b, "bd");
+            makeRelevant(bd);
+            Assert.IsTrue(isRelevant(bd));
+            Node bda = Child(g, bd, "bda");
+            makeIrrelevant(bda);
+            Node bdaa = Child(g, bda, "bdaa");
+            makeRelevant(bdaa);
+            Assert.IsTrue(isRelevant(bdaa));
+            Node c = NewNode(g, "c");
+            makeRelevant(c);
+            Assert.IsTrue(isRelevant(c));
+            Node d = NewNode(g, "d");
+            makeIrrelevant(d);
+            Node da = Child(g, d, "da");
+            makeRelevant(da);
+            Assert.IsTrue(isRelevant(da));
+            Node e = NewNode(g, "e");
+            makeRelevant(e);
+            Assert.IsTrue(isRelevant(e));
+            Node ea = Child(g, e, "ea");
+            makeIrrelevant(ea);
+            // makeIrrelevant may have no effect, which is why we have to count this way.
+            int relevantNodes = new List<Node>
             {
-                NewEdge(g, a, ba, edgeType),      // lost
-                NewEdge(g, a, b, edgeType),       // lost
-                NewEdge(g, baa, baaa, edgeType),  // kept
-                NewEdge(g, baa, bba, edgeType),   // kept
-                NewEdge(g, bb, bba, edgeType),    // kept
-                NewEdge(g, bbaa, bba, edgeType),  // kept
-                NewEdge(g, bcab, bcba, edgeType), // kept
-                NewEdge(g, bdaa, baaa, edgeType), // kept
-                NewEdge(g, bdaa, bd, edgeType),   // kept
-                NewEdge(g, bdaa, bdaa, edgeType), // kept
-                NewEdge(g, c, e, edgeType),       // kept
-                NewEdge(g, d, d, edgeType),       // lost
-                NewEdge(g, ea, d, edgeType),      // lost
-            };
+                a, b, ba, baa, baaa, baaaa, bb, bba, bbaa, bc, bca, bcaa, bcab, bcb,
+                bcba, bd, bda, bdaa, c, d, da, e, ea
+            }.Count(isRelevant);
 
-            HashSet<string> relevantNodeTypes = new HashSet<string>() { r };
-            Graph subgraph = g.Subgraph(relevantNodeTypes);
-            // Nodes in subgraph must have a relevant node type.
+            // We make irrelevant: BCBA->BD and E->C (these two would be included if not for their irrelevance)
+            Edge e0 = NewEdge(g, e, c);
+            makeIrrelevant(e0);
+            Edge e1 = NewEdge(g, a, ba);
+            makeRelevant(e1);
+            Assert.IsTrue(isRelevant(e1));
+            Edge e2 = NewEdge(g, a, b);
+            makeRelevant(e2);
+            Assert.IsTrue(isRelevant(e2));
+            Edge e3 = NewEdge(g, baa, baaa);
+            makeRelevant(e3);
+            Assert.IsTrue(isRelevant(e3));
+            Edge e4 = NewEdge(g, baa, bba);
+            makeRelevant(e4);
+            Assert.IsTrue(isRelevant(e4));
+            Edge e5 = NewEdge(g, bb, bba);
+            makeRelevant(e5);
+            Assert.IsTrue(isRelevant(e5));
+            Edge e6 = NewEdge(g, bbaa, bba);
+            makeRelevant(e6);
+            Assert.IsTrue(isRelevant(e6));
+            Edge e7 = NewEdge(g, bcab, bcba);
+            makeRelevant(e7);
+            Assert.IsTrue(isRelevant(e7));
+            Edge e8 = NewEdge(g, bdaa, baaa);
+            makeRelevant(e8);
+            Assert.IsTrue(isRelevant(e8));
+            Edge e9 = NewEdge(g, bdaa, bd);
+            makeRelevant(e9);
+            Assert.IsTrue(isRelevant(e9));
+            Edge e10 = NewEdge(g, bdaa, bdaa);
+            makeRelevant(e10);
+            Assert.IsTrue(isRelevant(e10));
+            Edge e11 = NewEdge(g, c, e);
+            makeRelevant(e11);
+            Assert.IsTrue(isRelevant(e11));
+            Edge e12 = NewEdge(g, d, d);
+            makeRelevant(e12);
+            Assert.IsTrue(isRelevant(e12));
+            Edge e13 = NewEdge(g, ea, d);
+            makeRelevant(e13);
+            Assert.IsTrue(isRelevant(e13));
+            Edge e14 = NewEdge(g, bcba, bd);
+            makeIrrelevant(e14);
+            // makeIrrelevant may have no effect, which is why we have to count this way.
+            int relevantEdges = new List<Edge> { e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14 }.Count(isRelevant);
+
+            Graph subgraph = makeSubgraph(g);
+
+            // Nodes in subgraph must be relevant.
             foreach (Node node in subgraph.Nodes())
             {
-                Assert.That(relevantNodeTypes.Contains(node.Type));
+                Assert.That(isRelevant(node));
             }
-            // There are 13 nodes with a relevant node type.
-            Assert.AreEqual(13, subgraph.NodeCount);
 
+            foreach (Edge edge in subgraph.Edges())
+            {
+                Assert.That(isRelevant(edge));
+            }
+
+            Assert.AreEqual(relevantNodes, subgraph.NodeCount);
             Assert.IsNull(Pendant(subgraph, a));
             Assert.IsNull(Pendant(subgraph, b));
             Assert.IsNull(Pendant(subgraph, ba));
@@ -434,46 +582,170 @@ namespace SEE.DataModel.DG
             AssertHasChild(subgraph, bca, bcab);
             AssertHasChild(subgraph, bd, bdaa);
 
-            // There are 9 edges kept.
-            Assert.AreEqual(9, subgraph.EdgeCount);
-            Assert.That(HasEdge(BAA, BAA, edgeType));
-            Assert.That(HasEdge(BAA, BBA, edgeType));
-            Assert.That(HasEdge(BB, BBA, edgeType));
-            Assert.That(HasEdge(BBA, BBA, edgeType));
-            Assert.That(HasEdge(BCAB, BCBA, edgeType));
-            Assert.That(HasEdge(BDAA, BAA, edgeType));
-            Assert.That(HasEdge(BDAA, BDAA, edgeType));
-            Assert.That(HasEdge(BDAA, BD, edgeType));
-            Assert.That(HasEdge(C, E, edgeType));
+            // 9 edges are kept.
+            // Kept edges: Those for which isRelevant returned true before subgraphing minus four "dangling" ones.
+            Assert.AreEqual(relevantEdges - 4, subgraph.EdgeCount);
+            Assert.That(HasEdge(BAA, BAA));
+            Assert.That(HasEdge(BAA, BBA));
+            Assert.That(HasEdge(BB, BBA));
+            Assert.That(HasEdge(BBA, BBA));
+            Assert.That(HasEdge(BCAB, BCBA));
+            Assert.That(HasEdge(BDAA, BAA));
+            Assert.That(HasEdge(BDAA, BDAA));
+            Assert.That(HasEdge(BDAA, BD));
+            Assert.That(HasEdge(C, E));
         }
 
-        private bool HasEdge(Node source, Node target, string edgeType)
+        [Test]
+        public void TestSubGraphByNodeType()
         {
-            foreach (Edge outgoing in source.Outgoings)
+            const string r = "relevant";
+            const string i = "irrelevant";
+            HashSet<string> relevantNodeTypes = new HashSet<string> { r };
+
+            TestSubGraphBy(x => x.Type = r, x => x.Type = i,
+                           x => !(x is Node) || relevantNodeTypes.Contains(x.Type),
+                           g => g.SubgraphByNodeType(relevantNodeTypes));
+        }
+
+        [Test]
+        public void TestSubGraphByToggleAttribute()
+        {
+            const string relevantToggleType = "relevant";
+
+            TestSubGraphBy(x => x.SetToggle(relevantToggleType),
+                           x => x.UnsetToggle(relevantToggleType),
+                           x => x.HasToggle(relevantToggleType),
+                           g => g.SubgraphByToggleAttributes(new[] { relevantToggleType }));
+        }
+
+        [Test]
+        public void TestSubGraphByToggleAttributes()
+        {
+            IEnumerable<string> relevantToggleTypes = new[] { "relevant", "relevant too", "oh, and me too" };
+
+            TestSubGraphBy(x =>
+                           {
+                               foreach (string relevantToggleType in relevantToggleTypes)
+                               {
+                                   x.SetToggle(relevantToggleType);
+                               }
+                           },
+                           // it suffices to unset a single toggle to make the element irrelevant
+                           x => x.UnsetToggle(relevantToggleTypes.First()),
+                           x => relevantToggleTypes.All(x.HasToggle),
+                           g => g.SubgraphByToggleAttributes(relevantToggleTypes));
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of only a single node.
+        /// </summary>
+        [Test]
+        public void TestDeleteTreeSingleNode()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a");
+            SubgraphMemento subgraph = a.DeleteTree();
+            Assert.IsNull(a.ItsGraph);
+            Assert.AreEqual(0, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(1, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of only a single node
+        /// and a self loop.
+        /// </summary>
+        [Test]
+        public void TestDeleteTreeSingleNodeAndEdge()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a");
+            Edge e = NewEdge(g, a, a);
+            SubgraphMemento subgraph = a.DeleteTree();
+            Assert.IsNull(a.ItsGraph);
+            Assert.IsNull(e.ItsGraph);
+            Assert.AreEqual(0, g.NodeCount);
+            Assert.AreEqual(0, g.EdgeCount);
+
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, e.ItsGraph);
+            Assert.AreEqual(1, g.NodeCount);
+            Assert.AreEqual(1, g.EdgeCount);
+        }
+
+        /// <summary>
+        /// Deleting and restoring a subtree consisting of multiple nested
+        /// nodes and several incoming, outgoing, and internal edges in
+        /// the node hierarchy to be deleted.
+        /// </summary>
+        [Test]
+        public void TestDeleteTree()
+        {
+            Graph g = new Graph();
+            Node a = NewNode(g, "a"); // root
+            Node b = Child(g, a, "b"); // child of a, but not descendant of c
+            Node c = Child(g, a, "c"); // root of subtree to be deleted
+            Node d = Child(g, c, "d"); // descendant of c
+            Node e = Child(g, c, "e"); // descendant of c
+            Node f = Child(g, e, "f"); // descendant of c
+
+            List<Node> subgraphNodes = new List<Node> { c, d, e, f };
+
+            Edge e1 = NewEdge(g, a, b); // outside
+            Edge e2 = NewEdge(g, b, a); // outside
+            Edge e3 = NewEdge(g, a, e); // incoming
+            Edge e4 = NewEdge(g, d, b); // outgoing
+            Edge e5 = NewEdge(g, d, e); // internal
+            Edge e6 = NewEdge(g, f, d); // internal
+            Edge e7 = NewEdge(g, a, c); // incoming
+            Edge e8 = NewEdge(g, c, a); // outgoing
+
+            List<Edge> subgraphEdges = new List<Edge> { e3, e4, e5, e6, e7, e8 };
+
+            SubgraphMemento subgraph = c.DeleteTree();
+
+            // a and b are still in the graph, but all other nodes are removed
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, b.ItsGraph);
+            foreach (Node node in subgraphNodes)
             {
-                if (outgoing.Type == edgeType && outgoing.Target == target)
-                {
-                    return true;
-                }
+                Assert.IsNull(node.ItsGraph);
             }
-            return false;
-        }
 
-        private void AssertHasChild(Graph subgraph, Node parent, Node child)
-        {
-            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
-        }
+            // e1 and e2 are still in the graph, but all other edges are removed
+            Assert.AreEqual(g, e1.ItsGraph);
+            Assert.AreEqual(g, e2.ItsGraph);
+            foreach (Edge edge in subgraphEdges)
+            {
+                Assert.IsNull(edge.ItsGraph);
+            }
 
-        private Node Pendant(Graph subgraph, Node baa)
-        {
-            return subgraph.GetNode(baa.ID);
-        }
+            Assert.AreEqual(2, g.NodeCount);
+            Assert.AreEqual(2, g.EdgeCount);
 
-        private static Node Child(Graph g, Node parent, string id, string nodeType)
-        {
-            Node child = NewNode(g, id, nodeType);
-            parent.AddChild(child);
-            return child;
+            subgraph.Restore();
+            Assert.AreEqual(g, a.ItsGraph);
+            Assert.AreEqual(g, b.ItsGraph);
+            foreach (Node node in subgraphNodes)
+            {
+                Assert.AreEqual(g, node.ItsGraph);
+            }
+
+            Assert.AreEqual(g, e1.ItsGraph);
+            Assert.AreEqual(g, e2.ItsGraph);
+            foreach (Edge edge in subgraphEdges)
+            {
+                Assert.AreEqual(g, edge.ItsGraph);
+            }
+
+            Assert.AreEqual(subgraphNodes.Count + 2, g.NodeCount);
+            Assert.AreEqual(subgraphEdges.Count + 2, g.EdgeCount);
         }
     }
 }

@@ -298,7 +298,7 @@ MonoBehaviour:
       Data: 
     - Name: LeafNodeSettings
       Entry: 7
-      Data: 4|SEE.Game.LeafNodeAttributes, SEE
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: Metric.LOC
@@ -388,7 +388,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeSettings
       Entry: 7
-      Data: 6|SEE.Game.InnerNodeAttributes, SEE
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -469,7 +469,7 @@ MonoBehaviour:
       Data: 
     - Name: NodeLayoutSettings
       Entry: 7
-      Data: 8|SEE.Game.NodeLayoutAttributes, SEE
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 3
@@ -493,7 +493,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeLayoutSettings
       Entry: 7
-      Data: 10|SEE.Game.EdgeLayoutAttributes, SEE
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 0
@@ -514,7 +514,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeSelectionSettings
       Entry: 7
-      Data: 11|SEE.Game.EdgeSelectionAttributes, SEE
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
     - Name: TubularSegments
       Entry: 3
       Data: 50
@@ -582,7 +582,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -598,7 +598,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -639,7 +639,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -1276,7 +1276,7 @@ MonoBehaviour:
       Data: 
     - Name: LeafNodeSettings
       Entry: 7
-      Data: 4|SEE.Game.LeafNodeAttributes, SEE
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: Metric.Lines.LOC
@@ -1366,7 +1366,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeSettings
       Entry: 7
-      Data: 6|SEE.Game.InnerNodeAttributes, SEE
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -1447,7 +1447,7 @@ MonoBehaviour:
       Data: 
     - Name: NodeLayoutSettings
       Entry: 7
-      Data: 8|SEE.Game.NodeLayoutAttributes, SEE
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 4
@@ -1471,7 +1471,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeLayoutSettings
       Entry: 7
-      Data: 10|SEE.Game.EdgeLayoutAttributes, SEE
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 0
@@ -1492,7 +1492,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeSelectionSettings
       Entry: 7
-      Data: 11|SEE.Game.EdgeSelectionAttributes, SEE
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
     - Name: TubularSegments
       Entry: 3
       Data: 50
@@ -1560,7 +1560,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -1576,7 +1576,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -1617,7 +1617,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -2416,7 +2416,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 433544, guid: fe29e3c90ef88194184c6f3656db5ec5, type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 433544, guid: fe29e3c90ef88194184c6f3656db5ec5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3085,7 +3085,7 @@ MonoBehaviour:
       Data: 
     - Name: LeafNodeSettings
       Entry: 7
-      Data: 4|SEE.Game.LeafNodeAttributes, SEE
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 
@@ -3175,7 +3175,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeSettings
       Entry: 7
-      Data: 6|SEE.Game.InnerNodeAttributes, SEE
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 
@@ -3256,7 +3256,7 @@ MonoBehaviour:
       Data: 
     - Name: NodeLayoutSettings
       Entry: 7
-      Data: 8|SEE.Game.NodeLayoutAttributes, SEE
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 1
@@ -3280,7 +3280,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeLayoutSettings
       Entry: 7
-      Data: 10|SEE.Game.EdgeLayoutAttributes, SEE
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 3
@@ -3301,7 +3301,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeSelectionSettings
       Entry: 7
-      Data: 11|SEE.Game.EdgeSelectionAttributes, SEE
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
     - Name: TubularSegments
       Entry: 3
       Data: 50
@@ -3369,7 +3369,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -3385,7 +3385,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -3426,7 +3426,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -3624,7 +3624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1758871329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3731,7 +3731,7 @@ MonoBehaviour:
       Data: 
     - Name: LeafNodeSettings
       Entry: 7
-      Data: 4|SEE.Game.LeafNodeAttributes, SEE
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -3821,7 +3821,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeSettings
       Entry: 7
-      Data: 6|SEE.Game.InnerNodeAttributes, SEE
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -3902,7 +3902,7 @@ MonoBehaviour:
       Data: 
     - Name: NodeLayoutSettings
       Entry: 7
-      Data: 8|SEE.Game.NodeLayoutAttributes, SEE
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 7
@@ -3926,7 +3926,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeLayoutSettings
       Entry: 7
-      Data: 10|SEE.Game.EdgeLayoutAttributes, SEE
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 3
@@ -3947,7 +3947,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeSelectionSettings
       Entry: 7
-      Data: 11|SEE.Game.EdgeSelectionAttributes, SEE
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
     - Name: TubularSegments
       Entry: 3
       Data: 50
@@ -4015,7 +4015,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -4031,7 +4031,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -4072,7 +4072,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -4497,6 +4497,692 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1860752598}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1898895663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1898895669}
+  - component: {fileID: 1898895668}
+  - component: {fileID: 1898895667}
+  - component: {fileID: 1898895666}
+  - component: {fileID: 1898895665}
+  - component: {fileID: 1898895664}
+  m_Layer: 0
+  m_Name: ReflexionCity
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1898895664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a618811bec564c845b47a861ede4c87f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: CityPath
+      Entry: 7
+      Data: 0|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SelectedNodeTypes
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Cluster
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Architecture_Layer
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LeafNodeSettings
+      Entry: 7
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
+    - Name: HeightMetric
+      Entry: 1
+      Data: 
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: ColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 5|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Kind
+      Entry: 3
+      Data: 0
+    - Name: WidthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: DepthMetric
+      Entry: 1
+      Data: Metric.LOC
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeSettings
+      Entry: 7
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
+    - Name: HeightMetric
+      Entry: 1
+      Data: 
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: ColorRange
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 7|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Kind
+      Entry: 3
+      Data: 0
+    - Name: InnerDonutMetric
+      Entry: 1
+      Data: Metric.IssuesTotal
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NodeLayoutSettings
+      Entry: 7
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
+    - Name: Kind
+      Entry: 3
+      Data: 1
+    - Name: LayoutPath
+      Entry: 7
+      Data: 9|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: EdgeLayoutSettings
+      Entry: 7
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
+    - Name: Kind
+      Entry: 3
+      Data: 3
+    - Name: EdgeWidth
+      Entry: 4
+      Data: 0.01
+    - Name: EdgesAboveBlocks
+      Entry: 5
+      Data: true
+    - Name: Tension
+      Entry: 4
+      Data: 0.85
+    - Name: RDP
+      Entry: 4
+      Data: 0.0001
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: EdgeSelectionSettings
+      Entry: 7
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
+    - Name: TubularSegments
+      Entry: 3
+      Data: 50
+    - Name: Radius
+      Entry: 4
+      Data: 0.005
+    - Name: RadialSegments
+      Entry: 3
+      Data: 8
+    - Name: AreSelectable
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 12|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 14|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 14
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 14
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 14
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ErosionSettings
+      Entry: 7
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
+    - Name: ShowInnerErosions
+      Entry: 5
+      Data: false
+    - Name: ShowLeafErosions
+      Entry: 5
+      Data: false
+    - Name: LoadDashboardMetrics
+      Entry: 5
+      Data: false
+    - Name: IssuesAddedFromVersion
+      Entry: 1
+      Data: 
+    - Name: OverrideMetrics
+      Entry: 5
+      Data: true
+    - Name: ErosionScalingFactor
+      Entry: 4
+      Data: 1.5
+    - Name: ArchitectureIssue
+      Entry: 1
+      Data: Metric.Architecture_Violations
+    - Name: CloneIssue
+      Entry: 1
+      Data: Metric.Clone
+    - Name: CycleIssue
+      Entry: 1
+      Data: Metric.Cycle
+    - Name: Dead_CodeIssue
+      Entry: 1
+      Data: Metric.Dead_Code
+    - Name: MetricIssue
+      Entry: 1
+      Data: Metric.Metric
+    - Name: StyleIssue
+      Entry: 1
+      Data: Metric.Style
+    - Name: UniversalIssue
+      Entry: 1
+      Data: Metric.Universal
+    - Name: ArchitectureIssue_SUM
+      Entry: 1
+      Data: Metric.Architecture_Violations_SUM
+    - Name: CloneIssue_SUM
+      Entry: 1
+      Data: Metric.Clone_SUM
+    - Name: CycleIssue_SUM
+      Entry: 1
+      Data: Metric.Cycle_SUM
+    - Name: Dead_CodeIssue_SUM
+      Entry: 1
+      Data: Metric.Dead_Code_SUM
+    - Name: MetricIssue_SUM
+      Entry: 1
+      Data: Metric.Metric_SUM
+    - Name: StyleIssue_SUM
+      Entry: 1
+      Data: Metric.Style_SUM
+    - Name: UniversalIssue_SUM
+      Entry: 1
+      Data: Metric.Universal_SUM
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.001
+  CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  ZScoreScale: 0
+  ScaleOnlyLeafMetrics: 1
+  GXLPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CSVPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  GxlImplementationPath:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  GxlArchitecturePath:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  GxlMappingPath:
+    Root: 1
+    relativePath: 
+    absolutePath: 
+  CsvImplementationPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CsvArchitecturePath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CityName: Reflexion Analysis
+--- !u!114 &1898895665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1898895666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0.0034428835
+--- !u!65 &1898895667
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1898895668
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!4 &1898895669
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898895663}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.85, y: 0.964, z: -2.6}
+  m_LocalScale: {x: 1, y: 0.0001, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1928000277
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4722,7 +5408,7 @@ MonoBehaviour:
       Data: 
     - Name: LeafNodeSettings
       Entry: 7
-      Data: 4|SEE.Game.LeafNodeAttributes, SEE
+      Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: Metric.Lines.LOC
@@ -4812,7 +5498,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeSettings
       Entry: 7
-      Data: 6|SEE.Game.InnerNodeAttributes, SEE
+      Data: 6|SEE.Game.City.InnerNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -4893,7 +5579,7 @@ MonoBehaviour:
       Data: 
     - Name: NodeLayoutSettings
       Entry: 7
-      Data: 8|SEE.Game.NodeLayoutAttributes, SEE
+      Data: 8|SEE.Game.City.NodeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 4
@@ -4917,7 +5603,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeLayoutSettings
       Entry: 7
-      Data: 10|SEE.Game.EdgeLayoutAttributes, SEE
+      Data: 10|SEE.Game.City.EdgeLayoutAttributes, SEE
     - Name: Kind
       Entry: 3
       Data: 3
@@ -4938,7 +5624,7 @@ MonoBehaviour:
       Data: 
     - Name: EdgeSelectionSettings
       Entry: 7
-      Data: 11|SEE.Game.EdgeSelectionAttributes, SEE
+      Data: 11|SEE.Game.City.EdgeSelectionAttributes, SEE
     - Name: TubularSegments
       Entry: 3
       Data: 50
@@ -5006,7 +5692,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -5022,7 +5708,7 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
@@ -5063,7 +5749,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -5414,7 +6100,7 @@ Transform:
   m_Children:
   - {fileID: 7848797144439543212}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5938819682562171534
 MonoBehaviour:

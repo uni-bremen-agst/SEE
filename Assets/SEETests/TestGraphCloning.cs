@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace SEE.DataModel.DG
 {
@@ -184,8 +183,8 @@ namespace SEE.DataModel.DG
             else
             {
                 Assert.That(!clonedNode.IsRoot(),
-                            clonedNode.ToString() + " should not be a root. Corresponding node in original graph: "
-                            + node.ToString());
+                            clonedNode + " should not be a root. Corresponding node in original graph: "
+                                       + node);
                 Assert.That(node.Parent.ID == clonedNode.Parent.ID);
             }
 

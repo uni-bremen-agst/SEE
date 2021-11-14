@@ -106,7 +106,6 @@ namespace SEE.GO
         public override GameObject NewBlock(int style, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject("Cube") { tag = Tags.Node };
-            //SetHeight(result, DefaultHeight);
 
             result.AddComponent<MeshFilter>().mesh = cubeMesh;
             result.AddComponent<BoxCollider>();

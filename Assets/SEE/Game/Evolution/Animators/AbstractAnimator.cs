@@ -87,10 +87,10 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added,
-        /// modified, or deleted w.r.t. to the previous graph</param>
         /// <param name="callback">an optional callback to be called when the animation has finished</param>
-        public void AnimateTo(GameObject gameObject, ILayoutNode nodeTransform, Difference difference, Action<object> callback = null)
+        public void AnimateTo(GameObject gameObject,
+                              ILayoutNode nodeTransform,
+                              Action<object> callback = null)
         {
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
@@ -108,25 +108,41 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, difference, callback);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, callback);
             }
         }
 
         /// <summary>
-        /// Abstract method called by <see cref="AnimateTo"/> for an animation with a callback. At the
-        /// end of the animation, the <see cref="Action"/> <paramref name="callback"/> will be called
-        /// with <paramref name="gameObject"/> as parameter if <paramref name="callback"/> is not null.
-        /// If <paramref name="callback"/> equals null, no callback happens.
+        /// Returns the strength of shaking an animated game object. Each component
+        /// is a degree and corresponds to one axis (x, y, z).
+        /// </summary>
+        /// <returns>the degree by which to shake an animated object</returns>
+        protected abstract Vector3 ShakeStrength();
+
+        /// <summary>
+        /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
+        /// At the end of the animation, the <see cref="Action"/> <paramref name="callback"/>
+        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callback"/>
+        /// is not null. If <paramref name="callback"/> equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
-        /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added,
-        /// modified, or deleted w.r.t. to the previous graph</param>
+        /// <param name="layout">the node transformation to be applied</param>
         /// <param name="callback">method to be called when the animation has finished</param>
-        protected abstract void AnimateToInternalWithCallback
-            (GameObject gameObject,
-             ILayoutNode nodeTransform,
-             Difference difference,
-             Action<object> callback);
+        private void AnimateToInternalWithCallback
+                  (GameObject gameObject,
+                   ILayoutNode layout,
+                   Action<object> callback)
+        {
+            // layout.scale is in world space, while the animation by iTween
+            // is in local space. Our game objects may be nested in other game objects,
+            // hence, the two spaces may be different.
+            // We may need to transform nodeTransform.scale from world space to local space.
+            Vector3 localScale = gameObject.transform.parent == null ?
+                                     layout.LocalScale
+                                   : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
+
+            Tweens.MoveScaleShakeRotate(gameObject, position: layout.CenterPosition, localScale: localScale,
+                                        strength: ShakeStrength(), duration: MaxAnimationTime, callback);
+        }
     }
 }
