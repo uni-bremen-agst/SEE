@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using StreamRpc;
 
-namespace Assets.SEE.IdeIntegration
+namespace Assets.SEE.IdeIntegration.IPC
 {
     public abstract class JsonRpcServer : IDisposable
     {
@@ -20,7 +17,7 @@ namespace Assets.SEE.IdeIntegration
 
             Dispose();
 
-            Server = StartServerAsync();
+            Server ??= StartServerAsync();
         }
 
         public abstract Task CallRemoteProcessAsync(string targetName);

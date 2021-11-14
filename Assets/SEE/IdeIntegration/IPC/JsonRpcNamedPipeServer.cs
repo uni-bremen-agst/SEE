@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO.Pipelines;
 using System.IO.Pipes;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using StreamRpc;
 using PipeOptions = System.IO.Pipes.PipeOptions;
 
-namespace Assets.SEE.IdeIntegration
+namespace Assets.SEE.IdeIntegration.IPC
 {
     public sealed class JsonRpcNamedPipeServer : JsonRpcServer
     {
