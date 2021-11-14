@@ -4,6 +4,7 @@ using System.ComponentModel.Design;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Assets.SEE.IdeIntegration.IPC;
 using StreamRpc;
 using UnityEngine;
 
