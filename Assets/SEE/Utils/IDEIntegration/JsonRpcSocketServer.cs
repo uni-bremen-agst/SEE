@@ -1,12 +1,11 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
-namespace Assets.SEE.IdeIntegration.IPC
+namespace Assets.SEE.Utils
 {
     /// <summary>
     /// Only the _port can be specified.
