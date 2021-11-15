@@ -12,28 +12,38 @@ namespace Assets.SEE.IdeIntegration
 {
     public class IntegratedDevelopmentEnvironmentIpc : MonoBehaviour
     {
-        public enum Ide { VisualStudio };
+        /// <summary>
+        /// There is currently only an implementation for Visual Studio.
+        /// </summary>
+        public enum Ide
+        {
+            VisualStudio // Establish connection to Visual Studio.
+        };
 
+        /// <summary>
+        /// Specifies to which IDE a connection is to be established.
+        /// </summary>
         public Ide Type;
+
+        /// <summary>
+        /// The JsonRpcServer used for communication between IDE and SEE.
+        /// </summary>
         private JsonRpcServer _rpc;
 
-        // Use this for initialization
+        /// <summary>
+        /// Initializes all necessary objects for IPC.
+        /// </summary>
         public void Start()
         {
             switch (Type)
             {
                 case Ide.VisualStudio:
-                    StartVisualStudio();
+                    _rpc = new JsonRpcSocketServer(new RemoteCommands(), 26100);
                     break;
                 default:
-                    throw new MissingMethodException();
+                    throw new MissingMethodException("Implementation of IDE integration not found!");
             }
-            _rpc.Start(new RemoteCommands());
-        }
-
-        private void StartVisualStudio()
-        {
-            _rpc = new JsonRpcSocketServer(26100);
+            _rpc.Start();
         }
     }
 }
