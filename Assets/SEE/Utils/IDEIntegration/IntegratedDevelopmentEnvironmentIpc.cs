@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel.Design;
-using System.IO.Pipes;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Assets.SEE.IdeIntegration.IPC;
-using StreamRpc;
 using UnityEngine;
 
-namespace Assets.SEE.IdeIntegration
+namespace Assets.SEE.Utils
 {
     public class IntegratedDevelopmentEnvironmentIpc : MonoBehaviour
     {
@@ -38,10 +31,10 @@ namespace Assets.SEE.IdeIntegration
             switch (Type)
             {
                 case Ide.VisualStudio:
-                    _rpc = new JsonRpcSocketServer(new RemoteCommands(), 26100);
+                    _rpc = new JsonRpcSocketServer(new RemoteProcedureCalls(), 26100);
                     break;
                 default:
-                    throw new MissingMethodException("Implementation of IDE integration not found!");
+                    throw new NotImplementedException($"Implementation of case {Type} not found");
             }
             _rpc.Start();
         }
