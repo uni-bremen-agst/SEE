@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using StreamRpc;
 using PipeOptions = System.IO.Pipes.PipeOptions;
 
-namespace Assets.SEE.Utils
+namespace SEE.Utils
 {
     /// <summary>
     /// The server for inter-process connection. This implementation is using

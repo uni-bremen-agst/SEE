@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using StreamRpc;
 
-namespace Assets.SEE.Utils
+namespace SEE.Utils
 {
     /// <summary>
     /// The Base class of the inter-process communication implementation for
