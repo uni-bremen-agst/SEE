@@ -67,6 +67,8 @@ namespace SEE.Game.UI.CodeWindow
             Delete
         }
 
+        private KeyCode oldKeyCode;
+
         /// <summary>
         /// Shows or hides the code window on Desktop platforms.
         /// </summary>
@@ -132,14 +134,14 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             if(TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
+                                TextMeshInputField.caretPosition++;
                             }
                             break;
                         case operationType.Delete:
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
+                                TextMeshInputField.caretPosition--;
                             }
                             break;
                     }
@@ -197,7 +199,6 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     oldIDX = -1;
                 }
-                Debug.Log("IDX " + TextMeshInputField.caretPosition);
                 SEEInput.KeyboardShortcutsEnabled = false;
                 if (SEEInput.SaveCodeWindow())
                 {
@@ -270,11 +271,11 @@ namespace SEE.Game.UI.CodeWindow
                         idx++;
                     }
                     oldIDX = idx;
-                    oldIDXCoolDown = Time.time + 0.1f;
+                    oldIDXCoolDown = Time.time + 0.1f; 
                     deleteSelectedText();
-                    TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string('x', neededPadding));
-                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + (neededPadding + 500);
-                    ICRDT.AddString("\n" + new string('x', neededPadding), idx - 1, Title);
+                    TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
+                    TextMeshInputField.MoveToEndOfLine(false, false);
+                    ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
                 } 
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
@@ -303,6 +304,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(idx , idx, Title);
                     }
+                    oldKeyCode = KeyCode.Backspace;
 
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
@@ -317,6 +319,14 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     deleteSelectedText();
                 }
+
+                if (valueHasChanged && oldKeyCode == KeyCode.Backspace)
+                {
+                    Debug.Log("TESTSSS0");
+                    ICRDT.DeleteString(idx, idx, Title);
+                }
+
+
 
             }
             else
