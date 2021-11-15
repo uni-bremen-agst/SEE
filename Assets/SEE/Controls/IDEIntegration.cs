@@ -1,9 +1,10 @@
 ﻿using System;
+using SEE.Utils;
 using UnityEngine;
 
-namespace Assets.SEE.Utils
+namespace SEE.Controls
 {
-    public class IntegratedDevelopmentEnvironmentIpc : MonoBehaviour
+    public class IDEIntegration : MonoBehaviour
     {
         /// <summary>
         /// There is currently only an implementation for Visual Studio.
@@ -31,7 +32,7 @@ namespace Assets.SEE.Utils
             switch (Type)
             {
                 case Ide.VisualStudio:
-                    _rpc = new JsonRpcSocketServer(new RemoteProcedureCalls(), 26100);
+                    _rpc = new JsonRpcSocketServer(new Utils.RemoteProcedureCalls(), 26100);
                     break;
                 default:
                     throw new NotImplementedException($"Implementation of case {Type} not found");

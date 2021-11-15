@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
-namespace Assets.SEE.Utils
+namespace SEE.Utils
 {
     /// <summary>
     /// Only the _port can be specified.
@@ -48,13 +48,17 @@ namespace Assets.SEE.Utils
                 {
                     using var tcpClient = await _socket.AcceptTcpClientAsync();
                     Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
+#if UNITY_EDITOR
                     Debug.Log("Socket connection to IDE established.\n");
+#endif
                     await Rpc.Completion;
                 }
             }
             catch (SocketException e)
             {
+#if UNITY_EDITOR
                 Debug.LogError($"{e.Message}\n");
+#endif
             }
         }
 

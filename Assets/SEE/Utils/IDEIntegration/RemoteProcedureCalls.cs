@@ -1,4 +1,4 @@
-﻿namespace Assets.SEE.Utils
+﻿namespace SEE.Utils
 {
     /// <summary>
     /// This class contains all functions, that can be called
