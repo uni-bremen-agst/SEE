@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
@@ -12,20 +13,32 @@ namespace Assets.SEE.IdeIntegration.IPC
     /// </summary>
     public sealed class JsonRpcSocketServer : JsonRpcServer
     {
+        /// <summary>
+        /// The port used for the inter-process communication.
+        /// </summary>
         private readonly int _port;
+
+        /// <summary>
+        /// TCP server.
+        /// </summary>
         private TcpListener _socket;
 
-        public JsonRpcSocketServer(int port)
+        /// <summary>
+        /// Creates a new JsonRpcNamedPipeServer instance.
+        /// </summary>
+        /// <param name="target">An object that contains function that can be called remotely.</param>
+        /// <param name="port">The port, that will be used for communication.</param>
+        public JsonRpcSocketServer(object target, int port) : base(target)
         {
             this._port = port;
         }
 
-        public override Task CallRemoteProcessAsync(string targetName)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override async Task StartServerAsync()
+        /// <summary>
+        /// Starts the socket server implementation.
+        /// </summary>
+        /// <param name="token">Token to cancel the current Task.</param>
+        /// <returns>Async Task.</returns>
+        protected override async Task StartServerAsync(CancellationToken token)
         {
             try
             {		
@@ -36,16 +49,19 @@ namespace Assets.SEE.IdeIntegration.IPC
                 {
                     using var tcpClient = await _socket.AcceptTcpClientAsync();
                     Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
-                    Debug.LogError("Connection to IDE establishedS.\n");
+                    Debug.Log("Socket connection to IDE established.\n");
                     await Rpc.Completion;
                 }
             }
-            catch (SocketException)
+            catch (SocketException e)
             {
-                
+                Debug.LogError($"{e.Message}\n");
             }
         }
 
+        /// <summary>
+        /// Dispose all open streams etc.
+        /// </summary>
         public override void Dispose()
         {
             base.Dispose();
