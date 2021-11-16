@@ -39,7 +39,7 @@ namespace SEE.Game.UI.ConfigMenu
     {
         private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
 
-        private readonly SteamVR_Action_Boolean openAction = SteamVR_Actions._default.OpenSettingsMenu;
+        private readonly SteamVR_Action_Boolean openAction = SteamVR_Actions._default?.OpenSettingsMenu;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
 
         private GameObject configMenuPrefab;
