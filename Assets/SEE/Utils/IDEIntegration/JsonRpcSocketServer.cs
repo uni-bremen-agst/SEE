@@ -25,7 +25,8 @@ namespace SEE.Utils
         /// <summary>
         /// Creates a new JsonRpcNamedPipeServer instance.
         /// </summary>
-        /// <param name="target">An object that contains function that can be called remotely.</param>
+        /// <param name="target">An object that contains function that can be called
+        /// remotely.</param>
         /// <param name="port">The port, that will be used for communication.</param>
         public JsonRpcSocketServer(object target, int port) : base(target)
         {
@@ -44,14 +45,15 @@ namespace SEE.Utils
                 _socket = new TcpListener(IPAddress.Parse("127.0.0.1"), _port);
                 _socket.Start();
 
+                // Listens to incoming Requests. Only one client will be connected to the server.
                 while (true)
                 {
+                    // TODO: For some reason cancel token can't be applied here!
                     using var tcpClient = await _socket.AcceptTcpClientAsync();
+                    Connected?.Invoke();
                     Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
-#if UNITY_EDITOR
-                    Debug.Log("Socket connection to IDE established.\n");
-#endif
                     await Rpc.Completion;
+                    Disconnected?.Invoke();
                 }
             }
             catch (SocketException e)
