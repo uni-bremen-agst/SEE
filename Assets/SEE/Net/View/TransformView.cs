@@ -203,8 +203,6 @@ namespace SEE.Net
             }
         }
 
-
-
         /// <summary>
         /// Sets the next desired position of the transform. This must only ever be
         /// called by <see cref="TransformViewPositionAction"/>!
@@ -265,5 +263,4 @@ namespace SEE.Net
             new TransformViewScaleAction(this, transformToSynchronize.localScale).Execute();
         }
     }
-
 }
