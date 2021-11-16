@@ -30,8 +30,7 @@ namespace Crosstales.Common.Util
       {
          get
          {
-            //if (!BaseHelper.isEditorMode && SingletonHelper.isQuitting)
-            if (SingletonHelper.isQuitting)
+            if (SingletonHelper.isQuitting && !BaseHelper.isEditorMode)
             {
                //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
                return instance;

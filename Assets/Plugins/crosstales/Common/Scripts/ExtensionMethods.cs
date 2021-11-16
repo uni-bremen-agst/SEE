@@ -2084,6 +2084,191 @@ namespace Crosstales
          return Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
       }
 
+      /// <summary>
+      /// Extension method for Texture.
+      /// Rotates a Texture by 90 degrees.
+      /// </summary>
+      /// <param name="texture">Texture to rotate.</param>
+      /// <returns>Rotated Texture.</returns>
+      public static Texture2D CTRotate90(this Texture2D texture)
+      {
+         if (texture == null)
+            throw new System.ArgumentNullException(nameof(texture));
+
+         Color32[] origpix = texture.GetPixels32(0);
+         Color32[] newpix = new Color32[texture.width * texture.height];
+
+         for (int cc = 0; cc < texture.height; cc++)
+         {
+            for (int rr = 0; rr < texture.width; rr++)
+            {
+               newpix[texture.width * texture.height - (texture.height * rr + texture.height) + cc] =
+                  origpix[texture.width * texture.height - (texture.width * cc + texture.width) + rr];
+            }
+         }
+
+         Texture2D newtex = new Texture2D(texture.height, texture.width, texture.format, false);
+         newtex.SetPixels32(newpix, 0);
+         newtex.Apply();
+
+         return newtex;
+      }
+
+      /// <summary>
+      /// Extension method for Texture.
+      /// Rotates a Texture by 180 degrees.
+      /// </summary>
+      /// <param name="texture">Texture to rotate.</param>
+      /// <returns>Rotated Texture.</returns>
+      public static Texture2D CTRotate180(this Texture2D texture)
+      {
+         if (texture == null)
+            throw new System.ArgumentNullException(nameof(texture));
+
+         Color32[] origpix = texture.GetPixels32(0);
+         Color32[] newpix = new Color32[texture.width * texture.height];
+
+         for (int ii = 0; ii < origpix.Length; ii++)
+         {
+            newpix[origpix.Length - ii - 1] = origpix[ii];
+         }
+
+         Texture2D newtex = new Texture2D(texture.width, texture.height, texture.format, false);
+         newtex.SetPixels32(newpix, 0);
+         newtex.Apply();
+
+         return newtex;
+      }
+
+      /// <summary>
+      /// Extension method for Texture.
+      /// Rotates a Texture by 270 degrees.
+      /// </summary>
+      /// <param name="texture">Texture to rotate.</param>
+      /// <returns>Rotated Texture.</returns>
+      public static Texture2D CTRotate270(this Texture2D texture)
+      {
+         if (texture == null)
+            throw new System.ArgumentNullException(nameof(texture));
+
+         Color32[] origpix = texture.GetPixels32(0);
+         Color32[] newpix = new Color32[texture.width * texture.height];
+
+         int ii = 0;
+         for (int cc = 0; cc < texture.height; cc++)
+         {
+            for (int rr = 0; rr < texture.width; rr++)
+            {
+               newpix[texture.width * texture.height - (texture.height * rr + texture.height) + cc] = origpix[ii];
+               ii++;
+            }
+         }
+
+         Texture2D newtex = new Texture2D(texture.height, texture.width, texture.format, false);
+         newtex.SetPixels32(newpix, 0);
+         newtex.Apply();
+
+         return newtex;
+      }
+
+
+      /// <summary>
+      /// Extension method for Texture.
+      /// Convert a Texture to a Texture2D
+      /// </summary>
+      /// <param name="texture">Texture to convert.</param>
+      /// <returns>Converted Texture2D.</returns>
+      public static Texture2D CTToTexture2D(this Texture texture)
+      {
+         if (texture == null)
+            throw new System.ArgumentNullException(nameof(texture));
+
+         return Texture2D.CreateExternalTexture(
+            texture.width,
+            texture.height,
+            TextureFormat.RGB24,
+            false, false,
+            texture.GetNativeTexturePtr());
+      }
+
+      /// <summary>
+      /// Extension method for WebCamTexture.
+      /// Convert a WebCamTexture to a Texture2D
+      /// </summary>
+      /// <param name="texture">WebCamTexture to convert.</param>
+      /// <returns>Converted Texture2D.</returns>
+      public static Texture2D CTToTexture2D(this WebCamTexture texture)
+      {
+         if (texture == null)
+            throw new System.ArgumentNullException(nameof(texture));
+
+         Texture2D texture2D = new Texture2D(texture.width, texture.height);
+
+         if (texture.isPlaying)
+         {
+            Color32[] data = new Color32[texture.width * texture.height];
+            texture.GetPixels32(data);
+
+            texture2D.SetPixels32(data, 0);
+            texture2D.Apply();
+         }
+
+         return texture2D;
+      }
+
+      /// <summary>
+      /// Extension method for Texture.
+      /// Flips a Texture2D horizontally
+      /// </summary>
+      /// <param name="texture">Texture to flip.</param>
+      /// <returns>Horizontally flipped Texture2D.</returns>
+      public static Texture2D CTFlipHorizontal(this Texture2D texture)
+      {
+         Texture2D flipped = new Texture2D(texture.width, texture.height);
+
+         int width = texture.width;
+         int height = texture.height;
+
+
+         for (int xx = 0; xx < width; xx++)
+         {
+            for (int yy = 0; yy < height; yy++)
+            {
+               flipped.SetPixel(width - xx - 1, yy, texture.GetPixel(xx, yy));
+            }
+         }
+
+         flipped.Apply();
+
+         return flipped;
+      }
+
+      /// <summary>
+      /// Extension method for Texture.
+      /// Flips a Texture2D vertically
+      /// </summary>
+      /// <param name="texture">Texture to flip.</param>
+      /// <returns>Vertically flipped Texture2D.</returns>
+      public static Texture2D CTFlipVertical(this Texture2D texture)
+      {
+         Texture2D flipped = new Texture2D(texture.width, texture.height);
+
+         int width = texture.width;
+         int height = texture.height;
+
+         for (int xx = 0; xx < width; xx++)
+         {
+            for (int yy = 0; yy < height; yy++)
+            {
+               flipped.SetPixel(xx, height - yy - 1, texture.GetPixel(xx, yy));
+            }
+         }
+
+         flipped.Apply();
+
+         return flipped;
+      }
+
       #endregion
 
 

@@ -1,5 +1,11 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2021.3.3 - 12.11.2021
+* PlatformProvider added
+* Update for TextMesh PRO components
+* Check if Speaker is active before executing methods
+* Updated to Common 2021.3.4
+
 ## 2021.3.2 - 27.09.2021
 * Azure: support for more than 170 neural voices
 * Fix for iOS

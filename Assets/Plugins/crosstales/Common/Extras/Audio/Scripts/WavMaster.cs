@@ -150,7 +150,7 @@ namespace Crosstales.Common.Audio
             // NB: Only supports 16 bit
 
             // total file size = 44 bytes for header format and audioClip.samples * factor due to float to Int16 / sbyte conversion
-            int fileSize = audioClip.samples * blockSize_16Bit + headerSize; // BlockSize (bitDepth)
+            int fileSize = audioClip.samples * audioClip.channels * blockSize_16Bit + headerSize; // BlockSize (bitDepth)
 
             // chunk descriptor (riff)
             writeFileHeader(stream, fileSize);
@@ -359,7 +359,7 @@ namespace Crosstales.Common.Audio
          byte[] id = Encoding.ASCII.GetBytes("data");
          count += writeBytesToMemoryStream(stream, id);
 
-         int subchunk2Size = Convert.ToInt32(audioClip.samples * blockSize_16Bit); // BlockSize (bitDepth)
+         int subchunk2Size = Convert.ToInt32(audioClip.samples * blockSize_16Bit * audioClip.channels); // BlockSize (bitDepth)
          count += writeBytesToMemoryStream(stream, BitConverter.GetBytes(subchunk2Size));
 
          // Validate header
@@ -369,7 +369,7 @@ namespace Crosstales.Common.Audio
          count += writeBytesToMemoryStream(stream, bytes);
 
          // Validate audio data
-         Debug.AssertFormat(bytes.Length == subchunk2Size, "Unexpected AudioClip to wav subchunk2 size: {0} == {1}", bytes.Length, subchunk2Size);
+         //Debug.AssertFormat(bytes.Length == subchunk2Size, "Unexpected AudioClip to wav subchunk2 size: {0} == {1}", bytes.Length, subchunk2Size);
 
          return count;
       }
