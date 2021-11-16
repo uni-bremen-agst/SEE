@@ -19,7 +19,7 @@ namespace SEE.Controls
             internal bool freeMode;
         }
 
-        private CameraState cameraState;        
+        private CameraState cameraState;
 
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
@@ -50,7 +50,7 @@ namespace SEE.Controls
         private void Update()
         {
             Camera mainCamera = MainCamera.Camera;
-            if (SEEInput.ToggleCameraLock())
+            if (focusedObject != null && SEEInput.ToggleCameraLock())
             {
                 cameraState.freeMode = !cameraState.freeMode;
                 if (!cameraState.freeMode)
@@ -132,7 +132,7 @@ namespace SEE.Controls
         /// <summary>
         /// If the user wants us, we rotate the camera according to mouse input.
         /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
-        /// 
+        ///
         /// Note: This is a workaround of issues with the correct mouse position
         /// in a remote-desktop session.
         /// </summary>
