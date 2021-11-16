@@ -322,8 +322,8 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (valueHasChanged && oldKeyCode == KeyCode.Backspace)
                 {
-                    Debug.Log("TESTSSS0");
                     ICRDT.DeleteString(idx, idx, Title);
+                    //TODO AUch für delte enter und co machen
                 }
 
 
