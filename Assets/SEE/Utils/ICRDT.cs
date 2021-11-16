@@ -90,7 +90,13 @@ namespace SEE.Utils
 
         public static void AddString(string s, int startIdx, string file)
         {
-             GetInstanceByName(file, s.Length).AddString(s, startIdx);
+            CRDT crdt = GetInstanceByName(file, s.Length);
+            if (GetLocalID() > 0  && crdt.getId().Equals("0"))
+            {
+                crdt.setId(GetLocalID().ToString());
+            }
+             crdt.AddString(s, startIdx);
+            Debug.Log("CRDT ID " + crdt.getId());
         } 
         public static async UniTask AsyncAddString(string s, int startIdx, string file, bool startUp = false)
         {
@@ -98,7 +104,12 @@ namespace SEE.Utils
         }
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
-            GetInstanceByName(file).DeleteString(startIdx, endIdx);
+            CRDT crdt = GetInstanceByName(file);
+            if (GetLocalID() > 0 && crdt.getId().Equals("0"))
+            {
+                crdt.setId(GetLocalID().ToString());
+            }
+            crdt.DeleteString(startIdx, endIdx);
         }
 
         public static string PrintString(string file)
