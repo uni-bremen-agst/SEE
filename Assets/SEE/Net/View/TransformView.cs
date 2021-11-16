@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// Synchronizes the transform of a game object.
     /// </summary>
@@ -20,7 +19,7 @@ namespace SEE.Net
         /// </summary>
         public const float UpdateRepeatRate = 0.1f;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// The transform view to synchronize.
@@ -59,7 +58,7 @@ namespace SEE.Net
         /// </summary>
         private float teleportMinDistanceSquared;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// The transform to synchronize.
@@ -81,7 +80,7 @@ namespace SEE.Net
         /// </summary>
         public bool SynchronizingScale => synchronizeScale;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// Stopwatch for determining whether a positional update should be submitted.
@@ -100,7 +99,7 @@ namespace SEE.Net
         /// </summary>
         private Vector3 positionNext;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// Stopwatch for determining whether a rotational update should be submitted.
@@ -119,7 +118,7 @@ namespace SEE.Net
         /// </summary>
         private Quaternion rotationNext;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// Stopwatch for determining whether a scale update should be submitted.
@@ -136,7 +135,7 @@ namespace SEE.Net
         /// </summary>
         private Vector3 scaleNext;
 
-
+        //-------------------------------------------------------------------
 
         /// <summary>
         /// Initializes the transform view to invoke the update function every
