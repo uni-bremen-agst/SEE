@@ -211,6 +211,127 @@ namespace SEE.Game.City
     }
 
     /// <summary>
+    /// How markers should be depicted.
+    /// </summary>
+    public enum MarkerKinds : byte
+    {
+        Static,
+        Dynamic
+    }
+
+    /// <summary>
+    /// The settings of markers sections.
+    /// </summary>
+    [System.Serializable]
+    public class MarkerSection : ConfigIO.PersistentConfigItem
+    {
+        /// <summary>
+        /// By which metric the marker should be weighted.
+        /// </summary>
+        public string Metric;
+        /// <summary>
+        /// In which color the marker should be drawn.
+        /// </summary>
+        public Color Color;
+
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Save(ConfigWriter writer, string label = "")
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+  
+    /// <summary>
+    /// The settings of markers of a specific kind.
+    /// </summary>
+    [System.Serializable]
+    public class MarkerAttributes : VisualNodeAttributes
+    {
+        /// <summary>
+        /// How a marker should be drawn.
+        /// </summary>
+        public MarkerKinds Kind = MarkerKinds.Static;
+        /// <summary>
+        /// Name of the metric defining the length.
+        /// </summary>
+        public string LengthMetric = "Metric.Vcs2See.Commit.Line_Changes";
+        /// <summary>
+        /// This parameter determines the minimal length of each marker.
+        /// Must not be greater than <see cref="MaximalMarkerLength"/>.
+        /// </summary>
+        public float MinimalMarkerLength = 0.001f; // serialized by Unity
+        /// <summary>
+        /// This parameter determines the maximal length of each marker.
+        /// Must not be smaller than <see cref="MinimalMarkerLength"/>.
+        /// </summary>
+        public float MaximalMarkerLength= 5.0f; // serialized by Unity
+        /// <summary>
+        /// This parameter determines the sections of each marker.
+        /// </summary>
+        [SerializeField]
+        public List<MarkerSection> MarkerSections = new List<MarkerSection>(1);
+        /// <summary>
+        /// Saves the settings in the configuration file.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings</param>
+        public override void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(Kind.ToString(), NodeKindsLabel);
+            writer.Save(LengthMetric, LengthMetricLabel);
+            LabelSettings.Save(writer, LabelSettingsLabel);
+            writer.Save(MinimalMarkerLength, MinimalMarkerLengthLabel);
+            writer.Save(MaximalMarkerLength, MaximalMarkerLengthLabel);
+            writer.Save(MarkerSections, MarkerSectionsLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        public override void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
+                ConfigIO.Restore(values, LengthMetricLabel, ref LengthMetric);
+                LabelSettings.Restore(values, LabelSettingsLabel);
+                ConfigIO.Restore(values, MinimalMarkerLengthLabel, ref MinimalMarkerLength);
+                ConfigIO.Restore(values, MaximalMarkerLengthLabel, ref MaximalMarkerLength);
+                ConfigIO.Restore(values, MarkerSectionsLabel, ref MarkerSections);
+            }
+        }
+
+        /// <summary>
+        /// Label in the configuration file for the length metric.
+        /// </summary>
+        private const string LengthMetricLabel = "LengthMetric";
+        /// <summary>
+        /// Label in the configuration file for the minimal block length of a node.
+        /// </summary>
+        private const string MinimalMarkerLengthLabel = "MinimalMarkerLength";
+        /// <summary>
+        /// Label in the configuration file for the maximal block length of a node.
+        /// </summary>
+        private const string MaximalMarkerLengthLabel = "MaximalMarkerLength";
+        /// <summary>
+        /// Label in the configuration file for the marker sections.
+        /// </summary>
+        private const string MarkerSectionsLabel = "MarkerSections";
+    }
+
+    /// <summary>
     /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
     public class InnerNodeAttributes : VisualNodeAttributes
