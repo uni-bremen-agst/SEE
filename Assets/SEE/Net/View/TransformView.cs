@@ -5,6 +5,8 @@ namespace SEE.Net
 {
     /// <summary>
     /// Synchronizes the transform of a game object.
+    /// This component is assumed to be added to the representation of
+    /// a remote player (e.g., an avatar or player head).
     /// </summary>
     public class TransformView : AbstractView
     {
