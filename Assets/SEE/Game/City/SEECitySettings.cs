@@ -234,14 +234,41 @@ namespace SEE.Game.City
         /// </summary>
         public Color Color;
 
+        private const string MetricLabel = "Metric";
+        private const string ColorLabel = "Color";
+
         public bool Restore(Dictionary<string, object> attributes, string label = "")
         {
-            throw new System.NotImplementedException();
+            Dictionary<string, object> values;
+            if (string.IsNullOrEmpty(label))
+            {
+                // no label given => attributes contains already the data to be restored
+                values = attributes;
+            }
+            else if (attributes.TryGetValue(label, out object dictionary))
+            {
+                // label was given => attributes is a dictionary where we need to look up the data 
+                // using the label
+                values = dictionary as Dictionary<string, object>;
+            }
+            else
+            {
+                // label was given, but attributes does not know it
+                // => no data; we cannot restore the object
+                return false;
+            }
+
+            bool result = ConfigIO.Restore(values, MetricLabel, ref Metric);
+            result = ConfigIO.Restore(values, ColorLabel, ref Color) || result;
+            return result;
         }
 
-        public void Save(ConfigWriter writer, string label = "")
+        public void Save(ConfigWriter writer, string label)
         {
-            throw new System.NotImplementedException();
+            writer.BeginGroup(label);
+            writer.Save(Metric, MetricLabel);
+            writer.Save(Color, ColorLabel);
+            writer.EndGroup();
         }
     }
   
