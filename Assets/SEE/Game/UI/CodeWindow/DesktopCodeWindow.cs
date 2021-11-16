@@ -114,9 +114,9 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    TextMeshInputField.text = ICRDT.PrintString(Title);
-                    //EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
-                    //TextMeshInputField.text = TextMesh.text = Text;
+                   // TextMeshInputField.text = ICRDT.PrintString(Title);
+                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    TextMeshInputField.text = TextMesh.text = Text;
                 }
 
                 //Change Listener
