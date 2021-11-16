@@ -12,6 +12,21 @@ namespace SEE.Utils
     public abstract class JsonRpcServer : IDisposable
     {
         /// <summary>
+        /// Represents the method that will handle the connection event.
+        /// </summary>
+        public delegate void ConnectionEventHandler();
+
+        /// <summary>
+        /// Will be fired when the connection is established successful.
+        /// </summary>
+        public ConnectionEventHandler Connected;
+
+        /// <summary>
+        /// Will be fired when the server disconnected from the client.
+        /// </summary>
+        public ConnectionEventHandler Disconnected;
+
+        /// <summary>
         /// The JsonRpc instance for standardized communication over a stream.
         /// </summary>
         protected JsonRpc Rpc;
@@ -34,7 +49,8 @@ namespace SEE.Utils
         /// <summary>
         /// Sets <see cref="Target"/>, which represents the remote called functions.
         /// </summary>
-        /// <param name="target">An object that contains function that can be called remotely.</param>
+        /// <param name="target">An object that contains function that can be called
+        /// remotely.</param>
         protected JsonRpcServer(object target)
         {
             _ = target ?? throw new ArgumentNullException(nameof(target));
@@ -63,6 +79,7 @@ namespace SEE.Utils
 
             Rpc = null;
             _sourceToken = new CancellationTokenSource();
+            Disconnected?.Invoke();
 
         }
 
@@ -82,7 +99,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Specific connection implementation of the derived class. This method
-        /// should wait for client completion.
+        /// should wait for client completion and call both <see cref="Connected"/>
+        /// and <see cref="Disconnected"/> with the client.
         /// </summary>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <returns>Async Task.</returns>
