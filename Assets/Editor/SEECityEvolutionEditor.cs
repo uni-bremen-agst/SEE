@@ -16,21 +16,30 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
+        /// <summary>
+        /// the city to display
+        /// </summary>
+        private SEECityEvolution city;
+
         public override void OnInspectorGUI()
         {            
             base.OnInspectorGUI();
-            SEECityEvolution city = target as SEECityEvolution;
+            city = target as SEECityEvolution;
+
+            EditorGUILayout.Separator();
+
             Attributes();
-            showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
-            if (showAnimationFoldOut)
-            {
-                city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
-                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
-                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
-                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
-                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
-            }
+
+            EditorGUILayout.Separator();
+
+            AnimationAttributes();
+
+            EditorGUILayout.Separator();
+
+            MarkerAttributes();
+
+            EditorGUILayout.Separator();
+
             ShowNodeTypes(city);
             Buttons();
         }
@@ -44,6 +53,11 @@ namespace SEEEditor
         /// Whether the animation foldout should be expanded.
         /// </summary>
         private bool showAnimationFoldOut = false;
+
+        /// <summary>
+        /// Whether the marker attribute foldout should be expanded.
+        /// </summary>
+        private bool showMarkerAttributes = false;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
@@ -82,6 +96,48 @@ namespace SEEEditor
             // We assume here that this SEECity instance was added to a game object as
             // a component. The inherited attribute gameObject identifies this game object.
             graphRenderer.DrawGraph(city.gameObject);
+        }
+
+        /// <summary>
+        /// Renders the GUI for attributes of animations.
+        /// </summary>
+        private void AnimationAttributes()
+        {
+            showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
+            if (showAnimationFoldOut)
+            {
+                city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
+                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
+                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
+                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
+                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
+                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
+            }
+        }
+
+        /// <summary>
+        /// Renders the GUI for attributes of markers.
+        /// </summary>
+        private void MarkerAttributes()
+        {
+            showMarkerAttributes = EditorGUILayout.Foldout(showMarkerAttributes, "Attributes of markers", true, EditorStyles.foldoutHeader);
+            if (showMarkerAttributes)
+            {
+                MarkerAttributes settings = city.MarkerSettings;
+
+                settings.Kind = (MarkerKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
+                settings.LengthMetric = EditorGUILayout.TextField("Length", settings.LengthMetric);
+                settings.MinimalMarkerLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalMarkerLength));
+                settings.MaximalMarkerLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalMarkerLength);
+
+                EditorGUI.indentLevel++;
+
+                SerializedProperty sections = serializedObject.FindProperty("MarkerSettings.MarkerSections");
+                EditorGUILayout.PropertyField(sections, new GUIContent("Marker sections"), true);
+
+                EditorGUI.indentLevel--;
+
+            }
         }
 
         /// <summary>

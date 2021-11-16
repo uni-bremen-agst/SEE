@@ -31,6 +31,7 @@ namespace SEE.Game.City
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
+    [System.Serializable]
     public class SEECityEvolution : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -72,6 +73,9 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
+
+        [SerializeField]
+        public MarkerAttributes MarkerSettings = new MarkerAttributes();
 
         /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector
