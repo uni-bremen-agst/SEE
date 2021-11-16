@@ -407,7 +407,7 @@ namespace SEE.Game.UI.CodeWindow
             string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) => {
                 if (x.Length > 0)
                 {
-                    return x.Substring(neededPadding);
+                    return x.Substring(neededPadding +1);
                 }
                 else
                 {
