@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,6 +43,7 @@ namespace SEE.Utils
         {
             try
             {		
+                // TODO: only accept one client. Currently the socket connects to more than one.
                 _socket = new TcpListener(IPAddress.Parse("127.0.0.1"), _port);
                 _socket.Start();
 
@@ -51,8 +53,21 @@ namespace SEE.Utils
                     // TODO: For some reason cancel token can't be applied here!
                     using var tcpClient = await _socket.AcceptTcpClientAsync();
                     Connected?.Invoke();
-                    Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
-                    await Rpc.Completion;
+
+                    try
+                    {
+                        Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
+                        await Rpc.Completion;
+                    }
+                    catch (Exception e)
+                    {
+                        // Connection was unexpectedly interrupted
+#if UNITY_EDITOR
+                        Debug.LogError($"{e.Message}\n");
+#endif
+                    }
+
+                    Rpc = null;
                     Disconnected?.Invoke();
                 }
             }

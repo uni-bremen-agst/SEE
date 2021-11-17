@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
@@ -429,6 +430,15 @@ namespace SEE.Game.UI.CodeWindow
             static IEnumerable<SourceCodeEntity> SplitUpIntoLines(SourceCodeEntity entity)
                 => Enumerable.Range(entity.line, entity.endLine - entity.line + 1 ?? 1)
                              .Select(l => new SourceCodeEntity(entity.path, l, null, entity.content));
+        }
+
+        /// <summary>
+        /// Calls the currently connected IDE with the <see cref="FilePath"/> of this CodeWindow.
+        /// </summary>
+        /// <returns>Async UniTask</returns>
+        private async UniTask OpenFileInIDE()
+        {
+            await IDEIntegration.Instance.Client.OpenFileAsync(FilePath);
         }
     }
 }
