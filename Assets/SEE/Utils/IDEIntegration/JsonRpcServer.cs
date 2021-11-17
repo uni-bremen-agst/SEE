@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
@@ -40,7 +40,7 @@ namespace SEE.Utils
         /// <summary>
         /// Task to check if this class is already trying to connect.
         /// </summary>
-        protected Task Server;
+        protected UniTask Server;
 
         /// <summary>
         /// CancellationTokenSource to stop the current server instance.
@@ -66,8 +66,10 @@ namespace SEE.Utils
         public void Start()
         {
             Dispose();
-
-            Server ??= StartServerAsync(_sourceToken.Token);
+            if (Server.Status != UniTaskStatus.Pending)
+            {
+                Server = StartServerAsync(_sourceToken.Token);
+            }
         }
 
         /// <summary>
@@ -75,13 +77,12 @@ namespace SEE.Utils
         /// </summary>
         public void Stop()
         {
+            if (IsConnected()) Disconnected?.Invoke();
             _sourceToken.Cancel();
             Dispose();
 
             Rpc = null;
             _sourceToken = new CancellationTokenSource();
-            Disconnected?.Invoke();
-
         }
 
         /// <summary>
@@ -90,13 +91,13 @@ namespace SEE.Utils
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
         /// <returns></returns>
-        public async Task CallRemoteProcessAsync(string targetName, params object[] arguments)
+        public async UniTask CallRemoteProcessAsync(string targetName, params object[] arguments)
         {
             if (IsConnected())
             {
                 try
                 {
-                    await Rpc.InvokeAsync(targetName, arguments);
+                    await Rpc.InvokeAsync(targetName, arguments).AsUniTask();
                 }
                 catch (Exception)
                 {
@@ -128,7 +129,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <returns>Async Task.</returns>
-        protected abstract Task StartServerAsync(CancellationToken token);
+        protected abstract UniTask StartServerAsync(CancellationToken token);
 
         /// <summary>
         /// Dispose all open streams etc.

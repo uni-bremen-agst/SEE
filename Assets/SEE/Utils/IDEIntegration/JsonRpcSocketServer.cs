@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
@@ -39,7 +39,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <returns>Async Task.</returns>
-        protected override async Task StartServerAsync(CancellationToken token)
+        protected override async UniTask StartServerAsync(CancellationToken token)
         {
             try
             {		
@@ -50,14 +50,14 @@ namespace SEE.Utils
                 // Listens to incoming Requests. Only one client will be connected to the server.
                 while (true)
                 {
-                    // TODO: For some reason cancel token can't be applied here!
-                    using var tcpClient = await _socket.AcceptTcpClientAsync();
+                    using var tcpClient = await _socket.AcceptTcpClientAsync().AsUniTask()
+                        .AttachExternalCancellation(token);
                     Connected?.Invoke();
 
                     try
                     {
                         Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
-                        await Rpc.Completion;
+                        await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
                     }
                     catch (Exception e)
                     {
