@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using StreamRpc;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -83,9 +84,32 @@ namespace SEE.Utils
 
         }
 
-        public async Task CallRemoteProcessAsync(string targetName)
+        /// <summary>
+        /// Checks for Connection to client and starts remote call procedure.
+        /// </summary>
+        /// <param name="targetName">Method name.</param>
+        /// <param name="arguments">Parameters of the called method.</param>
+        /// <returns></returns>
+        public async Task CallRemoteProcessAsync(string targetName, params object[] arguments)
         {
-
+            if (IsConnected())
+            {
+                try
+                {
+                    await Rpc.InvokeAsync(targetName, arguments);
+                }
+                catch (Exception)
+                {
+                    // Lost connection to client.
+                }
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("JsonRpcServer not connected to client!" +
+                                 $" Couldn't call '{targetName}'.");
+#endif
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
@@ -14,6 +15,50 @@ namespace SEE.Controls
     /// </summary>
     public class IDEIntegration : MonoBehaviour
     {
+        #region Remote Procedure Calls
+
+        /// <summary>
+        /// This class contains all functions, that can be called
+        /// by the client (IDE).
+        /// </summary>
+        private class RemoteProcedureCalls
+        {
+            /// <summary>
+            /// TODO: Remove! Just for testing purpose.
+            /// </summary>
+            /// <param name="a"></param>
+            /// <param name="b"></param>
+            /// <returns></returns>
+            public int Add(int a, int b)
+            {
+                return a + b;
+            }
+        }
+
+        #endregion
+
+        #region Client Calls
+
+        /// <summary>
+        /// Lists all methods remotely callable by the server in a convenient way.
+        /// </summary>
+        public class ClientCalls
+        {
+            private readonly IDEIntegration _ideIntegration;
+
+            public ClientCalls(IDEIntegration ideIntegration)
+            {
+                _ideIntegration = ideIntegration;
+            }
+
+            public async UniTask OpenFileAsync(string path)
+            {
+                await _ideIntegration._rpc.CallRemoteProcessAsync("OpenFile", path);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// There is currently only an implementation for Visual Studio.
         /// </summary>
@@ -22,7 +67,15 @@ namespace SEE.Controls
             VisualStudio // Establish connection to Visual Studio.
         };
 
+        /// <summary>
+        /// The singleton instance of this class.
+        /// </summary>
         public static IDEIntegration Instance { get; private set; }
+
+        /// <summary>
+        /// All callable methods by the server.
+        /// </summary>
+        public ClientCalls Client { get; private set; } 
 
         /// <summary>
         /// Specifies to which IDE a connection is to be established.
@@ -54,7 +107,9 @@ namespace SEE.Controls
                 return;
             }
             Instance = this;
-            InitializeJsonRpcServer();
+            Client = new ClientCalls(this);
+
+                InitializeJsonRpcServer();
 
             _rpc.Connected += ConnectedToClient;
             _rpc.Disconnected += DisconnectedFromClient;
@@ -63,14 +118,14 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// 
+        /// Initializes the JsonRpcServer.
         /// </summary>
         private void InitializeJsonRpcServer()
         {
             _rpc = Type switch
             {
                 Ide.VisualStudio => 
-                    new JsonRpcSocketServer(new Utils.RemoteProcedureCalls(), VisualStudioPort),
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VisualStudioPort),
                 _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
             };
         }
@@ -80,9 +135,7 @@ namespace SEE.Controls
         /// </summary>
         private void ConnectedToClient()
         {
-#if UNITY_EDITOR
-            Debug.Log("Socket connection to IDE established.\n");
-#endif
+            //TODO: Check whether the correct IDE instance is connected
             ShowNotification.Info("Connected to IDE",
                 "Connection to IDE established.", 5.0f);
         }

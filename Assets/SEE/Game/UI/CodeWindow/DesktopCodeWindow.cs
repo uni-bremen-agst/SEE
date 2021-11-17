@@ -57,6 +57,13 @@ namespace SEE.Game.UI.CodeWindow
                 TextMesh.fontSize = FontSize;
             }
 
+            // Get button for IDE interaction and register events.
+            codeWindow.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
+                .onClick.AddListener(() =>
+                {
+                    _ = OpenFileInIDE();
+                });
+
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.
