@@ -1,6 +1,6 @@
 ﻿using System.IO.Pipes;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using StreamRpc;
 using PipeOptions = System.IO.Pipes.PipeOptions;
 
@@ -26,16 +26,16 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="token">Token to cancel the current Task.</param>                          
         /// <returns>Async Task.</returns>
-        protected override async Task StartServerAsync(CancellationToken token)
+        protected override async UniTask StartServerAsync(CancellationToken token)
         {
             using var stream = new NamedPipeServerStream("VsSeeNamedPipe", PipeDirection.InOut,
                 1,
                 PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            await stream.WaitForConnectionAsync(token);
+            await stream.WaitForConnectionAsync(token).AsUniTask();
             Connected?.Invoke();
             using var jsonRpc = JsonRpc.Attach(stream);
             var sum = await jsonRpc.InvokeAsync<int>("Add", 3, 5);
-            await Rpc.Completion;
+            await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
             Disconnected?.Invoke();
         }
     }

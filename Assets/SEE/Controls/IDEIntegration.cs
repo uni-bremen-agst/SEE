@@ -44,13 +44,26 @@ namespace SEE.Controls
         /// </summary>
         public class ClientCalls
         {
+            /// <summary>
+            /// Instance of parent class.
+            /// </summary>
             private readonly IDEIntegration _ideIntegration;
 
+            /// <summary>
+            /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
+            /// deliver all methods, that can be called from the client.
+            /// </summary>
+            /// <param name="ideIntegration">Instance of IDEIntegration</param>
             public ClientCalls(IDEIntegration ideIntegration)
             {
                 _ideIntegration = ideIntegration;
             }
 
+            /// <summary>
+            /// Opens the file in the IDE of choice.
+            /// </summary>
+            /// <param name="path">Absolute file path.</param>
+            /// <returns></returns>
             public async UniTask OpenFileAsync(string path)
             {
                 await _ideIntegration._rpc.CallRemoteProcessAsync("OpenFile", path);
