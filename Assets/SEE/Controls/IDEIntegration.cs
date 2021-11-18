@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Controls
 {
@@ -50,6 +53,16 @@ namespace SEE.Controls
             private readonly IDEIntegration _ideIntegration;
 
             /// <summary>
+            /// Is looking for any active IDE.
+            /// </summary>
+            /// <returns>Async UniTask.</returns>
+            private async UniTask CheckForIDEInstance()
+            {
+                if (_ideIntegration._rpc.IsConnected()) return;
+                await _ideIntegration.OpenNewIDEInstanceAsync();
+            }
+
+            /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
             /// deliver all methods, that can be called from the client.
             /// </summary>
@@ -66,6 +79,7 @@ namespace SEE.Controls
             /// <returns></returns>
             public async UniTask OpenFileAsync(string path)
             {
+                await CheckForIDEInstance();
                 await _ideIntegration._rpc.CallRemoteProcessAsync("OpenFile", path);
             }
         }
@@ -77,7 +91,8 @@ namespace SEE.Controls
         /// </summary>
         public enum Ide
         {
-            VisualStudio // Establish connection to Visual Studio.
+            VisualStudio2019, // Establish connection to Visual Studio (2019)
+            VisualStudio2022 // Establish connection to Visual Studio (2022)
         };
 
         /// <summary>
@@ -96,9 +111,14 @@ namespace SEE.Controls
         public Ide Type;
 
         /// <summary>
-        /// TCP Socket port for communication to Visual Studio.
+        /// TCP Socket port for communication to Visual Studio (2019).
         /// </summary>
-        public int VisualStudioPort = 26100;
+        public int VS2019Port = 26100;
+
+        /// <summary>
+        /// TCP Socket port for communication to Visual Studio (2022).
+        /// </summary>
+        public int VS2022Port = 26101;
 
         /// <summary>
         /// The JsonRpcServer used for communication between IDE and SEE.
@@ -111,6 +131,15 @@ namespace SEE.Controls
         /// </summary>
         public void Start()
         {
+            // Checks current operating system.
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+#if UNITY_EDITOR
+                Debug.LogError("Currently only supported on Windows!");
+#endif
+                return;
+            }
+
             if (Instance != null)
             {
 #if UNITY_EDITOR
@@ -137,10 +166,56 @@ namespace SEE.Controls
         {
             _rpc = Type switch
             {
-                Ide.VisualStudio => 
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VisualStudioPort),
+                Ide.VisualStudio2019 =>
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VS2019Port),
+                Ide.VisualStudio2022 =>
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VS2022Port),
                 _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
             };
+        }
+
+        /// <summary>
+        /// Opens the IDE defined in <see cref="Type"/>. Will wait until client is connected.
+        /// </summary>
+        /// <returns>Async UniTask.</returns>
+        private async UniTask OpenNewIDEInstanceAsync()
+        {
+            string arguments;
+            string fileName;
+            switch (Type)
+            {
+                case Ide.VisualStudio2019:
+                    fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2019);
+                    arguments = "";
+                    break;
+                case Ide.VisualStudio2022:
+                    fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2022);
+                    arguments = "";
+                    break;
+                default:
+                    throw new NotImplementedException($"Implementation of case {Type} not found");
+            }
+            var start = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true
+            };
+
+            try
+            {
+                using var proc = Process.Start(start);
+            }
+            catch (Exception e)
+            {
+#if UNITY_EDITOR
+                Debug.LogError(e);
+#endif
+                throw;
+            }
+
+            // TODO: wait until connected
         }
 
         /// <summary>
