@@ -6,7 +6,6 @@ using UnityEditor;
 
 namespace SEEEditor
 {
-
     /// <summary>
     /// Custom editor for a <see cref="TransformView"/>.
     /// </summary>
@@ -69,7 +68,6 @@ namespace SEEEditor
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
-
 }
 
 #endif
