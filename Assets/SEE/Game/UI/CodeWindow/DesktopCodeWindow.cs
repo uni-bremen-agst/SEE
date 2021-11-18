@@ -136,7 +136,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition--;
+                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition -1;
                             }
                             break;
                     }
