@@ -41,11 +41,6 @@ namespace SEE.Game.UI.CodeWindow
         private int oldIDX = -1;
 
         /// <summary>
-        /// If a change has been made the syntax highliting should be recalculated
-        /// </summary>
-        private bool recalculadeSyntax = false;
-
-        /// <summary>
         /// Indicates that a changes was made in the CodeWindow and the inputlistener has to react
         /// </summary>
         private bool valueHasChanged = false;
@@ -123,7 +118,7 @@ namespace SEE.Game.UI.CodeWindow
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
-                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;  recalculadeSyntax = true;});
+                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;});
 
                 //Updates the entries in the CodeWindow
                 void updateCodeWindow(char c, int idx, operationType type)
@@ -134,7 +129,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             if(TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition++;
+                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             }
                             break;
                         case operationType.Delete:

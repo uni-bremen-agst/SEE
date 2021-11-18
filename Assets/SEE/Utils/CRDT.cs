@@ -328,7 +328,6 @@ namespace SEE.Utils
         /// <param name="dontSyncCodeWindowChars"></param>
         public async UniTask AsyncAddString(string s, int startIdx, bool startUp = false)
         {
-            Performance p = Performance.Begin("addString");
             await UniTask.SwitchToThreadPool();
             List<CharObj> charObjs = new List<CharObj>(s.Length);
             if (!startUp)
@@ -348,8 +347,6 @@ namespace SEE.Utils
                 }
             }
             await UniTask.SwitchToMainThread();
-            p.End();
-            //Debug.Log("ADD STRING " + p.GetElapsedTime());
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
@@ -358,10 +355,7 @@ namespace SEE.Utils
             }
             else
             {
-                Performance b = Performance.Begin("NET");
                 new NetCRDT().AddString(networkbuffer, filename); ;
-                b.End();
-                //Debug.Log("NET " + b.GetElapsedTime());
             }
         }
 
@@ -373,7 +367,6 @@ namespace SEE.Utils
         public void AddChar(char c, int index, bool startUp = false)
         {
             Identifier[] position;
-            Performance p = Performance.Begin("ADDCHAR");
             if (index - 1 >= 0 && crdt.Count > index)
             {
                 position = GeneratePositionBetween(crdt[index - 1].GetIdentifier(), crdt[index].GetIdentifier(), siteID);
@@ -390,8 +383,6 @@ namespace SEE.Utils
             {
                 position = GeneratePositionBetween(null, null, siteID);
             }
-            p.End();
-            //Debug.Log("GENERATE " + p.GetElapsedTime());
 
             if (crdt.Count > index)
             {
