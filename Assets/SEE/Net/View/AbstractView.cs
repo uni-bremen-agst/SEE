@@ -2,7 +2,6 @@
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// An abstract view synchronizes elements of a game object.
     /// </summary>
@@ -22,8 +21,9 @@ namespace SEE.Net
         {
             if (viewContainer == null)
             {
-                Debug.LogWarning("'viewContainer' is null! Destroying this view!");
+                Debug.LogWarning("'viewContainer' is null! Destroying this view!\n");
                 Destroy(this);
+                return;
             }
             this.viewContainer = viewContainer;
             InitializeImpl();
