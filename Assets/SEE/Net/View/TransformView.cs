@@ -242,7 +242,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes a new action for position synchronization.
+        /// Executes a new action for position synchronization for all network clients.
         /// </summary>
         private void SynchronizePosition()
         {
@@ -250,7 +250,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes a new action for rotation synchronization.
+        /// Executes a new action for rotation synchronization for all network clients.
         /// </summary>
         private void SynchronizeRotation()
         {
@@ -258,7 +258,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes a new action for scale synchronization.
+        /// Executes a new action for scale synchronization for all network clients.
         /// </summary>
         private void SynchronizeScale()
         {
