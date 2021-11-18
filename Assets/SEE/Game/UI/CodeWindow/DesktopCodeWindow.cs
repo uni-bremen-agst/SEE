@@ -246,8 +246,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (input.Contains("\r"))
                 {
-                    input = input.Replace("\r", "");//"\n" + new string('x', neededPadding));
-                    //TextMeshInputField.text = TextMeshInputField.text.Insert(idx - 2, new string('x', neededPadding));
+                    input = input.Replace("\r", "");
                 }
                 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
@@ -265,17 +264,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) &&  valueHasChanged)
                 {
-                    valueHasChanged = false;
-                    if (idx == oldIDX)
-                    {
-                        idx++;
-                    }
-                    oldIDX = idx;
-                    oldIDXCoolDown = Time.time + 0.1f; 
-                    deleteSelectedText();
-                    TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
-                    TextMeshInputField.MoveToEndOfLine(false, false);
-                    ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
+                    returnPressed(idx);
                 } 
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
@@ -320,13 +309,31 @@ namespace SEE.Game.UI.CodeWindow
                     deleteSelectedText();
                 }
 
-                if (valueHasChanged && oldKeyCode == KeyCode.Backspace)
+
+                //catches the changes in the code window that happens on a frame shift
+                //so that the code doesnot recognize any more that the key was pressed
+                if (valueHasChanged)
                 {
-                    ICRDT.DeleteString(idx, idx, Title);
-                    //TODO AUch für delte enter und co machen
+                    Debug.Log("Frameshift");
+                    switch (oldKeyCode)
+                    {
+                        case KeyCode.Backspace:
+                            ICRDT.DeleteString(idx, idx, Title);
+                            break;
+                        case KeyCode.Delete:
+                            ICRDT.DeleteString(idx +1, idx +1, Title);
+                            break;
+                        case KeyCode.KeypadEnter:
+                            returnPressed(idx);
+                            break;
+                        case KeyCode.Return:
+                            returnPressed(idx);
+                            break;
+                        default:
+                            ICRDT.AddString(input, idx - 1, Title);
+                            break;
+                    }
                 }
-
-
 
             }
             else
@@ -416,6 +423,20 @@ namespace SEE.Game.UI.CodeWindow
             }).ToList());
 
             return textWithOutNumbers;
+        }
+        private void returnPressed(int idx)
+        {
+            valueHasChanged = false;
+            if (idx == oldIDX)
+            {
+                idx++;
+            }
+            oldIDX = idx;
+            oldIDXCoolDown = Time.time + 0.1f;
+            deleteSelectedText();
+            TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
+            TextMeshInputField.MoveToEndOfLine(false, false);
+            ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
         }
 
         private bool deleteSelectedText()
