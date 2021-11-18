@@ -11,9 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -126,9 +124,9 @@ namespace SEE.Controls.Interactables
             outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
             outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
             //FIXME: Something's off here
-            int renderQueueOffset = GetRenderQueueOffset();
-            outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
-            outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
+            int renderQueue = GetRenderQueue();
+            outlineMaskMaterial.renderQueue = renderQueue;
+            outlineFillMaterial.renderQueue = renderQueue;
 
             outlineMaskMaterial.name = "OutlineMask (Instance)";
             outlineFillMaterial.name = "OutlineFill (Instance)";
@@ -139,27 +137,8 @@ namespace SEE.Controls.Interactables
             // Apply material properties immediately
             needsUpdate = true;
 
-            int GetRenderQueueOffset()
-            {
-                // FIXME: This code needs documentation.
-                NodeRef nodeRef = GetComponent<NodeRef>();
-                if (nodeRef != null && nodeRef.Value != null)
-                {
-                    Node node = nodeRef.Value;
-                    Graph graph = node.ItsGraph;
-                    int maxDepth = graph?.MaxDepth ?? 1;
-
-                    int inverseRenderQueueOffset = node.Level;
-                    if (nodeRef.Value.IsInnerNode())
-                    {
-                        inverseRenderQueueOffset += maxDepth;
-                    }
-
-                    return 2 * maxDepth - inverseRenderQueueOffset;
-                }
-
-                return 0;
-            }
+            // Returns render queue setting of game object's first material
+            int GetRenderQueue() => renderers.Select(x => x.materials.First().renderQueue).First();
         }
 
         private void OnEnable()
