@@ -42,8 +42,10 @@ namespace SEE.Net
 
         /// <summary>
         /// All views, this view container manages.
+        /// Note: This field must not be readonly because otherwise the <see cref="ViewContainerEditor"/>
+        /// will not be able to modify it (the user should be able to configure it).
         /// </summary>
-        [SerializeField] public readonly AbstractView[] views = new AbstractView[1];
+        [SerializeField] public AbstractView[] views = new AbstractView[1];
 
         /// <summary>
         /// Initializes a view container.
