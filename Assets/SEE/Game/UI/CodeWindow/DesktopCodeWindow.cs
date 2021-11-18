@@ -223,7 +223,7 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
-                if (recalculadeSyntax && Time.time > timeStamp)
+               /* if (recalculadeSyntax && Time.time > timeStamp)
                 {
                     timeStamp = Time.time + 5.0f;
                     recalculadeSyntax = false;
@@ -233,7 +233,7 @@ namespace SEE.Game.UI.CodeWindow
                 else if(Time.time > timeStamp)
                 {
                     timeStamp = Time.time + 5.0f;
-                }
+                } */
 
                 int idx = TextMeshInputField.caretPosition;
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
@@ -251,10 +251,15 @@ namespace SEE.Game.UI.CodeWindow
                 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
+                    Debug.Log("INDX " + idx);
                     valueHasChanged = false;
                     if(idx == oldIDX)
                     {
                         idx++;
+                    }
+                    else if(oldIDX > -1 && idx > oldIDX + 1)
+                    {
+                        idx = oldIDX + 1;
                     }
                     oldIDX = idx;
                     oldIDXCoolDown = Time.time + 0.1f;
