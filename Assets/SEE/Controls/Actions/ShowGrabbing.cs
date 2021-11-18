@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Interactables;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {

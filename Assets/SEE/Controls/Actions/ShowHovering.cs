@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Interactables;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -10,12 +11,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The local hovering color of the outline.
         /// </summary>
-        private readonly static Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+        private static readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
 
         /// <summary>
         /// The remote hovering color of the outline.
         /// </summary>
-        private readonly static Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+        private static readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
@@ -29,14 +30,7 @@ namespace SEE.Controls.Actions
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
-                if (TryGetComponent(out Outline outline))
-                {
-                    outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
+                //outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
             }
         }
 
@@ -51,7 +45,7 @@ namespace SEE.Controls.Actions
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
             {
-                DestroyImmediate(outline);
+                //DestroyImmediate(outline);
             }
         }
 
@@ -59,7 +53,7 @@ namespace SEE.Controls.Actions
         {
             if (interactable.IsHovered && !interactable.IsGrabbed)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                //GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
             }
         }
 
@@ -67,7 +61,7 @@ namespace SEE.Controls.Actions
         {
             if (interactable.IsHovered && !interactable.IsSelected)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                //GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
             }
         }
     }
