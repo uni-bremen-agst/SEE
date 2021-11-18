@@ -2,7 +2,6 @@
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// Supplies utility functionality for transform view actions.
     /// </summary>
@@ -14,7 +13,7 @@ namespace SEE.Net
         /// <param name="id">The ID of the view container.</param>
         /// <param name="index">The index of the transform view in the view container.
         /// </param>
-        /// <returns>The acquired transform view or <code>null</code>, if non was found.
+        /// <returns>The acquired transform view or <code>null</code>, if none was found.
         /// </returns>
         internal static TransformView AcquireTransformView(uint id, int index)
         {
@@ -29,7 +28,6 @@ namespace SEE.Net
                     result = transformView;
                 }
             }
-
             return result;
         }
     }
@@ -37,7 +35,7 @@ namespace SEE.Net
     /// <summary>
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
-    ///   
+    ///
     /// Synchronizes positions between Clients.
     /// </summary>
     public class TransformViewPositionAction : AbstractAction
@@ -57,8 +55,6 @@ namespace SEE.Net
         /// </summary>
         public Vector3 position;
 
-
-
         /// <summary>
         /// Constructs an action for given transform view and position.
         /// </summary>
@@ -71,10 +67,9 @@ namespace SEE.Net
             this.position = position;
         }
 
-
-
         protected override void ExecuteOnServer()
         {
+            // intentionally left blank
         }
 
         /// <summary>
@@ -110,8 +105,6 @@ namespace SEE.Net
         /// </summary>
         public Quaternion rotation;
 
-
-
         /// <summary>
         /// Constructs an action for given transform view and rotation.
         /// </summary>
@@ -124,10 +117,9 @@ namespace SEE.Net
             this.rotation = rotation;
         }
 
-
-
         protected override void ExecuteOnServer()
         {
+            // intentionally left blank
         }
 
         /// <summary>
@@ -143,7 +135,7 @@ namespace SEE.Net
     /// <summary>
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractAction"/> before modifying this class!
-    ///   
+    ///
     /// Synchronizes cale between Clients.
     /// </summary>
     public class TransformViewScaleAction : AbstractAction
@@ -163,8 +155,6 @@ namespace SEE.Net
         /// </summary>
         public Vector3 scale;
 
-
-
         /// <summary>
         /// Constructs an action for given transform view and scale.
         /// </summary>
@@ -177,10 +167,9 @@ namespace SEE.Net
             this.scale = scale;
         }
 
-
-
         protected override void ExecuteOnServer()
         {
+            // intentionally left blank
         }
 
         /// <summary>
@@ -192,5 +181,4 @@ namespace SEE.Net
             TransformViewActionHelper.AcquireTransformView(viewContainerID, viewIndex)?.SetNextScale(scale);
         }
     }
-
 }

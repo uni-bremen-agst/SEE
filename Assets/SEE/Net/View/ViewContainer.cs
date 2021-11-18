@@ -7,7 +7,6 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// A view container contains multiple views, which synchronize objects for multiple
     /// clients. Only one view container per object is allowed! It must be located at the
@@ -44,13 +43,11 @@ namespace SEE.Net
         /// <summary>
         /// All views, this view container manages.
         /// </summary>
-        [SerializeField] private AbstractView[] views = new AbstractView[1];
-
-
+        [SerializeField] public readonly AbstractView[] views = new AbstractView[1];
 
         /// <summary>
         /// Initializes a view container.
-        /// 
+        ///
         /// <paramref name="owner"/> and <paramref name="prefabPath"/> must not be
         /// <code>null</code>.
         /// </summary>
@@ -174,5 +171,4 @@ namespace SEE.Net
             return isOwner;
         }
     }
-
 }
