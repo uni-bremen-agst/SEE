@@ -21,6 +21,12 @@ namespace SEE.Net
         public const string PacketType = "Server";
 
         /// <summary>
+        /// The name (path) of the prefab to be used to instantiate a representation
+        /// of a player in a remote network client.
+        /// </summary>
+        private const string PlayerRepresentationPrefab = "Man"; //"PlayerHead";
+
+        /// <summary>
         /// The list of all active connections.
         /// </summary>
         public static List<Connection> Connections { get; private set; }
@@ -219,10 +225,10 @@ namespace SEE.Net
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
 
-                    // create new player head for every client
+                    // create new player representation for every client
                     new InstantiatePrefabAction(
                         (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint,
-                        "PlayerHead",
+                        PlayerRepresentationPrefab,
                         Vector3.zero,
                         Quaternion.identity,
                         new Vector3(0.02f, 0.015f, 0.015f)
