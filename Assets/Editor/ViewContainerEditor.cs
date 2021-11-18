@@ -2,6 +2,7 @@
 
 using SEE.Net;
 using UnityEditor;
+using UnityEngine;
 
 namespace SEEEditor
 {
@@ -15,12 +16,12 @@ namespace SEEEditor
         /// <summary>
         /// Whether infos should be displayed.
         /// </summary>
-        public bool showInfos = true;
+        private bool showInfos = false;
 
         /// <summary>
         /// Whether setting should be displayed.
         /// </summary>
-        public bool showSettings = true;
+        private bool showSettings = false;
 
         public override void OnInspectorGUI()
         {
@@ -31,7 +32,7 @@ namespace SEEEditor
                 using (new EditorGUI.IndentLevelScope())
                 {
                     ViewContainer viewContainer = (ViewContainer)target;
-                    bool useInOfflineMode = Network.UseInOfflineMode;
+                    bool useInOfflineMode = SEE.Net.Network.UseInOfflineMode;
                     string defaultMessage = useInOfflineMode ? "Unset in offline mode" : "Set at runtime";
 
                     EditorGUILayout.LabelField("ID", useInOfflineMode || viewContainer.id == ViewContainer.InvalidID ? defaultMessage : viewContainer.id.ToString());
@@ -48,7 +49,16 @@ namespace SEEEditor
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("views"), true);
+                    SerializedProperty views = serializedObject.FindProperty("views");
+                    if (views != null)
+                    {
+                        EditorGUILayout.PropertyField(views, true);
+                    }
+                    else
+                    {
+                        Debug.LogError("There is no property 'views'.\n");
+                        showSettings = false;
+                    }
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -56,7 +66,6 @@ namespace SEEEditor
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
     }
-
 }
 
 #endif
