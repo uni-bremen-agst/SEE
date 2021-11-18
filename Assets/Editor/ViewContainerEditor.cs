@@ -52,7 +52,13 @@ namespace SEEEditor
                     SerializedProperty views = serializedObject.FindProperty("views");
                     if (views != null)
                     {
-                        EditorGUILayout.PropertyField(views, true);
+                        // Note: We cannot use EditorGUILayout.PropertyField(views, true)
+                        // because views may contain an element that is null.
+                        for (int i = 0; i < views.arraySize; i++)
+                        {
+                            SerializedProperty view = views.GetArrayElementAtIndex(i);
+                            EditorGUILayout.PropertyField(view, true);
+                        }
                     }
                     else
                     {
