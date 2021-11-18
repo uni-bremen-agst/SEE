@@ -195,7 +195,7 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
-                 if(Time.time > oldIDXCoolDown)
+                 if(Time.time < oldIDXCoolDown)
                 {
                     oldIDX = -1;
                 }
