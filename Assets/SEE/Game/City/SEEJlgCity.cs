@@ -20,12 +20,12 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using SEE.Utils;
 using System.Collections.Generic;
 using System.IO;
+using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Configuration of a code city for the visualization of dynamic data in
@@ -36,7 +36,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEEJlgCity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEEJlgCity.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -80,37 +80,37 @@ namespace SEE.Game
         private const string JLGPathLabel = "JLGPath";
 
         /// <summary>
-        /// Label for attribute <see cref="BreakpointClass"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.BreakpointClass"/> in configuration file.
         /// </summary>
         private const string BreakpointClassLabel = "BreakpointClass";
 
         /// <summary>
-        /// Label for attribute <see cref="BreakpointLine"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.BreakpointLine"/> in configuration file.
         /// </summary>
         private const string BreakpointLineLabel = "BreakpointLine";
 
         /// <summary>
-        /// Label for attribute <see cref="DistanceAboveCity"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.DistanceAboveCity"/> in configuration file.
         /// </summary>
         private const string DistanceAboveCityLabel = "DistanceAboveCity";
 
         /// <summary>
-        /// Label for attribute <see cref="DistanceBehindCity"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.DistanceBehindCity"/> in configuration file.
         /// </summary>
         private const string DistanceBehindCityLabel = "DistanceBehindCity";
 
         /// <summary>
-        /// Label for attribute <see cref="LineWidth"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.LineWidth"/> in configuration file.
         /// </summary>
         private const string LineWidthLabel = "LineWidth";
 
         /// <summary>
-        /// Label for attribute <see cref="ShowOnlyCalls"/> in configuration file.
+        /// Label for attribute <see cref="SEEJlgCity.ShowOnlyCalls"/> in configuration file.
         /// </summary>
         private const string ShowOnlyCallsLabel = "ShowOnlyCalls";
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// <see cref="City.AbstractSEECity.Save(ConfigWriter)"/>
         /// </summary>
         protected override void Save(ConfigWriter writer)
         {
@@ -126,7 +126,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// <see cref="City.AbstractSEECity.Restore(Dictionary{string, object})"/>.
         /// </summary>
         protected override void Restore(Dictionary<string, object> attributes)
         {

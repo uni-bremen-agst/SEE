@@ -56,16 +56,16 @@ namespace SEE.GO.Menu
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
             modeMenu.AddEntries(entries);
-            
+
             return modeMenu;
 
             #region Local Functions
 
             // Constructs a toggle menu entry for the mode menu from the given action state type.
             ToggleMenuEntry ToModeMenuEntry(ActionStateType type) =>
-                new ToggleMenuEntry(active: Equals(type, firstType), 
-                                    entryAction: () => GlobalActionHistory.Execute(type), exitAction: null, 
-                                    title: type.Name, description: type.Description, entryColor: type.Color, 
+                new ToggleMenuEntry(active: Equals(type, firstType),
+                                    entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
+                                    title: type.Name, description: type.Description, entryColor: type.Color,
                                     icon: Resources.Load<Sprite>(type.IconPath));
 
             #endregion

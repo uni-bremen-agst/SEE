@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Lean.Common
@@ -51,15 +52,18 @@ namespace Lean.Common
 					targetPosition.z = currentPosition.z;
 				}
 
-				var direction = targetPosition - currentPosition;
-				var velocity  = direction / Time.fixedDeltaTime;
+				var direction      = targetPosition - currentPosition;
+				var targetVelocity = direction / Time.fixedDeltaTime;
+				var velocity       = Vector3.zero;
+
+				// Get t value
+				var factor = LeanHelper.GetDampenFactor(damping, Time.deltaTime);
 
 				// Apply the velocity
-				velocity *= LeanHelper.GetDampenFactor(damping, Time.fixedDeltaTime);
-				velocity  = Vector3.MoveTowards(velocity, Vector3.zero, linear * Time.fixedDeltaTime);
+				velocity = Vector3.Lerp(velocity, targetVelocity, factor);
+				velocity = Vector3.MoveTowards(velocity, targetVelocity, linear * Time.fixedDeltaTime);
 
 				cachedRigidbody.velocity = velocity;
-				Debug.Log(velocity);
 
 				/*
 				if (Rotation == true && direction != Vector3.zero)
@@ -93,8 +97,6 @@ namespace Lean.Common
 #if UNITY_EDITOR
 namespace Lean.Common.Editor
 {
-	using UnityEditor;
-
 	[CustomEditor(typeof(LeanChaseRigidbody))]
 	public class LeanChaseRigidbody_Editor : LeanChase_Editor
 	{

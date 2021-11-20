@@ -1,11 +1,11 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using System.IO;
+using SEE.DataModel;
 using SEE.DataModel.Runtime.IO;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// Configuration of a code city for the visualization of dynamic data in
@@ -16,7 +16,7 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in 
         /// <see cref="SEEDynCity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEEDynCity.Restore(Dictionary{string, object})"/>, 
+        /// <see cref="SEEDynCity.Restore(Dictionary{string,object})"/>, 
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -62,10 +62,12 @@ namespace SEE.Game
                 Runtime.Runtime runTime = gameObject.GetComponentInChildren<Runtime.Runtime>();
                 if (runTime == null)
                 {
-                    GameObject runtimeGO = new GameObject();
-                    runtimeGO.transform.parent = transform;
-                    runtimeGO.name = Tags.Runtime;
-                    runtimeGO.tag = Tags.Runtime;
+                    GameObject runtimeGO = new GameObject
+                    {
+                        transform = { parent = transform },
+                        name = Tags.Runtime,
+                        tag = Tags.Runtime
+                    };
                     runTime = runtimeGO.AddComponent<Runtime.Runtime>();
                 }
                 runTime.callTree = callTreeReader.CallTree;
@@ -96,7 +98,7 @@ namespace SEE.Game
         private const string DYNPathLabel = "DYNPath";
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Save(ConfigWriter)"/>
+        /// <see cref="City.AbstractSEECity.Save(ConfigWriter)"/>
         /// </summary>
         protected override void Save(ConfigWriter writer)
         {
@@ -105,7 +107,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// <see cref="AbstractSEECity.Restore(Dictionary{string, object})"/>.
+        /// <see cref="City.AbstractSEECity.Restore(Dictionary{string, object})"/>.
         /// </summary>
         protected override void Restore(Dictionary<string, object> attributes)
         {

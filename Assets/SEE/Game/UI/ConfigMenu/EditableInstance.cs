@@ -20,6 +20,10 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using SEE.DataModel;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace SEE.Game.UI.ConfigMenu
 {
     /// <summary>
@@ -44,20 +48,26 @@ namespace SEE.Game.UI.ConfigMenu
         public string GameObjectName { get; }
 
         /// <summary>
-        /// References the architecture SEECity.
-        ///
-        /// FIXME: We must not make any assumptions about the name of cities. We need
-        /// to support all cities in a scene, not just this one, if it exists at all.
+        /// Returns an EditableInstance for each game object in the scene that is
+        /// tagged as <see cref="Tags.CodeCity"/> and has a <see cref="City.SEECity"/>
+        /// component attached to it. The <see cref="EditableInstance.DisplayValue"/>
+        /// and <see cref="EditableInstance.GameObjectName"/> of these are the name
+        /// of the found game object.
         /// </summary>
-        public static EditableInstance Architecture => new EditableInstance("Arch", "Architecture");
+        /// <returns>all current <see cref="City.SEECity"/> names in the scene</returns>
+        public static List<EditableInstance> AllEditableCodeCities()
+        {
+            List<EditableInstance> result = new List<EditableInstance>();
 
-        /// <summary>
-        /// References the implementation SEECity.
-        ///
-        /// FIXME: We must not make any assumptions about the name of cities. We need
-        /// to support all cities in a scene, not just this one, if it exists at all.
-        /// </summary>
-        public static EditableInstance Implementation => new EditableInstance("Impl", "Implementation");
+            foreach (GameObject city in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
+            {
+                if (city.TryGetComponent(out City.SEECity seeCity))
+                {
+                    result.Add(new EditableInstance(city.name, city.name));
+                }
+            }
+            return result;
+        }
 
         protected bool Equals(EditableInstance other)
         {

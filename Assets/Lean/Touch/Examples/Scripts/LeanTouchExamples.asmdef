@@ -1,0 +1,17 @@
+{
+    "name": "LeanTouchExamples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:688cfbbe2a536604ab4aa06ececa1da3",
+        "GUID:82c7e6eac44d7e048b22ad98800dcfc7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
