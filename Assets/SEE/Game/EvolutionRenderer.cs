@@ -64,10 +64,14 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
+                //cityEvolution.MarkerSettings
+                Debug.Log(gameObject);
+                //graphRenderer.GetMetricValue(gameObject, cityEvolution.MarkerSettings.MarkerSections[0].Metric);
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
                 marker = new Marker(graphRenderer,
+                                    markerAttributes: cityEvolution.MarkerSettings,
                                     markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
@@ -982,7 +986,7 @@ namespace SEE.Game
             {
                 case Difference.Changed:
                     NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
-                    marker.MarkChanged(currentGameNode);
+                    marker.MarkChanged(graphNode, currentGameNode);
                     // There is a change. It may or may not be the metric determining the style.
                     // We will not further check that and just call the following method.
                     // If there is no change, this method does not to be called because then
@@ -991,7 +995,7 @@ namespace SEE.Game
                     graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
-                    marker.MarkBorn(currentGameNode);
+                    marker.MarkBorn(graphNode, currentGameNode);
                     break;
             }
             // we want the animator to move each node separately, which is why we
@@ -1120,7 +1124,7 @@ namespace SEE.Game
                 Assert.IsNotNull(block);
                 block.transform.SetParent(null);
                 /// if the node needs to be removed, mark it dead and let it raise to <see cref="SkyLevel"/>
-                marker.MarkDead(block);
+                marker.MarkDead(node, block);
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = SkyLevel;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);

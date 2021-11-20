@@ -1,8 +1,10 @@
-﻿using SEE.DataModel;
+using SEE.DataModel;
 using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Charts;
+using SEE.Game.City;
+using SEE.DataModel.DG;
 
 namespace SEE.Game.Evolution
 {
@@ -25,10 +27,11 @@ namespace SEE.Game.Evolution
         /// <param name="changeColor">the color for the markers for changed nodes</param>
         /// <param name="deletionColor">the color for the markers for deleted nodes</param>
         /// <param name="duration">the duration until the final height of the markers must be reached</param>
-        public Marker(GraphRenderer graphRenderer, float markerWidth, float markerHeight,
+        public Marker(GraphRenderer graphRenderer, MarkerAttributes markerAttributes, float markerWidth, float markerHeight,
                       Color additionColor, Color changeColor, Color deletionColor, float duration)
         {
             this.graphRenderer = graphRenderer;
+            this.markerAttributes = markerAttributes;
             this.duration = duration;
 
             // graphRenderer.ShaderType
@@ -80,7 +83,13 @@ namespace SEE.Game.Evolution
         /// The height of the beam markers used to mark new, changed, and deleted
         /// objects from one version to the next one.
         /// </summary>
-        private readonly float markerHeight;
+        private readonly MarkerAttributes markerAttributes;
+
+        /// <summary>
+        /// The height of the beam markers used to mark new, changed, and deleted
+        /// objects from one version to the next one.
+        /// </summary>
+        private float markerHeight;
 
         /// <summary>
         /// The width (x and z lengths) of the beam markers used to mark new, changed,
@@ -118,15 +127,21 @@ namespace SEE.Game.Evolution
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a beam marker on top
         /// of its roof.
         /// </summary>
+        /// <param name="node">node above which to add a beam marker</param>
         /// <param name="gameNode">node above which to add a beam marker</param>
-        /// <param name="factory">the factory to create the beam marker</param>
+        /// <param name="factory">node above which to add a beam marker</param>
         /// <returns>the resulting beam marker</returns>
-        private GameObject MarkByBeam(GameObject gameNode, CylinderFactory factory)
+        private GameObject MarkByBeam(Node node, GameObject gameNode, CylinderFactory factory)
         {
             // The marker should be drawn in front of the block, hence, its render
             // queue offset must be greater than the one of the block.
             //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
             GameObject beamMarker = NewBeam(factory, 0);
+
+
+            float height = graphRenderer.GetMetricValue(node, markerAttributes.LengthMetric);
+            
+            
 
             // FIXME: These kinds of beam markers make sense only for leaf nodes.
             // Could we better use some kind of blinking now that the cities
@@ -148,7 +163,7 @@ namespace SEE.Game.Evolution
             // In addition, it will also be destroyed along with its parent block.
             beamMarker.transform.SetParent(gameNode.transform);
             BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
-            raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, markerHeight, markerWidth), duration: duration);
+            raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, height, markerWidth), duration: duration);
             return beamMarker;
         }
 
@@ -195,11 +210,12 @@ namespace SEE.Game.Evolution
         /// Marks the given <paramref name="gameNode"/> as dying by putting a beam marker on top
         /// of its roof. The color of that beam was specified through the constructor call.
         /// </summary>
+        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkDead(GameObject gameNode)
+        public GameObject MarkDead(Node node, GameObject gameNode)
         {
-            GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
+            GameObject beamMarker = MarkByBeam(node, gameNode, deletionMarkerFactory);
             beamMarker.name = "dead " + gameNode.name;
             beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
@@ -210,12 +226,13 @@ namespace SEE.Game.Evolution
         /// of its roof. The color of that beam was specified through the constructor call.
         /// Adds the created beam marker to the cache.
         /// </summary>
+        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkBorn(GameObject gameNode)
+        public GameObject MarkBorn(Node node, GameObject gameNode)
         {
             NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(gameNode.gameObject.name);
-            GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
+            GameObject beamMarker = MarkByBeam(node, gameNode, additionMarkerFactory);
             beamMarker.name = "new " + gameNode.name;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
@@ -229,11 +246,12 @@ namespace SEE.Game.Evolution
         /// of its roof. The color of that beam was specified through the constructor call.
         /// Adds the created beam marker to the cache.
         /// </summary>
+        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkChanged(GameObject gameNode)
+        public GameObject MarkChanged(Node node, GameObject gameNode)
         {
-            GameObject beamMarker = MarkByBeam(gameNode, changeMarkerFactory);
+            GameObject beamMarker = MarkByBeam(node, gameNode, changeMarkerFactory);
             beamMarker.name = "changed " + gameNode.name;
             // We need to add beam marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
