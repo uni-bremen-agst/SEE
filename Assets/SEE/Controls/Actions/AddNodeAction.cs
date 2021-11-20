@@ -1,9 +1,9 @@
-﻿using SEE.GO;
-using SEE.Utils;
+﻿using System.Collections.Generic;
 using SEE.Game;
-using UnityEngine;
+using SEE.GO;
 using SEE.Net;
-using System.Collections.Generic;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -13,11 +13,11 @@ namespace SEE.Controls.Actions
     public class AddNodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// If the user clicks with the mouse hitting a game object representing a graph node, 
+        /// If the user clicks with the mouse hitting a game object representing a graph node,
         /// this graph node is a parent to which a new node is created and added as a child.
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns> 
+        /// <returns>true if completed</returns>
         public override bool Update()
         {
             bool result = false;
@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
                 // The position at which the parent was hit will be the center point of the new node
                 Vector3 position = raycastHit.point;
                 Vector3 scale = FindSize(parent, position);
-                addedGameNode = GameNodeAdder.Add(parent, position: position, worldSpaceScale: scale);
+                addedGameNode = GameNodeAdder.AddChild(parent, position: position, worldSpaceScale: scale);
                 if (addedGameNode != null)
                 {
                     memento = new Memento(parent, position: position, scale: scale);
@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
             if (addedGameNode != null)
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
-                GameNodeAdder.Remove(addedGameNode);
+                GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
                 Destroyer.DestroyGameObject(addedGameNode);
                 addedGameNode = null;
             }
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedGameNode = GameNodeAdder.Add(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
+            addedGameNode = GameNodeAdder.AddChild(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();

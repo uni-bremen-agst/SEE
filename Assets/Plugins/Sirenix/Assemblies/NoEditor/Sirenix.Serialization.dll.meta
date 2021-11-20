@@ -80,7 +80,11 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
+<<<<<<< HEAD
       Standalone: Win
+=======
+      Standalone: Win64
+>>>>>>> master
     second:
       enabled: 1
       settings: {}

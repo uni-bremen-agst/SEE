@@ -83,22 +83,38 @@ PluginImporter:
   - first:
       Standalone: OSXUniversal
     second:
+<<<<<<< HEAD
+=======
       enabled: 1
       settings:
         CPU: 
   - first:
       Standalone: Win
     second:
+>>>>>>> master
+      enabled: 1
+      settings:
+        CPU: 
+  - first:
+<<<<<<< HEAD
+      Standalone: Win
+=======
+      Standalone: Win64
+>>>>>>> master
+    second:
       enabled: 0
       settings:
         CPU: 
   - first:
+<<<<<<< HEAD
       Standalone: Win64
     second:
       enabled: 1
       settings:
         CPU: 
   - first:
+=======
+>>>>>>> master
       Windows Store Apps: WindowsStoreApps
     second:
       enabled: 0

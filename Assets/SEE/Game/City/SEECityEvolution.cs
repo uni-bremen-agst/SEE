@@ -17,15 +17,15 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.City
 {
     /// <summary>
     /// A SEECityEvolution combines all necessary components for the animations
@@ -36,11 +36,11 @@ namespace SEE.Game
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="SEECityEvolution.Save(ConfigWriter)"/> and
-        /// <see cref="SEECityEvolution.Restore(Dictionary{string, object})"/>,
+        /// <see cref="SEECityEvolution.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
-        /// Sets the maximum number of revsions to load.
+        /// Sets the maximum number of revisions to load.
         /// </summary>
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
@@ -94,10 +94,10 @@ namespace SEE.Game
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
-        /// <returns>the current or new evolution renderder attached to this city</returns>
+        /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer()
         {
-            if (!gameObject.TryGetComponent<EvolutionRenderer>(out EvolutionRenderer result))
+            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
             }
@@ -139,7 +139,7 @@ namespace SEE.Game
             }
             else
             {
-                Graph graph = graphs.First<Graph>();
+                Graph graph = graphs.First();
                 graph = RelevantGraph(graph);
                 return graph;
             }
@@ -198,6 +198,21 @@ namespace SEE.Game
                 graphs[i] = relevantGraph;
                 LoadDataForGraphListing(graphs[i]);
             }
+        }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph, that is, there is at least one node in the graph that has this
+        /// metric.
+        ///
+        /// The metric names are derived from the graph currently drawn by the
+        /// evolution renderer.
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        public override List<string> AllExistingMetrics()
+        {
+            return evolutionRenderer.AllExistingMetrics();
         }
 
         //--------------------------------
