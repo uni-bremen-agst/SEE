@@ -203,10 +203,12 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (SEEInput.CodeWindowUndo())
                 {
+                    ShowNotification.Info("UNDO", "UNDO");
                     ICRDT.Undo(Title);
                 }
                 if (SEEInput.CodeWindowRedo())
                 {
+                    ShowNotification.Info("REDO", "REDO");
                     ICRDT.Redo(Title);
                 }
 

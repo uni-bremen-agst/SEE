@@ -114,7 +114,7 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
             } 
@@ -145,7 +145,7 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
             return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
 
@@ -177,7 +177,7 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
             } 
@@ -201,7 +201,7 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
            // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
             } 

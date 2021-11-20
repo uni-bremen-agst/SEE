@@ -765,6 +765,7 @@ namespace SEE.Utils
                 ShowNotification.Info("Undo Failure", "Undo Stack is empty!");
                 return;
             }
+            Debug.Log(" us "+undoStack.Count);
             (CharObj[], operationType) lastOperation = undoStack.Pop();
             switch (lastOperation.Item2)
             {
@@ -792,10 +793,13 @@ namespace SEE.Utils
                     redoStack.Push((lastOperation.Item1, operationType.Add));
                     break;
             }
+            Debug.Log(" rs " + redoStack.Count);
+
         }
 
         public void Redo()
         {
+            Debug.Log(" rs " + redoStack.Count);
             if (redoStack.Count < 1)
             {
                 ShowNotification.Info("Redo Failure", "Redo Stack is empty!");
