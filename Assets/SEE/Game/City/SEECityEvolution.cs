@@ -31,7 +31,6 @@ namespace SEE.Game.City
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
-    [System.Serializable]
     public class SEECityEvolution : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -74,6 +73,9 @@ namespace SEE.Game.City
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
         public float MarkerWidth = 0.01f;
 
+        /// <summary>
+        /// Settings of markers.
+        /// </summary>
         [SerializeField]
         public MarkerAttributes MarkerSettings = new MarkerAttributes();
 
@@ -239,6 +241,10 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="MarkerWidth"/> in the configuration file.
         /// </summary>
         private const string MarkerWidthLabel = "MarkerWidth";
+        /// <summary>
+        /// Label of attribute <see cref="MarkerSettings"/> in the configuration file.
+        /// </summary>
+        private const string MarkerSettingsLabel = "MarkerSettings";
         /// <summary>
         /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
         /// </summary>

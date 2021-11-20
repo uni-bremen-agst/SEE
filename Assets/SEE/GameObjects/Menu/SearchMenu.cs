@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Evolution;
@@ -174,12 +175,12 @@ namespace SEE.GO.Menu
             {
                 // Display marker above the node
                 GraphRenderer graphRenderer = new GraphRenderer(city, null);
-                Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
+                Marker marker = new Marker(graphRenderer, null, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
                 Material material = cityRenderer.sharedMaterials.Last();
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();
-                marker.MarkBorn(result);
+                marker.MarkBorn(null, result);
             }
 
             async UniTaskVoid RemoveMarkerWhenDone(Marker marker)
