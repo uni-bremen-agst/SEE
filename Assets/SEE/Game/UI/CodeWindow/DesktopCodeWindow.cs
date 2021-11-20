@@ -31,11 +31,6 @@ namespace SEE.Game.UI.CodeWindow
         private Tuple<int, int> selectedText;
 
         /// <summary>
-        /// Saves the Current time for the Cooldown
-        /// </summary>
-        public float timeStamp = 0;
-
-        /// <summary>
         /// The old index, if changes happens faster than the carret moves
         /// </summary>
         private int oldIDX = -1;
@@ -142,9 +137,6 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
             }
-            //Initial cooldown for a recalculating of the highliting
-            timeStamp = Time.time + 5.0f;
-
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with
             // OnEndDrag and OnScroll.
@@ -218,17 +210,11 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
-               /* if (recalculadeSyntax && Time.time > timeStamp)
+               if (SEEInput.ReCalculateSyntaxHighliting())
                 {
-                    timeStamp = Time.time + 5.0f;
-                    recalculadeSyntax = false;
-                    //EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
-                    //TextMeshInputField.text = TextMesh.text = Text;
+                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    TextMeshInputField.text = TextMesh.text = Text;
                 }
-                else if(Time.time > timeStamp)
-                {
-                    timeStamp = Time.time + 5.0f;
-                } */
 
                 int idx = TextMeshInputField.caretPosition;
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
