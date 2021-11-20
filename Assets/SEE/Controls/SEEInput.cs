@@ -116,6 +116,12 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
             {
+               return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
+            } 
+            else
+            {
+                return false;
+            }
 #endif
 #if UNITY_EDITOR == true
             //ctrl keys replaced with f5 in the editor
@@ -123,15 +129,12 @@ namespace SEE.Controls
             {
                 return !KeyboardShortcutsEnabled;
             }
-#endif
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
-#if UNITY_EDITOR == false
-            } 
             else
             {
                 return false;
             }
 #endif
+
         }
 
         /// <summary>
@@ -144,6 +147,13 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
             {
+            return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
+
+            } 
+            else
+            {
+                return false;
+            }
 #endif
 #if UNITY_EDITOR == true
             //ctrl keys replaced with f5 in the editor
@@ -156,14 +166,7 @@ namespace SEE.Controls
                 return false;
             }
 #endif
-            return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
-#if UNITY_EDITOR == false
-            } 
-            else
-            {
-                return false;
-            }
-#endif
+
         }
 
         /// <summary>
@@ -176,6 +179,9 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
             {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+            } 
+            return false;
 #endif
 #if UNITY_EDITOR == true
             //ctrl keys replaced with F6 in the editor
@@ -183,17 +189,33 @@ namespace SEE.Controls
             {
                 return !KeyboardShortcutsEnabled;
             }
+            return false;
+#endif
+        }
 
-#endif
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+        /// <summary>
+        /// Recalculates the Syntaxhighliting
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ReCalculateSyntaxHighliting()
+        {
 #if UNITY_EDITOR == false
-            } 
-            else
+           // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
             {
-                return false;
-            }
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
+            } 
+            return false;
 #endif
+#if UNITY_EDITOR == true
+            //ctrl keys replaced with F8 in the editor
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                return !KeyboardShortcutsEnabled;
             }
+            return false;
+#endif  
+        }
 
         /// <summary>
         /// Whether the left or right shift key was pressed down (and not again released).
