@@ -170,7 +170,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// The color property of materials and used by the shader.
+        /// The color property of materials used by the shader.
         /// Ideally, string-based property lookups should be avoided due to being inefficient.
         /// This can be solved by creating a field for this class such as this.
         /// This property can then be used instead of "_Color".
@@ -182,7 +182,7 @@ namespace SEE.GO
         ///
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
         /// </summary>
-        /// <param name="gameObject">objects whose color is to be set</param>
+        /// <param name="gameObject">object whose color is to be set</param>
         /// <param name="color">the new color to be set</param>
         public static void SetColor(this GameObject gameObject, Color color)
         {
@@ -191,6 +191,26 @@ namespace SEE.GO
                 Material material = renderer.sharedMaterial;
                 material.SetColor(ColorProperty, color);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the color from this <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
+        /// </summary>
+        /// <param name="gameObject">object whose color is to be returned</param>
+        /// <returns>Color of this <paramref name="gameObject"/></returns>
+        /// <exception cref="InvalidOperationException">
+        /// If this <paramref name="gameObject"/> has no renderer attached to it.
+        /// </exception>
+        public static Color GetColor(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return renderer.sharedMaterial.GetColor(ColorProperty);
+            }
+
+            throw new InvalidOperationException($"GameObject {gameObject.name} has no renderer component.");
         }
 
         /// <summary>
