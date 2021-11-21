@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SEE.Controls.Actions;
 using SEE.Controls.Interactables;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -583,11 +584,15 @@ namespace SEE.Game
                 AddLabels(innerNodes, innerNodeFactory);
             }
             
-            // Add outline around nodes so they can be visually differentiated without needing the same color
-            //TODO: Make color configurable (including total transparency) for inner/leaf node!
+            // Add outline around nodes so they can be visually differentiated without needing the same color.
+            //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
+            // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
+            // other nodes, and to show when a node is being highlighted by making it opaque.
+            //TODO: Make transparency value configurable
             foreach (GameObject node in leafNodes.Concat(innerNodes))
             {
                 Outline.Create(node, Color.black);
+                node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles

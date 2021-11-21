@@ -22,7 +22,7 @@ namespace SEE.Controls.Interactables
     {
         private static readonly HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
 
-        public enum Mode
+        private enum Mode
         {
             OutlineAll,
             OutlineVisible,
@@ -40,12 +40,14 @@ namespace SEE.Controls.Interactables
             }
         }
 
-        private Color OutlineColor
+        public Color OutlineColor
         {
+            get => outlineColor;
             set
             {
                 outlineColor = value;
                 needsUpdate = true;
+                UpdateMaterialProperties();
             }
         }
 
@@ -123,7 +125,6 @@ namespace SEE.Controls.Interactables
             // Instantiate outline materials
             outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
             outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
-            //FIXME: Something's off here
             int renderQueue = GetRenderQueue();
             outlineMaskMaterial.renderQueue = renderQueue;
             outlineFillMaterial.renderQueue = renderQueue;
@@ -220,12 +221,6 @@ namespace SEE.Controls.Interactables
             Destroy(outlineFillMaterial);
         }
 
-        public void SetColor(Color color)
-        {
-            OutlineColor = color;
-            UpdateMaterialProperties();
-        }
-
         private void Bake()
         {
             // Generate smooth normals for each mesh
@@ -313,6 +308,10 @@ namespace SEE.Controls.Interactables
 
         private void UpdateMaterialProperties()
         {
+            if (outlineFillMaterial == null)
+            {
+                return;
+            }
             // Apply properties according to mode
             outlineFillMaterial.SetColor("_OutlineColor", outlineColor);
 
