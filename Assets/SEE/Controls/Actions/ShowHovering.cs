@@ -1,4 +1,5 @@
-﻿using SEE.Controls.Interactables;
+﻿using DG.Tweening;
+using SEE.Controls.Interactables;
 using SEE.Utils;
 using UnityEngine;
 
@@ -39,6 +40,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private AlphaEnforcer enforcer;
 
+        private Sequence hoverAnimation;
+
         /// <summary>
         /// Initializes this component by creating an outline and AlphaEnforcer, if necessary.
         /// </summary>
@@ -54,6 +57,11 @@ namespace SEE.Controls.Actions
                 enforcer = gameObject.AddComponent<AlphaEnforcer>();
                 enforcer.TargetAlpha = initialAlpha;
             }
+            hoverAnimation = DOTween.Sequence();
+            hoverAnimation.Append(DOTween.To(() => enforcer.TargetAlpha, x => enforcer.TargetAlpha = x, 1f, 0.5f));
+            hoverAnimation.SetAutoKill(false);
+            hoverAnimation.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            hoverAnimation.Pause();
         }
 
         /// <summary>
@@ -72,8 +80,9 @@ namespace SEE.Controls.Actions
                 outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
                 if (isInitiator)
                 {
-                    initialAlpha = enforcer.TargetAlpha;
-                    enforcer.TargetAlpha = 1f;
+                    // initialAlpha = enforcer.TargetAlpha;
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
                 }
             }
         }
@@ -93,7 +102,8 @@ namespace SEE.Controls.Actions
                 outline.OutlineColor = initialColor;
                 if (isInitiator)
                 {
-                    enforcer.TargetAlpha = initialAlpha;
+                    // enforcer.TargetAlpha = initialAlpha;
+                    hoverAnimation.PlayBackwards();
                 }
             }
         }
@@ -105,7 +115,8 @@ namespace SEE.Controls.Actions
                 outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
                 if (isInitiator)
                 {
-                    enforcer.TargetAlpha = 1f;
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
                 }
             }
         }
@@ -117,7 +128,8 @@ namespace SEE.Controls.Actions
                 outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
                 if (isInitiator)
                 {
-                    enforcer.TargetAlpha = 1f;
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
                 }
             }
         }
