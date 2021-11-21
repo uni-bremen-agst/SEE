@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO
@@ -129,7 +130,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns all ancestors of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
-        /// The result will also inlcude inactive game objects, but does not contained <paramref name="gameObject"/> itself.
+        /// The result will also include inactive game objects, but does not contained <paramref name="gameObject"/> itself.
         /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
         /// Precondition: <paramref name="gameObjectIDs"/> is not null.
@@ -170,33 +171,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// The color property of materials used by the shader.
-        /// Ideally, string-based property lookups should be avoided due to being inefficient.
-        /// This can be solved by creating a field for this class such as this.
-        /// This property can then be used instead of "_Color".
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
         ///
-        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
         /// </summary>
+        /// <seealso cref="Material.color"/>
         /// <param name="gameObject">object whose color is to be set</param>
         /// <param name="color">the new color to be set</param>
         public static void SetColor(this GameObject gameObject, Color color)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;
-                material.SetColor(ColorProperty, color);
+                renderer.sharedMaterial.color = color;
             }
         }
 
         /// <summary>
         /// Retrieves the color from this <paramref name="gameObject"/>.
         ///
-        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
         /// </summary>
         /// <param name="gameObject">object whose color is to be returned</param>
         /// <returns>Color of this <paramref name="gameObject"/></returns>
@@ -207,7 +200,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                return renderer.sharedMaterial.GetColor(ColorProperty);
+                return renderer.sharedMaterial.color;
             }
 
             throw new InvalidOperationException($"GameObject {gameObject.name} has no renderer component.");
@@ -218,14 +211,13 @@ namespace SEE.GO
         /// to <paramref name="alpha"/>.
         /// </summary>
         /// <param name="gameObject">game objects whose transparency is to be set</param>
-        /// <param name="alpha">a value in between 0 and 1 for transparence</param>
+        /// <param name="alpha">a value in between 0 and 1 for transparency</param>
         public static void SetTransparency(this GameObject gameObject, float alpha)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 Color oldColor = renderer.material.color;
-                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, alpha);
-                renderer.material.SetColor(ColorProperty, newColor);
+                renderer.material.color = oldColor.WithAlpha(alpha);
             }
         }
 
