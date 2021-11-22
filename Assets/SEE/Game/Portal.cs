@@ -110,15 +110,18 @@ namespace SEE.Game
 
         private static void SetPortalOfMaterials(GameObject go, Vector2 leftFront, Vector2 rightBack)
         {
-            if (go.TryGetComponent(out Renderer renderer))
+            Renderer[] renderers = go.GetComponents<Renderer>();
+            if (renderers.Length == 0)
+            {
+                Debug.LogError($"No Renderer found for '{go.name}'!");
+                return;
+            }
+            foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.sharedMaterials)
                 {
                     SetPortal(leftFront, rightBack, material);
                 }
-            } else
-            {
-                Debug.LogError($"No Renderer found for '{go.name}'!");
             }
         }
 

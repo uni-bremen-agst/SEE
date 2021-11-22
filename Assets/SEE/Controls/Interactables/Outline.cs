@@ -88,6 +88,11 @@ namespace SEE.Controls.Interactables
         private Material outlineMaskMaterial;
         private Material outlineFillMaterial;
 
+        /// <summary>
+        /// The game object of the code city this outline is attached to. May be null if no such city exists.
+        /// </summary>
+        private GameObject rootCity;
+
         private bool needsUpdate;
 
         public static Outline Create(GameObject go, Color color)
@@ -96,22 +101,11 @@ namespace SEE.Controls.Interactables
 
             if (go)
             {
-                Transform codeCityTransform = SceneQueries.GetCodeCity(go.transform);
-                if (codeCityTransform == null)
-                {
-                    Debug.LogWarning($"Couldn't create outline for '{go.name}' because its code city "
-                                     + "could not be found.");
-                    return null;
-                }
-
-                GameObject root = codeCityTransform.gameObject;
-
                 result = go.AddComponent<Outline>();
                 result.OutlineMode = Mode.OutlineAll;
                 result.OutlineColor = color;
                 result.OutlineWidth = 4.0f;
 
-                Portal.SetPortal(root, go);
             }
 
             return result;
@@ -137,6 +131,14 @@ namespace SEE.Controls.Interactables
 
             // Apply material properties immediately
             needsUpdate = true;
+            
+            // Set portal for outline
+            rootCity = SceneQueries.GetCodeCity(transform)?.gameObject;
+            if (rootCity == null)
+            {
+                Debug.LogWarning("Outline will not respect portal boundaries because no code city has been found"
+                                 + " attached to the game object.");
+            }
 
             // Returns render queue setting of game object's first material
             int GetRenderQueue() => renderers.Select(x => x.materials.First().renderQueue).First();
@@ -169,6 +171,8 @@ namespace SEE.Controls.Interactables
                     renderer.materials = materials;
                 }
             }
+
+            Portal.SetPortal(rootCity, gameObject);
         }
 
         private void OnValidate()
