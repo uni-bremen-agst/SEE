@@ -247,11 +247,13 @@ namespace SEE.Game.UI.CodeWindow
                     oldIDXCoolDown = Time.time + 0.1f;
                     deleteSelectedText();
                     ICRDT.AddString(input, idx - 1, Title);
+                    oldKeyCode = KeyCode.A;
                 }
 
                 if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) &&  valueHasChanged)
                 {
                     returnPressed(idx);
+                    oldKeyCode = KeyCode.Return;
                 } 
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
@@ -261,6 +263,7 @@ namespace SEE.Game.UI.CodeWindow
                     { 
                         ICRDT.DeleteString(idx , idx, Title);
                     }
+                    oldKeyCode = KeyCode.Delete;
                 }
 
                 if (Input.GetKey(KeyCode.Backspace) && valueHasChanged )
@@ -299,7 +302,7 @@ namespace SEE.Game.UI.CodeWindow
 
                 //catches the changes in the code window that happens on a frame shift
                 //so that the code doesnot recognize any more that the key was pressed
-                if (valueHasChanged)
+                if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
                     Debug.Log("Frameshift");
                     switch (oldKeyCode)
@@ -320,7 +323,14 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.AddString(input, idx - 1, Title);
                             break;
                     }
+                    oldKeyCode = KeyCode.None;
+                    valueHasChanged = false;
                 }
+                else
+                {
+                    oldKeyCode = KeyCode.None;
+                }
+
 
             }
             else
