@@ -137,7 +137,7 @@ namespace SEE.Controls.Interactables
             if (rootCity == null)
             {
                 Debug.LogWarning("Outline will not respect portal boundaries because no code city has been found"
-                                 + " attached to the game object.");
+                                 + " attached to the game object.\n");
             }
 
             // Returns render queue setting of game object's first material

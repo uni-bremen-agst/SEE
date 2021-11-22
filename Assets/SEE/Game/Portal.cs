@@ -113,7 +113,7 @@ namespace SEE.Game
             Renderer[] renderers = go.GetComponents<Renderer>();
             if (renderers.Length == 0)
             {
-                Debug.LogError($"No Renderer found for '{go.name}'!");
+                Debug.LogError($"No Renderer found for '{go.name}'!\n");
                 return;
             }
             foreach (Renderer renderer in renderers)
