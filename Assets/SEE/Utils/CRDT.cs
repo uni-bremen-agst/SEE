@@ -929,7 +929,6 @@ namespace SEE.Utils
         /// <returns>A string of a position</returns>
         public string PositionToString(Identifier[] position)
         {
-            //Performance p = Performance.Begin("TOSTRIN");
             string ret = "";
             bool fst = true;
             if (position == null) return null;
@@ -945,8 +944,6 @@ namespace SEE.Utils
                 }
                 ret += i.ToString();
             }
-            // p.End();
-            // Debug.Log("POStoSTRING " + p.GetElapsedTime());
             return ret;
         }
 

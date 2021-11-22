@@ -234,7 +234,6 @@ namespace SEE.Game.UI.CodeWindow
                 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
-                    Debug.Log("INDX " + idx);
                     valueHasChanged = false;
                     if(idx == oldIDX)
                     {
