@@ -3,6 +3,7 @@
 //  QuickOutline
 //
 //  Created by Chris Nolet on 2/21/18.
+//  Modified by Falko Galperin on 22-11-2021.
 //  Copyright © 2018 Chris Nolet. All rights reserved.
 //
 
@@ -76,9 +77,9 @@ Shader "Custom/Outline Fill"
 				UNITY_SETUP_INSTANCE_ID(input);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-				float3 normal = any(input.smoothNormal) ? input.smoothNormal : input.normal;
+				const float3 normal = any(input.smoothNormal) ? input.smoothNormal : input.normal;
 				float3 viewPosition = UnityObjectToViewPos(input.vertex);
-				float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
+				const float3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
 
 				output.position = UnityViewToClipPos(viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0);
 				output.worldPos = mul(unity_ObjectToWorld, float4(input.vertex.x, input.vertex.y, input.vertex.z, 1.0)).xyz;
