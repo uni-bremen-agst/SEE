@@ -1,21 +1,68 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using SEE.Controls.Interactables;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline around a game object being hovered over.
+    /// Draws an outline around a game object being hovered over and makes it opaque.
     /// </summary>
     public class ShowHovering : InteractableObjectHoveringAction
     {
         /// <summary>
         /// The local hovering color of the outline.
         /// </summary>
-        private readonly static Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+        private static readonly Color LocalHoverColor = ColorPalette.Viridis(0.4f);
 
         /// <summary>
         /// The remote hovering color of the outline.
         /// </summary>
-        private readonly static Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+        private static readonly Color RemoteHoverColor = ColorPalette.Viridis(0.2f);
+
+        /// <summary>
+        /// Color of the node's outline before being hovered over.
+        /// </summary>
+        private Color initialColor = Color.black;
+
+        /// <summary>
+        /// Alpha value of the node before being hovered over.
+        /// </summary>
+        private float initialAlpha = 1f;
+
+        /// <summary>
+        /// Outline of the game object being hovered over.
+        /// </summary>
+        private Outline outline;
+
+        /// <summary>
+        /// The material of the game object being hovered over.
+        /// </summary>
+        private AlphaEnforcer enforcer;
+
+        private Sequence hoverAnimation;
+
+        /// <summary>
+        /// Initializes this component by creating an outline and AlphaEnforcer, if necessary.
+        /// </summary>
+        private void Start()
+        {
+            if (!TryGetComponent(out outline))
+            {
+                outline = Outline.Create(gameObject, initialColor);
+            }
+
+            if (!TryGetComponent(out enforcer))
+            {
+                enforcer = gameObject.AddComponent<AlphaEnforcer>();
+                enforcer.TargetAlpha = initialAlpha;
+            }
+            hoverAnimation = DOTween.Sequence();
+            hoverAnimation.Append(DOTween.To(() => enforcer.TargetAlpha, x => enforcer.TargetAlpha = x, 1f, 0.5f));
+            hoverAnimation.SetAutoKill(false);
+            hoverAnimation.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            hoverAnimation.Pause();
+        }
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
@@ -29,13 +76,13 @@ namespace SEE.Controls.Actions
         {
             if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
-                if (TryGetComponent(out Outline outline))
+                initialColor = outline.OutlineColor;
+                outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
+                if (isInitiator)
                 {
-                    outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isInitiator ? LocalHoverColor : RemoteHoverColor);
+                    // initialAlpha = enforcer.TargetAlpha;
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
                 }
             }
         }
@@ -49,9 +96,15 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
+            //FIXME: Outline color is not correctly set if we hover off while a node is selected
+            if (!interactable.IsSelected && !interactable.IsGrabbed)
             {
-                DestroyImmediate(outline);
+                outline.OutlineColor = initialColor;
+                if (isInitiator)
+                {
+                    // enforcer.TargetAlpha = initialAlpha;
+                    hoverAnimation.PlayBackwards();
+                }
             }
         }
 
@@ -59,7 +112,12 @@ namespace SEE.Controls.Actions
         {
             if (interactable.IsHovered && !interactable.IsGrabbed)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
+                if (isInitiator)
+                {
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
+                }
             }
         }
 
@@ -67,7 +125,12 @@ namespace SEE.Controls.Actions
         {
             if (interactable.IsHovered && !interactable.IsSelected)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                outline.OutlineColor = isInitiator ? LocalHoverColor : RemoteHoverColor;
+                if (isInitiator)
+                {
+                    // enforcer.TargetAlpha = 1f;
+                    hoverAnimation.PlayForward();
+                }
             }
         }
     }

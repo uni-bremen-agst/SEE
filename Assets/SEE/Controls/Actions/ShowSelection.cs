@@ -1,21 +1,59 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Interactables;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline for a selected object.
+    /// Draws an outline for a selected object and makes it opaque.
     /// </summary>
     public class ShowSelection : InteractableObjectSelectionAction
     {
         /// <summary>
         /// The local selection color of the outline.
         /// </summary>
-        private readonly static Color LocalSelectColor = Utils.ColorPalette.Viridis(0.4f);
+        private static readonly Color LocalSelectColor = Utils.ColorPalette.Viridis(0.8f);
 
         /// <summary>
         /// The remote selection color of the outline.
         /// </summary>
-        private readonly static Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
+        private static readonly Color RemoteSelectColor = Utils.ColorPalette.Viridis(0.6f);
+
+        /// <summary>
+        /// Outline of the game object being selected.
+        /// </summary>
+        private Outline outline;
+
+        /// <summary>
+        /// The material of the game object being selected.
+        /// </summary>
+        private AlphaEnforcer enforcer;
+
+        /// <summary>
+        /// Color of the node before being selected.
+        /// </summary>
+        private Color initialColor = Color.black;
+
+        /// <summary>
+        /// Alpha value of the node before being hovered over.
+        /// </summary>
+        private float initialAlpha = 1f;
+
+        /// <summary>
+        /// Initializes this component by creating an outline and AlphaEnforcer, if necessary.
+        /// </summary>
+        private void Start()
+        {
+            if (!TryGetComponent(out outline))
+            {
+                outline = Outline.Create(gameObject, initialColor);
+            }
+
+            if (!TryGetComponent(out enforcer))
+            {
+                enforcer = gameObject.AddComponent<AlphaEnforcer>();
+                enforcer.TargetAlpha = initialAlpha;
+            }
+        }
 
         /// <summary>
         /// If the object is not grabbed, a selection outline will be
@@ -28,13 +66,12 @@ namespace SEE.Controls.Actions
         {
             if (!interactable.IsGrabbed)
             {
-                if (TryGetComponent(out Outline outline))
+                initialColor = outline.OutlineColor;
+                outline.OutlineColor = isInitiator ? LocalSelectColor : RemoteSelectColor;
+                if (isInitiator)
                 {
-                    outline.SetColor(isInitiator ? LocalSelectColor : RemoteSelectColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isInitiator ? LocalSelectColor : RemoteSelectColor);
+                    initialAlpha = enforcer.TargetAlpha;
+                    enforcer.TargetAlpha = 1f;
                 }
             }
         }
@@ -46,9 +83,13 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsHovered && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
+            if (!interactable.IsHovered && !interactable.IsGrabbed)
             {
-                DestroyImmediate(outline);
+                outline.OutlineColor = initialColor;
+                if (isInitiator)
+                {
+                    enforcer.TargetAlpha = initialAlpha;
+                }
             }
         }
 
@@ -61,7 +102,11 @@ namespace SEE.Controls.Actions
         {
             if (interactable.IsSelected)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalSelectColor : RemoteSelectColor);
+                outline.OutlineColor = isInitiator ? LocalSelectColor : RemoteSelectColor;
+                if (isInitiator)
+                {
+                    enforcer.TargetAlpha = 1f;
+                }
             }
         }
     }
