@@ -67,6 +67,15 @@ namespace SEE.Game.Evolution
         private readonly Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
 
         /// <summary>
+        /// A dictionary containing all created edges that are currently in use. The set of
+        /// edges contained may be an accumulation of all edges created and added by
+        /// <see cref="GetEdge(Edge, out GameObject)"/> so far and not just  those of one single
+        /// graph in the graph series (unless an edge was removed by
+        /// <see cref="RemoveEdge(Edge, out GameObject)"/> meanwhile).
+        /// </summary>
+        private readonly Dictionary<string, GameObject> edges = new Dictionary<string, GameObject>();
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="renderer">the graph renderer used to create the game objects</param>
@@ -198,6 +207,38 @@ namespace SEE.Game.Evolution
             }
         }
 
+        public Edge GetEdge(Edge edge, out GameObject gameEdge)
+        {
+            if (edges.TryGetValue(edge.ID, out gameEdge))
+            {
+                // A game edge with the requested ID exists already, which can
+                // be re-used.
+
+                // The game object has already an edge attached to it, but that
+                // edge is part of a different graph (i.e,, different revision).
+                // That is why we replace the attached edge by this edge here.
+                return ReattachEdge(gameEdge, edge);
+            }
+            else
+            {
+                // Avoid reattaching of `source' and `target' if they already exist.
+                if (!nodes.TryGetValue(edge.Source.ID, out GameObject source))
+                {
+                    GetNode(edge.Source, out source); // Create a new one.
+                }
+                if (!nodes.TryGetValue(edge.Target.ID, out GameObject target))
+                {
+                    GetNode(edge.Source, out target); // Create a new one.
+                }
+                gameEdge = _graphRenderer.EdgeLayout(
+                    new List<GameObject>() { source, target },
+                    city, false) .First(); // There can only be one.
+                // Add the newly created gameEdge to the cache.
+                edges[edge.ID] = gameEdge;
+                return null;
+            }
+        }
+
         /// <summary>
         /// Re-attaches the given <paramref name="node"/> to the given <paramref name="gameObject"/>,
         /// that is, the NodeRef component of <paramref name="gameObject"/> will refer to
@@ -226,13 +267,23 @@ namespace SEE.Game.Evolution
             return formerNode;
         }
 
-        /// <summary>
-        /// Clears old and new edges
-        /// </summary>
-        private void ClearAllEdges()
+        private static Edge ReattachEdge(GameObject gameObject, Edge edge)
         {
-            ClearEdges();
-            ClearNewEdges();
+            Edge formerEdge = null;
+
+            EdgeRef edgeref = gameObject.GetComponent<EdgeRef>();
+            if (edgeref == null)
+            {
+                // edgeref should not be null
+                Debug.LogError($"Re-used game object for edge '{edge.ID}' does not have a graph edge attached to it\n");
+                edgeref = gameObject.AddComponent<EdgeRef>();
+            }
+            else
+            {
+                formerEdge = edgeref.Value;
+            }
+            edgeref.Value = edge;
+            return formerEdge;
         }
 
         /// <summary>
@@ -255,77 +306,13 @@ namespace SEE.Game.Evolution
             return wasNodeRemoved;
         }
 
-        /// <summary>
-        /// The list of edges rendered for this graph.
-        /// </summary>
-        private ICollection<GameObject> edges;
-
-        /// <summary>
-        /// The list of edges calculated for the next graph.
-        /// </summary>
-        private ICollection<GameObject> newEdges;
-
-        /// <summary>
-        /// Renders all edges for the nodes in the node cache according to the settings.
-        /// If edges for these nodes existed already, their game objects are destroyed first.
-        /// </summary>
-        public void RenderEdges()
+        public bool RemoveEdge(Edge edge, out GameObject gameObject)
         {
-            ClearAllEdges();
-            // FIXME: Provide meaningful values for scaleFactor.
-            edges = _graphRenderer.EdgeLayout(nodes.Values, city);
-        }
+            edge.AssertNotNull("edge");
 
-        /// <summary>
-        /// Returns the list of edges rendered for this graph.
-        /// </summary>
-        /// <returns>The list of edges rendered for this graph</returns>
-        public ICollection<GameObject> GetEdges()
-        {
-            return edges;
-        }
-
-        /// <summary>
-        /// Calculates the edges of the next graph.
-        /// Checks which nodes have moved to calculate only those that have actually changed their position.
-        /// </summary>
-        /// <returns>The list of calculated edges of the next graph</returns>
-        public ICollection<GameObject> CalculateNewEdgeControlPoints()
-        {
-            ClearNewEdges();
-            newEdges = _graphRenderer.EdgeLayout(nodes.Values, city, draw: false);
-            return newEdges;
-        }
-
-        /// <summary>
-        /// Destroys an edge from the graph
-        /// </summary>
-        /// <param name="edge">The edge to be removed</param>
-        public void RemoveEdge(Edge edge)
-        {
-            foreach (GameObject go in edges.ToList<GameObject>())
-            {
-                if (edge.ID.Equals(go.ID()))
-                {
-                    edges.Remove(go);
-                    Destroyer.DestroyGameObject(go);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Destroys all game objects created for newEdges.
-        /// </summary>
-        private void ClearNewEdges()
-        {
-            if (newEdges != null)
-            {
-                foreach (GameObject gameObject in newEdges)
-                {
-                    Destroyer.DestroyGameObject(gameObject);
-                }
-                newEdges.Clear();
-            }
+            bool wasEdgeRemoved = edges.TryGetValue(edge.ID, out gameObject);
+            edges.Remove(edge.ID);
+            return wasEdgeRemoved;
         }
 
         /// <summary>
@@ -336,7 +323,7 @@ namespace SEE.Game.Evolution
         {
             ClearPlane();
             ClearNodes();
-            ClearAllEdges();
+            ClearEdges();
         }
 
         /// <summary>
@@ -365,20 +352,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Destroys all game objects created for edges.
+        /// Destroys all game objects created for edges. Clears the edge cache.
         /// </summary>
         private void ClearEdges()
         {
-            if (edges != null)
+            foreach (GameObject gameObject in edges.Values)
             {
-                foreach (GameObject gameObject in edges)
-                {
-                    Destroyer.DestroyGameObject(gameObject);
-                }
-                // edges will be overridden in RenderEdges() each time, that is why we
-                // do not Clear() it but reset it to null
-                edges = null;
+                Destroyer.DestroyGameObject(gameObject);
             }
+            edges.Clear();
         }
     }
 }
