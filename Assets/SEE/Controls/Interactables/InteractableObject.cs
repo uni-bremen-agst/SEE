@@ -98,10 +98,10 @@ namespace SEE.Controls
         {
             bool result = false;
             nodeRef = null;
-            if (GraphElemRef is NodeRef)
+            if (GraphElemRef is NodeRef @ref)
             {
                 result = true;
-                nodeRef = (NodeRef)GraphElemRef;
+                nodeRef = @ref;
             }
             return result;
         }
@@ -110,10 +110,10 @@ namespace SEE.Controls
         {
             bool result = false;
             edgeRef = null;
-            if (GraphElemRef is EdgeRef)
+            if (GraphElemRef is EdgeRef @ref)
             {
                 result = true;
-                edgeRef = (EdgeRef)GraphElemRef;
+                edgeRef = @ref;
             }
             return result;
         }
@@ -312,7 +312,7 @@ namespace SEE.Controls
                 HoverFlag[] flags = (HoverFlag[])Enum.GetValues(typeof(HoverFlag));
                 foreach (HoverFlag flag in flags)
                 {
-                    message += "\n\t" + flag.ToString() + ": " + (IsHoverFlagSet(flag) ? "Yes" : "No");
+                    message += $"\n\t{flag}: {(IsHoverFlagSet(flag) ? "Yes" : "No")}";
                 }
                 Debug.LogWarning(message);
                 return;
