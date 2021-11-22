@@ -282,6 +282,7 @@ namespace SEE.Utils
             }
             undoStack.Push((charObjs.ToArray(), operationType.Delete));
             redoStack.Clear();
+            Debug.Log("CLEAR REDO");
         }
 
         /// <summary>
@@ -305,7 +306,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        public void AddString(string s, int startIdx)
+        public void AddString(string s, int startIdx, bool disarmUndo = false)
         {
             List<CharObj> charObjs = new List<CharObj>(s.Length);
             for (int i = 0; i < s.Length; i++)
@@ -313,10 +314,14 @@ namespace SEE.Utils
                 AddChar(s[i], i + startIdx);
                 charObjs.Add(crdt[i + startIdx]);
             }
-
-            CharObj[] charArr = charObjs.ToArray();
-            undoStack.Push((charArr, operationType.Add));
-            redoStack.Clear();
+            if (!disarmUndo)
+            {
+                CharObj[] charArr = charObjs.ToArray();
+                undoStack.Push((charArr, operationType.Add));
+                redoStack.Clear();
+                Debug.Log("Clear Redo");
+            }
+            
 
         }
 
@@ -352,6 +357,7 @@ namespace SEE.Utils
                 CharObj[] charArr = charObjs.ToArray();
                 undoStack.Push((charArr, operationType.Add));
                 redoStack.Clear();
+                Debug.Log("REDO CLEAR");
             }
             else
             {
@@ -849,7 +855,7 @@ namespace SEE.Utils
             {
                 crdt.Add(c);
             }
-
+            
             if (index - 1 >= 0)
             {
                 new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), crdt[index - 1].GetIdentifier(), filename);
