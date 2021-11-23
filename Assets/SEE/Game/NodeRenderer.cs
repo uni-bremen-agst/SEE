@@ -583,7 +583,7 @@ namespace SEE.Game
             {
                 AddLabels(innerNodes, innerNodeFactory);
             }
-            
+
             // Add outline around nodes so they can be visually differentiated without needing the same color.
             //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
             // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
