@@ -221,20 +221,36 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                // Avoid reattaching of `source' and `target' if they already exist.
-                if (!nodes.TryGetValue(edge.Source.ID, out GameObject source))
+                // Find all relevant node objects.
+                List<GameObject> nodeObjecs = new List<GameObject>();
+                foreach (var node in edge.ItsGraph.Nodes())
                 {
-                    GetNode(edge.Source, out source); // Create a new one.
+                    GetNode(node, out GameObject no);
+                    nodeObjecs.Add(no);
                 }
-                if (!nodes.TryGetValue(edge.Target.ID, out GameObject target))
+
+                // Create the entire edge layout from the nodes.
+                var edgeObjecs = _graphRenderer.EdgeLayout(nodeObjecs, city, false);
+
+                // Put all edge objects into the cache and find `gameEdge'.
+                foreach (var edgeObject in edgeObjecs)
                 {
-                    GetNode(edge.Source, out target); // Create a new one.
+                    var id = edgeObject.GetComponent<EdgeRef>().Value.ID;
+                    if (edges.ContainsKey(id))
+                    {
+                        // Edge object has already been created in previous call.
+                        Destroyer.DestroyGameObject(edgeObject);
+                    }
+                    else
+                    {
+                        edges.Add(id, edgeObject);
+                    }
+                    if (id == edge.ID)
+                    {
+                        gameEdge = edgeObject;
+                    }
                 }
-                gameEdge = _graphRenderer.EdgeLayout(
-                    new List<GameObject>() { source, target },
-                    city, false) .First(); // There can only be one.
-                // Add the newly created gameEdge to the cache.
-                edges[edge.ID] = gameEdge;
+
                 return null;
             }
         }
