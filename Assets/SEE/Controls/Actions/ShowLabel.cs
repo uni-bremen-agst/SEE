@@ -253,13 +253,17 @@ namespace SEE.Controls.Actions
 
             string shownText = node.SourceName;
 
+            Vector3 roof = gameObject.transform.position;
+            roof.y += gameObject.transform.lossyScale.y / 2;
+
             // Now we create the label.
             // We define starting and ending positions for the animation.
-            Vector3 startLabelPosition = gameObject.transform.position;
+            Vector3 startLabelPosition = roof;
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
                 startLabelPosition,
                 (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
+                lift: true,
                 textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
@@ -267,8 +271,7 @@ namespace SEE.Controls.Actions
             SetOutline();
 
             // Add connecting line between "roof" of object and text.
-            Vector3 startLinePosition = gameObject.transform.position;
-            startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
+            Vector3 startLinePosition = roof;
             edge = new GameObject();
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
@@ -317,10 +320,10 @@ namespace SEE.Controls.Actions
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
             endLabelPosition.y += (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).Distance;
-            // Due to the line not using world space, we need to transform its position accordingly
+            // Due to the line not using world space, we need to transform its position accordingly.
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
-            float nodeTopPosition = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
-            endLinePosition.y -= nodeTopPosition * 1.3f; // add slight gap to make it slightly more aesthetic
+            float labelTextExtent = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
+            endLinePosition.y -= labelTextExtent * 1.3f; // add slight gap to make it slightly more aesthetic
 
             float animationDuration = AnimationDuration(node, city);
             if (animationDuration <= 0)
