@@ -165,6 +165,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Sequence sequence;
 
+        /// <summary>
+        /// Indicates whether we are about to destroy the label.
+        /// </summary>
         private bool currentlyDestroying;
 
         /// <summary>
@@ -250,8 +253,8 @@ namespace SEE.Controls.Actions
 
             string shownText = node.SourceName;
 
-            // Now we create the label
-            // We define starting and ending positions for the animation
+            // Now we create the label.
+            // We define starting and ending positions for the animation.
             Vector3 startLabelPosition = gameObject.transform.position;
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
@@ -263,15 +266,17 @@ namespace SEE.Controls.Actions
 
             SetOutline();
 
-            // Add connecting line between "roof" of object and text
+            // Add connecting line between "roof" of object and text.
             Vector3 startLinePosition = gameObject.transform.position;
             startLinePosition.y = BoundingBox.GetRoof(new List<GameObject> {gameObject});
             edge = new GameObject();
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
             edge.transform.SetParent(nodeLabel.transform);
-            //FIXME: Normal text labels also get an infinite portal due to shared material, so this is commented out for now
-            //Portal.SetInfinitePortal(nodeLabel);
+
+            // The nodeLabel and its child edge must inherit the portal of gameObject.
+            Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack);
+            Portal.SetPortal(nodeLabel, leftFront, rightBack);
 
             AnimateLabel(city, node);
         }
@@ -322,7 +327,6 @@ namespace SEE.Controls.Actions
             {
                 // If animation duration is set to 0, all otherwise animated attributes should be set immediately
                 SetAttributesImmediately();
-
                 return;
             }
 

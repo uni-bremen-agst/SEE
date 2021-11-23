@@ -10,23 +10,23 @@ namespace SEE.Game
     public static class Portal
     {
         /// <summary>
-        /// Cached property index for the _PortalMin shader property.
+        /// Cached property index for the _PortalMin shader property (Portal Left Front Corner).
         /// </summary>
         private static readonly int PortalMin = Shader.PropertyToID("_PortalMin");
-        
+
         /// <summary>
-        /// Cached property index for the _PortalMax shader property.
+        /// Cached property index for the _PortalMax shader property (Portal Right Back Corner).
         /// </summary>
         private static readonly int PortalMax = Shader.PropertyToID("_PortalMax");
 
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
         /// complete area of <paramref name="parent"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="parent"/> must have a plane component
         /// attached to it.
         /// </summary>
-        /// <param name="parent">game objects whose children should be culled if they leave 
+        /// <param name="parent">game objects whose children should be culled if they leave
         /// the area of the <paramref name="parent"/></param>
         public static void SetPortal(GameObject parent)
         {
@@ -38,9 +38,58 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/> 
+        /// Returns the portal of <paramref name="gameObject"/> a rectangle in the x/z plane
+        /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
+        ///
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="Renderer"/>.
+        /// If there is no renderer, <paramref name="leftFront"/> and <paramref name="rightBack"/>
+        /// are both <see cref="Vector2.zero"/>.
+        /// </summary>
+        /// <param name="gameObject">game objects whose portal is requested</param>
+        /// <param name="leftFront">the left front corner of the rectangular portal</param>
+        /// <param name="rightBack">the right back corner of the rectangular portal</param>
+        public static void GetPortal(GameObject gameObject, out Vector2 leftFront, out Vector2 rightBack)
+        {
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                GetPortal(renderer.sharedMaterial, out leftFront, out rightBack);
+            }
+            else
+            {
+                Debug.LogError($"Game object {gameObject.name} does not have a renderer.\n");
+                leftFront = Vector2.zero;
+                rightBack = Vector2.zero;
+            }
+        }
+
+        /// <summary>
+        /// Returns the portal of <paramref name="material"/> a rectangle in the x/z plane
+        /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
+        ///
+        /// Precondition: <paramref name="material"/> must have a the attributes
+        /// <see cref="PortalMin"/> and <see cref="PortalMax"/>. If they do not
+        /// exist, the result is undefined.
+        /// </summary>
+        /// <param name="gameObject">game objects whose portal is requested</param>
+        /// <param name="leftFront">the left front corner of the rectangular portal</param>
+        /// <param name="rightBack">the right back corner of the rectangular portal</param>
+        private static void GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
+        {
+            // Although PortalMin and PortalMax are Vector4, only their x and y component
+            // is set. The x component is the x axis in Unity space, but the y component
+            // is the z axis in Unity space.
+            Vector4 portalLeftFrontCorner = material.GetVector(PortalMin);
+            Vector4 portalRightBackCorner = material.GetVector(PortalMax);
+            leftFront.x = portalLeftFrontCorner.x;
+            leftFront.y = portalLeftFrontCorner.y;
+            rightBack.x = portalRightBackCorner.x;
+            rightBack.y = portalRightBackCorner.y;
+        }
+
+        /// <summary>
+        /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
-        /// 
+        ///
         /// Precondition: <paramref name="gameObject"/> must have a plane component
         /// attached to it.
         /// </summary>
@@ -56,10 +105,25 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogWarningFormat("Game object {0} has no GO.Plane.\n", gameObject.name);
+                Debug.LogWarning("Game object {gameObject.name} has no GO.Plane.\n");
                 leftFrontCorner = Vector2.zero;
                 rightBackCorner = Vector2.zero;
             }
+        }
+
+        /// <summary>
+        /// Recursively sets the culling area (portal) of the <paramref name="gameObject"/> and all
+        /// its children to the rectangle in the x/z plane defined by the given <paramref name="leftFront"/>
+        /// and <paramref name="rightBack"/> corner.
+        ///
+        /// N.B. equivalent to SetPortal(gameObject.transform, leftFront, rightBack).
+        /// </summary>
+        /// <param name="gameObject">object whose culling area is to be set</param>
+        /// <param name="leftFront">left front corner of the culling area</param>
+        /// <param name="rightBack">right back corner of the culling area</param>
+        public static void SetPortal(GameObject gameObject, Vector2 leftFront, Vector2 rightBack)
+        {
+            SetPortal(gameObject.transform, leftFront, rightBack);
         }
 
         /// <summary>
@@ -74,7 +138,7 @@ namespace SEE.Game
         {
             if (transform.TryGetComponent(out Renderer renderer))
             {
-                SetPortal(leftFront, rightBack, renderer.sharedMaterial);
+                SetPortal(renderer.sharedMaterial, leftFront, rightBack);
             }
             foreach (Transform child in transform)
             {
@@ -120,16 +184,15 @@ namespace SEE.Game
             {
                 foreach (Material material in renderer.sharedMaterials)
                 {
-                    SetPortal(leftFront, rightBack, material);
+                    SetPortal(material, leftFront, rightBack);
                 }
             }
         }
 
-        private static void SetPortal(Vector2 leftFrontCorner, Vector2 rightBackCorner, Material material)
+        private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             material.SetVector(PortalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
             material.SetVector(PortalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
-        
     }
 }
