@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Assets.SEE.GameObjects
 {
@@ -179,6 +180,98 @@ namespace Assets.SEE.GameObjects
             mesh.uv = uvs.ToArray();
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             return mesh;
+        }
+    }
+
+    /// <summary>
+    /// This class can be used to morph the <see cref="SEESpline"/> component
+    /// of a <see cref="GameObject"/>. The morphism is initialized with
+    /// <see cref="InitMorph(BSpline, BSpline)"/> and evaluated with
+    /// <see cref="Eval(double)"/>. For the sake of fail-safeness, a default
+    /// morphism is set up in <see cref="Awake"/> (i.e.,
+    /// <see cref="Eval(double)"/> never fails).
+    /// </summary>
+    public class SplineMorphism : SerializedMonoBehaviour
+    {
+        /// <summary>
+        /// Origin of the spline morphism.
+        /// </summary>
+        public BSpline Source;
+
+        /// <summary>
+        /// Target of the spline morphism.
+        /// </summary>
+        public BSpline Target;
+
+        /// <summary>
+        /// TinySpline's spline morphism.
+        /// </summary>
+        private Morphism Morphism;
+
+        void Awake()
+        {
+            // A very boring default morphism.
+            Source = new BSpline(2, 3, 1)
+            {
+                ControlPoints = { 0, 0, 0, 1, 1, 1 }
+            };
+            Target = new BSpline(Source);
+            Morphism = Source.MorphTo(Target);
+        }
+
+        /// <summary>
+        /// Initializes the spline morphism. Asserts that
+        /// <paramref name="source"/> and <paramref name="target"/> are not
+        /// null.
+        /// </summary>
+        /// <param name="source">Origin of the spline morphsim</param>
+        /// <param name="target">Target of the spline morphism</param>
+        public void InitMorph(BSpline source, BSpline target)
+        {
+            Assert.IsNotNull("source");
+            Assert.IsNotNull("target");
+            Source = source;
+            Target = target;
+            Morphism = source.MorphTo(target);
+        }
+
+        /// <summary>
+        /// Evaluates the morphism at the time parameter <see cref="t"/>
+        /// (domain [0, 1]; clamped if necessary) and updates the
+        /// <see cref="SEESpline"/>, <see cref="LineRenderer"/>, and
+        /// <see cref="MeshFilter"/> component of the <see cref="GameObject"/>
+        /// this morphism is attached to. Does not fail if any of these
+        /// components is missing. The returned <see cref="BSpline"/> instance
+        /// is a deep copy of the morphism result and can be used by the
+        /// caller for further calculations.
+        /// </summary>
+        /// <param name="t">The time parameter. Clamped to domain [0, 1]</param>
+        /// <returns>Interpolation of source and target at t</returns>
+        public BSpline Eval(double t)
+        {
+            BSpline interpolated = Morphism.Eval(t);
+            if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
+            {
+                spline.Spline = interpolated;
+                // Update line renderer.
+                if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer))
+                {
+                    Vector3[] polyLine = spline.PolyLine();
+                    lineRenderer.positionCount = polyLine.Length;
+                    lineRenderer.SetPositions(polyLine);
+                }
+                // Update mesh.
+                if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter))
+                {
+                    // TODO
+                }
+            }
+            else
+            {
+                Debug.LogWarning("gameObject without SEESpline component");
+            }
+            // Protect internal state of `spline'.
+            return new BSpline(spline.Spline);
         }
     }
 
