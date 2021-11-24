@@ -27,6 +27,12 @@ namespace SEE.Net
         private const string PlayerRepresentationPrefab = "Man"; //"PlayerHead";
 
         /// <summary>
+        /// The initial scale of the player representation instantiated from
+        /// <see cref="PlayerRepresentationPrefab"/>.
+        /// </summary>
+        private readonly static Vector3 PlayerRepresentationScale = Vector3.one; // new Vector3(0.02f, 0.015f, 0.015f);
+
+        /// <summary>
         /// The list of all active connections.
         /// </summary>
         public static List<Connection> Connections { get; private set; }
@@ -231,7 +237,7 @@ namespace SEE.Net
                         PlayerRepresentationPrefab,
                         Vector3.zero,
                         Quaternion.identity,
-                        new Vector3(0.02f, 0.015f, 0.015f)
+                        PlayerRepresentationScale
                     ).Execute();
                 }
                 else
