@@ -73,7 +73,7 @@ namespace Assets.SEE.GameObjects
                 Degree = (uint)value.Degree;
                 ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
                 Knots = TinySplineInterop.ListToArray(value.Knots);
-                Cache = Spline;
+                Cache = value;
             }
         }
 
