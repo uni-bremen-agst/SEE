@@ -80,7 +80,7 @@ namespace Assets.SEE.GameObjects
         /// <summary>
         /// Approximates <see cref="Spline"/> as poly line. The greater
         /// <paramref name="num"/>, the more accurate the approximation.
-        /// The poly line can be visualized with <see cref="LineRenderer"/>.
+        /// The poly line can be visualized with a <see cref="LineRenderer"/>.
         /// </summary>
         /// <param name="num">Number of vertecies in the poly line</param>
         /// <returns>A poly line approximating <see cref="Spline"/></returns>
