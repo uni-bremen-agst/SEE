@@ -86,5 +86,8 @@
     <edge id="E6" from="N6" to="N7">
       <type xlink:href="Belongs_To"/>
     </edge>
+    <edge id="E10" from="N3" to="N6">
+      <type xlink:href="Call"/>
+    </edge>
   </graph>
 </gxl>
