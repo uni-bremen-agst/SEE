@@ -230,10 +230,10 @@ namespace SEE.Game.Evolution
                 }
 
                 // Create the entire edge layout from the nodes.
-                var edgeObjecs = _graphRenderer.EdgeLayout(nodeObjecs, city, false);
+                var edgeObjects = _graphRenderer.EdgeLayout(nodeObjecs, city, true);
 
                 // Put all edge objects into the cache and find `gameEdge'.
-                foreach (var edgeObject in edgeObjecs)
+                foreach (var edgeObject in edgeObjects)
                 {
                     var id = edgeObject.GetComponent<EdgeRef>().Value.ID;
                     if (edges.ContainsKey(id))
@@ -243,6 +243,7 @@ namespace SEE.Game.Evolution
                     }
                     else
                     {
+                        edgeObject.SetActive(false); // Disable renderer
                         edges.Add(id, edgeObject);
                     }
                     if (id == edge.ID)
