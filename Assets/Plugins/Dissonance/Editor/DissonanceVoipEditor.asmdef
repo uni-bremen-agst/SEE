@@ -1,0 +1,10 @@
+{
+    "name": "DissonanceVoipEditor",
+    "references": [
+        "DissonanceVoip"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
