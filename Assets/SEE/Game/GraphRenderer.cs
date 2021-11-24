@@ -290,6 +290,11 @@ namespace SEE.Game
             return result;
         }
 
+        public static ICollection<LayoutEdge> LayoutEdges(ICollection<ILayoutNode> layoutNodes)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Applies the edge layout according to the the user's choice (settings).
         /// </summary>
