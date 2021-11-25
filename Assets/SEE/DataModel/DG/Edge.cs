@@ -16,20 +16,18 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="ID">unique ID of edge</param>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
         /// <param name="type">type of the edge</param>
-        public Edge(string ID, Node source, Node target, string type)
+        public Edge(Node source, Node target, string type)
         {
             this.Source = source;
             this.Target = target;
             Type = type;
-            id = ID;
         }
 
         /// <summary>
-        /// Constructor. A random ID will be used for this edge.
+        /// Constructor.
         /// </summary>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
@@ -37,25 +35,13 @@ namespace SEE.DataModel.DG
         {
             this.Source = source;
             this.Target = target;
-            id = Guid.NewGuid().ToString();
         }
 
         /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
-        /// </summary>
-        /// <param name="ID">unique ID of edge</param>
-        public Edge(string ID)
-        {
-            id = ID;
-        }
-
-        /// <summary>
-        /// Constructor. Source, target, and type of the edge remain undefined.
-        /// A random ID will be used for this edge.
         /// </summary>
         public Edge()
         {
-            id = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -157,14 +143,21 @@ namespace SEE.DataModel.DG
         /// </summary>
         public override string ID
         {
-            get => id;
-            set 
+            get
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    id = Type + "#" + Source.ID + "#" + Target.ID;
+                }
+                return id;
+            }
+            set
             {
                 if (ItsGraph != null)
                 {
                     throw new InvalidOperationException("ID must not be changed once added to graph.");
                 }
-                
+
                 id = value;
             }
         }
