@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SEE.Controls.Actions;
+using SEE.Controls.Interactables;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Object = UnityEngine.Object;
 
 namespace SEE.Game
 {
@@ -70,7 +73,7 @@ namespace SEE.Game
             // later it should be drawn, or in other words, the higher its offset in the
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
-            GameObject result = innerNodeFactory.NewBlock(style: SelectStyle(node), renderQueueOffset: node.Level);
+            GameObject result = innerNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset: node.Level);
             SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
             return result;
@@ -87,10 +90,10 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Create and returns a new game object for representing the given <paramref name="node"/>.
+        /// Creates and returns a new game object for representing the given <paramref name="node"/>.
         /// The exact kind of representation depends upon the leaf-node factory. The node is
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
-        /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
+        /// Its style is determined by LeafNodeStyleMetric (linear interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// LOD is added and the resulting node is prepared for interaction.
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
@@ -166,7 +169,7 @@ namespace SEE.Game
 
             // leafNode is no longer needed; we have its mesh that is all we needed.
             // It can be dismissed.
-            GameObject.Destroy(leafNode);
+            Object.Destroy(leafNode);
         }
 
         /// <summary>
@@ -551,7 +554,6 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes to be decorated</param>
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
-        /// <returns>the game objects added for the decorations; may be an empty collection</returns>
         private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds,
                                     NodeLayoutKind nodeLayout)
         {
@@ -580,6 +582,17 @@ namespace SEE.Game
                 || nodeLayout == NodeLayoutKind.CirclePacking)
             {
                 AddLabels(innerNodes, innerNodeFactory);
+            }
+
+            // Add outline around nodes so they can be visually differentiated without needing the same color.
+            //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
+            // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
+            // other nodes, and to show when a node is being highlighted by making it opaque.
+            //TODO: Make transparency value configurable
+            foreach (GameObject node in leafNodes.Concat(innerNodes))
+            {
+                Outline.Create(node, Color.black);
+                node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles

@@ -26,8 +26,8 @@ namespace SEE.Game
         /// Constructor. If the <paramref name="graph"/> is null, you need to call
         /// SetScaler() before you can call Draw().
         /// </summary>
-        /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
+        /// <param name="graph">the graph to be rendered</param>
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
             this.settings = settings;
@@ -94,7 +94,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly City.AbstractSEECity settings;
+        public readonly AbstractSEECity settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -693,7 +693,7 @@ namespace SEE.Game
         /// Calculate the child/ removed nodes for each sublayout
         /// </summary>
         /// <param name="sublayoutNodes">the sublayout nodes</param>
-        private void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
+        private static void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
         {
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
@@ -1018,12 +1018,12 @@ namespace SEE.Game
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>(nodes.Count);
 
-            for (int i = 0; i < nodes.Count; i++)
+            foreach (Node node in nodes)
             {
                 // We add only leaves.
-                if (nodes[i].IsLeaf())
+                if (node.IsLeaf())
                 {
-                    result[nodes[i]] = DrawLeafNode(nodes[i]);
+                    result[node] = DrawLeafNode(node);
                 }
             }
             return result;
