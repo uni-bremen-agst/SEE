@@ -250,7 +250,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
         /// <param name="gameNodes">where to add the ascendants</param>
-        private void AddAscendants(GameObject node, HashSet<GameObject> gameNodes)
+        private static void AddAscendants(GameObject node, HashSet<GameObject> gameNodes)
         {
             GameObject cursor = node;
             while (cursor != null && cursor.CompareTag(Tags.Node))
