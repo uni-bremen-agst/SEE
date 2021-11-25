@@ -203,12 +203,12 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (SEEInput.CodeWindowUndo())
                 {
-                    ShowNotification.Info("UNDO", "UNDO");
+                    ShowNotification.Info("UNDO", "");
                     ICRDT.Undo(Title);
                 }
                 if (SEEInput.CodeWindowRedo())
                 {
-                    ShowNotification.Info("REDO", "REDO");
+                    ShowNotification.Info("REDO", "");
                     ICRDT.Redo(Title);
                 }
 
@@ -254,6 +254,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     returnPressed(idx);
                     oldKeyCode = KeyCode.Return;
+                    valueHasChanged = false;
                 } 
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
@@ -304,7 +305,7 @@ namespace SEE.Game.UI.CodeWindow
                 //so that the code doesnot recognize any more that the key was pressed
                 if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
-                    Debug.Log("Frameshift");
+                    ShowNotification.Info("Frameshift", "Frameshift");
                     switch (oldKeyCode)
                     {
                         case KeyCode.Backspace:
@@ -330,8 +331,6 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     oldKeyCode = KeyCode.None;
                 }
-
-
             }
             else
             {
@@ -341,7 +340,6 @@ namespace SEE.Game.UI.CodeWindow
             {
                 Debug.Log("FILE:; " + Title);
                 Debug.Log(ICRDT.PrintString(Title));
-
             }
 
             valueHasChanged = false;
