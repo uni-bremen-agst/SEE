@@ -10,7 +10,7 @@ namespace SEE.Game
     /// Implementation of ILayoutNode. It is simply a wrapper to game objects
     /// created for inner nodes or leaf nodes.
     /// </summary>
-    public class GameNode : AbstractLayoutNode
+    public class LayoutGameNode : AbstractLayoutNode
     {
         /// <summary>
         /// The game object his layout node encapsulates.
@@ -22,14 +22,14 @@ namespace SEE.Game
         private readonly NodeFactory nodeFactory;
 
         /// <summary>
-        /// Constructor in cases where <paramref name="gameObject"/> is not a leaf and was created by 
+        /// Constructor in cases where <paramref name="gameObject"/> is not a leaf and was created by
         /// a <paramref name="nodeFactory"/>.
         /// </summary>
         /// <param name="to_layout_node">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
-        /// <param name="nodeFactory">the node factory that created <paramref name="gameObject"/>; 
+        /// <param name="nodeFactory">the node factory that created <paramref name="gameObject"/>;
         /// may be null for inner nodes</param>
-        public GameNode(Dictionary<Node, ILayoutNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
+        public LayoutGameNode(Dictionary<Node, ILayoutNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
             : base(gameObject.GetComponent<NodeRef>().Value, to_layout_node)
         {
             this.gameObject = gameObject;
@@ -62,7 +62,7 @@ namespace SEE.Game
 
         /// <summary>
         /// The absolute scale of a node in world co-ordinates.
-        /// 
+        ///
         /// Note: This value may be meaningful only if the node is not skewed.
         /// </summary>
         public override Vector3 AbsoluteScale
@@ -72,7 +72,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Scales this node by the given <paramref name="factor"/>: its current
-        /// Scale is multiplied by <paramref name="factor"/>. If the object 
+        /// Scale is multiplied by <paramref name="factor"/>. If the object
         /// contains a line, the line width is multiplied by <paramref name="factor"/>, too.
         /// </summary>
         /// <param name="factor">factor by which to mulitply the scale</param>
