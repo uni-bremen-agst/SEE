@@ -154,10 +154,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>mapping of graph node onto its corresponding game node</returns>
-        private static Dictionary<Node, LayoutGameNode> NodeToGameNodeMap(ICollection<LayoutGameNode> gameNodes)
+        private static Dictionary<Node, AbstractLayoutNode> NodeToGameNodeMap(ICollection<AbstractLayoutNode> gameNodes)
         {
-            Dictionary<Node, LayoutGameNode> map = new Dictionary<Node, LayoutGameNode>();
-            foreach (LayoutGameNode node in gameNodes)
+            Dictionary<Node, AbstractLayoutNode> map = new Dictionary<Node, AbstractLayoutNode>();
+            foreach (AbstractLayoutNode node in gameNodes)
             {
                 map[node.ItsNode] = node;
             }
