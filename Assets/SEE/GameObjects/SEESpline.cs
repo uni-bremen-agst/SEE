@@ -10,10 +10,10 @@ namespace Assets.SEE.GameObjects
 {
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
-    /// B-Splines and a serializable version that can be used in subclasses of
-    /// <see cref="MonoBehaviour"/>. Note that the attributes related to Unity
-    /// (e.g., <see cref="ControlPoints"/>) must not be set directly. Instead,
-    /// they must be updated via setting <see cref="Spline"/>.
+    /// B-Splines and a serializable B-Spline representation that can be
+    /// attached to <see cref="GameObject"/>. Note that the attributes related
+    /// to Unity (e.g., <see cref="ControlPoints"/>) must not be set directly.
+    /// Instead, they must be updated via setting <see cref="Spline"/>.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
     {
