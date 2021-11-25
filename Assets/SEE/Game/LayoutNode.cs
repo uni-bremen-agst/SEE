@@ -11,7 +11,7 @@ namespace SEE.Game
     /// of layouts when the layout information should not be applied immediately to
     /// game objects.
     /// </summary>
-    public class LayoutNode : AbstractLayoutNode
+    public class LayoutGraphNode : AbstractLayoutNode
     {
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
@@ -21,7 +21,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">graph node corresponding to this layout node</param>
         /// <param name="to_layout_node">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
-        public LayoutNode(Node node, Dictionary<Node, ILayoutNode> to_layout_node)
+        public LayoutGraphNode(Node node, Dictionary<Node, ILayoutNode> to_layout_node)
             : base(node, to_layout_node)
         { }
 
