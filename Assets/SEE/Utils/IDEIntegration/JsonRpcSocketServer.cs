@@ -59,12 +59,9 @@ namespace SEE.Utils
                         Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
                         await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        // Connection was unexpectedly interrupted
-#if UNITY_EDITOR
-                        Debug.LogError($"{e.Message}\n");
-#endif
+                        // Connection was unexpectedly interrupted.
                     }
 
                     Rpc = null;
