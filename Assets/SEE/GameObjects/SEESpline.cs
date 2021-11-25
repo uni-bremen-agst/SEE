@@ -20,33 +20,19 @@ namespace Assets.SEE.GameObjects
         /// What the name says.
         /// </summary>
         [NonSerialized]
-        const float PI2 = Mathf.PI * 2f;
+        private const float PI2 = Mathf.PI * 2f;
 
         /// <summary>
         /// The shaping spline.
         /// </summary>
         [NonSerialized]
-        private BSpline spline;
+        public BSpline Spline;
 
         /// <summary>
-        /// Serializable representation of <see cref="spline"/>.
+        /// Serializable representation of <see cref="Spline"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSpline;
-
-        /// <summary>
-        /// Property of <see cref="spline"/>. Updates
-        /// <see cref="serializableSpline"/> if set.
-        /// </summary>
-        public BSpline Spline
-        {
-            get { return spline; }
-            set
-            {
-                spline = value;
-                serializableSpline = TinySplineInterop.Serialize(value);
-            }
-        }
 
         /// <summary>
         /// Approximates <see cref="Spline"/> as poly line. The greater
@@ -153,10 +139,16 @@ namespace Assets.SEE.GameObjects
             return mesh;
         }
 
+        protected override void OnBeforeSerialize()
+        {
+            base.OnBeforeSerialize();
+            serializableSpline = TinySplineInterop.Serialize(Spline);
+        }
+
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            spline = TinySplineInterop.Deserialize(serializableSpline);
+            Spline = TinySplineInterop.Deserialize(serializableSpline);
         }
     }
 
