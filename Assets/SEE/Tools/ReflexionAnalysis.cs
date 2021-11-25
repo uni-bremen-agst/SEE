@@ -48,7 +48,7 @@ namespace SEE.Tools
     public class Corrupt_State : DG_Exception { }
 
     /// <summary>
-    /// State of a dependency in the architecture or implementation within the 
+    /// State of a dependency in the architecture or implementation within the
     /// reflexion model.
     /// </summary>
     public enum State
@@ -60,7 +60,7 @@ namespace SEE.Tools
         convergent = 4,         // specified architecture dependency with corresponding implementation dependency (convergence); only for architecture dependencies
         implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
         allowed_absent = 6,     // absence, but Architecture.Is_Optional attribute set
-        specified = 7           // tags an architecture edge that was created by the architect, 
+        specified = 7           // tags an architecture edge that was created by the architect,
                                 // i.e., is a specified edge; this is the initial state of a specified
                                 // architecture dependency; only for architecture dependencies
     };
@@ -127,16 +127,16 @@ namespace SEE.Tools
     /// <summary>
     /// A change event fired when an implementation dependency was propagated to
     /// the architecture.
-    /// 
+    ///
     /// Note: This event is fired only once for the very first time a corresponding
     /// new propagated edge was created in the architecture. If there is already such
-    /// a propagated edge in the architecture, this existing edge is re-used and only 
+    /// a propagated edge in the architecture, this existing edge is re-used and only
     /// its counter is updated.
     /// </summary>
     public class PropagatedEdgeAdded : PropagatedEdge
     {
         /// <summary>
-        /// Constructor preserving the implementation dependency propagated from the 
+        /// Constructor preserving the implementation dependency propagated from the
         /// implementation to the architecture.
         /// </summary>
         /// <param name="propagatedEdge">the propagated edge</param>
@@ -421,7 +421,7 @@ namespace SEE.Tools
                     Transition(edge, State.divergent, State.undefined);
                 }
                 */
-                // We can drop this edge; it is no longer needed. Because the edge is 
+                // We can drop this edge; it is no longer needed. Because the edge is
                 // dropped and all observers are informed about the removal of this
                 // edge, we do not need to inform them about its state change from
                 // divergent/allowed/implicitly_allowed to undefined.
@@ -529,7 +529,7 @@ namespace SEE.Tools
 
         /// <summary>
         /// Adds given node to architecture graph.
-        /// 
+        ///
         /// Precondition: node must not be contained in the architecture graph.
         /// Postcondition: node is contained in the architecture graph and the reflexion
         ///   data are updated; all observers are informed of the change.
@@ -555,7 +555,7 @@ namespace SEE.Tools
         /// <summary>
         /// Adds given node to implementation graph.
         /// Precondition: node must not be contained in the implementation graph.
-        /// Postcondition: node is contained in the implementation graph; all observers are 
+        /// Postcondition: node is contained in the implementation graph; all observers are
         /// informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the implementation graph</param>
@@ -623,7 +623,7 @@ namespace SEE.Tools
         /// <summary>
         /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
         /// they do not have one already and adds a Maps_To edge in between.
-        /// 
+        ///
         /// Precondition: from is contained in the implementation graph and to is
         /// contained in the architecture graph.
         /// Postcondition: a clone F of from and a clone T of to exist in the
@@ -637,10 +637,7 @@ namespace SEE.Tools
             Node from_clone = CloneInMapping(from);
             Node to_clone = CloneInMapping(to);
             // add maps_to edge to _mapping
-            Edge mapsTo = new Edge(MapsToType + "#" + from_clone.ID + "#" + to_clone.ID);
-            mapsTo.Type = MapsToType;
-            mapsTo.Source = from_clone;
-            mapsTo.Target = to_clone;
+            Edge mapsTo = new Edge(from_clone, to_clone, MapsToType);
             _mapping.AddEdge(mapsTo);
             Notify(new MapsToEdgeAdded(mapsTo));
         }
@@ -667,7 +664,7 @@ namespace SEE.Tools
         /// All nodes in given subtree are implicitly mapped onto given target architecture node
         /// if target != null. If target == null, all nodes in given subtree are removed from
         /// _implicit_maps_to_table.
-        /// 
+        ///
         /// Precondition: target is in the architecture graph and all nodes in subtree are in
         /// the implementation graph.
         /// </summary>
@@ -702,7 +699,7 @@ namespace SEE.Tools
         /// <summary>
         /// Handles every dependency edges (incoming as well as outgoing) of every node in given subtree
         /// as follows:
-        /// 
+        ///
         /// Let e = (i1, i2) be a dependency edge where either i1 or i2 or both are contained in subtree.
         /// Then e falls into one of the following categories:
         ///  (1) inner dependency: it is in between two entities, i1 and i2, mapped onto the same entity:
@@ -714,21 +711,21 @@ namespace SEE.Tools
         ///
         /// Dangling dependencies will be ignored. For every inner or cross dependency, e, the given handler
         /// will be applied with the following arguments:
-        /// 
+        ///
         ///   if e is an outgoing cross dependency, i.e., e.Source is contained in subtree:
-        ///     handler(e, arch_node, maps_to(e.Target)) 
+        ///     handler(e, arch_node, maps_to(e.Target))
         ///   if e is an incoming cross dependency, i.e., e.Target is contained in subtree:
         ///     handler(e, maps_to(e.Source), arch_node)
         ///   if e is an inner dependency:
         ///     handler(e, arch_node, arch_node)
-        ///     
+        ///
         /// Precondition: given arch_node is in the architecture graph and all nodes in subtree are in the
         /// implementation graph.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be adjusted</param>
         /// <param name="arch_node">architecture node related to the nodes in subtree (to be mapped or unmapped);
         /// this may either be the architecture node onto which the nodes in subtree were mapped originally
-        /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree 
+        /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree
         /// are to be mapped as new</param>
         /// <param name="handler">delegate handling the necessary adjustment</param>
         private void Handle_Mapped_Subtree(List<Node> subtree, Node arch_node, Handle_Mapping_Change handler)
@@ -793,7 +790,7 @@ namespace SEE.Tools
         /// Reverts the effect of the mapping of every node in the given subtree onto the
         /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
         /// node in the subtree will be "unpropagated" and "unlifted".
-        /// Precondition: given oldTarget is non-null and contained in the architecture graph and all nodes 
+        /// Precondition: given oldTarget is non-null and contained in the architecture graph and all nodes
         /// in subtree are in the implementation graph. All nodes in subtree were originally mapped onto oldTarget.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be reverted</param>
@@ -804,9 +801,9 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Maps every node in the given subtree onto newTarget. That is, every non-dangling incoming 
+        /// Maps every node in the given subtree onto newTarget. That is, every non-dangling incoming
         /// and outgoing dependency of every node in the subtree will be propagated and lifted.
-        /// Precondition: given newTarget is non-null and contained in the architecture graph and all nodes 
+        /// Precondition: given newTarget is non-null and contained in the architecture graph and all nodes
         /// in subtree are in the implementation graph. All nodes in subtree are to be mapped onto newTarget.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be put into effect</param>
@@ -819,7 +816,7 @@ namespace SEE.Tools
         /// <summary>
         /// If both 'from' and 'to' are not null, the propagated architecture dependency corresponding
         /// to given 'implementation_dependency' is lifted where the counter of the matching specified
-        /// architecture dependency and the counter of this propagated architecture dependency are decreased 
+        /// architecture dependency and the counter of this propagated architecture dependency are decreased
         /// by the absolute value of implementation_dependency's counter.
         /// Otherwise, nothing is done.
         /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
@@ -852,7 +849,7 @@ namespace SEE.Tools
         /// Propagates and lifts given implementation_dependency.
         /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
         /// and 'to' and 'from' are contained in the architecture graph.
-        /// 
+        ///
         /// Note: from and to are actually ignored (intentionally).
         /// </summary>
         /// <param name="implementation_dependency">an implementation dependency whose corresponding propagated dependency
@@ -867,11 +864,11 @@ namespace SEE.Tools
 
         /// <summary>
         /// Returns the list of nodes in the subtree rooted by given node (including this
-        /// node itself) excluding those descendants in nested subtrees rooted by a mapper node, 
+        /// node itself) excluding those descendants in nested subtrees rooted by a mapper node,
         /// that is, are mapped elsewhere.
         /// Precondition: node is contained in implementation graph and not Is_Mapper(node).
-        /// Postcondition: all nodes in the result are in the implementation graph and mapped 
-        /// onto the same architecture node as the given node; the given node is included 
+        /// Postcondition: all nodes in the result are in the implementation graph and mapped
+        /// onto the same architecture node as the given node; the given node is included
         /// in the result.
         /// </summary>
         /// <param name="node">root node of the subtree</param>
@@ -890,7 +887,7 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Removes the given Maps_To edge from the mapping graph. 
+        /// Removes the given Maps_To edge from the mapping graph.
         /// Precondition: edge must be contained in the mapping graph and must have type Maps_To.
         /// Postcondition: edge is no longer contained in the mapping graph and the reflexion
         ///   data are updated; all observers are informed of the change.
@@ -924,7 +921,7 @@ namespace SEE.Tools
         /// Precondition: impl_source is in the implementation graph and is a mapper, arch_target is in the architecture
         /// graph, and maps_to is in the mapping graph, where maps_to.Source.ID == impl_source.ID
         /// and maps_to.Target.ID = arch_target.ID.
-        /// Postconditions: 
+        /// Postconditions:
         /// (1) <paramref name="maps_to"/> is removed from _mapping
         /// (2) <paramref name="impl_source"/> is removed from _explicit_mapping
         /// (3) all nodes in the mapped subtree rooted by <paramref name="impl_source"/> are first unmapped
@@ -987,15 +984,15 @@ namespace SEE.Tools
         /// <summary>
         /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph (more precisely,
         /// the nodes corresponding to <paramref name="from"/> and <paramref name="to"/> in the
-        /// mapping graph; where two nodes correspond if they have the same ID). 
+        /// mapping graph; where two nodes correspond if they have the same ID).
         /// Precondition: a Maps_To edge between 'from' and 'to' must be contained in the mapping graph,
         /// 'from' is contained in implementation graph and 'to' is contained in the architecture graph.
         /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
         ///   data are updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="from">the source (contained in implementation graph) of the Maps_To edge 
+        /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
-        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge 
+        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
         public void Delete_From_Mapping(Node from, Node to)
         {
@@ -1130,8 +1127,8 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Prints the given <paramref name="summary"/> of the number of edges in each state 
-        /// using Unity's standard logger. The argument <paramref name="summary"/> can be 
+        /// Prints the given <paramref name="summary"/> of the number of edges in each state
+        /// using Unity's standard logger. The argument <paramref name="summary"/> can be
         /// computed by Summary(). It is assumed to have as many entries as there are different
         /// State values. When indexed by a State value, it yields the number of edges in the
         /// architecture that are in this state.
@@ -1148,7 +1145,7 @@ namespace SEE.Tools
 
         /// <summary>
         /// Yields a summary of the number of edges in the architecture for each respective state.
-        /// The result has as many entries as there are different State values. When indexed by a 
+        /// The result has as many entries as there are different State values. When indexed by a
         /// State value, it yields the number of edges in the architecture that are in this state.
         /// For instance, Summary()[(int)State.divergent] gives the number of architecture edges
         /// that are in state divergent.
@@ -1278,7 +1275,7 @@ namespace SEE.Tools
         /// (source of a mapping) and architecture (target of a mapping) are used-
         /// The correspondence of nodes between these three graphs is established
         /// by way of the unique ID attribute.
-        /// Note: key is a node in the implementation and target a node in the 
+        /// Note: key is a node in the implementation and target a node in the
         /// architecture graph.
         /// </summary>
         private Dictionary<string, Node> _explicit_maps_to_table;
@@ -1290,7 +1287,7 @@ namespace SEE.Tools
         /// </summary>
         private void Add_Transitive_Mapping()
         {
-            // Because add_subtree_to_implicit_map() will check whether a node is a 
+            // Because add_subtree_to_implicit_map() will check whether a node is a
             // mapper, which is done by consulting _explicit_maps_to_table, we need
             // to first create the explicit mapping and can only then map the otherwise
             // unmapped children
@@ -1356,7 +1353,7 @@ namespace SEE.Tools
             List<Node> children = root.Children();
 #if DEBUG
             // Debug.LogFormat("node {0} has {1} children\n", root.ID, children.Count);
-#endif            
+#endif
             foreach (Node child in children)
             {
 #if DEBUG
@@ -1580,7 +1577,7 @@ namespace SEE.Tools
 
         /// <summary>
         /// Propagates and lifts dependency edge from implementation to architecture graph.
-        /// 
+        ///
         /// Precondition: implementation_dep is in implementation graph.
         /// </summary>
         /// <param name="implementation_dep">the implementation edge to be propagated</param>
@@ -1644,10 +1641,10 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Propagates the outgoing dependencies of node from implementation to architecture 
+        /// Propagates the outgoing dependencies of node from implementation to architecture
         /// graph and lifts them in architecture (if and only if an outgoing dependency is
         /// relevant).
-        /// 
+        ///
         /// Precondition: node is in implementation graph.
         /// </summary>
         /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
@@ -1689,7 +1686,7 @@ namespace SEE.Tools
         /// <summary>
         /// Returns true if this causing implementation edge is a dependency from child to
         /// parent in the sense of the "allow dependencies to parents" option.
-        /// 
+        ///
         /// Precondition: edge is in implementation graph.
         /// </summary>
         /// <param name="edge">dependency edge to be checked</param>
@@ -1709,7 +1706,7 @@ namespace SEE.Tools
 
         /// <summary>
         /// Returns true if 'descendant' is a descendant of 'ancestor' in the node hierarchy.
-        /// 
+        ///
         /// Precondition: descendant and ancestor are in the same graph.
         /// </summary>
         /// <param name="descendant">source node</param>
@@ -1731,7 +1728,7 @@ namespace SEE.Tools
         /// Source dependencies are a special case because there may be two
         /// equivalent source dependencies between the same node pair: one
         /// specified and one propagated.
-        /// 
+        ///
         /// Precondition: from and to are already in the graph.
         /// </summary>
         /// <param name="from">the source of the edge</param>
@@ -1744,26 +1741,21 @@ namespace SEE.Tools
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
             // in between
-            Edge result = new Edge("propagated#" + its_type + "#" + from.ID + "#" + to.ID)
-            {
-                Type = its_type,
-                Source = from,
-                Target = to
-            };
+            Edge result = new Edge(from, to, its_type);
             graph.AddEdge(result);
             return result;
         }
 
         /// <summary>
-        /// Adds a propagated dependency to the architecture graph 
+        /// Adds a propagated dependency to the architecture graph
         /// from arch_source to arch_target with given edge type. This edge is lifted
         /// to an allowing specified architecture dependency if there is one (if that
         /// is the case the specified architecture dependency allowing this implementation
         /// dependency is returned in the output parameter allowing_edge_out. The state
-        /// of the allowing specified architecture dependency is set to convergent if 
+        /// of the allowing specified architecture dependency is set to convergent if
         /// such an edge exists. Likewise, the state of the propagated dependency is
         /// set to either allowed, implicitly_allowed, or divergent.
-        /// 
+        ///
         /// Preconditions:
         /// (1) there is no propagated edge from arch_source to arch_target with the given edge_type yet
         /// (2) arch_source and arch_target are in the architecture graph
@@ -1925,7 +1917,7 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Returns a human-readable identifier for the given edge. 
+        /// Returns a human-readable identifier for the given edge.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="edge">edge whose identifier is required</param>
@@ -1937,7 +1929,7 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Returns a human-readable identifier for the given node. 
+        /// Returns a human-readable identifier for the given node.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="node">node whose identifier is required</param>
@@ -1960,14 +1952,14 @@ namespace SEE.Tools
         }
 
         /// <summary>
-        /// Returns a human-readable identifier for the given node further qualified with 
+        /// Returns a human-readable identifier for the given node further qualified with
         /// its source location if available.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="node">node whose identifier is required</param>
         /// <param name="be_verbose">currently ignored</param>
         /// <returns>an identifier for the given node</returns>
-        // returns node name 
+        // returns node name
         private static string Qualified_Node_Name(Node node, bool be_verbose = false)
         {
             string filename = Get_Filename(node);
@@ -2085,4 +2077,4 @@ namespace SEE.Tools
         }
 
     } // ReflexionAnalysis
-} // namespace 
+} // namespace

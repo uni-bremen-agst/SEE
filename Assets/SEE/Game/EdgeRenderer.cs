@@ -29,11 +29,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
-        /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
-        /// <returns>the new edge</returns>
+        /// <param name="edgeType">the type of the edge to be created</param>
         /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string id)
+        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType)
         {
             Node fromNode = from.GetNode();
             if (fromNode == null)
@@ -51,10 +50,7 @@ namespace SEE.Game
             }
 
             // Creating the edge in the underlying graph
-            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id);
-            edge.Source = fromNode;
-            edge.Target = toNode;
-            edge.Type = Graph.UnknownType; // FIXME: We need to set the type of the edge.
+            Edge edge = new Edge(fromNode, toNode, edgeType);
 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);

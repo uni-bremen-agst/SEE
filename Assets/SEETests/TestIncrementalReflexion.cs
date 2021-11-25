@@ -6,7 +6,7 @@ namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Tests for the incremental reflexion analysis.
-    /// 
+    ///
     /// These test cases follows the scenarios described in the paper
     /// "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
     /// and Evolution, 2011, DOI 10.1002 / smr.542 in Figure 8.
@@ -15,14 +15,14 @@ namespace SEE.Tools.Architecture
     {
         /// <summary>
         /// The implementation nodes in the implementation graph: i[j] where 1 <= j <= 17.
-        /// 
+        ///
         /// Note: i[0] does not exist.
         /// </summary>
         private Dictionary<int, Node> i;
 
         /// <summary>
         /// The architecture nodes in the architecture graph: a[j] where 1 <= j <= 8.
-        /// 
+        ///
         /// Note: a[0] does not exist.
         /// </summary>
         private Dictionary<int, Node> a;
@@ -76,7 +76,7 @@ namespace SEE.Tools.Architecture
 
         /// <summary>
         /// Creates an architecture as follows:
-        /// 
+        ///
         /// Node hierarchy (child => parent):
         ///   a1 => a8
         ///   a2 => a8
@@ -110,7 +110,7 @@ namespace SEE.Tools.Architecture
             Dictionary<int, Edge> s = new Dictionary<int, Edge>();
             for (int j = 1; j <= 4; j++)
             {
-                s[j] = new Edge(j.ToString());
+                s[j] = new Edge();
                 s[j].Type = call;
             }
 
@@ -150,7 +150,7 @@ namespace SEE.Tools.Architecture
             Dictionary<int, Edge> e = new Dictionary<int, Edge>();
             for (int j = 1; j <= 9; j++)
             {
-                Edge edge = new Edge(j.ToString());
+                Edge edge = new Edge();
                 edge.Type = call;
                 e[j] = edge;
             }
@@ -169,7 +169,7 @@ namespace SEE.Tools.Architecture
         }
 
         //--------------------
-        // Incremental mapping 
+        // Incremental mapping
         //--------------------
 
         private void AssertMapped(Node implNode, Node archNode)
