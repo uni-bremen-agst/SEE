@@ -108,5 +108,52 @@ namespace SEE.Utils
                 (float)vec3.Y,
                 (float)vec3.Z);
         }
+
+        /// <summary>
+        /// Serializes TinySpline's BSpline into Unity "primitives" (i.e., a
+        /// set of objects that can be serialized by Unity). It should be
+        /// refrained from changing the returned values ​​directly as they are
+        /// strongly related to each other.
+        /// </summary>
+        /// <param name="spline">Spline to be serialized</param>
+        /// <param name="Degree">Degree of spline</param>
+        /// <param name="ControlPoints">Control points of spline</param>
+        /// <param name="Knots">Knot vector of spline</param>
+        public static void Serialize(
+            BSpline spline,
+            out uint Degree,
+            out Vector3[] ControlPoints,
+            out float[] Knots)
+        {
+            Degree = spline.Degree;
+            ControlPoints = TinySplineInterop.ListToVectors(spline.ControlPoints);
+            Knots = TinySplineInterop.ListToArray(spline.Knots);
+        }
+
+        /// <summary>
+        /// Creates a new BSpline from the given values. Usually, the values
+        /// are dervied from a previous call to
+        /// <see cref="Serialize(BSpline, out uint, out Vector3[], out float[])"/>.
+        /// If not, be sure you know how <paramref name="Degree"/>,
+        /// <paramref name="ControlPoints"/>, and <paramref name="Knots"/> are
+        /// related to each other and how <paramref name="Knots"/> must be
+        /// structed. Should the values have an unsuitable form, an
+        /// <see cref="System.ArgumentException"/> is thrown.
+        /// </summary>
+        /// <param name="Degree">Degree of spline</param>
+        /// <param name="ControlPoints">Control points of spline</param>
+        /// <param name="Knots">Knot vector of spline</param>
+        /// <returns>A new BSpline instance</returns>
+        public static BSpline Deserialize(
+            uint Degree,
+            Vector3[] ControlPoints,
+            float[] Knots)
+        {
+            return new BSpline((uint)ControlPoints.Length, 3, Degree)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
+                Knots = TinySplineInterop.ArrayToList(Knots)
+            };
+        }
     }
 }

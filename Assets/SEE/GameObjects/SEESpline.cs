@@ -44,7 +44,7 @@ namespace Assets.SEE.GameObjects
         /// Internal cache for <see cref="Spline"/>.
         /// </summary>
         [NonSerialized]
-        private BSpline Cache;
+        private BSpline cache;
 
         /// <summary>
         /// TinySpline's representation of a B-Spline. Note that this property
@@ -59,22 +59,18 @@ namespace Assets.SEE.GameObjects
         {
             get
             {
-                if (Cache is null)
+                if (cache is null)
                 {
-                    Cache = new BSpline((uint)ControlPoints.Length, 3, Degree)
-                    {
-                        ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
-                        Knots = TinySplineInterop.ArrayToList(Knots)
-                    };
+                    cache = TinySplineInterop.Deserialize(
+                        Degree, ControlPoints, Knots);
                 }
-                return Cache;
+                return cache;
             }
             set
             {
-                Degree = (uint)value.Degree;
-                ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
-                Knots = TinySplineInterop.ListToArray(value.Knots);
-                Cache = value;
+                TinySplineInterop.Serialize(value,
+                    out Degree, out ControlPoints, out Knots);
+                cache = value;
             }
         }
 
@@ -188,37 +184,41 @@ namespace Assets.SEE.GameObjects
     /// This class can be used to morph the <see cref="SEESpline"/> component
     /// of a <see cref="GameObject"/>. The morphism is initialized with
     /// <see cref="InitMorph(BSpline, BSpline)"/> and evaluated with
-    /// <see cref="Eval(double)"/>. For the sake of fail-safeness, a default
-    /// morphism is set up in <see cref="Awake"/> (i.e.,
-    /// <see cref="Eval(double)"/> never fails).
+    /// <see cref="Eval(double)"/>.
     /// </summary>
     public class SplineMorphism : SerializedMonoBehaviour
     {
-        /// <summary>
-        /// Origin of the spline morphism.
-        /// </summary>
-        public BSpline Source;
+        /*
+         * Attributes of the source spline.
+         * (see SEESpline for more details)
+         */
+        public uint SourceDegree;
+        public Vector3[] SourceControlPoints;
+        public float[] SourceKnots;
+        [NonSerialized]
+        private BSpline sourceCache;
 
-        /// <summary>
-        /// Target of the spline morphism.
-        /// </summary>
-        public BSpline Target;
+        /*
+         * Attributes of the target spline.
+         * (see SEESpline for more details)
+         */
+        public uint TargetDegree;
+        public Vector3[] TargetControlPoints;
+        public float[] TargetKnots;
+        [NonSerialized]
+        private BSpline targetCache;
 
         /// <summary>
         /// TinySpline's spline morphism.
         /// </summary>
-        private Morphism Morphism;
+        [NonSerialized]
+        private Morphism morphism;
 
-        void Awake()
-        {
-            // A very boring default morphism.
-            Source = new BSpline(2, 3, 1)
-            {
-                ControlPoints = { 0, 0, 0, 1, 1, 1 }
-            };
-            Target = new BSpline(Source);
-            Morphism = Source.MorphTo(Target);
-        }
+        /// <summary>
+        /// Stores the last time parameter passed to
+        /// <see cref="Eval(double)"/>. The default value is 0.
+        /// </summary>
+        public double Time = 0;
 
         /// <summary>
         /// Initializes the spline morphism. Asserts that
@@ -229,11 +229,14 @@ namespace Assets.SEE.GameObjects
         /// <param name="target">Target of the spline morphism</param>
         public void InitMorph(BSpline source, BSpline target)
         {
-            Assert.IsNotNull("source");
-            Assert.IsNotNull("target");
-            Source = source;
-            Target = target;
-            Morphism = source.MorphTo(target);
+            TinySplineInterop.Serialize(source,
+                out SourceDegree, out SourceControlPoints, out SourceKnots);
+            sourceCache = source;
+            TinySplineInterop.Serialize(target,
+                out TargetDegree, out TargetControlPoints, out TargetKnots);
+            targetCache = target;
+            morphism = source.MorphTo(target);
+            Time = 0;
         }
 
         /// <summary>
@@ -247,10 +250,21 @@ namespace Assets.SEE.GameObjects
         /// caller for further calculations.
         /// </summary>
         /// <param name="t">The time parameter. Clamped to domain [0, 1]</param>
-        /// <returns>Interpolation of source and target at t</returns>
+        /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Eval(double t)
         {
-            BSpline interpolated = Morphism.Eval(t);
+            if (morphism == null)
+            { // morphism cannot be serialized
+                // sourceCache and targetCache should also be null
+                sourceCache = TinySplineInterop.Deserialize(
+                    SourceDegree, SourceControlPoints, SourceKnots);
+                targetCache = TinySplineInterop.Deserialize(
+                    TargetDegree, TargetControlPoints, TargetKnots);
+                morphism = sourceCache.MorphTo(targetCache);
+            }
+
+            Time = t;
+            BSpline interpolated = morphism.Eval(t);
             if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
             {
                 spline.Spline = interpolated;
