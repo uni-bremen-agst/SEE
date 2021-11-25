@@ -1740,8 +1740,12 @@ namespace SEE.Tools
         {
             // Note: there may be a specified as well as a propagated edge between the
             // same two architectural entities; hence, we may have multiple edges
-            // in between
+            // in between. Because of that and because the edge's ID is generated
+            // based on its source, target, and type, we need to set the ID ourselves
+            // to make sure it is unique.
             Edge result = new Edge(from, to, its_type);
+            // The edge ID must be changed before the edge is added to the graph.
+            result.ID = Guid.NewGuid().ToString();
             graph.AddEdge(result);
             return result;
         }
