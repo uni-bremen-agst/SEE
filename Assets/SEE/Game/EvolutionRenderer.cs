@@ -380,7 +380,7 @@ namespace SEE.Game
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutNode layoutNode = new LayoutNode(node, to_layout_node);
+                LayoutGraphNode layoutNode = new LayoutGraphNode(node, to_layout_node);
                 // We must transfer the scale from gameObject to layoutNode.
                 // Rotation and CenterPosition are all zero. They will be computed by the layout,
                 // but the layout needs the game object's scale.
