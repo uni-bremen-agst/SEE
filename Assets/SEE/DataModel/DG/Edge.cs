@@ -15,6 +15,9 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Constructor.
+        ///
+        /// Note: The edge ID will be created lazily upon the first access to <see cref="ID"/>.
+        /// An edge ID can be set and changed as long as the edge is not yet added to a graph.
         /// </summary>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
@@ -27,18 +30,10 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="source">source of the edge</param>
-        /// <param name="target">target of the edge</param>
-        public Edge(Node source, Node target)
-        {
-            this.Source = source;
-            this.Target = target;
-        }
-
-        /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
+        ///
+        /// Note: The edge ID will be created lazily upon the first access to <see cref="ID"/>.
+        /// An edge ID can be set and changed as long as the edge is not yet added to a graph.
         /// </summary>
         public Edge()
         {
