@@ -1,4 +1,5 @@
-﻿using TinySpline;
+﻿using SEE.Utils;
+using TinySpline;
 
 namespace SEE.Layout
 {
@@ -20,13 +21,10 @@ namespace SEE.Layout
         /// <summary>
         /// The shaping spline of the edge. The default spline is a line
         /// (i.e., a spline of degree 1 with 2 control points) connecting the
-        /// points (0, 0, 0) and (1, 1, 1).
+        /// center position (<see cref="IGameNode.CenterPosition"/>) of
+        /// <see cref="Source"/> and <see cref="Target"/>.
         /// </summary>
-        public BSpline Spline { get; set; } =
-            new BSpline(2, 3, 1)
-            {
-                ControlPoints = {0, 0, 0, 1, 1, 1}
-            };
+        public BSpline Spline;
 
         /// <summary>
         /// Constructor.
@@ -37,6 +35,12 @@ namespace SEE.Layout
         {
             Source = source;
             Target = target;
+            Spline = new BSpline(2, 3, 1)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(
+                    Source.CenterPosition,
+                    Target.CenterPosition)
+            };
         }
     }
 }
