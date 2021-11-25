@@ -1,5 +1,5 @@
-﻿using Assets.SEE.GameObjects;
-using SEE.Layout.Utils;
+﻿using SEE.Layout.Utils;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
