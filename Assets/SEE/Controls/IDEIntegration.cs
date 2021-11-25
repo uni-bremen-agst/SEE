@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.Evolution;
 using SEE.Game.UI.Notification;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -27,14 +34,35 @@ namespace SEE.Controls
         private class RemoteProcedureCalls
         {
             /// <summary>
-            /// TODO: Remove! Just for testing purpose.
+            /// Instance of parent class.
             /// </summary>
-            /// <param name="a"></param>
-            /// <param name="b"></param>
-            /// <returns></returns>
-            public int Add(int a, int b)
+            private readonly IDEIntegration _ideIntegration;
+
+            /// <summary>
+            /// Nested class in <see cref="IDEIntegration"/>. Contains all methods that can be accessed
+            /// by the client. Should only be initiated by the <see cref="IDEIntegration"/>.
+            /// </summary>
+            /// <param name="ideIntegration">Instance of IDEIntegration</param>
+            public RemoteProcedureCalls(IDEIntegration ideIntegration)
             {
-                return a + b;
+                _ideIntegration = ideIntegration;
+            }
+
+            public void HighlightNode(string path)
+            {
+                UniTask.Run(async () =>
+                {
+                    await UniTask.SwitchToMainThread();
+                    var nodes = _ideIntegration._nodes[path];
+
+                    if (nodes == null) return;
+
+                    foreach (var node in nodes)
+                    {
+                        Outline.Create(node, Color.blue);
+                    }
+                    Debug.Log(path);
+                });
             }
         }
 
@@ -64,7 +92,8 @@ namespace SEE.Controls
 
             /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
-            /// deliver all methods, that can be called from the client.
+            /// deliver all methods, that can be called from the client. Should only be initiated
+            /// by the <see cref="IDEIntegration"/>.
             /// </summary>
             /// <param name="ideIntegration">Instance of IDEIntegration</param>
             public ClientCalls(IDEIntegration ideIntegration)
@@ -126,6 +155,12 @@ namespace SEE.Controls
         private JsonRpcServer _rpc;
 
         /// <summary>
+        /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
+        /// city have no impact to the source code, this will only be initialized during start up.
+        /// </summary>
+        private IDictionary<string, ICollection<GameObject>> _nodes;
+
+        /// <summary>
         /// Initializes all necessary objects for the inter-process communication
         /// between SEE and the selected IDE.
         /// </summary>
@@ -148,10 +183,37 @@ namespace SEE.Controls
                 Destroy(this);
                 return;
             }
+
             Instance = this;
             Client = new ClientCalls(this);
+            _nodes = new Dictionary<string, ICollection<GameObject>>();
+            
+            foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
+            {
+                var fileName = node.GetNode().Filename();
+                var path = node.GetNode().Path();
 
-                InitializeJsonRpcServer();
+                if (fileName == null || path == null) continue;
+
+                string fullPath;
+                try
+                {
+                    fullPath = Path.GetFullPath(path + fileName);
+                }
+                catch (Exception)
+                {
+                    // File not found
+                    continue;
+                }
+
+                if (!_nodes.ContainsKey(fullPath))
+                {
+                    _nodes[fullPath] = new List<GameObject>();
+                }
+                _nodes[fullPath].Add(node);
+            }
+
+            InitializeJsonRpcServer();
 
             _rpc.Connected += ConnectedToClient;
             _rpc.Disconnected += DisconnectedFromClient;
@@ -167,9 +229,9 @@ namespace SEE.Controls
             _rpc = Type switch
             {
                 Ide.VisualStudio2019 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VS2019Port),
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2019Port),
                 Ide.VisualStudio2022 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(), VS2022Port),
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2022Port),
                 _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
             };
         }
