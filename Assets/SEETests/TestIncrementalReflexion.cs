@@ -67,11 +67,11 @@ namespace SEE.Tools.Architecture
             Save(impl, arch, mapping);
         }
 
-        private static void AddToGraph(Graph graph, Edge edge, Node from, Node to)
+        private static Edge AddToGraph(Graph graph, string edgeType, Node from, Node to)
         {
-            edge.Source = from;
-            edge.Target = to;
+            Edge edge = new Edge(from, to, edgeType);
             graph.AddEdge(edge);
+            return edge;
         }
 
         /// <summary>
@@ -108,16 +108,10 @@ namespace SEE.Tools.Architecture
             a[8].AddChild(a[2]);
 
             Dictionary<int, Edge> s = new Dictionary<int, Edge>();
-            for (int j = 1; j <= 4; j++)
-            {
-                s[j] = new Edge();
-                s[j].Type = call;
-            }
-
-            AddToGraph(arch, s[1], a[3], a[7]);
-            AddToGraph(arch, s[2], a[1], a[3]);
-            AddToGraph(arch, s[3], a[8], a[8]);
-            AddToGraph(arch, s[4], a[2], a[4]);
+            s[1] = AddToGraph(arch, call, a[3], a[7]);
+            s[2] = AddToGraph(arch, call, a[1], a[3]);
+            s[3] = AddToGraph(arch, call, a[8], a[8]);
+            s[4] = AddToGraph(arch, call, a[2], a[4]);
 
             return arch;
         }
@@ -148,22 +142,15 @@ namespace SEE.Tools.Architecture
             i[11].AddChild(i[13]);
 
             Dictionary<int, Edge> e = new Dictionary<int, Edge>();
-            for (int j = 1; j <= 9; j++)
-            {
-                Edge edge = new Edge();
-                edge.Type = call;
-                e[j] = edge;
-            }
-
-            AddToGraph(impl, e[1], i[3], i[15]);
-            AddToGraph(impl, e[2], i[4], i[16]);
-            AddToGraph(impl, e[3], i[5], i[17]);
-            AddToGraph(impl, e[4], i[8], i[6]);
-            AddToGraph(impl, e[5], i[9], i[8]);
-            AddToGraph(impl, e[6], i[9], i[10]);
-            AddToGraph(impl, e[7], i[12], i[10]);
-            AddToGraph(impl, e[8], i[12], i[9]);
-            AddToGraph(impl, e[9], i[14], i[13]);
+            e[1] = AddToGraph(impl, call, i[3], i[15]);
+            e[2]= AddToGraph(impl, call, i[4], i[16]);
+            e[3] = AddToGraph(impl, call, i[5], i[17]);
+            e[4] = AddToGraph(impl, call, i[8], i[6]);
+            e[5] = AddToGraph(impl, call, i[9], i[8]);
+            e[6] = AddToGraph(impl, call, i[9], i[10]);
+            e[7] = AddToGraph(impl, call, i[12], i[10]);
+            e[8] = AddToGraph(impl, call, i[12], i[9]);
+            e[9] = AddToGraph(impl, call, i[14], i[13]);
 
             return impl;
         }
