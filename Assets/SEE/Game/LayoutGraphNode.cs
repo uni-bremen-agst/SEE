@@ -25,45 +25,77 @@ namespace SEE.Game
             : base(node, to_layout_node)
         { }
 
+        /// <summary>
+        /// The scale of the node (both local and absolute scale; there is
+        /// no distinction here).
+        /// </summary>
         private Vector3 scale;
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.LocalScale"/>.
+        /// </summary>
         public override Vector3 LocalScale
         {
             get => scale;
             set => scale = value;
         }
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.AbsoluteScale"/>.
+        /// </summary>
         public override Vector3 AbsoluteScale
         {
             get => scale;
         }
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.ScaleBy"/>.
+        /// </summary>
+        /// <param name="factor">factor by which to scale the node</param>
         public override void ScaleBy(float factor)
         {
             scale *= factor;
         }
 
+        /// <summary>
+        /// The position of the center of the node.
+        /// </summary>
         private Vector3 centerPosition;
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.CenterPosition"/>.
+        /// </summary>
         public override Vector3 CenterPosition
         {
             get => centerPosition;
             set => centerPosition = value;
         }
 
+        /// <summary>
+        /// The rotation of the node along the y axis.
+        /// </summary>
         private float rotation;
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.Rotation"/>.
+        /// </summary>
         public override float Rotation
         {
             get => rotation;
             set => rotation = value;
         }
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.Roof"/>.
+        /// </summary>
         public override Vector3 Roof
         {
             get => centerPosition + Vector3.up * 0.5f * scale.y;
         }
 
+        /// <summary>
+        /// <see cref="AbstractLayoutNode.Ground"/>.
+        /// </summary>
         public override Vector3 Ground
         {
             get => centerPosition - Vector3.up * 0.5f * scale.y;
