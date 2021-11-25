@@ -1,9 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
 
 namespace SEE.Utils
 {
+
+    /// <summary>
+    /// A serializable representation of TinySpline's B-Spline class. Use
+    /// <see cref="TinySplineInterop.Serialize(BSpline)"/> and
+    /// <see cref="TinySplineInterop.Deserialize(SerializableSpline)"/> to
+    /// convert between both representations. Note that the fields of this
+    /// class should not be changed directly as they are strongly related to
+    /// each other. If changes need to be made, either apply them on the
+    /// corresponding <see cref="BSpline"/> instance and convert the result
+    /// back to a serializable spline, or make sure you know how
+    /// <paramref name="Degree"/>, <paramref name="ControlPoints"/>, and
+    /// <paramref name="Knots"/> are related to each other and how
+    /// <paramref name="Knots"/> must be structed.
+    /// </summary>
+    [Serializable]
+    public class SerializableSpline
+    {
+        /// <summary>
+        /// Degree of the piecewise polynomials.
+        /// </summary>
+        public uint Degree;
+
+        /// <summary>
+        /// The control points of a spline are decisive for its shape.
+        /// </summary>
+        public Vector3[] ControlPoints;
+
+        /// <summary>
+        /// Weighting factors of the <see cref="ControlPoints"/>. Can also be
+        /// used to shape a spline, but is less intuitive. We usually don't
+        /// care about the values.
+        /// </summary>
+        public float[] Knots;
+    }
+
     /// <summary>
     /// Utility functions for interoperability between TinySpline and Unity.
     /// </summary>
@@ -110,49 +146,36 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Serializes TinySpline's BSpline into Unity "primitives" (i.e., a
-        /// set of objects that can be serialized by Unity). It should be
-        /// refrained from changing the returned values ​​directly as they are
-        /// strongly related to each other.
+        /// Converts <paramref name="spline"/> to a serializable
+        /// representation. Note that the fields of the returned spline should
+        /// not be changed directly (see <see cref="SerializableSpline"/> for
+        /// more details).
         /// </summary>
-        /// <param name="spline">Spline to be serialized</param>
-        /// <param name="Degree">Degree of spline</param>
-        /// <param name="ControlPoints">Control points of spline</param>
-        /// <param name="Knots">Knot vector of spline</param>
-        public static void Serialize(
-            BSpline spline,
-            out uint Degree,
-            out Vector3[] ControlPoints,
-            out float[] Knots)
+        /// <param name="spline">Spline to be converted</param>
+        /// <returns>A serializable representation of the spline</returns>
+        public static SerializableSpline Serialize(BSpline spline)
         {
-            Degree = spline.Degree;
-            ControlPoints = TinySplineInterop.ListToVectors(spline.ControlPoints);
-            Knots = TinySplineInterop.ListToArray(spline.Knots);
+            return new SerializableSpline()
+            {
+                Degree = spline.Degree,
+                ControlPoints = ListToVectors(spline.ControlPoints),
+                Knots = ListToArray(spline.Knots)
+            };
         }
 
         /// <summary>
-        /// Creates a new BSpline from the given values. Usually, the values
-        /// are dervied from a previous call to
-        /// <see cref="Serialize(BSpline, out uint, out Vector3[], out float[])"/>.
-        /// If not, be sure you know how <paramref name="Degree"/>,
-        /// <paramref name="ControlPoints"/>, and <paramref name="Knots"/> are
-        /// related to each other and how <paramref name="Knots"/> must be
-        /// structed. Should the values have an unsuitable form, an
-        /// <see cref="System.ArgumentException"/> is thrown.
+        /// Converts <paramref name="spline"/> to a TinySpline BSpline. It is
+        /// safe to make changes on the returned spline (see
+        /// <see cref="SerializableSpline"/> for more details).
         /// </summary>
-        /// <param name="Degree">Degree of spline</param>
-        /// <param name="ControlPoints">Control points of spline</param>
-        /// <param name="Knots">Knot vector of spline</param>
+        /// <param name="spline">Spline to be converted</param>
         /// <returns>A new BSpline instance</returns>
-        public static BSpline Deserialize(
-            uint Degree,
-            Vector3[] ControlPoints,
-            float[] Knots)
+        public static BSpline Deserialize(SerializableSpline spline)
         {
-            return new BSpline((uint)ControlPoints.Length, 3, Degree)
+            return new BSpline((uint)spline.ControlPoints.Length, 3, spline.Degree)
             {
-                ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
-                Knots = TinySplineInterop.ArrayToList(Knots)
+                ControlPoints = VectorsToList(spline.ControlPoints),
+                Knots = ArrayToList(spline.Knots)
             };
         }
     }
