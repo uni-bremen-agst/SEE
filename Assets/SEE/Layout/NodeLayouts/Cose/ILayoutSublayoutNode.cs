@@ -23,7 +23,7 @@ namespace SEE.Layout.NodeLayouts.Cose
     /// <summary>
     /// ILayoutNode for the caluclation of the sublayouts
     /// </summary>
-    public class ILayoutSublayoutNode : ILayoutNode
+    public class LayoutSublayoutNode : ILayoutNode
     {
         /// <summary>
         /// the scale
@@ -46,7 +46,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public int Level { get => node.Level; set => node.Level = value; }
 
         /// <summary>
-        /// the id 
+        /// the id
         /// </summary>
         public string ID => node.ID;
 
@@ -76,7 +76,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         public bool IsLeaf => isLeaf;
 
         /// <summary>
-        /// Returns all Children of a node 
+        /// Returns all Children of a node
         /// </summary>
         /// <returns></returns>
         public ICollection<ILayoutNode> Children()
@@ -105,12 +105,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         public bool IsSublayoutRoot { get => false; set => value = false; }
 
         /// <summary>
-        /// the sublayout of this node 
+        /// the sublayout of this node
         /// </summary>
         public Sublayout Sublayout { get; set; }
 
         /// <summary>
-        /// if node is a sublayoutNode this property holds the sublayout root node 
+        /// if node is a sublayoutNode this property holds the sublayout root node
         /// </summary>
         public ILayoutNode SublayoutRoot { get; set; }
 
@@ -142,7 +142,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         private ICollection<ILayoutNode> successors;
 
         /// <summary>
-        /// holding the child nodes temporary 
+        /// holding the child nodes temporary
         /// </summary>
         private readonly ICollection<ILayoutNode> temporaryChildren;
 
@@ -154,9 +154,9 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// a dictinary holding a mapping from the underlying IlayoutNode to a CoseSublayoutNode
         /// </summary>
-        private readonly Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode;
+        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode;
 
-        public ILayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
+        public LayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node;
             this.isLeaf = isLeaf;
@@ -167,7 +167,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             ILayout_to_CoseSublayoutNode[node] = this;
         }
 
-        public ILayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
+        public LayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node;
             isLeaf = node.IsLeaf;
