@@ -156,14 +156,38 @@ namespace SEE.Game
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, GameObject parent, bool draw = true)
         {
-            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
+            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes.Cast<AbstractLayoutNode>().ToList()), draw);
             AddToParent(result, parent);
             return result;
         }
 
-        public static ICollection<LayoutEdge> LayoutEdges(ICollection<ILayoutNode> layoutNodes)
+        /// <summary>
+        /// Returns the connecting edges among <paramref name="layoutNodes"/> laid out by the
+        /// selected edge layout.
+        /// If <paramref name="layoutNodes"/> is null or empty or if no layout was selected
+        /// by the user, the empty collection is returned.
+        /// </summary>
+        /// <param name="layoutNodes">nodes whose connecting edges are to be laid out</param>
+        /// <returns>laid out edges</returns>
+        public ICollection<LayoutEdge> LayoutEdges(ICollection<ILayoutNode> layoutNodes)
         {
-            throw new NotImplementedException();
+            if (layoutNodes == null || layoutNodes.Count == 0)
+            {
+                // no nodes, no edges, no layout
+                return new List<LayoutEdge>();
+            }
+            IEdgeLayout layout = GetEdgeLayout();
+            if (layout == null)
+            {
+                // No layout selected, no edges will be created.
+                return new List<LayoutEdge>();
+            }
+            else
+            {
+                ICollection<LayoutEdge> edges = ConnectingEdges(layoutNodes.Cast<AbstractLayoutNode>().ToList());
+                layout.Create(layoutNodes, edges.Cast<ILayoutEdge>().ToList());
+                return edges;
+            }
         }
 
         /// <summary>
@@ -175,26 +199,11 @@ namespace SEE.Game
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, ICollection<LayoutEdge> layoutEdges, bool draw = true)
         {
-            float minimalEdgeLevelDistance = 2.5f * settings.EdgeLayoutSettings.EdgeWidth;
-            bool edgesAboveBlocks = settings.EdgeLayoutSettings.EdgesAboveBlocks;
-            float rdp = settings.EdgeLayoutSettings.RDP;
-            IEdgeLayout layout;
-            switch (settings.EdgeLayoutSettings.Kind)
+            IEdgeLayout layout = GetEdgeLayout();
+            if (layout == null)
             {
-                case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
-                    break;
-                case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
-                    break;
-                case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, settings.EdgeLayoutSettings.Tension, rdp);
-                    break;
-                case EdgeLayoutKind.None:
-                    // nothing to be done
-                    return new List<GameObject>();
-                default:
-                    throw new Exception("Unhandled edge layout " + settings.EdgeLayoutSettings.Kind);
+                // No layout selected, no edges will be created.
+                return new List<GameObject>();
             }
 #if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
@@ -221,7 +230,6 @@ namespace SEE.Game
                 AddLOD(result);
             }
 
-
 #if UNITY_EDITOR
             p.End();
             Debug.Log($"Calculated \"  {settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
@@ -231,16 +239,41 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Yields the edge layout as specified in the <see cref="settings"/>.
+        /// </summary>
+        /// <returns>specified edge layout</returns>
+        private IEdgeLayout GetEdgeLayout()
+        {
+            float minimalEdgeLevelDistance = 2.5f * settings.EdgeLayoutSettings.EdgeWidth;
+            bool edgesAboveBlocks = settings.EdgeLayoutSettings.EdgesAboveBlocks;
+            float rdp = settings.EdgeLayoutSettings.RDP;
+            switch (settings.EdgeLayoutSettings.Kind)
+            {
+                case EdgeLayoutKind.Straight:
+                    return new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
+                case EdgeLayoutKind.Spline:
+                   return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
+                case EdgeLayoutKind.Bundling:
+                    return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, settings.EdgeLayoutSettings.Tension, rdp);
+                case EdgeLayoutKind.None:
+                    // nothing to be done
+                    return null;
+                default:
+                    throw new Exception("Unhandled edge layout " + settings.EdgeLayoutSettings.Kind);
+            }
+        }
+
+        /// <summary>
         /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
         /// <returns>list of layout edges/returns>
-        private static ICollection<LayoutEdge> ConnectingEdges(ICollection<LayoutGameNode> gameNodes)
+        private static ICollection<LayoutEdge> ConnectingEdges(ICollection<AbstractLayoutNode> gameNodes)
         {
             ICollection<LayoutEdge> edges = new List<LayoutEdge>();
-            Dictionary<Node, LayoutGameNode> map = NodeToGameNodeMap(gameNodes);
+            Dictionary<Node, AbstractLayoutNode> map = NodeToGameNodeMap(gameNodes);
 
-            foreach (LayoutGameNode source in gameNodes)
+            foreach (AbstractLayoutNode source in gameNodes)
             {
                 Node sourceNode = source.ItsNode;
 

@@ -333,7 +333,7 @@ namespace SEE.Game
             GraphRenderer.Fit(gameObject, layoutNodes);
             GraphRenderer.Stack(gameObject, layoutNodes);
 
-            ICollection<LayoutEdge> layoutEdges = GraphRenderer.LayoutEdges(layoutNodes);
+            ICollection<LayoutEdge> layoutEdges = graphRenderer.LayoutEdges(layoutNodes);
             EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
             foreach (var le in layoutEdges)
             {
