@@ -1,4 +1,5 @@
 ﻿using OdinSerializer;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using TinySpline;
@@ -9,10 +10,10 @@ namespace Assets.SEE.GameObjects
 {
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
-    /// B-Splines and a serializable version that can be used in subclasses of
-    /// <see cref="MonoBehaviour"/>. Note that the attributes related to Unity
-    /// (e.g., <see cref="ControlPoints"/>) must not be set directly. Instead,
-    /// they must be updated via setting <see cref="Spline"/>.
+    /// B-Splines and a serializable B-Spline representation that can be
+    /// attached to <see cref="GameObject"/>. Note that the attributes related
+    /// to Unity (e.g., <see cref="ControlPoints"/>) must not be set directly.
+    /// Instead, they must be updated via setting <see cref="Spline"/>.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
     {
@@ -43,7 +44,7 @@ namespace Assets.SEE.GameObjects
         /// Internal cache for <see cref="Spline"/>.
         /// </summary>
         [NonSerialized]
-        private BSpline Cache;
+        private BSpline cache;
 
         /// <summary>
         /// TinySpline's representation of a B-Spline. Note that this property
@@ -58,22 +59,18 @@ namespace Assets.SEE.GameObjects
         {
             get
             {
-                if (Cache is null)
+                if (cache is null)
                 {
-                    Cache = new BSpline((uint)ControlPoints.Length, 3, Degree)
-                    {
-                        ControlPoints = TinySplineInterop.VectorsToList(ControlPoints),
-                        Knots = TinySplineInterop.ArrayToList(Knots)
-                    };
+                    cache = TinySplineInterop.Deserialize(
+                        Degree, ControlPoints, Knots);
                 }
-                return Cache;
+                return cache;
             }
             set
             {
-                Degree = (uint)value.Degree;
-                ControlPoints = TinySplineInterop.ListToVectors(value.ControlPoints);
-                Knots = TinySplineInterop.ListToArray(value.Knots);
-                Cache = value;
+                TinySplineInterop.Serialize(value,
+                    out Degree, out ControlPoints, out Knots);
+                cache = value;
             }
         }
 
@@ -187,37 +184,41 @@ namespace Assets.SEE.GameObjects
     /// This class can be used to morph the <see cref="SEESpline"/> component
     /// of a <see cref="GameObject"/>. The morphism is initialized with
     /// <see cref="InitMorph(BSpline, BSpline)"/> and evaluated with
-    /// <see cref="Eval(double)"/>. For the sake of fail-safeness, a default
-    /// morphism is set up in <see cref="Awake"/> (i.e.,
-    /// <see cref="Eval(double)"/> never fails).
+    /// <see cref="Eval(double)"/>.
     /// </summary>
     public class SplineMorphism : SerializedMonoBehaviour
     {
-        /// <summary>
-        /// Origin of the spline morphism.
-        /// </summary>
-        public BSpline Source;
+        /*
+         * Attributes of the source spline.
+         * (see SEESpline for more details)
+         */
+        public uint SourceDegree;
+        public Vector3[] SourceControlPoints;
+        public float[] SourceKnots;
+        [NonSerialized]
+        private BSpline sourceCache;
 
-        /// <summary>
-        /// Target of the spline morphism.
-        /// </summary>
-        public BSpline Target;
+        /*
+         * Attributes of the target spline.
+         * (see SEESpline for more details)
+         */
+        public uint TargetDegree;
+        public Vector3[] TargetControlPoints;
+        public float[] TargetKnots;
+        [NonSerialized]
+        private BSpline targetCache;
 
         /// <summary>
         /// TinySpline's spline morphism.
         /// </summary>
-        private Morphism Morphism;
+        [NonSerialized]
+        private Morphism morphism;
 
-        void Awake()
-        {
-            // A very boring default morphism.
-            Source = new BSpline(2, 3, 1)
-            {
-                ControlPoints = { 0, 0, 0, 1, 1, 1 }
-            };
-            Target = new BSpline(Source);
-            Morphism = Source.MorphTo(Target);
-        }
+        /// <summary>
+        /// Stores the last time parameter passed to
+        /// <see cref="Eval(double)"/>. The default value is 0.
+        /// </summary>
+        public double Time = 0;
 
         /// <summary>
         /// Initializes the spline morphism. Asserts that
@@ -228,11 +229,14 @@ namespace Assets.SEE.GameObjects
         /// <param name="target">Target of the spline morphism</param>
         public void InitMorph(BSpline source, BSpline target)
         {
-            Assert.IsNotNull("source");
-            Assert.IsNotNull("target");
-            Source = source;
-            Target = target;
-            Morphism = source.MorphTo(target);
+            TinySplineInterop.Serialize(source,
+                out SourceDegree, out SourceControlPoints, out SourceKnots);
+            sourceCache = source;
+            TinySplineInterop.Serialize(target,
+                out TargetDegree, out TargetControlPoints, out TargetKnots);
+            targetCache = target;
+            morphism = source.MorphTo(target);
+            Time = 0;
         }
 
         /// <summary>
@@ -246,10 +250,21 @@ namespace Assets.SEE.GameObjects
         /// caller for further calculations.
         /// </summary>
         /// <param name="t">The time parameter. Clamped to domain [0, 1]</param>
-        /// <returns>Interpolation of source and target at t</returns>
+        /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Eval(double t)
         {
-            BSpline interpolated = Morphism.Eval(t);
+            if (morphism == null)
+            { // morphism cannot be serialized
+                // sourceCache and targetCache should also be null
+                sourceCache = TinySplineInterop.Deserialize(
+                    SourceDegree, SourceControlPoints, SourceKnots);
+                targetCache = TinySplineInterop.Deserialize(
+                    TargetDegree, TargetControlPoints, TargetKnots);
+                morphism = sourceCache.MorphTo(targetCache);
+            }
+
+            Time = t;
+            BSpline interpolated = morphism.Eval(t);
             if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
             {
                 spline.Spline = interpolated;
@@ -272,112 +287,6 @@ namespace Assets.SEE.GameObjects
             }
             // Protect internal state of `spline'.
             return new BSpline(spline.Spline);
-        }
-    }
-
-    /// <summary>
-    /// Utility functions for interoperability between TinySpline and Unity.
-    /// </summary>
-    class TinySplineInterop
-    {
-        /// <summary>
-        /// Converts the given list of Unity Vector3 to a list of doubles
-        /// (TinySpline's representation of points).
-        /// </summary>
-        /// <param name="vectors">Vectors to be converted</param>
-        /// <returns>List of doubles where the values `i' to `i+2' correspond
-        /// to the the Vector3 `i' in <paramref name="vectors"/></returns>
-        public static IList<double> VectorsToList(IList<Vector3> vectors)
-        {
-            List<double> list = new List<double>();
-            foreach (Vector3 vector in vectors)
-            {
-                list.Add(vector.x);
-                list.Add(vector.y);
-                list.Add(vector.z);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// Converts the given Unity Vector3s to a list of doubles
-        /// (TinySpline's representation of points).
-        /// </summary>
-        /// <param name="vectors">Vectors to be converted</param>
-        /// <returns>List of doubles where the values `i' to `i+2' correspond
-        /// to the the Vector3 `i' in <paramref name="vectors"/></returns>
-        public static IList<double> VectorsToList(params Vector3[] vectors)
-        {
-            return VectorsToList(new List<Vector3>(vectors));
-        }
-
-        /// <summary>
-        /// Converts the given list of doubles (TinySpline's representation of
-        /// points) to an array of Unity Vector3. It is assumed that the
-        /// length of <paramref name="values"/> can be completely divided by 3
-        /// (i.e., <paramref name="values"/> contains three-dimensional
-        /// points).
-        /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as an array of Unity Vector3
-        /// </returns>
-        public static Vector3[] ListToVectors(IList<double> values)
-        {
-            Debug.Assert(values.Count % 3 == 0,
-                    "Expecting three-dimensional points");
-            Vector3[] vectors = new Vector3[values.Count / 3];
-            for (int i = 0; i < vectors.Length; i++)
-            {
-                int idx = i * 3;
-                vectors[i] = new Vector3(
-                    (float)values[idx],
-                    (float)values[idx + 1],
-                    (float)values[idx + 2]);
-            }
-            return vectors;
-        }
-
-        /// <summary>
-        /// Converts the given list of doubles to a float array.
-        /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as float array</returns>
-        public static float[] ListToArray(IList<double> values)
-        {
-            float[] array = new float[values.Count];
-            for (int i = 0; i < values.Count; i++)
-            {
-                array[i] = (float)values[i];
-            }
-            return array;
-        }
-
-        /// <summary>
-        /// Converts the given float array to a list of doubles.
-        /// </summary>
-        /// <param name="values">Values to be converted</param>
-        /// <returns><paramref name="values"/> as list of doubles</returns>
-        public static IList<double> ArrayToList(float[] values)
-        {
-            IList<double> list = new List<double>(values.Length);
-            foreach (float val in values)
-            {
-                list.Add(val);
-            }
-            return list;
-        }
-
-        /// <summary>
-        /// Converts TinySpline's Vec3 to Unity's Vector3.
-        /// </summary>
-        /// <param name="vec3">Vector to be converted</param>
-        /// <returns>A Unity Vector3</returns>
-        public static Vector3 VectorToVector(Vec3 vec3)
-        {
-            return new Vector3(
-                (float)vec3.X,
-                (float)vec3.Y,
-                (float)vec3.Z);
         }
     }
 }
