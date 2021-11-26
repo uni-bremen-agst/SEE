@@ -164,12 +164,12 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Converts <paramref name="spline"/> to a TinySpline BSpline. It is
+        /// Converts <paramref name="spline"/> to a TinySpline B-Spline. It is
         /// safe to make changes on the returned spline (see
         /// <see cref="SerializableSpline"/> for more details).
         /// </summary>
         /// <param name="spline">Spline to be converted</param>
-        /// <returns>A new BSpline instance</returns>
+        /// <returns>A new B-Spline instance</returns>
         public static BSpline Deserialize(SerializableSpline spline)
         {
             return new BSpline((uint)spline.ControlPoints.Length, 3, spline.Degree)
