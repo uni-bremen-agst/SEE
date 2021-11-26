@@ -8,6 +8,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
+using SEE.Game;
 
 namespace SEE.Controls
 {
@@ -223,12 +224,18 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
+        /// <summary>
+        /// Will be used to flash the selected object while it is selected.
+        /// </summary>
+        private GameObjectFlasher flasher;
+
         private void Awake()
         {
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
             gameObject.TryGetComponentOrLog(out interactable);
             GraphElemRef = GetComponent<GraphElementRef>();
+            flasher = new GameObjectFlasher(gameObject);
         }
 
         private void OnDestroy()
@@ -445,6 +452,8 @@ namespace SEE.Controls
                 }
                 graphToSelectedIOs[graph].Add(this);
 
+                flasher.StartFlashing();
+
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
                 AnySelectIn?.Invoke(this, isInitiator);
@@ -463,6 +472,8 @@ namespace SEE.Controls
 
                 // Update all selected object list per graph
                 graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
+
+                flasher.StopFlashing();
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
