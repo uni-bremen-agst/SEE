@@ -176,7 +176,7 @@ namespace SEE.GO.Menu
                 GraphRenderer graphRenderer = new GraphRenderer(city, null);
                 Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
-                Material material = cityRenderer.sharedMaterials.Last();
+                Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();
                 marker.MarkBorn(result);
