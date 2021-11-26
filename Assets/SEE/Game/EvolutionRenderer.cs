@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Assets.SEE.Game.Evolution.Animators;
 using Assets.SEE.GameObjects;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -83,6 +84,12 @@ namespace SEE.Game
             {
                 Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
                 enabled = false;
+            }
+
+            // Implements the edge animation.
+            if (!gameObject.TryGetComponent<EdgeAnimator>(out var _))
+            {
+                gameObject.AddComponent<EdgeAnimator>();
             }
         }
 
@@ -154,17 +161,6 @@ namespace SEE.Game
         /// </summary>
         private AbstractAnimator changeAndBirthAnimator
             = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
-
-        /// <summary>
-        /// List of spline morphisms for the edge animatino. Null, if there is
-        /// no edge animation ongoing.
-        /// </summary>
-        private IList<SplineMorphism> morphisms = null;
-
-        /// <summary>
-        /// Timer for edge animation
-        /// </summary>
-        private float timer;
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -582,46 +578,36 @@ namespace SEE.Game
             objectManager.NegligibleNodes = negligibleNodes;
 
 
-            // PROTOTYPE CODE
-            // Set up spline morphisms.
+            // Create (or read from cache) the edge objects of the next
+            // visible graph and make the objects visible.
+            foreach (var edge in next.Graph.Edges())
+            {
+                objectManager.GetEdge(edge, out var edgeObject);
+                edgeObject.SetActive(true); // Make visible.
+            }
             if (currentCity != null)
             {
-                if (morphisms != null && morphisms.Count > 0)
-                {
-                    Debug.LogWarning("There are still active morphisms; fast-forwarding them to target");
-                    foreach (var m in morphisms)
-                    {
-                        m.Eval(1); // 1 => fast-forward to target
-                    }
-                }
-                morphisms = new List<SplineMorphism>();
+                // We are transitioning to another graph.
+                EdgeAnimator edgeAnimator = gameObject.GetComponent<EdgeAnimator>();
                 foreach (var edge in next.Graph.Edges())
                 {
                     if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
                     {
-                        Debug.LogError($"Missing layout edge for graph edge {edge.ID}");
+                        Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.");
                         continue;
                     }
                     if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
                     {
-                        objectManager.GetEdge(edge, out GameObject edgeObject);
+                        objectManager.GetEdge(edge, out var edgeObject);
                         if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
                         {
                             morphism = edgeObject.AddComponent<SplineMorphism>();
                         }
                         morphism.InitMorph(source.Spline, target.Spline);
-                        morphisms.Add(morphism);
+                        edgeAnimator.Add(morphism);
                     }
                 }
-                timer = 0;
-            }
-            else
-            {
-                foreach (var edge in next.Graph.Edges())
-                {
-                    objectManager.GetEdge(edge, out var edgeObject);
-                    edgeObject.SetActive(true);
-                }
+                edgeAnimator.DoAnimation(1);
             }
 
             // We have made the transition to the next graph.
@@ -734,15 +720,7 @@ namespace SEE.Game
         /// </summary>
         private void OnAnimationsFinished()
         {
-            // Stops the edge animation
-            if (morphisms != null)
-            {
-                foreach (var m in morphisms)
-                {
-                    m.Eval(1); // fast-forward to target
-                }
-                morphisms = null;
-            }
+            gameObject.GetComponent<EdgeAnimator>().FinalizeAnimation();
 
             NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
             nodeChangesBuffer.currentRevisionCounter = currentGraphRevisionCounter;
@@ -799,21 +777,6 @@ namespace SEE.Game
             return left.TryGetComponent(out EdgeRef leftEdgeRef)
                 && right.TryGetComponent(out EdgeRef rightEdgeRef)
                 && leftEdgeRef.Value.ID == rightEdgeRef.Value.ID;
-        }
-
-        /// <summary>
-        /// Interpolates the points of the old edges with those of the new edges over time.
-        /// </summary>
-        private void Update()
-        {
-            if (morphisms != null)
-            {
-                timer += Time.deltaTime;
-                foreach (var m in morphisms)
-                {
-                    m.Eval(timer / AnimationDuration);
-                }
-            }
         }
 
         /// <summary>
@@ -1064,7 +1027,8 @@ namespace SEE.Game
         /// <param name="edge"></param>
         private void RenderRemovedEdge(Edge edge)
         {
-            objectManager.RemoveEdge(edge, out var edgeObject);
+            //objectManager.RemoveEdge(edge, out var edgeObject);
+            objectManager.GetEdge(edge, out var edgeObject);
             edgeObject.SetActive(false);
             phase1AnimationWatchDog.Finished();
         }
