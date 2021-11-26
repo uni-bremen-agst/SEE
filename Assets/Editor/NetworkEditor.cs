@@ -91,8 +91,10 @@ namespace SEEEditor
                     #region Vivox
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
+                        SerializedProperty enableVivox = serializedObject.FindProperty("enableVivox");
                         SerializedProperty vivoxChannelName = serializedObject.FindProperty("vivoxChannelName");
-                        EditorGUILayout.PropertyField(vivoxChannelName, new GUIContent("Voice Channel Name", "The name of the voice channel."));
+                        EditorGUILayout.PropertyField(enableVivox, new GUIContent("Enable Vivox", "Whether Vivox voice chat is to be enabled."));
+                        EditorGUILayout.PropertyField(vivoxChannelName, new GUIContent("Vivox Channel Name", "The name of the voice channel."));
                     }
                     EditorGUI.EndDisabledGroup();
                     #endregion
