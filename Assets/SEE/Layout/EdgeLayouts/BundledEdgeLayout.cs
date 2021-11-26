@@ -296,7 +296,7 @@ namespace SEE.Layout.EdgeLayouts
                         }
                         
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length;
+                        uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
                         return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
                         {
                             ControlPoints = TinySplineInterop.VectorsToList(controlPoints)
