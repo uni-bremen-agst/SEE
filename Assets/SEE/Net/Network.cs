@@ -56,6 +56,11 @@ namespace SEE.Net
         [SerializeField] private int remoteServerPort = 0;
 
         /// <summary>
+        /// Whether the voice chat of Vivox is to be enabled. Is ignored in offline mode.
+        /// </summary>
+        [SerializeField] private bool enableVivox = false;
+
+        /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
         /// </summary>
@@ -167,7 +172,7 @@ namespace SEE.Net
 
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
             /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
-            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's 
+            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
             /// main thread here.
             MainThread = Thread.CurrentThread;
 
@@ -193,7 +198,10 @@ namespace SEE.Net
                         Server.Initialize();
                     }
                     Client.Initialize();
-                    VivoxInitialize();
+                    if (enableVivox)
+                    {
+                        VivoxInitialize();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -339,8 +347,6 @@ namespace SEE.Net
                 }
             }
         }
-
-
 
         /// <summary>
         /// Switches to offline mode.
