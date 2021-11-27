@@ -4315,11 +4315,11 @@ GameObject:
   - component: {fileID: 5421879745504582601}
   - component: {fileID: 5421879745504582600}
   - component: {fileID: 5421879745504582640}
-  - component: {fileID: 5421879745504582647}
   - component: {fileID: 5421879745504582646}
   - component: {fileID: 5421879745504582603}
   - component: {fileID: -7612929298753108540}
   - component: {fileID: -4745635825677508122}
+  - component: {fileID: -8986329616897808131}
   m_Layer: 0
   m_Name: Avatar
   m_TagString: Untagged
@@ -8910,7 +8910,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -9474,33 +9474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06a892ac1d6c864dad7c6c575b6e640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5421879745504582647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5421879745504582597}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
-  CanCommitToTransform: 0
 --- !u!114 &5421879745504582646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9557,6 +9530,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c02547380b5a94d4b8bdc3239eeeea84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8986329616897808131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5421879745504582597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54c9647dc784a46bca664910f182491e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+  CanCommitToTransform: 0
 --- !u!1 &5421879745519950751
 GameObject:
   m_ObjectHideFlags: 0
