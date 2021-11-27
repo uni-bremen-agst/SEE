@@ -45,8 +45,8 @@ namespace SEE.Controls
         /// </summary>
         private const string AppBarName = "HoloLensAppBar";
         /// <summary>
-        /// The name of the game object where the ChartManager component and his friends are 
-        /// attached to. It is used for handling the metric charts.        
+        /// The name of the game object where the ChartManager component and his friends are
+        /// attached to. It is used for handling the metric charts.
         /// </summary>
         private const string ChartManagerName = "ChartManager";
 
@@ -73,7 +73,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// The game object representing the ground in the scene. A Unity plane
-        /// should generally be attached to it. Will be deactivated for the Hololens player. In the VR 
+        /// should generally be attached to it. Will be deactivated for the Hololens player. In the VR
         /// environment, the TeleportArea will be attached to it.
         /// </summary>
         [Tooltip("The ground in the scene. This attribute must be set in VR for determining the teleporting area.")]
@@ -152,7 +152,7 @@ namespace SEE.Controls
         /// </summary>
         private void Awake()
         {
-            Debug.LogFormat("Player input type: {0}\n", playerInputType.ToString());
+            Debug.Log($"Player input type: {playerInputType}.\n");
             VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer);
             LocalPlayer = CreatePlayer(playerInputType);
         }
@@ -171,6 +171,7 @@ namespace SEE.Controls
             switch (inputType)
             {
                 case PlayerInputType.DesktopPlayer:
+                    return null; // FIXME
                     if (FocusPlane == null)
                     {
                        Debug.Log("No focus plane set for the desktop player. You can set this value in the inspector.\n");
@@ -180,7 +181,7 @@ namespace SEE.Controls
                 case PlayerInputType.VRPlayer:
                     {
                         player = PlayerFactory.CreateVRPlayer();
-                        SetupVR(player);                        
+                        SetupVR(player);
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:
@@ -202,7 +203,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Sets up the scene for playing in an VR environment. This means to instantiate the 
+        /// Sets up the scene for playing in an VR environment. This means to instantiate the
         /// Teleporting object and to attach a TeleportArea to the ground plane named <see cref="FloorName"/>.
         /// In addition, the VR camera is assigned to the ChartManager if it exists.
         ///
@@ -225,7 +226,7 @@ namespace SEE.Controls
                     // Attach TeleportArea to floor
                     // The TeleportArea replaces the material of the game object it is attached to
                     // into a transparent material. This way the game object becomes invisible.
-                    // For this reason, we will clone the floor and move the cloned floor slightly above 
+                    // For this reason, we will clone the floor and move the cloned floor slightly above
                     // its origin and then attach the TeleportArea to the cloned floor.
                     Vector3 position = Ground.transform.position;
                     position.y += 0.01f;
@@ -330,7 +331,7 @@ namespace SEE.Controls
             }
 
 #region Local Methods
-            //Scales the city by factor and pretend it to collection 
+            //Scales the city by factor and pretend it to collection
             static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
                 cityWitchContainer.transform.localScale *= cityScaleFactor;
@@ -361,7 +362,7 @@ namespace SEE.Controls
             }
 
 
-            // Creates a Container GameObject for Cities 
+            // Creates a Container GameObject for Cities
             static GameObject AddCodeCityContainer(GameObject city)
             {
                 GameObject cityContainer = new GameObject {name = city.name + "Container"};
