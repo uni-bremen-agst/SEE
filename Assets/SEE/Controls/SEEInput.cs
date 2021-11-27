@@ -17,7 +17,16 @@ namespace SEE.Controls
         /// For instance, pressing W would enter the text "W" and move the player
         /// forward.
         /// </summary>
-        public static bool KeyboardShortcutsEnabled = true;
+        private static bool keyboardShortcutsEnabled = true;
+
+        public static bool KeyboardShortcutsEnabled
+        {
+            get => keyboardShortcutsEnabled;
+            set
+            {
+                keyboardShortcutsEnabled = value;
+            }
+        }
 
         //-----------------------------------------------------
         // General key bindings
