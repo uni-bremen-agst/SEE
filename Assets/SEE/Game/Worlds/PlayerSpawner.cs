@@ -1,8 +1,11 @@
 ﻿using Dissonance;
+using SEE.DataModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace SEE.Game.Worlds
 {
@@ -30,15 +33,17 @@ namespace SEE.Game.Worlds
 
         private IEnumerator SpawnPlayerCoroutine()
         {
-            var nm = NetworkManager.Singleton;
-            while (ReferenceEquals(nm, null))
+            NetworkManager networkManager = NetworkManager.Singleton;
+            while (ReferenceEquals(networkManager, null))
             {
-                nm = NetworkManager.Singleton;
+                networkManager = NetworkManager.Singleton;
                 yield return null;
             }
 
-            if (!nm.IsServer)
+            // Terminate this co-routine.
+            if (!networkManager.IsServer)
                 yield break;
+            // The following code will be executed only on the server.
 
             // Wait until Dissonance is created
             DissonanceComms comms = null;
@@ -51,9 +56,9 @@ namespace SEE.Game.Worlds
             // The callback to invoke once a client connects. This callback is only
             // ran on the server and on the local client that connects. We want
             // to spawn a player whenever a client connects.
-            nm.OnClientConnectedCallback += Spawn;
+            networkManager.OnClientConnectedCallback += Spawn;
             // Spawn the local player.
-            Spawn(nm.LocalClientId);
+            Spawn(networkManager.LocalClientId);
         }
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace SEE.Game.Worlds
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
             player.name = "Player " + numberOfSpawnedPlayers;
-            Debug.Log($"Spawned {player.name}.\n");
+            Debug.LogError($"Spawned {player.name} local: {IsLocal(owner)}.\n");
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
@@ -81,6 +86,36 @@ namespace SEE.Game.Worlds
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
+        }
+
+        /// <summary>
+        /// FIXME: not used. Remove it.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="activate"></param>
+        private void Activate(GameObject player, bool activate)
+        {
+            foreach (Transform child in player.transform)
+            {
+                if (child.TryGetComponent(out Camera camera))
+                {
+                    camera.enabled = activate;
+                    camera.tag = Tags.MainCamera;
+                }
+                if (child.TryGetComponent(out AudioListener listener))
+                {
+                    listener.enabled = activate;
+                }
+                if (child.TryGetComponent(out EventSystem eventSystem))
+                {
+                    eventSystem.enabled = activate;
+                }
+            }
+        }
+
+        private bool IsLocal(ulong owner)
+        {
+            return owner == NetworkManager.Singleton.LocalClientId;
         }
     }
 }
