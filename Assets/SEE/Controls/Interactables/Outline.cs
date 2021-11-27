@@ -131,14 +131,6 @@ namespace SEE.Controls.Interactables
 
             // Apply material properties immediately
             needsUpdate = true;
-            
-            // Set portal for outline
-            rootCity = SceneQueries.GetCodeCity(transform)?.gameObject;
-            if (rootCity == null)
-            {
-                Debug.LogWarning("Outline will not respect portal boundaries because no code city has been found"
-                                 + " attached to the game object.\n");
-            }
 
             // Returns render queue setting of game object's first material
             int GetRenderQueue() => renderers.Select(x => x.materials.First().renderQueue).First();
@@ -172,7 +164,25 @@ namespace SEE.Controls.Interactables
                 }
             }
 
-            Portal.SetPortal(rootCity, gameObject);
+            UpdatePortal();
+        }
+
+        /// <summary>
+        /// Updates the outlines portal by evaluating which code city to use as a basis for it.
+        /// </summary>
+        public void UpdatePortal()
+        {
+            rootCity = SceneQueries.GetCodeCity(transform)?.gameObject;
+            if (rootCity != null)
+            {
+                Debug.Log($"Updated portal for {gameObject.name}.\n");
+                Portal.SetPortal(rootCity, gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("Outline will not respect portal boundaries because no code city has been found"
+                                 + $" attached to game object {gameObject.name}.\n");
+            }
         }
 
         private void OnValidate()
