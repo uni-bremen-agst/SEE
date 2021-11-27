@@ -577,12 +577,12 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon
+            /*if (nodeLayout == NodeLayoutKind.Balloon
                 || nodeLayout == NodeLayoutKind.EvoStreets
                 || nodeLayout == NodeLayoutKind.CirclePacking)
             {
                 AddLabels(innerNodes, innerNodeFactory);
-            }
+            }*/
 
             // Add outline around nodes so they can be visually differentiated without needing the same color.
             //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
