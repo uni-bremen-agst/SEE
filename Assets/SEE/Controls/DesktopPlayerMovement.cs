@@ -1,4 +1,5 @@
-﻿using SEE.Utils;
+﻿using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -26,20 +27,19 @@ namespace SEE.Controls
 
         private void Start()
         {
-            Camera mainCamera = MainCamera.Camera;
             if (focusedObject != null)
             {
                 cameraState.distance = 2.0f;
                 cameraState.yaw = 0.0f;
                 cameraState.pitch = 45.0f;
-                mainCamera.transform.position = focusedObject.CenterTop;
-                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                transform.position = focusedObject.CenterTop;
+                transform.position -= transform.forward * cameraState.distance;
+                transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
             else
             {
                 // Use the inital camera rotation.
-                Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
+                Vector3 rotation = transform.rotation.eulerAngles;
                 cameraState.yaw = rotation.y;
                 cameraState.pitch = rotation.x;
                 cameraState.freeMode = true;
@@ -49,7 +49,10 @@ namespace SEE.Controls
 
         private void Update()
         {
-            Camera mainCamera = MainCamera.Camera;
+            if (SEEInput.MoveForward())
+            {
+                Debug.Log($"DesktopPlayerMovement {gameObject.GetFullName()} forward\n");
+            }
             if (focusedObject != null && SEEInput.ToggleCameraLock())
             {
                 cameraState.freeMode = !cameraState.freeMode;
@@ -84,28 +87,28 @@ namespace SEE.Controls
                 cameraState.distance -= d;
 
                 HandleRotation();
-                mainCamera.transform.position = focusedObject.CenterTop;
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+                transform.position = focusedObject.CenterTop;
+                transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                transform.position -= transform.forward * cameraState.distance;
             }
             else // cameraState.freeMode == true
             {
                 Vector3 v = Vector3.zero;
                 if (SEEInput.MoveForward())
                 {
-                    v += mainCamera.transform.forward;
+                    v += transform.forward;
                 }
                 if (SEEInput.MoveBackward())
                 {
-                    v -= mainCamera.transform.forward;
+                    v -= transform.forward;
                 }
                 if (SEEInput.MoveRight())
                 {
-                    v += mainCamera.transform.right;
+                    v += transform.right;
                 }
                 if (SEEInput.MoveLeft())
                 {
-                    v -= mainCamera.transform.right;
+                    v -= transform.right;
                 }
                 if (SEEInput.MoveUp())
                 {
@@ -117,10 +120,10 @@ namespace SEE.Controls
                 }
                 v.Normalize();
                 v *= speed;
-                mainCamera.transform.position += v;
+                transform.position += v;
 
                 HandleRotation();
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
         }
 
@@ -130,7 +133,7 @@ namespace SEE.Controls
         private Vector2 lastAxis;
 
         /// <summary>
-        /// If the user wants us, we rotate the camera according to mouse input.
+        /// If the user wants us, we rotate the gameobject according to mouse input.
         /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
         ///
         /// Note: This is a workaround of issues with the correct mouse position
