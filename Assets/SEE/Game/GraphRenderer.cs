@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls.Interactables;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -470,7 +471,7 @@ namespace SEE.Game
                     }
                     else
                     {
-                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
+                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes);
                     }
                 }
                 finally
@@ -609,15 +610,13 @@ namespace SEE.Game
                 Node node = entry.Key;
                 Node parent = node.Parent;
 
-                if (parent == null)
+                // If node is a root, it will be added to parent as a child.
+                // Otherwise, node is a child of another game node.
+                AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
+
+                if (entry.Value.TryGetComponent(out Outline outline))
                 {
-                    // node is a root => it will be added to parent as a child
-                    AddToParent(entry.Value, root);
-                }
-                else
-                {
-                    // node is a child of another game node
-                    AddToParent(entry.Value, nodeMap[parent]);
+                    outline.UpdatePortal();
                 }
             }
         }
@@ -627,8 +626,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="layoutNodes">the layoutnodes</param>
         /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
-        /// <param name="parent">the parent gameobject</param>
-        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
+        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes)
         {
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)

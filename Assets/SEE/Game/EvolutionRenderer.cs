@@ -727,7 +727,7 @@ namespace SEE.Game
         /// <param name="left">First edge to be checked</param>
         /// <param name="right">Second edge to be checked</param>
         /// <returns>true if both edges are equal</returns>
-        private bool AreEqualGameEdges(GameObject left, GameObject right)
+        private static bool AreEqualGameEdges(GameObject left, GameObject right)
         {
             return left.TryGetComponent(out EdgeRef leftEdgeRef)
                 && right.TryGetComponent(out EdgeRef rightEdgeRef)
@@ -1549,6 +1549,7 @@ namespace SEE.Game
                 ToggleAutoPlayReverse();
             }
         }
+        
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
