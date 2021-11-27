@@ -95,7 +95,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 TextMesh.fontSize = FontSize;
                 TextMeshInputField.interactable = true;
-                TextMeshInputField.text = TextMesh.text = Text; 
+                TextMeshInputField.text = TextMesh.text = Text;
 
                 if (ICRDT.IsEmpty(Title))
                 {
@@ -104,7 +104,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                   // TextMeshInputField.text = ICRDT.PrintString(Title);
+                    // TextMeshInputField.text = ICRDT.PrintString(Title);
                     EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
@@ -113,7 +113,7 @@ namespace SEE.Game.UI.CodeWindow
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
-                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true;});
+                TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true; });
 
                 //Updates the entries in the CodeWindow
                 void updateCodeWindow(char c, int idx, operationType type)
@@ -122,7 +122,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         case operationType.Add:
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
-                            if(TextMeshInputField.caretPosition > idx)
+                            if (TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
                             }
@@ -131,7 +131,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition -1;
+                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
                             }
                             break;
                     }
@@ -182,7 +182,7 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
-                 if(Time.time < oldIDXCoolDown)
+                if (Time.time < oldIDXCoolDown)
                 {
                     oldIDX = -1;
                 }
@@ -194,9 +194,9 @@ namespace SEE.Game.UI.CodeWindow
                         File.WriteAllText(FilePath, removeLineNumbers(ICRDT.PrintString(Title)));
                         ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
                     }
-                    catch(Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException 
-                    ||e is NotSupportedException || e is ArgumentNullException || e is UnauthorizedAccessException || e is SecurityException )
-                    { 
+                    catch (Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException
+                    || e is NotSupportedException || e is ArgumentNullException || e is UnauthorizedAccessException || e is SecurityException)
+                    {
                         ShowNotification.Error("Saving Failed", e.Message);
                     }
                 }
@@ -212,7 +212,7 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
-               if (SEEInput.ReCalculateSyntaxHighliting())
+                if (SEEInput.ReCalculateSyntaxHighliting())
                 {
                     EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
@@ -222,7 +222,7 @@ namespace SEE.Game.UI.CodeWindow
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
                 string input = Input.inputString;
-                if(input.Contains("\b"))
+                if (input.Contains("\b"))
                 {
                     input = input.Replace("\b", "");
                 }
@@ -231,15 +231,15 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\r", "");
                 }
-                
+
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
                     valueHasChanged = false;
-                    if(idx == oldIDX)
+                    if (idx == oldIDX)
                     {
                         idx++;
                     }
-                    else if(oldIDX > -1 && idx > oldIDX + 1)
+                    else if (oldIDX > -1 && idx > oldIDX + 1)
                     {
                         idx = oldIDX + 1;
                     }
@@ -250,48 +250,59 @@ namespace SEE.Game.UI.CodeWindow
                     oldKeyCode = KeyCode.A;
                 }
 
-                if((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) &&  valueHasChanged)
+                if ((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) && valueHasChanged)
                 {
                     returnPressed(idx);
                     oldKeyCode = KeyCode.Return;
                     valueHasChanged = false;
-                } 
+                }
 
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
                 {
                     valueHasChanged = false;
                     if (!deleteSelectedText())
-                    { 
-                        ICRDT.DeleteString(idx , idx, Title);
+                    {
+                        ICRDT.DeleteString(idx, idx, Title);
                     }
                     oldKeyCode = KeyCode.Delete;
                 }
 
-                if (Input.GetKey(KeyCode.Backspace) && valueHasChanged )
+                if (Input.GetKey(KeyCode.Backspace) && valueHasChanged)
                 {
-                    if(oldIDX == idx)
+                    if (oldIDX == idx)
                     {
-                        if(idx == 0)
+                        if (idx == 0)
                         {
                             return;
                         }
                         idx--;
                     }
                     oldIDX = idx;
-                    oldIDXCoolDown = Time.time + 0.1f; 
+                    oldIDXCoolDown = Time.time + 0.1f;
                     valueHasChanged = false;
                     if (!deleteSelectedText())
                     {
-                        ICRDT.DeleteString(idx , idx, Title);
+                        ICRDT.DeleteString(idx, idx, Title);
                     }
                     oldKeyCode = KeyCode.Backspace;
 
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
-                  if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
+                    if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
                         deleteSelectedText();
+                        //Versuch die auto indentions auch bei strg +v bei zubehalten, muss aber noch im codewindow auch gemacht werden. Das einfachste waere einfach das syntax highliting neu zu kalkulier. dann darf aber kein knopf gedrückt werden
+                       /* string tmp = string.Join("\n", GUIUtility.systemCopyBuffer.Split('\n').Select((x, i) =>
+                            {
+                                if (i != 0)
+                                {
+                                    x.Insert(0, (new string(' ', neededPadding + 1)));
+                                }
+                                return x;
+                            }).ToList());
+                        Debug.Log("tmp " + tmp); */
+
                         ICRDT.AddString(GUIUtility.systemCopyBuffer, idx - GUIUtility.systemCopyBuffer.Length, Title);
                     }
                 }
@@ -312,7 +323,7 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(idx, idx, Title);
                             break;
                         case KeyCode.Delete:
-                            ICRDT.DeleteString(idx +1, idx +1, Title);
+                            ICRDT.DeleteString(idx + 1, idx + 1, Title);
                             break;
                         case KeyCode.KeypadEnter:
                             returnPressed(idx);
@@ -395,10 +406,10 @@ namespace SEE.Game.UI.CodeWindow
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }
         }
-        private async UniTask AddStringStart() 
+        private async UniTask AddStringStart()
         {
             ShowNotification.Info("Loading editor", "The Editable file is loading, please wait", 10);
-            string  cleanText = await AsyncGetCleanText();
+            string cleanText = await AsyncGetCleanText();
             await ICRDT.AsyncAddString(cleanText, 0, Title, true);
             TextMeshInputField.enabled = true;
             ShowNotification.Info("Editor ready", "You now can use the editor");
@@ -406,10 +417,11 @@ namespace SEE.Game.UI.CodeWindow
 
         private string removeLineNumbers(string textWithNumbers)
         {
-            string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) => {
+            string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) =>
+            {
                 if (x.Length > 0)
                 {
-                    return x.Substring(neededPadding +1);
+                    return x.Substring(neededPadding + 1);
                 }
                 else
                 {
@@ -438,7 +450,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             if (selectedText != null)
             {
-                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 -1, Title);
+                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 - 1, Title);
                 return true;
             }
             return false;

@@ -85,7 +85,17 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
+      Standalone: OSXUniversal
+    second:
+      enabled: 1
+      settings: {}
+  - first:
       Standalone: Win
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Win64
     second:
       enabled: 1
       settings: {}
