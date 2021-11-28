@@ -421,28 +421,21 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartAttr()
         {
-            if (ReferenceEquals(current, null))
+            if (reader.HasAttributes)
             {
-                LogError("Found attribute declaration outside of a node/edge declaration");
+                while (reader.MoveToNextAttribute())
+                {
+                    if (reader.Name == "name")
+                    {
+                        // save for later when we know the attribute type
+                        currentAttributeName = reader.Value;
+                        break;
+                    }
+                }
             }
             else
             {
-                if (reader.HasAttributes)
-                {
-                    while (reader.MoveToNextAttribute())
-                    {
-                        if (reader.Name == "name")
-                        {
-                            // save for later when we know the attribute type
-                            currentAttributeName = reader.Value;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    LogError("Attribute declaration without name.");
-                }
+                LogError("Attribute declaration without name.");
             }
         }
 
@@ -473,7 +466,24 @@ namespace SEE.DataModel.DG.IO
         {
             if (ReferenceEquals(current, null))
             {
-                LogError("Found string attribute outside of a node/edge declaration.");
+                if(currentAttributeName == "CommitId")
+                {
+                    graph.CommitId = value;
+                } 
+                else if (currentAttributeName == "commitMessage")
+                {
+                    graph.CommitMessage = value;
+                }
+                else if (currentAttributeName == "CommitAuthor")
+                {
+                    graph.CommitAuthor = value;
+                }
+                else if (currentAttributeName == "CommitTimestamp")
+                {
+                    graph.CommitTimestamp = value;
+                }
+
+                // LogError("Found string attribute outside of a node/edge declaration.");
             }
             else if (currentAttributeName == "")
             {
