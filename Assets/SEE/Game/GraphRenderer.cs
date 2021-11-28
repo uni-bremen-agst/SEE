@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls.Interactables;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -614,10 +613,7 @@ namespace SEE.Game
                 // Otherwise, node is a child of another game node.
                 AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
 
-                if (entry.Value.TryGetComponent(out Outline outline))
-                {
-                    outline.UpdatePortal();
-                }
+                entry.Value.UpdatePortal(includeDescendants: Portal.IncludeDescendants.DIRECT_DESCENDANTS);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -105,7 +106,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogWarning("Game object {gameObject.name} has no GO.Plane.\n");
+                Debug.LogWarning($"Game object {gameObject.name} has no GO.Plane.\n");
                 leftFrontCorner = Vector2.zero;
                 rightBackCorner = Vector2.zero;
             }
@@ -149,18 +150,80 @@ namespace SEE.Game
         /// <summary>
         /// Sets the culling area (portal) of <paramref name="gameObject"/> to the rectangle in
         /// the x/z plane defined by the extents of <paramref name="root"/>.
+        /// Depending on <paramref name="includeDescendants"/>, this will also be done for any
+        /// descendants of <paramref name="gameObject"/>.
         /// </summary>
         /// <param name="root">object defining the extent of the culling area</param>
         /// <param name="gameObject">object whose culling area is to be set</param>
-        public static void SetPortal(GameObject root, GameObject gameObject)
+        /// <param name="includeDescendants">
+        /// Whether to also set the portal for descendants of <paramref name="gameObject"/> too
+        /// </param>
+        public static void SetPortal(GameObject root, GameObject gameObject, 
+                                     IncludeDescendants includeDescendants = IncludeDescendants.ONLY_SELF)
         {
             GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
-            SetPortalOfMaterials(gameObject, leftFront, rightBack);
+
+            switch (includeDescendants)
+            {
+                case IncludeDescendants.DIRECT_DESCENDANTS: 
+                    foreach (Transform child in gameObject.transform)
+                    {
+                        SetPortalOfMaterials(child.gameObject, leftFront, rightBack);
+                    }
+
+                    // We also need to set the portal of the gameObject itself
+                    goto case IncludeDescendants.ONLY_SELF;
+                    
+                case IncludeDescendants.ALL_DESCENDANTS:
+                    // We will go through the children of gameObject using pre-order-traversal.
+                    static void SetPortalOfMaterialsRecursive(GameObject go, Vector2 leftFront, Vector2 rightBack)
+                    {
+                        SetPortalOfMaterials(go, leftFront, rightBack);
+                        foreach (Transform child in go.transform)
+                        {
+                            SetPortalOfMaterialsRecursive(child.gameObject, leftFront, rightBack);
+                        }
+                    }
+                    
+                    SetPortalOfMaterialsRecursive(gameObject, leftFront, rightBack);
+                    break;
+                
+                case IncludeDescendants.ONLY_SELF: 
+                    SetPortalOfMaterials(gameObject, leftFront, rightBack);
+                    break;
+                
+                default: 
+                    throw new ArgumentOutOfRangeException(nameof(includeDescendants), includeDescendants, 
+                                                          "Invalid IncludeDescendants setting in SetPortal.");
+            }
+            
+        }
+        
+        /// <summary>
+        /// Option for <see cref="SetPortal"/> which controls whether children of a
+        /// game object shall have their portal boundaries set too.
+        /// </summary>
+        public enum IncludeDescendants
+        {
+            /// <summary>
+            /// Will only set the portal of this game object.
+            /// </summary>
+            ONLY_SELF,
+            
+            /// <summary>
+            /// Will set the portal of the direct descendants of this game object.
+            /// </summary>
+            DIRECT_DESCENDANTS,
+            
+            /// <summary>
+            /// Will set the portal of all descendants (recursively) of this game object.
+            /// </summary>
+            ALL_DESCENDANTS
         }
 
         /// <summary>
         /// Sets the culling area (portal) of <paramref name="go"/> and all its descendants
-        /// to an infititely large rectangle.
+        /// to an infinitely large rectangle.
         /// </summary>
         /// <param name="go">object whose culling area is to be set</param>
         public static void SetInfinitePortal(GameObject go)
