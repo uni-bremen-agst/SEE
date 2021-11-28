@@ -124,6 +124,14 @@ namespace SEE.Game.Evolution
         private readonly CylinderFactory deletionMarkerFactory;
 
         /// <summary>
+        /// Transformation method to scale numbers.
+        /// </summary>
+        private float transform(float input)
+        {
+            return input;
+        }
+
+        /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a beam marker on top
         /// of its roof.
         /// </summary>
@@ -133,21 +141,6 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(Node node, GameObject gameNode, CylinderFactory factory)
         {
-            // The marker should be drawn in front of the block, hence, its render
-            // queue offset must be greater than the one of the block.
-            //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
-            GameObject beamMarker = NewBeam(factory, 0);
-
-
-            float height = graphRenderer.GetMetricValue(node, markerAttributes.LengthMetric);
-            
-            
-
-            // FIXME: These kinds of beam markers make sense only for leaf nodes.
-            // Could we better use some kind of blinking now that the cities
-            // are drawn in miniature?
-
-            beamMarker.tag = Tags.Decoration;
             Vector3 position = graphRenderer.GetRoof(gameNode);
 
             Vector3 beamScale;
@@ -155,16 +148,69 @@ namespace SEE.Game.Evolution
             beamScale.y = 0; // We start a zero height and let it grow over the given duration by way of BeamRaiser.
             beamScale.z = markerWidth;
 
-            position.y += beamScale.y / 2.0f;
-            beamMarker.transform.position = position;
-            beamMarker.transform.localScale = beamScale;
+            float offset = 0;
 
-            // Makes beamMarker a child of block so that it moves along with it during the animation.
-            // In addition, it will also be destroyed along with its parent block.
-            beamMarker.transform.SetParent(gameNode.transform);
-            BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
-            raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, height, markerWidth), duration: duration);
-            return beamMarker;
+            if (markerAttributes.Kind == MarkerKinds.Dynamic)
+            {
+                float lengthMetric = graphRenderer.GetMetricValue(node, markerAttributes.LengthMetric);
+                float totalHeight = transform(lengthMetric);
+
+                MarkerSection section = markerAttributes.MarkerSections[0];
+                float sectionMetric = graphRenderer.GetMetricValue(node, section.Metric);
+                float sectionHeight = transform(sectionMetric);
+
+                Debug.Log("Total: " + totalHeight + ", Section: " + sectionHeight);
+
+                offset += sectionHeight;
+
+                CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
+
+                // The marker should be drawn in front of the block, hence, its render
+                // queue offset must be greater than the one of the block.
+                //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+                GameObject beamMarker = NewBeam(customFactory, 0);
+
+                // FIXME: These kinds of beam markers make sense only for leaf nodes.
+                // Could we better use some kind of blinking now that the cities
+                // are drawn in miniature?
+
+                beamMarker.tag = Tags.Decoration;
+
+                position.y += beamScale.y / 2.0f + offset;
+                beamMarker.transform.position = position;
+                beamMarker.transform.localScale = beamScale;
+
+                // Makes beamMarker a child of block so that it moves along with it during the animation.
+                // In addition, it will also be destroyed along with its parent block.
+                beamMarker.transform.SetParent(gameNode.transform);
+                BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
+                raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, sectionHeight, markerWidth), duration: duration);
+                return beamMarker;
+            } 
+            else
+            {
+                // The marker should be drawn in front of the block, hence, its render
+                // queue offset must be greater than the one of the block.
+                //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+                GameObject beamMarker = NewBeam(factory, 0);
+
+                // FIXME: These kinds of beam markers make sense only for leaf nodes.
+                // Could we better use some kind of blinking now that the cities
+                // are drawn in miniature?
+
+                beamMarker.tag = Tags.Decoration;
+
+                position.y += beamScale.y / 2.0f;
+                beamMarker.transform.position = position;
+                beamMarker.transform.localScale = beamScale;
+
+                // Makes beamMarker a child of block so that it moves along with it during the animation.
+                // In addition, it will also be destroyed along with its parent block.
+                beamMarker.transform.SetParent(gameNode.transform);
+                BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
+                raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, markerHeight, markerWidth), duration: duration);
+                return beamMarker;
+            }
         }
 
         /// <summary>
