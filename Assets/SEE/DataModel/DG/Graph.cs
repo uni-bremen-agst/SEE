@@ -340,6 +340,26 @@ namespace SEE.DataModel.DG
         public string Name { get; set; }
 
         /// <summary>
+        /// ID of the commit.
+        /// </summary>
+        public string CommitId { get; set; }
+
+        /// <summary>
+        /// Message of the commit.
+        /// </summary>
+        public string CommitMessage { get; set; }
+
+        /// <summary>
+        /// Author of the commit.
+        /// </summary>
+        public string CommitAuthor { get; set; }
+
+        /// <summary>
+        /// Timestamp of the commit.
+        /// </summary>
+        public string CommitTimestamp { get; set; }
+
+        /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
         /// </summary>
