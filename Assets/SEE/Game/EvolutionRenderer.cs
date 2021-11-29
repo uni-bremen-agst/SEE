@@ -603,7 +603,7 @@ namespace SEE.Game
                         {
                             morphism = edgeObject.AddComponent<SplineMorphism>();
                         }
-                        morphism.InitMorph(source.Spline, target.Spline);
+                        morphism.Init(source.Spline, target.Spline);
                         edgeAnimator.Add(morphism);
                     }
                 }

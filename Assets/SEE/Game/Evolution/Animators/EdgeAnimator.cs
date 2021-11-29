@@ -8,43 +8,64 @@ using UnityEngine;
 namespace Assets.SEE.Game.Evolution.Animators
 {
     /// <summary>
-    /// This class implements the edege animation (through spline morphism)
-    /// of <see cref="SEE.Game.EvolutionRenderer"/>. To do so, it stores a
-    /// list of <see cref="SplineMorphism"/> instances and processes them by
-    /// calling <see cref="SplineMorphism.Eval(double)"/> in
-    /// <see cref="Update"/> (with corresponding time parameter).
+    /// This class implements the edege animation of
+    /// <see cref="SEE.Game.EvolutionRenderer"/>. To do so, it stores a list
+    /// of <see cref="IEvaluator"/> instances and processes them by calling
+    /// <see cref="IEvaluator.Eval(float)"/> in <see cref="Update"/> with a
+    /// time parameter that is linear to the elapsed time.
     ///
     /// How to use:
     ///
-    /// 1.  Add the spline morphisms to be processed with
-    ///     <see cref="Add(SplineMorphism)"/>.
+    /// 1.  Register the evaluators to be processed with
+    ///     <see cref="Add(IEvaluator)"/>.
     /// 2.  Start the animation with <see cref="DoAnimation(float)"/>.
     /// 3a. If the animation must be ended prematurely, call
-    ///     <see cref="FinalizeAnimation"/>. This forwards all morphisms to
-    ///     their target, clears the list of registered morphisms (1.), and
-    ///     inactivates the animation (i.e., <see cref="Update"/> doesn't
-    ///     process any morphism until <see cref="DoAnimation(float)"/> is
-    ///     called again).
+    ///     <see cref="FinalizeAnimation"/>. This forwards all evaluators to
+    ///     their end (time parameter 1), clears the list of registered
+    ///     evaluators (step 1.), and  inactivates the animation (i.e.,
+    ///     <see cref="Update"/> doesn't process any evaluator until
+    ///     <see cref="DoAnimation(float)"/> is called again).
     /// 3b. <see cref="Update"/> automatically finalizes the animation when
     ///     the duration passed to <see cref="DoAnimation(float)"/> (2.) has
     ///     been exceeded.
     ///
-    /// Instances of this class can be reused. That is, After 3a./3b., one can
+    /// Instances of this class can be reused. That is, after 3a./3b., one can
     /// start again with 1. It is therefore sufficient to create this
-    /// component once at the start and then use it whenever one or more edges
-    /// need to be animated (following the pattern described above).
+    /// component once at the start of the application and then use it
+    /// whenever one or more edges need to be animated (following the pattern
+    /// described above).
     /// </summary>
     public class EdgeAnimator : SerializedMonoBehaviour
     {
         /// <summary>
-        /// Morphisms to be processed in <see cref="Update"/>.
+        /// This interface serves as an abstraction layer to decouple the
+        /// evaluation process of edge animation (the part carried out by
+        /// <see cref="EdgeAnimator"/>) from the implementation of a single
+        /// evaluation step (the part carried out by implementors of this
+        /// interface).
         /// </summary>
-        [SerializeField]
-        private List<SplineMorphism> morphisms = new List<SplineMorphism>();
+        public interface IEvaluator
+        {
+            /// <summary>
+            /// Evaluate the edge animation at time parameter
+            /// <paramref name="t"/>. The domain of <paramref name="t"/> is
+            /// [0, 1] where 0 evaluates to the start of the animation and 1
+            /// to the end. It is not necessary for the animation to be linear
+            /// to the domain of <paramref name="t"/>.
+            /// </summary>
+            /// <param name="t">Time parameter with domain [0, 1]</param>
+            public void Eval(float t);
+        }
 
         /// <summary>
-        /// The time parameter passed to
-        /// <see cref="SplineMorphism.Eval(double)"/>.
+        /// Evaluators to be processed in <see cref="Update"/> when
+        /// <see cref="DoAnimation(float)"/> is called.
+        /// </summary>
+        [SerializeField]
+        private List<IEvaluator> evaluators = new List<IEvaluator>();
+
+        /// <summary>
+        /// The time parameter passed to <see cref="IEvaluator.Eval(float)"/>.
         /// </summary>
         [SerializeField]
         private float time;
@@ -68,21 +89,20 @@ namespace Assets.SEE.Game.Evolution.Animators
         /// Whether the animation is active. A finalized animation
         /// (<see cref="FinalizeAnimation"/>) is inactive.
         /// </summary>
-        [SerializeField]
         private bool active = false;
 
         /// <summary>
-        /// Registers the given morphism.
+        /// Registers the given evaluator.
         /// </summary>
-        /// <param name="morphism"></param>
-        public void Add(SplineMorphism morphism)
+        /// <param name="evaluator">Evaluator to be added</param>
+        public void Add(IEvaluator evaluator)
         {
-            morphisms.Add(morphism);
+            evaluators.Add(evaluator);
         }
 
         /// <summary>
         /// Starts the animation (i.e., <see cref="Update"/> processes all
-        /// registered morphisms).
+        /// registered evaluators).
         /// </summary>
         /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01</param>
         public void DoAnimation(float duration)
@@ -94,31 +114,32 @@ namespace Assets.SEE.Game.Evolution.Animators
         }
 
         /// <summary>
-        /// Fast-forward all spline morphisms to their target and prepare the
-        /// internal state for the next animation. Can be called explicitly.
-        /// Is called by <see cref="Update"/> when the animation duration has
-        /// been exceeded. Subsequent calls have no effect until
+        /// Fast-forward all evaluators to their end (i.e., call
+        /// <see cref="IEvaluator.Eval(float)"/> with time parameter 1) and
+        /// prepare the internal state for the next animation. Can be called
+        /// explicitly. Is called by <see cref="Update"/> when the animation
+        /// duration has been exceeded. Subsequent calls have no effect until
         /// <see cref="DoAnimation(float)"/> is called again.
         /// </summary>
         public void FinalizeAnimation()
         {
             if (active)
             {
-                time = 1; // Fast-forward to target.
-                foreach (var m in morphisms)
+                time = 1; // Fast-forward to end.
+                foreach (var m in evaluators)
                 {
                     m.Eval(time);
                 }
                 // Prepare for the next animation.
-                morphisms.Clear();
+                evaluators.Clear();
                 active = false;
             }
         }
 
 
         /// <summary>
-        /// Processes all registered morphisms (i.e., calls
-        /// <see cref="SplineMorphism.Eval(double)"/> with corresponding time
+        /// Processes all registered evaluators (i.e., calls
+        /// <see cref="IEvaluator.Eval(float)"/> with corresponding time
         /// parameter). If the animation duration has been exceeded, the
         /// animation is finalized.
         /// (<see cref="FinalizeAnimation"/>).
@@ -129,14 +150,14 @@ namespace Assets.SEE.Game.Evolution.Animators
             {
                 timer += Time.deltaTime;
                 time = timer / duration; // duration > 0
-                if (time >= 1)
+                if (time >= 1) // => timer > duration
                 {
                     FinalizeAnimation();
                     // => active = false
                 }
                 else
                 {
-                    foreach (var m in morphisms)
+                    foreach (var m in evaluators)
                     {
                         m.Eval(time);
                     }
