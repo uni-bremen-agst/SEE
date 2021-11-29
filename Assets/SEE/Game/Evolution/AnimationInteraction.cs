@@ -569,6 +569,7 @@ namespace SEE.Game.Evolution
         private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
+            animationDataModel.CommitInformationText.text = "Commit #" + evolutionRenderer.GraphCurrent.CommitId + "\nAuthor: " + evolutionRenderer.GraphCurrent.CommitAuthor + "\nTimestamp: " + evolutionRenderer.GraphCurrent.CommitTimestamp + "\nMessage:\n" + evolutionRenderer.GraphCurrent.CommitMessage;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
         }
 

@@ -470,7 +470,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     graph.CommitId = value;
                 } 
-                else if (currentAttributeName == "commitMessage")
+                else if (currentAttributeName == "CommitMessage")
                 {
                     graph.CommitMessage = value;
                 }

@@ -1168,6 +1168,11 @@ namespace SEE.Game
         public int GraphCount => graphs.Count;
 
         /// <summary>
+        /// Current graph of the graph series to be rendered.
+        /// </summary>
+        public Graph GraphCurrent => graphs[currentGraphIndex];
+
+        /// <summary>
         /// The time in seconds for showing a single graph revision during auto-play animation.
         /// </summary>
         public float AnimationLag

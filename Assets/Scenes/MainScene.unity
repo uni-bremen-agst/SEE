@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10010709, g: 0.1693151, b: 0.30522084, a: 1}
+  m_IndirectSpecularColor: {r: 0.100000754, g: 0.1693998, b: 0.3050715, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -924,10 +924,76 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 419627336, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1611227358, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 383924358232027407, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 383924358232027407, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 383924358232027407, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 383924358232027407, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -427
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Text
+      value: 'Commit #7d2375782acbb67e638ebb43d0bbabdf2fa51605
+
+        Author: Rainer
+        Koschke
+
+        Timestamp: 2019-08-06T12:00:00
+
+        Message:
+
+        Initial
+        commit'
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_FontData.m_BestFit
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_FontData.m_AlignByGeometry
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2728114383097898800, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4461994104216227603, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
@@ -1038,6 +1104,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: AnimationCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5506073792015535018, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: m_CullTransparentMesh
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6721087702604884392, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+      propertyPath: CommitInformationText
+      value: 
+      objectReference: {fileID: 1724780514}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
 --- !u!224 &326830033 stripped
@@ -1145,7 +1219,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &551180592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1231,13 +1305,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Method
+      Data: File
     - Name: $v
       Entry: 5
       Data: true
@@ -1249,19 +1323,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Class
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Package
+      Data: Directory
     - Name: $v
       Entry: 5
       Data: true
@@ -1279,10 +1341,10 @@ MonoBehaviour:
       Data: 4|SEE.Game.City.LeafNodeAttributes, SEE
     - Name: HeightMetric
       Entry: 1
-      Data: Metric.Lines.LOC
+      Data: Metric.LOC
     - Name: ColorMetric
       Entry: 1
-      Data: Metric.McCabe_Complexity
+      Data: Metric.Vcs2See.Most_Recent_Edit
     - Name: ColorRange
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1351,10 +1413,10 @@ MonoBehaviour:
       Data: 0
     - Name: WidthMetric
       Entry: 1
-      Data: Metric.Number_Of_Calling_Routines
+      Data: Metric.Number_of_Tokens
     - Name: DepthMetric
       Entry: 1
-      Data: Metric.Number_Of_Called_Routines
+      Data: Metric.Number_of_Tokens
     - Name: MinimalBlockLength
       Entry: 4
       Data: 0.001
@@ -1690,11 +1752,25 @@ MonoBehaviour:
   ScaleOnlyLeafMetrics: 1
   MaxRevisionsToLoad: 500
   GXLDirectory:
-    Root: 3
+    Root: 0
     relativePath: /mini-evolution
-    absolutePath: 
+    absolutePath: "C:/Users/Felix Gaebler/Documents/Universit\xE4t Bremen/Bachelorarbeit/vcs2see/example"
   MarkerHeight: 0.2
   MarkerWidth: 0.01
+  MarkerSettings:
+    HeightMetric: 
+    ColorMetric: 
+    Kind: 1
+    LengthMetric: Metric.Vcs2See.Commit.Line_Changes
+    MinimalMarkerLength: 0.001
+    MaximalMarkerLength: 5
+    MarkerSections:
+    - Metric: 
+      Color: {r: 0.050980393, g: 1, b: 0, a: 1}
+    - Metric: 
+      Color: {r: 0, g: 0.6901961, b: 1, a: 1}
+    - Metric: 
+      Color: {r: 1, g: 0, b: 0, a: 1}
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
@@ -1711,7 +1787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0031000376
+  HeightOffset: 0.003547728
 --- !u!65 &551180599
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2747,6 +2823,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3378868594509276438, guid: 830da89e8b558604cacf990f7c871563, type: 3}
+      propertyPath: m_BlockingMask.m_Bits
+      value: 2147484471
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 830da89e8b558604cacf990f7c871563, type: 3}
 --- !u!224 &1305587995 stripped
@@ -2788,7 +2868,7 @@ MonoBehaviour:
   playerInputType: 0
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   PlayerYRotation: 0
-  FocusPlane: {fileID: 1972412193}
+  FocusPlane: {fileID: 551180596}
   Ground: {fileID: 1190604626}
   HideVRControllers: 0
   ShowControllerHints: 0
@@ -3557,6 +3637,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1724780514 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1886076020051568678, guid: adacd0aa0ca2cfa4eb4bc4d266aaccf8, type: 3}
+  m_PrefabInstance: {fileID: 326830031}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1758871328
@@ -5233,7 +5324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1972412190
 MonoBehaviour:
   m_ObjectHideFlags: 0
