@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
-using SEE.Game.City;
-using SEE.Game.Evolution;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -48,21 +45,26 @@ namespace SEE.Controls
                 _ideIntegration = ideIntegration;
             }
 
-            public void HighlightNode(string path)
+            /// <summary>
+            /// Adds all nodes from <see cref="_cachedObjects"/> with the key created by
+            /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
+            /// null, it won't be appended to the key.
+            /// </summary>
+            /// <param name="path">The absolute path to the source file.</param>
+            /// <param name="name">Optional name of the element in a file.</param>
+            public void HighlightNode(string path, string name = null)
             {
-                UniTask.Run(async () =>
+                var tmp = path;
+
+                if (name != null)
                 {
-                    await UniTask.SwitchToMainThread();
-                    var nodes = _ideIntegration._nodes[path];
+                    path += $":{name}";
+                }
 
-                    if (nodes == null) return;
+                var nodes = _ideIntegration._cachedObjects[path];
+                if (nodes == null) return;
 
-                    foreach (var node in nodes)
-                    {
-                        Outline.Create(node, Color.blue);
-                    }
-                    Debug.Log(path);
-                });
+                _ideIntegration._pendingSelections = new HashSet<InteractableObject>(nodes);
             }
         }
 
@@ -132,7 +134,7 @@ namespace SEE.Controls
         /// <summary>
         /// All callable methods by the server.
         /// </summary>
-        public ClientCalls Client { get; private set; } 
+        public ClientCalls Client { get; private set; }
 
         /// <summary>
         /// Specifies to which IDE a connection is to be established.
@@ -158,7 +160,12 @@ namespace SEE.Controls
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
         /// city have no impact to the source code, this will only be initialized during start up.
         /// </summary>
-        private IDictionary<string, ICollection<GameObject>> _nodes;
+        private IDictionary<string, ICollection<InteractableObject>> _cachedObjects;
+
+        /// <summary>
+        /// Contains all <see cref="InteractableObject"/> that were selected by the selected IDE.
+        /// </summary>
+        private HashSet<InteractableObject> _pendingSelections;
 
         /// <summary>
         /// Initializes all necessary objects for the inter-process communication
@@ -185,13 +192,83 @@ namespace SEE.Controls
             }
 
             Instance = this;
+            _pendingSelections = new HashSet<InteractableObject>();
+
+            InitializeCachedObject();
+            InitializeJsonRpcServer();
+
+            _rpc.Connected += ConnectedToClient;
+            _rpc.Disconnected += DisconnectedFromClient;
+
+            // Starting the server as a background task.
+            StartServer().Forget();
+
+            async UniTaskVoid StartServer()
+            {
+                try
+                {
+                    await _rpc.Start();
+                }
+                catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
+                {
+                    ShowNotification.Error("IDE Integration", e.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stops the currently running server and the singleton instance of <see cref="IDEIntegration"/>.
+        /// </summary>
+        public void OnDestroy()
+        {
+            _rpc.Stop();
+            Instance = null;
+        }
+
+        /// <summary>
+        /// Is there any pending selection needed to be taken.
+        /// </summary>
+        /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
+        public bool PendingSelectionsAction()
+        {
+            return SEEInput.SelectionEnabled && _pendingSelections.Count > 0;
+        }
+
+        public HashSet<InteractableObject> PopPendingSelections()
+        {
+            HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
+            elements.UnionWith(_pendingSelections);
+            _pendingSelections.Clear();
+            return elements;
+        }
+
+        /// <summary>
+        /// Initializes the JsonRpcServer with the right port number.
+        /// </summary>
+        private void InitializeJsonRpcServer()
+        {
             Client = new ClientCalls(this);
-            _nodes = new Dictionary<string, ICollection<GameObject>>();
-            
+
+            _rpc = Type switch
+            {
+                Ide.VisualStudio2019 =>
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2019Port),
+                Ide.VisualStudio2022 =>
+                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2022Port),
+                _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
+            };
+        }
+
+        private void InitializeCachedObject()
+        {
+            _cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
+
+            // Get all nodes in scene
             foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
             {
                 var fileName = node.GetNode().Filename();
                 var path = node.GetNode().Path();
+                var name = node.GetNode().SourceName;
 
                 if (fileName == null || path == null) continue;
 
@@ -206,34 +283,20 @@ namespace SEE.Controls
                     continue;
                 }
 
-                if (!_nodes.ContainsKey(fullPath))
+                if (name != null && (!name.Equals("?") || !name.Equals("")))
                 {
-                    _nodes[fullPath] = new List<GameObject>();
+                    fullPath += $":{name}";
                 }
-                _nodes[fullPath].Add(node);
+
+                if (node.TryGetComponent(out InteractableObject obj))
+                {
+                    if (!_cachedObjects.ContainsKey(fullPath))
+                    {
+                        _cachedObjects[fullPath] = new List<InteractableObject>();
+                    }
+                    _cachedObjects[fullPath].Add(obj);
+                }
             }
-
-            InitializeJsonRpcServer();
-
-            _rpc.Connected += ConnectedToClient;
-            _rpc.Disconnected += DisconnectedFromClient;
-
-            _rpc.Start();
-        }
-
-        /// <summary>
-        /// Initializes the JsonRpcServer.
-        /// </summary>
-        private void InitializeJsonRpcServer()
-        {
-            _rpc = Type switch
-            {
-                Ide.VisualStudio2019 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2019Port),
-                Ide.VisualStudio2022 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2022Port),
-                _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
-            };
         }
 
         /// <summary>
