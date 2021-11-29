@@ -26,7 +26,37 @@ namespace Assets.SEE.GameObjects
         /// The shaping spline.
         /// </summary>
         [NonSerialized]
-        public BSpline Spline;
+        private BSpline spline;
+
+        /// <summary>
+        /// Property of <see cref="spline"/>. If set, the
+        /// <see cref="LineRenderer"/> and <see cref="MeshFilter"/> component
+        /// of the <see cref="GameObject"/> this spline is attached to is
+        /// updated. Does not fail if any of these components is missing. Note
+        /// that the returned <see cref="BSpline"/> instance is NOT a copy of
+        /// <see cref="spline"/>. Hence, treat it well and don't forget to set
+        /// this property after applying changes.
+        /// </summary>
+        public BSpline Spline
+        {
+            get { return spline; }
+            set
+            {
+                spline = value;
+                // Update line renderer (if any).
+                if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer))
+                {
+                    Vector3[] polyLine = PolyLine();
+                    lineRenderer.positionCount = polyLine.Length;
+                    lineRenderer.SetPositions(polyLine);
+                }
+                // Update mesh (if any).
+                if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter))
+                {
+                    // TODO
+                }
+            }
+        }
 
         /// <summary>
         /// Serializable representation of <see cref="Spline"/>.
@@ -202,33 +232,20 @@ namespace Assets.SEE.GameObjects
         /// <summary>
         /// Evaluates the morphism at the time parameter <see cref="t"/>
         /// (domain [0, 1]; clamped if necessary) and updates the
-        /// <see cref="SEESpline"/>, <see cref="LineRenderer"/>, and
-        /// <see cref="MeshFilter"/> component of the <see cref="GameObject"/>
-        /// this morphism is attached to. Does not fail if any of these
-        /// components is missing. The returned <see cref="BSpline"/> instance
-        /// is a deep copy of the morphism result and can be used by the
-        /// caller for further calculations.
+        /// <see cref="SEESpline"/> component of the <see cref="GameObject"/>
+        /// this morphism is attached to. Does not fail if the
+        /// <see cref="GameObject"/> has no <see cref="SEESpline"/> component.
+        /// The returned <see cref="BSpline"/> instance is a deep copy of the
+        /// morphism result and can be used by the caller for further
+        /// calculations.
         /// </summary>
-        /// <param name="t">The time parameter. Clamped to domain [0, 1]</param>
+        /// <param name="t">Time parameter; clamped to domain [0, 1]</param>
         /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Morph(double t)
         {
-            BSpline interpolated = morphism.Eval(t);
             if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
             {
-                spline.Spline = interpolated;
-                // Update line renderer.
-                if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer))
-                {
-                    Vector3[] polyLine = spline.PolyLine();
-                    lineRenderer.positionCount = polyLine.Length;
-                    lineRenderer.SetPositions(polyLine);
-                }
-                // Update mesh.
-                if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter))
-                {
-                    // TODO
-                }
+                spline.Spline = morphism.Eval(t);
             }
             else
             {
