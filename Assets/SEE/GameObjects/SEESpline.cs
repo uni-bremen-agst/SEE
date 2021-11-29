@@ -1,10 +1,10 @@
-﻿using OdinSerializer;
+﻿using Assets.SEE.Game.Evolution.Animators;
+using OdinSerializer;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Assets.SEE.GameObjects
 {
@@ -154,11 +154,18 @@ namespace Assets.SEE.GameObjects
 
     /// <summary>
     /// This class can be used to morph the <see cref="SEESpline"/> component
-    /// of a <see cref="GameObject"/>. The morphism is initialized with
-    /// <see cref="InitMorph(BSpline, BSpline)"/> and evaluated with
-    /// <see cref="Eval(double)"/>.
+    /// of a <see cref="GameObject"/>. A spline morphism can be thought of as
+    /// a linear interpolation between a `source' and a `target' spline (where
+    /// `source' and `target' can have any structure). To initialize the
+    /// morphism, call <see cref="Init(BSpline, BSpline)"/> with desired
+    /// source and target. To evaluate the morphism at a certain point, call
+    /// <see cref="Morph(double)"/> with corresponding time parameter. Note
+    /// that this class implements the <see cref="EdgeAnimator.IEvaluator"/>
+    /// interface and therefore is well suited to realize the edge animation
+    /// of <see cref="SEE.Game.EvolutionRenderer"/>.
     /// </summary>
-    public class SplineMorphism : SerializedMonoBehaviour
+    public class SplineMorphism :
+        SerializedMonoBehaviour, EdgeAnimator.IEvaluator
     {
         [NonSerialized]
         private BSpline source;
@@ -185,7 +192,7 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         /// <param name="source">Origin of the spline morphsim</param>
         /// <param name="target">Target of the spline morphism</param>
-        public void InitMorph(BSpline source, BSpline target)
+        public void Init(BSpline source, BSpline target)
         {
             this.source = source;
             this.target = target;
@@ -204,7 +211,7 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         /// <param name="t">The time parameter. Clamped to domain [0, 1]</param>
         /// <returns>Linear interpolation of source and target at t</returns>
-        public BSpline Eval(double t)
+        public BSpline Morph(double t)
         {
             BSpline interpolated = morphism.Eval(t);
             if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
@@ -229,6 +236,12 @@ namespace Assets.SEE.GameObjects
             }
             // Protect internal state of `spline'.
             return new BSpline(spline.Spline);
+        }
+
+        // Implementation of IEvaluator interface.
+        public void Eval(float t)
+        {
+            Morph(t);
         }
 
         protected override void OnBeforeSerialize()
