@@ -73,6 +73,7 @@ namespace SEE.Utils
 #if UNITY_EDITOR
                 Debug.LogError($"{e.Message}\n");
 #endif
+                throw new JsonRpcServerCreationFailedException("Couldn't initiate the Server instance.");
             }
         }
 

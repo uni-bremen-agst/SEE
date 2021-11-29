@@ -13,6 +13,20 @@ namespace SEE.Utils
     public abstract class JsonRpcServer : IDisposable
     {
         /// <summary>
+        /// This exception will be thrown, if creation of the server instance failed.
+        /// </summary>
+        public class JsonRpcServerCreationFailedException : Exception
+        {
+            /// <summary>
+            /// Exception with custom message when creation of server instance failed.
+            /// </summary>
+            /// <param name="message">Custom message.</param>
+            internal JsonRpcServerCreationFailedException(string message) : base(message)
+            {
+            }
+        }
+
+        /// <summary>
         /// Represents the method that will handle the connection event.
         /// </summary>
         public delegate void ConnectionEventHandler();
@@ -63,13 +77,14 @@ namespace SEE.Utils
         /// <summary>
         /// Starts listening to the TCP client.
         /// </summary>
-        public void Start()
+        /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
+        /// <returns>Async UniTask.</returns>
+        public async UniTask Start()
         {
+            if (Server.Status == UniTaskStatus.Pending) return;
             Dispose();
-            if (Server.Status != UniTaskStatus.Pending)
-            {
-                Server = StartServerAsync(_sourceToken.Token);
-            }
+            Server = StartServerAsync(_sourceToken.Token);
+            await Server;
         }
 
         /// <summary>
@@ -116,7 +131,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the connection status of the client.
         /// </summary>
-        /// <returns>Is the Client connected?</returns>
+        /// <returns>True when client is connected to SEE.</returns>
         public bool IsConnected()
         {
             return Rpc != null;
@@ -128,6 +143,7 @@ namespace SEE.Utils
         /// and <see cref="Disconnected"/> with the client.
         /// </summary>
         /// <param name="token">Token to cancel the current Task.</param>
+        /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <returns>Async Task.</returns>
         protected abstract UniTask StartServerAsync(CancellationToken token);
 

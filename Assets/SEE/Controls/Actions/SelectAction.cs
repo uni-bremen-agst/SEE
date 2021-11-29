@@ -48,6 +48,16 @@ namespace SEE.Controls.Actions
                     InteractableObject.ReplaceSelection(obj, true);
                 }
             }
+            else if (IDEIntegration.Instance.PendingSelectionsAction())
+            {
+                foreach (var elem in IDEIntegration.Instance.PopPendingSelections())
+                {
+                    if (elem != null)
+                    {
+                        elem.SetSelect(true, false);
+                    }
+                }
+            }
         }
     }
 }
