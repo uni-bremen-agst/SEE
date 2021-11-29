@@ -579,10 +579,15 @@ namespace SEE.Game
 
 
             // Create (or read from cache) the edge objects of the next
-            // visible graph and make the objects visible.
+            // visible graph, update their spline, and make the objects
+            // visible.
             foreach (var edge in next.Graph.Edges())
             {
                 objectManager.GetEdge(edge, out var edgeObject);
+                if (edgeObject.TryGetComponent<SEESpline>(out var spline))
+                {
+                    spline.Spline = next.EdgeLayout[edge.ID].Spline;
+                }
                 edgeObject.SetActive(true); // Make visible.
             }
             if (currentCity != null)
