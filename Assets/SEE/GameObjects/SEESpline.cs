@@ -12,7 +12,36 @@ namespace Assets.SEE.GameObjects
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
     /// B-Splines and a serializable B-Spline representation that can be
-    /// attached to <see cref="GameObject"/>.
+    /// attached to instances of <see cref="GameObject"/> (usually objects
+    /// representing an edge). It also provides functions for rendering
+    /// splines and keeps the rendering in sync with the internal state. That
+    /// is, whenever one of the public properties of this class is set (e.g.,
+    /// <see cref="Spline"/>), the internal state is marked dirty and the
+    /// rendering is updated in the next frame (via <see cref="Update"/>).
+    /// There are two rendering methods:
+    ///
+    /// 1. <see cref="LineRenderer"/>: The spline is rendered as polyline.
+    /// This method is comparatively fast, but lacks more advanced features
+    /// such as collision detection. It serves as a placeholder until the
+    /// runtime environment found the time to create a <see cref="Mesh"/>
+    /// (along with <see cref="MeshRenderer"/>, <see cref="MeshFilter"/>,
+    /// <see cref="MeshCollider"/> etc.). This class doesn't create
+    /// <see cref="LineRenderer"/> instances on its own, but rather updates
+    /// them if they are present.
+    ///
+    /// 2. <see cref="Mesh"/>: The spline is rendered as tubular mesh. This
+    /// method is a lot slower than <see cref="LineRenderer"/>, but in
+    /// contrast creates "real" 3D objects with collision detection. Because
+    /// the creation of a larger amount of meshes is quite slow, it is up to
+    /// an external client to replace any <see cref="LineRenderer"/> with a
+    /// <see cref="MeshRenderer"/>. For this purpose there is the method
+    /// <see cref="CreateMesh"/>.
+    ///
+    /// The geometric characteristics of the generated mesh, e.g., the radius
+    /// of the tube, can be set via properties. By setting a property, the
+    /// rendering of the spline is updated in the next frame. If an update
+    /// needs to be applied immediatly, call <see cref="UpdateMesh"/> after
+    /// setting one or more properties.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
     {
@@ -23,19 +52,21 @@ namespace Assets.SEE.GameObjects
         private const float PI2 = Mathf.PI * 2f;
 
         /// <summary>
+        /// Indicates whether the rendering of <see cref="spline"/> must be
+        /// updated (as a result of setting one of the public properties).
+        /// </summary>
+        private bool needsUpdate = false;
+
+        /// <summary>
         /// The shaping spline.
         /// </summary>
         [NonSerialized]
         private BSpline spline;
 
         /// <summary>
-        /// Property of <see cref="spline"/>. If set, the
-        /// <see cref="LineRenderer"/> and <see cref="MeshFilter"/> component
-        /// of the <see cref="GameObject"/> this spline is attached to is
-        /// updated. Does not fail if any of these components is missing. Note
-        /// that the returned <see cref="BSpline"/> instance is NOT a copy of
-        /// <see cref="spline"/>. Hence, treat it well and don't forget to set
-        /// this property after applying changes.
+        /// Property of <see cref="spline"/>. The returned instance is NOT a
+        /// copy of <see cref="spline"/>. Hence, treat it well and don't
+        /// forget to set this property after modifying the returned instance.
         /// </summary>
         public BSpline Spline
         {
@@ -43,18 +74,7 @@ namespace Assets.SEE.GameObjects
             set
             {
                 spline = value;
-                // Update line renderer (if any).
-                if (gameObject.TryGetComponent<LineRenderer>(out LineRenderer lineRenderer))
-                {
-                    Vector3[] polyLine = PolyLine();
-                    lineRenderer.positionCount = polyLine.Length;
-                    lineRenderer.SetPositions(polyLine);
-                }
-                // Update mesh (if any).
-                if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter meshFilter))
-                {
-                    // TODO
-                }
+                needsUpdate = true;
             }
         }
 
@@ -63,6 +83,96 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSpline;
+
+        /// <summary>
+        /// Radius of the mesh to be created (<see cref="CreateMesh"/>) or
+        /// updated <see cref="UpdateMesh"/>).
+        /// </summary>
+        [SerializeField, Min(0.0001f)]
+        private float radius = 0.01f; // default value
+
+        /// <summary>
+        /// Property of <see cref="radius"/>. Domain: [0.0001f, inf]
+        /// </summary>
+        public float Radius
+        {
+            get { return radius; }
+            set
+            {
+                radius = Math.Max(0.0001f, value);
+                needsUpdate = true;
+            }
+        }
+
+        /// <summary>
+        /// Number of tubular segments (number of radial polygons along the
+        /// spline) of the mesh to be created (<see cref="CreateMesh"/>) or
+        /// updated (<see cref="UpdateMesh"/>).
+        /// </summary>
+        [SerializeField, Min(5)]
+        public int tubularSegments = 50; // default value; based on Holten
+
+        /// <summary>
+        /// Property of <see cref="tubularSegments"/>. Domain [5, inf]
+        /// </summary>
+        public int TubularSegments
+        {
+            get { return tubularSegments; }
+            set
+            {
+                var tmp = Math.Max(5, value);
+                if (tubularSegments != tmp)
+                {
+                    tubularSegments = tmp;
+                    needsUpdate = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Number of radial segments (number of vertices around the spline)
+        /// of the mesh to be created (<see cref="CreateMesh"/>) or updated
+        /// (<see cref="UpdateMesh"/>).
+        /// </summary>
+        [SerializeField, Min(3)]
+        public int radialSegments = 8; // default value; octagon
+
+        /// <summary>
+        /// Property of <see cref="radialSegments"/>. Domain: [3, inf]
+        /// </summary>
+        public int RadialSegments
+        {
+            get { return radialSegments; }
+            set
+            {
+                var tmp = Math.Max(3, value);
+                if (radialSegments != tmp)
+                {
+                    radialSegments = tmp;
+                    needsUpdate = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the rendering of the spline if the internal state is
+        /// marked dirty (i.e., <see cref="needsUpdate"/> is true).
+        /// </summary>
+        private void Update()
+        {
+            if (needsUpdate)
+            {
+                if (gameObject.TryGetComponent<LineRenderer>(out var lr))
+                {
+                    UpdateLineRenderer();
+                }
+                if (gameObject.TryGetComponent<MeshFilter>(out var _))
+                {
+                    UpdateMesh();
+                }
+                needsUpdate = false;
+            }
+        }
 
         /// <summary>
         /// Approximates <see cref="Spline"/> as poly line. The greater
@@ -77,18 +187,27 @@ namespace Assets.SEE.GameObjects
         }
 
         /// <summary>
-        /// Approximates <see cref="Spline"/> as tubular mesh.
+        /// Updates the <see cref="LineRenderer"/> of the
+        /// <see cref="GameObject"/> this component is attached to
+        /// (<see cref="Component.gameObject"/>).
         /// </summary>
-        /// <param name="radius">Radius of tube</param>
-        /// <param name="markDynamic">If true, the created mesh is marked
-        /// dynamic (<see cref="Mesh.MarkDynamic"/>)</param>
-        /// <param name="tubularSegments">Number of "rings" along the tube</param>
-        /// <param name="radialSegments">Number of vertecies per "ring"</param>
-        /// <returns>A tubular mesh approximating <see cref="Spline"/></returns>
-        public Mesh Mesh(float radius,
-            bool markDynamic = true,
-            int tubularSegments = 50,
-            int radialSegments = 8)
+        private void UpdateLineRenderer()
+        {
+            if (gameObject.TryGetComponent<LineRenderer>(out var lr))
+            {
+                var polyLine = PolyLine(lr.positionCount);
+                lr.positionCount = polyLine.Length;
+                lr.SetPositions(polyLine);
+            }
+        }
+
+        /// <summary>
+        /// Create or update the spline mesh (a tube) and replace any
+        /// <see cref="LineRenderer"/> with the necessary mesh components
+        /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
+        /// </summary>
+        /// <returns>The created or updated mesh</returns>
+        private Mesh CreateOrUpdateMesh()
         {
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
@@ -97,9 +216,15 @@ namespace Assets.SEE.GameObjects
             var indices = new List<int>();
 
             // TODO: See todos below
-            var rv = Spline.UniformKnotSeq((uint) tubularSegments + 1);
+            // It is much more efficient to generate uniform knots than
+            // equidistant knots. Besides, you can't see the difference
+            // anyway. For the curious among you: With uniform knots, the
+            // distance between neighboring frames along the spline is not
+            // equal.
+            var rv = Spline.UniformKnotSeq((uint)tubularSegments + 1);
             var frames = Spline.ComputeRMF(rv);
 
+            // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
             {
                 var fr = frames.At((uint)i);
@@ -123,13 +248,15 @@ namespace Assets.SEE.GameObjects
                 }
             }
 
+            // Radial polygons
+            // TODO: Isn't this one too many?
             for (int i = 0; i < tubularSegments; i++)
             {
                 GenerateSegment(i);
             }
-            // TODO: Isn't this one too many?
             GenerateSegment(tubularSegments);
 
+            // U-v-vectors
             // TODO: Isn't this one too many?
             for (int i = 0; i <= tubularSegments; i++)
             {
@@ -141,6 +268,7 @@ namespace Assets.SEE.GameObjects
                 }
             }
 
+            // Indices (faces)
             for (int j = 1; j <= tubularSegments; j++)
             {
                 for (int i = 1; i <= radialSegments; i++)
@@ -156,17 +284,72 @@ namespace Assets.SEE.GameObjects
                 }
             }
 
-            var mesh = new Mesh();
-            if (markDynamic)
+            // Set up the mesh components.
+            if (!gameObject.TryGetComponent<MeshFilter>(out var filter))
             {
+                var mesh = new Mesh();
                 mesh.MarkDynamic();
+                var collider = gameObject.AddComponent<MeshCollider>();
+                filter = gameObject.AddComponent<MeshFilter>();
+                filter.sharedMesh = mesh;
+                collider.sharedMesh = mesh;
             }
-            mesh.vertices = vertices.ToArray();
-            mesh.normals = normals.ToArray();
-            mesh.tangents = tangents.ToArray();
-            mesh.uv = uvs.ToArray();
-            mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+            filter.mesh.vertices = vertices.ToArray();
+            filter.mesh.normals  = normals.ToArray();
+            filter.mesh.tangents = tangents.ToArray();
+            filter.mesh.uv       = uvs.ToArray();
+            filter.mesh.SetIndices(indices.ToArray(),
+                MeshTopology.Triangles, 0);
+
+            // Remove line renderer.
+            if (gameObject.TryGetComponent<LineRenderer>(out var renderer))
+            {
+                Destroy(renderer);
+            }
+
+            return filter.mesh;
+        }
+
+        /// <summary>
+        /// Enables mesh rendering and removes any <see cref="LineRenderer"/>
+        /// attached to the <see cref="GameObject"/> this component is
+        /// attached to (<see cref="Component.gameObject"/>). Returns the mesh
+        /// of <see cref="Component.gameObject"/> (without any updates applied
+        /// to it) if mesh rendering is already enabled (i.e.,
+        /// <see cref="Component.gameObject"/> has a <see cref="MeshFilter"/>
+        /// attached to it). In order to update a mesh, set any of the public
+        /// properties of this class, e.g., <see cref="Radius"/>. The update
+        /// is then applied in the next frame (via <see cref="Update"/>). Or
+        /// use <see cref="UpdateMesh"/> to update the mesh immediately.
+        /// </summary>
+        /// <returns>A mesh approximating <see cref="Spline"/></returns>
+        public Mesh CreateMesh()
+        {
+            if (gameObject.TryGetComponent<MeshFilter>(out var filter))
+            {
+                return filter.mesh;
+            }
+            var mesh = CreateOrUpdateMesh();
+            needsUpdate = false; // apparently
             return mesh;
+        }
+
+        /// <summary>
+        /// Updates the mesh rendering and marks the internal state as clean
+        /// (i.e., <see cref="needsUpdate"/> is set to false) so that
+        /// <see cref="Update"/> doesn't update the mesh again in the next
+        /// frame. Calling this method doesn't fail if mesh rendering has not
+        /// been enabled yet (i.e., there is no <see cref="MeshFilter"/>
+        /// attached to <see cref="Component.gameObject"/>; see
+        /// <see cref="CreateMesh"/> for more details).
+        /// </summary>
+        public void UpdateMesh()
+        {
+            if (gameObject.TryGetComponent<MeshFilter>(out var filter))
+            {
+                CreateOrUpdateMesh();
+            }
+            needsUpdate = false;
         }
 
         protected override void OnBeforeSerialize()
@@ -178,7 +361,7 @@ namespace Assets.SEE.GameObjects
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            Spline = TinySplineInterop.Deserialize(serializableSpline);
+            spline = TinySplineInterop.Deserialize(serializableSpline);
         }
     }
 
