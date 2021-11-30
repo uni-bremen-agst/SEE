@@ -117,13 +117,16 @@ namespace SEE.Utils
 
                     if (RpcConnections.Count < maxClients)
                     {
+                        var message = Encoding.ASCII.GetBytes("START\n");
+                        tcpClient.GetStream().Write(message, 0, message.Length);
+                        await tcpClient.GetStream().FlushAsync(token);
                         RunConnection(new Client(this, tcpClient));
                     }
                     else
                     {
-                        var errorMessage = Encoding.ASCII.GetBytes("Maximal number of clients reached!");
-                        tcpClient.GetStream().Write(errorMessage, 0, errorMessage.Length);
-                        tcpClient.Close();
+                        var message = Encoding.ASCII.GetBytes("MAX_CLIENT_REACHED\n");
+                        tcpClient.GetStream().Write(message, 0, message.Length);
+                        await tcpClient.GetStream().FlushAsync(token);
                     }
                 }
             }
