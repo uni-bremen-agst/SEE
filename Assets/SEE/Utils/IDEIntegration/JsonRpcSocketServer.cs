@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using StreamRpc;
@@ -9,10 +10,71 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// Only the _port can be specified.
+    /// The implementation of JsonRpcServer that will use <see cref="TcpListener"/>.
     /// </summary>
     public sealed class JsonRpcSocketServer : JsonRpcServer
     {
+        #region Client
+
+        /// <summary>
+        /// A class that will represent the client.
+        /// </summary>
+        private sealed class Client : JsonRpcClientConnection
+        {
+            /// <summary>
+            /// TCP connection to the client.
+            /// </summary>
+            private TcpClient _client;
+
+            /// <summary>
+            /// Creates a new client connection using a <see cref="TcpClient"/>.
+            /// </summary>
+            /// <param name="rpcServer">The server of this client.</param>
+            /// <param name="client">The TCP client.</param>
+            public Client(JsonRpcServer rpcServer, TcpClient client) :base(rpcServer)
+            {
+                _client = client;
+            }
+
+            /// <summary>
+            /// The Task that will handle the connection.
+            /// </summary>
+            /// <param name="token">The cancellation token.</param>
+            /// <returns>Async UniTask.</returns>
+            protected override async UniTask RunTask(CancellationToken token)
+            {
+                Rpc = JsonRpc.Attach(_client.GetStream(), RpcServer.Target);
+                Connected?.Invoke(this);
+
+                try
+                {
+                    await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception)
+                {
+                    // Connection was unexpectedly interrupted.
+                }
+
+                Disconnected?.Invoke(this);
+                Abort();
+            }
+
+            /// <summary>
+            /// Disposes all streams.
+            /// </summary>
+            public override void Abort()
+            {
+                base.Abort();
+                _client?.Close();
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// The port used for the inter-process communication.
         /// </summary>
@@ -37,35 +99,32 @@ namespace SEE.Utils
         /// <summary>
         /// Starts the socket server implementation.
         /// </summary>
+        /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <returns>Async Task.</returns>
-        protected override async UniTask StartServerAsync(CancellationToken token)
+        protected override async UniTask StartServerAsync(int maxClients, CancellationToken token)
         {
             try
-            {		
-                // TODO: only accept one client. Currently the socket connects to more than one.
+            {	
                 _socket = new TcpListener(IPAddress.Parse("127.0.0.1"), _port);
                 _socket.Start();
 
                 // Listens to incoming Requests. Only one client will be connected to the server.
                 while (true)
                 {
-                    using var tcpClient = await _socket.AcceptTcpClientAsync().AsUniTask()
+                    var tcpClient = await _socket.AcceptTcpClientAsync().AsUniTask()
                         .AttachExternalCancellation(token);
-                    Connected?.Invoke();
 
-                    try
+                    if (RpcConnections.Count < maxClients)
                     {
-                        Rpc = JsonRpc.Attach(tcpClient.GetStream(), Target);
-                        await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
+                        RunConnection(new Client(this, tcpClient));
                     }
-                    catch (Exception)
+                    else
                     {
-                        // Connection was unexpectedly interrupted.
+                        var errorMessage = Encoding.ASCII.GetBytes("Maximal number of clients reached!");
+                        tcpClient.GetStream().Write(errorMessage, 0, errorMessage.Length);
+                        tcpClient.Close();
                     }
-
-                    Rpc = null;
-                    Disconnected?.Invoke();
                 }
             }
             catch (SocketException e)

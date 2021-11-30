@@ -61,10 +61,15 @@ namespace SEE.Controls
                     path += $":{name}";
                 }
 
-                var nodes = _ideIntegration._cachedObjects[path];
-                if (nodes == null) return;
-
-                _pendingSelections = new HashSet<InteractableObject>(nodes);
+                try
+                {
+                    var nodes = _ideIntegration._cachedObjects[path];
+                    _pendingSelections = new HashSet<InteractableObject>(nodes);
+                }
+                catch (Exception)
+                {
+                    // The given key was not presented int the dictionary.
+                }
             }
         }
 
@@ -207,7 +212,7 @@ namespace SEE.Controls
             {
                 try
                 {
-                    await _rpc.Start();
+                    await _rpc.Start(1);
                 }
                 catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
                 {
@@ -353,7 +358,9 @@ namespace SEE.Controls
         /// <summary>
         /// Will be called when connection to client is established successful.
         /// </summary>
-        private void ConnectedToClient()
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void ConnectedToClient(object sender, EventArgs e)
         {
             //TODO: Check whether the correct IDE instance is connected
             ShowNotification.Info("Connected to IDE",
@@ -363,7 +370,9 @@ namespace SEE.Controls
         /// <summary>
         /// Will be called when the client disconnected form the server.
         /// </summary>
-        private void DisconnectedFromClient()
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments.</param>
+        private void DisconnectedFromClient(object sender, EventArgs e)
         {
             ShowNotification.Info("Disconnected from IDE",
                 "The IDE was disconnected form SEE.", 5.0f);
