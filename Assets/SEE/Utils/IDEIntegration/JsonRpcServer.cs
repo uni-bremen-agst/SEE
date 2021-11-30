@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using StreamRpc;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -27,29 +27,30 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Represents the method that will handle the connection event.
+        /// Will be fired when a client connection is established successful.
         /// </summary>
-        public delegate void ConnectionEventHandler();
+        public EventHandler Connected;
 
         /// <summary>
-        /// Will be fired when the connection is established successful.
+        /// Will be fired when a client disconnected from the server.
         /// </summary>
-        public ConnectionEventHandler Connected;
+        public EventHandler Disconnected;
 
         /// <summary>
-        /// Will be fired when the server disconnected from the client.
+        /// All currently to the server connected clients. Only access this set while using
+        /// <see cref="Semaphore"/>.
         /// </summary>
-        public ConnectionEventHandler Disconnected;
+        protected readonly HashSet<JsonRpcClientConnection> RpcConnections;
 
         /// <summary>
-        /// The JsonRpc instance for standardized communication over a stream.
+        /// The semaphore used for accessing <see cref="RpcConnections"/>.
         /// </summary>
-        protected JsonRpc Rpc;
+        protected Semaphore Semaphore;
 
         /// <summary>
         /// Object with all methods that can be called remotely.
         /// </summary>
-        protected object Target;
+        protected internal object Target;
 
         /// <summary>
         /// Task to check if this class is already trying to connect.
@@ -72,18 +73,21 @@ namespace SEE.Utils
             Target = target;
 
             _sourceToken = new CancellationTokenSource();
+            Semaphore = new Semaphore(1, 1);
+            RpcConnections = new HashSet<JsonRpcClientConnection>();
         }
 
         /// <summary>
         /// Starts listening to the TCP client.
         /// </summary>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
+        /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <returns>Async UniTask.</returns>
-        public async UniTask Start()
+        public async UniTask Start(int maxClients)
         {
             if (Server.Status == UniTaskStatus.Pending) return;
             Dispose();
-            Server = StartServerAsync(_sourceToken.Token);
+            Server = StartServerAsync(maxClients, _sourceToken.Token);
             await Server;
         }
 
@@ -92,12 +96,44 @@ namespace SEE.Utils
         /// </summary>
         public void Stop()
         {
-            if (IsConnected()) Disconnected?.Invoke();
-            _sourceToken.Cancel();
+            // TODO: Should send custom event arguments.
+            if (IsConnected()) Disconnected?.Invoke(this, EventArgs.Empty);
             Dispose();
+        }
 
-            Rpc = null;
-            _sourceToken = new CancellationTokenSource();
+        /// <summary>
+        /// Adds a connection to <see cref="RpcConnections"/> thread safe.
+        /// </summary>
+        /// <param name="connection">The client connection.</param>
+        private void AddConnection(JsonRpcClientConnection connection)
+        {
+            Semaphore.WaitOne();
+            RpcConnections.Add(connection);
+            Semaphore.Release();
+            Connected?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Removes a connection from <see cref="RpcConnections"/> thread safe.
+        /// </summary>
+        /// <param name="connection">The client connection.</param>
+        private void RemoveConnection(JsonRpcClientConnection connection)
+        {
+            Semaphore.WaitOne();
+            RpcConnections.Remove(connection);
+            Semaphore.Release();
+            Disconnected?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Will run the connection and register all necessary events.
+        /// </summary>
+        /// <param name="connection">The client connection.</param>
+        protected void RunConnection(JsonRpcClientConnection connection)
+        {
+            connection.Connected += AddConnection;
+            connection.Disconnected += RemoveConnection;
+            connection.Run();
         }
 
         /// <summary>
@@ -110,14 +146,21 @@ namespace SEE.Utils
         {
             if (IsConnected())
             {
-                try
+                Semaphore.WaitOne();
+                foreach (var connection in RpcConnections)
                 {
-                    await Rpc.InvokeAsync(targetName, arguments).AsUniTask();
+                    try
+                    {
+                        if (connection.Rpc == null) continue;
+                        await connection.Rpc.InvokeAsync(targetName, arguments).AsUniTask();
+
+                    }
+                    catch (Exception)
+                    {
+                        // Lost connection to client.
+                    }
                 }
-                catch (Exception)
-                {
-                    // Lost connection to client.
-                }
+                Semaphore.Release();
             }
             else
             {
@@ -129,30 +172,44 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the connection status of the client.
+        /// Check if a client is currently connected to the server.
         /// </summary>
-        /// <returns>True when client is connected to SEE.</returns>
+        /// <returns>True when a client is connected to server.</returns>
         public bool IsConnected()
         {
-            return Rpc != null;
+            return RpcConnections != null && RpcConnections.Count > 0;
         }
 
         /// <summary>
-        /// Specific connection implementation of the derived class. This method
-        /// should wait for client completion and call both <see cref="Connected"/>
-        /// and <see cref="Disconnected"/> with the client.
+        /// Specific connection implementation of the derived class. When a connection to a client
+        /// could be established, this method should call <see cref="RunConnection"/> instead of
+        /// calling <see cref="JsonRpcClientConnection.Run"/>.
         /// </summary>
+        /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <returns>Async Task.</returns>
-        protected abstract UniTask StartServerAsync(CancellationToken token);
+        protected abstract UniTask StartServerAsync(int maxClients, CancellationToken token);
 
         /// <summary>
-        /// Dispose all open streams etc.
+        /// Dispose all open streams etc. Will not call <see cref="Disconnected"/>, call
+        /// <see cref="Stop"/> instead.
         /// </summary>
         public virtual void Dispose()
         {
-            Rpc?.Dispose();
+            _sourceToken.Cancel();
+            if (RpcConnections != null)
+            {
+                Semaphore.WaitOne();
+                foreach (var connection in RpcConnections)
+                {
+                    connection?.Abort();
+                }
+
+                Semaphore.Release();
+            }
+            
+            _sourceToken = new CancellationTokenSource();
         }
     }
 }
