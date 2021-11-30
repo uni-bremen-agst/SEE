@@ -64,7 +64,7 @@ namespace SEE.Controls
                 var nodes = _ideIntegration._cachedObjects[path];
                 if (nodes == null) return;
 
-                _ideIntegration._pendingSelections = new HashSet<InteractableObject>(nodes);
+                _pendingSelections = new HashSet<InteractableObject>(nodes);
             }
         }
 
@@ -129,12 +129,12 @@ namespace SEE.Controls
         /// <summary>
         /// The singleton instance of this class.
         /// </summary>
-        public static IDEIntegration Instance { get; private set; }
+        private static IDEIntegration Instance;
 
         /// <summary>
         /// All callable methods by the server.
         /// </summary>
-        public ClientCalls Client { get; private set; }
+        public static ClientCalls Client { get; private set; }
 
         /// <summary>
         /// Specifies to which IDE a connection is to be established.
@@ -165,7 +165,7 @@ namespace SEE.Controls
         /// <summary>
         /// Contains all <see cref="InteractableObject"/> that were selected by the selected IDE.
         /// </summary>
-        private HashSet<InteractableObject> _pendingSelections;
+        private static HashSet<InteractableObject> _pendingSelections;
 
         /// <summary>
         /// Initializes all necessary objects for the inter-process communication
@@ -217,7 +217,8 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Stops the currently running server and the singleton instance of <see cref="IDEIntegration"/>.
+        /// Stops the currently running server and deletes the singleton instance of
+        /// <see cref="IDEIntegration"/>.
         /// </summary>
         public void OnDestroy()
         {
@@ -229,12 +230,18 @@ namespace SEE.Controls
         /// Is there any pending selection needed to be taken.
         /// </summary>
         /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
-        public bool PendingSelectionsAction()
+        public static bool PendingSelectionsAction()
         {
             return SEEInput.SelectionEnabled && _pendingSelections.Count > 0;
         }
 
-        public HashSet<InteractableObject> PopPendingSelections()
+        /// <summary>
+        /// Returns a set of <see cref="InteractableObject"/> that represents the elements the IDE
+        /// wants to be highlighted. After calling this method, the underlying set will be cleared
+        /// and thus is empty again.
+        /// </summary>
+        /// <returns>The set of elements to be highlighted.</returns>
+        public static HashSet<InteractableObject> PopPendingSelections()
         {
             HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
             elements.UnionWith(_pendingSelections);
