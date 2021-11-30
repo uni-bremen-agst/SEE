@@ -516,7 +516,7 @@ namespace SEE.Game
         /// <param name="node">node whose metric is to be returned</param>
         /// <param name="metricName">the name of a node metric or a number</param>
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
-        public float GetMetricValue(Node node, string metricName)
+        private float GetMetricValue(Node node, string metricName)
         {
             if (TryGetFloat(metricName, out float value))
             {
