@@ -438,7 +438,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <returns>Async UniTask</returns>
         private async UniTask OpenFileInIDE()
         {
-            await IDEIntegration.Instance.Client.OpenFileAsync(FilePath);
+            await IDEIntegration.Client.OpenFileAsync(FilePath);
         }
     }
 }
