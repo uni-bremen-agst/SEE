@@ -24,7 +24,7 @@ namespace SEE.Utils
             /// <summary>
             /// TCP connection to the client.
             /// </summary>
-            private readonly TcpClient _client;
+            private readonly TcpClient client;
 
             /// <summary>
             /// Creates a new client connection using a <see cref="TcpClient"/>.
@@ -33,7 +33,7 @@ namespace SEE.Utils
             /// <param name="client">The TCP client.</param>
             public Client(JsonRpcServer rpcServer, TcpClient client) :base(rpcServer)
             {
-                _client = client;
+                this.client = client;
             }
 
             /// <summary>
@@ -43,7 +43,7 @@ namespace SEE.Utils
             {
                 try
                 {
-                    Rpc = JsonRpc.Attach(_client.GetStream(), RpcServer.Target);
+                    Rpc = JsonRpc.Attach(client.GetStream(), RpcServer.Target);
                 }
                 catch (Exception)
                 {
@@ -59,7 +59,7 @@ namespace SEE.Utils
             public override void Abort()
             {
                 base.Abort();
-                _client?.Close();
+                client?.Close();
             }
         }
 
@@ -68,12 +68,12 @@ namespace SEE.Utils
         /// <summary>
         /// The port used for the inter-process communication.
         /// </summary>
-        private readonly int _port;
+        private readonly int port;
 
         /// <summary>
         /// TCP server.
         /// </summary>
-        private TcpListener _socket;
+        private TcpListener socket;
 
         /// <summary>
         /// Creates a new JsonRpcNamedPipeServer instance.
@@ -83,7 +83,7 @@ namespace SEE.Utils
         /// <param name="port">The port, that will be used for communication.</param>
         public JsonRpcSocketServer(object target, int port) : base(target)
         {
-            this._port = port;
+            this.port = port;
         }
 
         /// <summary>
@@ -92,17 +92,17 @@ namespace SEE.Utils
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <param name="token">Token to cancel the current Task.</param>
         /// <returns>Async Task.</returns>
-        protected override async UniTask StartServerAsync(int maxClients, CancellationToken token)
+        protected override async UniTask StartServerAsync(uint maxClients, CancellationToken token)
         {
             try
             {	
-                _socket = new TcpListener(IPAddress.Parse("127.0.0.1"), _port);
-                _socket.Start();
+                socket = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+                socket.Start();
 
                 // Listens to incoming Requests. Only one client will be connected to the server.
                 while (true)
                 {
-                    var tcpClient = await _socket.AcceptTcpClientAsync().AsUniTask()
+                    var tcpClient = await socket.AcceptTcpClientAsync().AsUniTask()
                         .AttachExternalCancellation(token);
 
                     if (RpcConnections.Count < maxClients)
@@ -135,7 +135,7 @@ namespace SEE.Utils
         public override void Dispose()
         {
             base.Dispose();
-            _socket?.Stop();
+            socket?.Stop();
         }
     }
 }

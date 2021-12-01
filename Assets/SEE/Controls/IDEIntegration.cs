@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -32,22 +33,22 @@ namespace SEE.Controls
         private class RemoteProcedureCalls
         {
             /// <summary>
-            /// Instance of parent class.
+            /// instance of parent class.
             /// </summary>
-            private readonly IDEIntegration _ideIntegration;
+            private readonly IDEIntegration ideIntegration;
 
             /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>. Contains all methods that can be accessed
             /// by the client. Should only be initiated by the <see cref="IDEIntegration"/>.
             /// </summary>
-            /// <param name="ideIntegration">Instance of IDEIntegration</param>
+            /// <param name="ideIntegration">instance of IDEIntegration</param>
             public RemoteProcedureCalls(IDEIntegration ideIntegration)
             {
-                _ideIntegration = ideIntegration;
+                this.ideIntegration = ideIntegration;
             }
 
             /// <summary>
-            /// Adds all nodes from <see cref="_cachedObjects"/> with the key created by
+            /// Adds all nodes from <see cref="IDEIntegration.cachedObjects"/> with the key created by
             /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
             /// null, it won't be appended to the key.
             /// </summary>
@@ -64,8 +65,8 @@ namespace SEE.Controls
 
                 try
                 {
-                    var nodes = _ideIntegration._cachedObjects[path];
-                    _pendingSelections = new HashSet<InteractableObject>(nodes);
+                    var nodes = ideIntegration.cachedObjects[path];
+                    pendingSelections = new HashSet<InteractableObject>(nodes);
                 }
                 catch (Exception)
                 {
@@ -84,19 +85,19 @@ namespace SEE.Controls
         public class ClientCalls
         {
             /// <summary>
-            /// Instance of parent class.
+            /// instance of parent class.
             /// </summary>
-            private readonly IDEIntegration _ideIntegration;
+            private readonly IDEIntegration ideIntegration;
 
             /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
             /// deliver all methods, that can be called from the client. Should only be initiated
             /// by the <see cref="IDEIntegration"/>.
             /// </summary>
-            /// <param name="ideIntegration">Instance of IDEIntegration</param>
+            /// <param name="ideIntegration">instance of IDEIntegration</param>
             public ClientCalls(IDEIntegration ideIntegration)
             {
-                _ideIntegration = ideIntegration;
+                this.ideIntegration = ideIntegration;
             }
 
             /// <summary>
@@ -118,8 +119,8 @@ namespace SEE.Controls
             private async UniTask CheckForIDEInstance()
             {
                 // TODO: FIX ME
-                if (_ideIntegration._rpc.IsConnected()) return;
-                await _ideIntegration.OpenNewIDEInstanceAsync();
+                if (ideIntegration.rpc.IsConnected()) return;
+                await ideIntegration.OpenNewIDEInstanceAsync();
             }
 
             /// <summary>
@@ -130,7 +131,7 @@ namespace SEE.Controls
             public async UniTask OpenFileAsync(string path)
             {
                 await CheckForIDEInstance();
-                await _ideIntegration._rpc.CallRemoteProcessAsync("OpenFile", path);
+                await ideIntegration.rpc.CallRemoteProcessAsync("OpenFile", path);
             }
         }
 
@@ -146,9 +147,33 @@ namespace SEE.Controls
         };
 
         /// <summary>
+        /// Specifies to which IDE a connection is to be established.
+        /// </summary>
+        [Tooltip("Specifies to which IDE a connection is to be established.")]
+        public Ide Type;
+
+        /// <summary>
+        /// Specifies the number of IDEs that can connect at the same time.
+        /// </summary>
+        [Tooltip("Specifies the number of IDEs that can connect at the same time.")] 
+        public uint MaxNumberOfClients = 1;
+
+        /// <summary>
+        /// TCP Socket port for communication to Visual Studio (2019).
+        /// </summary>
+        [Tooltip("TCP Socket port for communication to Visual Studio (2019).")] 
+        public int VS2019Port = 26100;
+
+        /// <summary>
+        /// TCP Socket port for communication to Visual Studio (2022).
+        /// </summary>
+        [Tooltip("TCP Socket port for communication to Visual Studio (2022).")] 
+        public int VS2022Port = 26101;
+
+        /// <summary>
         /// The singleton instance of this class.
         /// </summary>
-        private static IDEIntegration Instance;
+        private static IDEIntegration instance;
 
         /// <summary>
         /// All callable methods by the server. Will be executed in every connected IDE.
@@ -156,53 +181,38 @@ namespace SEE.Controls
         public static ClientCalls Client { get; private set; }
 
         /// <summary>
-        /// Specifies to which IDE a connection is to be established.
-        /// </summary>
-        public Ide Type;
-
-        /// <summary>
-        /// Specifies the number of IDEs that can connect at the same time.
-        /// </summary>
-        public int MaxNumberOfClients = 1;
-
-        /// <summary>
-        /// TCP Socket port for communication to Visual Studio (2019).
-        /// </summary>
-        public int VS2019Port = 26100;
-
-        /// <summary>
-        /// TCP Socket port for communication to Visual Studio (2022).
-        /// </summary>
-        public int VS2022Port = 26101;
-
-        /// <summary>
         /// The JsonRpcServer used for communication between IDE and SEE.
         /// </summary>
-        private JsonRpcServer _rpc;
+        private JsonRpcServer rpc;
 
         /// <summary>
-        /// Semaphore for accessing <see cref="_cachedConnections"/>.
+        /// Semaphore for accessing <see cref="cachedConnections"/>.
         /// </summary>
-        private SemaphoreSlim _semaphore;
+        private SemaphoreSlim semaphore;
 
         /// <summary>
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
         /// city have no impact to the source code, this will only be initialized during start up.
         /// </summary>
-        private IDictionary<string, ICollection<InteractableObject>> _cachedObjects;
+        private IDictionary<string, ICollection<InteractableObject>> cachedObjects;
 
         /// <summary>
         /// A mapping of all registered connections to the project they have opened. Only access
-        /// this dictionary while using <see cref="_semaphore"/>.
+        /// this dictionary while using <see cref="semaphore"/>.
         /// </summary>
-        private IDictionary<string, JsonRpcClientConnection> _cachedConnections;
+        private IDictionary<string, ICollection<JsonRpcClientConnection>> cachedConnections;
+
+        /// <summary>
+        /// Contains all Graphs in this scene
+        /// </summary>
+        private ICollection<Graph> cachedGraphs;
 
         /// <summary>
         /// Contains all <see cref="InteractableObject"/> that were selected by the selected IDE.
         /// Don't make any changes on this set directly. Instead, a new assignment should be made
         /// when the set changed.
         /// </summary>
-        private static HashSet<InteractableObject> _pendingSelections;
+        private static HashSet<InteractableObject> pendingSelections;
 
         /// <summary>
         /// Initializes all necessary objects for the inter-process communication
@@ -219,7 +229,7 @@ namespace SEE.Controls
                 return;
             }
 
-            if (Instance != null)
+            if (instance != null)
             {
 #if UNITY_EDITOR
                 Debug.LogError($"Only one instance of '{this}' can be initiated!");
@@ -228,16 +238,16 @@ namespace SEE.Controls
                 return;
             }
 
-            Instance = this;
-            _semaphore = new SemaphoreSlim(1, 1);
-            _pendingSelections = new HashSet<InteractableObject>();
-            _cachedConnections = new Dictionary<string, JsonRpcClientConnection>();
+            instance = this;
+            semaphore = new SemaphoreSlim(1, 1);
+            pendingSelections = new HashSet<InteractableObject>();
+            cachedConnections = new Dictionary<string, ICollection<JsonRpcClientConnection>>();
 
-            InitializeCachedObject();
+            InitializeCachedObjects();
             InitializeJsonRpcServer();
 
-            _rpc.Connected += ConnectedToClient;
-            _rpc.Disconnected += DisconnectedFromClient;
+            rpc.Connected += ConnectedToClient;
+            rpc.Disconnected += DisconnectedFromClient;
 
             // Starting the server as a background task.
             StartServer().Forget();
@@ -246,7 +256,7 @@ namespace SEE.Controls
             {
                 try
                 {
-                    await _rpc.Start(MaxNumberOfClients);
+                    await rpc.Start(MaxNumberOfClients);
                 }
                 catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
                 {
@@ -262,12 +272,12 @@ namespace SEE.Controls
         public void OnDestroy()
         {
             // To prevent show notification while destroying.
-            _rpc.Connected -= ConnectedToClient;
-            _rpc.Disconnected -= DisconnectedFromClient;
+            rpc.Connected -= ConnectedToClient;
+            rpc.Disconnected -= DisconnectedFromClient;
 
-            _rpc?.Dispose();
-            _semaphore?.Dispose();
-            Instance = null;
+            rpc?.Dispose();
+            semaphore?.Dispose();
+            instance = null;
         }
 
         /// <summary>
@@ -276,7 +286,7 @@ namespace SEE.Controls
         /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
         public static bool PendingSelectionsAction()
         {
-            return SEEInput.SelectionEnabled && _pendingSelections.Count > 0;
+            return SEEInput.SelectionEnabled && pendingSelections.Count > 0;
         }
 
         /// <summary>
@@ -288,8 +298,8 @@ namespace SEE.Controls
         public static HashSet<InteractableObject> PopPendingSelections()
         {
             HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
-            elements.UnionWith(_pendingSelections);
-            _pendingSelections.Clear();
+            elements.UnionWith(pendingSelections);
+            pendingSelections.Clear();
             return elements;
         }
 
@@ -300,7 +310,7 @@ namespace SEE.Controls
         {
             Client = new ClientCalls(this);
 
-            _rpc = Type switch
+            rpc = Type switch
             {
                 Ide.VisualStudio2019 =>
                     new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2019Port),
@@ -310,16 +320,22 @@ namespace SEE.Controls
             };
         }
 
-        private void InitializeCachedObject()
+        /// <summary>
+        /// Will get every node using <see cref="SceneQueries.AllGameNodesInScene"/> and store
+        /// them in <see cref="cachedObjects"/>.
+        /// </summary>
+        private void InitializeCachedObjects()
         {
-            _cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
+            cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
+            var allNodes = SceneQueries.AllGameNodesInScene(true, true);
+            cachedGraphs = SceneQueries.GetGraphs(allNodes);
 
             // Get all nodes in scene
-            foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
+            foreach (var node in allNodes)
             {
                 var fileName = node.GetNode().Filename();
                 var path = node.GetNode().Path();
-                var name = node.GetNode().SourceName;
+                var sourceName = node.GetNode().SourceName;
 
                 if (fileName == null || path == null) continue;
 
@@ -334,18 +350,18 @@ namespace SEE.Controls
                     continue;
                 }
 
-                if (name != null && (!name.Equals("?") || !name.Equals("")))
+                if (sourceName != null && (!sourceName.Equals("?") || !sourceName.Equals("")))
                 {
-                    fullPath += $":{name}";
+                    fullPath += $":{sourceName}";
                 }
 
                 if (node.TryGetComponent(out InteractableObject obj))
                 {
-                    if (!_cachedObjects.ContainsKey(fullPath))
+                    if (!cachedObjects.ContainsKey(fullPath))
                     {
-                        _cachedObjects[fullPath] = new List<InteractableObject>();
+                        cachedObjects[fullPath] = new List<InteractableObject>();
                     }
-                    _cachedObjects[fullPath].Add(obj);
+                    cachedObjects[fullPath].Add(obj);
                 }
             }
         }
@@ -395,7 +411,7 @@ namespace SEE.Controls
         /// <summary>
         /// Will be called when connection to client is established successful. And checks whether
         /// the client contains the right project. A connection will be added to
-        /// <see cref="_cachedConnections"/> when everything was successful.
+        /// <see cref="cachedConnections"/> when everything was successful.
         /// </summary>
         /// <param name="connection">The connection.</param>
         private void ConnectedToClient(JsonRpcClientConnection connection)
@@ -404,12 +420,17 @@ namespace SEE.Controls
             {
                 if (await Client.CheckProject(connection))
                 {
-                    await _semaphore.WaitAsync();
+                    await semaphore.WaitAsync();
 
-                    // TODO: Fix this!
-                    _cachedConnections["Test"] = connection;
+                    // TODO: Fix this! Should be file path of project solution (.sln).
+                    var project = "TEST";
+                    if (!cachedConnections.ContainsKey(project))
+                    {
+                        cachedConnections[project] = new List<JsonRpcClientConnection>();
+                    }
+                    cachedConnections[project].Add(connection);
 
-                    _semaphore.Release();
+                    semaphore.Release();
                     
                     await UniTask.SwitchToMainThread();
                     ShowNotification.Info("Connected to IDE",
@@ -420,28 +441,34 @@ namespace SEE.Controls
 
         /// <summary>
         /// Will be called when the client disconnected form the server and removes the connection
-        /// from <see cref="_cachedConnections"/>.
+        /// from <see cref="cachedConnections"/>.
         /// </summary>
         /// <param name="connection">The connection.</param>
         private void DisconnectedFromClient(JsonRpcClientConnection connection)
         {
             UniTask.Run(async () =>
             {
-                await _semaphore.WaitAsync();
+                await semaphore.WaitAsync();
 
-                var key = _cachedConnections.FirstOrDefault(x => x.Value == connection).Key;
+                var key = cachedConnections.FirstOrDefault(x => x.Value == connection).Key;
                 if (key != null)
                 {
-                    _cachedConnections.Remove(key);
+                    if (cachedConnections[key].Count > 1)
+                    {
+                        cachedConnections[key].Remove(connection);
+                    }
+                    else
+                    {
+                        cachedConnections.Remove(key);
+                    }
                 }
 
-                _semaphore.Release();
+                semaphore.Release();
 
                 await UniTask.SwitchToMainThread();
                 ShowNotification.Info("Disconnected from IDE",
                     "The IDE was disconnected form SEE.", 5.0f);
             }).Forget();
-            
         }
     }
 }
