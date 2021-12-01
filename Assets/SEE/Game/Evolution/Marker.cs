@@ -128,7 +128,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private float transform(float input)
         {
-            return input;
+            return input / 100;
         }
 
         /// <summary>
@@ -142,50 +142,62 @@ namespace SEE.Game.Evolution
         private GameObject MarkByBeam(Node node, GameObject gameNode, CylinderFactory factory)
         {
             Vector3 position = graphRenderer.GetRoof(gameNode);
-
-            Vector3 beamScale;
-            beamScale.x = markerWidth;
-            beamScale.y = 0; // We start a zero height and let it grow over the given duration by way of BeamRaiser.
-            beamScale.z = markerWidth;
-
-            float offset = 0;
+            Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
 
             if (markerAttributes.Kind == MarkerKinds.Dynamic)
             {
-                float lengthMetric = graphRenderer.GetMetricValue(node, markerAttributes.LengthMetric);
+                float lengthMetric = 0; 
+                node.TryGetNumeric(markerAttributes.LengthMetric, out lengthMetric);
                 float totalHeight = transform(lengthMetric);
 
-                MarkerSection section = markerAttributes.MarkerSections[0];
-                float sectionMetric = graphRenderer.GetMetricValue(node, section.Metric);
-                float sectionHeight = transform(sectionMetric);
+                Debug.Log("-----------------------------");
+                string name = "ERROR";
+                node.TryGetString("Linkage.Name", out name);
+                Debug.Log(name);
+                float offset = 0;
+                GameObject output = new GameObject();
+                foreach (MarkerSection section in markerAttributes.MarkerSections)
+                {
+                    Debug.Log(section.Color);
+                    //MarkerSection section = markerAttributes.MarkerSections[0];
+                    float sectionMetric = 0;
+                    node.TryGetNumeric(section.Metric, out sectionMetric);
+                    float sectionHeight = transform(sectionMetric);
 
-                Debug.Log("Total: " + totalHeight + ", Section: " + sectionHeight);
+                    Debug.Log("Metric: " + section.Metric + ", Total: " + totalHeight + ", Section: " + sectionHeight);
 
-                offset += sectionHeight;
+                    CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
-                CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
+                    // The marker should be drawn in front of the block, hence, its render
+                    // queue offset must be greater than the one of the block.
+                    //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
+                    GameObject beamMarker = NewBeam(customFactory, 0);
 
-                // The marker should be drawn in front of the block, hence, its render
-                // queue offset must be greater than the one of the block.
-                //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
-                GameObject beamMarker = NewBeam(customFactory, 0);
+                    // FIXME: These kinds of beam markers make sense only for leaf nodes.
+                    // Could we better use some kind of blinking now that the cities
+                    // are drawn in miniature?
 
-                // FIXME: These kinds of beam markers make sense only for leaf nodes.
-                // Could we better use some kind of blinking now that the cities
-                // are drawn in miniature?
+                    beamMarker.tag = Tags.Decoration;
 
-                beamMarker.tag = Tags.Decoration;
+                    Vector3 localBeamScale = new Vector3(markerWidth, sectionHeight, markerWidth);
 
-                position.y += beamScale.y / 2.0f + offset;
-                beamMarker.transform.position = position;
-                beamMarker.transform.localScale = beamScale;
+                    beamMarker.transform.position = new Vector3(0, offset, 0);
+                    beamMarker.transform.localScale = localBeamScale;
 
-                // Makes beamMarker a child of block so that it moves along with it during the animation.
-                // In addition, it will also be destroyed along with its parent block.
-                beamMarker.transform.SetParent(gameNode.transform);
-                BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
-                raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, sectionHeight, markerWidth), duration: duration);
-                return beamMarker;
+                    // Makes beamMarker a child of block so that it moves along with it during the animation.
+                    // In addition, it will also be destroyed along with its parent block.
+                    beamMarker.transform.SetParent(output.transform);
+
+                    offset += sectionHeight;
+                }
+
+                output.transform.position = position;
+                output.transform.localScale = new Vector3(1, 0, 1);
+                output.transform.SetParent(gameNode.transform);
+
+                BeamRaiser raiser = output.AddComponent<BeamRaiser>();
+                raiser.SetTargetHeightAndDuration(new Vector3(1, 1, 1), duration: duration);
+                return output;
             } 
             else
             {
