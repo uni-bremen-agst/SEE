@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.UI.Notification;
@@ -25,8 +27,7 @@ namespace SEE.Controls
         #region Remote Procedure Calls
 
         /// <summary>
-        /// This class contains all functions, that can be called
-        /// by the client (IDE).
+        /// This class contains all functions, that can be called by the client (IDE).
         /// </summary>
         private class RemoteProcedureCalls
         {
@@ -99,7 +100,19 @@ namespace SEE.Controls
             }
 
             /// <summary>
-            /// Is looking for any active IDE.
+            /// Does the connected IDE contain the project the graph represents. This method will
+            /// autocratically close the connection if the IDE has the wrong project open. 
+            /// </summary>
+            /// <returns>True if IDE contains this project, false otherwise.</returns>
+            public async UniTask<bool> CheckProject(JsonRpcClientConnection connection)
+            {
+                // TODO: Implement this!
+                return true;
+            }
+
+            /// <summary>
+            /// Is looking for any active IDE. If no instance is found, will open a new IDE
+            /// instance and wait until project is loaded
             /// </summary>
             /// <returns>Async UniTask.</returns>
             private async UniTask CheckForIDEInstance()
@@ -168,13 +181,26 @@ namespace SEE.Controls
         private JsonRpcServer _rpc;
 
         /// <summary>
+        /// Semaphore for accessing <see cref="_cachedConnections"/>.
+        /// </summary>
+        private SemaphoreSlim _semaphore;
+
+        /// <summary>
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
         /// city have no impact to the source code, this will only be initialized during start up.
         /// </summary>
         private IDictionary<string, ICollection<InteractableObject>> _cachedObjects;
 
         /// <summary>
+        /// A mapping of all registered connections to the project they have opened. Only access
+        /// this dictionary while using <see cref="_semaphore"/>.
+        /// </summary>
+        private IDictionary<string, JsonRpcClientConnection> _cachedConnections;
+
+        /// <summary>
         /// Contains all <see cref="InteractableObject"/> that were selected by the selected IDE.
+        /// Don't make any changes on this set directly. Instead, a new assignment should be made
+        /// when the set changed.
         /// </summary>
         private static HashSet<InteractableObject> _pendingSelections;
 
@@ -203,7 +229,9 @@ namespace SEE.Controls
             }
 
             Instance = this;
+            _semaphore = new SemaphoreSlim(1, 1);
             _pendingSelections = new HashSet<InteractableObject>();
+            _cachedConnections = new Dictionary<string, JsonRpcClientConnection>();
 
             InitializeCachedObject();
             InitializeJsonRpcServer();
@@ -237,7 +265,8 @@ namespace SEE.Controls
             _rpc.Connected -= ConnectedToClient;
             _rpc.Disconnected -= DisconnectedFromClient;
 
-            _rpc.Dispose();
+            _rpc?.Dispose();
+            _semaphore?.Dispose();
             Instance = null;
         }
 
@@ -322,7 +351,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Opens the IDE defined in <see cref="Type"/>. Will wait until client is connected.
+        /// Opens the IDE defined in <see cref="Type"/>.
         /// </summary>
         /// <returns>Async UniTask.</returns>
         private async UniTask OpenNewIDEInstanceAsync()
@@ -361,29 +390,58 @@ namespace SEE.Controls
 #endif
                 throw;
             }
-
-            // TODO: wait until connected
         }
 
         /// <summary>
-        /// Will be called when connection to client is established successful.
+        /// Will be called when connection to client is established successful. And checks whether
+        /// the client contains the right project. A connection will be added to
+        /// <see cref="_cachedConnections"/> when everything was successful.
         /// </summary>
         /// <param name="connection">The connection.</param>
         private void ConnectedToClient(JsonRpcClientConnection connection)
         {
-            //TODO: Check whether the correct IDE instance is connected
-            ShowNotification.Info("Connected to IDE",
-                "Connection to IDE established.", 5.0f);
+            UniTask.Run(async () =>
+            {
+                if (await Client.CheckProject(connection))
+                {
+                    await _semaphore.WaitAsync();
+
+                    // TODO: Fix this!
+                    _cachedConnections["Test"] = connection;
+
+                    _semaphore.Release();
+                    
+                    await UniTask.SwitchToMainThread();
+                    ShowNotification.Info("Connected to IDE",
+                        "Connection to IDE established.", 5.0f);
+                }
+            }).Forget();
         }
 
         /// <summary>
-        /// Will be called when the client disconnected form the server.
+        /// Will be called when the client disconnected form the server and removes the connection
+        /// from <see cref="_cachedConnections"/>.
         /// </summary>
         /// <param name="connection">The connection.</param>
         private void DisconnectedFromClient(JsonRpcClientConnection connection)
         {
-            ShowNotification.Info("Disconnected from IDE",
-                "The IDE was disconnected form SEE.", 5.0f);
+            UniTask.Run(async () =>
+            {
+                await _semaphore.WaitAsync();
+
+                var key = _cachedConnections.FirstOrDefault(x => x.Value == connection).Key;
+                if (key != null)
+                {
+                    _cachedConnections.Remove(key);
+                }
+
+                _semaphore.Release();
+
+                await UniTask.SwitchToMainThread();
+                ShowNotification.Info("Disconnected from IDE",
+                    "The IDE was disconnected form SEE.", 5.0f);
+            }).Forget();
+            
         }
     }
 }
