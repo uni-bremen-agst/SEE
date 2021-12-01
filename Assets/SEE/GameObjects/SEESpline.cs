@@ -162,14 +162,8 @@ namespace Assets.SEE.GameObjects
         {
             if (needsUpdate)
             {
-                if (gameObject.TryGetComponent<LineRenderer>(out var lr))
-                {
-                    UpdateLineRenderer();
-                }
-                if (gameObject.TryGetComponent<MeshFilter>(out var _))
-                {
-                    UpdateMesh();
-                }
+                UpdateLineRenderer();
+                UpdateMesh();
                 needsUpdate = false;
             }
         }
@@ -189,7 +183,12 @@ namespace Assets.SEE.GameObjects
         /// <summary>
         /// Updates the <see cref="LineRenderer"/> of the
         /// <see cref="GameObject"/> this component is attached to
-        /// (<see cref="Component.gameObject"/>).
+        /// (<see cref="Component.gameObject"/>) and marks the internal state
+        /// as clean (i.e., <see cref="needsUpdate"/> is set to false) so that
+        /// <see cref="Update"/> doesn't update the renderer again in the next
+        /// frame. Calling this method doesn't fail if
+        /// <see cref="Component.gameObject"/> has no
+        /// <see cref="LineRenderer"/> attached to it.
         /// </summary>
         private void UpdateLineRenderer()
         {
@@ -199,6 +198,7 @@ namespace Assets.SEE.GameObjects
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
             }
+            needsUpdate = false;
         }
 
         /// <summary>
