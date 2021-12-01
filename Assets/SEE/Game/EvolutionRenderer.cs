@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Assets.SEE.Game.City;
 using Assets.SEE.Game.Evolution.Animators;
 using Assets.SEE.GameObjects;
 using SEE.DataModel;
@@ -588,7 +589,11 @@ namespace SEE.Game
                 {
                     spline.Spline = next.EdgeLayout[edge.ID].Spline;
                 }
-                edgeObject.SetActive(true); // Make visible.
+                edgeObject.SetActive(true); // Make visible
+                if (gameObject.TryGetComponent<EdgeMeshScheduler>(out var scheduler))
+                {
+                    scheduler.Add(edgeObject); // Register for mesh creation
+                }
             }
             if (currentCity != null)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Assets.SEE.Game.City;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -101,6 +102,18 @@ namespace SEE.Game.City
         /// The metrics for the visualization of erosions.
         /// </summary>
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
+
+        /// <summary>
+        /// Called at game start. Sets up additional components.
+        /// </summary>
+        internal virtual void Start()
+        {
+            if (!gameObject.TryGetComponent<EdgeMeshScheduler>(out var _))
+            {
+                gameObject.AddComponent<EdgeMeshScheduler>().Init(
+                    EdgeLayoutSettings, EdgeSelectionSettings);
+            }
+        }
 
         /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
