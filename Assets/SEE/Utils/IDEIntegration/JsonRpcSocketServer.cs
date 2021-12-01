@@ -24,7 +24,7 @@ namespace SEE.Utils
             /// <summary>
             /// TCP connection to the client.
             /// </summary>
-            private TcpClient _client;
+            private readonly TcpClient _client;
 
             /// <summary>
             /// Creates a new client connection using a <see cref="TcpClient"/>.
@@ -37,30 +37,20 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// The Task that will handle the connection.
+            /// Will initiate the JsonRpc connection.
             /// </summary>
-            /// <param name="token">The cancellation token.</param>
-            /// <returns>Async UniTask.</returns>
-            protected override async UniTask RunTask(CancellationToken token)
+            protected override bool InitiateJsonRpc()
             {
-                Rpc = JsonRpc.Attach(_client.GetStream(), RpcServer.Target);
-                Connected?.Invoke(this);
-
                 try
                 {
-                    await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
-                }
-                catch (OperationCanceledException)
-                {
-                    throw;
+                    Rpc = JsonRpc.Attach(_client.GetStream(), RpcServer.Target);
                 }
                 catch (Exception)
                 {
-                    // Connection was unexpectedly interrupted.
+                    return false;
                 }
 
-                Disconnected?.Invoke(this);
-                Abort();
+                return true;
             }
 
             /// <summary>

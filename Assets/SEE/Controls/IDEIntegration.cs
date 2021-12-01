@@ -88,16 +88,6 @@ namespace SEE.Controls
             private readonly IDEIntegration _ideIntegration;
 
             /// <summary>
-            /// Is looking for any active IDE.
-            /// </summary>
-            /// <returns>Async UniTask.</returns>
-            private async UniTask CheckForIDEInstance()
-            {
-                if (_ideIntegration._rpc.IsConnected()) return;
-                await _ideIntegration.OpenNewIDEInstanceAsync();
-            }
-
-            /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
             /// deliver all methods, that can be called from the client. Should only be initiated
             /// by the <see cref="IDEIntegration"/>.
@@ -106,6 +96,17 @@ namespace SEE.Controls
             public ClientCalls(IDEIntegration ideIntegration)
             {
                 _ideIntegration = ideIntegration;
+            }
+
+            /// <summary>
+            /// Is looking for any active IDE.
+            /// </summary>
+            /// <returns>Async UniTask.</returns>
+            private async UniTask CheckForIDEInstance()
+            {
+                // TODO: FIX ME
+                if (_ideIntegration._rpc.IsConnected()) return;
+                await _ideIntegration.OpenNewIDEInstanceAsync();
             }
 
             /// <summary>
@@ -137,7 +138,7 @@ namespace SEE.Controls
         private static IDEIntegration Instance;
 
         /// <summary>
-        /// All callable methods by the server.
+        /// All callable methods by the server. Will be executed in every connected IDE.
         /// </summary>
         public static ClientCalls Client { get; private set; }
 
@@ -145,6 +146,11 @@ namespace SEE.Controls
         /// Specifies to which IDE a connection is to be established.
         /// </summary>
         public Ide Type;
+
+        /// <summary>
+        /// Specifies the number of IDEs that can connect at the same time.
+        /// </summary>
+        public int MaxNumberOfClients = 1;
 
         /// <summary>
         /// TCP Socket port for communication to Visual Studio (2019).
@@ -212,7 +218,7 @@ namespace SEE.Controls
             {
                 try
                 {
-                    await _rpc.Start(1);
+                    await _rpc.Start(MaxNumberOfClients);
                 }
                 catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
                 {
@@ -227,7 +233,11 @@ namespace SEE.Controls
         /// </summary>
         public void OnDestroy()
         {
-            _rpc.Stop();
+            // To prevent show notification while destroying.
+            _rpc.Connected -= ConnectedToClient;
+            _rpc.Disconnected -= DisconnectedFromClient;
+
+            _rpc.Dispose();
             Instance = null;
         }
 
@@ -358,9 +368,8 @@ namespace SEE.Controls
         /// <summary>
         /// Will be called when connection to client is established successful.
         /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void ConnectedToClient(object sender, EventArgs e)
+        /// <param name="connection">The connection.</param>
+        private void ConnectedToClient(JsonRpcClientConnection connection)
         {
             //TODO: Check whether the correct IDE instance is connected
             ShowNotification.Info("Connected to IDE",
@@ -370,9 +379,8 @@ namespace SEE.Controls
         /// <summary>
         /// Will be called when the client disconnected form the server.
         /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments.</param>
-        private void DisconnectedFromClient(object sender, EventArgs e)
+        /// <param name="connection">The connection.</param>
+        private void DisconnectedFromClient(JsonRpcClientConnection connection)
         {
             ShowNotification.Info("Disconnected from IDE",
                 "The IDE was disconnected form SEE.", 5.0f);
