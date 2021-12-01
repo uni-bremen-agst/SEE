@@ -287,12 +287,15 @@ namespace Assets.SEE.GameObjects
             // Set up the mesh components.
             if (!gameObject.TryGetComponent<MeshFilter>(out var filter))
             {
-                var mesh = new Mesh();
-                mesh.MarkDynamic();
-                var collider = gameObject.AddComponent<MeshCollider>();
                 filter = gameObject.AddComponent<MeshFilter>();
+                if (!gameObject.TryGetComponent<MeshCollider>(out var coll))
+                {
+                    coll = gameObject.AddComponent<MeshCollider>();
+                }
+                var mesh = new Mesh();
+                mesh.MarkDynamic(); // May improve performance.
                 filter.sharedMesh = mesh;
-                collider.sharedMesh = mesh;
+                coll.sharedMesh = mesh;
             }
             filter.mesh.vertices = vertices.ToArray();
             filter.mesh.normals  = normals.ToArray();
@@ -300,6 +303,10 @@ namespace Assets.SEE.GameObjects
             filter.mesh.uv       = uvs.ToArray();
             filter.mesh.SetIndices(indices.ToArray(),
                 MeshTopology.Triangles, 0);
+            if (!gameObject.TryGetComponent<MeshRenderer>(out var _))
+            {
+                gameObject.AddComponent<MeshRenderer>();
+            }
 
             // Remove line renderer.
             if (gameObject.TryGetComponent<LineRenderer>(out var renderer))
@@ -345,7 +352,7 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         public void UpdateMesh()
         {
-            if (gameObject.TryGetComponent<MeshFilter>(out var filter))
+            if (gameObject.TryGetComponent<MeshFilter>(out var _))
             {
                 CreateOrUpdateMesh();
             }
