@@ -1765,11 +1765,11 @@ MonoBehaviour:
     MinimalMarkerLength: 0.001
     MaximalMarkerLength: 5
     MarkerSections:
-    - Metric: 
+    - Metric: Metric.Vcs2See.Commit.Lines_Added
       Color: {r: 0.050980393, g: 1, b: 0, a: 1}
-    - Metric: 
+    - Metric: Metric.Vcs2See.Commit.Lines_Edited
       Color: {r: 0, g: 0.6901961, b: 1, a: 1}
-    - Metric: 
+    - Metric: Metric.Vcs2See.Commit.Lines_Deleted
       Color: {r: 1, g: 0, b: 0, a: 1}
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
