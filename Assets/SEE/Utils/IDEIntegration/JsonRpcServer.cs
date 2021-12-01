@@ -27,14 +27,20 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Represents the method that will handle the server connection events.
+        /// </summary>
+        /// <param name="connection">The connection that fired this event.</param>
+        public delegate void ConnectionEventHandler(JsonRpcClientConnection connection);
+
+        /// <summary>
         /// Will be fired when a client connection is established successful.
         /// </summary>
-        public EventHandler Connected;
+        public ConnectionEventHandler Connected;
 
         /// <summary>
         /// Will be fired when a client disconnected from the server.
         /// </summary>
-        public EventHandler Disconnected;
+        public ConnectionEventHandler Disconnected;
 
         /// <summary>
         /// All currently to the server connected clients. Only access this set while using
@@ -78,7 +84,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Starts listening to the TCP client.
+        /// Starts listening to the TCP clients.
         /// </summary>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
@@ -92,16 +98,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Stops listening to the TCP client.
-        /// </summary>
-        public void Stop()
-        {
-            // TODO: Should send custom event arguments.
-            if (IsConnected()) Disconnected?.Invoke(this, EventArgs.Empty);
-            Dispose();
-        }
-
-        /// <summary>
         /// Adds a connection to <see cref="RpcConnections"/> thread safe.
         /// </summary>
         /// <param name="connection">The client connection.</param>
@@ -110,7 +106,7 @@ namespace SEE.Utils
             Semaphore.WaitOne();
             RpcConnections.Add(connection);
             Semaphore.Release();
-            Connected?.Invoke(this, EventArgs.Empty);
+            Connected?.Invoke(connection);
         }
 
         /// <summary>
@@ -122,7 +118,7 @@ namespace SEE.Utils
             Semaphore.WaitOne();
             RpcConnections.Remove(connection);
             Semaphore.Release();
-            Disconnected?.Invoke(this, EventArgs.Empty);
+            Disconnected?.Invoke(connection);
         }
 
         /// <summary>
@@ -149,16 +145,7 @@ namespace SEE.Utils
                 Semaphore.WaitOne();
                 foreach (var connection in RpcConnections)
                 {
-                    try
-                    {
-                        if (connection.Rpc == null) continue;
-                        await connection.Rpc.InvokeAsync(targetName, arguments).AsUniTask();
-
-                    }
-                    catch (Exception)
-                    {
-                        // Lost connection to client.
-                    }
+                    await CallRemoteProcessOnConnectionAsync(connection, targetName, arguments);
                 }
                 Semaphore.Release();
             }
@@ -166,6 +153,37 @@ namespace SEE.Utils
             {
 #if UNITY_EDITOR
                 Debug.LogWarning("JsonRpcServer not connected to client!" +
+                                 $" Couldn't call '{targetName}'.");
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Use this method if you want to call a remote process on a specific connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="targetName">Method name.</param>
+        /// <param name="arguments">Parameters of the called method.</param>
+        /// <returns></returns>
+        public async UniTask CallRemoteProcessOnConnectionAsync(JsonRpcClientConnection connection,
+            string targetName, params object[] arguments)
+        {
+            if (connection != null)
+            {
+                try
+                {
+                    if (connection.Rpc == null) return;
+                    await connection.Rpc.InvokeAsync(targetName, arguments).AsUniTask();
+                }
+                catch (Exception)
+                {
+                    // Lost connection to client.
+                }
+            }
+            else
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("Connection is null!" +
                                  $" Couldn't call '{targetName}'.");
 #endif
             }
@@ -192,8 +210,7 @@ namespace SEE.Utils
         protected abstract UniTask StartServerAsync(int maxClients, CancellationToken token);
 
         /// <summary>
-        /// Dispose all open streams etc. Will not call <see cref="Disconnected"/>, call
-        /// <see cref="Stop"/> instead.
+        /// Dispose all open streams and stops the server.
         /// </summary>
         public virtual void Dispose()
         {

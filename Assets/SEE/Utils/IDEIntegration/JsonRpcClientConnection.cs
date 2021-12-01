@@ -1,6 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using StreamRpc;
+using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -42,6 +45,11 @@ namespace SEE.Utils
         private readonly CancellationTokenSource _tokenSource;
 
         /// <summary>
+        /// Indicates if <see cref="Run"/> was already called.
+        /// </summary>
+        private bool _started;
+
+        /// <summary>
         /// Creates a new client connection.
         /// </summary>
         /// <param name="rpcServer">The server instance of this client.</param>
@@ -52,10 +60,21 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Will run the connection process. Only execute this method once.
+        /// Gets the connection status of this connection.
+        /// </summary>
+        /// <returns>True if client is still connected to the server.</returns>
+        public bool IsConnected()
+        {
+            return Rpc != null;
+        }
+
+        /// <summary>
+        /// Will run the connection process. Only callable once.
         /// </summary>
         public void Run()
         {
+            if (_started) return;
+            _started = true;
             RunTask(_tokenSource.Token).Forget();
         }
 
@@ -65,14 +84,64 @@ namespace SEE.Utils
         /// <see cref="Disconnected"/>.
         /// </summary>
         /// <returns>UniTask.</returns>
-        protected abstract UniTask RunTask(CancellationToken token);
+        private async UniTask RunTask(CancellationToken token)
+        {
+            if (!InitiateJsonRpc()) return;
+
+            Connected?.Invoke(this);
+
+            try
+            {
+                await Rpc.Completion.AsUniTask().AttachExternalCancellation(token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Disconnecting asynchronously
+                Disconnected?.BeginInvoke(this, EndAsync, null);
+                throw;
+            }
+            catch (Exception)
+            {
+                // Connection was unexpectedly interrupted.
+            }
+
+            Disconnected?.Invoke(this);
+            Abort();
+        }
 
         /// <summary>
-        /// Abort this connection to a client and closes all open streams.
+        /// To prevent a thread leak when an error occurred while calling <see cref="Disconnected"/>.
+        /// </summary>
+        /// <param name="asyncResult">Async result.</param>
+        private void EndAsync(IAsyncResult asyncResult)
+        {
+            var result = (AsyncResult)asyncResult;
+            var invokedMethod = (EventHandler)result.AsyncDelegate;
+
+            try
+            {
+                invokedMethod.EndInvoke(asyncResult);
+            }
+            catch (Exception e)
+            {
+#if UNITY_EDITOR
+                Debug.LogError(e.Message);
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Will initiate <see cref="Rpc"/> with the specific stream the derived class uses.
+        /// </summary>
+        protected abstract bool InitiateJsonRpc();
+
+        /// <summary>
+        /// Aborts this connection to a client and closes all open streams.
         /// </summary>
         public virtual void Abort()
         {
             _tokenSource.Cancel();
+            Rpc = null;
         }
     }
 }
