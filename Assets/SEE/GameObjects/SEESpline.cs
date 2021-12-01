@@ -369,26 +369,40 @@ namespace Assets.SEE.GameObjects
     /// This class can be used to morph the <see cref="SEESpline"/> component
     /// of a <see cref="GameObject"/>. A spline morphism can be thought of as
     /// a linear interpolation between a `source' and a `target' spline (where
-    /// `source' and `target' can have any structure). To initialize the
-    /// morphism, call <see cref="Init(BSpline, BSpline)"/> with desired
-    /// source and target. To evaluate the morphism at a certain point, call
-    /// <see cref="Morph(double)"/> with corresponding time parameter. Note
-    /// that this class implements the <see cref="EdgeAnimator.IEvaluator"/>
-    /// interface and therefore is well suited to realize the edge animation
-    /// of <see cref="SEE.Game.EvolutionRenderer"/>.
+    /// `source' and `target' may have any structure with regard to degree,
+    /// control points, and knots). To initialize the morphism, call
+    /// <see cref="Init(BSpline, BSpline)"/> with desired source and target
+    /// spline. To evaluate the morphism at a certain point, call
+    /// <see cref="Morph(double)"/> with corresponding time parameter.
+    ///
+    /// By implementing the <see cref="EdgeAnimator.IEvaluator"/> interface,
+    /// spline morphisms can be registered at <see cref="EdgeAnimator"/> in
+    /// order to realize a linear edge animation.
     /// </summary>
     public class SplineMorphism :
         SerializedMonoBehaviour, EdgeAnimator.IEvaluator
     {
+        /// <summary>
+        /// Origin of the spline morphism.
+        /// </summary>
         [NonSerialized]
         private BSpline source;
 
+        /// <summary>
+        /// Serializable representation of <see cref="source"/>.
+        /// </summary>
         [SerializeField]
         private SerializableSpline serializableSource;
 
+        /// <summary>
+        /// Target of the spline morphism.
+        /// </summary>
         [NonSerialized]
         private BSpline target;
 
+        /// <summary>
+        /// Serializable representation of <see cref="target"/>.
+        /// </summary>
         [SerializeField]
         private SerializableSpline serializableTarget;
 
@@ -399,9 +413,10 @@ namespace Assets.SEE.GameObjects
         private Morphism morphism;
 
         /// <summary>
-        /// Initializes the spline morphism. Asserts that
-        /// <paramref name="source"/> and <paramref name="target"/> are not
-        /// null.
+        /// Initializes the spline morphism.
+        ///
+        /// Postcondition: <see cref="SEESpline"/> is morphed to
+        /// <paramref name="source"/>.
         /// </summary>
         /// <param name="source">Origin of the spline morphsim</param>
         /// <param name="target">Target of the spline morphism</param>
@@ -410,6 +425,7 @@ namespace Assets.SEE.GameObjects
             this.source = source;
             this.target = target;
             morphism = source.MorphTo(target);
+            Morph(0); // Morph to source.
         }
 
         /// <summary>
