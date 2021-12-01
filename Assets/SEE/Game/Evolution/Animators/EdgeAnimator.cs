@@ -104,11 +104,12 @@ namespace Assets.SEE.Game.Evolution.Animators
         /// Starts the animation (i.e., <see cref="Update"/> processes all
         /// registered evaluators).
         /// </summary>
-        /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01</param>
+        /// <param name="duration">Duration of the animation; lower bound is
+        /// clamped to 0.01</param>
         public void DoAnimation(float duration)
         {
             timer = 0;
-            // Avoid divition by zero (and negative durations).
+            // Avoid division by zero (and negative durations).
             this.duration = (float)Math.Max(duration, 0.01);
             active = true;
         }
