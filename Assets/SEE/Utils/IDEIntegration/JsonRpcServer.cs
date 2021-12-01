@@ -66,7 +66,7 @@ namespace SEE.Utils
         /// <summary>
         /// CancellationTokenSource to stop the current server instance.
         /// </summary>
-        private CancellationTokenSource _sourceToken;
+        private CancellationTokenSource sourceToken;
 
         /// <summary>
         /// Sets <see cref="Target"/>, which represents the remote called functions.
@@ -78,7 +78,7 @@ namespace SEE.Utils
             _ = target ?? throw new ArgumentNullException(nameof(target));
             Target = target;
 
-            _sourceToken = new CancellationTokenSource();
+            sourceToken = new CancellationTokenSource();
             Semaphore = new Semaphore(1, 1);
             RpcConnections = new HashSet<JsonRpcClientConnection>();
         }
@@ -89,11 +89,11 @@ namespace SEE.Utils
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <returns>Async UniTask.</returns>
-        public async UniTask Start(int maxClients)
+        public async UniTask Start(uint maxClients)
         {
             if (Server.Status == UniTaskStatus.Pending) return;
             Dispose();
-            Server = StartServerAsync(maxClients, _sourceToken.Token);
+            Server = StartServerAsync(maxClients, sourceToken.Token);
             await Server;
         }
 
@@ -207,14 +207,14 @@ namespace SEE.Utils
         /// <param name="token">Token to cancel the current Task.</param>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <returns>Async Task.</returns>
-        protected abstract UniTask StartServerAsync(int maxClients, CancellationToken token);
+        protected abstract UniTask StartServerAsync(uint maxClients, CancellationToken token);
 
         /// <summary>
         /// Dispose all open streams and stops the server.
         /// </summary>
         public virtual void Dispose()
         {
-            _sourceToken.Cancel();
+            sourceToken.Cancel();
             if (RpcConnections != null)
             {
                 Semaphore.WaitOne();
@@ -226,7 +226,7 @@ namespace SEE.Utils
                 Semaphore.Release();
             }
             
-            _sourceToken = new CancellationTokenSource();
+            sourceToken = new CancellationTokenSource();
         }
     }
 }

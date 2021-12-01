@@ -42,12 +42,12 @@ namespace SEE.Utils
         /// <summary>
         /// Cancellation token to stop any running background tasks in this client connection.
         /// </summary>
-        private readonly CancellationTokenSource _tokenSource;
+        private readonly CancellationTokenSource tokenSource;
 
         /// <summary>
         /// Indicates if <see cref="Run"/> was already called.
         /// </summary>
-        private bool _started;
+        private bool started;
 
         /// <summary>
         /// Creates a new client connection.
@@ -56,7 +56,7 @@ namespace SEE.Utils
         protected JsonRpcClientConnection(JsonRpcServer rpcServer)
         {
             RpcServer = rpcServer;
-            _tokenSource = new CancellationTokenSource();
+            tokenSource = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace SEE.Utils
         /// </summary>
         public void Run()
         {
-            if (_started) return;
-            _started = true;
-            RunTask(_tokenSource.Token).Forget();
+            if (started) return;
+            started = true;
+            RunTask(tokenSource.Token).Forget();
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace SEE.Utils
         /// </summary>
         public virtual void Abort()
         {
-            _tokenSource.Cancel();
+            tokenSource.Cancel();
             Rpc = null;
         }
     }
