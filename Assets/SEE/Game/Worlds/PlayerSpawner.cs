@@ -41,7 +41,9 @@ namespace SEE.Game.Worlds
 
             // Terminate this co-routine.
             if (!networkManager.IsServer)
+            {
                 yield break;
+            }
             // The following code will be executed only on the server.
 
             // Wait until Dissonance is created
@@ -75,13 +77,6 @@ namespace SEE.Game.Worlds
             numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
-            if (false)
-            {
-                // Lift player by half of its size, because InitialPosition is meant to be the ground position.
-                Vector3 playerPosition = InitialPosition;
-                playerPosition.y += player.transform.lossyScale.y / 2.0f;
-                player.transform.position = playerPosition;
-            }
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
@@ -91,31 +86,6 @@ namespace SEE.Game.Worlds
             else
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
-            }
-        }
-
-        /// <summary>
-        /// FIXME: not used. Remove it.
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="activate"></param>
-        private void Activate(GameObject player, bool activate)
-        {
-            foreach (Transform child in player.transform)
-            {
-                if (child.TryGetComponent(out Camera camera))
-                {
-                    camera.enabled = activate;
-                    camera.tag = Tags.MainCamera;
-                }
-                if (child.TryGetComponent(out AudioListener listener))
-                {
-                    listener.enabled = activate;
-                }
-                if (child.TryGetComponent(out EventSystem eventSystem))
-                {
-                    eventSystem.enabled = activate;
-                }
             }
         }
 
