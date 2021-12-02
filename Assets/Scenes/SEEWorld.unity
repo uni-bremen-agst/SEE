@@ -2035,7 +2035,7 @@ MonoBehaviour:
   PlayerOrigin: {x: 0, y: 0.5, z: -1.5}
   PlayerYRotation: 0
   FocusPlane: {fileID: 1535691040}
-  Ground: {fileID: 0}
+  Ground: {fileID: 531878081}
   HideVRControllers: 0
   ShowControllerHints: 0
   ExperienceScale: 1
@@ -2640,6 +2640,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+--- !u!1 &531878081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1706114631358294, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+  m_PrefabInstance: {fileID: 531878080}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &558293894
 GameObject:
   m_ObjectHideFlags: 0
