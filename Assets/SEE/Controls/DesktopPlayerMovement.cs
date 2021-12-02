@@ -1,11 +1,12 @@
 ﻿using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls
 {
-
-    public class DesktopPlayerMovement : MonoBehaviour
+    /// <summary>
+    /// Moves a player in a desktop environment (keyboard and mouse input).
+    /// </summary>
+    public class DesktopPlayerMovement : PlayerMovement
     {
         [Tooltip("Speed of movements")]
         public float Speed = 0.5f;
