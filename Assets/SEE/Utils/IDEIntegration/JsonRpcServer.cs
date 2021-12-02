@@ -51,7 +51,7 @@ namespace SEE.Utils
         /// <summary>
         /// The semaphore used for accessing <see cref="RpcConnections"/>.
         /// </summary>
-        protected Semaphore Semaphore;
+        protected SemaphoreSlim Semaphore;
 
         /// <summary>
         /// Object with all methods that can be called remotely.
@@ -79,7 +79,7 @@ namespace SEE.Utils
             Target = target;
 
             sourceToken = new CancellationTokenSource();
-            Semaphore = new Semaphore(1, 1);
+            Semaphore = new SemaphoreSlim(1, 1);
             RpcConnections = new HashSet<JsonRpcClientConnection>();
         }
 
@@ -103,10 +103,13 @@ namespace SEE.Utils
         /// <param name="connection">The client connection.</param>
         private void AddConnection(JsonRpcClientConnection connection)
         {
-            Semaphore.WaitOne();
-            RpcConnections.Add(connection);
-            Semaphore.Release();
-            Connected?.Invoke(connection);
+            UniTask.Run(async () =>
+            {
+                await Semaphore.WaitAsync();
+                RpcConnections.Add(connection);
+                Semaphore.Release();
+                Connected?.Invoke(connection);
+            }).Forget();
         }
 
         /// <summary>
@@ -115,10 +118,13 @@ namespace SEE.Utils
         /// <param name="connection">The client connection.</param>
         private void RemoveConnection(JsonRpcClientConnection connection)
         {
-            Semaphore.WaitOne();
-            RpcConnections.Remove(connection);
-            Semaphore.Release();
-            Disconnected?.Invoke(connection);
+            UniTask.Run(async () =>
+            {
+                await Semaphore.WaitAsync();
+                RpcConnections.Remove(connection);
+                Semaphore.Release();
+                Disconnected?.Invoke(connection);
+            }).Forget();
         }
 
         /// <summary>
@@ -142,7 +148,7 @@ namespace SEE.Utils
         {
             if (IsConnected())
             {
-                Semaphore.WaitOne();
+                await Semaphore.WaitAsync();
                 foreach (var connection in RpcConnections)
                 {
                     await CallRemoteProcessOnConnectionAsync(connection, targetName, arguments);
@@ -168,14 +174,27 @@ namespace SEE.Utils
         public async UniTask CallRemoteProcessOnConnectionAsync(JsonRpcClientConnection connection,
             string targetName, params object[] arguments)
         {
+            await CallRemoteProcessOnConnectionAsync<object>(connection, targetName, arguments);
+        }
+
+        /// <summary>
+        /// Use this method if you want to call a remote process on a specific connection.
+        /// </summary>
+        /// <param name="connection">The connection.</param>
+        /// <param name="targetName">Method name.</param>
+        /// <param name="arguments">Parameters of the called method.</param>
+        /// <returns></returns>
+        public async UniTask<T> CallRemoteProcessOnConnectionAsync<T>(JsonRpcClientConnection connection,
+            string targetName, params object[] arguments)
+        {
             if (connection != null)
             {
                 try
                 {
-                    if (connection.Rpc == null) return;
-                    await connection.Rpc.InvokeAsync(targetName, arguments).AsUniTask();
+                    if (connection.Rpc == null) return default;
+                    return await connection.Rpc.InvokeAsync<T>(targetName, arguments);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // Lost connection to client.
                 }
@@ -187,6 +206,7 @@ namespace SEE.Utils
                                  $" Couldn't call '{targetName}'.");
 #endif
             }
+            return default;
         }
 
         /// <summary>
@@ -217,7 +237,7 @@ namespace SEE.Utils
             sourceToken.Cancel();
             if (RpcConnections != null)
             {
-                Semaphore.WaitOne();
+                Semaphore.Wait();
                 foreach (var connection in RpcConnections)
                 {
                     connection?.Abort();

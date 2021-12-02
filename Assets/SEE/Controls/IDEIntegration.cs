@@ -25,6 +25,66 @@ namespace SEE.Controls
     /// </summary>
     public class IDEIntegration : MonoBehaviour
     {
+        #region IDE Calls
+
+        /// <summary>
+        /// Lists all methods remotely callable by the server in a convenient way.
+        /// </summary>
+        public class IDECalls
+        {
+            private readonly JsonRpcServer server;
+
+            /// <summary>
+            /// Provides all method SEE can invoke on an IDE.
+            /// </summary>
+            /// <param name="server">The server instance.</param>
+            public IDECalls(JsonRpcServer server)
+            {
+                this.server = server;
+            }
+
+            /// <summary>
+            /// Opens the file in the IDE of choice.
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            /// <param name="path">Absolute file path.</param>
+            public async UniTask OpenFile(JsonRpcClientConnection connection, string path)
+            {
+                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path);
+            }
+
+            /// <summary>
+            /// Gets the absolute project path (e.g. .sln). 
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            /// <returns>Returns the absolute project path. Can be null.</returns>
+            public async UniTask<string> GetProjectPath(JsonRpcClientConnection connection)
+            {
+                return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetProject");
+            }
+
+            /// <summary>
+            /// Gets the absolute project path (e.g. .sln). 
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            /// <returns>Returns the absolute project path. Can be null.</returns>
+            public async UniTask<string> GetIDEVersion(JsonRpcClientConnection connection)
+            {
+                return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetIdeVersion");
+            }
+
+            /// <summary>
+            /// Declines an IDE instance.
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            public async UniTask Decline(JsonRpcClientConnection connection)
+            {
+                await server.CallRemoteProcessOnConnectionAsync(connection, "Decline");
+            }
+        }
+
+        #endregion
+
         #region Remote Procedure Calls
 
         /// <summary>
@@ -48,7 +108,7 @@ namespace SEE.Controls
             }
 
             /// <summary>
-            /// Adds all nodes from <see cref="IDEIntegration.cachedObjects"/> with the key created by
+            /// Adds all nodes from <see cref="cachedObjects"/> with the key created by
             /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
             /// null, it won't be appended to the key.
             /// </summary>
@@ -66,72 +126,12 @@ namespace SEE.Controls
                 try
                 {
                     var nodes = ideIntegration.cachedObjects[path];
-                    pendingSelections = new HashSet<InteractableObject>(nodes);
+                    ideIntegration.pendingSelections = new HashSet<InteractableObject>(nodes);
                 }
                 catch (Exception)
                 {
                     // The given key was not presented int the dictionary.
                 }
-            }
-        }
-
-        #endregion
-
-        #region Client Calls
-
-        /// <summary>
-        /// Lists all methods remotely callable by the server in a convenient way.
-        /// </summary>
-        public class ClientCalls
-        {
-            /// <summary>
-            /// instance of parent class.
-            /// </summary>
-            private readonly IDEIntegration ideIntegration;
-
-            /// <summary>
-            /// Nested class in <see cref="IDEIntegration"/>.  The purpose of this class is to
-            /// deliver all methods, that can be called from the client. Should only be initiated
-            /// by the <see cref="IDEIntegration"/>.
-            /// </summary>
-            /// <param name="ideIntegration">instance of IDEIntegration</param>
-            public ClientCalls(IDEIntegration ideIntegration)
-            {
-                this.ideIntegration = ideIntegration;
-            }
-
-            /// <summary>
-            /// Does the connected IDE contain the project the graph represents. This method will
-            /// autocratically close the connection if the IDE has the wrong project open. 
-            /// </summary>
-            /// <returns>True if IDE contains this project, false otherwise.</returns>
-            public async UniTask<bool> CheckProject(JsonRpcClientConnection connection)
-            {
-                // TODO: Implement this!
-                return true;
-            }
-
-            /// <summary>
-            /// Is looking for any active IDE. If no instance is found, will open a new IDE
-            /// instance and wait until project is loaded
-            /// </summary>
-            /// <returns>Async UniTask.</returns>
-            private async UniTask CheckForIDEInstance()
-            {
-                // TODO: FIX ME
-                if (ideIntegration.rpc.IsConnected()) return;
-                await ideIntegration.OpenNewIDEInstanceAsync();
-            }
-
-            /// <summary>
-            /// Opens the file in the IDE of choice.
-            /// </summary>
-            /// <param name="path">Absolute file path.</param>
-            /// <returns></returns>
-            public async UniTask OpenFileAsync(string path)
-            {
-                await CheckForIDEInstance();
-                await ideIntegration.rpc.CallRemoteProcessAsync("OpenFile", path);
             }
         }
 
@@ -153,37 +153,37 @@ namespace SEE.Controls
         public Ide Type;
 
         /// <summary>
+        /// Connects to IDE regardless of the loaded project (solution).
+        /// </summary>
+        [Tooltip("Connects to IDE regardless of the loaded project (solution).")]
+        public bool ConnectToAny = false;
+
+        /// <summary>
         /// Specifies the number of IDEs that can connect at the same time.
         /// </summary>
         [Tooltip("Specifies the number of IDEs that can connect at the same time.")] 
-        public uint MaxNumberOfClients = 1;
+        public uint MaxNumberOfIdes = 1;
 
         /// <summary>
-        /// TCP Socket port for communication to Visual Studio (2019).
+        /// TCP Socket port that will be used on local host.
         /// </summary>
-        [Tooltip("TCP Socket port for communication to Visual Studio (2019).")] 
-        public int VS2019Port = 26100;
+        [Tooltip("TCP Socket port that will be used on local host.")] 
+        public int Port = 26100;
 
         /// <summary>
-        /// TCP Socket port for communication to Visual Studio (2022).
+        /// Represents the singleton instance of this integration in the scene.
         /// </summary>
-        [Tooltip("TCP Socket port for communication to Visual Studio (2022).")] 
-        public int VS2022Port = 26101;
-
-        /// <summary>
-        /// The singleton instance of this class.
-        /// </summary>
-        private static IDEIntegration instance;
+        public static IDEIntegration Instance { get; private set; }
 
         /// <summary>
         /// All callable methods by the server. Will be executed in every connected IDE.
         /// </summary>
-        public static ClientCalls Client { get; private set; }
+        private IDECalls ideCalls;
 
         /// <summary>
         /// The JsonRpcServer used for communication between IDE and SEE.
         /// </summary>
-        private JsonRpcServer rpc;
+        private JsonRpcServer server;
 
         /// <summary>
         /// Semaphore for accessing <see cref="cachedConnections"/>.
@@ -197,8 +197,8 @@ namespace SEE.Controls
         private IDictionary<string, ICollection<InteractableObject>> cachedObjects;
 
         /// <summary>
-        /// A mapping of all registered connections to the project they have opened. Only access
-        /// this dictionary while using <see cref="semaphore"/>.
+        /// A mapping of all registered connections to the project they have opened. Only add and
+        /// delete elements in this directory while using <see cref="semaphore"/>.
         /// </summary>
         private IDictionary<string, ICollection<JsonRpcClientConnection>> cachedConnections;
 
@@ -212,7 +212,9 @@ namespace SEE.Controls
         /// Don't make any changes on this set directly. Instead, a new assignment should be made
         /// when the set changed.
         /// </summary>
-        private static HashSet<InteractableObject> pendingSelections;
+        private HashSet<InteractableObject> pendingSelections;
+
+        #region Initialization 
 
         /// <summary>
         /// Initializes all necessary objects for the inter-process communication
@@ -229,7 +231,7 @@ namespace SEE.Controls
                 return;
             }
 
-            if (instance != null)
+            if (Instance != null)
             {
 #if UNITY_EDITOR
                 Debug.LogError($"Only one instance of '{this}' can be initiated!");
@@ -238,16 +240,18 @@ namespace SEE.Controls
                 return;
             }
 
-            instance = this;
+            Instance = this;
             semaphore = new SemaphoreSlim(1, 1);
             pendingSelections = new HashSet<InteractableObject>();
             cachedConnections = new Dictionary<string, ICollection<JsonRpcClientConnection>>();
 
             InitializeCachedObjects();
-            InitializeJsonRpcServer();
 
-            rpc.Connected += ConnectedToClient;
-            rpc.Disconnected += DisconnectedFromClient;
+            server = new JsonRpcSocketServer(new RemoteProcedureCalls(this), Port);
+            ideCalls = new IDECalls(server);
+
+            server.Connected += ConnectedToClient;
+            server.Disconnected += DisconnectedFromClient;
 
             // Starting the server as a background task.
             StartServer().Forget();
@@ -256,7 +260,7 @@ namespace SEE.Controls
             {
                 try
                 {
-                    await rpc.Start(MaxNumberOfClients);
+                    await server.Start(MaxNumberOfIdes);
                 }
                 catch (JsonRpcServer.JsonRpcServerCreationFailedException e)
                 {
@@ -272,52 +276,12 @@ namespace SEE.Controls
         public void OnDestroy()
         {
             // To prevent show notification while destroying.
-            rpc.Connected -= ConnectedToClient;
-            rpc.Disconnected -= DisconnectedFromClient;
+            server.Connected -= ConnectedToClient;
+            server.Disconnected -= DisconnectedFromClient;
 
-            rpc?.Dispose();
+            server?.Dispose();
             semaphore?.Dispose();
-            instance = null;
-        }
-
-        /// <summary>
-        /// Is there any pending selection needed to be taken.
-        /// </summary>
-        /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
-        public static bool PendingSelectionsAction()
-        {
-            return SEEInput.SelectionEnabled && pendingSelections.Count > 0;
-        }
-
-        /// <summary>
-        /// Returns a set of <see cref="InteractableObject"/> that represents the elements the IDE
-        /// wants to be highlighted. After calling this method, the underlying set will be cleared
-        /// and thus is empty again.
-        /// </summary>
-        /// <returns>The set of elements to be highlighted.</returns>
-        public static HashSet<InteractableObject> PopPendingSelections()
-        {
-            HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
-            elements.UnionWith(pendingSelections);
-            pendingSelections.Clear();
-            return elements;
-        }
-
-        /// <summary>
-        /// Initializes the JsonRpcServer with the right port number.
-        /// </summary>
-        private void InitializeJsonRpcServer()
-        {
-            Client = new ClientCalls(this);
-
-            rpc = Type switch
-            {
-                Ide.VisualStudio2019 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2019Port),
-                Ide.VisualStudio2022 =>
-                    new JsonRpcSocketServer(new RemoteProcedureCalls(this), VS2022Port),
-                _ => throw new NotImplementedException($"Implementation of case {Type} not found"),
-            };
+            Instance = null;
         }
 
         /// <summary>
@@ -364,6 +328,82 @@ namespace SEE.Controls
                     cachedObjects[fullPath].Add(obj);
                 }
             }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Is there any pending selection needed to be taken.
+        /// </summary>
+        /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
+        public bool PendingSelectionsAction()
+        {
+            return SEEInput.SelectionEnabled && pendingSelections.Count > 0;
+        }
+
+        /// <summary>
+        /// Returns a set of <see cref="InteractableObject"/> that represents the elements the IDE
+        /// wants to be highlighted. After calling this method, the underlying set will be cleared
+        /// and thus is empty again.
+        /// </summary>
+        /// <returns>The set of elements to be highlighted.</returns>
+        public HashSet<InteractableObject> PopPendingSelections()
+        {
+            var elements = new HashSet<InteractableObject>();
+            elements.UnionWith(pendingSelections);
+            pendingSelections.Clear();
+            return elements;
+        }
+
+        /// <summary>
+        /// Opens the specified file in an IDE.
+        /// </summary>
+        /// <param name="filePath">The absolute file path.</param>
+        /// <returns>Async UniTask.</returns>
+        public async UniTask OpenFile(string filePath)
+        {
+            await Instance.LookForIDEInstance();
+            // TODO: Fix me!
+        }
+
+        #region IDE Management
+
+        /// <summary>
+        /// Is looking for any active IDE. If no instance is found, will open a new IDE
+        /// instance.
+        /// </summary>
+        /// <returns>Async UniTask.</returns>
+        private async UniTask LookForIDEInstance()
+        {
+            if (server.IsConnected()) return;
+            await OpenNewIDEInstanceAsync();
+        }
+
+        /// <summary>
+        /// Checks if the IDE is the right <see cref="Type"/> and contains a project that is represented
+        /// by a graph. If <see cref="ConnectToAny"/> is true, it will skip the project check up.
+        /// </summary>
+        /// <param name="connection">The IDE connection.</param>
+        /// <returns>True if IDE was accepted, false otherwise.</returns>
+        private async UniTask<bool> CheckIDE(JsonRpcClientConnection connection)
+        {
+            // Right version of the IDE
+            var version = await ideCalls.GetIDEVersion(connection);
+            if (version == null || !version.Equals(Type.ToString())) return false;
+
+            if (ConnectToAny) return true;
+
+            var project = await ideCalls.GetProjectPath(connection);
+            foreach (var graph in cachedGraphs)
+            {
+                // TODO: Fix me!
+                if (graph.Path.Equals(ideCalls))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -418,12 +458,14 @@ namespace SEE.Controls
         {
             UniTask.Run(async () =>
             {
-                if (await Client.CheckProject(connection))
+                if (await CheckIDE(connection))
                 {
                     await semaphore.WaitAsync();
 
-                    // TODO: Fix this! Should be file path of project solution (.sln).
-                    var project = "TEST";
+                    var project = ConnectToAny ? "" : await ideCalls.GetProjectPath(connection);
+
+                    if (project == null) return;
+
                     if (!cachedConnections.ContainsKey(project))
                     {
                         cachedConnections[project] = new List<JsonRpcClientConnection>();
@@ -431,10 +473,14 @@ namespace SEE.Controls
                     cachedConnections[project].Add(connection);
 
                     semaphore.Release();
-                    
+
                     await UniTask.SwitchToMainThread();
                     ShowNotification.Info("Connected to IDE",
                         "Connection to IDE established.", 5.0f);
+                }
+                else
+                {
+                    await ideCalls.Decline(connection);
                 }
             }).Forget();
         }
@@ -450,7 +496,7 @@ namespace SEE.Controls
             {
                 await semaphore.WaitAsync();
 
-                var key = cachedConnections.FirstOrDefault(x => x.Value == connection).Key;
+                var key = cachedConnections.FirstOrDefault(x => x.Value.Contains(connection)).Key;
                 if (key != null)
                 {
                     if (cachedConnections[key].Count > 1)
@@ -461,14 +507,14 @@ namespace SEE.Controls
                     {
                         cachedConnections.Remove(key);
                     }
+                    await UniTask.SwitchToMainThread();
+                    ShowNotification.Info("Disconnected from IDE",
+                        "The IDE was disconnected form SEE.", 5.0f);
                 }
-
                 semaphore.Release();
-
-                await UniTask.SwitchToMainThread();
-                ShowNotification.Info("Disconnected from IDE",
-                    "The IDE was disconnected form SEE.", 5.0f);
             }).Forget();
         }
+
+        #endregion
     }
 }
