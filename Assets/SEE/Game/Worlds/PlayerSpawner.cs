@@ -16,7 +16,7 @@ namespace SEE.Game.Worlds
         [Tooltip("The prefab to be used to spawn a player.")]
         public List<GameObject> PlayerPrefab = new List<GameObject>();
 
-        [Tooltip("Position where a player is spawned.")]
+        [Tooltip("Ground position where a player is spawned.")]
         public Vector3 InitialPosition = Vector3.zero;
 
         [Tooltip("Initial rotation of a spawned player along the y axis."), Range(0, 360-float.Epsilon)]
@@ -75,6 +75,10 @@ namespace SEE.Game.Worlds
             numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
+            // Lift player by half of its size, because InitialPosition is meant to be the ground position.
+            Vector3 playerPosition = InitialPosition;
+            playerPosition.y += player.transform.lossyScale.y / 2.0f;
+            player.transform.position = playerPosition;
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.LogError($"Spawned {player.name} local: {IsLocal(owner)}.\n");
             if (player.TryGetComponent(out NetworkObject net))
