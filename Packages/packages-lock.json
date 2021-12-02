@@ -31,13 +31,32 @@
         "com.unity.textmeshpro": "2.1.4"
       }
     },
+    "com.unity.burst": {
+      "version": "1.5.4",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.mathematics": "1.2.1"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.collab-proxy": {
-      "version": "1.13.5",
+      "version": "1.15.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "2.0.0",
         "com.unity.services.core": "1.0.1"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.collections": {
+      "version": "1.0.0-pre.5",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.5.4",
+        "com.unity.test-framework": "1.1.22"
       },
       "url": "https://packages.unity.com"
     },
@@ -73,37 +92,11 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-	"com.unity.nuget.mono-cecil": {
-      "version": "1.10.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-	"com.unity.mathematics": {
+    "com.unity.mathematics": {
       "version": "1.2.1",
       "depth": 3,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },	
-    "com.unity.burst": {
-      "version": "1.5.4",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.mathematics": "1.2.1"
-      },
-      "url": "https://packages.unity.com"
-    },	
-	"com.unity.collections": {
-      "version": "1.0.0-pre.5",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.burst": "1.5.4",
-        "com.unity.test-framework": "1.1.22"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
@@ -116,6 +109,13 @@
         "com.unity.nuget.mono-cecil": "1.10.1",
         "com.unity.collections": "1.0.0-pre.5"
       },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.mono-cecil": {
+      "version": "1.10.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.newtonsoft-json": {
