@@ -50,11 +50,11 @@ namespace SEE.Controls.Actions
                     InteractableObject.ReplaceSelection(obj, true);
                 }
             }
-            else if (IDEIntegration.PendingSelectionsAction())
+            else if (IDEIntegration.Instance != null && IDEIntegration.Instance.PendingSelectionsAction())
             {
                 InteractableObject.UnselectAll(false);
 
-                foreach (var elem in IDEIntegration.PopPendingSelections())
+                foreach (var elem in IDEIntegration.Instance?.PopPendingSelections())
                 {
                     if (elem != null)
                     {

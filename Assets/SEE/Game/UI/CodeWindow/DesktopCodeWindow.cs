@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -61,7 +62,7 @@ namespace SEE.Game.UI.CodeWindow
             codeWindow.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                 .onClick.AddListener(() =>
                 {
-                    OpenFileInIDE().Forget();
+                    IDEIntegration.Instance?.OpenFile(FilePath).Forget();
                 });
 
             // Register events to find out when window was scrolled in.

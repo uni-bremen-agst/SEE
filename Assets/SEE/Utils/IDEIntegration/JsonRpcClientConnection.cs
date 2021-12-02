@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using StreamRpc;
-using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -96,8 +94,7 @@ namespace SEE.Utils
             }
             catch (OperationCanceledException)
             {
-                // Disconnecting asynchronously
-                Disconnected?.BeginInvoke(this, EndAsync, null);
+                Disconnected?.Invoke(this);
                 throw;
             }
             catch (Exception)
@@ -107,27 +104,6 @@ namespace SEE.Utils
 
             Disconnected?.Invoke(this);
             Abort();
-        }
-
-        /// <summary>
-        /// To prevent a thread leak when an error occurred while calling <see cref="Disconnected"/>.
-        /// </summary>
-        /// <param name="asyncResult">Async result.</param>
-        private void EndAsync(IAsyncResult asyncResult)
-        {
-            var result = (AsyncResult)asyncResult;
-            var invokedMethod = (EventHandler)result.AsyncDelegate;
-
-            try
-            {
-                invokedMethod.EndInvoke(asyncResult);
-            }
-            catch (Exception e)
-            {
-#if UNITY_EDITOR
-                Debug.LogError(e.Message);
-#endif
-            }
         }
 
         /// <summary>
