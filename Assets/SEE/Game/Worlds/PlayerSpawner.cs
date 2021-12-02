@@ -80,7 +80,7 @@ namespace SEE.Game.Worlds
             playerPosition.y += player.transform.lossyScale.y / 2.0f;
             player.transform.position = playerPosition;
             player.name = "Player " + numberOfSpawnedPlayers;
-            Debug.LogError($"Spawned {player.name} local: {IsLocal(owner)}.\n");
+            Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
