@@ -208,6 +208,7 @@ GameObject:
   - component: {fileID: 2805103860523082012}
   - component: {fileID: 7979395337416128357}
   - component: {fileID: -2805069639637197271}
+  - component: {fileID: 137689770738575469}
   m_Layer: 0
   m_Name: BaseAvatar
   m_TagString: Untagged
@@ -896,6 +897,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c02547380b5a94d4b8bdc3239eeeea84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &137689770738575469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5253056979780411083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee64685f2881fe9479b93b1d1583b4ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDebug: 0
+  useLocalLipSync: 1
+  amplifyMultipleExperimental: 3.5
 --- !u!1 &8352872910035677894
 GameObject:
   m_ObjectHideFlags: 0
