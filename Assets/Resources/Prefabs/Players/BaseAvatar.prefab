@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 5253056979780411123}
   - component: {fileID: 2805103860523082012}
   - component: {fileID: 7979395337416128357}
+  - component: {fileID: -2805069639637197271}
   m_Layer: 0
   m_Name: BaseAvatar
   m_TagString: Untagged
@@ -539,7 +540,7 @@ CharacterController:
   m_Radius: 0.3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.001
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &5253056979780411085
@@ -883,6 +884,18 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   CanCommitToTransform: 0
+--- !u!114 &-2805069639637197271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5253056979780411083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c02547380b5a94d4b8bdc3239eeeea84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8352872910035677894
 GameObject:
   m_ObjectHideFlags: 0
