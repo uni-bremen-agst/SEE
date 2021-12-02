@@ -150,21 +150,16 @@ namespace SEE.Game.Evolution
                 node.TryGetNumeric(markerAttributes.LengthMetric, out lengthMetric);
                 float totalHeight = transform(lengthMetric);
 
-                Debug.Log("-----------------------------");
-                string name = "ERROR";
-                node.TryGetString("Linkage.Name", out name);
-                Debug.Log(name);
+                // Offset from bottom against overlapping beams.
                 float offset = 0;
+
+                // New game object as parent for multiple beams.
                 GameObject output = new GameObject();
                 foreach (MarkerSection section in markerAttributes.MarkerSections)
                 {
-                    Debug.Log(section.Color);
-                    //MarkerSection section = markerAttributes.MarkerSections[0];
                     float sectionMetric = 0;
                     node.TryGetNumeric(section.Metric, out sectionMetric);
                     float sectionHeight = transform(sectionMetric);
-
-                    Debug.Log("Metric: " + section.Metric + ", Total: " + totalHeight + ", Section: " + sectionHeight);
 
                     CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
