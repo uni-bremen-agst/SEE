@@ -240,7 +240,7 @@ MonoBehaviour:
   MessageBufferSize: 5120
   MaxConnections: 100
   MaxSentMessageQueueSize: 128
-  ConnectAddress: 127.0.0.1
+  ConnectAddress: 192.168.178.120
   ConnectPort: 7777
   ServerListenPort: 7777
   MessageSendMode: 0
@@ -264,6 +264,11 @@ MonoBehaviour:
     NetworkTransport: {fileID: 1769839050}
     PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
+    - Override: 0
+      Prefab: {fileID: 5253056979780411083, guid: 5e7fb83b65668864e977a0d4f028c206, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 144342, guid: 236c098b0c25a254285f9f2ab67675fc, type: 3}
       SourcePrefabToOverride: {fileID: 0}
