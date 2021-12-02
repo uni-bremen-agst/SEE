@@ -8,13 +8,15 @@ namespace SEE.Game.Worlds
 {
     class AvatarAdapter : NetworkBehaviour
     {
+        /// <summary>
+        /// If this code is execute for the local player, the necessary player type
+        /// for the environment we are currently running on are added to this game object.
+        /// </summary>
         private void Start()
         {
             if (IsLocalPlayer)
             {
                 // I am the avatar of the local player.
-                Debug.Log($"{gameObject.GetFullName()} is the local player.\n");
-
                 switch (PlayerSettings.GetInputType())
                 {
                     case PlayerInputType.DesktopPlayer:
@@ -28,13 +30,12 @@ namespace SEE.Game.Worlds
                         throw new System.NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
                 }
             }
-            else
-            {
-                // I am the avatar of a remote player.
-                Debug.Log($"{gameObject.GetFullName()} is a remote player.\n");
-            }
         }
 
+        /// <summary>
+        /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
+        /// as a child and an <see cref="XRPlayerMovement"/> component.
+        /// </summary>
         private void PrepareForXR()
         {
             GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
@@ -43,18 +44,29 @@ namespace SEE.Game.Worlds
             gameObject.AddComponent<XRPlayerMovement>();
         }
 
+        /// <summary>
+        /// Returns the height of a desktop avatar. Call this method only when running
+        /// in a desktop environment.
+        /// </summary>
+        /// <returns>height of a desktop avatar</returns>
         private float DesktopAvatarHeight()
         {
+            // If the avatar has a collider, we derive the height from the collider.
             if (gameObject.TryGetComponent(out Collider collider))
             {
                 return collider.bounds.size.y;
             }
             else
             {
+                // Fallback if we do not have a collider.
                 return gameObject.transform.lossyScale.y;
             }
         }
 
+        /// <summary>
+        /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
+        /// as a child and an <see cref="DesktopPlayerMovement"/> component.
+        /// </summary>
         private void PrepareForDesktop()
         {
             // Set up the desktop player at the top of the player just in front of it.
