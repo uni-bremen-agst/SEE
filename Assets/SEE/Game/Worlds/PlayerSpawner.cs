@@ -75,10 +75,13 @@ namespace SEE.Game.Worlds
             numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
-            // Lift player by half of its size, because InitialPosition is meant to be the ground position.
-            Vector3 playerPosition = InitialPosition;
-            playerPosition.y += player.transform.lossyScale.y / 2.0f;
-            player.transform.position = playerPosition;
+            if (false)
+            {
+                // Lift player by half of its size, because InitialPosition is meant to be the ground position.
+                Vector3 playerPosition = InitialPosition;
+                playerPosition.y += player.transform.lossyScale.y / 2.0f;
+                player.transform.position = playerPosition;
+            }
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
