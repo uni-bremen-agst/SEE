@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Game;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -131,14 +131,6 @@ namespace SEE.Controls.Interactables
 
             // Apply material properties immediately
             needsUpdate = true;
-            
-            // Set portal for outline
-            rootCity = SceneQueries.GetCodeCity(transform)?.gameObject;
-            if (rootCity == null)
-            {
-                Debug.LogWarning("Outline will not respect portal boundaries because no code city has been found"
-                                 + " attached to the game object.\n");
-            }
 
             // Returns render queue setting of game object's first material
             int GetRenderQueue() => renderers.Select(x => x.materials.First().renderQueue).First();
@@ -172,7 +164,7 @@ namespace SEE.Controls.Interactables
                 }
             }
 
-            Portal.SetPortal(rootCity, gameObject);
+            gameObject.UpdatePortal(true);
         }
 
         private void OnValidate()
