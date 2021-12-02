@@ -2558,6 +2558,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: DemoWorld
       objectReference: {fileID: 0}
+    - target: {fileID: 1219238646228308, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+      propertyPath: m_Name
+      value: MainCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 4059027695825568, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 4325557504585264, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_LocalPosition.y
       value: 20
@@ -15650,10 +15658,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1971358097}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f03046f3623fd1445b7229e0c6a5356f, type: 3}
+  m_Script: {fileID: 11500000, guid: d774210f68c92ba42a39ab95f8b89946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 5253056979780411083, guid: 5e7fb83b65668864e977a0d4f028c206, type: 3}
+  PlayerPrefab:
+  - {fileID: 5253056979780411083, guid: 5e7fb83b65668864e977a0d4f028c206, type: 3}
+  InitialPosition: {x: 0, y: 0.3, z: 0}
+  InitialRotation: 0
 --- !u!1 &1989357559
 GameObject:
   m_ObjectHideFlags: 0
