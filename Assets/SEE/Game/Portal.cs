@@ -158,14 +158,14 @@ namespace SEE.Game
         /// <param name="includeDescendants">
         /// Whether to also set the portal for descendants of <paramref name="gameObject"/> too
         /// </param>
-        public static void SetPortal(GameObject root, GameObject gameObject, 
+        public static void SetPortal(GameObject root, GameObject gameObject,
                                      IncludeDescendants includeDescendants = IncludeDescendants.ONLY_SELF)
         {
             GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
 
             switch (includeDescendants)
             {
-                case IncludeDescendants.DIRECT_DESCENDANTS: 
+                case IncludeDescendants.DIRECT_DESCENDANTS:
                     foreach (Transform child in gameObject.transform)
                     {
                         SetPortalOfMaterials(child.gameObject, leftFront, rightBack);
@@ -173,7 +173,7 @@ namespace SEE.Game
 
                     // We also need to set the portal of the gameObject itself
                     goto case IncludeDescendants.ONLY_SELF;
-                    
+
                 case IncludeDescendants.ALL_DESCENDANTS:
                     // We will go through the children of gameObject using pre-order-traversal.
                     static void SetPortalOfMaterialsRecursive(GameObject go, Vector2 leftFront, Vector2 rightBack)
@@ -184,24 +184,23 @@ namespace SEE.Game
                             SetPortalOfMaterialsRecursive(child.gameObject, leftFront, rightBack);
                         }
                     }
-                    
+
                     SetPortalOfMaterialsRecursive(gameObject, leftFront, rightBack);
                     break;
-                
-                case IncludeDescendants.ONLY_SELF: 
+
+                case IncludeDescendants.ONLY_SELF:
                     SetPortalOfMaterials(gameObject, leftFront, rightBack);
                     break;
-                
-                default: 
-                    throw new ArgumentOutOfRangeException(nameof(includeDescendants), includeDescendants, 
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(includeDescendants), includeDescendants,
                                                           "Invalid IncludeDescendants setting in SetPortal.");
             }
-            
         }
-        
+
         /// <summary>
         /// Option for <see cref="SetPortal"/> which controls whether children of a
-        /// game object shall have their portal boundaries set too.
+        /// game object shall have their portal boundaries set, too.
         /// </summary>
         public enum IncludeDescendants
         {
@@ -209,12 +208,12 @@ namespace SEE.Game
             /// Will only set the portal of this game object.
             /// </summary>
             ONLY_SELF,
-            
+
             /// <summary>
             /// Will set the portal of the direct descendants of this game object.
             /// </summary>
             DIRECT_DESCENDANTS,
-            
+
             /// <summary>
             /// Will set the portal of all descendants (recursively) of this game object.
             /// </summary>

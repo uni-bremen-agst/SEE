@@ -1549,7 +1549,6 @@ namespace SEE.Game
                 ToggleAutoPlayReverse();
             }
         }
-        
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
