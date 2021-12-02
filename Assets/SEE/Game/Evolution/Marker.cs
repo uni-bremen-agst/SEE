@@ -5,7 +5,6 @@ using SEE.Game.Charts;
 using SEE.GO;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using SEE.Game.Charts;
 using SEE.Game.City;
 using SEE.DataModel.DG;
 
