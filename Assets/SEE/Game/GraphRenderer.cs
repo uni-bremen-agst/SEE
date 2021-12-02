@@ -470,7 +470,7 @@ namespace SEE.Game
                     }
                     else
                     {
-                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
+                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes);
                     }
                 }
                 finally
@@ -609,16 +609,11 @@ namespace SEE.Game
                 Node node = entry.Key;
                 Node parent = node.Parent;
 
-                if (parent == null)
-                {
-                    // node is a root => it will be added to parent as a child
-                    AddToParent(entry.Value, root);
-                }
-                else
-                {
-                    // node is a child of another game node
-                    AddToParent(entry.Value, nodeMap[parent]);
-                }
+                // If node is a root, it will be added to parent as a child.
+                // Otherwise, node is a child of another game node.
+                AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
+
+                entry.Value.UpdatePortal(includeDescendants: Portal.IncludeDescendants.DIRECT_DESCENDANTS);
             }
         }
 
@@ -627,8 +622,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="layoutNodes">the layoutnodes</param>
         /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
-        /// <param name="parent">the parent gameobject</param>
-        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
+        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes)
         {
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)

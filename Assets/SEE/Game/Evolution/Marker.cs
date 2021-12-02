@@ -1,7 +1,10 @@
-using SEE.DataModel;
-using SEE.GO;
+﻿using System;
 using System.Collections.Generic;
+using SEE.DataModel;
+using SEE.Game.Charts;
+using SEE.GO;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using SEE.Game.Charts;
 using SEE.Game.City;
 using SEE.DataModel.DG;
@@ -42,7 +45,7 @@ namespace SEE.Game.Evolution
             if (markerHeight < 0)
             {
                 this.markerHeight = 0;
-                Debug.LogError("SEE.Game.Evolution.Marker received a negative marker height.\n");
+                throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker height.\n");
             }
             else
             {
@@ -51,7 +54,7 @@ namespace SEE.Game.Evolution
             if (markerWidth < 0)
             {
                 this.markerWidth = 0;
-                Debug.LogError("SEE.Game.Evolution.Marker received a negative marker width.\n");
+                throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker width.\n");
             }
             else
             {
@@ -124,6 +127,11 @@ namespace SEE.Game.Evolution
         private readonly CylinderFactory deletionMarkerFactory;
 
         /// <summary>
+        /// Cached shader property for emission strength.
+        /// </summary>
+        private static readonly int Strength = Shader.PropertyToID("_EmissionStrength");
+
+        /// <summary>
         /// Transformation method to scale numbers.
         /// </summary>
         private float transform(float input)
@@ -139,7 +147,7 @@ namespace SEE.Game.Evolution
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">node above which to add a beam marker</param>
         /// <returns>the resulting beam marker</returns>
-        private GameObject MarkByBeam(Node node, GameObject gameNode, CylinderFactory factory)
+        private GameObject MarkByBeam(Node node, GameObject gameNode, NodeFactory factory)
         {
             Vector3 position = graphRenderer.GetRoof(gameNode);
             Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
@@ -228,7 +236,7 @@ namespace SEE.Game.Evolution
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new beam marker</returns>
-        private static GameObject NewBeam(CylinderFactory factory, int renderQueueOffset)
+        private static GameObject NewBeam(NodeFactory factory, int renderQueueOffset)
         {
             GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
             AddEmission(beamMarker);
@@ -252,10 +260,10 @@ namespace SEE.Game.Evolution
         /// <param name="gameObject">the object receiving the emission strength</param>
         private static void AddEmission(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<Renderer>(out Renderer renderer))
+            if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 // Set power beam material to emissive
-                renderer.sharedMaterial.SetFloat("_EmissionStrength", EmissionStrength);
+                renderer.sharedMaterial.SetFloat(Strength, EmissionStrength);
             }
         }
 
@@ -359,7 +367,7 @@ namespace SEE.Game.Evolution
             /// <summary>
             /// The time in seconds since this BeamRaiser was started.
             /// </summary>
-            private float timeSinceStart = 0;
+            private float timeSinceStart;
 
             /// <summary>
             /// The duration in seconds until the requested scale must be reached.
