@@ -265,12 +265,12 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 5253056979780411083, guid: 5e7fb83b65668864e977a0d4f028c206, type: 3}
+      Prefab: {fileID: 6682574196854409275, guid: ef2faae75a71d2b4cab6833676b297f8, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 144342, guid: 236c098b0c25a254285f9f2ab67675fc, type: 3}
+      Prefab: {fileID: 5972119402757336040, guid: 17e39b6d6ac69974bb1a2f0fab584a2c, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
@@ -301,7 +301,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1769839053
 MonoBehaviour:

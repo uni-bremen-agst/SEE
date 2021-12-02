@@ -15662,8 +15662,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab:
-  - {fileID: 5253056979780411083, guid: 5e7fb83b65668864e977a0d4f028c206, type: 3}
-  InitialPosition: {x: 0, y: 0.3, z: -1}
+  - {fileID: 6682574196854409275, guid: ef2faae75a71d2b4cab6833676b297f8, type: 3}
+  - {fileID: 5972119402757336040, guid: 17e39b6d6ac69974bb1a2f0fab584a2c, type: 3}
+  InitialPosition: {x: 0, y: 0, z: -1}
   InitialRotation: 0
 --- !u!1 &1989357559
 GameObject:
