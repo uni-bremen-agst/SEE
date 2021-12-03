@@ -92,12 +92,18 @@ namespace Assets.SEE.Game.Evolution.Animators
         private bool active = false;
 
         /// <summary>
-        /// Registers the given evaluator.
+        /// Registers the given evaluator. Evaluators cannot be registered if
+        /// an animation is in progress (i.e., <see cref="active"/> is true).
         /// </summary>
         /// <param name="evaluator">Evaluator to be added</param>
-        public void Add(IEvaluator evaluator)
+        /// <returns>Whether the evaluator was registered</returns>
+        public bool Add(IEvaluator evaluator)
         {
-            evaluators.Add(evaluator);
+            if (!active)
+            {
+                evaluators.Add(evaluator);
+            }
+            return !active;
         }
 
         /// <summary>
