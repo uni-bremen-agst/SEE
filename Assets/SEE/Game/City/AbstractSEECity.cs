@@ -108,10 +108,10 @@ namespace SEE.Game.City
         /// </summary>
         internal virtual void Start()
         {
-            if (!gameObject.TryGetComponent<EdgeMeshScheduler>(out var _))
+            if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
             {
-                gameObject.AddComponent<EdgeMeshScheduler>().Init(
-                    EdgeLayoutSettings, EdgeSelectionSettings);
+                gameObject.AddComponent<EdgeMeshScheduler>()
+                    .Init(EdgeLayoutSettings, EdgeSelectionSettings);
             }
         }
 

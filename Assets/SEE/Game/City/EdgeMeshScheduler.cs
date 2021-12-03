@@ -1,6 +1,5 @@
 ﻿using Assets.SEE.GameObjects;
 using OdinSerializer;
-using OdinSerializer.Utilities;
 using SEE.Game.City;
 using SEE.Utils;
 using System.Collections;
@@ -21,33 +20,13 @@ namespace Assets.SEE.Game.City
     /// queue and processed (using <see cref="SEESpline.CreateMesh"/>; note
     /// that this also removes the <see cref="LineRenderer"/> of the edge).
     /// New edges can be registered from anywhere at any time via
-    /// <see cref="Add(GameObject)"/>. It is also possible to listen to
-    /// different kinds of events via <see cref="IListener"/>.
+    /// <see cref="Add(GameObject)"/>.
     ///
     /// Note: This component needs to be initialized via
     /// <see cref="Init(EdgeLayoutAttributes, EdgeSelectionAttributes)"/>.
     /// </summary>
     public class EdgeMeshScheduler : SerializedMonoBehaviour
     {
-        /// <summary>
-        /// A listener for different kinds of events of
-        /// <see cref="EdgeMeshScheduler"/>.
-        /// </summary>
-        public interface IListener
-        {
-            /// <summary>
-            /// Called when the <see cref="Mesh"/> for <paramref name="edge"/>
-            /// has been created.
-            /// </summary>
-            /// <param name="edge">Edge whose mesh has been created</param>
-            public void OnMeshCreated(GameObject edge);
-        }
-
-        /// <summary>
-        /// Set of event listeners.
-        /// </summary>
-        public HashSet<IListener> EventListeners = new HashSet<IListener>();
-
         /// <summary>
         /// Number of edges to be processed in each frame (i.e., when
         /// <see cref="Update"/> is called). The default value is 5, which
@@ -157,7 +136,6 @@ namespace Assets.SEE.Game.City
                 }
 
                 spline.CreateMesh();
-                EventListeners.ForEach(l => l.OnMeshCreated(edge));
                 yield return null;
             }
         }
