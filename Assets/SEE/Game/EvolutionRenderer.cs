@@ -198,16 +198,6 @@ namespace SEE.Game
         private LaidOutGraph currentCity;  // not serialized by Unity
 
         /// <summary>
-        /// Evaluates the performance of the edge animation.
-        /// </summary>
-        private int edgeAnimationPerfScore = 10;
-
-        /// <summary>
-        /// Saves how many edges were moved during the last animation.
-        /// </summary>
-        private int lastMovedEdgesCount = 0;
-
-        /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
         private LaidOutGraph nextCity;  // not serialized by Unity
