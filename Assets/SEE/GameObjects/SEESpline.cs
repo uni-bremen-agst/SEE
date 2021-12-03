@@ -379,7 +379,7 @@ namespace Assets.SEE.GameObjects
             {
                 renderer.sharedMaterial = defaultMaterial;
             }
-            if (renderer.sharedMaterial == defaultMaterial)
+            if (renderer.sharedMaterial.shader == defaultMaterial.shader)
             { // Don't re-color non-default material.
                 Mesh mesh = filter.mesh;
                 Vector2[] uv = mesh.uv;
