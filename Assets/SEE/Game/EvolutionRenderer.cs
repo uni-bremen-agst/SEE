@@ -85,12 +85,6 @@ namespace SEE.Game
                 Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
                 enabled = false;
             }
-
-            // Implements the edge animation.
-            if (!gameObject.TryGetComponent<EdgeAnimator>(out var _))
-            {
-                gameObject.AddComponent<EdgeAnimator>();
-            }
         }
 
         /// <summary>
@@ -597,7 +591,6 @@ namespace SEE.Game
             if (currentCity != null)
             {
                 // We are transitioning to another graph.
-                EdgeAnimator edgeAnimator = gameObject.GetComponent<EdgeAnimator>();
                 foreach (var edge in next.Graph.Edges())
                 {
                     if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
@@ -613,10 +606,14 @@ namespace SEE.Game
                             morphism = edgeObject.AddComponent<SplineMorphism>();
                         }
                         morphism.Init(source.Spline, target.Spline);
-                        edgeAnimator.Add(morphism);
+                        if (!edgeObject.TryGetComponent(out EdgeAnimator animator))
+                        {
+                            animator = edgeObject.AddComponent<EdgeAnimator>();
+                            animator.Evaluator = morphism;
+                        }
+                        animator.DoAnimation(1);
                     }
                 }
-                edgeAnimator.DoAnimation(1);
             }
 
             // We have made the transition to the next graph.
@@ -729,8 +726,6 @@ namespace SEE.Game
         /// </summary>
         private void OnAnimationsFinished()
         {
-            gameObject.GetComponent<EdgeAnimator>().FinalizeAnimation();
-
             NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
             nodeChangesBuffer.currentRevisionCounter = currentGraphRevisionCounter;
             nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
