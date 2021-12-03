@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game.Evolution.Animators;
-using OdinSerializer;
+﻿using OdinSerializer;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -458,8 +457,8 @@ namespace Assets.SEE.GameObjects
     /// <see cref="Morph(double)"/> with corresponding time parameter.
     ///
     /// By implementing the <see cref="EdgeAnimator.IEvaluator"/> interface,
-    /// spline morphisms can be registered at <see cref="EdgeAnimator"/> in
-    /// order to realize a linear edge animation.
+    /// spline morphisms can used by <see cref="EdgeAnimator"/> to run linear
+    /// edge animations.
     /// </summary>
     public class SplineMorphism :
         SerializedMonoBehaviour, EdgeAnimator.IEvaluator

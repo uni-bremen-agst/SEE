@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Assets.SEE.Game.City;
-using Assets.SEE.Game.Evolution.Animators;
 using Assets.SEE.GameObjects;
 using SEE.DataModel;
 using SEE.DataModel.DG;
