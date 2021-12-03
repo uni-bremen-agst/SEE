@@ -243,7 +243,6 @@ namespace Assets.SEE.GameObjects
             var uvs = new List<Vector2>();
             var indices = new List<int>();
 
-            // TODO: See todos below
             // It is much more efficient to generate uniform knots than
             // equidistant knots. Besides, you can't see the difference
             // anyway. For the curious among you: With uniform knots, the
@@ -277,7 +276,6 @@ namespace Assets.SEE.GameObjects
             }
 
             // Radial polygons
-            // TODO: Isn't this one too many?
             for (int i = 0; i < tubularSegments; i++)
             {
                 GenerateSegment(i);
@@ -285,7 +283,6 @@ namespace Assets.SEE.GameObjects
             GenerateSegment(tubularSegments);
 
             // U-v-vectors
-            // TODO: Isn't this one too many?
             for (int i = 0; i <= tubularSegments; i++)
             {
                 for (int j = 0; j <= radialSegments; j++)
