@@ -30,7 +30,7 @@ namespace SEE.Controls
         /// <summary>
         /// Lists all methods remotely callable by the server in a convenient way.
         /// </summary>
-        public class IDECalls
+        private class IDECalls
         {
             private readonly JsonRpcServer server;
 
@@ -48,9 +48,9 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <param name="path">Absolute file path.</param>
-            public async UniTask OpenFile(JsonRpcClientConnection connection, string path)
+            public async UniTask OpenFile(JsonRpcClientConnection connection, string path, int? line)
             {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path);
+                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path, line);
             }
 
             /// <summary>
@@ -71,6 +71,24 @@ namespace SEE.Controls
             public async UniTask<string> GetIDEVersion(JsonRpcClientConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetIdeVersion");
+            }
+
+            /// <summary>
+            /// Was the connection started by SEE directly through a command switch.
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            /// <returns>True if SEE started this connection.</returns>
+            public async UniTask<bool> WasStartedBySee(JsonRpcClientConnection connection)
+            {
+                return await server.CallRemoteProcessOnConnectionAsync<bool>(connection, "WasStartedBySee");
+            }
+
+            /// <summary>
+            /// Will focus this IDE instance.
+            /// </summary>
+            public async UniTask FocusIDE(JsonRpcClientConnection connection)
+            {
+                await server.CallRemoteProcessOnConnectionAsync(connection, "SetFocus");
             }
 
             /// <summary>
@@ -120,12 +138,12 @@ namespace SEE.Controls
 
                 if (name != null)
                 {
-                    path += $":{name}";
+                    tmp = $"{path}:{name}";
                 }
 
                 try
                 {
-                    var nodes = ideIntegration.cachedObjects[path];
+                    var nodes = ideIntegration.cachedObjects[tmp];
                     ideIntegration.pendingSelections = new HashSet<InteractableObject>(nodes);
                 }
                 catch (Exception)
@@ -159,6 +177,12 @@ namespace SEE.Controls
         public bool ConnectToAny = false;
 
         /// <summary>
+        /// Fixes potential problem with lines/columns if they do not match to those of the IDE.
+        /// </summary>
+        [Tooltip("Ignore the given line and column values of a node.")]
+        public bool IgnorePosition = false;
+
+        /// <summary>
         /// Specifies the number of IDEs that can connect at the same time.
         /// </summary>
         [Tooltip("Specifies the number of IDEs that can connect at the same time.")] 
@@ -189,6 +213,12 @@ namespace SEE.Controls
         /// Semaphore for accessing <see cref="cachedConnections"/>.
         /// </summary>
         private SemaphoreSlim semaphore;
+
+        /// <summary>
+        /// Will be raised when <see cref="CheckIDE"/> is used. Only purpose is to wait in
+        /// <see cref="OpenNewIDEInstanceAsync"/> until connection happened.
+        /// </summary>
+        private SemaphoreSlim connectionSignal;
 
         /// <summary>
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
@@ -226,7 +256,7 @@ namespace SEE.Controls
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
 #if UNITY_EDITOR
-                Debug.LogError("Currently only supported on Windows!");
+                Debug.LogWarning("Currently only supported on Windows!");
 #endif
                 return;
             }
@@ -242,6 +272,7 @@ namespace SEE.Controls
 
             Instance = this;
             semaphore = new SemaphoreSlim(1, 1);
+            connectionSignal = new SemaphoreSlim(0, 1);
             pendingSelections = new HashSet<InteractableObject>();
             cachedConnections = new Dictionary<string, ICollection<JsonRpcClientConnection>>();
 
@@ -281,6 +312,7 @@ namespace SEE.Controls
 
             server?.Dispose();
             semaphore?.Dispose();
+            connectionSignal?.Dispose();
             Instance = null;
         }
 
@@ -292,41 +324,58 @@ namespace SEE.Controls
         {
             cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
             var allNodes = SceneQueries.AllGameNodesInScene(true, true);
-            cachedGraphs = SceneQueries.GetGraphs(allNodes);
+            //cachedGraphs = SceneQueries.GetGraphs(allNodes);
+            cachedGraphs = new List<Graph>();
 
             // Get all nodes in scene
             foreach (var node in allNodes)
             {
-                var fileName = node.GetNode().Filename();
-                var path = node.GetNode().Path();
-                var sourceName = node.GetNode().SourceName;
+                var key = GenerateKey(node.GetNode());
 
-                if (fileName == null || path == null) continue;
-
-                string fullPath;
-                try
+                if (key != null && node.TryGetComponent(out InteractableObject obj))
                 {
-                    fullPath = Path.GetFullPath(path + fileName);
-                }
-                catch (Exception)
-                {
-                    // File not found
-                    continue;
-                }
-
-                if (sourceName != null && (!sourceName.Equals("?") || !sourceName.Equals("")))
-                {
-                    fullPath += $":{sourceName}";
-                }
-
-                if (node.TryGetComponent(out InteractableObject obj))
-                {
-                    if (!cachedObjects.ContainsKey(fullPath))
+                    if (!cachedObjects.ContainsKey(key))
                     {
-                        cachedObjects[fullPath] = new List<InteractableObject>();
+                        cachedObjects[key] = new List<InteractableObject>();
                     }
-                    cachedObjects[fullPath].Add(obj);
+                    cachedObjects[key].Add(obj);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Generates an appropriate key for a given node.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <returns>A key.</returns>
+        private string GenerateKey(Node node)
+        {
+            var fileName = node.Filename();
+            var path = node.Path();
+            var sourceName = node.SourceName;
+            var line = node.SourceLine();
+            var column = node.SourceColumn();
+            try
+            {
+                if (fileName == null || path == null) return null;
+
+                var key = Path.GetFullPath(path + fileName);
+                if (sourceName != null && !sourceName.Equals(""))
+                {
+                    key = $"{key}:{sourceName}";
+                }
+
+                if (line.HasValue && column.HasValue && !IgnorePosition)
+                {
+                    key = $"{key}:{line}:{column}";
+                }
+
+                return key;
+            }
+            catch (Exception)
+            {
+                // File not found
+                return null;
             }
         }
 
@@ -335,7 +384,7 @@ namespace SEE.Controls
         /// <summary>
         /// Is there any pending selection needed to be taken.
         /// </summary>
-        /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and </returns>
+        /// <returns>True if <see cref="SEEInput.SelectionEnabled"/> and there is a selection.</returns>
         public bool PendingSelectionsAction()
         {
             return SEEInput.SelectionEnabled && pendingSelections.Count > 0;
@@ -360,10 +409,11 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="filePath">The absolute file path.</param>
         /// <returns>Async UniTask.</returns>
-        public async UniTask OpenFile(string filePath)
+        public async UniTask OpenFile(string filePath, int? line = null)
         {
-            await Instance.LookForIDEInstance();
-            // TODO: Fix me!
+            await LookForIDEConnection();
+            // TODO: Fix me
+            await ideCalls.OpenFile(cachedConnections.First().Value.First(), filePath, line);
         }
 
         #region IDE Management
@@ -373,10 +423,14 @@ namespace SEE.Controls
         /// instance.
         /// </summary>
         /// <returns>Async UniTask.</returns>
-        private async UniTask LookForIDEInstance()
+        private async UniTask LookForIDEConnection()
         {
-            if (server.IsConnected()) return;
-            await OpenNewIDEInstanceAsync();
+            if (!server.IsConnected())
+            {
+                await OpenNewIDEInstanceAsync();
+            }
+            // TODO: Fix me
+            await ideCalls.FocusIDE(cachedConnections.First().Value.First());
         }
 
         /// <summary>
@@ -390,6 +444,12 @@ namespace SEE.Controls
             // Right version of the IDE
             var version = await ideCalls.GetIDEVersion(connection);
             if (version == null || !version.Equals(Type.ToString())) return false;
+
+            if (await ideCalls.WasStartedBySee(connection))
+            {
+                connectionSignal.Release();
+                return true;
+            }
 
             if (ConnectToAny) return true;
 
@@ -414,15 +474,18 @@ namespace SEE.Controls
         {
             string arguments;
             string fileName;
+            // TODO: Dynamically generate location of (.sln)
+            string project = Path.GetFullPath("SEE.sln");
+
             switch (Type)
             {
                 case Ide.VisualStudio2019:
                     fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2019);
-                    arguments = "";
+                    arguments = $"\"{project}\" /VsSeeExtension";
                     break;
                 case Ide.VisualStudio2022:
                     fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2022);
-                    arguments = "";
+                    arguments = $"\"{project}\" /VsSeeExtension";
                     break;
                 default:
                     throw new NotImplementedException($"Implementation of case {Type} not found");
@@ -431,9 +494,9 @@ namespace SEE.Controls
             {
                 FileName = fileName,
                 Arguments = arguments,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true
             };
+
+            connectionSignal = new SemaphoreSlim(0, 1);
 
             try
             {
@@ -446,6 +509,8 @@ namespace SEE.Controls
 #endif
                 throw;
             }
+
+            await connectionSignal.WaitAsync();
         }
 
         /// <summary>
