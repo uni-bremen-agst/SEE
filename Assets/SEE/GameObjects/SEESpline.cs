@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Evolution.Animators;
 using OdinSerializer;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -155,6 +156,34 @@ namespace Assets.SEE.GameObjects
         }
 
         /// <summary>
+        /// The default material to be used for splines whose
+        /// <see cref="Mesh"/> has just been created (used by
+        /// <see cref="UpdateMaterial"/>).
+        /// </summary>
+        [SerializeField]
+        private Material defaultMaterial;
+
+        /// <summary>
+        /// Called by Unity when an instance of this class is being loaded.
+        /// </summary>
+        private void Awake()
+        {
+            // Corresponds to the material of the LineRenderer.
+            defaultMaterial = Materials.New(
+                Materials.ShaderType.TransparentLine, Color.white);
+        }
+
+        /// <summary>
+        /// Called by Unity after one of the serializable fields (e.g.,
+        /// <see cref="radius"/>) has been updated in the editor. Marks the
+        /// internal state as dirty, forcing an update in the next frame.
+        /// </summary>
+        private void OnValidate()
+        {
+            needsUpdate = true;
+        }
+
+        /// <summary>
         /// Updates the rendering of the spline if the internal state is
         /// marked dirty (i.e., <see cref="needsUpdate"/> is true).
         /// </summary>
@@ -285,36 +314,82 @@ namespace Assets.SEE.GameObjects
             }
 
             // Set up the mesh components.
-            if (!gameObject.TryGetComponent<MeshFilter>(out var filter))
+            Mesh mesh; // The mesh to work on.
+            bool updateMaterial = false; // Whether to call `UpdateMaterial'.
+            if (!gameObject.TryGetComponent(out MeshFilter filter))
             {
                 filter = gameObject.AddComponent<MeshFilter>();
-                if (!gameObject.TryGetComponent<MeshCollider>(out var coll))
+                if (!gameObject.TryGetComponent(out MeshCollider collider))
                 {
-                    coll = gameObject.AddComponent<MeshCollider>();
+                    collider = gameObject.AddComponent<MeshCollider>();
                 }
-                var mesh = new Mesh();
+                mesh = new Mesh();
                 mesh.MarkDynamic(); // May improve performance.
                 filter.sharedMesh = mesh;
-                coll.sharedMesh = mesh;
+                collider.sharedMesh = mesh;
+                updateMaterial = true;
             }
-            filter.mesh.vertices = vertices.ToArray();
-            filter.mesh.normals  = normals.ToArray();
-            filter.mesh.tangents = tangents.ToArray();
-            filter.mesh.uv       = uvs.ToArray();
-            filter.mesh.SetIndices(indices.ToArray(),
-                MeshTopology.Triangles, 0);
-            if (!gameObject.TryGetComponent<MeshRenderer>(out var _))
+            mesh = filter.mesh;
+            updateMaterial = updateMaterial // Implies new mesh.
+                || // Or the geometrics of the mesh have changed.
+                (mesh.vertices.Length != vertices.Count ||
+                 mesh.normals.Length  != normals.Count  ||
+                 mesh.tangents.Length != tangents.Count ||
+                 mesh.uv.Length != uvs.Count);
+            if (updateMaterial)
+            {
+                mesh.Clear();
+            }
+            mesh.vertices = vertices.ToArray();
+            mesh.normals  = normals.ToArray();
+            mesh.tangents = tangents.ToArray();
+            mesh.uv       = uvs.ToArray();
+            mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+            if (!gameObject.TryGetComponent(out MeshRenderer _))
             {
                 gameObject.AddComponent<MeshRenderer>();
             }
+            if (updateMaterial)
+            {
+                UpdateMaterial();
+            }
 
             // Remove line renderer.
-            if (gameObject.TryGetComponent<LineRenderer>(out var renderer))
+            if (gameObject.TryGetComponent(out LineRenderer renderer))
             {
                 Destroy(renderer);
             }
 
-            return filter.mesh;
+            return mesh;
+        }
+
+        /// <summary>
+        /// Update the material of the <see cref="MeshRenderer"/> created by
+        /// <see cref="CreateOrUpdateMesh"/>.
+        /// </summary>
+        protected virtual void UpdateMaterial()
+        {
+            if (!gameObject.TryGetComponent(out MeshFilter filter) ||
+                !gameObject.TryGetComponent(out MeshRenderer renderer))
+            {
+                return;
+            }
+
+            if (renderer.sharedMaterial == null)
+            {
+                renderer.sharedMaterial = defaultMaterial;
+            }
+            if (renderer.sharedMaterial == defaultMaterial)
+            { // Don't re-color non-default material.
+                Mesh mesh = filter.mesh;
+                Vector2[] uv = mesh.uv;
+                Color[] colors = new Color[uv.Length];
+                for (var i = 0; i < uv.Length; i++)
+                {
+                    colors[i] = Color.Lerp(Color.red, Color.green, uv[i].y);
+                }
+                mesh.colors = colors;
+            }
         }
 
         /// <summary>
