@@ -157,6 +157,14 @@ namespace SEE.Game
             = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
+        /// Maps from the source of an edge to its animator. This storage is
+        /// used by <see cref="RenderNode(Node)"/> to synchronize node
+        /// animation with edge animation.
+        /// </summary>
+        private Dictionary<Node, EdgeAnimator> edgeAnimators
+            = new Dictionary<Node, EdgeAnimator>();
+
+        /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
         public bool IsStillAnimating { get; private set; }
@@ -547,20 +555,10 @@ namespace SEE.Game
             /// and <see cref="RenderNode(Node)"/> will access it.
             nextCity = next;
 
-            phase2AnimationWatchDog.Await(next.Graph.NodeCount);
-            // Draw all nodes of next graph.
-            if (ignoreInnerNodes)
-            {
-                // FIXME: The root could be a leaf.
-                next.Graph.Traverse(IgnoreNode, IgnoreNode, RenderNode);
-            }
-            else
-            {
-                next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
-            }
-
-            objectManager.NegligibleNodes = negligibleNodes;
-
+            #region Edge Animation
+            // Edge Animation must be set up before node animation because it
+            // prepares the edge animators that are used during node
+            // animation. If the other way around => BOOM!
 
             // Create (or read from cache) the edge objects of the next
             // visible graph, update their spline, and make the objects
@@ -581,6 +579,7 @@ namespace SEE.Game
             if (currentCity != null)
             {
                 // We are transitioning to another graph.
+                edgeAnimators.Clear();
                 foreach (var edge in next.Graph.Edges())
                 {
                     if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
@@ -601,10 +600,27 @@ namespace SEE.Game
                             animator = edgeObject.AddComponent<EdgeAnimator>();
                             animator.Evaluator = morphism;
                         }
-                        animator.DoAnimation(1);
+                        edgeAnimators[edge.Source] = animator;
                     }
                 }
             }
+            #endregion
+
+            #region Node Animation
+            phase2AnimationWatchDog.Await(next.Graph.NodeCount);
+            // Draw all nodes of next graph.
+            if (ignoreInnerNodes)
+            {
+                // FIXME: The root could be a leaf.
+                next.Graph.Traverse(IgnoreNode, IgnoreNode, RenderNode);
+            }
+            else
+            {
+                next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
+            }
+
+            objectManager.NegligibleNodes = negligibleNodes;
+            #endregion
 
             // We have made the transition to the next graph.
             currentCity = next;
@@ -873,7 +889,14 @@ namespace SEE.Game
             // re-established
             RemoveFromNodeHierarchy(currentGameNode);
             // currentGameNode is shifted to its new position through the animator.
-            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode, OnAnimationNodeAnimationFinished);
+            Action<float> onEdgeAnimationStart = null;
+            if (edgeAnimators.TryGetValue(graphNode, out EdgeAnimator animator))
+            {
+                onEdgeAnimationStart = duration =>
+                    { OnEdgeAnimationStart(animator, duration); };
+            }
+            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode,
+                OnAnimationNodeAnimationFinished, onEdgeAnimationStart);
         }
 
         /// <summary>
@@ -958,6 +981,19 @@ namespace SEE.Game
                 go.transform.SetParent(gameObject.transform);
             }
             phase2AnimationWatchDog.Finished();
+        }
+
+        /// <summary>
+        /// Starts the animation of <paramref name="animator"/> with given duration.
+        /// </summary>
+        /// <param name="animator">Animator to start</param>
+        /// <param name="duration">Duration of the animation</param>
+        private void OnEdgeAnimationStart(EdgeAnimator animator, float duration)
+        {
+            if (animator != null)
+            {
+                animator.DoAnimation(duration);
+            }
         }
 
         /// <summary>
