@@ -40,6 +40,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private AlphaEnforcer enforcer;
 
+        /// <summary>
+        /// The animation sequence to be played while the gameObject is being hovered over.
+        /// </summary>
         private Sequence hoverAnimation;
 
         /// <summary>
