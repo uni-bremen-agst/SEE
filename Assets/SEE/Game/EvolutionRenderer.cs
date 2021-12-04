@@ -322,23 +322,10 @@ namespace SEE.Game
 
             ICollection<LayoutEdge> layoutEdges = graphRenderer.LayoutEdges(layoutNodes);
             EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
-            foreach (var le in layoutEdges)
+            foreach (LayoutEdge le in layoutEdges)
             {
                 EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
             }
-
-            /* OLD CODE
-            var gameNodes = graphRenderer.ToLayoutNodes(gameObjects);
-            var layoutEdges = GraphRenderer.ConnectingEdges(gameNodes);
-            //graphRenderer.EdgeLayout(gameNodes, layoutEdges, false);
-            graphRenderer.GetEdgeLayout().Create(layoutNodes, layoutEdges.Cast<ILayoutEdge>().ToList());
-            EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
-            foreach (var le in layoutEdges)
-            {
-                EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
-            }
-            */
-
             return ToNodeIDLayout(layoutNodes);
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to
@@ -562,15 +549,15 @@ namespace SEE.Game
             // Create (or read from cache) the edge objects of the next
             // visible graph, update their spline, and make the objects
             // visible.
-            foreach (var edge in next.Graph.Edges())
+            foreach (Edge edge in next.Graph.Edges())
             {
-                objectManager.GetEdge(edge, out var edgeObject);
-                if (edgeObject.TryGetComponent<SEESpline>(out var spline))
+                objectManager.GetEdge(edge, out GameObject edgeObject);
+                if (edgeObject.TryGetComponent<SEESpline>(out SEESpline spline))
                 {
                     spline.Spline = next.EdgeLayout[edge.ID].Spline;
                 }
                 edgeObject.SetActive(true); // Make visible
-                if (gameObject.TryGetComponent<EdgeMeshScheduler>(out var scheduler))
+                if (gameObject.TryGetComponent<EdgeMeshScheduler>(out EdgeMeshScheduler scheduler))
                 {
                     scheduler.Add(edgeObject); // Register for mesh creation
                 }
@@ -579,7 +566,7 @@ namespace SEE.Game
             {
                 // We are transitioning to another graph.
                 edgeAnimators.Clear();
-                foreach (var edge in next.Graph.Edges())
+                foreach (Edge edge in next.Graph.Edges())
                 {
                     if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
                     {
@@ -588,7 +575,7 @@ namespace SEE.Game
                     }
                     if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
                     {
-                        objectManager.GetEdge(edge, out var edgeObject);
+                        objectManager.GetEdge(edge, out GameObject edgeObject);
                         if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
                         {
                             morphism = edgeObject.AddComponent<SplineMorphism>();
@@ -1056,8 +1043,7 @@ namespace SEE.Game
         /// <param name="edge"></param>
         private void RenderRemovedEdge(Edge edge)
         {
-            //objectManager.RemoveEdge(edge, out var edgeObject);
-            objectManager.GetEdge(edge, out var edgeObject);
+            objectManager.GetEdge(edge, out GameObject edgeObject);
             edgeObject.SetActive(false);
             phase1AnimationWatchDog.Finished();
         }
