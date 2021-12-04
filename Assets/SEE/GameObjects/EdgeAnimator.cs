@@ -1,9 +1,8 @@
 ﻿using OdinSerializer;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.GameObjects
+namespace SEE.GO
 {
     /// <summary>
     /// This class implements edege animation. To do so, an
