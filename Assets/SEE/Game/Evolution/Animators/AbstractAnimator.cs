@@ -88,7 +88,7 @@ namespace SEE.Game.Evolution
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="callback">an optional callback to be called when the animation has finished</param>
-        /// <param name="moveCallback">ab optional callback to be called when the move animation is about to start</param>
+        /// <param name="moveCallback">an optional callback to be called when the move animation is about to start</param>
         public void AnimateTo(GameObject gameObject,
                               ILayoutNode nodeTransform,
                               Action<object> callback = null,
