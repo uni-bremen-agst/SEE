@@ -118,6 +118,16 @@ namespace SEE.Game
         private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
+        /// True if edges are actually drawn, that is, if the user has selected an
+        /// edge layout different from <see cref="EdgeLayoutKind.None"/>.
+        /// </summary>
+        /// <returns>True if edges are actually drawn.</returns>
+        public bool AreEdgesDrawn()
+        {
+            return settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+        }
+
+        /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
         /// (e.g., width, height, depth, color) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
