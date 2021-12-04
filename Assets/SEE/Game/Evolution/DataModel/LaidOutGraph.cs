@@ -26,7 +26,7 @@ namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Data model containing a <see cref="Graph"/> with its node and edge
-    /// layout. The layouts are indexed by the node's and edges' ID
+    /// layout. The layouts are indexed by the node's or edge's ID,
     /// respectively.
     /// </summary>
     public class LaidOutGraph
@@ -39,7 +39,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The layout of the nodes as a mapping of the nodes' IDs onto their ILayoutNode.
         /// </summary>
-        private readonly Dictionary<string, ILayoutNode> layout;
+        private readonly Dictionary<string, ILayoutNode> nodeLayout;
 
         /// <summary>
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
@@ -54,7 +54,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The layout of the nodes as a mapping of the nodes' IDs onto their ILayoutNode.
         /// </summary>
-        public Dictionary<string, ILayoutNode> Layout => layout;
+        public Dictionary<string, ILayoutNode> Layout => nodeLayout;
 
         /// <summary>
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
@@ -65,12 +65,12 @@ namespace SEE.Game.Evolution
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
-        /// <param name="layout">its node layout as a mapping of the nodes' IDs onto their ILayoutNode</param>
+        /// <param name="nodeLayout">its node layout as a mapping of the nodes' IDs onto their ILayoutNode</param>
         /// <param name="edgeLayout">its edge layout as a mapping of the edges' IDs onto their ILayoutEdge</param>
-        public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> layout, Dictionary<string, ILayoutEdge> edgeLayout)
+        public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> nodeLayout, Dictionary<string, ILayoutEdge> edgeLayout)
         {
             this.graph = graph.AssertNotNull("graph");
-            this.layout = layout.AssertNotNull("layout");
+            this.nodeLayout = nodeLayout.AssertNotNull("layout");
             this.edgeLayout = edgeLayout.AssertNotNull("edgeLayout");
         }
     }
