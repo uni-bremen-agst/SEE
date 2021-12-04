@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SEE.Utils
 {
-
     /// <summary>
     /// A serializable representation of TinySpline's B-Spline class. Use
     /// <see cref="TinySplineInterop.Serialize(BSpline)"/> and
@@ -17,7 +16,7 @@ namespace SEE.Utils
     /// back to a serializable spline, or make sure you know how
     /// <paramref name="Degree"/>, <paramref name="ControlPoints"/>, and
     /// <paramref name="Knots"/> are related to each other and how
-    /// <paramref name="Knots"/> must be structed.
+    /// <paramref name="Knots"/> must be structured.
     /// </summary>
     [Serializable]
     public class SerializableSpline
