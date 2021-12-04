@@ -63,6 +63,7 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
+                edgesAreDrawn = graphRenderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new Marker(graphRenderer,
@@ -82,6 +83,12 @@ namespace SEE.Game
                 enabled = false;
             }
         }
+
+        /// <summary>
+        /// True if edges are actually drawn, that is, if the user has selected an
+        /// edge layout different from <see cref="EdgeLayoutKind.None"/>.
+        /// </summary>
+        private bool edgesAreDrawn = false;
 
         /// <summary>
         /// The y co-ordinate where to to move deleted nodes in world space. Deleted nodes will
@@ -317,11 +324,14 @@ namespace SEE.Game
             GraphRenderer.Fit(gameObject, layoutNodes);
             GraphRenderer.Stack(gameObject, layoutNodes);
 
-            ICollection<LayoutEdge> layoutEdges = graphRenderer.LayoutEdges(layoutNodes);
-            EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
-            foreach (LayoutEdge le in layoutEdges)
+            if (edgesAreDrawn)
             {
-                EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
+                ICollection<LayoutEdge> layoutEdges = graphRenderer.LayoutEdges(layoutNodes);
+                EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
+                foreach (LayoutEdge le in layoutEdges)
+                {
+                    EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
+                }
             }
             return ToNodeIDLayout(layoutNodes);
 
@@ -541,7 +551,10 @@ namespace SEE.Game
             // Edge Animation must be set up before node animation because it
             // prepares the edge animators that are used during node
             // animation. If the other way around => BOOM!
-            EdgeAnimation(next);
+            if (edgesAreDrawn)
+            {
+                EdgeAnimation(next);
+            }
             NodeAnimation(next);
 
             // We have made the transition to the next graph.
@@ -1044,8 +1057,11 @@ namespace SEE.Game
         /// <param name="edge"></param>
         private void RenderRemovedEdge(Edge edge)
         {
-            objectManager.GetEdge(edge, out GameObject edgeObject);
-            edgeObject.SetActive(false);
+            if (edgesAreDrawn)
+            {
+                objectManager.GetEdge(edge, out GameObject edgeObject);
+                edgeObject.SetActive(false);
+            }
             phase1AnimationWatchDog.Finished();
         }
 
@@ -1235,19 +1251,27 @@ namespace SEE.Game
                 Debug.LogError($"There is no graph available for graph with index {index}.\n");
                 return false;
             }
-            bool hasLayout = TryGetLayout(graph, out Dictionary<string, ILayoutNode> layout);
-            if (layout == null || !hasLayout)
+            if (!TryGetLayout(graph, out Dictionary<string, ILayoutNode> nodeLayout) || nodeLayout == null)
             {
                 Debug.LogError($"There is no layout available for graph with index {index}.\n");
                 return false;
             }
-            hasLayout = EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge> edgeLayout);
-            if (edgeLayout == null || !hasLayout)
+            if (edgesAreDrawn)
             {
-                Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
-                return false;
+                if (EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge> edgeLayout) || edgeLayout == null)
+                {
+                    Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
+                    return false;
+                }
+                else
+                {
+                    laidOutGraph = new LaidOutGraph(graph, nodeLayout, edgeLayout);
+                }
             }
-            laidOutGraph = new LaidOutGraph(graph, layout, edgeLayout);
+            else
+            {
+                laidOutGraph = new LaidOutGraph(graph, nodeLayout, null);
+            }
             return true;
         }
 
