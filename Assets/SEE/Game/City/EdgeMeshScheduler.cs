@@ -1,12 +1,12 @@
-﻿using Assets.SEE.GameObjects;
-using OdinSerializer;
+﻿using OdinSerializer;
 using SEE.Game.City;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.Game.City
+namespace SEE.Game.City
 {
     /// <summary>
     /// Although the creation of a <see cref="Mesh"/> for a single edge is
@@ -108,14 +108,14 @@ namespace Assets.SEE.Game.City
                 // fail-safe
                 if (!edge.TryGetComponent<SEESpline>(out var spline))
                 {
-                    Debug.LogWarning("Game object without SEESpline component. Ignoring");
+                    Debug.LogWarning("Game object without SEESpline component. Ignoring.\n");
                     continue;
                 }
 
                 // fail-safe
                 if (layout == null)
                 {
-                    Debug.LogWarning("Layout settings are missing. Fallling back to defaults.");
+                    Debug.LogWarning("Layout settings are missing. Falling back to defaults.\n");
                 }
                 else
                 {
@@ -125,7 +125,7 @@ namespace Assets.SEE.Game.City
                 // fail-safe
                 if (selection == null)
                 {
-                    Debug.LogWarning("Selection settings are missing. Fallling back to defaults.");
+                    Debug.LogWarning("Selection settings are missing. Falling back to defaults.\n");
                 }
                 else
                 {

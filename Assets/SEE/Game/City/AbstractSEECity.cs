@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Assets.SEE.Game.City;
 using OdinSerializer;
 using SEE.DataModel;
 using SEE.DataModel.DG;
