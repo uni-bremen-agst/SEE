@@ -538,75 +538,79 @@ namespace SEE.Game
             /// and <see cref="RenderNode(Node)"/> will access it.
             nextCity = next;
 
-            #region Edge Animation
             // Edge Animation must be set up before node animation because it
             // prepares the edge animators that are used during node
             // animation. If the other way around => BOOM!
-
-            // Create (or read from cache) the edge objects of the next
-            // visible graph, update their spline, and make the objects
-            // visible.
-            foreach (Edge edge in next.Graph.Edges())
-            {
-                objectManager.GetEdge(edge, out GameObject edgeObject);
-                if (edgeObject.TryGetComponent<SEESpline>(out SEESpline spline))
-                {
-                    spline.Spline = next.EdgeLayout[edge.ID].Spline;
-                }
-                edgeObject.SetActive(true); // Make visible
-                if (gameObject.TryGetComponent<EdgeMeshScheduler>(out EdgeMeshScheduler scheduler))
-                {
-                    scheduler.Add(edgeObject); // Register for mesh creation
-                }
-            }
-            if (currentCity != null)
-            {
-                // We are transitioning to another graph.
-                edgeAnimators.Clear();
-                foreach (Edge edge in next.Graph.Edges())
-                {
-                    if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
-                    {
-                        Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.\n");
-                        continue;
-                    }
-                    if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
-                    {
-                        objectManager.GetEdge(edge, out GameObject edgeObject);
-                        if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
-                        {
-                            morphism = edgeObject.AddComponent<SplineMorphism>();
-                        }
-                        morphism.Init(source.Spline, target.Spline);
-                        if (!edgeObject.TryGetComponent(out EdgeAnimator animator))
-                        {
-                            animator = edgeObject.AddComponent<EdgeAnimator>();
-                            animator.Evaluator = morphism;
-                        }
-                        edgeAnimators[edge.Source] = animator;
-                    }
-                }
-            }
-            #endregion
-
-            #region Node Animation
-            phase2AnimationWatchDog.Await(next.Graph.NodeCount);
-            // Draw all nodes of next graph.
-            if (ignoreInnerNodes)
-            {
-                // FIXME: The root could be a leaf.
-                next.Graph.Traverse(IgnoreNode, IgnoreNode, RenderNode);
-            }
-            else
-            {
-                next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
-            }
-
-            objectManager.NegligibleNodes = negligibleNodes;
-            #endregion
+            EdgeAnimation(next);
+            NodeAnimation(next);
 
             // We have made the transition to the next graph.
             currentCity = next;
+
+            void EdgeAnimation(LaidOutGraph next)
+            {
+                // Create (or read from cache) the edge objects of the next
+                // visible graph, update their spline, and make the objects
+                // visible.
+                foreach (Edge edge in next.Graph.Edges())
+                {
+                    objectManager.GetEdge(edge, out GameObject edgeObject);
+                    if (edgeObject.TryGetComponent<SEESpline>(out SEESpline spline))
+                    {
+                        spline.Spline = next.EdgeLayout[edge.ID].Spline;
+                    }
+                    edgeObject.SetActive(true); // Make visible
+                    if (gameObject.TryGetComponent<EdgeMeshScheduler>(out EdgeMeshScheduler scheduler))
+                    {
+                        scheduler.Add(edgeObject); // Register for mesh creation
+                    }
+                }
+                if (currentCity != null)
+                {
+                    // We are transitioning to another graph.
+                    edgeAnimators.Clear();
+                    foreach (Edge edge in next.Graph.Edges())
+                    {
+                        if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
+                        {
+                            Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.\n");
+                            continue;
+                        }
+                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
+                        {
+                            objectManager.GetEdge(edge, out GameObject edgeObject);
+                            if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
+                            {
+                                morphism = edgeObject.AddComponent<SplineMorphism>();
+                            }
+                            morphism.Init(source.Spline, target.Spline);
+                            if (!edgeObject.TryGetComponent(out EdgeAnimator animator))
+                            {
+                                animator = edgeObject.AddComponent<EdgeAnimator>();
+                                animator.Evaluator = morphism;
+                            }
+                            edgeAnimators[edge.Source] = animator;
+                        }
+                    }
+                }
+            }
+
+            void NodeAnimation(LaidOutGraph next)
+            {
+                phase2AnimationWatchDog.Await(next.Graph.NodeCount);
+                // Draw all nodes of next graph.
+                if (ignoreInnerNodes)
+                {
+                    // FIXME: The root could be a leaf.
+                    next.Graph.Traverse(IgnoreNode, IgnoreNode, RenderNode);
+                }
+                else
+                {
+                    next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
+                }
+
+                objectManager.NegligibleNodes = negligibleNodes;
+            }
 
             /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="phase2AnimationWatchDog"/>
             /// when phase 2 has completed.
