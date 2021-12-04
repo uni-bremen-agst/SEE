@@ -14,6 +14,9 @@ using Object = UnityEngine.Object;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Implements the functions of the <see cref="GraphRenderer"/> related to nodes.
+    /// </summary>
     public partial class GraphRenderer
     {
         /// <summary>
