@@ -1,14 +1,12 @@
 ﻿using OdinSerializer;
-using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using TinySpline;
 using UnityEngine;
 
-namespace Assets.SEE.GameObjects
+namespace SEE.GO
 {
-
     /// <summary>
     /// This class serves as a bridge between TinySpline's representation of
     /// B-Splines and a serializable B-Spline representation that can be
@@ -120,10 +118,10 @@ namespace Assets.SEE.GameObjects
             get { return tubularSegments; }
             set
             {
-                var tmp = Math.Max(5, value);
-                if (tubularSegments != tmp)
+                int max = Math.Max(5, value);
+                if (tubularSegments != max)
                 {
-                    tubularSegments = tmp;
+                    tubularSegments = max;
                     needsUpdate = true;
                 }
             }
@@ -145,10 +143,10 @@ namespace Assets.SEE.GameObjects
             get { return radialSegments; }
             set
             {
-                var tmp = Math.Max(3, value);
-                if (radialSegments != tmp)
+                int max = Math.Max(3, value);
+                if (radialSegments != max)
                 {
-                    radialSegments = tmp;
+                    radialSegments = max;
                     needsUpdate = true;
                 }
             }
@@ -168,8 +166,7 @@ namespace Assets.SEE.GameObjects
         private void Awake()
         {
             // Corresponds to the material of the LineRenderer.
-            defaultMaterial = Materials.New(
-                Materials.ShaderType.TransparentLine, Color.white);
+            defaultMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>
@@ -237,40 +234,40 @@ namespace Assets.SEE.GameObjects
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            var vertices = new List<Vector3>();
-            var normals = new List<Vector3>();
-            var tangents = new List<Vector4>();
-            var uvs = new List<Vector2>();
-            var indices = new List<int>();
+            List<Vector3> vertices = new List<Vector3>();
+            List<Vector3> normals = new List<Vector3>();
+            List<Vector4> tangents = new List<Vector4>();
+            List<Vector2> uvs = new List<Vector2>();
+            List<int> indices = new List<int>();
 
             // It is much more efficient to generate uniform knots than
             // equidistant knots. Besides, you can't see the difference
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            var rv = Spline.UniformKnotSeq((uint)tubularSegments + 1);
-            var frames = Spline.ComputeRMF(rv);
+            IList<double> rv = Spline.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = Spline.ComputeRMF(rv);
 
             // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
             {
-                var fr = frames.At((uint)i);
+                Frame fr = frames.At((uint)i);
 
-                var p = TinySplineInterop.VectorToVector(fr.Position);
-                var N = TinySplineInterop.VectorToVector(fr.Normal);
-                var B = TinySplineInterop.VectorToVector(fr.Binormal);
+                Vector3 p = TinySplineInterop.VectorToVector(fr.Position);
+                Vector3 N = TinySplineInterop.VectorToVector(fr.Normal);
+                Vector3 B = TinySplineInterop.VectorToVector(fr.Binormal);
 
                 for (int j = 0; j <= radialSegments; j++)
                 {
                     float v = 1f * j / radialSegments * PI2;
-                    var sin = Mathf.Sin(v);
-                    var cos = Mathf.Cos(v);
+                    float sin = Mathf.Sin(v);
+                    float cos = Mathf.Cos(v);
 
                     Vector3 normal = (cos * N + sin * B).normalized;
                     vertices.Add(p + radius * normal);
                     normals.Add(normal);
 
-                    var tangent = TinySplineInterop.VectorToVector(fr.Tangent);
+                    Vector3 tangent = TinySplineInterop.VectorToVector(fr.Tangent);
                     tangents.Add(new Vector4(tangent.x, tangent.y, tangent.z, 0f));
                 }
             }
@@ -376,7 +373,8 @@ namespace Assets.SEE.GameObjects
                 renderer.sharedMaterial = defaultMaterial;
             }
             if (renderer.sharedMaterial.shader == defaultMaterial.shader)
-            { // Don't re-color non-default material.
+            {
+                // Don't re-color non-default material.
                 Mesh mesh = filter.mesh;
                 Vector2[] uv = mesh.uv;
                 Color[] colors = new Color[uv.Length];
@@ -407,7 +405,7 @@ namespace Assets.SEE.GameObjects
             {
                 return filter.mesh;
             }
-            var mesh = CreateOrUpdateMesh();
+            Mesh mesh = CreateOrUpdateMesh();
             needsUpdate = false; // apparently
             return mesh;
         }
@@ -423,7 +421,7 @@ namespace Assets.SEE.GameObjects
         /// </summary>
         public void UpdateMesh()
         {
-            if (gameObject.TryGetComponent<MeshFilter>(out var _))
+            if (gameObject.TryGetComponent(out MeshFilter _))
             {
                 CreateOrUpdateMesh();
             }
@@ -516,26 +514,29 @@ namespace Assets.SEE.GameObjects
         /// morphism result and can be used by the caller for further
         /// calculations.
         /// </summary>
-        /// <param name="t">Time parameter; clamped to domain [0, 1]</param>
+        /// <param name="time">Time parameter in seconds; clamped to domain [0, 1]</param>
         /// <returns>Linear interpolation of source and target at t</returns>
-        public BSpline Morph(double t)
+        public BSpline Morph(double time)
         {
             if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
             {
-                spline.Spline = morphism.Eval(t);
+                spline.Spline = morphism.Eval(time);
             }
             else
             {
-                Debug.LogWarning("gameObject without SEESpline component");
+                Debug.LogWarning("gameObject without SEESpline component.\n");
             }
             // Protect internal state of `spline'.
             return new BSpline(spline.Spline);
         }
 
-        // Implementation of IEvaluator interface.
-        public void Eval(float t)
+        /// <summary>
+        /// Implementation of <see cref="IEvaluator"/> interface.
+        /// </summary>
+        /// <param name="time">time in seconds</param>
+        public void Eval(float time)
         {
-            Morph(t);
+            Morph(time);
         }
 
         protected override void OnBeforeSerialize()
