@@ -43,6 +43,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
+        /// May be null if edges are not drawn.
         /// </summary>
         private readonly Dictionary<string, ILayoutEdge> edgeLayout;
 
@@ -58,6 +59,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
+        /// May be null if edges are not drawn.
         /// </summary>
         public Dictionary<string, ILayoutEdge> EdgeLayout => edgeLayout;
 
@@ -71,7 +73,6 @@ namespace SEE.Game.Evolution
         {
             this.graph = graph.AssertNotNull("graph");
             this.nodeLayout = nodeLayout.AssertNotNull("layout");
-            this.edgeLayout = edgeLayout.AssertNotNull("edgeLayout");
         }
     }
 }
