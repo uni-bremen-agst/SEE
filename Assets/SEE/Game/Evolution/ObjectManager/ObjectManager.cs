@@ -40,7 +40,7 @@ namespace SEE.Game.Evolution
         /// The graph renderer used to create the game objects. It is used for creating missing
         /// game objects.
         /// </summary>
-        private readonly GraphRenderer _graphRenderer;
+        private readonly GraphRenderer graphRenderer;
 
         /// <summary>
         /// The game object representing the city; its position and scale determines
@@ -69,7 +69,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// A dictionary containing all created edges that are currently in use. The set of
         /// edges contained may be an accumulation of all edges created and added by
-        /// <see cref="GetEdge(Edge, out GameObject)"/> so far and not just  those of one single
+        /// <see cref="GetEdge(Edge, out GameObject)"/> so far and not just those of one single
         /// graph in the graph series (unless an edge was removed by
         /// <see cref="RemoveEdge(Edge, out GameObject)"/> meanwhile).
         /// </summary>
@@ -81,26 +81,12 @@ namespace SEE.Game.Evolution
         /// <param name="renderer">the graph renderer used to create the game objects</param>
         /// <param name="city">the game object representing the city; its position and scale determines
         /// the position and scaling of the city elements visualized by the renderer</param>
-        /// <param name="deletedNodeBeamColor">color of the beams for deleted nodes</param>
-        /// <param name="deletedNodeBeamScale">scale of the beams for deleted nodes</param>
-        public ObjectManager(GraphRenderer renderer, GameObject city, Color deletedNodeBeamColor, Vector3 deletedNodeBeamScale)
+        public ObjectManager(GraphRenderer renderer, GameObject city)
         {
             renderer.AssertNotNull("renderer");
-            _graphRenderer = renderer;
+            graphRenderer = renderer;
             this.city = city;
-            this.deletedNodeBeamColor = deletedNodeBeamColor;
-            this.deletedNodeBeamScale = deletedNodeBeamScale;
         }
-
-        /// <summary>
-        /// The color of the beams for deleted nodes.
-        /// </summary>
-        private readonly Color deletedNodeBeamColor;
-
-        /// <summary>
-        /// The scale of the beams for deleted nodes.
-        /// </summary>
-        private readonly Vector3 deletedNodeBeamScale;
 
         /// <summary>
         /// Returns all created GameObjects till now.
@@ -128,7 +114,7 @@ namespace SEE.Game.Evolution
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = _graphRenderer.DrawPlane(gameObjects, city.transform.position.y);
+                currentPlane = graphRenderer.DrawPlane(gameObjects, city.transform.position.y);
                 currentPlane.transform.SetParent(city.transform);
             }
             plane = currentPlane;
@@ -142,7 +128,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void AdjustPlane()
         {
-            _graphRenderer.AdjustPlane(currentPlane, gameObjects);
+            graphRenderer.AdjustPlane(currentPlane, gameObjects);
         }
 
         /// <summary>
@@ -155,7 +141,7 @@ namespace SEE.Game.Evolution
         /// <param name="scale">the new scale of the plane</param>
         public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
         {
-            _graphRenderer.GetPlaneTransform(currentPlane, gameObjects, out centerPosition, out scale);
+            graphRenderer.GetPlaneTransform(currentPlane, gameObjects, out centerPosition, out scale);
         }
 
         /// <summary>
@@ -192,12 +178,12 @@ namespace SEE.Game.Evolution
                 {
                     /// <see cref="DrawLeafNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>
                     /// and will also set the scale and style of gameNode.
-                    gameNode = _graphRenderer.DrawLeafNode(node);
+                    gameNode = graphRenderer.DrawLeafNode(node);
                 }
                 else
                 {
                     /// <see cref="DrawInnerNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>.
-                    gameNode = _graphRenderer.DrawInnerNode(node);
+                    gameNode = graphRenderer.DrawInnerNode(node);
                     // Note: The scale of inner nodes will be adjusted later when
                     // we have the layout.
                 }
@@ -223,19 +209,19 @@ namespace SEE.Game.Evolution
             {
                 // Find all relevant node objects.
                 List<GameObject> nodeObjecs = new List<GameObject>();
-                foreach (var node in edge.ItsGraph.Nodes())
+                foreach (Node node in edge.ItsGraph.Nodes())
                 {
                     GetNode(node, out GameObject no);
                     nodeObjecs.Add(no);
                 }
 
                 // Create the entire edge layout from the nodes.
-                var edgeObjects = _graphRenderer.EdgeLayout(nodeObjecs, city, true);
+                ICollection<GameObject> edgeObjects = graphRenderer.EdgeLayout(nodeObjecs, city, true);
 
                 // Put all edge objects into the cache and find `gameEdge'.
-                foreach (var edgeObject in edgeObjects)
+                foreach (GameObject edgeObject in edgeObjects)
                 {
-                    var id = edgeObject.GetComponent<EdgeRef>().Value.ID;
+                    string id = edgeObject.GetComponent<EdgeRef>().Value.ID;
                     if (edges.ContainsKey(id))
                     {
                         // Edge object has already been created in previous call.
@@ -257,8 +243,66 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Yields the Value of <see cref="GraphElement"/> reference (<see cref="NodeRef"/>
+        /// or <see cref="EdgeRef"/>) for the given <paramref name="graphElementRef"/>.
+        ///
+        /// N.B.: This is essentially a specification of the Value property of <see cref="NodeRef"/>
+        /// or <see cref="EdgeRef"/>, respectively, for read accesses.
+        /// </summary>
+        /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
+        /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
+        /// <param name="graphElementRef">a reference to a graph element</param>
+        /// <returns>Value of <paramref name="graphElementRef"/></returns>
+        delegate GE GetValue<GE, R>(R graphElementRef) where GE : GraphElement where R : GraphElementRef;
+
+        /// <summary>
+        /// Sets the Value of the given <paramref name="graphElementRef"/> to
+        /// <paramref name="graphElement"/>.
+        ///
+        /// N.B.: This is essentially a specification of the Value property of <see cref="NodeRef"/>
+        /// or <see cref="EdgeRef"/>, respectively, for write accesses.
+        /// </summary>
+        /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
+        /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
+        /// <param name="graphElementRef">a reference to a graph element</param>
+        /// <param name="graphElement">a graph element becoming the Value of <paramref name="graphElementRef"/></param>
+        delegate void SetValue<GE, R>(ref R graphElementRef, GE graphElement) where GE : GraphElement where R : GraphElementRef;
+
+        /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>,
+        /// that is, the <see cref="GraphElementRef"/> component of <paramref name="gameObject"/> will refer to
+        /// <paramref name="graphElement"/> afterwards. Returns the graph element formerly attached to
+        /// <paramref name="gameObject"/> if there was one or null if there was none.
+        /// </summary>
+        /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
+        /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
+        /// <param name="gameObject">the game object where the node is to be attached to</param>
+        /// <param name="node">the node to be attached</param>
+        /// <returns>the node formerly attached to <paramref name="gameObject"/> or null</returns>
+        /// <param name="getValue">yields the Value of a <see cref="GraphElementRef"/></param>
+        /// <param name="setValue">sets the Value of a <see cref="GraphElementRef"/></param>
+        /// <returns>the graph element formerly attached to <paramref name="gameObject"/> or null</returns>
+        private static GE Reattach<GE, R>(GameObject gameObject, GE graphElement, GetValue<GE, R> getValue, SetValue<GE, R> setValue)
+            where GE : GraphElement where R : GraphElementRef
+        {
+            GE formerGraphElement = null;
+
+            if (!gameObject.TryGetComponent(out R graphElementRef))
+            {
+                // reference should not be null
+                Debug.LogError($"Re-used game object for graph element '{graphElement.ID}' does not have a {typeof(R)} attached to it.\n");
+                graphElementRef = gameObject.AddComponent<R>();
+            }
+            else
+            {
+                formerGraphElement = getValue(graphElementRef);
+            }
+            setValue(ref graphElementRef, graphElement);
+            return formerGraphElement;
+        }
+
+        /// <summary>
         /// Re-attaches the given <paramref name="node"/> to the given <paramref name="gameObject"/>,
-        /// that is, the NodeRef component of <paramref name="gameObject"/> will refer to
+        /// that is, the <see cref="NodeRef"/> component of <paramref name="gameObject"/> will refer to
         /// <paramref name="node"/> afterwards. Returns the node formerly attached to
         /// <paramref name="gameObject"/> if there was one or null if there was none.
         /// </summary>
@@ -267,40 +311,21 @@ namespace SEE.Game.Evolution
         /// <returns>the node formerly attached to <paramref name="gameObject"/> or null</returns>
         private static Node ReattachNode(GameObject gameObject, Node node)
         {
-            Node formerNode = null;
-
-            NodeRef noderef = gameObject.GetComponent<NodeRef>();
-            if (noderef == null)
-            {
-                // noderef should not be null
-                Debug.LogError($"Re-used game object for node '{node.ID}' does not have a graph node attached to it\n");
-                noderef = gameObject.AddComponent<NodeRef>();
-            }
-            else
-            {
-                formerNode = noderef.Value;
-            }
-            noderef.Value = node;
-            return formerNode;
+            return Reattach(gameObject, node, nr => nr.Value, (ref NodeRef nr, Node n) => { nr.Value = n; });
         }
 
+        /// <summary>
+        /// Re-attaches the given <paramref name="edge"/> to the given <paramref name="gameObject"/>,
+        /// that is, the <see cref="EdgeRef"/> component of <paramref name="gameObject"/> will refer to
+        /// <paramref name="edge"/> afterwards. Returns the edge formerly attached to
+        /// <paramref name="gameObject"/> if there was one or null if there was none.
+        /// </summary>
+        /// <param name="gameObject">the game object where the edge is to be attached to</param>
+        /// <param name="edge">the edge to be attached</param>
+        /// <returns>the edge formerly attached to <paramref name="gameObject"/> or null</returns>
         private static Edge ReattachEdge(GameObject gameObject, Edge edge)
         {
-            Edge formerEdge = null;
-
-            EdgeRef edgeref = gameObject.GetComponent<EdgeRef>();
-            if (edgeref == null)
-            {
-                // edgeref should not be null
-                Debug.LogError($"Re-used game object for edge '{edge.ID}' does not have a graph edge attached to it\n");
-                edgeref = gameObject.AddComponent<EdgeRef>();
-            }
-            else
-            {
-                formerEdge = edgeref.Value;
-            }
-            edgeref.Value = edge;
-            return formerEdge;
+            return Reattach(gameObject, edge, er => er.Value, (ref EdgeRef er, Edge e) => { er.Value = e; });
         }
 
         /// <summary>

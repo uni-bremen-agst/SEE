@@ -66,9 +66,8 @@ namespace SEE.Game
                 // So in fact this is the perfect place to assign graphRenderer.
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
-                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
-                objectManager = new ObjectManager(graphRenderer, gameObject, cityEvolution.DeletionBeamColor, beamScale);
+                objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new Marker(graphRenderer,
                                     markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
