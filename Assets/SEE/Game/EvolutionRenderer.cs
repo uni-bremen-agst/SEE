@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Assets.SEE.Game.City;
 using Assets.SEE.GameObjects;
 using SEE.DataModel;
@@ -570,7 +569,7 @@ namespace SEE.Game
                 {
                     if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
                     {
-                        Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.");
+                        Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.\n");
                         continue;
                     }
                     if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
@@ -970,7 +969,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Starts the animation of <paramref name="animator"/> with given duration.
+        /// Starts the animation of <paramref name="animator"/> with given <paramref name="duration"/>.
         /// </summary>
         /// <param name="animator">Animator to start</param>
         /// <param name="duration">Duration of the animation</param>
@@ -1231,19 +1230,19 @@ namespace SEE.Game
             Graph graph = graphs[index];
             if (graph == null)
             {
-                Debug.LogError($"There is no graph available for graph with index {index}\n");
+                Debug.LogError($"There is no graph available for graph with index {index}.\n");
                 return false;
             }
             bool hasLayout = TryGetLayout(graph, out Dictionary<string, ILayoutNode> layout);
             if (layout == null || !hasLayout)
             {
-                Debug.LogError($"There is no layout available for graph with index {index}\n");
+                Debug.LogError($"There is no layout available for graph with index {index}.\n");
                 return false;
             }
             hasLayout = EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge> edgeLayout);
             if (edgeLayout == null || !hasLayout)
             {
-                Debug.LogError($"There is no edge layout available for graph with index {index}\n");
+                Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
                 return false;
             }
             laidOutGraph = new LaidOutGraph(graph, layout, edgeLayout);
