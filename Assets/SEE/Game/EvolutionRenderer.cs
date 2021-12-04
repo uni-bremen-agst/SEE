@@ -20,8 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.SEE.Game.City;
-using Assets.SEE.GameObjects;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
