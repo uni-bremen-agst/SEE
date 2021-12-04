@@ -10,7 +10,7 @@ namespace Assets.SEE.Game.City
 {
     /// <summary>
     /// Although the creation of a <see cref="Mesh"/> for a single edge is
-    /// fast enough for 60 fps, a larger number of edges (several dozen) can
+    /// fast enough for 60 fps, a larger number of edges (several dozens) can
     /// lead to massive performance issues (see <see cref="SEESpline"/> for
     /// more details on spline meshes). It is therefore necessary to
     /// coordinate the creation of the meshes centrally. This class serves as
@@ -62,14 +62,12 @@ namespace Assets.SEE.Game.City
             EdgeLayoutAttributes layoutSettings,
             EdgeSelectionAttributes selectionSettings)
         {
-            layout = Assertions.AssertNotNull(
-                layoutSettings, "layoutSettings");
-            selection = Assertions.AssertNotNull(
-                selectionSettings, "selectionSettings");
+            layout = Assertions.AssertNotNull(layoutSettings, "layoutSettings");
+            selection = Assertions.AssertNotNull(selectionSettings, "selectionSettings");
         }
 
         /// <summary>
-        /// Registeres the given edge object for mesh creation. If
+        /// Registers the given edge object for mesh creation. If
         /// <paramref name="edge"/> already has a mesh (i.e., a
         /// <see cref="MeshFilter"/> is attached to it), it is ignored.
         /// </summary>
@@ -99,7 +97,7 @@ namespace Assets.SEE.Game.City
         ///
         ///     https://docs.unity3d.com/Manual/Coroutines.html
         /// </summary>
-        /// <returns></returns>
+        /// <returns>enumerate as to whether to continue</returns>
         private IEnumerator CreateMeshes()
         {
             for (int i = 0; i < EdgesPerFrame; i++)
@@ -110,14 +108,14 @@ namespace Assets.SEE.Game.City
                 // fail-safe
                 if (!edge.TryGetComponent<SEESpline>(out var spline))
                 {
-                    Debug.LogWarning("Game object without SEESpline component.  Ignoring");
+                    Debug.LogWarning("Game object without SEESpline component. Ignoring");
                     continue;
                 }
 
                 // fail-safe
                 if (layout == null)
                 {
-                    Debug.LogWarning("Layout settings are missing.  Fallling back to defaults.");
+                    Debug.LogWarning("Layout settings are missing. Fallling back to defaults.");
                 }
                 else
                 {
@@ -127,7 +125,7 @@ namespace Assets.SEE.Game.City
                 // fail-safe
                 if (selection == null)
                 {
-                    Debug.LogWarning("Selection settings are missing.  Fallling back to defaults.");
+                    Debug.LogWarning("Selection settings are missing. Fallling back to defaults.");
                 }
                 else
                 {
