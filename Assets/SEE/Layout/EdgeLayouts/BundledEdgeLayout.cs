@@ -1,4 +1,5 @@
 ﻿using SEE.Layout.Utils;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -104,8 +105,7 @@ namespace SEE.Layout.EdgeLayouts
 
                 foreach (ILayoutEdge edge in edges)
                 {
-                    edge.ControlPoints = GetLinePoints(edge.Source, edge.Target, lca, maxLevel);
-                    edge.Points = Simplify(LinePoints.BSplineLinePoints(edge.ControlPoints, tension), rdp);
+                    edge.Spline = CreateSpline(edge.Source, edge.Target, lca, maxLevel);
                 }
             }
         }
@@ -187,25 +187,34 @@ namespace SEE.Layout.EdgeLayouts
         }
 
         /// <summary>
-        /// Yields the list of points for a spline along the node hierarchy.
-        /// If source equals target, a self loop is generated atop of the node.
-        /// If source and target have no common LCA, the path starts at source
-        /// and ends at target and reaches through the point on half distance between 
-        /// these two nodes, but at the top-most edge height (given by maxLevel).
-        /// If source and target are siblings (immediate ancestors of the same parent
-        /// node), a direct spline is drawn between them.
-        /// Otherwise, the control points of the splines are chosen along the node hierarchy 
-        /// path from the source node to their lowest common ancestor and then down again 
-        /// to the target node. The height of each such points is proportional to the level 
-        /// of the node hierarchy. The higher the node in the hierarchy on this path,
-        /// the higher the points.
+        /// Creates a spline along the node hierarchy. The path of the
+        /// spline is determined as follows:
+        ///
+        /// If <paramref name="source"/> equals <paramref name="target"/>, a
+        /// self loop is generated atop of the node.
+        ///
+        /// If <paramref name="source"/> and <paramref name="target"/> have no
+        /// common LCA, the path starts at <paramref name="source"/> and ends
+        /// at <paramref name="target"/> and reaches through the point on half
+        /// distance between these two nodes, but at the top-most edge height
+        /// (given by <paramref name="maxLevel"/>).
+        ///
+        /// If <paramref name="source"/> and <paramref name="target"/> are
+        /// siblings (i.e., they are immediate ancestors of the same parent
+        /// node), a direct spline is created between them.
+        ///
+        /// Otherwise, the control points of the spline are chosen along the
+        /// node hierarchy path from the source node to their lowest common
+        /// ancestor and then down again to the target node. The height of
+        /// each such points is proportional to the level of the node
+        /// hierarchy.
         /// </summary>
         /// <param name="source">starting node</param>
         /// <param name="target">ending node</param>
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <param name="maxLevel">the maximal level of the node hierarchy</param>
         /// <returns>points to draw a spline between source and target</returns>
-        private Vector3[] GetLinePoints
+        private TinySpline.BSpline CreateSpline
             (ILayoutNode source,
              ILayoutNode target,
              LCAFinder<ILayoutNode> lcaFinder,
@@ -287,14 +296,18 @@ namespace SEE.Layout.EdgeLayouts
                         }
                         
                         controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        return controlPoints;
+                        uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
+                        return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
+                        {
+                            ControlPoints = TinySplineInterop.VectorsToList(controlPoints)
+                        }.Tension(tension);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Returns points of a direct spline for an edge from <paramref name="source"/> to <paramref name="target"/>.
+        /// Returns a spline for an edge from <paramref name="source"/> to <paramref name="target"/>.
         /// The first point is the center of the roof/ground of <paramref name="source"/> and the last
         /// point the center of the roof/ground of <paramref name="target"/>. The middle peak point
         /// is the position in between <paramref name="source"/> and <paramref name="target"/> where
@@ -306,14 +319,15 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="target">the node where to end the edge</param>
         /// <param name="yLevel">the y co-ordinate of the two middle control points</param>
         /// <returns>control points for a direct spline between the two nodes</returns>
-        private Vector3[] DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
+        private TinySpline.BSpline DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
             Vector3 start = edgesAboveBlocks ? source.Roof : source.Ground;
             Vector3 end = edgesAboveBlocks ? target.Roof : target.Ground;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y = yLevel;
-            return LinePoints.SplineLinePoints(start, middle, end);
+            return TinySpline.BSpline.InterpolateCubicNatural(
+                TinySplineInterop.VectorsToList(start, middle, end), 3);
         }
 
         /// <summary>
@@ -344,7 +358,7 @@ namespace SEE.Layout.EdgeLayouts
         }
 
         /// <summary>
-        /// Yields points of a spline for a self loop at a node. The first point
+        /// Yields a spline for a self loop at a node. The first point
         /// is the front left corner of the roof/ground of <paramref name="node"/>
         /// and the last point is its opposite back right roof/ground corner. Thus, the 
         /// edge is diagonal across the roof/ground. The peak of the spline is in the
@@ -353,7 +367,7 @@ namespace SEE.Layout.EdgeLayouts
         /// </summary>
         /// <param name="node">node whose self loop line points are required</param>
         /// <returns>line points forming a self loop above/below <paramref name="node"/></returns>
-        private Vector3[] SelfLoop(ILayoutNode node)
+        private TinySpline.BSpline SelfLoop(ILayoutNode node)
         {
             // center area (roof or ground)
             Vector3 center = edgesAboveBlocks ? node.Roof : node.Ground;
@@ -364,7 +378,8 @@ namespace SEE.Layout.EdgeLayouts
             Vector3 end = new Vector3(center.x + extent.x, center.y, center.z + extent.z);
             Vector3 middle = center;
             middle.y += edgesAboveBlocks ? levelDistance : -levelDistance;
-            return LinePoints.SplineLinePoints(start, middle, end);
+            return TinySpline.BSpline.InterpolateCubicNatural(
+                TinySplineInterop.VectorsToList(start, middle, end), 3);
         }
 
         /// <summary>
@@ -382,7 +397,7 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="source">start of edge (in one tree)</param>
         /// <param name="target">end of the edge (in another tree)</param>
         /// <returns>line points for two nodes without common ancestor</returns>
-        private Vector3[] BetweenTrees(ILayoutNode source, ILayoutNode target)
+        private TinySpline.BSpline BetweenTrees(ILayoutNode source, ILayoutNode target)
         {
             return DirectSpline(source, target, GetLevelHeight(-1));
         }

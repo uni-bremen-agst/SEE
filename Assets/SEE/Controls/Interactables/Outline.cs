@@ -198,6 +198,7 @@ namespace SEE.Controls.Interactables
 
         private void OnDisable()
         {
+            renderers = renderers.Where(x => x != null).ToArray();
             foreach (Renderer renderer in renderers)
             {
                 // Remove outline shaders

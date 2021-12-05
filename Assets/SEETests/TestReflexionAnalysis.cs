@@ -48,7 +48,7 @@ namespace SEE.Tools.Architecture
         protected List<EdgeChange> edgeChanges = new List<EdgeChange>();
 
         /// <summary>
-        /// List of edges propagated from the implementation onto the architecture for 
+        /// List of edges propagated from the implementation onto the architecture for
         /// a single reflexion-analysis run.
         /// </summary>
         protected List<PropagatedEdge> propagatedEdgesAdded = new List<PropagatedEdge>();
@@ -328,10 +328,7 @@ namespace SEE.Tools.Architecture
         protected static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
             edgeID++;
-            Edge result = new Edge(edgeID.ToString());
-            result.Type = type;
-            result.Source = from;
-            result.Target = to;
+            Edge result = new Edge(from, to, type);
             graph.AddEdge(result);
             return result;
         }

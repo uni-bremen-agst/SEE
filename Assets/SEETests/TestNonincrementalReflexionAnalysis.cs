@@ -148,16 +148,16 @@ namespace SEE.Tools.Architecture
 
         /// <summary>
         /// Returns new architecture graph with the following node hierarchy:
-        /// 
+        ///
         ///  N1
         ///   -- N1_C1
         ///   -- N1_C2
         ///  N2
         ///   -- N2_C1
         ///  N3
-        ///  
+        ///
         /// edges:
-        /// 
+        ///
         /// call(N1_C1, N2_C1)
         /// call(N2, N1)
         /// call(N3, N1_C2)
@@ -202,7 +202,7 @@ namespace SEE.Tools.Architecture
         ///  n2
         ///   -- n2_c1
         ///  n3
-        ///  
+        ///
         /// </summary>
         /// <returns>new implementation graph with a hierarchy of nodes</returns>
         private Graph NewImplementationNodeHierarchy()
@@ -236,7 +236,7 @@ namespace SEE.Tools.Architecture
 
         /// <summary>
         /// Returns a new mapping between implementation and architecture as follows:
-        /// 
+        ///
         /// n1    -Maps_To-> N1
         /// n2    -Maps_To-> N2
         /// n3    -Maps_To-> N3
@@ -300,7 +300,7 @@ namespace SEE.Tools.Architecture
         }
 
         //-------------------
-        // Implicitly allowed 
+        // Implicitly allowed
         //-------------------
 
         private void CommonImplicitlyAllowed()
@@ -310,7 +310,7 @@ namespace SEE.Tools.Architecture
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
-            // 4 absences 
+            // 4 absences
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
             Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
             Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
@@ -371,7 +371,7 @@ namespace SEE.Tools.Architecture
             // 1 propagated edges
             Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
-            // 4 absences 
+            // 4 absences
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
             Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
             Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
@@ -398,7 +398,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestAllowedParentAccess2()
         {
-            // dependency to parent where source is not mapped explicitly but 
+            // dependency to parent where source is not mapped explicitly but
             // target is mapped explicitly
             NewEdge(impl, n1_c1_c1, n1, call);
             reflexion.Run();
@@ -411,7 +411,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestAllowedChildAccess1()
         {
-            // dependency from parent to child where both are mapped explicitly 
+            // dependency from parent to child where both are mapped explicitly
             NewEdge(impl, n1_c1, n1_c1_c1, call);
             reflexion.Run();
 
@@ -423,7 +423,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDisallowedChildAccess()
         {
-            // dependency from parent to child where both are mapped explicitly 
+            // dependency from parent to child where both are mapped explicitly
             NewEdge(impl, n1, n1_c1, call);
             reflexion.Run();
 
@@ -433,7 +433,7 @@ namespace SEE.Tools.Architecture
         }
 
         //-------------------
-        // Convergences 
+        // Convergences
         //-------------------
 
         [Test]
@@ -547,7 +547,7 @@ namespace SEE.Tools.Architecture
         }
 
         //-------------------
-        // Divergences 
+        // Divergences
         //-------------------
 
         private void CommonAbsences()
@@ -555,7 +555,7 @@ namespace SEE.Tools.Architecture
             // 1 propagated edges
             Assert.AreEqual(1, propagatedEdgesAdded.Count);
 
-            // 4 absences 
+            // 4 absences
             Assert.That(IsAbsent(edgeChanges, N2, N1, call));
             Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
             Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
@@ -595,7 +595,6 @@ namespace SEE.Tools.Architecture
         public void TestDivergences3()
         {
             NewEdge(impl, n1_c1_c1, n2, call);
-            NewEdge(impl, n1_c1_c1, n2, call);
             NewEdge(impl, n1_c1_c2, n2, call);
             reflexion.Run();
 
@@ -632,7 +631,6 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences6()
         {
-            NewEdge(impl, n1_c1_c1, n1_c2, call);
             NewEdge(impl, n1_c1_c1, n1_c2, call);
             NewEdge(impl, n1_c1_c2, n1_c2, call);
             reflexion.Run();

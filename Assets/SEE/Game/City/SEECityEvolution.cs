@@ -179,8 +179,9 @@ namespace SEE.Game.City
             animationInteraction.EvolutionRenderer = evolutionRenderer;
         }
 
-        private void Start()
+        override internal void Start()
         {
+            base.Start();
             evolutionRenderer.ShowGraphEvolution();
         }
 

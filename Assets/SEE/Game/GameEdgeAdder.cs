@@ -28,12 +28,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
-        /// <param name="edgeID">unique ID of the edge (may be null or empty, in which a random
-        ///     ID will be used)</param>
+        /// <param name="edgeType">the type of the edge to be added</param>
         /// <returns>the new game object representing the edge</returns>
         /// <exception cref="Exception">thrown if the edge could not be created; the message of the exception
         /// provides more details why</exception>
-        public static GameObject Add(GameObject source, GameObject target, string edgeID = null)
+        public static GameObject Add(GameObject source, GameObject target, string edgeType)
         {
             Transform cityObject = SceneQueries.GetCodeCity(source.transform);
             GameObject result;
@@ -44,7 +43,7 @@ namespace SEE.Game
                 {
                     try
                     {
-                        result = city.Renderer.DrawEdge(source, target, id: edgeID);
+                        result = city.Renderer.DrawEdge(source, target, edgeType);
                     }
                     catch (Exception e)
                     {
