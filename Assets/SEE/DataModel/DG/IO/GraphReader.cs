@@ -311,7 +311,7 @@ namespace SEE.DataModel.DG.IO
 
                 // Note that we do not know yet whether this edge is a hierarchical
                 // or non-hierarchical edge until we see the edge type.
-                Edge thisEdge = new Edge(id);
+                Edge thisEdge = new Edge();
                 // set source of the edge
                 if (nodes.TryGetValue(fromNode, out Node sourceNode))
                 {

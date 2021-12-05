@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using TinySpline;
 
 namespace SEE.Layout
 {
@@ -11,18 +12,19 @@ namespace SEE.Layout
         /// Source of the edge.
         /// </summary>
         public ILayoutNode Source;
+
         /// <summary>
         /// Target of the edge.
         /// </summary>
         public ILayoutNode Target;
+
         /// <summary>
-        /// The points of the polygone for rendering the edge.
+        /// The shaping spline of the edge. The default spline is a line
+        /// (i.e., a spline of degree 1 with 2 control points) connecting the
+        /// center position (<see cref="IGameNode.CenterPosition"/>) of
+        /// <see cref="Source"/> and <see cref="Target"/>.
         /// </summary>
-        public Vector3[] Points;
-        /// <summary>
-        /// The control points of the polygon for rendering the edge.
-        /// </summary>
-        public Vector3[] ControlPoints;
+        public BSpline Spline;
 
         /// <summary>
         /// Constructor.
@@ -33,6 +35,12 @@ namespace SEE.Layout
         {
             Source = source;
             Target = target;
+            Spline = new BSpline(2, 3, 1)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(
+                    Source.CenterPosition,
+                    Target.CenterPosition)
+            };
         }
     }
 }
