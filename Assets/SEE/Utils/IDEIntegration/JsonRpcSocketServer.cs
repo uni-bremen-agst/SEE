@@ -19,7 +19,7 @@ namespace SEE.Utils
         /// <summary>
         /// A class that will represent the client.
         /// </summary>
-        private sealed class Client : JsonRpcClientConnection
+        private sealed class Client : JsonRpcConnection
         {
             /// <summary>
             /// TCP connection to the client.

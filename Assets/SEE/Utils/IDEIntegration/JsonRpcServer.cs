@@ -30,7 +30,7 @@ namespace SEE.Utils
         /// Represents the method that will handle the server connection events.
         /// </summary>
         /// <param name="connection">The connection that fired this event.</param>
-        public delegate void ConnectionEventHandler(JsonRpcClientConnection connection);
+        public delegate void ConnectionEventHandler(JsonRpcConnection connection);
 
         /// <summary>
         /// Will be fired when a client connection is established successful.
@@ -46,7 +46,7 @@ namespace SEE.Utils
         /// All currently to the server connected clients. Only access this set while using
         /// <see cref="Semaphore"/>.
         /// </summary>
-        protected readonly HashSet<JsonRpcClientConnection> RpcConnections;
+        protected readonly HashSet<JsonRpcConnection> RpcConnections;
 
         /// <summary>
         /// The semaphore used for accessing <see cref="RpcConnections"/>.
@@ -80,7 +80,7 @@ namespace SEE.Utils
 
             sourceToken = new CancellationTokenSource();
             Semaphore = new SemaphoreSlim(1, 1);
-            RpcConnections = new HashSet<JsonRpcClientConnection>();
+            RpcConnections = new HashSet<JsonRpcConnection>();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SEE.Utils
         /// Adds a connection to <see cref="RpcConnections"/> thread safe.
         /// </summary>
         /// <param name="connection">The client connection.</param>
-        private void AddConnection(JsonRpcClientConnection connection)
+        private void AddConnection(JsonRpcConnection connection)
         {
             UniTask.Run(async () =>
             {
@@ -116,7 +116,7 @@ namespace SEE.Utils
         /// Removes a connection from <see cref="RpcConnections"/> thread safe.
         /// </summary>
         /// <param name="connection">The client connection.</param>
-        private void RemoveConnection(JsonRpcClientConnection connection)
+        private void RemoveConnection(JsonRpcConnection connection)
         {
             UniTask.Run(async () =>
             {
@@ -131,7 +131,7 @@ namespace SEE.Utils
         /// Will run the connection and register all necessary events.
         /// </summary>
         /// <param name="connection">The client connection.</param>
-        protected void RunConnection(JsonRpcClientConnection connection)
+        protected void RunConnection(JsonRpcConnection connection)
         {
             connection.Connected += AddConnection;
             connection.Disconnected += RemoveConnection;
@@ -171,7 +171,7 @@ namespace SEE.Utils
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
         /// <returns></returns>
-        public async UniTask CallRemoteProcessOnConnectionAsync(JsonRpcClientConnection connection,
+        public async UniTask CallRemoteProcessOnConnectionAsync(JsonRpcConnection connection,
             string targetName, params object[] arguments)
         {
             await CallRemoteProcessOnConnectionAsync<object>(connection, targetName, arguments);
@@ -184,7 +184,7 @@ namespace SEE.Utils
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
         /// <returns></returns>
-        public async UniTask<T> CallRemoteProcessOnConnectionAsync<T>(JsonRpcClientConnection connection,
+        public async UniTask<T> CallRemoteProcessOnConnectionAsync<T>(JsonRpcConnection connection,
             string targetName, params object[] arguments)
         {
             if (connection != null)
@@ -221,7 +221,7 @@ namespace SEE.Utils
         /// <summary>
         /// Specific connection implementation of the derived class. When a connection to a client
         /// could be established, this method should call <see cref="RunConnection"/> instead of
-        /// calling <see cref="JsonRpcClientConnection.Run"/>.
+        /// calling <see cref="JsonRpcConnection.Run"/>.
         /// </summary>
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         /// <param name="token">Token to cancel the current Task.</param>
