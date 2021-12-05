@@ -48,7 +48,7 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <param name="path">Absolute file path.</param>
-            public async UniTask OpenFile(JsonRpcClientConnection connection, string path, int? line)
+            public async UniTask OpenFile(JsonRpcConnection connection, string path, int? line)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path, line);
             }
@@ -58,7 +58,7 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetProjectPath(JsonRpcClientConnection connection)
+            public async UniTask<string> GetProjectPath(JsonRpcConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetProject");
             }
@@ -68,7 +68,7 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetIDEVersion(JsonRpcClientConnection connection)
+            public async UniTask<string> GetIDEVersion(JsonRpcConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetIdeVersion");
             }
@@ -78,7 +78,7 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>True if SEE started this connection.</returns>
-            public async UniTask<bool> WasStartedBySee(JsonRpcClientConnection connection)
+            public async UniTask<bool> WasStartedBySee(JsonRpcConnection connection)
             {
                 return await server.CallRemoteProcessOnConnectionAsync<bool>(connection, "WasStartedBySee");
             }
@@ -86,7 +86,7 @@ namespace SEE.Controls
             /// <summary>
             /// Will focus this IDE instance.
             /// </summary>
-            public async UniTask FocusIDE(JsonRpcClientConnection connection)
+            public async UniTask FocusIDE(JsonRpcConnection connection)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "SetFocus");
             }
@@ -95,7 +95,7 @@ namespace SEE.Controls
             /// Declines an IDE instance.
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
-            public async UniTask Decline(JsonRpcClientConnection connection)
+            public async UniTask Decline(JsonRpcConnection connection)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "Decline");
             }
@@ -230,7 +230,7 @@ namespace SEE.Controls
         /// A mapping of all registered connections to the project they have opened. Only add and
         /// delete elements in this directory while using <see cref="semaphore"/>.
         /// </summary>
-        private IDictionary<string, ICollection<JsonRpcClientConnection>> cachedConnections;
+        private IDictionary<string, ICollection<JsonRpcConnection>> cachedConnections;
 
         /// <summary>
         /// Contains all Graphs in this scene
@@ -274,7 +274,7 @@ namespace SEE.Controls
             semaphore = new SemaphoreSlim(1, 1);
             connectionSignal = new SemaphoreSlim(0, 1);
             pendingSelections = new HashSet<InteractableObject>();
-            cachedConnections = new Dictionary<string, ICollection<JsonRpcClientConnection>>();
+            cachedConnections = new Dictionary<string, ICollection<JsonRpcConnection>>();
 
             InitializeCachedObjects();
 
@@ -439,7 +439,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="connection">The IDE connection.</param>
         /// <returns>True if IDE was accepted, false otherwise.</returns>
-        private async UniTask<bool> CheckIDE(JsonRpcClientConnection connection)
+        private async UniTask<bool> CheckIDE(JsonRpcConnection connection)
         {
             // Right version of the IDE
             var version = await ideCalls.GetIDEVersion(connection);
@@ -519,7 +519,7 @@ namespace SEE.Controls
         /// <see cref="cachedConnections"/> when everything was successful.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        private void ConnectedToClient(JsonRpcClientConnection connection)
+        private void ConnectedToClient(JsonRpcConnection connection)
         {
             UniTask.Run(async () =>
             {
@@ -533,7 +533,7 @@ namespace SEE.Controls
 
                     if (!cachedConnections.ContainsKey(project))
                     {
-                        cachedConnections[project] = new List<JsonRpcClientConnection>();
+                        cachedConnections[project] = new List<JsonRpcConnection>();
                     }
                     cachedConnections[project].Add(connection);
 
@@ -555,7 +555,7 @@ namespace SEE.Controls
         /// from <see cref="cachedConnections"/>.
         /// </summary>
         /// <param name="connection">The connection.</param>
-        private void DisconnectedFromClient(JsonRpcClientConnection connection)
+        private void DisconnectedFromClient(JsonRpcConnection connection)
         {
             UniTask.Run(async () =>
             {

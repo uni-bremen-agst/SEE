@@ -9,13 +9,13 @@ namespace SEE.Utils
     /// Represents a unique client connection. Contains the underlying <see cref="JsonRpc"/>
     /// instance to invoke methods in this specific client.
     /// </summary>
-    public abstract class JsonRpcClientConnection
+    public abstract class JsonRpcConnection
     {
         /// <summary>
         /// Represents the method that will handle the client connection events.
         /// </summary>
         /// <param name="connection">Connection that fired this event.</param>
-        public delegate void ConnectionEventHandler(JsonRpcClientConnection connection);
+        public delegate void ConnectionEventHandler(JsonRpcConnection connection);
 
         /// <summary>
         /// Will be fired when the client is fully connected.
@@ -51,7 +51,7 @@ namespace SEE.Utils
         /// Creates a new client connection.
         /// </summary>
         /// <param name="rpcServer">The server instance of this client.</param>
-        protected JsonRpcClientConnection(JsonRpcServer rpcServer)
+        protected JsonRpcConnection(JsonRpcServer rpcServer)
         {
             RpcServer = rpcServer;
             tokenSource = new CancellationTokenSource();
