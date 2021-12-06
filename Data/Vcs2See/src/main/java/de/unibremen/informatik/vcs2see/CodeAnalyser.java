@@ -20,10 +20,15 @@ public class CodeAnalyser {
 
     /**
      * Helper method to run a ProcessBuilder and output the output to the console.
-     * @param processBuilder ProcessBuilder which should be executed
+     * @param command command which should be executed
+     * @param directory where the command should be executed
      * @throws IOException exception
      */
-    private void run(ProcessBuilder processBuilder) throws IOException {
+    private void run(String command, String directory) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(command.split("\\s(?=(?:[^\"]*([\"])[^\"]*\\1)*[^\"]*$)"));
+        processBuilder.directory(new File(directory));
+
         System.out.println(String.join(" ", processBuilder.command()));
 
         if(!processBuilder.directory().exists() && !processBuilder.directory().mkdirs()) {
@@ -48,6 +53,10 @@ public class CodeAnalyser {
     public void analyse(int revision) throws IOException {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
 
+        String beforeCommand = propertiesManager.getProperty("analyser.before.command").orElseThrow();
+        String beforeDirectory = propertiesManager.getProperty("analyser.before.command").orElseThrow();
+        run(beforeCommand, beforeDirectory);
+
         for(int i = 0; true; i++) {
             String key = "analyser." + i + ".";
             Optional<String> optionalCommand = propertiesManager.getProperty(key + "command");
@@ -58,12 +67,12 @@ public class CodeAnalyser {
 
             String command = replacePlaceholders(optionalCommand.get(), revision);
             String directory = replacePlaceholders(optionalDirectory.get(), revision);
-
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(command.split("\\s(?=(?:[^\"]*([\"])[^\"]*\\1)*[^\"]*$)"));
-            processBuilder.directory(new File(directory));
-            run(processBuilder);
+            run(command, directory);
         }
+
+        String afterCommand = propertiesManager.getProperty("analyser.after.command").orElseThrow();
+        String afterDirectory = propertiesManager.getProperty("analyser.after.command").orElseThrow();
+        run(afterCommand, afterDirectory);
     }
 
     public String replacePlaceholders(String input, int revision) {
