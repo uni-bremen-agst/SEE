@@ -121,7 +121,6 @@ public class Vcs2See {
             String key = "analyser." + i + ".";
             Optional<String> optionalCommand = propertiesManager.getProperty(key + "command");
             Optional<String> optionalDirectory = propertiesManager.getProperty(key + "directory");
-
             if(optionalCommand.isEmpty() || optionalDirectory.isEmpty()) {
                 break;
             }
@@ -205,6 +204,10 @@ public class Vcs2See {
         // Initialize the repository crawler
         repositoryCrawler.crawl();
 
+        // Prepare analysis
+        codeAnalyser.prepare();
+        consoleManager.printSeparator();
+
         // Go through all revisions
         int i = 1;
         Optional<RevisionRange> optional;
@@ -217,6 +220,10 @@ public class Vcs2See {
             graphModifier.process(revisionRange);
             consoleManager.printSeparator();
         }
+
+        // Postprocess analysis
+        codeAnalyser.postprocess();
+        consoleManager.printSeparator();
 
         consoleManager.print("Program finished.");
         consoleManager.printSeparator();
