@@ -31,8 +31,8 @@ public class CodeAnalyser {
 
         System.out.println(String.join(" ", processBuilder.command()));
 
-        if(!processBuilder.directory().exists() && !processBuilder.directory().mkdirs()) {
-            throw new IOException("Could not create directory");
+        if(!processBuilder.directory().exists()) {
+            processBuilder.directory().mkdirs();
         }
 
         processBuilder.redirectErrorStream(true);
@@ -46,16 +46,34 @@ public class CodeAnalyser {
     }
 
     /**
-     *
-     * @param revision
-     * @throws IOException
+     * Prepare the analysis (execute before command).
+     * @throws IOException exception
+     */
+    public void prepare() throws IOException {
+        PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
+        String beforeCommand = propertiesManager.getProperty("analyser.before.command").orElseThrow();
+        String beforeDirectory = propertiesManager.getProperty("analyser.before.directory").orElseThrow();
+        run(replacePlaceholders(beforeCommand, 0), replacePlaceholders(beforeDirectory, 0));
+    }
+
+    /**
+     * Postprocess the analysis (execute after command).
+     * @throws IOException exception
+     */
+    public void postprocess() throws IOException {
+        PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
+        String afterCommand = propertiesManager.getProperty("analyser.after.command").orElseThrow();
+        String afterDirectory = propertiesManager.getProperty("analyser.after.directory").orElseThrow();
+        run(replacePlaceholders(afterCommand, 0), replacePlaceholders(afterDirectory, 0));
+    }
+
+    /**
+     * Run code analysis.
+     * @param revision revision
+     * @throws IOException exception
      */
     public void analyse(int revision) throws IOException {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
-
-        String beforeCommand = propertiesManager.getProperty("analyser.before.command").orElseThrow();
-        String beforeDirectory = propertiesManager.getProperty("analyser.before.command").orElseThrow();
-        run(beforeCommand, beforeDirectory);
 
         for(int i = 0; true; i++) {
             String key = "analyser." + i + ".";
@@ -69,10 +87,6 @@ public class CodeAnalyser {
             String directory = replacePlaceholders(optionalDirectory.get(), revision);
             run(command, directory);
         }
-
-        String afterCommand = propertiesManager.getProperty("analyser.after.command").orElseThrow();
-        String afterDirectory = propertiesManager.getProperty("analyser.after.command").orElseThrow();
-        run(afterCommand, afterDirectory);
     }
 
     public String replacePlaceholders(String input, int revision) {
