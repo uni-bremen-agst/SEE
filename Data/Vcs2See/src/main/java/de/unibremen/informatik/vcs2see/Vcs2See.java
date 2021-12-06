@@ -4,7 +4,9 @@ import de.unibremen.informatik.st.libvcs4j.RevisionRange;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class Vcs2See {
 
@@ -39,7 +41,9 @@ public class Vcs2See {
     }
 
     private void setup() throws IOException {
-        consoleManager.print("SETUP\nYou can set a new value or accept the current one by \npressing <Enter>. To skip the setup you can set the start \nargument \"-Dci=true\". In CI mode no manual interactions \nare necessary.");
+        consoleManager.print("SETUP");
+        consoleManager.printSeparator();
+        consoleManager.print("You can set a new value or accept the current one by \npressing <Enter>. To skip the setup you can set the start \nargument \"-Dci=true\". In CI mode no manual interactions \nare necessary.");
         consoleManager.printSeparator();
 
         setupEnvironment();
@@ -51,12 +55,16 @@ public class Vcs2See {
     }
 
     private void setupEnvironment() throws IOException {
+        consoleManager.print("SETUP - ENVIRONMENT");
+        consoleManager.printSeparator();
         read("environment.bauhaus");
         read("environment.cpfcsv2rfg");
         consoleManager.printSeparator();
     }
 
     private void setupRepository() throws IOException {
+        consoleManager.print("SETUP - REPOSITORY");
+        consoleManager.printSeparator();
         read("repository.name");
         read("repository.path");
         read("repository.language");
@@ -65,13 +73,39 @@ public class Vcs2See {
     }
 
     private void setupBase() throws IOException {
+        consoleManager.print("SETUP - BASE");
+        consoleManager.printSeparator();
         read("project.base");//TODO: CHECK PATHS
         consoleManager.printSeparator();
     }
 
     private void setupAnalysis() throws IOException {
+        consoleManager.print("SETUP - ANALYSIS");
+        consoleManager.printSeparator();
+        consoleManager.print("Current value: ");
+
+        // Find existing commands
+        Set<String> keys = new HashSet<>();
+        for(int i = 0; true; i++) {
+            String key = "analyser." + i + ".";
+            Optional<String> optionalCommand = propertiesManager.getProperty(key + "command");
+            Optional<String> optionalDirectory = propertiesManager.getProperty(key + "directory");
+
+            if(optionalCommand.isEmpty() || optionalDirectory.isEmpty()) {
+                break;
+            }
+
+            consoleManager.print(key + "command=" + codeAnalyser.replacePlaceholders(optionalCommand.get(), 1));
+            consoleManager.print(key + "directory=" + codeAnalyser.replacePlaceholders(optionalDirectory.get(), 1));
+
+            keys.add(key + "command");
+            keys.add(key + "directory");
+        }
+
+        consoleManager.printSeparator();
+
         // Amount of analysis commands
-        consoleManager.print("Number of commands needed for the analysis. The commands are queried afterwards.");
+        consoleManager.print("Number of commands needed for the analysis. The commands are \nqueried afterwards. Enter -1 to accept the existing \ncommands. The following placeholders can be used: \n%filename% - resolves the file name (e.g. example-1)\n%repository.temp% - resolves the temporary repository path\nAll values from the configuration file can also be used as \nplaceholders (e.g. %environment.bauhaus%)");
         Integer commands = null;
         do {
             try {
@@ -82,15 +116,13 @@ public class Vcs2See {
         } while (commands == null);
         consoleManager.printSeparator();
 
+        // Apply old commands
+        if(commands < 0) {
+            return;
+        }
+
         // Remove existing analyser commands
-        for(int i = 0; true; i++) {
-            String key = "analyser." + i + ".command";
-            Optional<String> optional = propertiesManager.getProperty(key);
-
-            if(optional.isEmpty()) {
-                break;
-            }
-
+        for(String key : keys) {
             propertiesManager.removeProperty(key);
         }
 
@@ -106,17 +138,22 @@ public class Vcs2See {
         Optional<String> value = propertiesManager.getProperty(key);
         consoleManager.print("Current value: " + value.orElse("<empty>"));
         String newValue = consoleManager.readLine(key + "=");
-        propertiesManager.setProperty(key, newValue);
+        if(!newValue.isBlank()) {
+            propertiesManager.setProperty(key, newValue);
+        }
     }
 
     public static void main(String[] args) throws IOException {
         Vcs2See vcs2See = new Vcs2See();
+
         if(!Boolean.parseBoolean(System.getProperty("ci", "false"))) {
             vcs2See.setup();
         } else {
             consoleManager.print("SETUP\nProgram was started in CI mode. The setup is skipped and \nsettings are read from the file. No manual intervention \nis necessary.");
             consoleManager.printSeparator();
         }
+
+        repositoryCrawler.crawl();
 
         int i = 1;
         Optional<RevisionRange> optional;

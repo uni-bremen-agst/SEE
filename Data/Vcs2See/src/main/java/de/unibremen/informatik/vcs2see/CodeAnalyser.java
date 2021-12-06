@@ -48,7 +48,7 @@ public class CodeAnalyser {
                 break;
             }
 
-            String command = placeholders(optionalCommand.get(), revision);
+            String command = replacePlaceholders(optionalCommand.get(), revision);
             String directory = optionalDirectory.get();
 
             ProcessBuilder processBuilder = new ProcessBuilder();
@@ -58,7 +58,7 @@ public class CodeAnalyser {
         }
     }
 
-    private String placeholders(String input, int revision) {
+    public String replacePlaceholders(String input, int revision) {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
 
         for(String key : propertiesManager.getKeys()) {
