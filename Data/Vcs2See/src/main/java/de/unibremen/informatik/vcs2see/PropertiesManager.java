@@ -1,7 +1,5 @@
 package de.unibremen.informatik.vcs2see;
 
-import lombok.Getter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

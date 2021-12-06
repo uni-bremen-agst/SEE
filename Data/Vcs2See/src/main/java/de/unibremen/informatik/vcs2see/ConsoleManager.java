@@ -1,7 +1,5 @@
 package de.unibremen.informatik.vcs2see;
 
-import lombok.Getter;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

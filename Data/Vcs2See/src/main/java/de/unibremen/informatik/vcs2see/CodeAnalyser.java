@@ -26,6 +26,10 @@ public class CodeAnalyser {
     private void run(ProcessBuilder processBuilder) throws IOException {
         System.out.println(String.join(" ", processBuilder.command()));
 
+        if(!processBuilder.directory().exists() && !processBuilder.directory().mkdirs()) {
+            throw new IOException("Could not create directory");
+        }
+
         processBuilder.redirectErrorStream(true);
         Process process = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));

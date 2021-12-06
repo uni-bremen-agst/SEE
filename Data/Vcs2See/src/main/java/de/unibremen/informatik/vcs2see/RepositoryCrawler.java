@@ -17,6 +17,10 @@ public class RepositoryCrawler {
 
     private VCSEngine engine;
 
+    /**
+     * Initializes the repository crawler.
+     * Important to set the "repository.temp" properties value.
+     */
     public void crawl() {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
         String path = propertiesManager.getProperty("repository.path").orElseThrow();
@@ -43,6 +47,11 @@ public class RepositoryCrawler {
         propertiesManager.setProperty("repository.temp", engine.getOutput().toString());
     }
 
+    /**
+     * Gets the next revision from version control.
+     * @return revision
+     * @throws IOException exception
+     */
     public Optional<RevisionRange> nextRevision() throws IOException {
         return engine.next();
     }
