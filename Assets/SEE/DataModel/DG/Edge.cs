@@ -15,47 +15,28 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Constructor.
+        ///
+        /// Note: The edge ID will be created lazily upon the first access to <see cref="ID"/>.
+        /// An edge ID can be set and changed as long as the edge is not yet added to a graph.
         /// </summary>
-        /// <param name="ID">unique ID of edge</param>
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
         /// <param name="type">type of the edge</param>
-        public Edge(string ID, Node source, Node target, string type)
+        public Edge(Node source, Node target, string type)
         {
             this.Source = source;
             this.Target = target;
             Type = type;
-            id = ID;
-        }
-
-        /// <summary>
-        /// Constructor. A random ID will be used for this edge.
-        /// </summary>
-        /// <param name="source">source of the edge</param>
-        /// <param name="target">target of the edge</param>
-        public Edge(Node source, Node target)
-        {
-            this.Source = source;
-            this.Target = target;
-            id = Guid.NewGuid().ToString();
         }
 
         /// <summary>
         /// Constructor. Source, target, and type of the edge remain undefined.
-        /// </summary>
-        /// <param name="ID">unique ID of edge</param>
-        public Edge(string ID)
-        {
-            id = ID;
-        }
-
-        /// <summary>
-        /// Constructor. Source, target, and type of the edge remain undefined.
-        /// A random ID will be used for this edge.
+        ///
+        /// Note: The edge ID will be created lazily upon the first access to <see cref="ID"/>.
+        /// An edge ID can be set and changed as long as the edge is not yet added to a graph.
         /// </summary>
         public Edge()
         {
-            id = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -157,14 +138,21 @@ namespace SEE.DataModel.DG
         /// </summary>
         public override string ID
         {
-            get => id;
-            set 
+            get
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    id = Type + "#" + Source.ID + "#" + Target.ID;
+                }
+                return id;
+            }
+            set
             {
                 if (ItsGraph != null)
                 {
                     throw new InvalidOperationException("ID must not be changed once added to graph.");
                 }
-                
+
                 id = value;
             }
         }

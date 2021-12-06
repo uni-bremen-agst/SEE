@@ -213,14 +213,7 @@ namespace SEE.Game
             }
             result = transform.root;
 
-            if (result.CompareTag(Tags.CodeCity))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
+            return result.CompareTag(Tags.CodeCity) ? result : null;
         }
 
         /// <summary>
