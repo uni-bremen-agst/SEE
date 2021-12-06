@@ -15,9 +15,9 @@ import java.util.Optional;
  */
 public class RepositoryCrawler {
 
-    private final VCSEngine engine;
+    private VCSEngine engine;
 
-    public RepositoryCrawler() {
+    public void crawl() {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
         String path = propertiesManager.getProperty("repository.path").orElseThrow();
         Type type = Type.valueOf(propertiesManager.getProperty("repository.type").orElseThrow());
