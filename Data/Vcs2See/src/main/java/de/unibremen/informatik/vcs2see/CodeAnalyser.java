@@ -53,7 +53,7 @@ public class CodeAnalyser {
             }
 
             String command = replacePlaceholders(optionalCommand.get(), revision);
-            String directory = optionalDirectory.get();
+            String directory = replacePlaceholders(optionalDirectory.get(), revision);
 
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(command.split("\\s(?=(?:[^\"]*([\"])[^\"]*\\1)*[^\"]*$)"));
