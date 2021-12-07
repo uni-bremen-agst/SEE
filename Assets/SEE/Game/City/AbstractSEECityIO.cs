@@ -21,6 +21,7 @@ namespace SEE.Game.City
         private const string NodeLayoutSettingsLabel = "NodeLayout";
         private const string EdgeLayoutSettingsLabel = "EdgeLayout";
         private const string CityPathLabel = "ConfigPath";
+        private const string SolutionPathLabel = "SolutionPath";
         private const string LODCullingLabel = "LODCulling";
         private const string ZScoreScaleLabel = "ZScoreScale";
         private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
@@ -34,6 +35,7 @@ namespace SEE.Game.City
         protected virtual void Save(ConfigWriter writer)
         {
             CityPath.Save(writer, CityPathLabel);
+            SolutionPath.Save(writer, SolutionPathLabel);
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
             writer.Save(SelectedNodeTypes, SelectedNodeTypesLabel);
@@ -55,6 +57,7 @@ namespace SEE.Game.City
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             CityPath.Restore(attributes, CityPathLabel);
+            SolutionPath.Restore(attributes, SolutionPathLabel);
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, SelectedNodeTypesLabel, ref SelectedNodeTypes);
