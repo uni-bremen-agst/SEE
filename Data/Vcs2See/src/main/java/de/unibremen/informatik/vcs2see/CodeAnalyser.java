@@ -29,6 +29,7 @@ public class CodeAnalyser {
         processBuilder.command(command.split("\\s(?=(?:[^\"]*([\"])[^\"]*\\1)*[^\"]*$)"));
         processBuilder.directory(new File(directory));
 
+        System.out.println("Directory: " + directory);
         System.out.println(String.join(" ", processBuilder.command()));
 
         if(!processBuilder.directory().exists()) {
@@ -103,6 +104,7 @@ public class CodeAnalyser {
                 .collect(Collectors.joining(" "));
 
         String repositoryName = propertiesManager.getProperty("repository.name").orElse("");
+        input = input.replaceAll("%here%", new File("").getAbsolutePath().replace("\\", "\\\\"));
         input = input.replaceAll("%filename%", repositoryName + "-" + revision);
         input = input.replaceAll("%extensions%", extensions);
         return input;
@@ -123,12 +125,6 @@ public class CodeAnalyser {
 
         Language(String... extensions) {
             this.extensions = extensions;
-        }
-
-        public String regex() {
-            return ".*\\" + Arrays.stream(extensions)
-                    .map(extension -> "." + extension)
-                    .collect(Collectors.joining("|"));
         }
     }
 
