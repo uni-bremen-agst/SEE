@@ -1,6 +1,10 @@
-﻿using SEE.Controls;
+﻿using CrazyMinnow.SALSA;
+using Dissonance;
+using Dissonance.Audio.Playback;
+using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -30,6 +34,49 @@ namespace SEE.Game.Worlds
                         throw new System.NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
                 }
             }
+            else
+            {
+                // Remote players need to be set up for Dissonance and SALSA lip sync.
+                SetUpSALSA();
+            }
+        }
+
+        /// <summary>
+        /// The dissonance communication. Its game object holds the remote players as its children.
+        /// </summary>
+        private DissonanceComms comms;
+
+        private void SetUpSALSA()
+        {
+            if (gameObject.TryGetComponent(out IDissonancePlayer iDissonancePlayer))
+            {
+                GameObject dissonancePlayer = GetDissonancePlayer(iDissonancePlayer.PlayerId);
+                if (dissonancePlayer.TryGetComponent(out AudioSource audioSource)
+                    && gameObject.TryGetComponent(out Salsa salsa))
+                {
+                    salsa.audioSrc = audioSource;
+                }
+            }
+        }
+
+        private GameObject GetDissonancePlayer(string playerId)
+        {
+            if (comms == null)
+            {
+                comms = FindObjectOfType<DissonanceComms>();
+                if (comms == null)
+                {
+                    throw new Exception($"A game object with a {typeof(DissonanceComms)} cannot be found.\n");
+                }
+            }
+            foreach (GameObject child in comms.transform)
+            {
+                if (child.TryGetComponent(out VoicePlayback voicePlayback) && voicePlayback.PlayerName == playerId)
+                {
+                    return child;
+                }
+            }
+            throw new Exception($"There is no player with the id {playerId} in {comms.name}.");
         }
 
         /// <summary>
