@@ -29,6 +29,12 @@ namespace SEE.Game.Worlds
                     default:
                         throw new System.NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
                 }
+
+                gameObject.name = "Local " + gameObject.name;
+            }
+            else
+            {
+                gameObject.name = "Remote " + gameObject.name;
             }
         }
 
