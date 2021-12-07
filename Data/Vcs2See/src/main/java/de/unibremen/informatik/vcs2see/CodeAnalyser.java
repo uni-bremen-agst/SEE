@@ -126,6 +126,12 @@ public class CodeAnalyser {
         Language(String... extensions) {
             this.extensions = extensions;
         }
+
+        public String regex() {
+            return ".*\\" + Arrays.stream(extensions)
+                    .map(extension -> "." + extension)
+                    .collect(Collectors.joining("|"));
+        }
     }
 
 }
