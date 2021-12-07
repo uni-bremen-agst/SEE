@@ -1,0 +1,2171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>83db0821847b37de9adc016bf0ebe3f3b9128eaf</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Benjamin Winterberg</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Lock examples</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2015-04-19T08:27:56</string>
+		</attr>
+		<node id="N1">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>376</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>50</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Atomic1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Atomic1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Atomic1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>239</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>170</int>
+			</attr>
+		</node>
+		<node id="N2">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>concurrent</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>concurrent/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N3">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>samples</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N4">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>java8</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N5">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>winterbe</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N6">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>com</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>com/src</string>
+			</attr>
+		</node>
+		<node id="N7">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>src</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src</string>
+			</attr>
+		</node>
+		<node id="N8">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>97</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>13</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>CompletableFuture1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/CompletableFuture1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>CompletableFuture1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>229</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N9">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>109</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>21</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>ConcurrentUtils.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/ConcurrentUtils.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>ConcurrentUtils.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>241</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N10">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>240</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>41</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Executors1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Executors1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Executors1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>231</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N11">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>386</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>57</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Executors2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Executors2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Executors2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>233</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N12">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>588</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>80</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Executors3.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Executors3.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Executors3.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>235</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N13">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>187</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>31</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lock1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Lock1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lock1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Line_Changes">
+				<int>46</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Added">
+				<int>46</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Edited">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>253</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N14">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>125</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>20</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lock2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Lock2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lock2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Line_Changes">
+				<int>29</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Added">
+				<int>29</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Edited">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>255</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N15">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>173</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>20</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LongAccumulator1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/LongAccumulator1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LongAccumulator1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>245</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N16">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>230</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>28</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LongAdder1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/LongAdder1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LongAdder1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>243</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N17">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>225</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>37</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Semaphore1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Semaphore1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Semaphore1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>247</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N18">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>237</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>35</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Synchronized1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Synchronized1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Synchronized1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>249</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>170</int>
+			</attr>
+		</node>
+		<node id="N19">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>159</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>25</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Synchronized2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Synchronized2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Synchronized2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>251</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N20">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>303</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>46</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Threads1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/concurrent/Threads1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Threads1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/concurrent/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>237</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N21">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>129</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>23</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Interface1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Interface1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Interface1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>141</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N22">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>lambda</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>lambda/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N23">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>307</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>31</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lambda1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Lambda1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lambda1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>143</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N24">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>227</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>30</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lambda2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Lambda2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lambda2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>209</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N25">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>392</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>41</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lambda3.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Lambda3.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lambda3.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>211</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N26">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>191</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>26</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Lambda4.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Lambda4.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Lambda4.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>145</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N27">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>53</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>10</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Person.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/lambda/Person.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Person.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/lambda/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>217</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N28">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>227</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>32</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Annotations1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/Annotations1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Annotations1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>147</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N29">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>misc</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>misc/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N30">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>303</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>58</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>CheckedFunctions.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/CheckedFunctions.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>CheckedFunctions.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>227</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N31">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>206</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>26</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Concurrency1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/Concurrency1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Concurrency1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>149</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N32">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>684</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>91</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Files1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/Files1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Files1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>221</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>255</int>
+			</attr>
+		</node>
+		<node id="N33">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>357</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>29</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Maps1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/Maps1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Maps1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>151</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N34">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>276</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>45</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Math1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/Math1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Math1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>223</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N35">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>269</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>40</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>String1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/misc/String1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>String1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/misc/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>225</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>170</int>
+			</attr>
+		</node>
+		<node id="N36">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>188</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>21</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>213</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N37">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>nashorn</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>nashorn/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N38">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>150</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>18</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn10.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn10.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn10.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>153</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N39">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>203</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>25</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>155</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N40">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>64</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>9</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn3.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn3.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn3.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>157</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N41">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>64</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>9</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn4.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn4.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn4.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>159</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N42">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>129</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.837209</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn5.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn5.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn5.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>161</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N43">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>190</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>22</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.568421</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn6.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn6.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn6.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>163</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N44">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>180</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>30</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn7.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn7.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn7.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>165</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N45">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>131</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>16</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn8.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn8.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn8.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>215</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N46">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>176</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>21</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Nashorn9.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Nashorn9.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Nashorn9.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>167</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N47">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>132</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>31</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Product.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/Product.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Product.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>169</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N48">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>36</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>7</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SuperRunner.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/nashorn/SuperRunner.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SuperRunner.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/nashorn/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>171</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N49">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>91</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>11</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Optional1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Optional1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Optional1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>173</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N50">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>stream</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>stream/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N51">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>347</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>57</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Optional2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Optional2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Optional2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>175</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N52">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>405</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>55</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.276543</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>177</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N53">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>949</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>137</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.134879</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams10.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams10.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams10.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>179</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N54">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>627</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>94</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.204147</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams11.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams11.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams11.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>181</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N55">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>578</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>67</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams12.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams12.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams12.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>183</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N56">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>153</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>19</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams13.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams13.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams13.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>185</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N57">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>140</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>22</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.800000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams2.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams2.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams2.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>187</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N58">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>338</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>39</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams3.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams3.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams3.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>189</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N59">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>221</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>28</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams4.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams4.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams4.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>191</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N60">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>789</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>108</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams5.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams5.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams5.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>193</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N61">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>255</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>47</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams6.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams6.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams6.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>219</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>85</int>
+			</attr>
+		</node>
+		<node id="N62">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>345</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>44</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams7.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams7.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams7.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>195</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N63">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>232</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>29</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams8.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams8.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams8.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>197</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N64">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>89</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>13</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Streams9.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/stream/Streams9.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Streams9.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/stream/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>199</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N65">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>217</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>27</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LocalDate1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/time/LocalDate1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LocalDate1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/time/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>201</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N66">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>time</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>time/samples/java8/winterbe/com/src</string>
+			</attr>
+		</node>
+		<node id="N67">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>245</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>31</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LocalDateTime1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/time/LocalDateTime1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LocalDateTime1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/time/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>203</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N68">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>368</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>42</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LocalTime1.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>src/com/winterbe/java8/samples/time/LocalTime1.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LocalTime1.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>src/com/winterbe/java8/samples/time/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>205</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<edge from="N6" id="E1" to="N7">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N5" id="E2" to="N6">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N4" id="E3" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N3" id="E4" to="N4">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N2" id="E5" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N1" id="E6" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N8" id="E7" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N9" id="E8" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N10" id="E9" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N11" id="E10" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N12" id="E11" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N13" id="E12" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N14" id="E13" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N15" id="E14" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N16" id="E15" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N17" id="E16" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N18" id="E17" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N19" id="E18" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N20" id="E19" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N22" id="E20" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N21" id="E21" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N23" id="E22" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N24" id="E23" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N25" id="E24" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N26" id="E25" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N27" id="E26" to="N22">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N29" id="E27" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N28" id="E28" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N30" id="E29" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N31" id="E30" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N32" id="E31" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N33" id="E32" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N34" id="E33" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N35" id="E34" to="N29">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N37" id="E35" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N36" id="E36" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N38" id="E37" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N39" id="E38" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N40" id="E39" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N41" id="E40" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N42" id="E41" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N43" id="E42" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N44" id="E43" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N45" id="E44" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N46" id="E45" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N47" id="E46" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N48" id="E47" to="N37">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N50" id="E48" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N49" id="E49" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N51" id="E50" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N52" id="E51" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N53" id="E52" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N54" id="E53" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N55" id="E54" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N56" id="E55" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N57" id="E56" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N58" id="E57" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N59" id="E58" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N60" id="E59" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N61" id="E60" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N62" id="E61" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N63" id="E62" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N64" id="E63" to="N50">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N66" id="E64" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N65" id="E65" to="N66">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N67" id="E66" to="N66">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N68" id="E67" to="N66">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N42" id="E68" to="N43">
+			<type xlink:href="Clone"/>
+			<attr name="Clone.Source.Start.Line">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Source.Start.Column">
+				<int>9</int>
+			</attr>
+			<attr name="Clone.Source.End.Line">
+				<int>25</int>
+			</attr>
+			<attr name="Clone.Source.End.Column">
+				<int>23</int>
+			</attr>
+			<attr name="Clone.Target.Start.Line">
+				<int>3</int>
+			</attr>
+			<attr name="Clone.Target.Start.Column">
+				<int>8</int>
+			</attr>
+			<attr name="Clone.Target.End.Line">
+				<int>27</int>
+			</attr>
+			<attr name="Clone.Target.End.Column">
+				<int>35</int>
+			</attr>
+			<attr name="Clone.Type">
+				<int>2</int>
+			</attr>
+			<attr name="Clone.Length">
+				<int>25</int>
+			</attr>
+			<attr name="Clone.Number_Of_Tokens">
+				<int>108</int>
+			</attr>
+			<attr name="Clone.Multiplicity">
+				<int>1</int>
+			</attr>
+		</edge>
+		<edge from="N52" id="E69" to="N57">
+			<type xlink:href="Clone"/>
+			<attr name="Clone.Source.Start.Line">
+				<int>3</int>
+			</attr>
+			<attr name="Clone.Source.Start.Column">
+				<int>8</int>
+			</attr>
+			<attr name="Clone.Source.End.Line">
+				<int>29</int>
+			</attr>
+			<attr name="Clone.Source.End.Column">
+				<int>24</int>
+			</attr>
+			<attr name="Clone.Target.Start.Line">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Target.Start.Column">
+				<int>22</int>
+			</attr>
+			<attr name="Clone.Target.End.Line">
+				<int>28</int>
+			</attr>
+			<attr name="Clone.Target.End.Column">
+				<int>24</int>
+			</attr>
+			<attr name="Clone.Type">
+				<int>2</int>
+			</attr>
+			<attr name="Clone.Length">
+				<int>27</int>
+			</attr>
+			<attr name="Clone.Number_Of_Tokens">
+				<int>112</int>
+			</attr>
+			<attr name="Clone.Multiplicity">
+				<int>1</int>
+			</attr>
+		</edge>
+		<edge from="N53" id="E70" to="N54">
+			<type xlink:href="Clone"/>
+			<attr name="Clone.Source.Start.Line">
+				<int>9</int>
+			</attr>
+			<attr name="Clone.Source.Start.Column">
+				<int>13</int>
+			</attr>
+			<attr name="Clone.Source.End.Line">
+				<int>51</int>
+			</attr>
+			<attr name="Clone.Source.End.Column">
+				<int>9</int>
+			</attr>
+			<attr name="Clone.Target.Start.Line">
+				<int>4</int>
+			</attr>
+			<attr name="Clone.Target.Start.Column">
+				<int>8</int>
+			</attr>
+			<attr name="Clone.Target.End.Line">
+				<int>43</int>
+			</attr>
+			<attr name="Clone.Target.End.Column">
+				<int>9</int>
+			</attr>
+			<attr name="Clone.Type">
+				<int>2</int>
+			</attr>
+			<attr name="Clone.Length">
+				<int>40</int>
+			</attr>
+			<attr name="Clone.Number_Of_Tokens">
+				<int>128</int>
+			</attr>
+			<attr name="Clone.Multiplicity">
+				<int>1</int>
+			</attr>
+		</edge>
+	</graph>
+</gxl>

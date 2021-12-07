@@ -1,5 +1,6 @@
 package de.unibremen.informatik.vcs2see;
 
+import de.unibremen.informatik.st.libvcs4j.Commit;
 import de.unibremen.informatik.st.libvcs4j.RevisionRange;
 import lombok.Getter;
 import org.xml.sax.SAXException;
@@ -213,15 +214,16 @@ public class Vcs2See {
         consoleManager.printSeparator();
 
         // Go through all revisions
-        int i = 1;
+        int index = 1;
         do {
-            consoleManager.print("CRAWLING - " + i);
-            consoleManager.printSeparator();
-            codeAnalyser.analyse(i++);
-
-            RevisionRange revisionRange = optional.orElseThrow();
-            graphModifier.process(revisionRange);
-            consoleManager.printSeparator();
+            for(Commit commit : optional.orElseThrow().getCommits()) {
+                consoleManager.print("CRAWLING - " + index);
+                consoleManager.printSeparator();
+                codeAnalyser.analyse(index);
+                graphModifier.process(commit, index);
+                consoleManager.printSeparator();
+                index++;
+            }
         } while ((optional = repositoryCrawler.nextRevision()).isPresent());
 
         // Postprocess analysis
