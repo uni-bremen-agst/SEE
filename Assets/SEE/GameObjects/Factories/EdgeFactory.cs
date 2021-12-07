@@ -1,9 +1,9 @@
-﻿using SEE.DataModel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.GO
@@ -134,6 +134,7 @@ namespace SEE.GO
                 // material and will not be affected by changes of the
                 // original material.
                 line.sharedMaterial = defaultLineMaterial;
+                line.sharedMaterial.renderQueue = new[] { layoutEdge.Source, layoutEdge.Target }.Max(x => x.gameObject.GetComponent<Renderer>().sharedMaterial.renderQueue);
 
                 LineFactory.SetDefaults(line);
                 LineFactory.SetWidth(line, edgeWidth);

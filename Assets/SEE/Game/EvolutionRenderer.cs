@@ -1545,6 +1545,8 @@ namespace SEE.Game
 
             public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
 
+            public GameObject gameObject => throw new NotImplementedException();
+
             public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
             public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
