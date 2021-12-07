@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace SEE.Net
@@ -18,7 +19,7 @@ namespace SEE.Net
         /// <summary>
         /// The repeat rate of updating via network in seconds.
         /// </summary>
-        public const float UpdateRepeatRate = 0.1f;
+        public const float UpdateRepeatRate = 0.3f;
 
 
 
@@ -137,28 +138,54 @@ namespace SEE.Net
         private Vector3 scaleNext;
 
 
+        private Vector3 oldSynchronizedPosition;
+        private Quaternion oldSynchronizedRotation;
+        private Vector3 oldSynchronizedScale;
+        /// <summary>
+        /// Controls if the <see cref="UpdateRepeatRate"/> time has been elapsed
+        /// </summary>
+        private bool cooldown = true;
 
         /// <summary>
-        /// Initializes the transform view to invoke the update function every
+        /// updates the player head every
         /// <see cref="UpdateRepeatRate"/> seconds.
         /// </summary>
-        protected override void InitializeImpl()
+        /// <returns></returns>
+        private IEnumerator NetworkUpdate()
         {
+            cooldown = false;
             if (viewContainer.IsOwner() && !Network.UseInOfflineMode)
             {
-                if (synchronizePosition)
+                if (synchronizePosition && oldSynchronizedPosition != transformToSynchronize.position)
                 {
-                    InvokeRepeating(nameof(SynchronizePosition), UpdateTimeStartDelay, UpdateRepeatRate);
+                    SynchronizePosition(); 
+                    oldSynchronizedPosition = transformToSynchronize.position;
+                    
                 }
-                if (synchronizeRotation)
+                if (synchronizeRotation && oldSynchronizedRotation != transformToSynchronize.rotation)
                 {
-                    InvokeRepeating(nameof(SynchronizeRotation), UpdateTimeStartDelay, UpdateRepeatRate);
+                    SynchronizeRotation();
+                    oldSynchronizedRotation = transformToSynchronize.rotation;
+
                 }
-                if (synchronizeScale)
+                if (synchronizeScale && oldSynchronizedScale != transformToSynchronize.localScale)
                 {
-                    InvokeRepeating(nameof(SynchronizeScale), UpdateTimeStartDelay, UpdateRepeatRate);
+                    SynchronizeScale();
+                    oldSynchronizedScale = transformToSynchronize.localScale;
                 }
             }
+            yield return new WaitForSeconds(UpdateRepeatRate);
+            cooldown = true;
+        }
+
+        /// <summary>
+        /// Initializes the transform view 
+        /// </summary>
+        protected override void InitializeImpl() 
+        {
+            oldSynchronizedPosition = transformToSynchronize.position;
+            oldSynchronizedRotation = transformToSynchronize.rotation;
+            oldSynchronizedScale = transformToSynchronize.localScale;
             teleportMinDistanceSquared = teleportMinDistance * teleportMinDistance;
         }
 
@@ -168,6 +195,10 @@ namespace SEE.Net
         /// </summary>
         protected override void UpdateImpl()
         {
+            if (cooldown)
+            {
+                StartCoroutine(NetworkUpdate());
+            }
             if (viewContainer != null && !viewContainer.IsOwner())
             {
                 if (synchronizePosition)
@@ -178,7 +209,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        transformToSynchronize.position = Vector3.LerpUnclamped(
+                        transformToSynchronize.position = Vector3.Lerp(
                             positionLast,
                             positionNext,
                             (float)(positionUpdateStopwatch.Elapsed.TotalSeconds / UpdateRepeatRate)
@@ -213,6 +244,7 @@ namespace SEE.Net
         /// <param name="nextPosition">The desired position of the transform.</param>
         internal void SetNextPosition(Vector3 nextPosition)
         {
+            UnityEngine.Debug.Log("SYNCRON");
             positionUpdateStopwatch.Restart();
             positionLast = transformToSynchronize.position;
             positionNext = nextPosition;
@@ -225,6 +257,7 @@ namespace SEE.Net
         /// <param name="nextRotation">The desired rotation of the transform.</param>
         internal void SetNextRotation(Quaternion nextRotation)
         {
+            UnityEngine.Debug.Log("ROT");
             rotationUpdateStopwatch.Restart();
             rotationLast = transformToSynchronize.rotation;
             rotationNext = nextRotation;
@@ -237,6 +270,7 @@ namespace SEE.Net
         /// <param name="nextScale">The desired scale of the transform.</param>
         internal void SetNextScale(Vector3 nextScale)
         {
+            UnityEngine.Debug.Log("SCALE");
             scaleUpdateStopwatch.Restart();
             scaleLast = transformToSynchronize.localScale;
             scaleNext = nextScale;
