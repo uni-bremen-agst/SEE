@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DG.Tweening;
+﻿using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
