@@ -63,7 +63,7 @@ public class Vcs2See {
 
         setupEnvironment();
         setupRepository();
-        setupBase();
+        setupProject();
         setupAnalysis();
 
         propertiesManager.saveProperties();
@@ -99,7 +99,7 @@ public class Vcs2See {
      * Runs project specific setup.
      * @throws IOException exception
      */
-    private void setupBase() throws IOException {
+    private void setupProject() throws IOException {
         consoleManager.print("SETUP - BASE");
         consoleManager.printSeparator();
         read("project.base");//TODO: CHECK PATHS
