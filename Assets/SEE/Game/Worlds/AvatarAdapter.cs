@@ -39,9 +39,6 @@ namespace SEE.Game.Worlds
             else
             {
                 gameObject.name = "Remote " + gameObject.name;
-            }
-            else
-            {
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 SetUpSALSA();
             }
