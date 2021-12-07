@@ -2,6 +2,7 @@ package de.unibremen.informatik.vcs2see;
 
 import de.unibremen.informatik.st.libvcs4j.RevisionRange;
 import lombok.Getter;
+import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -190,7 +191,7 @@ public class Vcs2See {
      * @param args ignored
      * @throws IOException exception
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SAXException {
         Vcs2See vcs2See = new Vcs2See();
 
         // Check if CI-Mode argument is set
@@ -218,7 +219,7 @@ public class Vcs2See {
             consoleManager.printSeparator();
             codeAnalyser.analyse(i++);
 
-            RevisionRange revisionRange = optional.get();
+            RevisionRange revisionRange = optional.orElseThrow();
             graphModifier.process(revisionRange);
             consoleManager.printSeparator();
         } while ((optional = repositoryCrawler.nextRevision()).isPresent());
