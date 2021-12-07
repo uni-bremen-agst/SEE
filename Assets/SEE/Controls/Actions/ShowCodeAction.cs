@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.UI.CodeWindow;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -105,7 +107,14 @@ namespace SEE.Controls.Actions
                 {
                     codeWindow.VisibleLine = line.Value;
                 }
-                    
+
+                // Add solution path
+                GameObject cityObject = SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
+                if (cityObject.TryGetComponentOrLog(out AbstractSEECity city))
+                {
+                    codeWindow.SolutionPath = city.SolutionPath.Path;
+                }
+
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
                 {

@@ -31,6 +31,11 @@ namespace SEE.Game.UI.CodeWindow
         public string FilePath;
 
         /// <summary>
+        /// The solution path used for the IDE integration.
+        /// </summary>
+        public string SolutionPath;
+
+        /// <summary>
         /// The title (e.g. filename) for the code window.
         /// </summary>
         public string Title;
