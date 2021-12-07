@@ -1,10 +1,8 @@
 ﻿using Dissonance;
-using SEE.DataModel;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SEE.Game.Worlds
 {
@@ -21,6 +19,11 @@ namespace SEE.Game.Worlds
 
         [Tooltip("Initial rotation of a spawned player along the y axis."), Range(0, 360-float.Epsilon)]
         public float InitialRotation = 0;
+
+        /// <summary>
+        /// The dissonance communication. Its game object holds the remote players as its children.
+        /// </summary>
+        private DissonanceComms comms = null;
 
         /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
@@ -47,7 +50,6 @@ namespace SEE.Game.Worlds
             // The following code will be executed only on the server.
 
             // Wait until Dissonance is created
-            DissonanceComms comms = null;
             while (ReferenceEquals(comms, null))
             {
                 comms = FindObjectOfType<DissonanceComms>();
