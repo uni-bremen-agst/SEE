@@ -44,7 +44,10 @@ public class RepositoryCrawler {
                 break;
         }
 
-        propertiesManager.setProperty("repository.temp", engine.getOutput().toString());
+        String temp = engine.getOutput()
+                .toFile().getAbsolutePath()
+                .replace("\\", "\\\\");
+        propertiesManager.setProperty("repository.temp", temp);
     }
 
     /**

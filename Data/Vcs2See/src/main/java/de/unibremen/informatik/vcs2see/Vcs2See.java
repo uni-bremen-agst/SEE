@@ -204,14 +204,16 @@ public class Vcs2See {
         // Initialize the repository crawler
         repositoryCrawler.crawl();
 
+        // Load first revision before preparing, else clone fails because of non empty directory
+        Optional<RevisionRange> optional = repositoryCrawler.nextRevision();
+
         // Prepare analysis
         codeAnalyser.prepare();
         consoleManager.printSeparator();
 
         // Go through all revisions
         int i = 1;
-        Optional<RevisionRange> optional;
-        while ((optional = repositoryCrawler.nextRevision()).isPresent()) {
+        do {
             consoleManager.print("CRAWLING - " + i);
             consoleManager.printSeparator();
             codeAnalyser.analyse(i++);
@@ -219,7 +221,7 @@ public class Vcs2See {
             RevisionRange revisionRange = optional.get();
             graphModifier.process(revisionRange);
             consoleManager.printSeparator();
-        }
+        } while ((optional = repositoryCrawler.nextRevision()).isPresent());
 
         // Postprocess analysis
         codeAnalyser.postprocess();
