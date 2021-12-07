@@ -31,7 +31,7 @@ namespace SEE.Utils
             /// </summary>
             /// <param name="rpcServer">The server of this client.</param>
             /// <param name="client">The TCP client.</param>
-            public Client(JsonRpcServer rpcServer, TcpClient client) :base(rpcServer)
+            public Client(TcpClient client)
             {
                 this.client = client;
             }
@@ -43,7 +43,7 @@ namespace SEE.Utils
             {
                 try
                 {
-                    Rpc = JsonRpc.Attach(client.GetStream(), RpcServer.Target);
+                    Rpc = JsonRpc.Attach(client.GetStream());
                 }
                 catch (Exception)
                 {
@@ -79,7 +79,7 @@ namespace SEE.Utils
         /// Creates a new JsonRpcNamedPipeServer instance.
         /// </summary>
         /// <param name="target">An object that contains function that can be called
-        /// remotely.</param>
+        /// remotely. If null no target will be added by default.</param>
         /// <param name="port">The port, that will be used for communication.</param>
         public JsonRpcSocketServer(object target, int port) : base(target)
         {
@@ -110,7 +110,7 @@ namespace SEE.Utils
                         var message = Encoding.ASCII.GetBytes("START\n");
                         tcpClient.GetStream().Write(message, 0, message.Length);
                         await tcpClient.GetStream().FlushAsync(token);
-                        RunConnection(new Client(this, tcpClient));
+                        RunConnection(new Client(tcpClient));
                     }
                     else
                     {
