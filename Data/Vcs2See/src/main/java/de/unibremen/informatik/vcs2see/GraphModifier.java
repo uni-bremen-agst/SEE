@@ -35,6 +35,13 @@ public class GraphModifier {
         this.mostRecent = new LinkedList<>();
     }
 
+    /**
+     * Processes single commit into graph.
+     * @param commit commit to extract information from
+     * @param index ordinal of commit
+     * @throws IOException exception
+     * @throws SAXException exception
+     */
     public void process(Commit commit, int index) throws IOException, SAXException {
         // Get GXL file of revision
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
@@ -52,6 +59,9 @@ public class GraphModifier {
         document.write(file);
     }
 
+    /**
+     * Loads Nodes from GXL file.
+     */
     private void loadNodes() {
         ConsoleManager consoleManager = Vcs2See.getConsoleManager();
         consoleManager.print("Nodes:");
@@ -73,6 +83,11 @@ public class GraphModifier {
         }
     }
 
+    /**
+     * Loads commit from VCSLib4j.
+     * @param commit commit
+     * @throws IOException exception
+     */
     private void loadCommit(Commit commit) throws IOException {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
         String basePath = propertiesManager.getProperty("project.base").orElseThrow();
@@ -137,6 +152,9 @@ public class GraphModifier {
         }
     }
 
+    /**
+     * Populates GXL Nodes with queried information.
+     */
     private void populateNodes() {
         List<String> list = (LinkedList<String>) mostRecent;
         for(int i = 0; i < list.size(); i++) {
@@ -151,6 +169,10 @@ public class GraphModifier {
         }
     }
 
+    /**
+     * Adds commit attributes to current graph.
+     * @param commit commit
+     */
     private void addCommitGraph(Commit commit) {
         GXLGraph codeGraph = document.getDocumentElement().getGraphAt(0);
         codeGraph.setAttr("CommitId", new GXLString(commit.getId()));
@@ -159,11 +181,22 @@ public class GraphModifier {
         codeGraph.setAttr("CommitTimestamp", new GXLString(commit.getDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
     }
 
+    /**
+     * Calculates most recent value from collected information.
+     * @param size size of the list
+     * @param index index of the calculated element
+     * @return most recent value
+     */
     private int calculateMostRecent(int size, int index) {
         int step = 255 / (size - 1);
         return 255 - (step  * index);
     }
 
+    /**
+     * Calculates most frequent value from collected information.
+     * @param value value of current node
+     * @return most frequent value
+     */
     private int calculateMostFrequent(int value) {
         float min = mostFrequent.values().stream().min(Integer::compareTo).orElse(0);
         float max = mostFrequent.values().stream().max(Integer::compareTo).orElse(255);
