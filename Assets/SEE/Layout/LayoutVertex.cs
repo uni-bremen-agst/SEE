@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -37,32 +38,13 @@ namespace SEE.Layout
         /// <summary>
         /// Immediate ancestor of the node. May be null, if the node is a root.
         /// </summary>
-        private ILayoutNode parent;
-
-        /// <summary>
-        /// Immediate ancestor of the node. May be null, if the node is a root.
-        /// </summary>
-        public ILayoutNode Parent
-        {
-            get => parent;
-            set => parent = value;
-        }
+        public ILayoutNode Parent { get; private set; }
 
         /// <summary>
         /// The level of the node in the node hierarchy, that is, the number
         /// of ancestors. A root has level 0.
         /// </summary>
-        private int level = 0;
-
-        /// <summary>
-        /// The level of the node in the node hierarchy, that is, the number
-        /// of ancestors. A root has level 0.
-        /// </summary>
-        public int Level
-        {
-            get => level;
-            set => level = value;
-        }
+        public int Level { get; set; } = 0;
 
         /// <summary>
         /// Immediate children of the node.
@@ -116,12 +98,12 @@ namespace SEE.Layout
 
         public void SetOrigin()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void SetRelative(ILayoutNode node)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -189,10 +171,11 @@ namespace SEE.Layout
         /// </summary>
         public Vector3 AbsoluteScale => scale;
 
-        public Vector3 RelativePosition { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public bool IsSublayoutNode { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public bool IsSublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public Sublayout Sublayout { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public ILayoutNode SublayoutRoot { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public GameObject gameObject => throw new NotImplementedException();
     }
 }

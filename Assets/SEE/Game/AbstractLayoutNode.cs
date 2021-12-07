@@ -17,6 +17,11 @@ namespace SEE.Game
         protected readonly Node node;
 
         /// <summary>
+        /// The game object this layout node encapsulates.
+        /// </summary>
+        public GameObject gameObject { get; protected set; }
+
+        /// <summary>
         /// The underlying graph node represented by this laid out node.
         /// </summary>
         public Node ItsNode => node;
