@@ -6,8 +6,10 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -48,6 +50,7 @@ namespace SEE.Controls
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <param name="path">Absolute file path.</param>
+            /// <param name="line">Optional line number.</param>
             public async UniTask OpenFile(JsonRpcConnection connection, string path, int? line)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path, line);
@@ -106,7 +109,8 @@ namespace SEE.Controls
         #region Remote Procedure Calls
 
         /// <summary>
-        /// This class contains all functions, that can be called by the client (IDE).
+        /// This class contains all functions, that can be called by the client (IDE). It will be
+        /// given to each <see cref="JsonRpcConnection"/> individually.
         /// </summary>
         private class RemoteProcedureCalls
         {
@@ -116,13 +120,20 @@ namespace SEE.Controls
             private readonly IDEIntegration ideIntegration;
 
             /// <summary>
+            /// The current solution path of the connected IDE.
+            /// </summary>
+            private string solutionPath;
+
+            /// <summary>
             /// Nested class in <see cref="IDEIntegration"/>. Contains all methods that can be accessed
             /// by the client. Should only be initiated by the <see cref="IDEIntegration"/>.
             /// </summary>
             /// <param name="ideIntegration">instance of IDEIntegration</param>
-            public RemoteProcedureCalls(IDEIntegration ideIntegration)
+            /// <param name="solutionPath">The solution path of the connected IDE.</param>
+            public RemoteProcedureCalls(IDEIntegration ideIntegration, string solutionPath)
             {
                 this.ideIntegration = ideIntegration;
+                this.solutionPath = solutionPath;
             }
 
             /// <summary>
@@ -131,14 +142,21 @@ namespace SEE.Controls
             /// null, it won't be appended to the key.
             /// </summary>
             /// <param name="path">The absolute path to the source file.</param>
-            /// <param name="name">Optional name of the element in a file.</param>
-            public void HighlightNode(string path, string name = null)
+            /// <param name="name">Name of the element in a file.</param>
+            /// <param name="line">Line of the element.</param>
+            /// <param name="column">Column of the element.</param>
+            public void HighlightNode(string path, string name, int line, int column)
             {
                 var tmp = path;
 
                 if (name != null)
                 {
                     tmp = $"{path}:{name}";
+
+                    if (!ideIntegration.IgnorePosition)
+                    {
+                        tmp += $":{line}:{column}";
+                    }
                 }
 
                 try
@@ -150,6 +168,32 @@ namespace SEE.Controls
                 {
                     // The given key was not presented int the dictionary.
                 }
+            }
+
+            /// <summary>
+            /// Solution path changed.
+            /// </summary>
+            /// <returns>Async Task.</returns>
+            public void SolutionChanged(string path)
+            {
+                ideIntegration.semaphore.Wait();
+                var connection = ideIntegration.cachedConnections[solutionPath];
+
+                if (ideIntegration.cachedSolutionPaths.Contains(path) || ideIntegration.ConnectToAny)
+                {
+                    if (ideIntegration.cachedConnections.Remove(solutionPath))
+                    {
+                        ideIntegration.cachedConnections.Add(path, connection);
+                        solutionPath = path;
+                    }
+                }
+                else
+                {
+                    ideIntegration.ideCalls.Decline(connection).Forget();
+                }
+
+                ideIntegration.semaphore.Release();
+
             }
         }
 
@@ -215,12 +259,6 @@ namespace SEE.Controls
         private SemaphoreSlim semaphore;
 
         /// <summary>
-        /// Will be raised when <see cref="CheckIDE"/> is used. Only purpose is to wait in
-        /// <see cref="OpenNewIDEInstanceAsync"/> until connection happened.
-        /// </summary>
-        private SemaphoreSlim connectionSignal;
-
-        /// <summary>
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
         /// city have no impact to the source code, this will only be initialized during start up.
         /// </summary>
@@ -230,12 +268,12 @@ namespace SEE.Controls
         /// A mapping of all registered connections to the project they have opened. Only add and
         /// delete elements in this directory while using <see cref="semaphore"/>.
         /// </summary>
-        private IDictionary<string, ICollection<JsonRpcConnection>> cachedConnections;
+        private IDictionary<string, JsonRpcConnection> cachedConnections;
 
         /// <summary>
-        /// Contains all Graphs in this scene
+        /// Contains all solution path of code cities in this scene.
         /// </summary>
-        private ICollection<Graph> cachedGraphs;
+        private HashSet<string> cachedSolutionPaths;
 
         /// <summary>
         /// Contains all <see cref="InteractableObject"/> that were selected by the selected IDE.
@@ -272,13 +310,12 @@ namespace SEE.Controls
 
             Instance = this;
             semaphore = new SemaphoreSlim(1, 1);
-            connectionSignal = new SemaphoreSlim(0, 1);
             pendingSelections = new HashSet<InteractableObject>();
-            cachedConnections = new Dictionary<string, ICollection<JsonRpcConnection>>();
+            cachedConnections = new Dictionary<string, JsonRpcConnection>();
 
-            InitializeCachedObjects();
+            InitializeSceneElementsObjects();
 
-            server = new JsonRpcSocketServer(new RemoteProcedureCalls(this), Port);
+            server = new JsonRpcSocketServer(null, Port);
             ideCalls = new IDECalls(server);
 
             server.Connected += ConnectedToClient;
@@ -312,23 +349,20 @@ namespace SEE.Controls
 
             server?.Dispose();
             semaphore?.Dispose();
-            connectionSignal?.Dispose();
             Instance = null;
         }
 
         /// <summary>
         /// Will get every node using <see cref="SceneQueries.AllGameNodesInScene"/> and store
-        /// them in <see cref="cachedObjects"/>.
+        /// them in <see cref="cachedObjects"/>. Additionally will look for all solution paths.
         /// </summary>
-        private void InitializeCachedObjects()
+        private void InitializeSceneElementsObjects()
         {
             cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
-            var allNodes = SceneQueries.AllGameNodesInScene(true, true);
-            //cachedGraphs = SceneQueries.GetGraphs(allNodes);
-            cachedGraphs = new List<Graph>();
+            cachedSolutionPaths = new HashSet<string>();
 
             // Get all nodes in scene
-            foreach (var node in allNodes)
+            foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
             {
                 var key = GenerateKey(node.GetNode());
 
@@ -339,6 +373,14 @@ namespace SEE.Controls
                         cachedObjects[key] = new List<InteractableObject>();
                     }
                     cachedObjects[key].Add(obj);
+                }
+            }
+
+            foreach (var obj in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
+            {
+                if (obj.TryGetComponent(out AbstractSEECity city))
+                {
+                    cachedSolutionPaths.Add(city.SolutionPath.Path);
                 }
             }
         }
@@ -408,29 +450,42 @@ namespace SEE.Controls
         /// Opens the specified file in an IDE.
         /// </summary>
         /// <param name="filePath">The absolute file path.</param>
+        /// <param name="solutionPath">The absolute solution path of this file.</param>
+        /// <param name="line">Optional line number.</param>
         /// <returns>Async UniTask.</returns>
-        public async UniTask OpenFile(string filePath, int? line = null)
+        public async UniTask OpenFile(string filePath, string solutionPath, int? line = null)
         {
-            await LookForIDEConnection();
-            // TODO: Fix me
-            await ideCalls.OpenFile(cachedConnections.First().Value.First(), filePath, line);
+            var connection = await LookForIDEConnection(solutionPath);
+            if (connection == null) return;
+            await ideCalls.OpenFile(connection, filePath, line);
         }
 
         #region IDE Management
 
         /// <summary>
         /// Is looking for any active IDE. If no instance is found, will open a new IDE
-        /// instance.
+        /// instance. Also focusing the IDE.
         /// </summary>
-        /// <returns>Async UniTask.</returns>
-        private async UniTask LookForIDEConnection()
+        /// <param name="solutionPath">The solution path.</param>
+        /// <returns>Will return the <see cref="JsonRpcConnection"/> to a given solution path.
+        /// Null if not found.</returns>
+        private async UniTask<JsonRpcConnection> LookForIDEConnection(string solutionPath)
         {
-            if (!server.IsConnected())
+            if (solutionPath == null) return null;
+
+            JsonRpcConnection connection;
+            try
             {
-                await OpenNewIDEInstanceAsync();
+                connection = cachedConnections[solutionPath];
             }
-            // TODO: Fix me
-            await ideCalls.FocusIDE(cachedConnections.First().Value.First());
+            catch (Exception)
+            {
+                connection = await OpenNewIDEInstanceAsync(solutionPath);
+            }
+
+            await ideCalls.FocusIDE(connection);
+
+            return connection;
         }
 
         /// <summary>
@@ -444,48 +499,30 @@ namespace SEE.Controls
             // Right version of the IDE
             var version = await ideCalls.GetIDEVersion(connection);
             if (version == null || !version.Equals(Type.ToString())) return false;
-
-            if (await ideCalls.WasStartedBySee(connection))
-            {
-                connectionSignal.Release();
-                return true;
-            }
-
-            if (ConnectToAny) return true;
-
-            var project = await ideCalls.GetProjectPath(connection);
-            foreach (var graph in cachedGraphs)
-            {
-                // TODO: Fix me!
-                if (graph.Path.Equals(ideCalls))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            
+            return await ideCalls.WasStartedBySee(connection) || ConnectToAny || 
+                   cachedSolutionPaths.Contains(await ideCalls.GetProjectPath(connection));
         }
 
         /// <summary>
-        /// Opens the IDE defined in <see cref="Type"/>.
+        /// Opens the IDE defined in <see cref="Type"/> and returns the new connection.
         /// </summary>
-        /// <returns>Async UniTask.</returns>
-        private async UniTask OpenNewIDEInstanceAsync()
+        /// <param name="solutionPath">The solution path.</param>
+        /// <returns>Established connection. Can be null if connection couldn't be established</returns>
+        private async UniTask<JsonRpcConnection> OpenNewIDEInstanceAsync(string solutionPath)
         {
             string arguments;
             string fileName;
-            // TODO: Dynamically generate location of (.sln)
-            string project = Path.GetFullPath("SEE.sln");
 
             switch (Type)
             {
                 case Ide.VisualStudio2019:
                     fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2019);
-                    arguments = $"\"{project}\" /VsSeeExtension";
+                    arguments = $"\"{solutionPath}\" /VsSeeExtension";
                     break;
                 case Ide.VisualStudio2022:
                     fileName = await VSPathFinder.GetVisualStudioExecutableAsync(VSPathFinder.Version.VS2022);
-                    arguments = $"\"{project}\" /VsSeeExtension";
+                    arguments = $"\"{solutionPath}\" /VsSeeExtension";
                     break;
                 default:
                     throw new NotImplementedException($"Implementation of case {Type} not found");
@@ -495,8 +532,6 @@ namespace SEE.Controls
                 FileName = fileName,
                 Arguments = arguments,
             };
-
-            connectionSignal = new SemaphoreSlim(0, 1);
 
             try
             {
@@ -509,8 +544,28 @@ namespace SEE.Controls
 #endif
                 throw;
             }
+            JsonRpcConnection connection = null;
 
-            await connectionSignal.WaitAsync();
+            // Time out after 3 minutes.
+            await UniTask.WhenAny(LookUpConnection(), UniTask.Delay(180000));
+
+            return connection;
+
+            async UniTask LookUpConnection()
+            {
+                while (true)
+                {
+                    try
+                    {
+                        connection = cachedConnections[solutionPath];
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        await UniTask.Delay(200);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -527,15 +582,16 @@ namespace SEE.Controls
                 {
                     await semaphore.WaitAsync();
 
-                    var project = ConnectToAny ? "" : await ideCalls.GetProjectPath(connection);
+                    var project = await ideCalls.GetProjectPath(connection);
+
+                    connection.AddTarget(new RemoteProcedureCalls(this, project));
 
                     if (project == null) return;
 
                     if (!cachedConnections.ContainsKey(project))
                     {
-                        cachedConnections[project] = new List<JsonRpcConnection>();
+                        cachedConnections[project] = connection;
                     }
-                    cachedConnections[project].Add(connection);
 
                     semaphore.Release();
 
@@ -561,17 +617,10 @@ namespace SEE.Controls
             {
                 await semaphore.WaitAsync();
 
-                var key = cachedConnections.FirstOrDefault(x => x.Value.Contains(connection)).Key;
+                var key = cachedConnections.FirstOrDefault(x => x.Value.Equals(connection)).Key;
                 if (key != null)
                 {
-                    if (cachedConnections[key].Count > 1)
-                    {
-                        cachedConnections[key].Remove(connection);
-                    }
-                    else
-                    {
-                        cachedConnections.Remove(key);
-                    }
+                    cachedConnections.Remove(key);
                     await UniTask.SwitchToMainThread();
                     ShowNotification.Info("Disconnected from IDE",
                         "The IDE was disconnected form SEE.", 5.0f);

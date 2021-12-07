@@ -72,10 +72,9 @@ namespace SEE.Utils
         /// Sets <see cref="Target"/>, which represents the remote called functions.
         /// </summary>
         /// <param name="target">An object that contains function that can be called
-        /// remotely.</param>
+        /// remotely. Null means no target will be added.</param>
         protected JsonRpcServer(object target)
         {
-            _ = target ?? throw new ArgumentNullException(nameof(target));
             Target = target;
 
             sourceToken = new CancellationTokenSource();
@@ -136,6 +135,7 @@ namespace SEE.Utils
             connection.Connected += AddConnection;
             connection.Disconnected += RemoveConnection;
             connection.Run();
+            if (Target != null) connection.AddTarget(Target);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace SEE.Utils
                     if (connection.Rpc == null) return default;
                     return await connection.Rpc.InvokeAsync<T>(targetName, arguments);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // Lost connection to client.
                 }

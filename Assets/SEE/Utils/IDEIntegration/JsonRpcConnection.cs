@@ -33,11 +33,6 @@ namespace SEE.Utils
         public JsonRpc Rpc { get; protected set; }
 
         /// <summary>
-        /// The server instance related to this client connection.
-        /// </summary>
-        protected JsonRpcServer RpcServer;
-
-        /// <summary>
         /// Cancellation token to stop any running background tasks in this client connection.
         /// </summary>
         private readonly CancellationTokenSource tokenSource;
@@ -50,10 +45,8 @@ namespace SEE.Utils
         /// <summary>
         /// Creates a new client connection.
         /// </summary>
-        /// <param name="rpcServer">The server instance of this client.</param>
-        protected JsonRpcConnection(JsonRpcServer rpcServer)
+        protected JsonRpcConnection()
         {
-            RpcServer = rpcServer;
             tokenSource = new CancellationTokenSource();
         }
 
@@ -86,6 +79,9 @@ namespace SEE.Utils
         {
             if (!InitiateJsonRpc()) return;
 
+            // To allow adding targets after starting
+            Rpc.AllowModificationWhileListening = true;
+
             Connected?.Invoke(this);
 
             try
@@ -104,6 +100,16 @@ namespace SEE.Utils
 
             Disconnected?.Invoke(this);
             Abort();
+        }
+
+        /// <summary>
+        /// Adds a target, that will be called by the client. You can add multiple targets.
+        /// </summary>
+        /// <param name="target">An object that contains function that can be called
+        /// remotely.</param>
+        public void AddTarget(object target)
+        {
+            Rpc.AddLocalRpcTarget(target);
         }
 
         /// <summary>
