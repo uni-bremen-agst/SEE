@@ -31,6 +31,15 @@
             <version>1.8.0</version>
         </dependency>
 
+        <!-- GXL library -->
+        <dependency>
+            <groupId>net.sourceforge.gxl</groupId>
+            <artifactId>gxl</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/gxl.jar</systemPath>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
