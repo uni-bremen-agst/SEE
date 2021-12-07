@@ -44,6 +44,12 @@ namespace SEE.Game.City
         public DataPath CityPath = new DataPath();
 
         /// <summary>
+        /// The solution path for our project.
+        /// </summary>
+        [OdinSerialize]
+        public DataPath SolutionPath = new DataPath();
+
+        /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize]
