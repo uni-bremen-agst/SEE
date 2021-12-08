@@ -95,7 +95,7 @@ namespace SEE.GO
             }
 
             //calculate how many vertices we need
-            int numVertexColumns = radialSegments + 1;
+            int numVertexColumns = radialSegments + 1;  // +1 for welding
             int numVertexRows = heightSegments + 1;
 
             //calculate sizes
