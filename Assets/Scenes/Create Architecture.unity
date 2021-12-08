@@ -2348,7 +2348,7 @@ MonoBehaviour:
   MinimalBlockLength: 0.1
   MaximalBlockLength: 100
   GXLPath:
-    Root: 0
+    Root: 3
     relativePath: /mini/Architecture.gxl
     absolutePath: C:/Users/nicow/Desktop/Kram/testbiggxl.gxl
   CSVPath:
@@ -2356,7 +2356,7 @@ MonoBehaviour:
     relativePath: 
     absolutePath: 
   ArchitectureLayoutPath:
-    Root: 0
+    Root: 3
     relativePath: /mini/Architecture.gvl
     absolutePath: C:/Users/nicow/Desktop/Kram/Architecture_Hierarchy_Belongs_To_Layout.gvl
   NODE_COUNTER: 0
