@@ -61,5 +61,17 @@ namespace SEE.GO
             player.name = PlayerInputType.TouchGamepadPlayer.ToString();
             return player;
         }
+
+        /// <summary>
+        /// Creates and returns a player for mobile devices instantiated from prefab Resources/Prefabs/Players/MobilePlayer
+        /// with all required components attached to it.
+        /// </summary>
+        /// <returns>a player for the gamepad/touchpad environment</returns>
+        public static GameObject CreateMobilePlayer()
+        {
+            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/MobilePlayer");
+            player.name = PlayerInputType.MobilePlayer.ToString();
+            return player;
+        }
     }
 }

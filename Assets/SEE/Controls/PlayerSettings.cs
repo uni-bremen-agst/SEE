@@ -192,6 +192,9 @@ namespace SEE.Controls
                 case PlayerInputType.TouchGamepadPlayer:
                     player = PlayerFactory.CreateTouchGamepadPlayer();
                     break;
+                case PlayerInputType.MobilePlayer:
+                    player = PlayerFactory.CreateMobilePlayer();
+                    break;
                 case PlayerInputType.None: return null; // No player needs to be created
                 default:
                     throw new NotImplementedException($"Unhandled case {inputType}.");
