@@ -5,6 +5,7 @@ using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -40,46 +41,93 @@ namespace SEE.Game.Worlds
             {
                 gameObject.name = "Remote " + gameObject.name;
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
-                SetUpSALSA();
+                StartCoroutine(SetUpSALSA());
             }
         }
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
+        /// There can only be one such dissonance communication object for each client, that is, why
+        /// this field can be static.
         /// </summary>
-        private DissonanceComms comms;
+        private static DissonanceComms dissonanceComms;
 
-        private void SetUpSALSA()
+        /// <summary>
+        /// A coroutine setting up SALSA for lipsync.
+        /// More specifically, the audio source of the <see cref="Salsa"/> component of this
+        /// game object be the audio source of the remote player under the Dissonance communication
+        /// associated with this avatar.
+        /// </summary>
+        /// <returns>as to whether to continue</returns>
+        private IEnumerator SetUpSALSA()
         {
             if (gameObject.TryGetComponent(out IDissonancePlayer iDissonancePlayer))
             {
-                GameObject dissonancePlayer = GetDissonancePlayer(iDissonancePlayer.PlayerId);
-                if (dissonancePlayer.TryGetComponent(out AudioSource audioSource)
-                    && gameObject.TryGetComponent(out Salsa salsa))
+                string playerId = iDissonancePlayer.PlayerId;
+                // Wait until the iDissonancePlayer is connected and has a valid player ID.
+                // This may take some time.
+                while (string.IsNullOrEmpty(playerId))
                 {
-                    salsa.audioSrc = audioSource;
+                    playerId = iDissonancePlayer.PlayerId;
+                    yield return null;
                 }
+                if (!string.IsNullOrEmpty(playerId))
+                {
+                    GameObject dissonancePlayer = GetDissonancePlayer(playerId);
+                    if (dissonancePlayer.TryGetComponent(out AudioSource audioSource)
+                        && gameObject.TryGetComponent(out Salsa salsa))
+                    {
+                        salsa.audioSrc = audioSource;
+                    }
+                    else
+                    {
+                        if (audioSource == null)
+                        {
+                            Debug.LogWarning($"{dissonancePlayer.name} has no {typeof(AudioSource)}.\n");
+                        }
+                        if (!gameObject.TryGetComponent(out Salsa _))
+                        {
+                            Debug.LogWarning($"{name} has no {typeof(Salsa)}.\n");
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Game object {name} has a {typeof(IDissonancePlayer)} without ID.\n");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"{name} has no {typeof(IDissonancePlayer)}.\n");
             }
         }
 
-        private GameObject GetDissonancePlayer(string playerId)
+        /// <summary>
+        /// Yields the first child of <see cref="dissonanceComms"/> that has a <see cref="VoicePlayback"/>
+        /// component whose <see cref="VoicePlayback.PlayerName"/> equals <paramref name="playerId"/>.
+        /// If a <see cref="dissonanceComms"/> cannot be found or if there is no such child, an exception
+        /// will be thrown.
+        /// </summary>
+        /// <param name="playerId">the searched player ID</param>
+        /// <returns>child of <see cref="dissonanceComms"/> representing <paramref name="playerId"/></returns>
+        private static GameObject GetDissonancePlayer(string playerId)
         {
-            if (comms == null)
+            if (dissonanceComms == null)
             {
-                comms = FindObjectOfType<DissonanceComms>();
-                if (comms == null)
+                dissonanceComms = FindObjectOfType<DissonanceComms>();
+                if (dissonanceComms == null)
                 {
                     throw new Exception($"A game object with a {typeof(DissonanceComms)} cannot be found.\n");
                 }
             }
-            foreach (GameObject child in comms.transform)
+            foreach (Transform child in dissonanceComms.transform)
             {
                 if (child.TryGetComponent(out VoicePlayback voicePlayback) && voicePlayback.PlayerName == playerId)
                 {
-                    return child;
+                    return child.gameObject;
                 }
             }
-            throw new Exception($"There is no player with the id {playerId} in {comms.name}.");
+            throw new Exception($"There is no player with the id {playerId} in {dissonanceComms.name}.");
         }
 
         /// <summary>
