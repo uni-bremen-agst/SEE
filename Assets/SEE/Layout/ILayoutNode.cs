@@ -18,7 +18,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// The absolute scale of a node in world co-ordinates.
-        /// 
+        ///
         /// Note: This value may be meaningful only if the node is not skewed.
         /// </summary>
         Vector3 AbsoluteScale { get; }
@@ -56,13 +56,11 @@ namespace SEE.Layout
         /// The set of immediate successors of this node.
         /// </summary>
         ICollection<T> Successors { get; }
-        
-        
+
         /// <summary>
         /// The game object this layout node encapsulates.
         /// </summary>
         GameObject gameObject { get; }
-        
     }
 
     public interface ISublayoutNode<T>
@@ -83,7 +81,7 @@ namespace SEE.Layout
         bool IsSublayoutRoot { get; set; }
 
         /// <summary>
-        /// if the node is a sublayout root, this is the sublayout 
+        /// if the node is a sublayout root, this is the sublayout
         /// </summary>
         Sublayout Sublayout { get; set; }
 
