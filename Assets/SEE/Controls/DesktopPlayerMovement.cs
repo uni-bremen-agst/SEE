@@ -50,10 +50,6 @@ namespace SEE.Controls
 
         private void Update()
         {
-            if (SEEInput.MoveForward())
-            {
-                Debug.Log($"DesktopPlayerMovement {gameObject.GetFullName()} forward\n");
-            }
             if (focusedObject != null && SEEInput.ToggleCameraLock())
             {
                 cameraState.freeMode = !cameraState.freeMode;
