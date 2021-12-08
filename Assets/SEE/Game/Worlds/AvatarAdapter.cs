@@ -73,7 +73,14 @@ namespace SEE.Game.Worlds
                 }
                 if (!string.IsNullOrEmpty(playerId))
                 {
+                    // Wait until we find a Dissonance player representation with the given playerId
                     GameObject dissonancePlayer = GetDissonancePlayer(playerId);
+                    while (dissonancePlayer == null)
+                    {
+                        dissonancePlayer = GetDissonancePlayer(playerId);
+                        yield return null;
+                    }
+
                     if (dissonancePlayer.TryGetComponent(out AudioSource audioSource)
                         && gameObject.TryGetComponent(out Salsa salsa))
                     {
@@ -127,7 +134,7 @@ namespace SEE.Game.Worlds
                     return child.gameObject;
                 }
             }
-            throw new Exception($"There is no player with the id {playerId} in {dissonanceComms.name}.");
+            return null;
         }
 
         /// <summary>
