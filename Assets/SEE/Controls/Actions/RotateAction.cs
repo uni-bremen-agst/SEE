@@ -8,9 +8,9 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// An action to rotate nodes. 
+    /// An action to rotate nodes.
     /// </summary>
-    public class RotateAction : AbstractPlayerAction
+    internal class RotateAction : AbstractPlayerAction
     {
         private struct Hit
         {
@@ -206,23 +206,19 @@ namespace SEE.Controls.Actions
                 }
                 gizmo.gameObject.SetActive(false);
 
-                #region AbstractPlayerAction
                 currentState = ReversibleAction.Progress.Completed;
-                #endregion
             }
 
             if (synchronize)
             {
                 // TODO(torben): synchronize
-                //new Net.SyncCitiesAction(this).Execute();
+                new Net.SyncCitiesAction(this).Execute();
             }
 
-            #region AbstractPlayerAction
             if (currentState != ReversibleAction.Progress.Completed)
             {
                 currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
             }
-            #endregion
 
             return true;
         }

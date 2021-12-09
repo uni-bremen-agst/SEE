@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create an edge between two selected nodes.
     /// </summary>
-    public class AddEdgeAction : AbstractPlayerAction
+    internal class AddEdgeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.

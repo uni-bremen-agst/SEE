@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create a new node for a selected city.
     /// </summary>
-    public class AddNodeAction : AbstractPlayerAction
+    internal class AddNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// If the user clicks with the mouse hitting a game object representing a graph node,
