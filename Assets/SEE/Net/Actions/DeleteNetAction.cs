@@ -23,7 +23,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
-            this.GameObjectID = gameObjectID;
+            GameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
                 }
             }
         }
