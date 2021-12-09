@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: EyeSquint_L
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: CheekBone_L
+    hash: 1863153293
+    position: {x: -0.0019231178, y: 0, z: 0}
+    rotation: {x: -0.00000006877226, y: -0.00000012598206, z: 0.00000011457015, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: EyeAdjust_L
+    hash: -1164442592
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 3.637979e-12, y: 1.4210192e-14, z: 1.954098e-14, w: 1}
+    scale: {x: 1, y: 1, z: 0.71028084}
+  - bone: LidLower_L
+    hash: -346914924
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.0000000012675037, y: -0.061011165, z: -9.447515e-10, w: 0.99818736}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LidUpper_L
+    hash: 1505020631
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.000000046279435, y: 0.035021342, z: 0.00000017217113, w: 0.9993679}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

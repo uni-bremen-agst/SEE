@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: MouthWide_L
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LipLowerCorner_L
+    hash: 1534549083
+    position: {x: 0.0057220496, y: -0.0008301139, z: -0.010475559}
+    rotation: {x: -0.07999519, y: -0.18334082, z: -0.12067277, w: 0.97232974}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerIn_L
+    hash: -1225183903
+    position: {x: 0.0011759996, y: -0.0014164336, z: -0.0010000528}
+    rotation: {x: -0.018751552, y: -0.05707297, z: -0.04476581, w: 0.9973379}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerOut_L
+    hash: -893089928
+    position: {x: 0.005194057, y: 0, z: -0.0076851677}
+    rotation: {x: 0.0016581125, y: -0.18325895, z: -0.14487705, w: 0.97232926}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperAbove
+    hash: 213529522
+    position: {x: 0, y: 0, z: -0.00004714774}
+    rotation: {x: -2.816975e-16, y: -0.0000000018619252, z: -1.6652874e-14, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperCorner_L
+    hash: 1062377319
+    position: {x: 0.005320873, y: -0.00055128336, z: -0.010376321}
+    rotation: {x: 0.005633024, y: -0.1717824, z: -0.15822022, w: 0.9723299}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperIn_L
+    hash: -693713854
+    position: {x: 0.004574552, y: -0.0029398603, z: -0.0025847936}
+    rotation: {x: -0.0031682374, y: -0.0769323, z: -0.1831421, w: 0.98093563}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperMiddle
+    hash: -741693195
+    position: {x: 0, y: 0, z: -0.00004714774}
+    rotation: {x: -5.1559364e-13, y: 0.000000054581403, z: -5.4174384e-14, w: 1.0000001}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperOut_L
+    hash: 1757653475
+    position: {x: 0.0044408888, y: 0, z: -0.0073365816}
+    rotation: {x: 0.037741896, y: -0.17700662, z: -0.07692468, w: 0.9813658}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []
