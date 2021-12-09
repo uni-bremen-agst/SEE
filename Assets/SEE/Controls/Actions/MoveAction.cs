@@ -183,8 +183,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                // TODO(torben): synchronize!
-                new Net.SyncCitiesAction(this).Execute();
+                new Net.MoveCityNetAction().Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
