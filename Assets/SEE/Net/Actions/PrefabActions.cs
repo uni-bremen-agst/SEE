@@ -10,7 +10,7 @@ namespace SEE.Net
     /// <summary>
     /// Abstract class for all prefab related actions.
     /// </summary>
-    public abstract class PrefabAction : AbstractAction
+    public abstract class PrefabAction : AbstractNetAction
     {
         /// <summary>
         /// Contains every <see cref="InstantiatePrefabAction"/> of every connected
@@ -91,7 +91,7 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///   
     /// Instantiates a prefab for each client. The prefab must contain exactly one
     /// <see cref="ViewContainer"/> in the root object.
@@ -208,7 +208,7 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///   
     /// Destroys an object that was instantiated by using an
     /// <see cref="InstantiatePrefabAction"/>.

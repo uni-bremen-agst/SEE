@@ -6,7 +6,7 @@ namespace SEE.Net
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
-    public class DeleteNetAction : AbstractAction
+    public class DeleteNetAction : AbstractNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.

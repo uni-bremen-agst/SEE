@@ -25,7 +25,7 @@ namespace SEE.Net
     /// An abstract networked action. Actions can be completely arbitrary and can be
     /// executed on the server and/or client.
     /// </summary>
-    public abstract class AbstractAction
+    public abstract class AbstractNetAction
     {
         /// <summary>
         /// The IP-address of the requester of this action.
@@ -50,7 +50,7 @@ namespace SEE.Net
         /// <summary>
         /// Constructs an abstract action.
         /// </summary>
-        public AbstractAction()
+        public AbstractNetAction()
         {
             IPEndPoint requester = Client.LocalEndPoint;
             SetRequester(requester);
@@ -253,7 +253,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="action">The action to be serialized.</param>
         /// <returns>The serialized action as a string.</returns>
-        internal static string Serialize(AbstractAction action)
+        internal static string Serialize(AbstractNetAction action)
         {
             return action.GetType().ToString() + ';' + JsonUtility.ToJson(action);
         }
@@ -263,10 +263,10 @@ namespace SEE.Net
         /// </summary>
         /// <param name="data">The serialized action as a string.</param>
         /// <returns>The deserialized action.</returns>
-        internal static AbstractAction Deserialize(string data)
+        internal static AbstractNetAction Deserialize(string data)
         {
             string[] tokens = data.Split(new[] { ';' }, 2, StringSplitOptions.None);
-            AbstractAction result = (AbstractAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
+            AbstractNetAction result = (AbstractNetAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
             if (result.RecipientsIPAddresses.Length == 0)
             {
                 result.RecipientsIPAddresses = null;

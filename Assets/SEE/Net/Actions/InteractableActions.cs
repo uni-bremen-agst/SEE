@@ -9,9 +9,9 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetHoverAction : AbstractAction
+    public class SetHoverAction : AbstractNetAction
     {
         /// <summary>
         /// Every hovered object of the end point of every client. This is only used by
@@ -98,9 +98,9 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetSelectAction : AbstractAction
+    public class SetSelectAction : AbstractNetAction
     {
         /// <summary>
         /// Every selected object of the end point of every client. This is only used by
@@ -187,9 +187,9 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetGrabAction : AbstractAction
+    public class SetGrabAction : AbstractNetAction
     {
         /// <summary>
         /// Every grabbed object of the end point of every client. This is only used by
@@ -279,9 +279,9 @@ namespace SEE.Net
     /// object.
     /// 
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SynchronizeInteractableAction : AbstractAction
+    public class SynchronizeInteractableAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the interactable.
