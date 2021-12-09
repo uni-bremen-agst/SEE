@@ -4,25 +4,24 @@ using UnityEngine;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// !!! IMPORTANT !!!
-    /// 
+    ///
     ///   Rules for every deriving class:
-    ///   
+    ///
     ///     1. Every field MUST be public!
     ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
     ///        MonoBehaviours.
-    ///        
+    ///
     ///   These rules are necessary, to allow (de)serialization of the classes for
     ///   networking.
-    ///   
+    ///
     ///   See section Networking.Actions.Creation in
     ///   <see href="https://github.com/uni-bremen-agst/SEE/wiki/Networking">here</see>
     ///   for further details.
-    /// 
-    /// 
-    /// 
+    ///
+    ///
+    ///
     /// An abstract networked action. Actions can be completely arbitrary and can be
     /// executed on the server and/or client.
     /// </summary>
@@ -125,18 +124,18 @@ namespace SEE.Net
 
         /// <summary>
         /// Executes this action for the server and every client.
-        /// 
+        ///
         /// The action will be sent to the server and from there broadcast to every
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
-        /// 
+        ///
         /// If <see cref="Network.UseInOfflineMode"/> is <code>true</code>, this will be
         /// simulated locally without sending networked packets.
-        /// 
+        ///
         /// <param name="recipients">The recipients of this action. If <code>null</code>,
         /// this actions will be executed everywhere.</param>
         /// </summary>
-        /// 
+        ///
         /// <param name="recipients">The recipients of the actions.</param>
         public void Execute(IPEndPoint[] recipients = null)
         {
@@ -205,7 +204,7 @@ namespace SEE.Net
         /// <summary>
         /// The implementation of the action for the server. Returns whether the action
         /// could be executed successfully.
-        /// 
+        ///
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>
@@ -214,7 +213,7 @@ namespace SEE.Net
         /// <summary>
         /// The implementation of the action for the client. Returns whether the action
         /// could be executed successfully.
-        /// 
+        ///
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>

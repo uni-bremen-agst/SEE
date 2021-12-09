@@ -51,12 +51,12 @@ namespace SEE.Net
                     }
                     else
                     {
-                        Debug.LogWarning("NavigationAction does not have an initialized city attached!");
+                        Debug.LogWarning("SyncCitiesAction does not have an initialized city attached!");
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("NavigationAction could not be found!");
+                    Debug.LogWarning("SyncCitiesAction could not be found!");
                 }
             }
         }

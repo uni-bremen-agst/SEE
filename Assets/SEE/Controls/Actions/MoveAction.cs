@@ -8,9 +8,9 @@ using UnityEngine.Assertions;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// An action to move nodes. 
+    /// An action to move nodes.
     /// </summary>
-    public class MoveAction : AbstractPlayerAction
+    internal class MoveAction : AbstractPlayerAction
     {
         private struct Hit
         {
@@ -178,23 +178,19 @@ namespace SEE.Controls.Actions
                 moving = false;
                 hit = new Hit();
 
-                #region AbstractPlayerAction
                 currentState = ReversibleAction.Progress.Completed;
-                #endregion
             }
 
             if (synchronize)
             {
                 // TODO(torben): synchronize!
-                //new Net.SyncCitiesAction(this).Execute();
+                new Net.SyncCitiesAction(this).Execute();
             }
 
-            #region AbstractPlayerAction
             if (currentState != ReversibleAction.Progress.Completed)
             {
                 currentState = moving ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
             }
-            #endregion
 
             return true;
         }
