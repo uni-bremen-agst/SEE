@@ -89,9 +89,20 @@ namespace SEE.Controls
             /// <summary>
             /// Will focus this IDE instance.
             /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
             public async UniTask FocusIDE(JsonRpcConnection connection)
             {
                 await server.CallRemoteProcessOnConnectionAsync(connection, "SetFocus");
+            }
+
+            /// <summary>
+            /// Calling this method will change the loaded solution of this Connection.
+            /// </summary>
+            /// <param name="connection">A connection to an IDE.</param>
+            /// <param name="path">The absolute solution path.</param>
+            public async UniTask ChangeSolution(JsonRpcConnection connection, string path)
+            {
+                await server.CallRemoteProcessOnConnectionAsync(connection, "", path);
             }
 
             /// <summary>
@@ -147,27 +158,71 @@ namespace SEE.Controls
             /// <param name="column">Column of the element.</param>
             public void HighlightNode(string path, string name, int line, int column)
             {
-                var tmp = path;
-
-                if (name != null)
-                {
-                    tmp = $"{path}:{name}";
-
-                    if (!ideIntegration.IgnorePosition)
-                    {
-                        tmp += $":{line}:{column}";
-                    }
-                }
-
                 try
                 {
-                    var nodes = ideIntegration.cachedObjects[tmp];
-                    ideIntegration.pendingSelections = new HashSet<InteractableObject>(nodes);
+                    var key = GenerateKey(path, name, line, column);
+                    var objects = ideIntegration.cachedObjects[key];
+                    SetInteractableObjects(objects);
                 }
                 catch (Exception)
                 {
                     // The given key was not presented int the dictionary.
                 }
+            }
+
+
+            /// <summary>
+            /// Adds all edges from <see cref="cachedObjects"/> with the key created by
+            /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
+            /// null, it won't be appended to the key.
+            /// </summary>
+            /// <param name="path">The absolute path to the source file.</param>
+            /// <param name="name">Name of the element in a file.</param>
+            /// <param name="line">Line of the element.</param>
+            /// <param name="column">Column of the element.</param>
+            public void HighlightNodeReferences(string path, string name, int line, int column)
+            {
+                var objects = new HashSet<GameObject>();
+                try
+                {
+                    var nodes = ideIntegration.cachedObjects[
+                        GenerateKey(path, name, line, column)];
+                    var ids = new HashSet<string>();
+                    foreach (var node in nodes)
+                    {
+                        ids.Add(node.GetNode().ID);
+                    }
+                    objects.UnionWith(SceneQueries.Find(ids));
+                }
+                catch (Exception)
+                {
+                    // The given key was not presented int the dictionary.
+                }
+
+                SetInteractableObjects(objects);
+            }
+
+            /// <summary>
+            /// This method will highlight all given elements of a specific file in SEE.
+            /// </summary>
+            /// <param name="path">The absolute path to the source file.</param>
+            /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column)</param>
+            /// <returns></returns>
+            public void HighlightNodes(string path, ICollection<Tuple<string, int, int>> nodes)
+            {
+                var objects = new HashSet<GameObject>();
+                foreach (var (name, line, column) in nodes)
+                {
+                    try
+                    {
+                        objects.UnionWith(ideIntegration.cachedObjects[GenerateKey(path, name, line, column)]);
+                    }
+                    catch (Exception)
+                    {
+                        // The given key was not presented int the dictionary.
+                    }
+                }
+                SetInteractableObjects(objects);
             }
 
             /// <summary>
@@ -194,6 +249,57 @@ namespace SEE.Controls
 
                 ideIntegration.semaphore.Release();
 
+            }
+
+            /// <summary>
+            /// Will generate a key from the given parameter to be used for <see cref="cachedObjects"/>.
+            /// </summary>
+            /// <param name="path">The path of the file.</param>
+            /// <param name="name">The name of the element.</param>
+            /// <param name="line">The line number of the element.</param>
+            /// <param name="column">The column number of the element.</param>
+            /// <returns></returns>
+            private string GenerateKey(string path, string name, int line, int column)
+            {
+                var tmp = "";
+
+                if (name != null)
+                {
+                    tmp = $"{path}:{name}";
+
+                    if (!ideIntegration.IgnorePosition)
+                    {
+                        tmp += $":{line}:{column}";
+                    }
+                }
+
+                return tmp;
+            }
+
+            /// <summary>
+            /// Will transform the given collection to a set of <see cref="InteractableObject"/> and
+            /// add them to <see cref="pendingSelections"/>.
+            /// </summary>
+            /// <param name="objects">The collection of GameObjects representing nodes.</param>
+            private void SetInteractableObjects(IEnumerable<GameObject> objects)
+            {
+                UniTask.Run(async () =>
+                {
+                    await UniTask.SwitchToMainThread();
+                    var tmp = new HashSet<InteractableObject>();
+
+                    foreach (var node in objects)
+                    {
+                        if (node.TryGetComponent(out InteractableObject obj))
+                        {
+                            tmp.Add(obj);
+                        }
+                    }
+
+                    await UniTask.SwitchToThreadPool();
+
+                    ideIntegration.pendingSelections = tmp;
+                });
             }
         }
 
@@ -262,7 +368,7 @@ namespace SEE.Controls
         /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
         /// city have no impact to the source code, this will only be initialized during start up.
         /// </summary>
-        private IDictionary<string, ICollection<InteractableObject>> cachedObjects;
+        private IDictionary<string, ICollection<GameObject>> cachedObjects;
 
         /// <summary>
         /// A mapping of all registered connections to the project they have opened. Only add and
@@ -358,7 +464,7 @@ namespace SEE.Controls
         /// </summary>
         private void InitializeSceneElementsObjects()
         {
-            cachedObjects = new Dictionary<string, ICollection<InteractableObject>>();
+            cachedObjects = new Dictionary<string, ICollection<GameObject>>();
             cachedSolutionPaths = new HashSet<string>();
 
             // Get all nodes in scene
@@ -366,14 +472,12 @@ namespace SEE.Controls
             {
                 var key = GenerateKey(node.GetNode());
 
-                if (key != null && node.TryGetComponent(out InteractableObject obj))
+                if (key == null) continue;
+                if (!cachedObjects.ContainsKey(key))
                 {
-                    if (!cachedObjects.ContainsKey(key))
-                    {
-                        cachedObjects[key] = new List<InteractableObject>();
-                    }
-                    cachedObjects[key].Add(obj);
+                    cachedObjects[key] = new List<GameObject>();
                 }
+                cachedObjects[key].Add(node);
             }
 
             foreach (var obj in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
@@ -389,7 +493,7 @@ namespace SEE.Controls
         /// Generates an appropriate key for a given node.
         /// </summary>
         /// <param name="node">The node.</param>
-        /// <returns>A key.</returns>
+        /// <returns>A key. Can be null</returns>
         private string GenerateKey(Node node)
         {
             var fileName = node.Filename();
@@ -473,14 +577,28 @@ namespace SEE.Controls
         {
             if (solutionPath == null) return null;
 
-            JsonRpcConnection connection;
+            JsonRpcConnection connection = null;
             try
             {
                 connection = cachedConnections[solutionPath];
             }
             catch (Exception)
             {
-                connection = await OpenNewIDEInstanceAsync(solutionPath);
+                if (MaxNumberOfIdes == cachedConnections.Count && MaxNumberOfIdes != 0)
+                {
+                    await semaphore.WaitAsync();
+                    connection = cachedConnections.First().Value;
+                    semaphore.Release();
+                    await ideCalls.ChangeSolution(connection, solutionPath);
+                }
+                else if (MaxNumberOfIdes != 0)
+                {
+                    connection = await OpenNewIDEInstanceAsync(solutionPath);
+                }
+                else
+                {
+                    return connection;
+                }
             }
 
             await ideCalls.FocusIDE(connection);
@@ -546,7 +664,7 @@ namespace SEE.Controls
             }
             JsonRpcConnection connection = null;
 
-            // Time out after 3 minutes.
+            // Time out after 3 minutes without connecting.
             await UniTask.WhenAny(LookUpConnection(), UniTask.Delay(180000));
 
             return connection;
