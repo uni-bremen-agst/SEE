@@ -14,16 +14,26 @@ namespace SEE.Controls.Actions
     {
         private struct Hit
         {
-            internal Hit(Transform hit)
+            internal Hit(Transform hoveredObject)
             {
-                root = SceneQueries.GetCityRootTransformUpwards(hit);
-                transform = hit.transform;
-                interactableObject = hit.GetComponent<InteractableObject>();
-                plane = new Plane(Vector3.up, root.position);
+                cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
+                this.hoveredObject = hoveredObject;
+                interactableObject = hoveredObject.GetComponent<InteractableObject>();
+                plane = new Plane(Vector3.up, cityRootNode.position);
             }
-
-            internal Transform root;
-            internal Transform transform;
+            /// <summary>
+            /// The root of the code city. This the top-most game object representing a node,
+            /// i.e., is tagged by <see cref="Tags.Node"/>.
+            /// </summary>
+            internal Transform cityRootNode;
+            /// <summary>
+            /// The game object currently being hovered over. It is a descendant of <see cref="cityRootNode"/>
+            /// or <see cref="cityRootNode"/> itself.
+            /// </summary>
+            internal Transform hoveredObject;
+            /// <summary>
+            /// The interactable component attached to <see cref="hoveredObject"/>.
+            /// </summary>
             internal InteractableObject interactableObject;
             internal Plane plane;
         }
@@ -89,13 +99,13 @@ namespace SEE.Controls.Actions
         /// <returns>always false</returns>
         public override bool Update()
         {
-            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-            Transform root = null;
+            InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
+            Transform cityRootNode = null;
 
-            if (obj)
+            if (hoveredObject)
             {
-                root = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                Assert.IsNotNull(root);
+                cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject.transform);
+                Assert.IsNotNull(cityRootNode);
             }
 
             bool synchronize = false;
@@ -104,7 +114,7 @@ namespace SEE.Controls.Actions
             {
                 if (moving)
                 {
-                    hit.transform.position = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.transform.localScale);
+                    CodeCityManipulator.Set(hit.hoveredObject, dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale));
                     hit.interactableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -112,23 +122,23 @@ namespace SEE.Controls.Actions
                     hit = new Hit();
                     synchronize = true;
                 }
-                else if (obj)
+                else if (hoveredObject)
                 {
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
+                    InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
                 }
             }
             else if (SEEInput.Drag()) // start or continue movement
             {
-                if (SEEInput.StartDrag() && obj && Raycasting.RaycastPlane(new Plane(Vector3.up, root.position), out Vector3 planeHitPoint)) // start movement
+                if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
-                    hit = new Hit(SEEInput.DragHovered() ? obj.transform : root);
+                    hit = new Hit(SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode);
 
                     hit.interactableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
-                    dragStartTransformPosition = hit.transform.position;
-                    dragStartOffset = planeHitPoint - hit.transform.position;
-                    dragCanonicalOffset = dragStartOffset.DividePairwise(hit.transform.localScale);
+                    dragStartTransformPosition = hit.hoveredObject.position;
+                    dragStartOffset = planeHitPoint - hit.hoveredObject.position;
+                    dragCanonicalOffset = dragStartOffset.DividePairwise(hit.hoveredObject.localScale);
                 }
 
                 if (moving && Raycasting.RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
@@ -144,9 +154,9 @@ namespace SEE.Controls.Actions
                         Vector2 proj = dir * Vector2.Dot(point2, dir);
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
-                    hit.transform.position = dragStartTransformPosition + totalDragOffsetFromStart;
+                    CodeCityManipulator.Set(hit.hoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.transform.position + Vector3.Scale(dragCanonicalOffset, hit.transform.localScale);
+                    Vector3 endPoint = hit.hoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                     gizmo.SetPositions(startPoint, endPoint);
 
                     synchronize = true;
@@ -154,10 +164,10 @@ namespace SEE.Controls.Actions
             }
             else if (SEEInput.Reset()) // reset to center of table
             {
-                if (obj && !moving)
+                if (hoveredObject && !moving)
                 {
-                    GO.Plane plane = root.GetComponentInParent<GO.Plane>();
-                    root.position = plane.CenterTop;
+                    GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
+                    cityRootNode.position = plane.CenterTop;
                     gizmo.gameObject.SetActive(false);
 
                     synchronize = true;
@@ -165,10 +175,13 @@ namespace SEE.Controls.Actions
             }
             else if (moving) // finalize movement
             {
-                if (hit.transform != hit.root) // only reparent non-root nodes
+                if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
-                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.transform.localScale);
-                    GameNodeMover.FinalizePosition(hit.transform.gameObject, originalPosition);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
+
+                    // FIXME: This is a re-parent operation and must be handled accordingly
+                    // and be propagated through the network differently.
+                    GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject, originalPosition);
 
                     synchronize = true;
                 }
@@ -183,7 +196,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new Net.MoveCityNetAction().Execute();
+                new Net.MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
