@@ -6,9 +6,9 @@ namespace SEE.Net
 {
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SyncCitiesAction : AbstractAction
+    public class SyncCitiesAction : AbstractNetAction
     {
         public int navigationActionID;
         public Vector3 position;

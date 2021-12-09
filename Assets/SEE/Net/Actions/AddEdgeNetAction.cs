@@ -6,7 +6,7 @@ namespace SEE.Net
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : AbstractAction
+    public class AddEdgeNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the gameObject from which the edge should be drawn (source node).
