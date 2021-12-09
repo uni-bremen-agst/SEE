@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
@@ -14,7 +15,11 @@ namespace SEE.Controls.Actions
     {
         private struct Hit
         {
-            internal Transform root;
+            /// <summary>
+            /// The root of the code city. This the top-most game object representing a node,
+            /// i.e., is tagged by <see cref="Tags.Node"/>.
+            /// </summary>
+            internal Transform cityRootNode;
             internal CityCursor cursor;
             internal UnityEngine.Plane plane;
         }
@@ -83,13 +88,13 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-            Transform root = null;
-            CityCursor cursor = null;
+            Transform cityRootNode = null;
+            CityCursor cityCursor = null;
 
             if (obj)
             {
-                root = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                cursor = root.GetComponentInParent<CityCursor>();
+                cityRootNode = SceneQueries.GetCityRootTransformUpwards(obj.transform);
+                cityCursor = cityRootNode.GetComponentInParent<CityCursor>();
             }
 
             bool synchronize = false;
@@ -98,8 +103,7 @@ namespace SEE.Controls.Actions
             {
                 if (rotating)
                 {
-                    hit.root.position = originalPosition;
-                    hit.root.rotation = Quaternion.Euler(0.0f, originalEulerAngleY, 0.0f);
+                    CodeCityManipulator.Set(hit.cityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
                     foreach (InteractableObject o in hit.cursor.E.GetFocusses())
                     {
                         if (o.IsGrabbed)
@@ -120,14 +124,14 @@ namespace SEE.Controls.Actions
             else if (SEEInput.Drag()) // start or continue rotation
             {
                 Vector3 planeHitPoint;
-                if (root)
+                if (cityRootNode)
                 {
-                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, root.position);
+                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
                     if (SEEInput.StartDrag() && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
                         rotating = true;
-                        hit.root = root;
-                        hit.cursor = cursor;
+                        hit.cityRootNode = cityRootNode;
+                        hit.cursor = cityCursor;
                         hit.plane = plane;
 
                         foreach (InteractableObject o in hit.cursor.E.GetFocusses())
@@ -135,14 +139,14 @@ namespace SEE.Controls.Actions
                             o.SetGrab(true, true);
                         }
                         gizmo.gameObject.SetActive(true);
-                        gizmo.Center = cursor.E.HasFocus() ? hit.cursor.E.ComputeCenter() : hit.root.position;
+                        gizmo.Center = cityCursor.E.HasFocus() ? hit.cursor.E.ComputeCenter() : hit.cityRootNode.position;
 
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
 
-                        originalEulerAngleY = root.rotation.eulerAngles.y;
-                        originalPosition = root.position;
-                        startAngle = AngleMod(root.rotation.eulerAngles.y - toHitAngle);
+                        originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
+                        originalPosition = cityRootNode.position;
+                        startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
                         gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
                         gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
                     }
@@ -157,7 +161,8 @@ namespace SEE.Controls.Actions
                     {
                         angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                     }
-                    hit.root.RotateAround(gizmo.Center, Vector3.up, angle - hit.root.rotation.eulerAngles.y);
+
+                    hit.cityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.cityRootNode.rotation.eulerAngles.y);
 
                     float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
                     float currAngle = toHitAngle;
@@ -183,7 +188,7 @@ namespace SEE.Controls.Actions
             {
                 if (obj && !rotating)
                 {
-                    foreach (InteractableObject o in cursor.E.GetFocusses())
+                    foreach (InteractableObject o in cityCursor.E.GetFocusses())
                     {
                         if (o.IsGrabbed)
                         {
@@ -192,7 +197,7 @@ namespace SEE.Controls.Actions
                     }
                     gizmo.gameObject.SetActive(false);
 
-                    root.RotateAround(cursor.E.HasFocus() ? cursor.E.ComputeCenter() : root.position, Vector3.up, -root.rotation.eulerAngles.y);
+                    cityRootNode.RotateAround(cityCursor.E.HasFocus() ? cityCursor.E.ComputeCenter() : cityRootNode.position, Vector3.up, -cityRootNode.rotation.eulerAngles.y);
                     synchronize = true;
                 }
             }
@@ -211,8 +216,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                // TODO(torben): synchronize
-                new Net.SyncCitiesAction(this).Execute();
+                new Net.RotateCityNetAction(hit.cityRootNode.name, hit.cityRootNode.position, hit.cityRootNode.eulerAngles.y).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
