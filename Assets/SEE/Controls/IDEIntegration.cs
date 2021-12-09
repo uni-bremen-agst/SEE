@@ -34,6 +34,9 @@ namespace SEE.Controls
         /// </summary>
         private class IDECalls
         {
+            /// <summary>
+            /// The server instance.
+            /// </summary>
             private readonly JsonRpcServer server;
 
             /// <summary>
@@ -158,16 +161,10 @@ namespace SEE.Controls
             /// <param name="column">Column of the element.</param>
             public void HighlightNode(string path, string name, int line, int column)
             {
-                try
-                {
-                    var key = GenerateKey(path, name, line, column);
-                    var objects = ideIntegration.cachedObjects[key];
-                    SetInteractableObjects(objects);
-                }
-                catch (Exception)
-                {
-                    // The given key was not presented int the dictionary.
-                }
+                var key = ideIntegration.GenerateKey(path, name, line, column);
+                if (ideIntegration.cachedObjects.ContainsKey(key))
+                    SetInteractableObjects(ideIntegration.cachedObjects[ideIntegration
+                        .GenerateKey(path, name, line, column)]);
             }
 
 
@@ -182,24 +179,11 @@ namespace SEE.Controls
             /// <param name="column">Column of the element.</param>
             public void HighlightNodeReferences(string path, string name, int line, int column)
             {
-                var objects = new HashSet<GameObject>();
-                try
-                {
-                    var nodes = ideIntegration.cachedObjects[
-                        GenerateKey(path, name, line, column)];
-                    var ids = new HashSet<string>();
-                    foreach (var node in nodes)
-                    {
-                        ids.Add(node.GetNode().ID);
-                    }
-                    objects.UnionWith(SceneQueries.Find(ids));
-                }
-                catch (Exception)
-                {
-                    // The given key was not presented int the dictionary.
-                }
-
-                SetInteractableObjects(objects);
+                var key = ideIntegration.GenerateKey(path, name, line, column);
+                if (ideIntegration.cachedObjects.ContainsKey(key))
+                    SetInteractableObjects(SceneQueries.Find(new HashSet<string>(ideIntegration
+                    .cachedObjects[key].ToList().
+                    Select(x => x.ID()))));
             }
 
             /// <summary>
@@ -213,14 +197,9 @@ namespace SEE.Controls
                 var objects = new HashSet<GameObject>();
                 foreach (var (name, line, column) in nodes)
                 {
-                    try
-                    {
-                        objects.UnionWith(ideIntegration.cachedObjects[GenerateKey(path, name, line, column)]);
-                    }
-                    catch (Exception)
-                    {
-                        // The given key was not presented int the dictionary.
-                    }
+                    var key = ideIntegration.GenerateKey(path, name, line, column);
+                    if (ideIntegration.cachedObjects.ContainsKey(key))
+                        objects.UnionWith(ideIntegration.cachedObjects[key]);
                 }
                 SetInteractableObjects(objects);
             }
@@ -232,48 +211,25 @@ namespace SEE.Controls
             public void SolutionChanged(string path)
             {
                 ideIntegration.semaphore.Wait();
-                var connection = ideIntegration.cachedConnections[solutionPath];
+                if (ideIntegration.cachedConnections.ContainsKey(solutionPath))
+                {
+                    var connection = ideIntegration.cachedConnections[solutionPath];
 
-                if (ideIntegration.cachedSolutionPaths.Contains(path) || ideIntegration.ConnectToAny)
-                {
-                    if (ideIntegration.cachedConnections.Remove(solutionPath))
+                    if (ideIntegration.cachedSolutionPaths.Contains(path) || ideIntegration.ConnectToAny)
                     {
-                        ideIntegration.cachedConnections.Add(path, connection);
-                        solutionPath = path;
+                        if (ideIntegration.cachedConnections.Remove(solutionPath))
+                        {
+                            ideIntegration.cachedConnections.Add(path, connection);
+                            solutionPath = path;
+                        }
                     }
-                }
-                else
-                {
-                    ideIntegration.ideCalls.Decline(connection).Forget();
+                    else
+                    {
+                        ideIntegration.ideCalls.Decline(connection).Forget();
+                    }
                 }
 
                 ideIntegration.semaphore.Release();
-
-            }
-
-            /// <summary>
-            /// Will generate a key from the given parameter to be used for <see cref="cachedObjects"/>.
-            /// </summary>
-            /// <param name="path">The path of the file.</param>
-            /// <param name="name">The name of the element.</param>
-            /// <param name="line">The line number of the element.</param>
-            /// <param name="column">The column number of the element.</param>
-            /// <returns></returns>
-            private string GenerateKey(string path, string name, int line, int column)
-            {
-                var tmp = "";
-
-                if (name != null)
-                {
-                    tmp = $"{path}:{name}";
-
-                    if (!ideIntegration.IgnorePosition)
-                    {
-                        tmp += $":{line}:{column}";
-                    }
-                }
-
-                return tmp;
             }
 
             /// <summary>
@@ -470,7 +426,7 @@ namespace SEE.Controls
             // Get all nodes in scene
             foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
             {
-                var key = GenerateKey(node.GetNode());
+                var key = GenerateNodeKey(node.GetNode());
 
                 if (key == null) continue;
                 if (!cachedObjects.ContainsKey(key))
@@ -480,6 +436,7 @@ namespace SEE.Controls
                 cachedObjects[key].Add(node);
             }
 
+            // Get all code cities
             foreach (var obj in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
             {
                 if (obj.TryGetComponent(out AbstractSEECity city))
@@ -494,35 +451,34 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="node">The node.</param>
         /// <returns>A key. Can be null</returns>
-        private string GenerateKey(Node node)
+        private string GenerateNodeKey(Node node)
         {
-            var fileName = node.Filename();
-            var path = node.Path();
-            var sourceName = node.SourceName;
-            var line = node.SourceLine();
-            var column = node.SourceColumn();
             try
             {
-                if (fileName == null || path == null) return null;
-
-                var key = Path.GetFullPath(path + fileName);
-                if (sourceName != null && !sourceName.Equals(""))
-                {
-                    key = $"{key}:{sourceName}";
-                }
-
-                if (line.HasValue && column.HasValue && !IgnorePosition)
-                {
-                    key = $"{key}:{line}:{column}";
-                }
-
-                return key;
+                return GenerateKey(Path.GetFullPath(node.Path() + node.Filename()), node.SourceName,
+                    node.SourceLine().GetValueOrDefault(), node.SourceColumn().GetValueOrDefault());
             }
             catch (Exception)
             {
                 // File not found
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Will generate a key from the given parameter to be used for <see cref="cachedObjects"/>.
+        /// </summary>
+        /// <param name="path">The path of the file.</param>
+        /// <param name="name">The name of the element.</param>
+        /// <param name="line">The line number of the element.</param>
+        /// <param name="column">The column number of the element.</param>
+        /// <returns>A key for <see cref="cachedObjects"/>.</returns>
+        private string GenerateKey(string path, string name, int line, int column)
+        {
+            if (path == null || name == null) return "";
+            var key = $"{path}:{name}";
+
+            return (IgnorePosition ? key : $"{key}:{line}:{column}");
         }
 
         #endregion
@@ -561,7 +517,14 @@ namespace SEE.Controls
         {
             var connection = await LookForIDEConnection(solutionPath);
             if (connection == null) return;
-            await ideCalls.OpenFile(connection, filePath, line);
+            try
+            {
+                await ideCalls.OpenFile(connection, Path.GetFullPath(filePath), line);
+            }
+            catch (Exception)
+            {
+                // File not found!
+            }
         }
 
         #region IDE Management
@@ -701,7 +664,6 @@ namespace SEE.Controls
                     await semaphore.WaitAsync();
 
                     var project = await ideCalls.GetProjectPath(connection);
-
                     connection.AddTarget(new RemoteProcedureCalls(this, project));
 
                     if (project == null) return;
