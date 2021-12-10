@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace SEE.Net
 {
-    internal class RotateCityNetAction : AbstractNetAction
+    /// <summary>
+    /// Propagates the rotation of a game node through the network.
+    /// </summary>
+    internal class RotateNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the gameObject of a node or edge that needs to be deleted.
+        /// The unique name of the gameObject of a node that needs to be rotated.
         /// </summary>
         public string GameObjectID;
 
@@ -20,7 +23,7 @@ namespace SEE.Net
         /// </summary>
         public float YAngle;
 
-        public RotateCityNetAction(string nodeID, Vector3 position, float yAngle) : base()
+        public RotateNodeNetAction(string nodeID, Vector3 position, float yAngle) : base()
         {
             GameObjectID = nodeID;
             Position = position;
