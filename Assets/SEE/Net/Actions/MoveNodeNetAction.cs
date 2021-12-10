@@ -38,7 +38,7 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    CodeCityManipulator.Set(gameObject.transform, Position);
+                    Positioner.Set(gameObject.transform, Position);
                 }
                 else
                 {
