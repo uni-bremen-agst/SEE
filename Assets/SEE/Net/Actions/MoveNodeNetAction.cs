@@ -9,7 +9,7 @@ namespace SEE.Net
     internal class MoveNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the gameObject of a node or edge that needs to be moved.
+        /// The unique name of the gameObject of a node that needs to be moved.
         /// </summary>
         public string GameObjectID;
 
