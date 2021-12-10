@@ -3,10 +3,14 @@ using UnityEngine;
 
 namespace SEE.Net
 {
+    /// <summary>
+    /// Propagates the movement of a code city through the network. As a matter of
+    /// fact, any type of game object can be moved with it.
+    /// </summary>
     internal class MoveCityNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the gameObject of a node or edge that needs to be deleted.
+        /// The unique name of the gameObject of a node or edge that needs to be moved.
         /// </summary>
         public string GameObjectID;
 
@@ -15,11 +19,19 @@ namespace SEE.Net
         /// </summary>
         public Vector3 Position;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="gameObjectID">the unique game-object name of the game object to be moved</param>
+        /// <param name="position">the new position of the game object</param>
         public MoveCityNetAction(string gameObjectID, Vector3 position)
         {
             GameObjectID = gameObjectID;
             Position = position;
         }
+        /// <summary>
+        /// Movement in all clients except the requesting client.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -36,6 +48,9 @@ namespace SEE.Net
             }
         }
 
+        /// <summary>
+        /// Does not do anything.
+        /// </summary>
         protected override void ExecuteOnServer()
         {
             // Intentionally left blank.
