@@ -103,6 +103,18 @@ namespace SEE.Game.City
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
+        /// Called at game start. Sets up additional components.
+        /// </summary>
+        internal virtual void Start()
+        {
+            if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
+            {
+                gameObject.AddComponent<EdgeMeshScheduler>()
+                    .Init(EdgeLayoutSettings, EdgeSelectionSettings);
+            }
+        }
+
+        /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
         /// </summary>
         public void Save()

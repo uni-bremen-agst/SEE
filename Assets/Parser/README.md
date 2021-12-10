@@ -45,7 +45,7 @@ If any of these conditions aren't true, please edit the grammar accordingly:
 You can then drop the (modified, if necessary) grammar file into this directory.
 
 ## Generating Lexer Code
-To generate the C\# lexer code so we can use the grammar in SEE, do the following:
+To generate the C# lexer code so we can use the grammar in SEE, do the following:
 1. Open a terminal in this directory.
 2. Run the `GenerateLexerCode.bat` file.
 3. Verify that a new lexer file with the ending `.cs` has appeared. Remember its name.

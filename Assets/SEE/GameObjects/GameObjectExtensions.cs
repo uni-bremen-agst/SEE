@@ -7,6 +7,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEngine;
+using static SEE.Game.Portal.IncludeDescendants;
 
 namespace SEE.GO
 {
@@ -363,14 +364,15 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it.
+        /// component attached to it that is actually referring to a valid node
+        /// (i.e., its Value is not null).
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent(out NodeRef _);
+            return gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null;
         }
 
         /// <summary>
@@ -600,6 +602,37 @@ namespace SEE.GO
             else
             {
                 throw new Exception($"Game object {gameObject.name} is not an edge. It has no target node.");
+            }
+        }
+
+
+        /// <summary>
+        /// Updates the portal of this game object by setting the boundaries of itself
+        /// (and its descendants, depending on <paramref name="includeDescendants"/>)
+        /// to the code city they're contained in.
+        /// If they're not contained in a code city and <paramref name="warnOnFailure"/> is true,
+        /// a warning log message will be emitted, otherwise nothing will happen.
+        /// </summary>
+        /// <param name="gameObject">The game object whose portal shall be updated</param>
+        /// <param name="warnOnFailure">
+        /// Whether a warning log message shall be emitted if the <paramref name="gameObject"/>
+        /// is not attached to any code city
+        /// </param>
+        /// <param name="includeDescendants">
+        /// Whether the portal of the descendants of this <paramref name="gameObject"/> shall be updated too
+        /// </param>
+        public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
+                                        Portal.IncludeDescendants includeDescendants = ONLY_SELF)
+        {
+            GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (rootCity != null)
+            {
+                Portal.SetPortal(rootCity, gameObject, includeDescendants);
+            }
+            else if (warnOnFailure)
+            {
+                Debug.LogWarning("Couldn't update portal: No code city has been found"
+                                 + $" attached to game object {gameObject.name}.\n");
             }
         }
     }

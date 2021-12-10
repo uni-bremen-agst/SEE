@@ -189,12 +189,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge($"{type}#{from.ID}#{to.ID}")
-            {
-                Type = type,
-                Source = from,
-                Target = to
-            };
+            Edge result = new Edge(from, to, type);
             result.SetToggle("Is Real");
             result.SetString("Source.Path", "path");
             result.SetFloat("Pi", 3.14f);
