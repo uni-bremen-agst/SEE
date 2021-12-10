@@ -6,7 +6,6 @@ using UnityEngine.Assertions;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
@@ -22,7 +21,7 @@ namespace SEE.Net
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public uint id;
+        public string id;
 
         /// <summary>
         /// The hover flags of the interactable.
@@ -38,7 +37,7 @@ namespace SEE.Net
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.ID;
+            id = interactable.name;
             this.hoverFlags = hoverFlags;
         }
 
@@ -111,7 +110,7 @@ namespace SEE.Net
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public uint id;
+        public string id;
 
         /// <summary>
         /// Whether the interactable should be selected.
@@ -127,7 +126,7 @@ namespace SEE.Net
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.ID;
+            id = interactable.name;
             this.select = select;
         }
 
@@ -200,7 +199,7 @@ namespace SEE.Net
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public uint id;
+        public string id;
 
         /// <summary>
         /// Whether the interactable should be grabbed.
@@ -216,7 +215,7 @@ namespace SEE.Net
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.ID;
+            id = interactable.name;
             this.grab = grab;
         }
 
@@ -277,7 +276,7 @@ namespace SEE.Net
     /// <summary>
     /// Updates position, rotation and potentially local scale of an interactable
     /// object.
-    /// 
+    ///
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
@@ -286,7 +285,7 @@ namespace SEE.Net
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public uint id;
+        public string id;
 
         /// <summary>
         /// The position of the interactable.
@@ -314,7 +313,7 @@ namespace SEE.Net
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.ID;
+            id = interactable.name;
             position = interactable.transform.position;
             rotation = interactable.transform.rotation;
             localScale = syncLocalScale ? interactable.transform.localScale : Vector3.zero;
