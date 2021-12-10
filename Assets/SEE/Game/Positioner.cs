@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -30,6 +31,19 @@ namespace SEE.Game
         internal static void Set(Transform transform, Vector3 position)
         {
             transform.position = position;
+        }
+
+        /// <summary>
+        /// Sets the position (world space) and local scale of the given <paramref name="transform"/>
+        /// according to <paramref name="position"/> and <paramref name="localScale"/>.
+        /// </summary>
+        /// <param name="transform">transform to be set</param>
+        /// <param name="position">new position in world space</param>
+        /// <param name="localScale">new local scale</param>
+        internal static void Set(Transform transform, Vector3 position, Vector3 localScale)
+        {
+            transform.position = position;
+            transform.localScale = localScale;
         }
     }
 }
