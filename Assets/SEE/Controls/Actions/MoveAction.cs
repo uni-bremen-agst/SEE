@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
@@ -94,6 +95,48 @@ namespace SEE.Controls.Actions
             return ActionStateType.Move;
         }
 
+        private class Memento
+        {
+            private Transform gameObject;
+            private GameObject newParent;
+            private Vector3 newPosition;
+            private Transform oldParent;
+            private Vector3 oldPosition;
+
+            internal Memento(Transform hoveredObject)
+            {
+                this.gameObject = hoveredObject;
+                this.oldParent = hoveredObject.transform.parent;
+                this.oldPosition = hoveredObject.position;
+            }
+
+            internal void Undo()
+            {
+                gameObject.position = oldPosition;
+                gameObject.SetParent(oldParent);
+                new ReparentNetAction(gameObject.name, oldParent.name, oldPosition).Execute();
+            }
+
+            internal void Redo()
+            {
+                gameObject.position = newPosition;
+                gameObject.SetParent(newParent.transform);
+                new ReparentNetAction(gameObject.name, newParent.name, gameObject.position).Execute();
+            }
+
+            internal void SetNewPosition(Vector3 position)
+            {
+                newPosition = position;
+            }
+
+            internal void SetNewParent(GameObject parent)
+            {
+                newParent = parent;
+            }
+        }
+
+        private Memento memento;
+
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -116,7 +159,8 @@ namespace SEE.Controls.Actions
             {
                 if (moving)
                 {
-                    Positioner.Set(hit.hoveredObject, dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale));
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
+                    Positioner.Set(hit.hoveredObject, originalPosition);
                     hit.interactableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -137,7 +181,9 @@ namespace SEE.Controls.Actions
                     // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to
                     // be dragged; otherwise the whole city (city root node). Note: the hoveredObject may in
                     // fact be cityRootNode.
-                    hit = new Hit(SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode);
+                    Transform draggedObject = SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode;
+                    hit = new Hit(draggedObject);
+                    memento = new Memento(draggedObject);
 
                     hit.interactableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
@@ -184,29 +230,31 @@ namespace SEE.Controls.Actions
             {
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
+                    hit.interactableObject.SetGrab(false, true);
+                    gizmo.gameObject.SetActive(false);
+
                     GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject);
                     if (parent != null)
                     {
+                        // The move has come to a successful end.
                         new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, hit.hoveredObject.position).Execute();
-                        synchronize = false; // false because we just called the necessary network action ReparentNetAction().
+                        memento.SetNewParent(parent);
+                        memento.SetNewPosition(hit.hoveredObject.position);
+                        currentState = ReversibleAction.Progress.Completed;
                         result = true;
                     }
                     else
                     {
+                        // An attempt was made to move the hovered object outside of the city.
+                        // We need to reset it to its original position. And then we start from scratch.
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
-                        // We run MoveNodeNetAction here because hit will be reset below.
                         new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
-                        synchronize = false; // false because we just called MoveNodeNetAction
+                        hit = new Hit();
                     }
+                    synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
-                hit.interactableObject.SetGrab(false, true);
-                gizmo.gameObject.SetActive(false);
-
                 moving = false;
-                hit = new Hit();
-
-                currentState = ReversibleAction.Progress.Completed;
             }
 
             if (synchronize)
@@ -220,6 +268,18 @@ namespace SEE.Controls.Actions
             }
 
             return result;
+        }
+
+        public override void Undo()
+        {
+            base.Undo();
+            memento?.Undo();
+        }
+
+        public override void Redo()
+        {
+            base.Redo();
+            memento?.Redo();
         }
     }
 }
