@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
+using SEE.Net;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -179,11 +180,16 @@ namespace SEE.Controls.Actions
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
 
-                    // FIXME: This is a re-parent operation and must be handled accordingly
-                    // and be propagated through the network differently.
-                    GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject, originalPosition);
-
-                    synchronize = true;
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject, originalPosition);
+                    if (parent != null)
+                    {
+                        new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, originalPosition).Execute();
+                        synchronize = false; // false because we just called the necessary network action ReparentNetAction().
+                    }
+                    else
+                    {
+                        synchronize = true;
+                    }
                 }
                 hit.interactableObject.SetGrab(false, true);
                 gizmo.gameObject.SetActive(false);
@@ -196,7 +202,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new Net.MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                new MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
