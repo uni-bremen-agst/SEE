@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>always false</returns>
+        /// <returns>always true</returns>
         public override bool Update()
         {
             InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
@@ -188,12 +188,10 @@ namespace SEE.Controls.Actions
                     {
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
-                        synchronize = true;
+                        // We run MoveCityNetAction here because hit will be reset below.
+                        new MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                        synchronize = false; // false because we just called MoveCityNetAction
                     }
-                }
-                else
-                {
-                    synchronize = true;
                 }
                 hit.interactableObject.SetGrab(false, true);
                 gizmo.gameObject.SetActive(false);
