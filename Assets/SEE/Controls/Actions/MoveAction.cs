@@ -116,7 +116,7 @@ namespace SEE.Controls.Actions
             {
                 if (moving)
                 {
-                    CodeCityManipulator.Set(hit.hoveredObject, dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale));
+                    Positioner.Set(hit.hoveredObject, dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale));
                     hit.interactableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -134,6 +134,9 @@ namespace SEE.Controls.Actions
                 if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
+                    // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to
+                    // be dragged; otherwise the whole city (city root node). Note: the hoveredObject may in
+                    // fact be cityRootNode.
                     hit = new Hit(SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode);
 
                     hit.interactableObject.SetGrab(true, true);
@@ -156,7 +159,7 @@ namespace SEE.Controls.Actions
                         Vector2 proj = dir * Vector2.Dot(point2, dir);
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
-                    CodeCityManipulator.Set(hit.hoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+                    Positioner.Set(hit.hoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.hoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                     gizmo.SetPositions(startPoint, endPoint);
@@ -176,6 +179,7 @@ namespace SEE.Controls.Actions
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
             }
+            // No canceling, no dragging, no reset.
             else if (moving) // finalize movement
             {
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes

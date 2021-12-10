@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions
             {
                 if (rotating)
                 {
-                    CodeCityManipulator.Set(hit.cityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
+                    Positioner.Set(hit.cityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
                     foreach (InteractableObject o in hit.cursor.E.GetFocusses())
                     {
                         if (o.IsGrabbed)
