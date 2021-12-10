@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new Net.RotateCityNetAction(hit.cityRootNode.name, hit.cityRootNode.position, hit.cityRootNode.eulerAngles.y).Execute();
+                new Net.RotateNodeNetAction(hit.cityRootNode.name, hit.cityRootNode.position, hit.cityRootNode.eulerAngles.y).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
