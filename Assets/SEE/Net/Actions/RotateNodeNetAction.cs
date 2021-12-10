@@ -37,6 +37,7 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
+                    Debug.Log($"[Net] Rotating/moving {gameObject.name} to {Position} and rotation {YAngle}.\n");
                     Positioner.Set(gameObject.transform, position: Position, yAngle: YAngle);
                 }
                 else
