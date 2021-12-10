@@ -14,6 +14,9 @@ using Object = UnityEngine.Object;
 
 namespace SEE.Game
 {
+    /// <summary>
+    /// Implements the functions of the <see cref="GraphRenderer"/> related to nodes.
+    /// </summary>
     public partial class GraphRenderer
     {
         /// <summary>
@@ -583,16 +586,10 @@ namespace SEE.Game
             {
                 AddLabels(innerNodes, innerNodeFactory);
             }
-            
-            // Add outline around nodes so they can be visually differentiated without needing the same color.
-            //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
-            // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
-            // other nodes, and to show when a node is being highlighted by making it opaque.
-            //TODO: Make transparency value configurable
+
             foreach (GameObject node in leafNodes.Concat(innerNodes))
             {
-                Outline.Create(node, Color.black);
-                node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
+                AddGeneralDecorations(node);
             }
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
@@ -635,6 +632,25 @@ namespace SEE.Game
                     throw new InvalidOperationException("Unhandled GraphSettings.InnerNodeKinds "
                                                         + $"{settings.InnerNodeSettings.Kind}");
             }
+        }
+
+        /// <summary>
+        /// Adds decorations applicable to all node kinds to them.
+        /// These general decorations currently consist of:
+        /// <ul>
+        /// <li>Outlines around the node</li>
+        /// <li>An AlphaEnforcer ensuring the node always has the correct alpha value</li>
+        /// </ul>
+        /// </summary>
+        protected virtual void AddGeneralDecorations(GameObject node)
+        {
+            // Add outline around nodes so they can be visually differentiated without needing the same color.
+            //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
+            // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
+            // other nodes, and to show when a node is being highlighted by making it opaque.
+            //TODO: Make transparency value configurable
+            Outline.Create(node, Color.black);
+            node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
         }
 
         /// <summary>

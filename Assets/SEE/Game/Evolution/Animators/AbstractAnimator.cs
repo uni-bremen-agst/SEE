@@ -88,9 +88,11 @@ namespace SEE.Game.Evolution
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
         /// <param name="callback">an optional callback to be called when the animation has finished</param>
+        /// <param name="moveCallback">an optional callback to be called when the move animation is about to start</param>
         public void AnimateTo(GameObject gameObject,
                               ILayoutNode nodeTransform,
-                              Action<object> callback = null)
+                              Action<object> callback = null,
+                              Action<float> moveCallback = null)
         {
             gameObject.AssertNotNull("gameObject");
             nodeTransform.AssertNotNull("nodeTransform");
@@ -108,7 +110,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, callback);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, callback, moveCallback);
             }
         }
 
@@ -128,10 +130,12 @@ namespace SEE.Game.Evolution
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transformation to be applied</param>
         /// <param name="callback">method to be called when the animation has finished</param>
+        /// <param name="moveCallback">method to be called when the move animation is about to start</param>
         private void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
-                   Action<object> callback)
+                   Action<object> callback,
+                   Action<float> moveCallback = null)
         {
             // layout.scale is in world space, while the animation by iTween
             // is in local space. Our game objects may be nested in other game objects,
@@ -142,7 +146,8 @@ namespace SEE.Game.Evolution
                                    : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
 
             Tweens.MoveScaleShakeRotate(gameObject, position: layout.CenterPosition, localScale: localScale,
-                                        strength: ShakeStrength(), duration: MaxAnimationTime, callback);
+                                        strength: ShakeStrength(), duration: MaxAnimationTime, callback,
+                                        moveCallback);
         }
     }
 }

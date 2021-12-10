@@ -29,12 +29,7 @@ namespace SEE.DataModel.DG
         private static Edge NewEdge(Graph graph, Node from, Node to, string type = "call")
         {
             edgeID++;
-            Edge result = new Edge(edgeID.ToString())
-            {
-                Type = type,
-                Source = from,
-                Target = to
-            };
+            Edge result = new Edge(from, to, type);
             graph.AddEdge(result);
             return result;
         }
@@ -85,7 +80,7 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3 }, AsSet(n1.Outgoings));
             Edge use_n1_n3_a = NewEdge(g, n1, n3, "use");
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
-            Edge use_n1_n3_b = NewEdge(g, n1, n3, "use");
+            Edge use_n1_n3_b = NewEdge(g, n1, n3, "abuse");
             // We have overridden Equals() for edges so that they are considered the same if
             // they have the same type, same source and target linknames, and same attributes.
             // Based on this comparison, use_n1_n3_a and use_n1_n3_b are equal. To make them different,
@@ -95,7 +90,8 @@ namespace SEE.DataModel.DG
 
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n3, "none")));
             Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a, use_n1_n3_b }, AsSet(n1.From_To(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_b }, AsSet(n1.From_To(n3, "abuse")));
 
             Edge call_n2_n3 = NewEdge(g, n2, n3);
 
