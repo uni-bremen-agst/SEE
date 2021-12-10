@@ -46,17 +46,18 @@ namespace SEE.Game
         /// parent and its associated graph node will be become a child of the graph node
         /// associated with the target parent and <paramref name="movingObject"/> becomes
         /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
-        /// must be in sync).
+        /// must be in sync). The target parent will be returned.
         ///
         /// If no such target node can be identified, the <paramref name="movingObject"/> will
         /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy
-        /// nor the game-node hierarchy will be changed.
+        /// nor the game-node hierarchy will be changed. The returned result will be null.
         ///
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
         /// <param name="originalPosition">the original world-space position of <paramref name="movingObject"/>
         /// to be used if the movement cannot be finalized</param>
-        public static void FinalizePosition(GameObject movingObject, Vector3 originalPosition)
+        /// <returns>the game object that is the new parent or null</returns>
+        public static GameObject FinalizePosition(GameObject movingObject, Vector3 originalPosition)
         {
             // The underlying graph node of the moving object.
             Node movingNode = movingObject.GetComponent<NodeRef>().Value;
@@ -108,15 +109,17 @@ namespace SEE.Game
                 // => Reset its original transform.
                 Tweens.Move(movingObject, originalPosition, 1.0f);
             }
+            return newGameParent;
         }
 
         /// <summary>
-        /// Sets the new parent for <paramref name="child"/> via the network.
+        /// Sets the new parent for <paramref name="child"/> to the game node with <paramref name="parentName"/>
+        /// at the given <paramref name="position"/> in world space.
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
-        /// <param name="parentName">the parent's name (assumed to be unique)</param>
+        /// <param name="parentName">the new parent's name (assumed to be unique)</param>
         /// <param name="position">new position</param>
-        public static void NetworkFinalizeNodePosition(GameObject child, string parentName, Vector3 position)
+        public static void Reparent(GameObject child, string parentName, Vector3 position)
         {
             GameObject parent = GameObject.Find(parentName);
             if (parent != null)
