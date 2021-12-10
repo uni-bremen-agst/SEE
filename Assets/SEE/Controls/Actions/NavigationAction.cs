@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-
     /// <summary>
     /// The abstract navigation action handles generic interactions with the city.
     /// </summary>
@@ -28,7 +27,7 @@ namespace SEE.Controls.Actions
             public readonly Vector2 ZoomCenter;
 
             /// <summary>
-            /// The amount of time in seconds that it should take to reach
+            /// The amount of time in seconds that it should take to reach the target zoom stage.
             /// <see cref="TargetZoomSteps"/>.
             /// </summary>
             private readonly float duration;
@@ -154,6 +153,7 @@ namespace SEE.Controls.Actions
 
         public virtual void Update()
         {
+            Debug.Log($"NavigationAction of {name}.\n");
             Transform currentCityTransform = SceneQueries.GetCityRootNode(gameObject);
             // Nothing to be done if the city root node has not changed (including
             // the case that it was null before and is still null).
@@ -164,12 +164,12 @@ namespace SEE.Controls.Actions
                 // The new node may be valid, but could also be null (for the empty
                 // graph).
                 if (currentCityTransform == null)
-                {                    
+                {
                     CityTransform = null;
                 }
                 else
                 {
-                    // There is a new valid root node. We must update the state.                    
+                    // There is a new valid root node. We must update the state.
                     CityTransform = currentCityTransform;
 
                     zoomState.originalScale = CityTransform.localScale;
@@ -281,5 +281,4 @@ namespace SEE.Controls.Actions
             }
         }
     }
-
 }
