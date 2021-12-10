@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
                         // We run MoveCityNetAction here because hit will be reset below.
-                        new MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                        new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
                         synchronize = false; // false because we just called MoveCityNetAction
                     }
                 }
@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new MoveCityNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
