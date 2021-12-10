@@ -155,7 +155,7 @@ namespace SEE.GO.Menu
             {
                 ShowNotification.Error("Action Error", e.Message);
 #if UNITY_EDITOR
-                Debug.LogError(e.StackTrace);
+                throw;
 #endif
             }
         }
