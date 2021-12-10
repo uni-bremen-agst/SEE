@@ -1,7 +1,9 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using static SEE.Game.City.SEEReflexionCity;
 
 namespace SEE.Game
 {
@@ -16,11 +18,16 @@ namespace SEE.Game
         private static float MovingSpeed = 1.0f;
 
         /// <summary>
+        /// Number of raycast hits we can store in the buffer for <see cref="FinalizePosition"/>.
+        /// </summary>
+        private const int RAYCAST_BUFFER_SIZE = 100;
+
+        /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
         /// camera. The radius sphere of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
+        /// this sphere. The speed of travel is defined by <see cref="MovingSpeed"/>.
         ///
         /// This method is expected to be called at every Update().
         /// </summary>
@@ -72,8 +79,15 @@ namespace SEE.Game
             // is at the lowest level in the tree (more precisely, the one with
             // the greatest value of the node attribute Level; Level counting
             // starts at the root and increases downward into the tree).
-            foreach (RaycastHit hit in Physics.RaycastAll(UserPointsTo()))
+            RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
+            int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
+            if (numberOfHits == RAYCAST_BUFFER_SIZE)
             {
+                Debug.LogWarning("We possibly got more hits than buffer space is available.");
+            }
+            for (int i = 0; i < numberOfHits; i++)
+            {
+                RaycastHit hit = hits[i];
                 // Must be different from the movingObject itself
                 if (hit.collider.gameObject != movingObject)
                 {
@@ -81,8 +95,19 @@ namespace SEE.Game
                     // Is it a node at all and if so, are they in the same graph?
                     if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
+                        // Reflexion analysis: Dropping implementation node on architecture node
+                        if (nodeRef.Value.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
+                        {
+                            ShowNotification.Info("Reflexion Analysis", $"Mapping node {movingNode.SourceName} "
+                                                                        + $"onto {nodeRef.Value.SourceName}.");
+                        }
+                        else if (nodeRef.Value.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
+                        {
+                            ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
+                                                                         + "architecture, not the other way around.");
+                        }
                         // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
+                        else if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
                         {
                             newGraphParent = nodeRef.Value;
                             newGameParent = hit.collider.gameObject;

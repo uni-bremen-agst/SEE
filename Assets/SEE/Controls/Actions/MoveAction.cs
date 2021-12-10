@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-﻿using SEE.Game;
+using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.Utils;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class MoveAction : AbstractPlayerAction
     {
-        private struct Hit
+        private readonly struct Hit
         {
             internal Hit(Transform hit)
             {
@@ -22,10 +22,10 @@ namespace SEE.Controls.Actions
                 plane = new Plane(Vector3.up, root.position);
             }
 
-            internal Transform root;
-            internal Transform transform;
-            internal InteractableObject interactableObject;
-            internal Plane plane;
+            internal readonly Transform root;
+            internal readonly Transform transform;
+            internal readonly InteractableObject interactableObject;
+            internal readonly Plane plane;
         }
 
         private const float SnapStepCount = 8;
@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>always false</returns>
+        /// <returns>always true</returns>
         public override bool Update()
         {
             InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions
                     hit.interactableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
                     dragStartTransformPosition = hit.transform.position;
-                    dragStartOffset = planeHitPoint - hit.transform.position;
+                    dragStartOffset = planeHitPoint - dragStartTransformPosition;
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.transform.localScale);
                 }
 

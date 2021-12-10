@@ -20,12 +20,12 @@ namespace SEE.Game.City
         /// <summary>
         /// Label for the architecture toggle added to each graph element of the architecture city.
         /// </summary>
-        private const string ArchitectureLabel = "Architecture";
+        public const string ArchitectureLabel = "Architecture";
         
         /// <summary>
         /// Label for the implementation toggle added to each graph element of the implementation city.
         /// </summary>
-        private const string ImplementationLabel = "Implementation";
+        public const string ImplementationLabel = "Implementation";
 
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
