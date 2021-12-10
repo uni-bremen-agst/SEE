@@ -178,18 +178,22 @@ namespace SEE.Controls.Actions
             {
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
-                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
-
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject, originalPosition);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject);
                     if (parent != null)
                     {
-                        new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, originalPosition).Execute();
+                        new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, hit.hoveredObject.position).Execute();
                         synchronize = false; // false because we just called the necessary network action ReparentNetAction().
                     }
                     else
                     {
+                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
+                        hit.hoveredObject.position = originalPosition;
                         synchronize = true;
                     }
+                }
+                else
+                {
+                    synchronize = true;
                 }
                 hit.interactableObject.SetGrab(false, true);
                 gizmo.gameObject.SetActive(false);
