@@ -97,9 +97,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>always true</returns>
+        /// <returns>true if completed</returns>
         public override bool Update()
         {
+            bool result = false;
             InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
             Transform cityRootNode = null;
 
@@ -169,9 +170,10 @@ namespace SEE.Controls.Actions
                 {
                     GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
                     cityRootNode.position = plane.CenterTop;
+                    new MoveNodeNetAction(cityRootNode.name, cityRootNode.position).Execute();
                     gizmo.gameObject.SetActive(false);
 
-                    synchronize = true;
+                    synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
             }
             else if (moving) // finalize movement
@@ -183,14 +185,15 @@ namespace SEE.Controls.Actions
                     {
                         new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, hit.hoveredObject.position).Execute();
                         synchronize = false; // false because we just called the necessary network action ReparentNetAction().
+                        result = true;
                     }
                     else
                     {
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
-                        // We run MoveCityNetAction here because hit will be reset below.
+                        // We run MoveNodeNetAction here because hit will be reset below.
                         new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
-                        synchronize = false; // false because we just called MoveCityNetAction
+                        synchronize = false; // false because we just called MoveNodeNetAction
                     }
                 }
                 hit.interactableObject.SetGrab(false, true);
@@ -212,7 +215,7 @@ namespace SEE.Controls.Actions
                 currentState = moving ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
             }
 
-            return true;
+            return result;
         }
     }
 }
