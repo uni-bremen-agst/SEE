@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
@@ -45,37 +44,26 @@ namespace SEE.Controls.Actions
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
-        private bool moving;
-        private Hit hit;
-        private Vector3 dragStartTransformPosition;
-        private Vector3 dragStartOffset;
-        private Vector3 dragCanonicalOffset;
+        /// <summary>
+        /// Whether moving a node has been initiated.
+        /// </summary>
+        private bool moving = false;
+        private Hit hit = new Hit();
+        private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
+        private Vector3 dragStartOffset = Vector3.positiveInfinity;
+        private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new MoveAction
-        {
-            moving = false,
-            hit = new Hit(),
-            dragStartTransformPosition = Vector3.positiveInfinity,
-            dragStartOffset = Vector3.positiveInfinity,
-            dragCanonicalOffset = Vector3.positiveInfinity
-        };
+        internal static ReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new MoveAction
-        {
-            moving = moving,
-            hit = hit,
-            dragStartTransformPosition = dragStartTransformPosition,
-            dragStartOffset = dragStartOffset,
-            dragCanonicalOffset = dragCanonicalOffset
-        };
+        public override ReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
@@ -84,7 +72,14 @@ namespace SEE.Controls.Actions
         /// <returns>empty set because this action does not change anything</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>();
+            if (memento != null && memento.gameObject != null)
+            {
+                return new HashSet<string> { memento.gameObject.name };
+            }
+            else
+            {
+                return new HashSet<string>();
+            }
         }
 
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -95,21 +90,54 @@ namespace SEE.Controls.Actions
             return ActionStateType.Move;
         }
 
+        /// <summary>
+        /// A memento for memorizing game nodes that were moved by this action.
+        /// Used for Undo/Redo.
+        /// </summary>
         private class Memento
         {
-            private Transform gameObject;
-            private GameObject newParent;
-            private Vector3 newPosition;
+            /// <summary>
+            /// The transform of the game object that was moved.
+            /// </summary>
+            public Transform gameObject;
+            /// <summary>
+            /// The parent of <see cref="gameObject"/> at the time before it was moved.
+            /// This will be used to restore the original parent upon <see cref="Undo"/>.
+            /// </summary>
             private Transform oldParent;
+            /// <summary>
+            /// The position of <see cref="gameObject"/> in world space at the time before it was moved.
+            /// This will be used to restore the original world-space position upon <see cref="Undo"/>.
+            /// </summary>
             private Vector3 oldPosition;
+            /// <summary>
+            /// The new parent of <see cref="gameObject"/> at the time after it was moved.
+            /// Maybe the same value as <see cref="oldParent"/>.
+            /// This will be used to restore the new parent upon <see cref="Redo"/>.
+            /// </summary>
+            private GameObject newParent;
+            /// <summary>
+            /// The new position of <see cref="gameObject"/> in world space at the time after it was moved.
+            /// This will be used to restore the new position upon <see cref="Redo"/>.
+            /// </summary>
+            private Vector3 newPosition;
 
-            internal Memento(Transform hoveredObject)
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="movedGameNode">the transform of the game node that was moved</param>
+            internal Memento(Transform movedGameNode)
             {
-                this.gameObject = hoveredObject;
-                this.oldParent = hoveredObject.transform.parent;
-                this.oldPosition = hoveredObject.position;
+                this.gameObject = movedGameNode;
+                this.oldParent = movedGameNode.transform.parent;
+                this.oldPosition = movedGameNode.position;
             }
 
+            /// <summary>
+            /// Restores the original state of <see cref="gameObject"/> before it was moved
+            /// regarding its original parent and position. Will also propagate that state
+            /// through the network to all clients.
+            /// </summary>
             internal void Undo()
             {
                 gameObject.position = oldPosition;
@@ -117,6 +145,13 @@ namespace SEE.Controls.Actions
                 new ReparentNetAction(gameObject.name, oldParent.name, oldPosition).Execute();
             }
 
+            /// <summary>
+            /// Restores the state of <see cref="gameObject"/> after it was moved regarding its
+            /// new parent and position. Will also propagate that state through the network to
+            /// all clients.
+            ///
+            /// Precondition: <see cref="Undo"/> has been called before.
+            /// </summary>
             internal void Redo()
             {
                 gameObject.position = newPosition;
@@ -124,17 +159,31 @@ namespace SEE.Controls.Actions
                 new ReparentNetAction(gameObject.name, newParent.name, gameObject.position).Execute();
             }
 
+            /// <summary>
+            /// Memorizes the new position of <see cref="gameObject"/> after it was moved.
+            /// Relevant for <see cref="Redo"/>.
+            /// </summary>
+            /// <param name="position">new position</param>
             internal void SetNewPosition(Vector3 position)
             {
                 newPosition = position;
             }
 
+            /// <summary>
+            /// Memorizes the new parent of <see cref="gameObject"/> after it was moved.
+            /// Can be the original parent. Relevant for <see cref="Redo"/>.
+            /// </summary>
+            /// <param name="parent">new parent</param>
             internal void SetNewParent(GameObject parent)
             {
                 newParent = parent;
             }
         }
 
+        /// <summary>
+        /// The memento memorizing the original state of the hovered object that was moved.
+        /// Will be null until a node was actually moved.
+        /// </summary>
         private Memento memento;
 
         /// <summary>
