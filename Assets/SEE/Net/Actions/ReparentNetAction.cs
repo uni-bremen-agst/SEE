@@ -46,7 +46,6 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(ChildObjectID);
                 if (gameObject != null)
                 {
-                    Debug.Log($"[Net] Reparanting {gameObject.name} under {ParentObjectID} at {Position}.\n");
                     GameNodeMover.Reparent(gameObject, ParentObjectID, Position);
                 }
                 else

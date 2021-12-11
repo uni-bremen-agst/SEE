@@ -30,6 +30,9 @@ namespace SEE.Net
             YAngle = yAngle;
         }
 
+        /// <summary>
+        /// Rotation of node in all clients except the requesting client.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -37,7 +40,6 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    Debug.Log($"[Net] Rotating/moving {gameObject.name} to {Position} and rotation {YAngle}.\n");
                     Positioner.Set(gameObject.transform, position: Position, yAngle: YAngle);
                 }
                 else
