@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-﻿using SEE.Game;
+using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.Net;
 using SEE.Utils;
@@ -60,10 +60,20 @@ namespace SEE.Controls.Actions
         internal static ReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
-        /// Returns a new instance of <see cref="MoveAction"/>.
+        /// Returns a new instance of <see cref="MoveAction"/> that can continue
+        /// with the user interaction so far.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => CreateReversibleAction();
+        public override ReversibleAction NewInstance() => new MoveAction
+        {
+            // We will be re-using the current settings so that the new action
+            // can continue.
+            moving = moving,
+            hit = hit,
+            dragStartTransformPosition = dragStartTransformPosition,
+            dragStartOffset = dragStartOffset,
+            dragCanonicalOffset = dragCanonicalOffset
+        };
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
