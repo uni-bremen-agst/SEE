@@ -28,6 +28,7 @@ namespace SEE.Net
             GameObjectID = gameObjectID;
             Position = position;
         }
+
         /// <summary>
         /// Movement in all clients except the requesting client.
         /// </summary>
@@ -38,7 +39,6 @@ namespace SEE.Net
                 GameObject gameObject = GameObject.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    Debug.Log($"[Net] Moving {gameObject.name} to {Position}.\n");
                     Positioner.Set(gameObject.transform, Position);
                 }
                 else
