@@ -9,9 +9,9 @@ namespace SEE.Tools
     /// <summary>
     /// A descriptor defining the name of an attribute and the normal distribution
     /// (mean, standard deviation) from which to draw its values randomly.
-    /// 
+    ///
     /// Note: This class must be serializable. The names of the attributes must
-    /// be consistent with the string literals used to retrieved them in 
+    /// be consistent with the string literals used to retrieved them in
     /// SeeCityRandomEditor.
     /// </summary>
     [Serializable]
@@ -62,7 +62,7 @@ namespace SEE.Tools
             }
             else if (attributes.TryGetValue(label, out object dictionary))
             {
-                // label was given => attributes is a dictionary where we need to look up the data 
+                // label was given => attributes is a dictionary where we need to look up the data
                 // using the label
                 values = dictionary as Dictionary<string, object>;
             }
@@ -266,10 +266,9 @@ namespace SEE.Tools
                 {
                     if (constraint.EdgeDensity == 1 || random.NextDouble() < constraint.EdgeDensity)
                     {
-                        string id = constraint.EdgeType + "#" + source.ID + "#" + target.ID;
-                        Edge edge = new Edge(id, source, target, constraint.EdgeType);
+                        Edge edge = new Edge(source, target, constraint.EdgeType);
                         result.Add(edge);
-                        graph.AddEdge(edge);                        
+                        graph.AddEdge(edge);
                     }
                 }
             }
@@ -321,7 +320,7 @@ namespace SEE.Tools
 
 
         /// <summary>
-        /// Returns a random number drawn from a normal distribution with given 
+        /// Returns a random number drawn from a normal distribution with given
         /// <paramref name="mean"/> and <paramref name="standardDeviation"/>.
         /// </summary>
         /// <param name="mean">mean of the normal distribution</param>
@@ -329,7 +328,7 @@ namespace SEE.Tools
         /// <returns>random number drawn from a normal distribution</returns>
         private static float RandomGaussian(System.Random random, float mean, float standardDeviation)
         {
-            // Using two random variables, you can generate random values along a Gaussian 
+            // Using two random variables, you can generate random values along a Gaussian
             // distribution using the Box-Muller transformation.
             // The method requires sampling from a uniform random of (0,1]
             // but Random.NextDouble() returns a sample of [0,1).
