@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions
     /// This class is responsible for the edit-node process via network from one client 
     /// to all others and to the server. 
     /// </summary>
-    public class EditNodeNetAction : AbstractAction
+    public class EditNodeNetAction : AbstractNetAction
     {
         /// <summary>
         /// The new name of the node that has to be edited.

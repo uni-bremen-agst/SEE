@@ -8,12 +8,12 @@ namespace SEE.Net
 {
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///
     /// Loads a city with the attributes defined in object with name
     /// <see cref="gameObjectName"/> for every client.
     /// </summary>
-    public class LoadCityAction : AbstractAction
+    public class LoadCityAction : AbstractNetAction
     {
         /// <summary>
         /// The name of the game object defining the loading details.
