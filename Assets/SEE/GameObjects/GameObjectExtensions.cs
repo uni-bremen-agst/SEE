@@ -363,14 +363,15 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it.
+        /// component attached to it that is actually referring to a valid node
+        /// (i.e., its Value is not null).
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent(out NodeRef _);
+            return gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null;
         }
 
         /// <summary>
