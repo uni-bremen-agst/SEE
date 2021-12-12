@@ -182,7 +182,7 @@ namespace SEE.Game.UI.CodeWindow
             //Input Handling
             if (TextMeshInputField.isFocused)
             {
-                if (Time.time < oldIDXCoolDown)
+                if (Time.time > oldIDXCoolDown)
                 {
                     oldIDX = -1;
                 }
@@ -203,19 +203,21 @@ namespace SEE.Game.UI.CodeWindow
 
                 if (SEEInput.CodeWindowUndo())
                 {
-                    ShowNotification.Info("UNDO", "");
+                    ShowNotification.Info("Undo", "");
                     ICRDT.Undo(Title);
                 }
                 if (SEEInput.CodeWindowRedo())
                 {
-                    ShowNotification.Info("REDO", "");
+                    ShowNotification.Info("Redo", "");
                     ICRDT.Redo(Title);
                 }
 
                 if (SEEInput.ReCalculateSyntaxHighliting())
                 {
+                    ShowNotification.Info("Reloading Code", "");
                     EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
+                    ShowNotification.Info("Reloading Code Complete", "Recalculating Syntaxhighliting finished");
                 }
 
                 int idx = TextMeshInputField.caretPosition;
@@ -231,6 +233,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\r", "");
                 }
+                Debug.Log("OLD " + oldIDX + " IDX "+ idx + " INPOUT " + input +"|");
 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
@@ -246,7 +249,7 @@ namespace SEE.Game.UI.CodeWindow
                     oldIDX = idx;
                     oldIDXCoolDown = Time.time + 0.1f;
                     deleteSelectedText();
-                    ICRDT.AddString(input, idx - 1, Title);
+                    ICRDT.AddString(input, idx - input.Length, Title);
                     oldKeyCode = KeyCode.A;
                 }
 
