@@ -197,18 +197,18 @@ namespace SEE.Controls.Actions
                     const float SCALING_FACTOR = 1.3f;
                     ForEachErosion((sprite, textMesh, layoutGroup) =>
                     {
-                    // We have to delete the text first to animate it more nicely, so we save it here before that
-                    string metricText = textMesh.text;
-                    // This will enlarge the sprite, make it more opaque, and fade in the text
-                    sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
-                                .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
-                                                   .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
-                                                                         s => sprite.transform.localScale = s,
-                                                                         sprite.transform.localScale * SCALING_FACTOR, duration))
-                                                   .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
-                                                                              1f, duration))
-                                                   .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
-                                                                         metricText, duration));
+                        // We have to delete the text first to animate it more nicely, so we save it here before that.
+                        string metricText = textMesh.text;
+                        // This will enlarge the sprite, make it more opaque, and fade in the text.
+                        sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
+                                    .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                                       .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                                             s => sprite.transform.localScale = s,
+                                                                             sprite.transform.localScale * SCALING_FACTOR, duration))
+                                                       .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                                                  1f, duration))
+                                                       .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                                             metricText, duration));
                     });
                     sequence.PlayForward();
                 }
