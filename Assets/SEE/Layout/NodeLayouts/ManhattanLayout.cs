@@ -32,12 +32,13 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly float Unit;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
 
             // Simple grid layout with the same number of blocks in each row (roughly).
-            int numberOfBuildingsPerRow = (int)Mathf.Sqrt(gameNodes.Count);
+            IList<ILayoutNode> layoutNodes = gameNodes.ToList();
+            int numberOfBuildingsPerRow = (int)Mathf.Sqrt(layoutNodes.Count);
             int column = 0;
             int row = 1;
             float distanceBetweenBuildings = Unit * 3.0f;
@@ -47,7 +48,7 @@ namespace SEE.Layout.NodeLayouts
             // Note: (position.X, position.Y) is the left lower corner of the game object in the X,Z plane
 
             // Draw all nodes in a grid in ascending alphabetic order of their ID.
-            foreach (ILayoutNode gameNode in gameNodes.OrderBy<ILayoutNode, string>(gameObject => gameObject.ID))
+            foreach (ILayoutNode gameNode in layoutNodes.OrderBy(gameObject => gameObject.ID))
             {
                 column++;
                 if (column > numberOfBuildingsPerRow)
