@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+using SEE.Utils;
 using TinySpline;
 
 namespace SEE.Layout
@@ -6,17 +6,18 @@ namespace SEE.Layout
     /// <summary>
     /// Layout information about an edge.
     /// </summary>
-    public abstract class ILayoutEdge
+    /// <typeparam name="T">Type of node this edge connects to.</typeparam>
+    public interface ILayoutEdge<out T> where T : ILayoutNode
     {
         /// <summary>
         /// Source of the edge.
         /// </summary>
-        public ILayoutNode Source;
+        public T Source { get; }
 
         /// <summary>
         /// Target of the edge.
         /// </summary>
-        public ILayoutNode Target;
+        public T Target { get; }
 
         /// <summary>
         /// The shaping spline of the edge. The default spline is a line
@@ -24,23 +25,6 @@ namespace SEE.Layout
         /// center position (<see cref="IGameNode.CenterPosition"/>) of
         /// <see cref="Source"/> and <see cref="Target"/>.
         /// </summary>
-        public BSpline Spline;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="source">Source of the edge.</param>
-        /// <param name="target">Target of the edge.</param>
-        public ILayoutEdge(ILayoutNode source, ILayoutNode target)
-        {
-            Source = source;
-            Target = target;
-            Spline = new BSpline(2, 3, 1)
-            {
-                ControlPoints = TinySplineInterop.VectorsToList(
-                    Source.CenterPosition,
-                    Target.CenterPosition)
-            };
-        }
+        public BSpline Spline { get; set; }
     }
 }
