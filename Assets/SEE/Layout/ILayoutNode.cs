@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -17,7 +18,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// The absolute scale of a node in world co-ordinates.
-        /// 
+        ///
         /// Note: This value may be meaningful only if the node is not skewed.
         /// </summary>
         Vector3 AbsoluteScale { get; }
@@ -55,6 +56,11 @@ namespace SEE.Layout
         /// The set of immediate successors of this node.
         /// </summary>
         ICollection<T> Successors { get; }
+
+        /// <summary>
+        /// The game object this layout node encapsulates.
+        /// </summary>
+        GameObject gameObject { get; }
     }
 
     public interface ISublayoutNode<T>
@@ -75,7 +81,7 @@ namespace SEE.Layout
         bool IsSublayoutRoot { get; set; }
 
         /// <summary>
-        /// if the node is a sublayout root, this is the sublayout 
+        /// if the node is a sublayout root, this is the sublayout
         /// </summary>
         Sublayout Sublayout { get; set; }
 
@@ -105,15 +111,7 @@ namespace SEE.Layout
         /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
         public static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> layoutNodes)
         {
-            ICollection<ILayoutNode> result = new List<ILayoutNode>();
-            foreach (ILayoutNode node in layoutNodes)
-            {
-                if (node.Parent == null)
-                {
-                    result.Add(node);
-                }
-            }
-            return result;
+            return layoutNodes.Where(node => node.Parent == null).ToList();
         }
     }
 }
