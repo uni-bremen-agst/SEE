@@ -12,7 +12,7 @@ namespace SEE.GO
         internal static void SetDefaults(LineRenderer line)
         {
             line.sortingLayerName = "OnTop";
-            line.sortingOrder = 5;
+            line.sortingOrder = 0;
 
             // simplify rendering; no shadows
             line.receiveShadows = false;

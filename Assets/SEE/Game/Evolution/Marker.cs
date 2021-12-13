@@ -4,6 +4,8 @@ using SEE.DataModel;
 using SEE.Game.Charts;
 using SEE.GO;
 using UnityEngine;
+using UnityEngine.Rendering;
+using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
 using SEE.Game.City;
 using SEE.DataModel.DG;
@@ -37,9 +39,9 @@ namespace SEE.Game.Evolution
             this.duration = duration;
 
             // graphRenderer.ShaderType
-            additionMarkerFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(additionColor, additionColor, 1));
-            changeMarkerFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(changeColor, changeColor, 1));
-            deletionMarkerFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(deletionColor, deletionColor, 1));
+            additionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(additionColor, additionColor, 1));
+            changeMarkerFactory = new CylinderFactory(Transparent, new ColorRange(changeColor, changeColor, 1));
+            deletionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(deletionColor, deletionColor, 1));
 
             if (markerHeight < 0)
             {
@@ -170,10 +172,9 @@ namespace SEE.Game.Evolution
 
                     CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
-                    // The marker should be drawn in front of the block, hence, its render
-                    // queue offset must be greater than the one of the block.
-                    //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
-                    GameObject beamMarker = NewBeam(customFactory, 0);
+                    // The marker should be drawn as part of the block, hence, its render
+                    // queue offset must be equal to that of the block.
+                    GameObject beamMarker = NewBeam(customFactory, gameNode.GetRenderQueue() - (int) RenderQueue.Transparent);
 
                     // FIXME: These kinds of beam markers make sense only for leaf nodes.
                     // Could we better use some kind of blinking now that the cities
@@ -205,8 +206,7 @@ namespace SEE.Game.Evolution
             {
                 // The marker should be drawn in front of the block, hence, its render
                 // queue offset must be greater than the one of the block.
-                //GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() + 1);
-                GameObject beamMarker = NewBeam(factory, 0);
+                GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int) RenderQueue.Transparent);
 
                 // FIXME: These kinds of beam markers make sense only for leaf nodes.
                 // Could we better use some kind of blinking now that the cities

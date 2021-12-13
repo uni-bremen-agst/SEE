@@ -167,7 +167,7 @@ namespace SEE.GO
             {
                 return renderer.sharedMaterial.renderQueue;
             }
-            Debug.LogWarningFormat("GetRenderQueue: Game object {0} has no renderer.\n", gameObject.name);
+            Debug.LogWarning($"GetRenderQueue: Game object {gameObject.name} has no renderer.\n");
             return 0;
         }
 

@@ -1,15 +1,15 @@
-﻿using SEE.DataModel.DG;
-using SEE.Game.City;
-using SEE.Layout;
-using SEE.GO;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Assertions;
 using System.Linq;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.GO;
+using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
-using SEE.DataModel;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -216,12 +216,12 @@ namespace SEE.Game
             // Calculate only
             if (!draw)
             {
-                result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                result = edgeFactory.CalculateNewEdges(gameNodes.ToList<ILayoutNode>(), layoutEdges);
             }
             // Calculate and draw edges
             else
             {
-                result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
+                result = edgeFactory.DrawEdges(gameNodes.ToList<ILayoutNode>(), layoutEdges);
                 InteractionDecorator.PrepareForInteraction(result);
                 AddLOD(result);
             }
