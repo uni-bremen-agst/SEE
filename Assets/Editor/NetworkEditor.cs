@@ -31,6 +31,7 @@ namespace SEEEditor
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
+            SerializedProperty gameScene = serializedObject.FindProperty("GameScene");
             SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
             SerializedProperty networkCommsLoggingEnabled = serializedObject.FindProperty("networkCommsLoggingEnabled");
             SerializedProperty internalLoggingEnabled = serializedObject.FindProperty("internalLoggingEnabled");
@@ -57,6 +58,8 @@ namespace SEEEditor
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
+                    EditorGUILayout.PropertyField(gameScene, new GUIContent("Loaded Scene", "The name of the scene to be loaded when the game is started."));
+
                     EditorGUILayout.PropertyField(useInOfflineMode);
 
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
