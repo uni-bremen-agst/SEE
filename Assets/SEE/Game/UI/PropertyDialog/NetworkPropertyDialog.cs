@@ -2,6 +2,7 @@
 using SEE.Game.UI.Notification;
 using SEE.Net;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,7 +18,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// Constructor.
         /// </summary>
         /// <param name="node">the network configuration to be manipulated by this dialog.</param>
-        public NetworkPropertyDialog(NetworkConfig networkConfig)
+        public NetworkPropertyDialog(Net.Network networkConfig)
         {
             this.networkConfig = networkConfig;
         }
@@ -30,7 +31,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
         /// </summary>
-        private NetworkConfig networkConfig;
+        private Net.Network networkConfig;
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
@@ -64,6 +65,26 @@ namespace SEE.Game.UI.PropertyDialog
         private StringProperty serverActionPort;
 
         /// <summary>
+        /// Selectable value for no voice chat.
+        /// </summary>
+        private const string NoVoiceChat = "None";
+
+        /// <summary>
+        /// Selectable value for no voice chat.
+        /// </summary>
+        private const string Dissonance = "Dissonance";
+
+        /// <summary>
+        /// Selectable value for no voice chat.
+        /// </summary>
+        private const string Vivox = "Vivox";
+
+        /// <summary>
+        /// The selector for the voice chat system.
+        /// </summary>
+        private SelectionProperty voiceChatSelector;
+
+        /// <summary>
         /// Creates and opens the dialog.
         /// </summary>
         public void Open()
@@ -94,6 +115,15 @@ namespace SEE.Game.UI.PropertyDialog
                 serverActionPort.Value = networkConfig.ServerActionPort.ToString();
                 serverActionPort.Description = "Server port for SEE actions";
                 group.AddProperty(serverActionPort);
+            }
+            {
+                voiceChatSelector = dialog.AddComponent<SelectionProperty>();
+                voiceChatSelector.Name = "Voice Chat";
+                voiceChatSelector.Description = "Select a voice chat system or None if no voice chat is requested";
+                IList<string> voiceChats = new List<string> { NoVoiceChat, Dissonance, Vivox };
+                voiceChatSelector.AddOptions(voiceChats);
+                voiceChatSelector.Value = voiceChats[0];
+                group.AddProperty(voiceChatSelector);
             }
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -157,6 +187,9 @@ namespace SEE.Game.UI.PropertyDialog
                 {
                     ShowPortError("Server Action");
                 }
+            }
+            {
+                Debug.Log($"Selected voice chat: {voiceChatSelector.Value}.\n");
             }
 
             OnConfirm.Invoke();
