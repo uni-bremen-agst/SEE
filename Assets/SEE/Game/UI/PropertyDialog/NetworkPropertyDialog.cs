@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.Game.UI.Notification;
-using SEE.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +14,26 @@ namespace SEE.Game.UI.PropertyDialog
     public class NetworkPropertyDialog
     {
         /// <summary>
+        /// Callback to be called when this dialog closes.
+        /// </summary>
+        public delegate void OnClosed();
+
+        /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the network configuration to be manipulated by this dialog.</param>
-        public NetworkPropertyDialog(Net.Network networkConfig)
+        /// <param name="node">the network configuration to be manipulated by this dialog</param>
+        /// <param name="callBack">delegate to be called when this dialog is closed</param>
+        public NetworkPropertyDialog(Net.Network networkConfig, OnClosed callBack = null)
         {
             this.networkConfig = networkConfig;
+            this.callBack = callBack;
         }
+
+        /// <summary>
+        /// Delegate to be called when this dialog is closed. May be null in which case
+        /// nothing is called.
+        /// </summary>
+        private OnClosed callBack;
 
         /// <summary>
         /// The maximal valid network port number.
@@ -148,6 +160,7 @@ namespace SEE.Game.UI.PropertyDialog
             OnCancel.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
+            callBack?.Invoke();
         }
 
         /// <summary>
@@ -195,6 +208,7 @@ namespace SEE.Game.UI.PropertyDialog
             OnConfirm.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
+            callBack?.Invoke();
 
             static void ShowPortError(string portPrefix)
             {
