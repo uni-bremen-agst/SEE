@@ -22,11 +22,11 @@ namespace SEE.Game.UI.Menu
         private const string MENU_PREFAB = "Prefabs/UI/Menu";
 
         /// <summary>
-        /// The path to the prefab for the menu game object.
+        /// The path to the prefab for the button.
         /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
-        
+
         /// <summary>
         /// The path to the prefab for the list game object.
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
@@ -37,7 +37,7 @@ namespace SEE.Game.UI.Menu
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
         private GameObject MenuContent;
-        
+
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
@@ -89,6 +89,7 @@ namespace SEE.Game.UI.Menu
             {
                 MenuGameObject = Manager.gameObject;
             }
+            EnableClosingDesktop(MenuGameObject, closingIsEnabled);
 
             // Set menu properties
             Manager.titleText = Title;
@@ -98,7 +99,7 @@ namespace SEE.Game.UI.Menu
 
             // Create tooltip
             Tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-            
+
             // Find content GameObject for menu entries.
             MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
             if (MenuContent == null)
@@ -106,7 +107,7 @@ namespace SEE.Game.UI.Menu
                 Debug.LogError("Couldn't find required components on MenuGameObject.");
             }
         }
-        
+
         /// <summary>
         /// Sets up the content of the previously created desktop window (<see cref="SetUpDesktopWindow"/>).
         /// In this case, buttons are created for each menu entry and added to the content GameObject.
@@ -220,6 +221,24 @@ namespace SEE.Game.UI.Menu
                 }
 
                 CurrentMenuShown = MenuShown;
+            }
+        }
+
+        /// <summary>
+        /// Enables/disables the "Main Content/Buttons" child of <paramref name="menuGameObject"/>.
+        /// </summary>
+        /// <param name="enable">whether the button for closing should be enabled</param>
+        private static void EnableClosingDesktop(GameObject menuGameObject, bool enable)
+        {
+            const string buttonsPath = "Main Content/Buttons";
+            Transform buttons = menuGameObject.transform.Find(buttonsPath);
+            if (buttons != null)
+            {
+                buttons.gameObject.SetActive(enable);
+            }
+            else
+            {
+                Debug.LogError($"{menuGameObject.GetFullName()} does not have a child '{buttonsPath}'.\n");
             }
         }
     }
