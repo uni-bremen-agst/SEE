@@ -249,12 +249,15 @@ namespace SEE.Controls.Actions
                 return;
             }
             currentlyDestroying = false;
-
             string shownText = node.SourceName;
+            if (node.IntAttributes.ContainsKey("Metric.Lines.LOC"))
+            {
+                shownText += " " + node.IntAttributes["Metric.Lines.LOC"].ToString();
+            }
+           
 
             Vector3 roof = gameObject.transform.position;
             roof.y += gameObject.transform.lossyScale.y / 2;
-
             // Now we create the label.
             // We define starting and ending positions for the animation.
             Vector3 startLabelPosition = roof;
@@ -263,7 +266,7 @@ namespace SEE.Controls.Actions
                 startLabelPosition,
                 (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
                 lift: true,
-                textColor: Color.black.ColorWithAlpha(0f));
+                textColor: Color.black.ColorWithAlpha(0f)) ;
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
 
