@@ -84,18 +84,19 @@ namespace SEE.Game.UI.PropertyDialog
             void SetupTooltip(GameObject field)
             {
                 tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-                if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                if (!field.TryGetComponent(out PointerHelper pointerHelper))
                 {
-                    // Register listeners on entry and exit events, respectively
-                    pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
-                    pointerHelper.ExitEvent.AddListener(tooltip.Hide);
-                    // FIXME scrolling doesn't work while hovering above the field, because
-                    // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
-                    // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                    // in this instance or without modifying the Modern UI Pack, which would complicate
-                    // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
-                    // be contacted about this.
+                    pointerHelper = field.AddComponent<PointerHelper>();
                 }
+                // Register listeners on entry and exit events, respectively
+                pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
+                pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                // FIXME scrolling doesn't work while hovering above the field, because
+                // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
+                // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
+                // in this instance or without modifying the Modern UI Pack, which would complicate
+                // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
+                // be contacted about this.
             }
 
             static HorizontalSelector GetHorizontalSelector(GameObject field)
