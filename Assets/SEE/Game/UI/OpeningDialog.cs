@@ -119,15 +119,20 @@ namespace SEE.UI
         /// </summary>
         private void Settings()
         {
-            Debug.Log($"{actionMenu.gameObject.GetFullName()}\n");
-            actionMenu.ToggleMenu();
+            // Note: We arrive here because the user pressed on of the buttons of the
+            // actionMenu, which - in turn - will call actionMenu.ShowMenu(false). Thus
+            // at this time, actionMenu is no longer visible. When the following dialog
+            // is finished, Reactive will be called to turn the actionMenu on again.
             NetworkPropertyDialog dialog = new NetworkPropertyDialog(network, Reactivate);
             dialog.Open();
         }
 
+        /// <summary>
+        /// Turns on the <see cref="actionMenu"/>.
+        /// </summary>
         private void Reactivate()
         {
-            //actionMenu.ToggleMenu();
+            actionMenu.ShowMenu(true);
         }
 
         /// <summary>
@@ -143,12 +148,12 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Creates and shows the action menu.
+        /// Creates and shows the <see cref="actionMenu"/>.
         /// </summary>
         private void Start()
         {
-            actionMenu = CreateModeMenu(gameObject);
-            actionMenu.ToggleMenu();
+            actionMenu = CreateModeMenu();
+            actionMenu.ShowMenu(true);
         }
     }
 }
