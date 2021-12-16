@@ -25,242 +25,8 @@ namespace SEE.Controls
     /// future.
     /// Note: Only one instance of this class can be created.
     /// </summary>
-    public class IDEIntegration : MonoBehaviour
+    public partial class IDEIntegration : MonoBehaviour
     {
-        #region IDE Calls
-
-        /// <summary>
-        /// Lists all methods remotely callable by the server in a convenient way.
-        /// </summary>
-        private class IDECalls
-        {
-            /// <summary>
-            /// The server instance.
-            /// </summary>
-            private readonly JsonRpcServer server;
-
-            /// <summary>
-            /// Provides all method SEE can invoke on an IDE.
-            /// </summary>
-            /// <param name="server">The server instance.</param>
-            public IDECalls(JsonRpcServer server)
-            {
-                this.server = server;
-            }
-
-            /// <summary>
-            /// Opens the file in the IDE of choice.
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            /// <param name="path">Absolute file path.</param>
-            /// <param name="line">Optional line number.</param>
-            public async UniTask OpenFile(JsonRpcConnection connection, string path, int? line)
-            {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "OpenFile", path, line);
-            }
-
-            /// <summary>
-            /// Gets the absolute project path (e.g. .sln). 
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetProjectPath(JsonRpcConnection connection)
-            {
-                return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetProject");
-            }
-
-            /// <summary>
-            /// Gets the absolute project path (e.g. .sln). 
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            /// <returns>Returns the absolute project path. Can be null.</returns>
-            public async UniTask<string> GetIDEVersion(JsonRpcConnection connection)
-            {
-                return await server.CallRemoteProcessOnConnectionAsync<string>(connection, "GetIdeVersion");
-            }
-
-            /// <summary>
-            /// Was the connection started by SEE directly through a command switch.
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            /// <returns>True if SEE started this connection.</returns>
-            public async UniTask<bool> WasStartedBySee(JsonRpcConnection connection)
-            {
-                return await server.CallRemoteProcessOnConnectionAsync<bool>(connection, "WasStartedBySee");
-            }
-
-            /// <summary>
-            /// Will focus this IDE instance.
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            public async UniTask FocusIDE(JsonRpcConnection connection)
-            {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "SetFocus");
-            }
-
-            /// <summary>
-            /// Calling this method will change the loaded solution of this Connection.
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            /// <param name="path">The absolute solution path.</param>
-            public async UniTask ChangeSolution(JsonRpcConnection connection, string path)
-            {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "", path);
-            }
-
-            /// <summary>
-            /// Declines an IDE instance.
-            /// </summary>
-            /// <param name="connection">A connection to an IDE.</param>
-            public async UniTask Decline(JsonRpcConnection connection)
-            {
-                await server.CallRemoteProcessOnConnectionAsync(connection, "Decline");
-            }
-        }
-
-        #endregion
-
-        #region Remote Procedure Calls
-
-        /// <summary>
-        /// This class contains all functions, that can be called by the client (IDE). It will be
-        /// given to each <see cref="JsonRpcConnection"/> individually.
-        /// </summary>
-        private class RemoteProcedureCalls
-        {
-            /// <summary>
-            /// instance of parent class.
-            /// </summary>
-            private readonly IDEIntegration ideIntegration;
-
-            /// <summary>
-            /// The current solution path of the connected IDE.
-            /// </summary>
-            private string solutionPath;
-
-            /// <summary>
-            /// Nested class in <see cref="IDEIntegration"/>. Contains all methods that can be accessed
-            /// by the client. Should only be initiated by the <see cref="IDEIntegration"/>.
-            /// </summary>
-            /// <param name="ideIntegration">instance of IDEIntegration</param>
-            /// <param name="solutionPath">The solution path of the connected IDE.</param>
-            public RemoteProcedureCalls(IDEIntegration ideIntegration, string solutionPath)
-            {
-                this.ideIntegration = ideIntegration;
-                this.solutionPath = solutionPath;
-            }
-
-            /// <summary>
-            /// Adds all nodes from <see cref="cachedObjects"/> with the key created by
-            /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
-            /// null, it won't be appended to the key.
-            /// </summary>
-            /// <param name="path">The absolute path to the source file.</param>
-            /// <param name="name">Name of the element in a file.</param>
-            /// <param name="line">Line of the element.</param>
-            /// <param name="column">Column of the element.</param>
-            public void HighlightNode(string path, string name, int line, int column)
-            {
-                var key = ideIntegration.GenerateKey(path, name, line, column);
-                if (ideIntegration.cachedObjects.ContainsKey(key))
-                    SetInteractableObjects(ideIntegration.cachedObjects[ideIntegration
-                        .GenerateKey(path, name, line, column)]);
-            }
-
-
-            /// <summary>
-            /// Adds all edges from <see cref="cachedObjects"/> with the key created by
-            /// <paramref name="path"/> and <paramref name="name"/>. If <paramref name="name"/> is
-            /// null, it won't be appended to the key.
-            /// </summary>
-            /// <param name="path">The absolute path to the source file.</param>
-            /// <param name="name">Name of the element in a file.</param>
-            /// <param name="line">Line of the element.</param>
-            /// <param name="column">Column of the element.</param>
-            public void HighlightNodeReferences(string path, string name, int line, int column)
-            {
-                var key = ideIntegration.GenerateKey(path, name, line, column);
-                if (ideIntegration.cachedObjects.ContainsKey(key))
-                    SetInteractableObjects(SceneQueries.Find(new HashSet<string>(ideIntegration
-                    .cachedObjects[key].ToList().
-                    Select(x => x.ID()))));
-            }
-
-            /// <summary>
-            /// This method will highlight all given elements of a specific file in SEE.
-            /// </summary>
-            /// <param name="path">The absolute path to the source file.</param>
-            /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column)</param>
-            /// <returns></returns>
-            public void HighlightNodes(string path, ICollection<Tuple<string, int, int>> nodes)
-            {
-                var objects = new HashSet<GameObject>();
-                foreach (var (name, line, column) in nodes)
-                {
-                    var key = ideIntegration.GenerateKey(path, name, line, column);
-                    if (ideIntegration.cachedObjects.ContainsKey(key))
-                        objects.UnionWith(ideIntegration.cachedObjects[key]);
-                }
-                SetInteractableObjects(objects);
-            }
-
-            /// <summary>
-            /// Solution path changed.
-            /// </summary>
-            /// <returns>Async Task.</returns>
-            public void SolutionChanged(string path)
-            {
-                ideIntegration.semaphore.Wait();
-                if (ideIntegration.cachedConnections.ContainsKey(solutionPath))
-                {
-                    var connection = ideIntegration.cachedConnections[solutionPath];
-
-                    if (ideIntegration.cachedSolutionPaths.Contains(path) || ideIntegration.ConnectToAny)
-                    {
-                        if (ideIntegration.cachedConnections.Remove(solutionPath))
-                        {
-                            ideIntegration.cachedConnections.Add(path, connection);
-                            solutionPath = path;
-                        }
-                    }
-                    else
-                    {
-                        ideIntegration.ideCalls.Decline(connection).Forget();
-                    }
-                }
-
-                ideIntegration.semaphore.Release();
-            }
-
-            /// <summary>
-            /// Will transform the given collection to a set of <see cref="InteractableObject"/> and
-            /// add them to <see cref="pendingSelections"/>.
-            /// </summary>
-            /// <param name="objects">The collection of GameObjects representing nodes.</param>
-            private void SetInteractableObjects(IEnumerable<GameObject> objects)
-            {
-                UniTask.Run(async () =>
-                {
-                    await UniTask.SwitchToMainThread();
-                    var tmp = new HashSet<InteractableObject>();
-
-                    foreach (var node in objects)
-                    {
-                        if (node.TryGetComponent(out InteractableObject obj))
-                        {
-                            tmp.Add(obj);
-                        }
-                    }
-
-                    await UniTask.SwitchToThreadPool();
-
-                    ideIntegration.pendingSelections = tmp;
-                });
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// There is currently only an implementation for Visual Studio.
         /// </summary>
@@ -273,20 +39,9 @@ namespace SEE.Controls
         /// <summary>
         /// Specifies to which IDE a connection is to be established.
         /// </summary>
+        [Header("General")]
         [Tooltip("Specifies to which IDE a connection is to be established.")]
         public Ide Type;
-
-        /// <summary>
-        /// Connects to IDE regardless of the loaded project (solution).
-        /// </summary>
-        [Tooltip("Connects to IDE regardless of the loaded project (solution).")]
-        public bool ConnectToAny = false;
-
-        /// <summary>
-        /// Fixes potential problem with lines/columns if they do not match to those of the IDE.
-        /// </summary>
-        [Tooltip("Ignore the given line and column values of a node.")]
-        public bool IgnorePosition = false;
 
         /// <summary>
         /// Specifies the number of IDEs that can connect at the same time.
@@ -299,6 +54,25 @@ namespace SEE.Controls
         /// </summary>
         [Tooltip("TCP Socket port that will be used on local host.")] 
         public int Port = 26100;
+
+        /// <summary>
+        /// Connects to IDE regardless of the loaded project (solution).
+        /// </summary>
+        [Tooltip("Connects to IDE regardless of the loaded project (solution).")]
+        public bool ConnectToAny = false;
+
+        /// <summary>
+        /// Will use the position of a member. Disabling may fix some problems.
+        /// </summary>
+        [Header("Node lookup")]
+        [Tooltip("Will use the position of a member. Disabling may fix some problems.")]
+        public bool UseElementPosition = false;
+
+        /// <summary>
+        /// Will use the range (start to end) of a member.
+        /// </summary>
+        [Tooltip("Will use the range (start to end) of a member.")] 
+        public bool UseElementRange = false;
 
         /// <summary>
         /// Represents the singleton instance of this integration in the scene.
@@ -321,10 +95,11 @@ namespace SEE.Controls
         private SemaphoreSlim semaphore;
 
         /// <summary>
-        /// A mapping from the absolute path of the node to a list of nodes. Since changes in the
-        /// city have no impact to the source code, this will only be initialized during start up.
+        /// A mapping from the absolute path of the node to another Dictionary, which will map an
+        /// element key to a list of GameObjects. Since changes in the city have no impact to the
+        /// source code, this will only be initialized during start up.
         /// </summary>
-        private IDictionary<string, ICollection<GameObject>> cachedObjects;
+        private IDictionary<string, IDictionary<string, ICollection<GameObject>>> cachedObjects;
 
         /// <summary>
         /// A mapping of all registered connections to the project they have opened. Only add and
@@ -420,24 +195,30 @@ namespace SEE.Controls
         /// </summary>
         private void InitializeSceneElementsObjects()
         {
-            cachedObjects = new Dictionary<string, ICollection<GameObject>>();
+            // A GameObject should be unique, but the key generated by SourceLength may be used repeated
+            cachedObjects = new Dictionary<string, IDictionary<string, ICollection<GameObject>>>();
             cachedSolutionPaths = new HashSet<string>();
 
-            // Get all nodes in scene
-            foreach (var node in SceneQueries.AllGameNodesInScene(true, true))
+            // Get all nodes in scene and cache them in cachedObjects
+            foreach (GameObject node in SceneQueries.AllGameNodesInScene(true, true))
             {
-                var key = GenerateNodeKey(node.GetNode());
-
-                if (key == null) continue;
-                if (!cachedObjects.ContainsKey(key))
+                if (TryGenerateNodeKey(node.GetNode(), out string path, out string key))
                 {
-                    cachedObjects[key] = new List<GameObject>();
+                    if (!cachedObjects.ContainsKey(path))
+                    {
+                        cachedObjects[path] = new Dictionary<string, ICollection<GameObject>>();
+                    }
+
+                    if (!cachedObjects[path].ContainsKey(key))
+                    {
+                        cachedObjects[path][key] = new List<GameObject>();
+                    }
+                    cachedObjects[path][key].Add(node);
                 }
-                cachedObjects[key].Add(node);
             }
 
             // Get all code cities
-            foreach (var obj in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
             {
                 if (obj.TryGetComponent(out AbstractSEECity city))
                 {
@@ -450,35 +231,42 @@ namespace SEE.Controls
         /// Generates an appropriate key for a given node.
         /// </summary>
         /// <param name="node">The node.</param>
-        /// <returns>A key. Can be null</returns>
-        private string GenerateNodeKey(Node node)
+        /// <param name="path">The generated path to the given node. Can be null.</param>
+        /// <param name="key">The generated key to the given node. Can be null.</param>
+        /// <returns>Generating was successful.</returns>
+        private bool TryGenerateNodeKey(Node node, out string path, out string key)
         {
+            path = null;
             try
             {
-                return GenerateKey(Path.GetFullPath(node.Path() + node.Filename()), node.SourceName,
-                    node.SourceLine().GetValueOrDefault(), node.SourceColumn().GetValueOrDefault());
+                path = Path.GetFullPath(node.Path() + node.Filename());
             }
             catch (Exception)
             {
                 // File not found
-                return null;
             }
+
+            key = GenerateKey(node.SourceName, node.SourceLine().GetValueOrDefault(), 
+                node.SourceColumn().GetValueOrDefault(), node.SourceLength().GetValueOrDefault());
+            return path != null && key != null;
         }
 
         /// <summary>
         /// Will generate a key from the given parameter to be used for <see cref="cachedObjects"/>.
         /// </summary>
-        /// <param name="path">The path of the file.</param>
         /// <param name="name">The name of the element.</param>
         /// <param name="line">The line number of the element.</param>
         /// <param name="column">The column number of the element.</param>
+        /// <param name="length">The length of the code range.</param>
         /// <returns>A key for <see cref="cachedObjects"/>.</returns>
-        private string GenerateKey(string path, string name, int line, int column)
+        private string GenerateKey(string name, int line, int column, int length)
         {
-            if (path == null || name == null) return "";
-            var key = $"{path}:{name}";
+            if (name == null) return "";
+            string key = UseElementRange || UseElementPosition ? $"{name}:{line}" : name;
+            key = UseElementRange ? $"{key}:{length}" : key;
+            key = UseElementPosition ? $"{key}:{column}" : key;
 
-            return (IgnorePosition ? key : $"{key}:{line}:{column}");
+            return key;
         }
 
         #endregion
@@ -500,7 +288,7 @@ namespace SEE.Controls
         /// <returns>The set of elements to be highlighted.</returns>
         public HashSet<InteractableObject> PopPendingSelections()
         {
-            var elements = new HashSet<InteractableObject>();
+            HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
             elements.UnionWith(pendingSelections);
             pendingSelections.Clear();
             return elements;
@@ -515,7 +303,7 @@ namespace SEE.Controls
         /// <returns>Async UniTask.</returns>
         public async UniTask OpenFile(string filePath, string solutionPath, int? line = null)
         {
-            var connection = await LookForIDEConnection(solutionPath);
+            JsonRpcConnection connection = await LookForIDEConnection(solutionPath);
             if (connection == null) return;
             try
             {
@@ -578,7 +366,7 @@ namespace SEE.Controls
         private async UniTask<bool> CheckIDE(JsonRpcConnection connection)
         {
             // Right version of the IDE
-            var version = await ideCalls.GetIDEVersion(connection);
+            string version = await ideCalls.GetIDEVersion(connection);
             if (version == null || !version.Equals(Type.ToString())) return false;
             
             return await ideCalls.WasStartedBySee(connection) || ConnectToAny || 
@@ -608,7 +396,7 @@ namespace SEE.Controls
                 default:
                     throw new NotImplementedException($"Implementation of case {Type} not found");
             }
-            var start = new ProcessStartInfo
+            ProcessStartInfo start = new ProcessStartInfo
             {
                 FileName = fileName,
                 Arguments = arguments,
@@ -616,7 +404,7 @@ namespace SEE.Controls
 
             try
             {
-                using var proc = Process.Start(start);
+                using Process proc = Process.Start(start);
             }
             catch (Exception e)
             {
@@ -663,7 +451,7 @@ namespace SEE.Controls
                 {
                     await semaphore.WaitAsync();
 
-                    var project = await ideCalls.GetProjectPath(connection);
+                    string project = await ideCalls.GetProjectPath(connection);
                     connection.AddTarget(new RemoteProcedureCalls(this, project));
 
                     if (project == null) return;
@@ -697,7 +485,7 @@ namespace SEE.Controls
             {
                 await semaphore.WaitAsync();
 
-                var key = cachedConnections.FirstOrDefault(x => x.Value.Equals(connection)).Key;
+                string key = cachedConnections.FirstOrDefault(x => x.Value.Equals(connection)).Key;
                 if (key != null)
                 {
                     cachedConnections.Remove(key);

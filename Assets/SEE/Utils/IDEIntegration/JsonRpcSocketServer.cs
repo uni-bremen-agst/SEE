@@ -102,19 +102,19 @@ namespace SEE.Utils
                 // Listens to incoming Requests. Only one client will be connected to the server.
                 while (true)
                 {
-                    var tcpClient = await socket.AcceptTcpClientAsync().AsUniTask()
+                    TcpClient tcpClient = await socket.AcceptTcpClientAsync().AsUniTask()
                         .AttachExternalCancellation(token);
 
                     if (RpcConnections.Count < maxClients)
                     {
-                        var message = Encoding.ASCII.GetBytes("START\n");
+                        byte[] message = Encoding.ASCII.GetBytes("START\n");
                         tcpClient.GetStream().Write(message, 0, message.Length);
                         await tcpClient.GetStream().FlushAsync(token);
                         RunConnection(new Client(tcpClient));
                     }
                     else
                     {
-                        var message = Encoding.ASCII.GetBytes("MAX_CLIENT_REACHED\n");
+                        byte[] message = Encoding.ASCII.GetBytes("MAX_CLIENT_REACHED\n");
                         tcpClient.GetStream().Write(message, 0, message.Length);
                         await tcpClient.GetStream().FlushAsync(token);
                     }

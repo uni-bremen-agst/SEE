@@ -149,7 +149,7 @@ namespace SEE.Utils
             if (IsConnected())
             {
                 await Semaphore.WaitAsync();
-                foreach (var connection in RpcConnections)
+                foreach (JsonRpcConnection connection in RpcConnections)
                 {
                     await CallRemoteProcessOnConnectionAsync(connection, targetName, arguments);
                 }
@@ -238,7 +238,7 @@ namespace SEE.Utils
             if (RpcConnections != null)
             {
                 Semaphore.Wait();
-                foreach (var connection in RpcConnections)
+                foreach (JsonRpcConnection connection in RpcConnections)
                 {
                     connection?.Abort();
                 }
