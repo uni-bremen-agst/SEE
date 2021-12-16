@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SEEEditor
 {
-
     [CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
@@ -26,13 +25,11 @@ namespace SEEEditor
 
         public override void OnInspectorGUI()
         {
-            SerializedProperty remoteServerIPAddress = serializedObject.FindProperty("remoteServerIPAddress");
             SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
             SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
             SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
             SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
             SerializedProperty gameScene = serializedObject.FindProperty("GameScene");
-            SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
             SerializedProperty networkCommsLoggingEnabled = serializedObject.FindProperty("networkCommsLoggingEnabled");
             SerializedProperty internalLoggingEnabled = serializedObject.FindProperty("internalLoggingEnabled");
             SerializedProperty minimalSeverity = serializedObject.FindProperty("minimalSeverity");
@@ -62,13 +59,7 @@ namespace SEEEditor
 
                     EditorGUILayout.PropertyField(useInOfflineMode);
 
-                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    {
-                        EditorGUILayout.PropertyField(hostServer);
-                    }
-                    EditorGUI.EndDisabledGroup();
-
-                    EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue && !hostServer.boolValue);
+                    EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue);
                     {
                         EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
                     }
@@ -76,27 +67,17 @@ namespace SEEEditor
 
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
-                        EditorGUI.BeginDisabledGroup(!hostServer.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
-                        }
-                        EditorGUI.EndDisabledGroup();
-
-                        EditorGUI.BeginDisabledGroup(hostServer.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(remoteServerIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
-                            EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
-                        }
-                        EditorGUI.EndDisabledGroup();
+                        EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
+                        EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
                     }
                     EditorGUI.EndDisabledGroup();
 
                     #region Vivox
                     EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
                     {
-                        SerializedProperty enableVivox = serializedObject.FindProperty("enableVivox");
+                        SerializedProperty voiceChat = serializedObject.FindProperty("VoiceChat");
                         SerializedProperty vivoxChannelName = serializedObject.FindProperty("vivoxChannelName");
-                        EditorGUILayout.PropertyField(enableVivox, new GUIContent("Enable Vivox", "Whether Vivox voice chat is to be enabled."));
+                        EditorGUILayout.PropertyField(voiceChat, new GUIContent("Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat)."));
                         EditorGUILayout.PropertyField(vivoxChannelName, new GUIContent("Vivox Channel Name", "The name of the voice channel."));
                     }
                     EditorGUI.EndDisabledGroup();
