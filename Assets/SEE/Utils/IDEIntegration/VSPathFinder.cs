@@ -50,7 +50,7 @@ namespace SEE.Utils
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 throw new InvalidOperationException("This method is only supported on Windows!");
-            var requestedInstance = version switch
+            string requestedInstance = version switch
             {
                 Version.VS2019 => VS2019,
                 Version.VS2022 => VS2022,
@@ -58,7 +58,7 @@ namespace SEE.Utils
                     $"Implementation of case {version} not found!")
             };
 
-            var result = await ExecuteVSWhereAsync(
+            string result = await ExecuteVSWhereAsync(
                 $"-version {requestedInstance} -format value -property productPath");
 
             return await UniTask.FromResult(result);
@@ -71,7 +71,7 @@ namespace SEE.Utils
         /// <returns>Returns the output of the process</returns>
         private static async UniTask<string> ExecuteVSWhereAsync(string arguments)
         {
-            var start = new ProcessStartInfo
+            ProcessStartInfo start = new ProcessStartInfo
             {
                 FileName = VSWherePath,
                 Arguments = arguments,
@@ -82,9 +82,9 @@ namespace SEE.Utils
 
             try
             {
-                using var proc = Process.Start(start);
+                using Process proc = Process.Start(start);
 
-                var result = "";
+                string result = "";
                 while (proc != null && !proc.StandardOutput.EndOfStream)
                 {
                     result += await proc.StandardOutput.ReadLineAsync();
