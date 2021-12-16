@@ -570,12 +570,12 @@ namespace SEE.Game
                 foreach (Edge edge in next.Graph.Edges())
                 {
                     objectManager.GetEdge(edge, out GameObject edgeObject);
-                    if (edgeObject.TryGetComponent<SEESpline>(out SEESpline spline))
+                    if (edgeObject.TryGetComponent(out SEESpline spline))
                     {
                         spline.Spline = next.EdgeLayout[edge.ID].Spline;
                     }
                     edgeObject.SetActive(true); // Make visible
-                    if (gameObject.TryGetComponent<EdgeMeshScheduler>(out EdgeMeshScheduler scheduler))
+                    if (gameObject.TryGetComponent(out EdgeMeshScheduler scheduler))
                     {
                         scheduler.Add(edgeObject); // Register for mesh creation
                     }
