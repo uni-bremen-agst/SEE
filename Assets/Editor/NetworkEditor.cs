@@ -84,6 +84,7 @@ namespace SEEEditor
         /// <param name="propertyName">name of the property</param>
         /// <param name="label">label to be shown to the user</param>
         /// <param name="toolTip">tool tip to be shown to the user</param>
+        /// <returns>the property with <paramref name="propertyName"/> if any, otherwise null</returns>
         private SerializedProperty SetProperty(string propertyName, string label, string toolTip)
         {
             SerializedProperty property = serializedObject.FindProperty(propertyName);
