@@ -69,8 +69,8 @@ namespace SEE.Game.Charts.VR
                 Vector2 markerPos = marker.GetComponent<RectTransform>().anchoredPosition;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<uint> ids = marker.ids;
-                    foreach (uint id in ids)
+                    List<string> ids = marker.ids;
+                    foreach (string id in ids)
                     {
                         InteractableObject o = InteractableObject.Get(id);
                         o.SetSelect(true, true);

@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions
     /// This class is responsible for the scaling nodes via network from one 
     /// client to all others and to the server. 
     /// </summary>
-    public class ScaleNodeNetAction : AbstractAction
+    public class ScaleNodeNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the gameObject that has to be scaled.

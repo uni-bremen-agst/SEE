@@ -14,7 +14,7 @@ namespace SEE.Net
         /// <summary>
         /// The action to be executed.
         /// </summary>
-        public AbstractAction action;
+        public AbstractNetAction action;
 
         /// <summary>
         /// Empty constructor is necessary for JsonUtility-serialization.
@@ -27,7 +27,7 @@ namespace SEE.Net
         /// Constructs a packet with given action.
         /// </summary>
         /// <param name="action">The action to be executed.</param>
-        public ExecuteActionPacket(AbstractAction action)
+        public ExecuteActionPacket(AbstractNetAction action)
         {
             this.action = action;
         }
