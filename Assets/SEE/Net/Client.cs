@@ -80,7 +80,7 @@ namespace SEE.Net
                         Logger.Log($"Connection with server established: {Connection}");
                         break;
                     }
-                    catch (ConnectionSetupException) 
+                    catch (ConnectionSetupException)
                     {
                         Logger.Log($"No server connection could be established using : {connectionInfo}");
                     }
@@ -114,6 +114,7 @@ namespace SEE.Net
         {
             if (initialized)
             {
+                Logger.Log($"Client connected via {Connection} is shut down.");
                 initialized = false;
 
                 Connection?.CloseConnection(false);
