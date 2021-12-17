@@ -361,7 +361,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetHoverAction(this, hoverFlags).Execute();
             }
@@ -473,7 +473,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetSelectAction(this, select).Execute();
             }
@@ -594,7 +594,7 @@ namespace SEE.Controls
                 GrabbedObjects.Remove(this);
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)

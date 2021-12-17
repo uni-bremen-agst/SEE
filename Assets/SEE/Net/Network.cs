@@ -72,14 +72,6 @@ namespace SEE.Net
         private readonly Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
 
         /// <summary>
-        /// <see cref="useInOfflineMode"/>
-        ///
-        /// FIXME: This will be removed.
-        /// </summary>
-        [Obsolete]
-        public static bool UseInOfflineMode => false;
-
-        /// <summary>
         /// True if we are running a host or server.
         /// </summary>
         public static bool HostServer => NetworkManager.Singleton != null
@@ -178,34 +170,31 @@ namespace SEE.Net
             /// main thread here.
             MainThread = Thread.CurrentThread;
 
-            if (!UseInOfflineMode)
-            {
 #if UNITY_EDITOR
-                if (networkCommsLoggingEnabled)
-                {
-                    NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
-                }
-                else
-                {
-                    NetworkComms.DisableLogging();
-                }
+            if (networkCommsLoggingEnabled)
+            {
+                NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
+            }
+            else
+            {
+                NetworkComms.DisableLogging();
+            }
 #else
                 NetworkComms.DisableLogging();
 #endif
 
-                try
+            try
+            {
+                if (HostServer)
                 {
-                    if (HostServer)
-                    {
-                        Server.Initialize();
-                    }
-                    Client.Initialize();
-                    StartVoiceChat();
+                    Server.Initialize();
                 }
-                catch (Exception e)
-                {
-                    Util.Logger.LogError("Some network error happened! Exception: " + e);
-                }
+                Client.Initialize();
+                StartVoiceChat();
+            }
+            catch (Exception e)
+            {
+                Util.Logger.LogError("Some network error happened! Exception: " + e);
             }
 
             InitializeGame();
@@ -246,7 +235,7 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if ((UseInOfflineMode || HostServer) && loadCityOnStart)
+            if (HostServer && loadCityOnStart)
             {
                 foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
                 {
@@ -298,38 +287,34 @@ namespace SEE.Net
         /// </summary>
         private void LateUpdate()
         {
-            bool updateServer = HostServer && !UseInOfflineMode;
-            if (updateServer)
+            if (HostServer)
             {
                 Server.Update();
             }
             Client.Update();
 
-            if (!UseInOfflineMode)
+            if (submittedSerializedPackets.Count != 0)
             {
-                if (submittedSerializedPackets.Count != 0)
+                foreach (Connection connection in submittedSerializedPackets.Keys)
                 {
-                    foreach (Connection connection in submittedSerializedPackets.Keys)
+                    List<string> serializedObjects = submittedSerializedPackets[connection];
+
+                    if (serializedObjects.Count != 0)
                     {
-                        List<string> serializedObjects = submittedSerializedPackets[connection];
-
-                        if (serializedObjects.Count != 0)
+                        ulong id = ulong.MaxValue;
+                        if (HostServer && Server.Connections.Contains(connection))
                         {
-                            ulong id = ulong.MaxValue;
-                            if (updateServer && Server.Connections.Contains(connection))
-                            {
-                                id = Server.outgoingPacketSequenceIDs[connection]++;
-                            }
-                            else if (Client.Connection.Equals(connection))
-                            {
-                                id = Client.outgoingPacketID++;
-                            }
-                            Assert.IsTrue(id != ulong.MaxValue);
-
-                            PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
-                            Send(connection, PacketSerializer.Serialize(packet));
-                            serializedObjects.Clear();
+                            id = Server.outgoingPacketSequenceIDs[connection]++;
                         }
+                        else if (Client.Connection.Equals(connection))
+                        {
+                            id = Client.outgoingPacketID++;
+                        }
+                        Assert.IsTrue(id != ulong.MaxValue);
+
+                        PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
+                        Send(connection, PacketSerializer.Serialize(packet));
+                        serializedObjects.Clear();
                     }
                 }
             }
@@ -340,11 +325,8 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
-            if (!UseInOfflineMode)
-            {
-                Server.Shutdown();
-                Client.Shutdown();
-            }
+            Server.Shutdown();
+            Client.Shutdown();
 
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -371,14 +353,6 @@ namespace SEE.Net
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Switches to offline mode.
-        /// </summary>
-        [Obsolete]
-        internal static void SwitchToOfflineMode()
-        {
         }
 
         /// <summary>
@@ -441,10 +415,6 @@ namespace SEE.Net
                         if (HostServer)
                         {
                             connection.CloseConnection(true);
-                        }
-                        else
-                        {
-                            SwitchToOfflineMode();
                         }
                     }
                 }
@@ -551,6 +521,7 @@ namespace SEE.Net
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
+        [SerializeField]
         private VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
