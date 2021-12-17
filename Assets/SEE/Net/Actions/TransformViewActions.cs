@@ -36,11 +36,11 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///   
     /// Synchronizes positions between Clients.
     /// </summary>
-    public class TransformViewPositionAction : AbstractAction
+    public class TransformViewPositionAction : AbstractNetAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
@@ -89,11 +89,11 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///
     /// Synchronizes rotations between Clients.
     /// </summary>
-    public class TransformViewRotationAction : AbstractAction
+    public class TransformViewRotationAction : AbstractNetAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
@@ -142,11 +142,11 @@ namespace SEE.Net
 
     /// <summary>
     /// !!! IMPORTANT !!!
-    ///   See <see cref="AbstractAction"/> before modifying this class!
+    ///   See <see cref="AbstractNetAction"/> before modifying this class!
     ///   
     /// Synchronizes cale between Clients.
     /// </summary>
-    public class TransformViewScaleAction : AbstractAction
+    public class TransformViewScaleAction : AbstractNetAction
     {
         /// <summary>
         /// The unique ID of the view container containing the transform view.
