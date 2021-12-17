@@ -201,9 +201,6 @@ namespace SEE.Game.UI.PropertyDialog
                     ShowPortError("Server Action");
                 }
             }
-            {
-                Debug.Log($"Selected voice chat: {voiceChatSelector.Value}.\n");
-            }
 
             OnConfirm.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
