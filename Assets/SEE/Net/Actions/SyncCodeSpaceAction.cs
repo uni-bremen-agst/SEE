@@ -7,7 +7,7 @@ namespace SEE.Net
     /// <summary>
     /// Synchronizes the code spaces across all clients.
     /// </summary>
-    public class SyncCodeSpaceAction: AbstractAction
+    public class SyncCodeSpaceAction: AbstractNetAction
     {
         /// <summary>
         /// Whether the full text of the code windows should be transmitted instead of just the filename.

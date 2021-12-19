@@ -196,10 +196,6 @@ namespace SEE.Net
                                 new LoadCityAction(city).Execute(recipient);
                             }
                         }
-                        foreach (Controls.Actions.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.Actions.NavigationAction>())
-                        {
-                            new SyncCitiesAction(navigationAction).Execute(recipient);
-                        }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {
                             new SetGrabAction(interactableObject, true).Execute(recipient);

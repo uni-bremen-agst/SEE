@@ -4,29 +4,28 @@ using UnityEngine;
 
 namespace SEE.Net
 {
-
     /// <summary>
     /// !!! IMPORTANT !!!
-    /// 
+    ///
     ///   Rules for every deriving class:
-    ///   
+    ///
     ///     1. Every field MUST be public!
     ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
     ///        MonoBehaviours.
-    ///        
+    ///
     ///   These rules are necessary, to allow (de)serialization of the classes for
     ///   networking.
-    ///   
+    ///
     ///   See section Networking.Actions.Creation in
     ///   <see href="https://github.com/uni-bremen-agst/SEE/wiki/Networking">here</see>
     ///   for further details.
-    /// 
-    /// 
-    /// 
+    ///
+    ///
+    ///
     /// An abstract networked action. Actions can be completely arbitrary and can be
     /// executed on the server and/or client.
     /// </summary>
-    public abstract class AbstractAction
+    public abstract class AbstractNetAction
     {
         /// <summary>
         /// The IP-address of the requester of this action.
@@ -51,7 +50,7 @@ namespace SEE.Net
         /// <summary>
         /// Constructs an abstract action.
         /// </summary>
-        public AbstractAction()
+        public AbstractNetAction()
         {
             IPEndPoint requester = Client.LocalEndPoint;
             SetRequester(requester);
@@ -125,18 +124,18 @@ namespace SEE.Net
 
         /// <summary>
         /// Executes this action for the server and every client.
-        /// 
+        ///
         /// The action will be sent to the server and from there broadcast to every
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
-        /// 
+        ///
         /// If <see cref="Network.UseInOfflineMode"/> is <code>true</code>, this will be
         /// simulated locally without sending networked packets.
-        /// 
+        ///
         /// <param name="recipients">The recipients of this action. If <code>null</code>,
         /// this actions will be executed everywhere.</param>
         /// </summary>
-        /// 
+        ///
         /// <param name="recipients">The recipients of the actions.</param>
         public void Execute(IPEndPoint[] recipients = null)
         {
@@ -205,7 +204,7 @@ namespace SEE.Net
         /// <summary>
         /// The implementation of the action for the server. Returns whether the action
         /// could be executed successfully.
-        /// 
+        ///
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>
@@ -214,7 +213,7 @@ namespace SEE.Net
         /// <summary>
         /// The implementation of the action for the client. Returns whether the action
         /// could be executed successfully.
-        /// 
+        ///
         /// If the implementation throws an exception, it will be interpreted just like
         /// returning <code>false</code>.
         /// </summary>
@@ -254,7 +253,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="action">The action to be serialized.</param>
         /// <returns>The serialized action as a string.</returns>
-        internal static string Serialize(AbstractAction action)
+        internal static string Serialize(AbstractNetAction action)
         {
             return action.GetType().ToString() + ';' + JsonUtility.ToJson(action);
         }
@@ -264,10 +263,10 @@ namespace SEE.Net
         /// </summary>
         /// <param name="data">The serialized action as a string.</param>
         /// <returns>The deserialized action.</returns>
-        internal static AbstractAction Deserialize(string data)
+        internal static AbstractNetAction Deserialize(string data)
         {
             string[] tokens = data.Split(new[] { ';' }, 2, StringSplitOptions.None);
-            AbstractAction result = (AbstractAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
+            AbstractNetAction result = (AbstractNetAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
             if (result.RecipientsIPAddresses.Length == 0)
             {
                 result.RecipientsIPAddresses = null;

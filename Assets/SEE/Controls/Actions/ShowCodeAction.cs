@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to display the source code of the currently selected node using <see cref="CodeWindow"/>s.
     /// </summary>
-    public class ShowCodeAction : AbstractPlayerAction
+    internal class ShowCodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Manager object which takes care of the player selection menu and code space dictionary for us.
@@ -57,8 +57,8 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER 
-                && Input.GetMouseButtonDown(0) 
+            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER
+                && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
@@ -70,12 +70,12 @@ namespace SEE.Controls.Actions
                 }
                 if (selectedPath == null)
                 {
-                    ShowNotification.Warn("No associated code", 
+                    ShowNotification.Warn("No associated code",
                                           $"Selected node '{selectedNode.Value.SourceName}' has no source code "
                                           + "associated with it.");
                     return false;
                 }
-                
+
                 // Create new code window for active selection, or use existing one
                 if (!selectedNode.TryGetComponent(out CodeWindow codeWindow))
                 {
@@ -105,7 +105,7 @@ namespace SEE.Controls.Actions
                 {
                     codeWindow.VisibleLine = line.Value;
                 }
-                    
+
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
                 {
