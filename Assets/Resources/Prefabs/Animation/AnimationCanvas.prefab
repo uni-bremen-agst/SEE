@@ -1483,7 +1483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RevisionNumberText: {fileID: 3372066274193659943}
-  CommitInformationText: {fileID: 0}
+  CommitInformationText: {fileID: 1886076020051568678}
   Slider: {fileID: 1811363259}
   PlayButton: {fileID: 565943335}
   FastForwardButton: {fileID: 438968762}

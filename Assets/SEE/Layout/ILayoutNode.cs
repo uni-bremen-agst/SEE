@@ -56,11 +56,6 @@ namespace SEE.Layout
         /// The set of immediate successors of this node.
         /// </summary>
         ICollection<T> Successors { get; }
-
-        /// <summary>
-        /// The game object this layout node encapsulates.
-        /// </summary>
-        GameObject gameObject { get; }
     }
 
     public interface ISublayoutNode<T>

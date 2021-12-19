@@ -245,8 +245,8 @@ namespace SEE.Game
         /// <summary>
         /// All pre-computed edge layouts for the whole graph series.
         /// </summary>
-        private Dictionary<Graph, Dictionary<string, ILayoutEdge>> EdgeLayouts { get; }
-            = new Dictionary<Graph, Dictionary<string, ILayoutEdge>>(); // not serialized by Unity
+        private Dictionary<Graph, Dictionary<string, ILayoutEdge<ILayoutNode>>> EdgeLayouts { get; }
+            = new Dictionary<Graph, Dictionary<string, ILayoutEdge<ILayoutNode>>>(); // not serialized by Unity
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will
@@ -318,7 +318,7 @@ namespace SEE.Game
             }
 
             // Calculate and apply the node layout
-            ICollection<ILayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
+            ICollection<AbstractLayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
@@ -328,14 +328,14 @@ namespace SEE.Game
 
             if (edgesAreDrawn)
             {
-                ICollection<LayoutEdge> layoutEdges = graphRenderer.LayoutEdges(layoutNodes);
-                EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge>(layoutEdges.Count);
-                foreach (LayoutEdge le in layoutEdges)
+                List<LayoutGraphEdge<AbstractLayoutNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
+                EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge<ILayoutNode>>(layoutEdges.Count);
+                foreach (LayoutGraphEdge<AbstractLayoutNode> le in layoutEdges)
                 {
                     EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
                 }
             }
-            return ToNodeIDLayout(layoutNodes);
+            return ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -355,19 +355,21 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<ILayoutNode> ToLayoutNodes(List<GameObject> gameNodes)
+        private ICollection<AbstractLayoutNode> ToLayoutNodes(List<GameObject> gameNodes)
         {
-            IList<ILayoutNode> result = new List<ILayoutNode>();
-            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+            IList<AbstractLayoutNode> result = new List<AbstractLayoutNode>();
+            Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
 
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutGraphNode layoutNode = new LayoutGraphNode(node, to_layout_node);
-                // We must transfer the scale from gameObject to layoutNode.
-                // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                // but the layout needs the game object's scale.
-                layoutNode.LocalScale = graphRenderer.GetSize(gameObject);
+                LayoutGraphNode layoutNode = new LayoutGraphNode(node, toLayoutNode)
+                {
+                    // We must transfer the scale from gameObject to layoutNode.
+                    // but the layout needs the game object's scale.
+                    // Rotation and CenterPosition are all zero. They will be computed by the layout,
+                    LocalScale = graphRenderer.GetSize(gameObject)
+                };
                 result.Add(layoutNode);
             }
             LayoutNodes.SetLevels(result);
@@ -379,10 +381,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
         /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
-        private static Dictionary<string, ILayoutNode> ToNodeIDLayout(ICollection<ILayoutNode> layoutNodes)
+        private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
         {
-            Dictionary<string, ILayoutNode> result = new Dictionary<string, ILayoutNode>();
-            foreach (ILayoutNode layoutNode in layoutNodes)
+            Dictionary<string, T> result = new Dictionary<string, T>();
+            foreach (T layoutNode in layoutNodes)
             {
                 result[layoutNode.ID] = layoutNode;
             }
@@ -570,12 +572,12 @@ namespace SEE.Game
                 foreach (Edge edge in next.Graph.Edges())
                 {
                     objectManager.GetEdge(edge, out GameObject edgeObject);
-                    if (edgeObject.TryGetComponent<SEESpline>(out SEESpline spline))
+                    if (edgeObject.TryGetComponent(out SEESpline spline))
                     {
                         spline.Spline = next.EdgeLayout[edge.ID].Spline;
                     }
                     edgeObject.SetActive(true); // Make visible
-                    if (gameObject.TryGetComponent<EdgeMeshScheduler>(out EdgeMeshScheduler scheduler))
+                    if (gameObject.TryGetComponent(out EdgeMeshScheduler scheduler))
                     {
                         scheduler.Add(edgeObject); // Register for mesh creation
                     }
@@ -586,12 +588,12 @@ namespace SEE.Game
                     edgeAnimators.Clear();
                     foreach (Edge edge in next.Graph.Edges())
                     {
-                        if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge target))
+                        if (!next.EdgeLayout.TryGetValue(edge.ID, out LayoutEdge target))
                         {
                             Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.\n");
                             continue;
                         }
-                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge source))
+                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out LayoutEdge source))
                         {
                             objectManager.GetEdge(edge, out GameObject edgeObject);
                             if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
@@ -1265,7 +1267,7 @@ namespace SEE.Game
             }
             if (edgesAreDrawn)
             {
-                if (EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge> edgeLayout) || edgeLayout == null)
+                if (EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout) || edgeLayout == null)
                 {
                     Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
                     return false;

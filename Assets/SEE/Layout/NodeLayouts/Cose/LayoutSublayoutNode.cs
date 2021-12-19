@@ -156,12 +156,9 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// </summary>
         private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode;
 
-        public GameObject gameObject { get; }
-
         public LayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
         {
             this.node = node;
-            gameObject = node.gameObject;
             this.isLeaf = isLeaf;
             temporaryChildren = children;
             temporaryParent = parent;
