@@ -48,14 +48,9 @@ namespace SEE.Controls
         // See https://valvesoftware.github.io/steamvr_unity_plugin/articles/Interaction-System.html
 
         /// <summary>
-        /// The next available ID to be assigned.
-        /// </summary>
-        private static uint nextID = 0;
-
-        /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<uint, InteractableObject> idToInteractableObjectDict = new Dictionary<uint, InteractableObject>();
+        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict = new Dictionary<string, InteractableObject>();
 
         /// <summary>
         /// The hovered objects.
@@ -83,11 +78,6 @@ namespace SEE.Controls
         /// The selected objects per graph.
         /// </summary>
         private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new Dictionary<Graph, HashSet<InteractableObject>>();
-
-        /// <summary>
-        /// The unique id of the interactable object.
-        /// </summary>
-        public uint ID { get; private set; }
 
         /// <summary>
         /// The graph element, this interactable object is attached to.
@@ -225,8 +215,6 @@ namespace SEE.Controls
 
         private void Awake()
         {
-            ID = nextID++;
-            idToInteractableObjectDict.Add(ID, this);
             gameObject.TryGetComponentOrLog(out interactable);
             GraphElemRef = GetComponent<GraphElementRef>();
         }
@@ -247,8 +235,6 @@ namespace SEE.Controls
             }
             GraphElemRef = null;
             interactable = null;
-            idToInteractableObjectDict.Remove(ID);
-            ID = uint.MaxValue;
         }
 
         /// <summary>
@@ -257,7 +243,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
         /// <returns></returns>
-        public static InteractableObject Get(uint id)
+        public static InteractableObject Get(string id)
         {
             if (!idToInteractableObjectDict.TryGetValue(id, out InteractableObject result))
             {
