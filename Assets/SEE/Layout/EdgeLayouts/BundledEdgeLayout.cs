@@ -2,6 +2,7 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -89,23 +90,25 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="nodes">nodes whose edges are to be drawn or which are 
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
-        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
+        public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
-            if (edges.Count > 0)
+            IList<ILayoutEdge<T>> layoutEdges = edges.ToList();
+            IList<T> layoutNodes = nodes.ToList();
+            if (layoutEdges.Count > 0)
             {
-                ICollection<ILayoutNode> roots = GetRoots(nodes);
-                Assert.AreNotEqual(roots.Count, 0);
+                ICollection<T> roots = GetRoots(layoutNodes).ToList();
+                Assert.IsTrue(roots.Any());
                 maxLevel = GetMaxLevel(roots, -1);
 
                 MinMaxBlockY(nodes, out float minY, out float maxY, out float maxHeight);
                 levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
                 levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
 
-                LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots);
+                LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots.Cast<ILayoutNode>().ToList());
 
-                foreach (ILayoutEdge edge in edges)
+                foreach (ILayoutEdge<T> edge in layoutEdges)
                 {
-                    edge.Spline = CreateSpline(edge.Source, edge.Target, lca, maxLevel);
+                    edge.Spline = CreateSpline(edge.Source, edge.Target, lca);
                 }
             }
         }
@@ -123,14 +126,10 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="nodes">nodes whose maximal level is to be determined</param>
         /// <param name="currentLevel">the current level of all <paramref name="nodes"/></param>
         /// <returns>maximal tree level</returns>
-        private int GetMaxLevel(ICollection<ILayoutNode> nodes, int currentLevel)
+        private static int GetMaxLevel<T>(IEnumerable<T> nodes, int currentLevel) where T : ILayoutNode
         {
             int max = currentLevel + 1;
-            foreach (ILayoutNode node in nodes)
-            {
-                max = Math.Max(max, GetMaxLevel(node.Children(), currentLevel + 1));
-            }
-            return max;
+            return nodes.Select(node => GetMaxLevel(node.Children(), currentLevel + 1)).Prepend(max).Max();
         }
 
         /// <summary>
@@ -139,17 +138,9 @@ namespace SEE.Layout.EdgeLayouts
         /// </summary>
         /// <param name="layoutNodes">list of nodes</param>
         /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
-        private ICollection<ILayoutNode> GetRoots(ICollection<ILayoutNode> layoutNodes)
+        private static ICollection<T> GetRoots<T>(IEnumerable<T> layoutNodes) where T : ILayoutNode
         {
-            ICollection<ILayoutNode> result = new List<ILayoutNode>();
-            foreach (ILayoutNode layoutNode in layoutNodes)
-            {
-                if (layoutNode.Parent == null)
-                {
-                    result.Add(layoutNode);
-                }
-            }
-            return result;
+            return layoutNodes.Where(layoutNode => layoutNode.Parent == null).ToList();
         }
 
         /// <summary>
@@ -162,7 +153,7 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="child">from where to start</param>
         /// <param name="ancestor">where to stop</param>
         /// <returns>path from child to ancestor in the node hierarchy</returns>
-        private ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
+        private static ILayoutNode[] Ancestors(ILayoutNode child, ILayoutNode ancestor)
         {
             int childLevel = child.Level;
             int ancestorLevel = ancestor.Level;
@@ -189,20 +180,20 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Creates a spline along the node hierarchy. The path of the
         /// spline is determined as follows:
-        ///
+        /// 
         /// If <paramref name="source"/> equals <paramref name="target"/>, a
         /// self loop is generated atop of the node.
-        ///
+        /// 
         /// If <paramref name="source"/> and <paramref name="target"/> have no
         /// common LCA, the path starts at <paramref name="source"/> and ends
         /// at <paramref name="target"/> and reaches through the point on half
         /// distance between these two nodes, but at the top-most edge height
         /// (given by <paramref name="maxLevel"/>).
-        ///
+        /// 
         /// If <paramref name="source"/> and <paramref name="target"/> are
         /// siblings (i.e., they are immediate ancestors of the same parent
         /// node), a direct spline is created between them.
-        ///
+        /// 
         /// Otherwise, the control points of the spline are chosen along the
         /// node hierarchy path from the source node to their lowest common
         /// ancestor and then down again to the target node. The height of
@@ -212,98 +203,88 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="source">starting node</param>
         /// <param name="target">ending node</param>
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
-        /// <param name="maxLevel">the maximal level of the node hierarchy</param>
         /// <returns>points to draw a spline between source and target</returns>
-        private TinySpline.BSpline CreateSpline
-            (ILayoutNode source,
-             ILayoutNode target,
-             LCAFinder<ILayoutNode> lcaFinder,
-             int maxLevel)
+        private TinySpline.BSpline CreateSpline<T>(T source, T target, LCAFinder<T> lcaFinder) 
+            where T : ILayoutNode, IHierarchyNode<T>
         {
-            if (source == target)
+            EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+            if (comparer.Equals(source, target))
             {
                 return SelfLoop(source);
             }
-            else
+
+            // Lowest common ancestor
+            T lca = lcaFinder.LCA(source, target);
+            if (lca == null)
             {
-                // Lowest common ancestor
-                ILayoutNode lca = lcaFinder.LCA(source, target);
-                if (lca == null)
-                {
-                    // This should never occur if we have a single root node, but may happen if
-                    // there are multiple roots, in which case nodes in different trees of this
-                    // forrest do not have a common ancestor.
-                    Debug.LogWarning("Undefined lowest common ancestor for "
-                        + source.ID + " and " + target.ID + "\n");
-                    return BetweenTrees(source, target);
-                }
-                else if (lca == source || lca == target)
-                {
-                    // The edge is along a node hierarchy path.
-                    // We will create a direct spline from source to target at the lowest level.
-                    return DirectSpline(source, target, levelOffset);
-                }
-                else
-                {
-                    // assert: sourceObject != targetObject
-                    // assert: lcaObject != null
-                    // because the edges are only between leaves:
-                    // assert: sourceObject != lcaObject
-                    // assert: targetObject != lcaObject
-
-                    ILayoutNode[] sourceToLCA = Ancestors(source, lca);
-                    ILayoutNode[] targetToLCA = Ancestors(target, lca);
-
-                    Array.Reverse(targetToLCA, 0, targetToLCA.Length);
-
-                    // Note: lca is included in both paths
-                    if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
-                    {
-                        // source and target are siblings in the same subtree at the same level.
-                        // We assume that those nodes are close to each other for all hierarchical layouts,
-                        // which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges 
-                        // between siblings were led over one single control point, they would often take 
-                        // a detour even though the nodes are close by. The detour would make it difficult 
-                        // to follow the edges visually.
-                        return DirectSpline(source, target, levelOffset);
-                    }
-                    else
-                    {
-                        // Concatenate both paths.
-                        // We have sufficient many control points without the duplicated LCA,
-                        // hence, we can remove the duplicated LCA
-                        ILayoutNode[] fullPath = new ILayoutNode[sourceToLCA.Length + targetToLCA.Length - 1];
-                        sourceToLCA.CopyTo(fullPath, 0);
-                        // copy without the first element
-                        for (int i = 1; i < targetToLCA.Length; i++)
-                        {
-                            fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
-                        }
-                        // Calculate control points along the node hierarchy 
-                        Vector3[] controlPoints = new Vector3[fullPath.Length];
-                        controlPoints[0] = edgesAboveBlocks ? source.Roof : source.Ground;
-                        for (int i = 1; i < fullPath.Length - 1; i++)
-                        {
-                            // We consider the height of intermediate nodes.
-                            // Note that a root has level 0 and the level is increased along 
-                            // the childrens' depth. That is why we need to choose the height
-                            // as a measure relative to maxLevel.
-                            // TODO: Do we really want the center position here?
-                            controlPoints[i] = new Vector3(fullPath[i].CenterPosition.x,
-                                                           GetLevelHeight(fullPath[i].Level),
-                                                           fullPath[i].CenterPosition.z);
-
-                        }
-                        
-                        controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
-                        uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
-                        return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
-                        {
-                            ControlPoints = TinySplineInterop.VectorsToList(controlPoints)
-                        }.Tension(tension);
-                    }
-                }
+                // This should never occur if we have a single root node, but may happen if
+                // there are multiple roots, in which case nodes in different trees of this
+                // forrest do not have a common ancestor.
+                Debug.LogWarning($"Undefined lowest common ancestor for {source.ID} and {target.ID}\n");
+                return BetweenTrees(source, target);
             }
+
+            if (comparer.Equals(lca, source) || comparer.Equals(lca, target))
+            {
+                // The edge is along a node hierarchy path.
+                // We will create a direct spline from source to target at the lowest level.
+                return DirectSpline(source, target, levelOffset);
+            }
+            // assert: sourceObject != targetObject
+            // assert: lcaObject != null
+            // because the edges are only between leaves:
+            // assert: sourceObject != lcaObject
+            // assert: targetObject != lcaObject
+
+            ILayoutNode[] sourceToLCA = Ancestors(source, lca);
+            ILayoutNode[] targetToLCA = Ancestors(target, lca);
+
+            Array.Reverse(targetToLCA, 0, targetToLCA.Length);
+
+            // Note: lca is included in both paths
+            if (sourceToLCA.Length == 2 && targetToLCA.Length == 2)
+            {
+                // source and target are siblings in the same subtree at the same level.
+                // We assume that those nodes are close to each other for all hierarchical layouts,
+                // which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges 
+                // between siblings were led over one single control point, they would often take 
+                // a detour even though the nodes are close by. The detour would make it difficult 
+                // to follow the edges visually.
+                return DirectSpline(source, target, levelOffset);
+            }
+
+            // Concatenate both paths.
+            // We have sufficient many control points without the duplicated LCA,
+            // hence, we can remove the duplicated LCA
+            ILayoutNode[] fullPath = new ILayoutNode[sourceToLCA.Length + targetToLCA.Length - 1];
+            sourceToLCA.CopyTo(fullPath, 0);
+            // copy without the first element
+            for (int i = 1; i < targetToLCA.Length; i++)
+            {
+                fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
+            }
+            // Calculate control points along the node hierarchy 
+            Vector3[] controlPoints = new Vector3[fullPath.Length];
+            controlPoints[0] = edgesAboveBlocks ? source.Roof : source.Ground;
+            for (int i = 1; i < fullPath.Length - 1; i++)
+            {
+                // We consider the height of intermediate nodes.
+                // Note that a root has level 0 and the level is increased along 
+                // the childrens' depth. That is why we need to choose the height
+                // as a measure relative to maxLevel.
+                // TODO: Do we really want the center position here?
+                controlPoints[i] = new Vector3(fullPath[i].CenterPosition.x,
+                    GetLevelHeight(fullPath[i].Level),
+                    fullPath[i].CenterPosition.z);
+
+            }
+                        
+            controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
+            uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
+            return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(controlPoints)
+            }.Tension(tension);
         }
 
         /// <summary>
