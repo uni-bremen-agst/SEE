@@ -3,11 +3,13 @@ using SEE.Layout;
 
 namespace SEE.Game
 {
+
     /// <summary>
     /// Implementation of ILayoutEdge that also stores the underlying graph edge that is 
     /// visualized by this layout edge.
     /// </summary>
-    public class LayoutEdge : ILayoutEdge
+    /// <typeparam name="T">Type of node this edge connects to.</typeparam>
+    public class LayoutGraphEdge<T> : LayoutEdge<T> where T : ILayoutNode
     {
         /// <summary>
         /// Constructor.
@@ -15,7 +17,7 @@ namespace SEE.Game
         /// <param name="source">source node of the layout edge</param>
         /// <param name="target">target node of the layout edge</param>
         /// <param name="edge">the underlying graph edge that is visualized by this layout edge</param>
-        public LayoutEdge(ILayoutNode source, ILayoutNode target, Edge edge)
+        public LayoutGraphEdge(T source, T target, Edge edge)
             : base(source, target)
         {
             ItsEdge = edge;
@@ -26,7 +28,7 @@ namespace SEE.Game
         /// </summary>
         public Edge ItsEdge
         {
-            get; private set;
+            get;
         }
     }
 }

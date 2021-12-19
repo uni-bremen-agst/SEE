@@ -243,10 +243,6 @@ namespace SEE.Game.City
         /// </summary>
         private const string MarkerWidthLabel = "MarkerWidth";
         /// <summary>
-        /// Label of attribute <see cref="MarkerSettings"/> in the configuration file.
-        /// </summary>
-        private const string MarkerSettingsLabel = "MarkerSettings";
-        /// <summary>
         /// Label of attribute <see cref="AdditionBeamColor"/> in the configuration file.
         /// </summary>
         private const string AdditionBeamColorLabel = "AdditionBeamColor";

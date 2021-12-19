@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SEE.DataModel;
 using SEE.Game;
@@ -24,7 +25,8 @@ namespace SEE.GO
         /// <param name="radius">The radius of the tubular</param>
         /// <param name="radialSegments">The amount of radial segments of the tubular</param>
         /// <param name="isEdgeSelectable">Are the edges selectable or not; if not, no colliders will be added</param>
-        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments, bool isEdgeSelectable)
+        public EdgeFactory(IEdgeLayout layout, float edgeWidth, int tubularSegments, float radius, int radialSegments,
+            bool isEdgeSelectable)
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
@@ -81,22 +83,22 @@ namespace SEE.GO
         /// Returns a new game edge.
         /// </summary>
         /// <returns>new game edge</returns>
-        private static GameObject NewGameEdge(LayoutEdge layoutEdge)
+        private static GameObject NewGameEdge<T>(LayoutGraphEdge<T> layoutGraphEdge) where T : ILayoutNode
         {
             GameObject gameEdge = new GameObject
             {
                 tag = Tags.Edge,
                 isStatic = false,
-                name = layoutEdge.ItsEdge.ID
+                name = layoutGraphEdge.ItsEdge.ID
             };
 
             EdgeRef edgeRef = gameEdge.AddComponent<EdgeRef>();
-            edgeRef.Value = layoutEdge.ItsEdge;
-            edgeRef.SourceNodeID = layoutEdge.Source.ID;
-            edgeRef.TargetNodeID = layoutEdge.Source.ID;
+            edgeRef.Value = layoutGraphEdge.ItsEdge;
+            edgeRef.SourceNodeID = layoutGraphEdge.Source.ID;
+            edgeRef.TargetNodeID = layoutGraphEdge.Source.ID;
 
             SEESpline spline = gameEdge.AddComponent<SEESpline>();
-            spline.Spline = layoutEdge.Spline;
+            spline.Spline = layoutGraphEdge.Spline;
 
             return gameEdge;
         }
@@ -110,15 +112,17 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-        public ICollection<GameObject> DrawEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
+        public ICollection<GameObject> DrawEdges<T>(ICollection<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
+        where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
             {
                 return result;
             }
-            layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
-            foreach (LayoutEdge layoutEdge in edges)
+
+            layout.Create(nodes, edges);
+            foreach (LayoutGraphEdge<T> layoutEdge in edges)
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
@@ -134,7 +138,9 @@ namespace SEE.GO
                 // material and will not be affected by changes of the
                 // original material.
                 line.sharedMaterial = defaultLineMaterial;
-                line.sharedMaterial.renderQueue = new[] { layoutEdge.Source, layoutEdge.Target }.Max(x => x.gameObject.GetComponent<Renderer>().sharedMaterial.renderQueue);
+                line.sharedMaterial.renderQueue =
+                    new[] {layoutEdge.Source, layoutEdge.Target}.Max(x =>
+                        x.gameObject.GetComponent<Renderer>().sharedMaterial.renderQueue);
 
                 LineFactory.SetDefaults(line);
                 LineFactory.SetWidth(line, edgeWidth);
@@ -150,6 +156,7 @@ namespace SEE.GO
                 line.positionCount = positions.Length; // number of vertices
                 line.SetPositions(positions);
             }
+
             return result;
         }
 
@@ -161,15 +168,16 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-        public ICollection<GameObject> CalculateNewEdges(ICollection<ILayoutNode> nodes, ICollection<LayoutEdge> edges)
+        public ICollection<GameObject> CalculateNewEdges<T>(ICollection<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
+        where T: ILayoutNode, IHierarchyNode<ILayoutNode>
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
             if (edges.Count == 0)
             {
                 return result;
             }
-            layout.Create(nodes, edges.Cast<ILayoutEdge>().ToList());
-            foreach (LayoutEdge layoutEdge in edges)
+            layout.Create(nodes, edges);
+            foreach (LayoutGraphEdge<T> layoutEdge in edges)
             {
                 GameObject gameEdge = NewGameEdge(layoutEdge);
                 result.Add(gameEdge);
