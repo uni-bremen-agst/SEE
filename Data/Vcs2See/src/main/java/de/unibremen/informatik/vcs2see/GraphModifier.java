@@ -31,7 +31,7 @@ public class GraphModifier {
 
     public GraphModifier() {
         this.nodes = new HashMap<>();
-        this.mostFrequent = new HashMap<>();
+        this.mostFrequent = new LinkedHashMap<>();
         this.mostRecent = new LinkedList<>();
     }
 
@@ -142,13 +142,10 @@ public class GraphModifier {
             }
 
             // Calculate most recent changes
-            mostRecent.remove(path);
-            mostRecent.addFirst(path);
+            addMostRecent(path);
 
             // Calculate most frequent changes
-            if(mostFrequent.computeIfPresent(path, (k, v) -> v + 1) == null) {
-                mostFrequent.put(path, 1);
-            }
+            addMostFrequent(path);
         }
     }
 
@@ -181,6 +178,29 @@ public class GraphModifier {
         codeGraph.setAttr("CommitTimestamp", new GXLString(commit.getDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
     }
 
+    private void addMostRecent(String path) {
+        mostRecent.remove(path);
+        mostRecent.addFirst(path);
+
+        if(mostRecent.size() > 255) {
+            mostRecent.removeLast();
+        }
+    }
+
+    private void addMostFrequent(String path) {
+        if(mostFrequent.computeIfPresent(path, (k, v) -> v + 1) == null) {
+            mostFrequent.put(path, 1);
+
+            if(mostFrequent.size() > 255) {
+                float min = mostFrequent.values().stream()
+                        .min(Integer::compareTo).orElseThrow();
+                Map.Entry<String, Integer> entry = mostFrequent.entrySet().stream()
+                        .filter(a -> a.getValue() == min).findFirst().orElseThrow();
+                mostFrequent.remove(entry.getKey());
+            }
+        }
+    }
+
     /**
      * Calculates most recent value from collected information.
      * @param size size of the list
@@ -188,7 +208,7 @@ public class GraphModifier {
      * @return most recent value
      */
     private int calculateMostRecent(int size, int index) {
-        int step = 255 / (size - 1);
+        int step = 255 / Math.max(size - 1, 1);
         return 255 - (step  * index);
     }
 
