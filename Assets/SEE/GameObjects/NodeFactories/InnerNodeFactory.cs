@@ -1,4 +1,6 @@
-﻿using SEE.Game;
+﻿using System.Linq;
+using SEE.Controls.Interactables;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -45,13 +47,17 @@ namespace SEE.GO
 
         public override void SetStyle(GameObject block, int style)
         {
-            Renderer renderer = block.GetComponent<Renderer>();
-            if (renderer != null)
+            if (block.TryGetComponent(out Renderer renderer))
             {
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
                 int level = block.GetComponent<NodeRef>().Value.Level;
                 Materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
+            }
+
+            if (block.TryGetComponent(out Outline outline))
+            {
+                outline.UpdateRenderQueue(true);
             }
         }
     }
