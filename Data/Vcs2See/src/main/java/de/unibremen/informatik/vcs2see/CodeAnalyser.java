@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -93,8 +95,18 @@ public class CodeAnalyser {
     public String replacePlaceholders(String input, int revision) {
         PropertiesManager propertiesManager = Vcs2See.getPropertiesManager();
 
-        for(String key : propertiesManager.getKeys()) {
-            input = input.replaceAll("%" + key + "%", propertiesManager.getProperty(key).orElse(""));
+        // Find all placeholders in properties
+        Matcher matcher = Pattern.compile("%(.*?)%").matcher(input);
+        while (matcher.find()) {
+            String key = matcher.group();
+
+            // Define exceptions
+            if(Arrays.asList("here", "filename", "extensions").contains(key)) {
+                continue;
+            }
+
+            // Replace placeholder with properties content
+            input = input.replaceAll(key, propertiesManager.getProperty(key.replace("%", "")).orElse(""));
         }
 
         // Collect language extensions
