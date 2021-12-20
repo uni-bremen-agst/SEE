@@ -57,6 +57,7 @@ public class GraphModifier {
         addCommitGraph(commit);
 
         document.write(file);
+        System.gc();
     }
 
     /**

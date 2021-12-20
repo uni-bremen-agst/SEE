@@ -1,0 +1,1274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>cde7dcb60eebefa76064badc9a31bad6c8bcf9a3</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Rainer Koschke</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Creates BSplines using control points using Marcel Steinbeck's library
+tinySplines available at https://github.com/msteinbeck/tinyspline.
+
+Still work in progress.</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2019-08-31T09:09:17</string>
+		</attr>
+		<node id="N1">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>936</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>168</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>FlyCamera.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Camera/FlyCamera.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>FlyCamera.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Camera/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>252</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>107</int>
+			</attr>
+		</node>
+		<node id="N2">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Camera</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Camera/Assets</string>
+			</attr>
+		</node>
+		<node id="N3">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Assets</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets</string>
+			</attr>
+		</node>
+		<node id="N4">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>515</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>100</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>CityEditor.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/CityEditor.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>CityEditor.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>234</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>255</int>
+			</attr>
+		</node>
+		<node id="N5">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Editor</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Editor/Assets</string>
+			</attr>
+		</node>
+		<node id="N6">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>44</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>14</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>ImportProcessor.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/ImportProcessor.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>ImportProcessor.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>129</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>19</int>
+			</attr>
+		</node>
+		<node id="N7">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>112</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>16</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>1.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SEEEditor.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/SEEEditor.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SEEEditor.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>96</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N8">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>2972</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>482</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SerializableDictionaryPropertyDrawer.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/SerializableDictionaryPropertyDrawer.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SerializableDictionaryPropertyDrawer.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>159</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N9">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>31</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>13</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>UnityEditorStartup.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/UnityEditorStartup.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>UnityEditorStartup.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>132</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N10">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>527</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>118</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Attributable.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/Attributable.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Attributable.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>192</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>58</int>
+			</attr>
+		</node>
+		<node id="N11">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>DataModel</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>DataModel/SEECity/Assets</string>
+			</attr>
+		</node>
+		<node id="N12">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>SEECity</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>SEECity/Assets</string>
+			</attr>
+		</node>
+		<node id="N13">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>121</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>32</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Edge.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/Edge.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Edge.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>195</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>39</int>
+			</attr>
+		</node>
+		<node id="N14">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>1553</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>372</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>GXLParser.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/GXLParser.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>GXLParser.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>153</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>19</int>
+			</attr>
+		</node>
+		<node id="N15">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>618</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>132</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Graph.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/Graph.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Graph.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>216</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>68</int>
+			</attr>
+		</node>
+		<node id="N16">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>1191</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>329</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>GraphCreator.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/GraphCreator.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>GraphCreator.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>219</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>68</int>
+			</attr>
+		</node>
+		<node id="N17">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>90</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>33</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>GraphElement.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/GraphElement.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>GraphElement.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>198</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>39</int>
+			</attr>
+		</node>
+		<node id="N18">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>21</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>9</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>GraphSettings.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/GraphSettings.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>GraphSettings.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>246</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>39</int>
+			</attr>
+		</node>
+		<node id="N19">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>241</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>61</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Node.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/Node.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Node.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>204</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>39</int>
+			</attr>
+		</node>
+		<node id="N20">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>3</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>StringFloatDictionary.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/StringFloatDictionary.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>StringFloatDictionary.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>171</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N21">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>2</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>StringIntDictionary.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/StringIntDictionary.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>StringIntDictionary.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>162</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N22">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>23</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>6</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>StringNodeDictionary.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/StringNodeDictionary.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>StringNodeDictionary.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>207</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N23">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>3</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>StringStringDictionary.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/StringStringDictionary.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>StringStringDictionary.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>165</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N24">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>61</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>12</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Tags.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/Tags.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Tags.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>225</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N25">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>56</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>19</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>UnknownAttribute.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/DataModel/UnknownAttribute.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>UnknownAttribute.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/DataModel/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>156</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>19</int>
+			</attr>
+		</node>
+		<node id="N26">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>577</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>95</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>BSplineFactory.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/BSplineFactory.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>BSplineFactory.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Line_Changes">
+				<int>180</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Added">
+				<int>180</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Edited">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>255</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N27">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Layout</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Layout/SEECity/Assets</string>
+			</attr>
+		</node>
+		<node id="N28">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>1899</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>261</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>BalloonLayout.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/BalloonLayout.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>BalloonLayout.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>249</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>156</int>
+			</attr>
+		</node>
+		<node id="N29">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>534</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>103</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>ILayout.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/ILayout.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>ILayout.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>228</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>49</int>
+			</attr>
+		</node>
+		<node id="N30">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>172</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>37</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>LineFactory.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/LineFactory.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>LineFactory.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>243</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N31">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>862</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>139</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>ManhattenLayout.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/ManhattenLayout.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>ManhattenLayout.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>231</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>58</int>
+			</attr>
+		</node>
+		<node id="N32">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>455</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>92</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>MeshFactory.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Layout/MeshFactory.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>MeshFactory.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Layout/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>237</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>58</int>
+			</attr>
+		</node>
+		<node id="N33">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>377</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>79</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SceneGraphs.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/SceneGraphs.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SceneGraphs.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>240</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>29</int>
+			</attr>
+		</node>
+		<node id="N34">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>51</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>18</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>DestroyGameObject.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/DestroyGameObject.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>DestroyGameObject.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>213</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N35">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Utils</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Utils/SEECity/Assets</string>
+			</attr>
+		</node>
+		<node id="N36">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>113</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>28</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>FramesPerSeconds.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/FramesPerSeconds.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>FramesPerSeconds.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>222</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N37">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>57</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>15</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>ILogger.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/ILogger.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>ILogger.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>123</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>9</int>
+			</attr>
+		</node>
+		<node id="N38">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>177</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>34</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Performance.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/Performance.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Performance.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>135</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>19</int>
+			</attr>
+		</node>
+		<node id="N39">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>62</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>20</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SEELogger.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/SEELogger.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SEELogger.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>141</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N40">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>597</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>103</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SerializableDictionary.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/SEECity/Utils/SerializableDictionary.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SerializableDictionary.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/SEECity/Utils/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>168</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N41">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>112</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>16</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>1.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>SEE.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>SEE.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>SEE.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string/>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>99</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<edge from="N2" id="E1" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N1" id="E2" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N5" id="E3" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N4" id="E4" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N6" id="E5" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N7" id="E6" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N8" id="E7" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N9" id="E8" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N12" id="E9" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N11" id="E10" to="N12">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N10" id="E11" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N13" id="E12" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N14" id="E13" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N15" id="E14" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N16" id="E15" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N17" id="E16" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N18" id="E17" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N19" id="E18" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N20" id="E19" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N21" id="E20" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N22" id="E21" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N23" id="E22" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N24" id="E23" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N25" id="E24" to="N11">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N27" id="E25" to="N12">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N26" id="E26" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N28" id="E27" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N29" id="E28" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N30" id="E29" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N31" id="E30" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N32" id="E31" to="N27">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N33" id="E32" to="N12">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N35" id="E33" to="N12">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N34" id="E34" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N36" id="E35" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N37" id="E36" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N38" id="E37" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N39" id="E38" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N40" id="E39" to="N35">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N7" id="E40" to="N41">
+			<type xlink:href="Clone"/>
+			<attr name="Clone.Source.Start.Line">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Source.Start.Column">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Source.End.Line">
+				<int>34</int>
+			</attr>
+			<attr name="Clone.Source.End.Column">
+				<int>23</int>
+			</attr>
+			<attr name="Clone.Target.Start.Line">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Target.Start.Column">
+				<int>1</int>
+			</attr>
+			<attr name="Clone.Target.End.Line">
+				<int>34</int>
+			</attr>
+			<attr name="Clone.Target.End.Column">
+				<int>16</int>
+			</attr>
+			<attr name="Clone.Type">
+				<int>2</int>
+			</attr>
+			<attr name="Clone.Length">
+				<int>34</int>
+			</attr>
+			<attr name="Clone.Number_Of_Tokens">
+				<int>112</int>
+			</attr>
+			<attr name="Clone.Multiplicity">
+				<int>1</int>
+			</attr>
+		</edge>
+	</graph>
+</gxl>

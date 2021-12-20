@@ -101,7 +101,7 @@ public class CodeAnalyser {
             String key = matcher.group();
 
             // Define exceptions
-            if(Arrays.asList("here", "filename", "extensions").contains(key)) {
+            if(Arrays.asList("%here%", "%filename%", "%extensions%").contains(key)) {
                 continue;
             }
 
