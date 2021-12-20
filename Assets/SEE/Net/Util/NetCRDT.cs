@@ -46,6 +46,11 @@ namespace SEE.Net
             /// </summary>
             SetID,
 
+            /// <summary>
+            /// IUf a new client joins the game
+            /// </summary>
+            SingleAddChar,
+
         };
 
         /// <summary>
@@ -91,6 +96,10 @@ namespace SEE.Net
                         ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
                     
                         break;
+                    case RemoteAction.SingleAddChar:
+                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
+                    
+                       break;
 
                     case RemoteAction.DelteChar:
                         ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position, file), file);
@@ -127,6 +136,18 @@ namespace SEE.Net
             state = RemoteAction.AddChar;
             Execute(null);
            
+        }
+
+        public void SingleAddChar(char c, Identifier[] position, Identifier[] prePosition, string file, IPEndPoint[] recipient)
+        {
+
+            this.file = file;
+            this.c = c;
+            this.position = ICRDT.PositionToString(position, file);
+            this.prePosition = ICRDT.PositionToString(prePosition, file);
+            state = RemoteAction.SingleAddChar;
+            Execute(recipient);
+
         }
 
         public void AddString(string text, string filename)

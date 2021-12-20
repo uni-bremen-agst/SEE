@@ -5,6 +5,7 @@ using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Game.City;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net
@@ -212,6 +213,10 @@ namespace SEE.Net
                         {
                             new SetHoverAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
                         }
+
+                        //Synchronize CRDTs with Client 
+                        //TODO: Fix Bug that the code ist dupolicate if a third member joins
+                       // ICRDT.SyncCodeWindows(recipient);
                     }
 
                     // recognize client

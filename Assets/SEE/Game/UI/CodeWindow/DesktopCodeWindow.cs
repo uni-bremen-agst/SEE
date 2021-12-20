@@ -233,7 +233,11 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\r", "");
                 }
-                Debug.Log("OLD " + oldIDX + " IDX "+ idx + " INPOUT " + input +"|");
+                if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+                {
+                    input = "";
+                }
+                ShowNotification.Info(input, input);
 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
@@ -320,6 +324,7 @@ namespace SEE.Game.UI.CodeWindow
                 if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
                     ShowNotification.Info("Frameshift", "Frameshift");
+                    deleteSelectedText();
                     switch (oldKeyCode)
                     {
                         case KeyCode.Backspace:
@@ -349,11 +354,6 @@ namespace SEE.Game.UI.CodeWindow
             else
             {
                 SEEInput.KeyboardShortcutsEnabled = true;
-            }
-            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.W))
-            {
-                Debug.Log("FILE:; " + Title);
-                Debug.Log(ICRDT.PrintString(Title));
             }
 
             valueHasChanged = false;
@@ -453,7 +453,15 @@ namespace SEE.Game.UI.CodeWindow
         {
             if (selectedText != null)
             {
-                ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 - 1, Title);
+                ShowNotification.Info("DEL", selectedText.Item2 + " " + selectedText.Item1);
+                if (selectedText.Item2 < selectedText.Item1 - 1)
+                {
+                    ICRDT.DeleteString(selectedText.Item2 - 1, selectedText.Item1, Title);
+                }
+                else
+                {
+                    ICRDT.DeleteString(selectedText.Item1, selectedText.Item2 - 1, Title);
+                }
                 return true;
             }
             return false;
