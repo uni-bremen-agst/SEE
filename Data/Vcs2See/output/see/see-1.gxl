@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>7d2375782acbb67e638ebb43d0bbabdf2fa51605</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Rainer Koschke</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Unity and Windows files to be ignored by Git. See also https://thoughtbot.com/blog/how-to-git-with-unity on how to set up Git for Unity projects.</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2019-08-06T08:47:24</string>
+		</attr>
+	</graph>
+</gxl>

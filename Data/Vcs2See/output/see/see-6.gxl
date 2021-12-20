@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>a610198f18c275133855a75065a89262e508c761</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Rainer Koschke</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Added single block with brick texture.</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2019-08-06T09:47:43</string>
+		</attr>
+	</graph>
+</gxl>

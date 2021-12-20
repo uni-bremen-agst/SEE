@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>227b11a7860f627f455fb445052f36bd00559770</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Rainer Koschke</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Renamed from SampleScene to MainScene.</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2019-08-06T08:51:14</string>
+		</attr>
+	</graph>
+</gxl>

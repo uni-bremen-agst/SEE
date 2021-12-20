@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>e116ad2be377f36dbbdecb5c29ee2fe268dfe5e3</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Rainer Koschke</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Folder for preftabs. Added one preftab for houses.</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2019-08-07T00:10:41</string>
+		</attr>
+		<node id="N1">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>421</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>54</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>FlyCamera.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Camera/FlyCamera.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>FlyCamera.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Camera/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N2">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Camera</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Camera/Assets</string>
+			</attr>
+		</node>
+		<node id="N3">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Assets</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets</string>
+			</attr>
+		</node>
+		<node id="N4">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>332</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>65</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>CityEditor.cs</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Assets/Editor/CityEditor.cs</string>
+			</attr>
+			<attr name="Source.File">
+				<string>CityEditor.cs</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>Assets/Editor/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>255</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N5">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>Editor</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>Editor/Assets</string>
+			</attr>
+		</node>
+		<edge from="N2" id="E1" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N1" id="E2" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N5" id="E3" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N4" id="E4" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+	</graph>
+</gxl>
