@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {

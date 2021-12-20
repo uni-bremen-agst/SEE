@@ -21,18 +21,6 @@ namespace SEE.Net
         public const string PacketType = "Server";
 
         /// <summary>
-        /// The name (path) of the prefab to be used to instantiate a representation
-        /// of a player in a remote network client.
-        /// </summary>
-        private const string PlayerRepresentationPrefab = "Man"; //"PlayerHead";
-
-        /// <summary>
-        /// The initial scale of the player representation instantiated from
-        /// <see cref="PlayerRepresentationPrefab"/>.
-        /// </summary>
-        private readonly static Vector3 PlayerRepresentationScale = Vector3.one; // new Vector3(0.02f, 0.015f, 0.015f);
-
-        /// <summary>
         /// The list of all active connections.
         /// </summary>
         public static List<Connection> Connections { get; private set; }
@@ -190,17 +178,12 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Util.Logger.Log("Connection with client established: " + connection);
+                    Util.Logger.Log($"Connection with client established: {connection}");
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
                     {
                         IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
-                        List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
-                        foreach (InstantiatePrefabAction action in actions)
-                        {
-                            action.Execute(recipient);
-                        }
                         if (Network.LoadCityOnStart)
                         {
                             foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
@@ -226,15 +209,6 @@ namespace SEE.Net
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
-
-                    // create new player representation for every client
-                    new InstantiatePrefabAction(
-                        (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint,
-                        PlayerRepresentationPrefab,
-                        Vector3.zero,
-                        Quaternion.identity,
-                        PlayerRepresentationScale
-                    ).Execute();
                 }
                 else
                 {
@@ -244,10 +218,9 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Handles closing of given connection. Destroys the player prefab of given
-        /// connection.
+        /// Handles closing of given <paramref name="connection"/>.
         /// </summary>
-        /// <param name="connection"></param>
+        /// <param name="connection">connection to be closed</param>
         private static void OnConnectionClosed(Connection connection)
         {
             bool connectionListenerInitialized = ConnectionListeners.Any(listener => listener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint));
@@ -261,12 +234,6 @@ namespace SEE.Net
                     outgoingPacketSequenceIDs.Remove(connection);
 
                     IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
-
-                    ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner(remoteEndPoint);
-                    foreach (ViewContainer viewContainer in viewContainers)
-                    {
-                        new DestroyPrefabAction(viewContainer).Execute();
-                    }
 
                     if (SetGrabAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
                     {

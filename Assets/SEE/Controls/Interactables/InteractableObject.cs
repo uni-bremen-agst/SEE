@@ -291,7 +291,7 @@ namespace SEE.Controls
         /// additionally. This <see cref="InteractableObject"/> will be removed from the set of <see cref="HoveredObjects"/>.
         ///
         /// At any rate, if we are running in multiplayer mode and <paramref name="isInitiator"/> is true,
-        /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>.
+        /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>
         /// and this <see cref="InteractableObject"/>.
         /// </summary>
         /// <param name="hoverFlags">New value for <see cref="HoverFlags"./></param>
@@ -361,7 +361,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetHoverAction(this, hoverFlags).Execute();
             }
@@ -473,7 +473,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetSelectAction(this, select).Execute();
             }
@@ -594,7 +594,7 @@ namespace SEE.Controls
                 GrabbedObjects.Remove(this);
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
@@ -866,8 +866,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer && !Raycasting.IsMouseOverGUI())
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -875,20 +874,27 @@ namespace SEE.Controls
 
         /// <summary>
         /// The mouse cursor is still positioned above a GUIElement or Collider in this frame.
+        /// If the <see cref="Hoverflag.World"/> flag is set, but we are currently hovering over the GUI,
+        /// we need to reset the <see cref="Hoverflag.World"/> flag to false.
+        /// If the <see cref="Hoverflag.World"/> flag is not set and we are not hovering over the GUI,
+        /// we need to set the <see cref="Hoverflag.World"/> flag to true again.
         /// </summary>
         private void OnMouseOver()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer)
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
                 if (isFlagSet && isMouseOverGUI)
                 {
+                    // If the Hoverflag.World flag is set, but we are currently hovering over the GUI,
+                    // we need to reset the Hoverflag.World flag to false.
                     SetHoverFlag(HoverFlag.World, false, true);
                 }
                 else if (!isFlagSet && !isMouseOverGUI)
                 {
+                    // If the Hoverflag.World flag is not set and no longer hovering over the GUI,
+                    // we need to set the Hoverflag.World flag to true again.
                     SetHoverFlag(HoverFlag.World, true, true);
                 }
             }
@@ -899,8 +905,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer && IsHoverFlagSet(HoverFlag.World))
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer
+                && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);
             }
