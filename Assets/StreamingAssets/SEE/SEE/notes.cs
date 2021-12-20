@@ -1,13 +1,13 @@
-﻿// Jeder Spieler soll aus den 5 groeßten Kreisen in seinem Bereich den jeweils groeßten
+﻿// Jeder Spieler soll aus den 3 groeßten Kreisen in seinem Bereich den jeweils groeßten
 // Block finden. (Gemeint ist zuerst die Hoehe, sollte diese gleich sein, nimm den mit mehr Volumen.)
 // Ist dieser gefunden erstelle ein Eintrag.
 // Ein Eintrag sollte so aussehen: 
 // 1. Beispiel.cs, 500 Zeilen, BeispielCircle
 // 2. Beispiel2.cs, 300 Zeilen, BeispielKreis
 
-// Player 1, Dein Bereich ist Cose.
-// Player 2, Dein Bereich ist Charts
-// Player 3, Dein Bereich ist Actions
+// Player 1, Dein Bereich ist Edgelayouts
+// Player 2, Dein Bereich ist UI3D
+// Player 3, Dein Bereich ist CameraPaths
 
 // Hier folgen jetzt die groeßten Dateien:
 

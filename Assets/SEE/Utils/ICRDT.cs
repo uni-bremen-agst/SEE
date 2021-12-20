@@ -52,6 +52,16 @@ namespace SEE.Utils
                 }
             }
         }
+        /// <summary>
+        /// Syncs all Code Windows to a new Client
+        /// </summary>
+        public static void SyncCodeWindows(IPEndPoint[] recipient)
+        {
+            foreach(KeyValuePair<string, CRDT> elm in crdts)
+            {
+                elm.Value.SyncCodeWindows(recipient);
+            }
+        }
 
         /// <summary>
         /// ATTANTION ONLY FOR THE USE IN EXECUTE ON SERVER
@@ -81,6 +91,10 @@ namespace SEE.Utils
         public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
         {
             GetInstanceByName(file).RemoteAddChar(c, position, prePosition);
+        } 
+        public static void SingleRemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
+        {
+            GetInstanceByName(file).SingleRemoteAddChar(c, position, prePosition);
         }
 
         public static void RemoteDeleteChar(Identifier[] position, string file)

@@ -4,6 +4,7 @@ using SEE.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Profiling;
@@ -204,6 +205,14 @@ namespace SEE.Utils
                     }
                     tmpPos += c;
                 }
+            }
+        }
+
+        public void SingleRemoteAddChar(char c, Identifier[] position, Identifier[] prePosition)
+        {
+            if (IsEmpty())
+            {
+                RemoteAddChar(c, position, prePosition);
             }
         }
 
@@ -859,6 +868,30 @@ namespace SEE.Utils
             }
             changeEvent.Invoke(c.GetValue(), index, operationType.Add);
         }
+
+        /// <summary>
+        /// For a new client later in the network
+        /// </summary>
+        /// <param name="recipient"></param>
+        public void SyncCodeWindows(IPEndPoint[] recipient)
+        {
+            int idx = 0;
+           foreach(CharObj c in crdt)
+            {
+                if(idx != 0)
+                {
+                    new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), crdt[idx - 1].GetIdentifier(), filename);
+                }
+                else
+                {
+                    new NetCRDT().SingleAddChar(c.GetValue(), c.GetIdentifier(), null, filename, recipient);
+
+                }
+                idx++;
+            }
+           
+        }
+
         /// <summary>
         /// Transforms an string into a position
         /// </summary>
