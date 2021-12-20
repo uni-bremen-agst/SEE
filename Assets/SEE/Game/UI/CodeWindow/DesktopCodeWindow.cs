@@ -57,6 +57,11 @@ namespace SEE.Game.UI.CodeWindow
             Delete
         }
 
+        /// <summary>
+        /// A try to fix the bug that the TMP select to much chars if you select a word at the end of a line with ctrl + rightArrow
+        /// </summary>
+        private bool FixSelection = false;
+
         private KeyCode oldKeyCode;
 
         /// <summary>
@@ -111,7 +116,17 @@ namespace SEE.Game.UI.CodeWindow
 
                 //Change Listener
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
-                TextMeshInputField.onTextSelection.AddListener((text, start, end) => { selectedText = new Tuple<int, int>(GetCleanIndex(start), GetCleanIndex(end)); });
+                TextMeshInputField.onTextSelection.AddListener((text, start, end) => {
+                    int clean = GetCleanIndex(end);
+                    int richIdx = GetRichIndex(clean - 1);
+                    if (TextMeshInputField.text[richIdx].Equals('\n'))
+                    {
+                        clean--;
+                        FixSelection = true;
+                    }
+                   selectedText = new Tuple<int, int>(GetCleanIndex(start), clean); 
+                });
+
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
                 TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true; });
 
@@ -237,7 +252,6 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = "";
                 }
-                ShowNotification.Info(input, input);
 
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
@@ -271,6 +285,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(idx, idx, Title);
                     }
+                    
                     oldKeyCode = KeyCode.Delete;
                 }
 
@@ -290,6 +305,11 @@ namespace SEE.Game.UI.CodeWindow
                     if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx, idx, Title);
+                    }
+                    else if (FixSelection)
+                    {
+                        TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
+                        FixSelection = false;
                     }
                     oldKeyCode = KeyCode.Backspace;
 
@@ -324,7 +344,7 @@ namespace SEE.Game.UI.CodeWindow
                 if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
                     ShowNotification.Info("Frameshift", "Frameshift");
-                    deleteSelectedText();
+                    
                     switch (oldKeyCode)
                     {
                         case KeyCode.Backspace:
@@ -443,7 +463,11 @@ namespace SEE.Game.UI.CodeWindow
             }
             oldIDX = idx;
             oldIDXCoolDown = Time.time + 0.1f;
-            deleteSelectedText();
+            if(deleteSelectedText() && FixSelection)
+                {
+                    TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
+                    FixSelection = false;
+                }
             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
             TextMeshInputField.MoveToEndOfLine(false, false);
             ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
@@ -453,10 +477,9 @@ namespace SEE.Game.UI.CodeWindow
         {
             if (selectedText != null)
             {
-                ShowNotification.Info("DEL", selectedText.Item2 + " " + selectedText.Item1);
                 if (selectedText.Item2 < selectedText.Item1 - 1)
                 {
-                    ICRDT.DeleteString(selectedText.Item2 - 1, selectedText.Item1, Title);
+                    ICRDT.DeleteString(selectedText.Item2, selectedText.Item1 - 1, Title);
                 }
                 else
                 {
