@@ -422,23 +422,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Checks, whether the given IP-address is local.
-        /// </summary>
-        /// <param name="ipAddress">The IP-address.</param>
-        /// <returns><code>true</code> if given IP-address is local, <code>false</code> otherwise.</returns>
-        public static bool IsLocalIPAddress(IPAddress ipAddress)
-        {
-            if (ipAddress == null)
-            {
-                return false;
-            }
-
-            IPAddress[] localIPAddresses = LookupLocalIPAddresses();
-            bool result = Array.Exists(localIPAddresses, e => e.Equals(ipAddress));
-            return result;
-        }
-
-        /// <summary>
         /// Returns an array of all local IP-Addresses.
         /// </summary>
         /// <returns>An array of all local IP-Addresses.</returns>
