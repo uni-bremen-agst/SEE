@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>57b624f15474478a54220e4fa9e46598a614ef11</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Felix Gaebler</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>lal</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2021-10-29T10:24:05</string>
+		</attr>
+		<node id="N1">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>336</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>37</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>FileInfo.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>de/unibremen/informatik/vcs4see/FileInfo.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>FileInfo.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>de/unibremen/informatik/vcs4see/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>0</int>
+			</attr>
+		</node>
+		<node id="N2">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>vcs4see</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>vcs4see/informatik/unibremen/de</string>
+			</attr>
+		</node>
+		<node id="N3">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>informatik</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>informatik/unibremen/de</string>
+			</attr>
+		</node>
+		<node id="N4">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>unibremen</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>unibremen/de</string>
+			</attr>
+		</node>
+		<node id="N5">
+			<type xlink:href="Directory"/>
+			<attr name="Source.Name">
+				<string>de</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>de</string>
+			</attr>
+		</node>
+		<node id="N6">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>170</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>22</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Main.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>de/unibremen/informatik/vcs4see/Main.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Main.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>de/unibremen/informatik/vcs4see/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Line_Changes">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Added">
+				<int>17</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Edited">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+				<int>0</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>170</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>255</int>
+			</attr>
+		</node>
+		<node id="N7">
+			<type xlink:href="File"/>
+			<attr name="Metric.Number_of_Tokens">
+				<int>1005</int>
+			</attr>
+			<attr name="Metric.LOC">
+				<int>105</int>
+			</attr>
+			<attr name="Metric.Clone_Rate">
+				<float>0.000000</float>
+			</attr>
+			<attr name="Source.Name">
+				<string>Vcs2See.java</string>
+			</attr>
+			<attr name="Linkage.Name">
+				<string>de/unibremen/informatik/vcs4see/Vcs2See.java</string>
+			</attr>
+			<attr name="Source.File">
+				<string>Vcs2See.java</string>
+			</attr>
+			<attr name="Source.Path">
+				<string>de/unibremen/informatik/vcs4see/</string>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Line_Changes">
+				<int>58</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Added">
+				<int>47</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Edited">
+				<int>3</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+				<int>5</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Recent_Edit">
+				<int>255</int>
+			</attr>
+			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
+				<int>255</int>
+			</attr>
+		</node>
+		<edge from="N4" id="E1" to="N5">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N3" id="E2" to="N4">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N2" id="E3" to="N3">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N1" id="E4" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N6" id="E5" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+		<edge from="N7" id="E6" to="N2">
+			<type xlink:href="Enclosing"/>
+		</edge>
+	</graph>
+</gxl>
