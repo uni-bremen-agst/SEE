@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gxl
+  SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+	<graph edgeids="true" id="Clones">
+		<attr name="CommitId">
+			<string>d409412b11be1c0176269ec9aa82294234d46a38</string>
+		</attr>
+		<attr name="CommitAuthor">
+			<string>Felix Gaebler</string>
+		</attr>
+		<attr name="CommitMessage">
+			<string>Initial commit</string>
+		</attr>
+		<attr name="CommitTimestamp">
+			<string>2021-10-22T14:53:06</string>
+		</attr>
+	</graph>
+</gxl>
