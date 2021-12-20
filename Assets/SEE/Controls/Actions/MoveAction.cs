@@ -234,7 +234,8 @@ namespace SEE.Controls.Actions
             }
             else if (SEEInput.Drag()) // start or continue movement
             {
-                if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
+                if (SEEInput.StartDrag() && hoveredObject
+                    && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
                     // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to

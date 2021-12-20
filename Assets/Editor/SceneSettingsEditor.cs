@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Net.Dashboard;
@@ -15,9 +16,9 @@ namespace SEEEditor
     /// <summary>
     /// An editor for the player settings class. Allows the user to set platform settings and create new code cities.
     /// </summary>
-    [CustomEditor(typeof(PlayerSettings))]
+    [CustomEditor(typeof(SceneSettings))]
     [CanEditMultipleObjects]
-    public class PlayerSettingsEditor : Editor
+    public class SceneSettingsEditor : Editor
     {
         /// <summary>
         /// An array of all types of code cities which the user should be able to create.
@@ -120,7 +121,7 @@ namespace SEEEditor
         {
             //TODO: Check if objects are already there and only add as necessary
             //TODO: This is out of date, the MainScene looks different now!
-            
+
             // Add dashboard retriever to PlayerSettings if it isn't there yet
             PlayerSettings settings = FindObjectOfType<PlayerSettings>();
             if (!settings.TryGetComponent(out DashboardRetriever _))
