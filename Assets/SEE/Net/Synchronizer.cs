@@ -41,9 +41,8 @@ namespace SEE.Net
 
         /// <summary>
         /// Intializes <see cref="sendUpdate"/>, <see cref="interactable"/>, and
-        /// <see cref="updateTimeout"/>. If <see cref="Network.UseInOfflineMode"/>
-        /// is true, the component self-destructs. Otherwise the period call of
-        /// <see cref="Synchronize"/> is triggered.
+        /// <see cref="updateTimeout"/>. The period call of <see cref="Synchronize"/> is
+        /// triggered.
         /// </summary>
         private void Start()
         {
