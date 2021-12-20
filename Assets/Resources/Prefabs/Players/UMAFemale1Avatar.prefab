@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7605895346099895647
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754247987, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754451489, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: m_Name
+      value: UMAFemale1Avatar
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754451492, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 951099334
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838754451516, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: inspSalsaLinked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: context
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[0]._recipeName
+      value: FemaleHair3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[1]._recipeName
+      value: FemaleTallShoes_White
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[2]._recipeName
+      value: FemalePants1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[3]._recipeName
+      value: FemaleShirt2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[4]._recipeName
+      value: FemaleUndies
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[0]._compatibleRaces.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[1]._compatibleRaces.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[2]._compatibleRaces.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[3]._compatibleRaces.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[4]._compatibleRaces.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[0]._compatibleRaces.Array.data[0]
+      value: HumanFemale
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[0]._compatibleRaces.Array.data[1]
+      value: HumanFemaleDCS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[1]._compatibleRaces.Array.data[0]
+      value: HumanFemale
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[1]._compatibleRaces.Array.data[1]
+      value: HumanFemaleDCS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[1]._compatibleRaces.Array.data[2]
+      value: HumanFemaleHighPoly
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[2]._compatibleRaces.Array.data[0]
+      value: HumanFemaleDCS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[2]._compatibleRaces.Array.data[1]
+      value: HumanFemale
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[2]._compatibleRaces.Array.data[2]
+      value: HumanFemaleHighPoly
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[3]._compatibleRaces.Array.data[0]
+      value: HumanFemaleDCS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[3]._compatibleRaces.Array.data[1]
+      value: HumanFemale
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[4]._compatibleRaces.Array.data[0]
+      value: HumanFemaleDCS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102710838759928173, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
+      propertyPath: preloadWardrobeRecipes.recipes.Array.data[4]._compatibleRaces.Array.data[1]
+      value: HumanFemale
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b05f9b13ac827694cbb9949c56c307ed, type: 3}
