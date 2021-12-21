@@ -244,7 +244,6 @@ namespace SEE.Net
         /// <param name="nextPosition">The desired position of the transform.</param>
         internal void SetNextPosition(Vector3 nextPosition)
         {
-            UnityEngine.Debug.Log("SYNCRON");
             positionUpdateStopwatch.Restart();
             positionLast = transformToSynchronize.position;
             positionNext = nextPosition;
@@ -257,7 +256,6 @@ namespace SEE.Net
         /// <param name="nextRotation">The desired rotation of the transform.</param>
         internal void SetNextRotation(Quaternion nextRotation)
         {
-            UnityEngine.Debug.Log("ROT");
             rotationUpdateStopwatch.Restart();
             rotationLast = transformToSynchronize.rotation;
             rotationNext = nextRotation;
@@ -270,7 +268,6 @@ namespace SEE.Net
         /// <param name="nextScale">The desired scale of the transform.</param>
         internal void SetNextScale(Vector3 nextScale)
         {
-            UnityEngine.Debug.Log("SCALE");
             scaleUpdateStopwatch.Restart();
             scaleLast = transformToSynchronize.localScale;
             scaleNext = nextScale;
