@@ -6,8 +6,22 @@
 // 2. Beispiel2.cs, 300 Zeilen, BeispielKreis
 
 // Player 1, Dein Bereich ist Edgelayouts
+      
+
+    
+    
+
 // Player 2, Dein Bereich ist UI3D
+    
+
+
+
+ 
 // Player 3, Dein Bereich ist CameraPaths
+    
+
+
+
 
 // Hier folgen jetzt die groeßten Dateien:
 
