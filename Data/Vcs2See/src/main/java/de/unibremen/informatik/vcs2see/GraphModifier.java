@@ -191,14 +191,6 @@ public class GraphModifier {
     private void addMostFrequent(String path) {
         if(mostFrequent.computeIfPresent(path, (k, v) -> v + 1) == null) {
             mostFrequent.put(path, 1);
-
-            if(mostFrequent.size() > 255) {
-                float min = mostFrequent.values().stream()
-                        .min(Integer::compareTo).orElseThrow();
-                Map.Entry<String, Integer> entry = mostFrequent.entrySet().stream()
-                        .filter(a -> a.getValue() == min).findFirst().orElseThrow();
-                mostFrequent.remove(entry.getKey());
-            }
         }
     }
 
@@ -219,7 +211,7 @@ public class GraphModifier {
      * @return most frequent value
      */
     private int calculateMostFrequent(int value) {
-        float min = mostFrequent.values().stream().min(Integer::compareTo).orElse(0);
+        float min = 0; //mostFrequent.values().stream().min(Integer::compareTo).orElse(0);
         float max = mostFrequent.values().stream().max(Integer::compareTo).orElse(255);
         float output = (255 / (max - min)) * (value - min);
         return (int) output;
