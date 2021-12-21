@@ -140,6 +140,10 @@ namespace SEE.Game.UI.CodeWindow
                             if (TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
+                               /* if (c.Equals('\n'))
+                                {
+                                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 10;
+                                } */
                             }
                             break;
                         case operationType.Delete:
@@ -147,6 +151,10 @@ namespace SEE.Game.UI.CodeWindow
                             if (TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
+                                /*if (c.Equals('\n'))
+                                {
+                                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 10;
+                                } */
                             }
                             break;
                     }
