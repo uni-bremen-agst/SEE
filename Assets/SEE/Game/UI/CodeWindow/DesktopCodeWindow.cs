@@ -305,13 +305,15 @@ namespace SEE.Game.UI.CodeWindow
                     if (!deleteSelectedText())
                     {
                         ICRDT.DeleteString(idx, idx, Title);
+                        oldKeyCode = KeyCode.Backspace;
                     }
                     else if (FixSelection)
                     {
                         TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
                         FixSelection = false;
+                        oldKeyCode = KeyCode.None;
                     }
-                    oldKeyCode = KeyCode.Backspace;
+                   
 
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
