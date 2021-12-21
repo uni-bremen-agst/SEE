@@ -55,7 +55,7 @@
 				<int>0</int>
 			</attr>
 			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
-				<int>0</int>
+				<int>255</int>
 			</attr>
 		</node>
 		<node id="N2">
@@ -133,7 +133,7 @@
 				<int>85</int>
 			</attr>
 			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
-				<int>0</int>
+				<int>255</int>
 			</attr>
 		</node>
 		<node id="N7">
@@ -175,7 +175,7 @@
 				<int>170</int>
 			</attr>
 			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
-				<int>0</int>
+				<int>255</int>
 			</attr>
 		</node>
 		<node id="N8">
@@ -217,7 +217,7 @@
 				<int>255</int>
 			</attr>
 			<attr name="Metric.Vcs2See.Most_Frequent_Edit">
-				<int>0</int>
+				<int>255</int>
 			</attr>
 		</node>
 		<edge from="N4" id="E1" to="N5">
