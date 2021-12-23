@@ -275,7 +275,7 @@ namespace SEE.Controls.Actions
             }
             else if (SEEInput.Reset()) // reset to center of table
             {
-                if (hoveredObject && !moving)
+                if (cityRootNode && !moving)
                 {
                     GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
                     cityRootNode.position = plane.CenterTop;
@@ -285,9 +285,9 @@ namespace SEE.Controls.Actions
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
             }
-            // No canceling, no dragging, no reset.
-            else if (moving) // finalize movement
+            else if (moving)
             {
+                // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
                     hit.interactableObject.SetGrab(false, true);
