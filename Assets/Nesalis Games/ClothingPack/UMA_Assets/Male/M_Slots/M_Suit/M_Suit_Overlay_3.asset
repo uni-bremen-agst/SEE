@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c4834e6077abe64e968f9f87c9ac70a, type: 3}
+  m_Name: M_Suit_Overlay_3
+  m_EditorClassIdentifier: 
+  overlayName: M_Suit_Overlay_3
+  overlayType: 0
+  rect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  alphaMask: {fileID: 0}
+  textureList:
+  - {fileID: 2800000, guid: 308e8386b0cf4224694b098eed9779bf, type: 3}
+  - {fileID: 2800000, guid: e70e9a3ba21656b4eabffc0f378cc72a, type: 3}
+  - {fileID: 2800000, guid: 211ca3b3fa98ded4faa2b0b498cc5ec8, type: 3}
+  tags: []
+  material: {fileID: 11400000, guid: 8e29dbac5d2e82f44a759a7e2cc568ab, type: 2}
+  OcclusionEntries: []

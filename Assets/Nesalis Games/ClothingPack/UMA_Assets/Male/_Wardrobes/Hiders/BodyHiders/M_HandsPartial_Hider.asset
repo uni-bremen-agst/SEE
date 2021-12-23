@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
+  m_Name: M_HandsPartial_Hider
+  m_EditorClassIdentifier: 
+  _asset: {fileID: 11400000, guid: 881f10d72572db34cb1150ac3df21a97, type: 2}
+  _serializedFlags:
+  - flags: 0000000050feffffffffffffffff0f00000000000000f001001f00000000000000000000801ff9ffff8110000000000000000010feffffff0f0000f80000000000c0ff9f170300000000f8feffffffffffff7d1800000100000000fc0fffffbfffffffff1f0000000000000000000000000060187d00080000000000000000f000000000001d00007efce080b0000000
+    Count: 1128
