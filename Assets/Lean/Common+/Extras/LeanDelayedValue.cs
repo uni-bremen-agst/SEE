@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Common
