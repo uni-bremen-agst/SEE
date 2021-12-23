@@ -31,16 +31,17 @@ namespace SEE.Net
         /// <summary>
         /// The single unique instance of the network.
         /// </summary>
-        public static Network Instance
-        {
-            get;
-            set;
-        }
+        public static Network Instance { get; set; }
 
         /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// </summary>
         public int ServerActionPort = 55555;
+
+        /// <summary>
+        /// The port where the server listens to NetCode and Dissonance traffic.
+        /// </summary>
+        public int ServerPort { set; get; } = 55555;
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
@@ -466,11 +467,6 @@ namespace SEE.Net
         /// The IP address of the server.
         /// </summary>
         public string IPAddress { set; get; } = "127.0.0.1";
-
-        /// <summary>
-        /// The port where the server listens to NetCode and Dissonance traffic.
-        /// </summary>
-        public int ServerPort { set; get; } = 55555;
 
         /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
