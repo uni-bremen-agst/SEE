@@ -5,7 +5,6 @@ using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Game.City;
-using UnityEngine;
 
 namespace SEE.Net
 {
