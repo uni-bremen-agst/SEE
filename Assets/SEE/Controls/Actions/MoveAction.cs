@@ -287,12 +287,10 @@ namespace SEE.Controls.Actions
             }
             else if (moving)
             {
+                InteractableObject interactableObjectToBeUngrabbed = hit.interactableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
-                    hit.interactableObject.SetGrab(false, true);
-                    gizmo.gameObject.SetActive(false);
-
                     GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject);
                     if (parent != null)
                     {
@@ -310,10 +308,14 @@ namespace SEE.Controls.Actions
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
                         new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                        // The following assignment will override hit.interactableObject; that is why we
+                        // stored its value in interactableObjectToBeUngrabbed above.
                         hit = new Hit();
                     }
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
+                interactableObjectToBeUngrabbed.SetGrab(false, true);
+                gizmo.gameObject.SetActive(false);
                 moving = false;
             }
 
