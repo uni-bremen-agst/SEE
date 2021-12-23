@@ -29,19 +29,18 @@ namespace SEE.Net
         private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
 
         /// <summary>
-        /// The instance of the network.
+        /// The single unique instance of the network.
         /// </summary>
-        private static Network instance;
+        public static Network Instance
+        {
+            get;
+            set;
+        }
 
         /// <summary>
-        /// The port of the server. Is ignored, if this host does not host the server.
+        /// The port of the server where the server listens to SEE action requests.
         /// </summary>
-        [SerializeField] private int localServerPort = 55555;
-
-        /// <summary>
-        /// The port of the remote server. Is ignored, if this client hosts the server.
-        /// </summary>
-        [SerializeField] private int remoteServerPort = 0;
+        public int ServerActionPort = 55555;
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
@@ -84,25 +83,15 @@ namespace SEE.Net
         public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress;
 
         /// <summary>
-        /// <see cref="localServerPort"/>
-        /// </summary>
-        public static int LocalServerPort => instance ? instance.localServerPort : -1;
-
-        /// <summary>
-        /// <see cref="remoteServerPort"/>
-        /// </summary>
-        public static int RemoteServerPort => instance ? instance.remoteServerPort : -1;
-
-        /// <summary>
         /// <see cref="loadCityOnStart"/>
         /// </summary>
-        public static bool LoadCityOnStart => instance && instance.loadCityOnStart;
+        public static bool LoadCityOnStart => Instance && Instance.loadCityOnStart;
 
 #if UNITY_EDITOR
         /// <summary>
         /// <see cref="internalLoggingEnabled"/>
         /// </summary>
-        public static bool InternalLoggingEnabled => instance && instance.internalLoggingEnabled;
+        public static bool InternalLoggingEnabled => Instance && Instance.internalLoggingEnabled;
 #endif
 
         /// <summary>
@@ -137,13 +126,13 @@ namespace SEE.Net
         private static readonly List<Connection> deadConnections = new List<Connection>();
 
         /// <summary>
-        /// Makes sure that we have only one <see cref="instance"/>.
+        /// Makes sure that we have only one <see cref="Instance"/>.
         /// </summary>
         private void Start()
         {
-            if (instance)
+            if (Instance)
             {
-                if (instance != this)
+                if (Instance != this)
                 {
                     Util.Logger.LogError("There must not be more than one Network component! "
                         + $"This component in {gameObject.GetFullName()} will be destroyed!\n");
@@ -153,7 +142,7 @@ namespace SEE.Net
             }
             else
             {
-                instance = this;
+                Instance = this;
             }
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
@@ -377,11 +366,11 @@ namespace SEE.Net
         /// <param name="packet">The serialized packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, string serializedPacket)
         {
-            bool result = instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
+            bool result = Instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
             if (!result)
             {
                 serializedPackets = new List<string>();
-                instance.submittedSerializedPackets.Add(connection, serializedPackets);
+                Instance.submittedSerializedPackets.Add(connection, serializedPackets);
             }
             serializedPackets.Add(serializedPacket);
         }
@@ -484,11 +473,6 @@ namespace SEE.Net
         public int ServerPort { set; get; } = 55555;
 
         /// <summary>
-        /// The port where the server listens to SEE actions.
-        /// </summary>
-        public int ServerActionPort { set; get; } = 7777;
-
-        /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
         /// chat whatsoever.
         /// </summary>
@@ -518,7 +502,6 @@ namespace SEE.Net
                     // nothing to be done
                     break;
                 case VoiceChatSystems.Dissonance:
-                    throw new NotImplementedException();
                     break;
                 case VoiceChatSystems.Vivox:
                     VivoxClient?.Uninitialize();
@@ -541,7 +524,7 @@ namespace SEE.Net
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
         [SerializeField] private string vivoxChannelName = string.Empty;
-        public static string VivoxChannelName { get => instance ? instance.vivoxChannelName : string.Empty; }
+        public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()
         {

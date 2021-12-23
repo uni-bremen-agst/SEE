@@ -89,7 +89,8 @@ namespace SEE.Net
 
                 try
                 {
-                    ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
+                    ConnectionListeners.AddRange
+                        (Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.Instance.ServerActionPort), false));
 #if UNITY_EDITOR
                     string message = "Server listening on end-points:";
                     foreach (ConnectionListenerBase connectionListener in ConnectionListeners)

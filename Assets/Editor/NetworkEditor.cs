@@ -48,8 +48,7 @@ namespace SEEEditor
                 {
                     SetProperty("GameScene", "Loaded Scene", "The name of the scene to be loaded when the game is started.");
                     SetProperty("loadCityOnStart", "Load City On Start", "Whether the city should be loaded on start of the application.");
-                    SetProperty("localServerPort", "Local Action Port", "The port of the local server for actions.");
-                    SetProperty("remoteServerPort", "Remote Action Port", "The port of the remote server for actions.");
+                    SetProperty("serverActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
                     SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
                     SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
                 }
