@@ -249,7 +249,7 @@ namespace SEE.Controls
         /// not exist.
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
-        /// <returns></returns>
+        /// <returns>the interactable with the given <paramref name="id"/>; null if none exists</returns>
         public static InteractableObject Get(string id)
         {
             if (!idToInteractableObjectDict.TryGetValue(id, out InteractableObject result))
