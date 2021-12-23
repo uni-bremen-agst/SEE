@@ -1,18 +1,9 @@
 {
     "name": "LeanTouchPlus",
-    "rootNamespace": "",
     "references": [
         "LeanCommon",
-        "LeanTouch",
-        "LeanTouchExtras"
+        "LeanTouch"
     ],
     "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "excludePlatforms": []
 }

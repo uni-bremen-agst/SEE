@@ -1,7 +1,6 @@
+using UnityEngine;
 using System.Collections.Generic;
 using Lean.Common;
-using UnityEditor;
-using UnityEngine;
 
 namespace Lean.Touch
 {
@@ -206,6 +205,8 @@ namespace Lean.Touch
 #if UNITY_EDITOR
 namespace Lean.Touch.Editor
 {
+	using UnityEditor;
+
 	[CustomPropertyDrawer(typeof(LeanFingerFilter))]
 	public class LeanFingerFilter_Drawer : PropertyDrawer
 	{
