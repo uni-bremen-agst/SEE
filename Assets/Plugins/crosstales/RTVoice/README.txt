@@ -1,4 +1,4 @@
-﻿# RT-Voice PRO 2021.3.3
+﻿# RT-Voice PRO 2021.3.5
 
 Thank you for buying our asset "RT-Voice PRO"! 
 If you have any questions about this asset, send us an email at [rtvoice@crosstales.com](mailto:rtvoice@crosstales.com). 
@@ -100,4 +100,4 @@ CH-8002 Zürich
 * [Volumetric Audio](https://assetstore.unity.com/packages/slug/17125?aid=1011lNGT)
 * [WebGL Speech Synthesis](https://assetstore.unity.com/packages/slug/81861?aid=1011lNGT)
 
-`Version: 12.11.2021`
+`Version: 24.11.2021`

@@ -8,32 +8,37 @@ namespace Crosstales.RTVoice.Tool
    [HelpURL("https://www.crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_r_t_voice_1_1_tool_1_1_paralanguage.html")] //TODO update URL
    public class PlatformProvider : MonoBehaviour
    {
-      [Header("Configuration Settings")] public PlatformProviderTuple[] Configuration;
+      [Header("Configuration Settings"), Tooltip("Platform specific provider for the app (empty provider = default of the OS).")] public PlatformProviderTuple[] Configuration;
 
-      [Header("Default")] public Provider.BaseCustomVoiceProvider DefaultVoiceProvider;
+      [Header("Default"), Tooltip("Default provider of the app (empty = default of the OS).")] public Provider.BaseCustomVoiceProvider DefaultVoiceProvider;
+
+      [Header("Editor"), Tooltip("Use the default provider inside the Editor (default: false).")] public bool UseDefault;
 
       private void Start()
       {
-         Crosstales.Common.Model.Enum.Platform currentPlatform = Util.Helper.CurrentPlatform;
-
          bool found = false;
 
-         foreach (var config in Configuration)
+         if (!Crosstales.RTVoice.Util.Helper.isEditor && !UseDefault)
          {
-            if (config.Platform == currentPlatform)
-            {
-               if (config.CustomVoiceProvider == null)
-               {
-                  Speaker.Instance.CustomMode = false;
-               }
-               else
-               {
-                  Speaker.Instance.CustomProvider = config.CustomVoiceProvider;
-                  Speaker.Instance.CustomMode = true;
-               }
+            Crosstales.Common.Model.Enum.Platform currentPlatform = Util.Helper.CurrentPlatform;
 
-               found = true;
-               break;
+            foreach (PlatformProviderTuple config in Configuration)
+            {
+               if (config.Platform == currentPlatform)
+               {
+                  if (config.CustomVoiceProvider == null)
+                  {
+                     Speaker.Instance.CustomMode = false;
+                  }
+                  else
+                  {
+                     Speaker.Instance.CustomProvider = config.CustomVoiceProvider;
+                     Speaker.Instance.CustomMode = true;
+                  }
+
+                  found = true;
+                  break;
+               }
             }
          }
 

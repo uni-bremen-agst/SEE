@@ -2190,7 +2190,7 @@ namespace Crosstales
             false, false,
             texture.GetNativeTexturePtr());
       }
-
+#if CT_WEBCAM
       /// <summary>
       /// Extension method for WebCamTexture.
       /// Convert a WebCamTexture to a Texture2D
@@ -2215,7 +2215,7 @@ namespace Crosstales
 
          return texture2D;
       }
-
+#endif
       /// <summary>
       /// Extension method for Texture.
       /// Flips a Texture2D horizontally

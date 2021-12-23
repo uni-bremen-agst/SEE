@@ -1,5 +1,19 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2021.3.5 - 24.11.2021
+* Unnecessary logs removed
+* PlatformProvider improved
+* VoiceProviderMaryTTS: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderSAPI: automatic fallback to default wrapper under unsupported platforms
+* VoiceProviderAWS: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderAzure: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderGoogle: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderWebGL: automatic fallback to default wrapper under unsupported platforms
+
+## 2021.3.4 - 19.11.2021
+* Removal of generic AudioSources improved
+* Updated to Common 2021.3.5
+
 ## 2021.3.3 - 12.11.2021
 * PlatformProvider added
 * Update for TextMesh PRO components

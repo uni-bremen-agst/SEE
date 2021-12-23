@@ -55,8 +55,6 @@ namespace Crosstales.RTVoice
       public static readonly System.Collections.Generic.List<string> FilesToDelete = new System.Collections.Generic.List<string>();
       */
 
-      private readonly System.Collections.Generic.Dictionary<string, AudioSource> removeSources = new System.Collections.Generic.Dictionary<string, AudioSource>();
-
       private float cleanUpTimer;
 
       private Provider.IVoiceProvider voiceProvider;
@@ -606,36 +604,25 @@ namespace Crosstales.RTVoice
 
             if (genericSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
-               {
-                  removeSources.Add(source.Key, source.Value);
-               }
+               //Debug.Log(genericSources.Count);
 
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in removeSources)
+               System.Collections.Generic.KeyValuePair<string, AudioSource>[] sources = genericSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()).ToArray();
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in sources)
                {
                   genericSources.Remove(source.Key);
                   Destroy(source.Value);
                }
-
-               removeSources.Clear();
             }
 
             if (providedSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
+               System.Collections.Generic.KeyValuePair<string, AudioSource>[] sources = providedSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()).ToArray();
+
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in sources)
                {
                   //source.Value.clip = null; //remove clip
-
-                  removeSources.Add(source.Key, source.Value);
-               }
-
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in removeSources)
-               {
-                  //genericSources.Remove(source.Key);
                   providedSources.Remove(source.Key);
                }
-
-               removeSources.Clear();
             }
          }
       }
@@ -710,25 +697,25 @@ namespace Crosstales.RTVoice
             if (!TouchScreenKeyboard.isSupported || !TouchScreenKeyboard.visible)
             {
 #endif
-            if (silenceOnFocusLost)
-            {
-               if (!hasFocus)
-                  Silence();
-            }
-            else
-            {
-               if (handleFocus)
+               if (silenceOnFocusLost)
                {
-                  if (hasFocus)
+                  if (!hasFocus)
+                     Silence();
+               }
+               else
+               {
+                  if (handleFocus)
                   {
-                     UnPause();
-                  }
-                  else
-                  {
-                     Pause();
+                     if (hasFocus)
+                     {
+                        UnPause();
+                     }
+                     else
+                     {
+                        Pause();
+                     }
                   }
                }
-            }
 #if UNITY_ANDROID || UNITY_IOS
             }
 #endif
@@ -1570,18 +1557,12 @@ namespace Crosstales.RTVoice
                if (genericSources.ContainsKey(uid))
                {
                   if (genericSources.TryGetValue(uid, out AudioSource source))
-                  {
                      source.Stop();
-                     genericSources.Remove(uid);
-                  }
                }
                else if (providedSources.ContainsKey(uid))
                {
                   if (providedSources.TryGetValue(uid, out AudioSource source))
-                  {
                      source.Stop();
-                     providedSources.Remove(uid);
-                  }
                }
                else
                {
