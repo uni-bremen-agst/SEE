@@ -13,7 +13,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7941336885923562866, guid: 547c2e9840c2c35459e94d2b505d5eb7, type: 3}
       propertyPath: activeRace.name
-      value: HumanFemale
+      value: HumanFemaleHighPoly
       objectReference: {fileID: 0}
     - target: {fileID: 7941336885929104419, guid: 547c2e9840c2c35459e94d2b505d5eb7, type: 3}
       propertyPath: inspSalsaLinked

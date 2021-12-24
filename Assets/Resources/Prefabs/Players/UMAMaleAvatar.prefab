@@ -69,7 +69,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4189678325435440223, guid: 9337f073ac4ff5044b7cb00acb1fdd19, type: 3}
       propertyPath: activeRace.name
-      value: HumanMale
+      value: HumanMaleHighPoly
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9337f073ac4ff5044b7cb00acb1fdd19, type: 3}
