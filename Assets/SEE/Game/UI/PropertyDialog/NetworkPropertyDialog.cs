@@ -110,7 +110,7 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "IP4 Address";
-                ipAddress.Value = networkConfig.IPAddress;
+                ipAddress.Value = networkConfig.ServerIP4Address;
                 ipAddress.Description = "IP4 Address of the server";
                 group.AddProperty(ipAddress);
             }
@@ -177,7 +177,7 @@ namespace SEE.Game.UI.PropertyDialog
                     ShowNotification.Error("IP Syntax Error",
                         "IP addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
                 }
-                networkConfig.IPAddress = ipAddressValue;
+                networkConfig.ServerIP4Address = ipAddressValue;
             }
             {
                 if (Int32.TryParse(serverPort.Value.Trim(), out int serverPortNumber) && 0 <= serverPortNumber && serverPortNumber <= MaximalPortNumber)
