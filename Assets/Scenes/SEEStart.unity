@@ -253,7 +253,7 @@ MonoBehaviour:
   MessageBufferSize: 5120
   MaxConnections: 100
   MaxSentMessageQueueSize: 128
-  ConnectAddress: 192.168.178.120
+  ConnectAddress: 127.0.0.1
   ConnectPort: 7777
   ServerListenPort: 7777
   MessageSendMode: 0
@@ -338,8 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localServerPort: 55555
-  remoteServerPort: 55555
+  ServerActionPort: 55555
   loadCityOnStart: 0
   networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1

@@ -34,14 +34,69 @@ namespace SEE.Net
         public static Network Instance { get; set; }
 
         /// <summary>
+        /// The maximal port number.
+        /// </summary>
+        private const int MaxServerPort = 65535;
+
+        /// <summary>
         /// The port of the server where the server listens to SEE action requests.
+        /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
         public int ServerActionPort = 55555;
 
         /// <summary>
         /// The port where the server listens to NetCode and Dissonance traffic.
+        /// Valid range is [0, 65535].
         /// </summary>
-        public int ServerPort { set; get; } = 55555;
+        public int ServerPort
+        {
+            set
+            {
+                if (value < 0 ||value > MaxServerPort)
+                {
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                }
+                Unity.Netcode.Transports.UNET.UNetTransport netTransport
+                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
+                    as Unity.Netcode.Transports.UNET.UNetTransport;
+                netTransport.ConnectPort = value;
+                netTransport.ServerListenPort = value;
+
+            }
+            get
+            {
+                Unity.Netcode.Transports.UNET.UNetTransport netTransport
+                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
+                      as Unity.Netcode.Transports.UNET.UNetTransport;
+                return netTransport.ServerListenPort;
+            }
+        }
+
+        /// <summary>
+        /// The IP4 address of the server.
+        /// </summary>
+        public string ServerIP4Address
+        {
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
+                }
+                Unity.Netcode.Transports.UNET.UNetTransport netTransport
+                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
+                    as Unity.Netcode.Transports.UNET.UNetTransport;
+                netTransport.ConnectAddress = value;
+            }
+
+            get
+            {
+                Unity.Netcode.Transports.UNET.UNetTransport netTransport
+                   = NetworkManager.Singleton.NetworkConfig.NetworkTransport
+                     as Unity.Netcode.Transports.UNET.UNetTransport;
+                return netTransport.ConnectAddress;
+            }
+        }
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
@@ -462,11 +517,6 @@ namespace SEE.Net
             NetworkManager.Singleton.StartServer();
             StartUp();
         }
-
-        /// <summary>
-        /// The IP address of the server.
-        /// </summary>
-        public string IPAddress { set; get; } = "127.0.0.1";
 
         /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
