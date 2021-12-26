@@ -17,8 +17,8 @@ namespace SEE.Game.Worlds
         [Tooltip("Ground position where a player is spawned.")]
         public Vector3 InitialPosition = Vector3.zero;
 
-        [Tooltip("Initial rotation of a spawned player along the y axis."), Range(0, 360-float.Epsilon)]
-        public float InitialRotation = 0;
+        [Tooltip("Initial rotation of a spawned player.")]
+        public Vector3 InitialRotation = Vector3.zero;
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
@@ -78,7 +78,7 @@ namespace SEE.Game.Worlds
         {
             numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
-                                            InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
+                                            InitialPosition, Quaternion.Euler(InitialRotation));
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
