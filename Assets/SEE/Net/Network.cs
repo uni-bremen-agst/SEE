@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Dissonance;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
+using SEE.Utils;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -271,8 +273,18 @@ namespace SEE.Net
         /// </summary>
         private void DissonanceInitialize()
         {
-            // FIXME: Needs to be implemented.
-            throw new NotImplementedException();
+            // The DissonanceComms is initialized inactive and the local player is muted and deafened.
+            DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
+            if (dissonanceComms != null)
+            {
+                dissonanceComms.IsMuted = false;
+                dissonanceComms.IsDeafened = false;
+                dissonanceComms.enabled = true;
+            }
+            else
+            {
+                Debug.LogError($"There is no {typeof(DissonanceComms)} in the current scene.\n");
+            }
         }
 
         /// <summary>
@@ -522,7 +534,7 @@ namespace SEE.Net
         /// The kinds of voice-chats system we support. None means no voice
         /// chat whatsoever.
         /// </summary>
-        private enum VoiceChatSystems
+        public enum VoiceChatSystems
         {
             None = 0,       // no voice chat
             Dissonance = 1, // Dissonance voice chat
@@ -534,8 +546,8 @@ namespace SEE.Net
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [SerializeField]
-        private VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
         /// Shuts down the voice-chat system.
@@ -548,12 +560,134 @@ namespace SEE.Net
                     // nothing to be done
                     break;
                 case VoiceChatSystems.Dissonance:
+                    // nothing to be done
                     break;
                 case VoiceChatSystems.Vivox:
                     VivoxClient?.Uninitialize();
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerActionPortLabel = "serverActionPort";
+        /// <summary>
+        /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
+        /// </summary>
+        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        /// <summary>
+        /// Label of attribute <see cref="GameScene"/> in the configuration file.
+        /// </summary>
+        private const string GameSceneLabel = "gameScene";
+        /// <summary>
+        /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
+        /// </summary>
+        private const string VoiceChatLabel = "voiceChat";
+        /// <summary>
+        /// Label of attribute <see cref="ServerPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerPortLabel = "serverPort";
+        /// <summary>
+        /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
+        /// </summary>
+        private const string ServerIP4AddressLabel = "serverIP4Address";
+
+        /// <summary>
+        /// Default name of the configuration file (just the filename, not the path).
+        /// </summary>
+        private const string ConfigFile = "network.cfg";
+
+        /// <summary>
+        /// Default path of the configuration file.
+        /// </summary>
+        /// <returns></returns>
+        private string ConfigPath()
+        {
+            return Filenames.OnCurrentPlatform(Application.streamingAssetsPath + "/" + ConfigFile);
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        public void Save()
+        {
+            Save(ConfigPath());
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        public void Load()
+        {
+            string filename = ConfigPath();
+            if (File.Exists(filename))
+            {
+                Load(filename);
+            }
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file in which the settings are stored</param>
+        public void Save(string filename)
+        {
+            using ConfigWriter writer = new ConfigWriter(filename);
+            Save(writer);
+        }
+
+        /// <summary>
+        /// Reads the settings of this network configuration from <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file from which the settings are restored</param>
+        public void Load(string filename)
+        {
+            using ConfigReader stream = new ConfigReader(filename);
+            Restore(stream.Read());
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">the writer to be used to save the settings</param>
+        protected virtual void Save(ConfigWriter writer)
+        {
+            writer.Save(ServerActionPort, ServerActionPortLabel);
+            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
+            writer.Save(GameScene, GameSceneLabel);
+            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
+            writer.Save(ServerPort, ServerPortLabel);
+            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">the attributes from which to restore the settings</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
+            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            {
+                int value = ServerPort;
+                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ServerPort = value;
+            }
+            {
+                string value = ServerIP4Address;
+                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ServerIP4Address = value;
             }
         }
 
