@@ -72,6 +72,7 @@ namespace SEEEditor
                     EditorGUI.EndDisabledGroup();
                 }
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
         }
