@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using static SEE.Net.Network;
 
 namespace SEE.Game.UI.PropertyDialog
 {
@@ -77,21 +78,6 @@ namespace SEE.Game.UI.PropertyDialog
         private StringProperty serverActionPort;
 
         /// <summary>
-        /// Selectable value for no voice chat.
-        /// </summary>
-        private const string NoVoiceChat = "None";
-
-        /// <summary>
-        /// Selectable value for no voice chat.
-        /// </summary>
-        private const string Dissonance = "Dissonance";
-
-        /// <summary>
-        /// Selectable value for no voice chat.
-        /// </summary>
-        private const string Vivox = "Vivox";
-
-        /// <summary>
         /// The selector for the voice chat system.
         /// </summary>
         private SelectionProperty voiceChatSelector;
@@ -101,6 +87,8 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
+            networkConfig.Load();
+
             dialog = new GameObject("Network settings");
 
             // Group for network properties (one group for all).
@@ -131,10 +119,10 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
                 voiceChatSelector.Name = "Voice Chat";
-                voiceChatSelector.Description = "Select a voice chat system or None if no voice chat is requested";
-                IList<string> voiceChats = new List<string> { NoVoiceChat, Dissonance, Vivox };
+                voiceChatSelector.Description = "Select a voice chat system";
+                IList<string> voiceChats = VoiceChatSystemsToStrings();
                 voiceChatSelector.AddOptions(voiceChats);
-                voiceChatSelector.Value = voiceChats[0];
+                voiceChatSelector.Value = networkConfig.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
             // Dialog
@@ -150,6 +138,15 @@ namespace SEE.Game.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
             propertyDialog.DialogShouldBeShown = true;
+        }
+
+        /// <summary>
+        /// Returns the enum values of <see cref="VoiceChatSystems"/> as a list of strings.
+        /// </summary>
+        /// <returns>enum values of <see cref="VoiceChatSystems"/> as a list of strings</returns>
+        private IList<string> VoiceChatSystemsToStrings()
+        {
+            return Enum.GetNames(typeof(VoiceChatSystems)).ToList();
         }
 
         /// <summary>
@@ -171,6 +168,7 @@ namespace SEE.Game.UI.PropertyDialog
         private void OKButtonPressed()
         {
             {
+                // Server IP Address
                 string ipAddressValue = ipAddress.Value.Trim();
                 if (!HasCorrectIPAddressSyntax(ipAddressValue))
                 {
@@ -180,7 +178,9 @@ namespace SEE.Game.UI.PropertyDialog
                 networkConfig.ServerIP4Address = ipAddressValue;
             }
             {
-                if (Int32.TryParse(serverPort.Value.Trim(), out int serverPortNumber) && 0 <= serverPortNumber && serverPortNumber <= MaximalPortNumber)
+                // Server Port Number
+                if (Int32.TryParse(serverPort.Value.Trim(), out int serverPortNumber)
+                    && 0 <= serverPortNumber && serverPortNumber <= MaximalPortNumber)
                 {
                     networkConfig.ServerPort = serverPortNumber;
                 }
@@ -191,6 +191,7 @@ namespace SEE.Game.UI.PropertyDialog
                 }
             }
             {
+                // Server Action Port Number
                 if (Int32.TryParse(serverActionPort.Value.Trim(), out int serverActionPortNumber)
                     && 0 <= serverActionPortNumber && serverActionPortNumber <= MaximalPortNumber)
                 {
@@ -201,11 +202,25 @@ namespace SEE.Game.UI.PropertyDialog
                     ShowPortError("Server Action");
                 }
             }
+            {
+                // Voice Chat
+                string value = voiceChatSelector.Value.Trim();
+                if (Enum.TryParse(value, out VoiceChatSystems voiceChat))
+                {
+                    networkConfig.VoiceChat = voiceChat;
+                }
+                else
+                {
+                    Debug.LogError($"Invalid value for {typeof(VoiceChatSystems)}: {value}.\n");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice is not available");
+                }
+            }
 
             OnConfirm.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
             callBack?.Invoke();
+            networkConfig.Save();
 
             static void ShowPortError(string portPrefix)
             {
