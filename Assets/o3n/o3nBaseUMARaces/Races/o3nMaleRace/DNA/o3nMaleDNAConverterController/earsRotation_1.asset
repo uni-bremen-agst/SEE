@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: earsRotation_1
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: Ear02_R
+    hash: -1536732436
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -1.1255974e-10, y: 0.17364822, z: -0.0000000026391138, w: 0.98480785}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: Ear02_L
+    hash: 1583902607
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0.000000006864922, y: 0.17364818, z: -0.000000003375142, w: 0.9848078}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

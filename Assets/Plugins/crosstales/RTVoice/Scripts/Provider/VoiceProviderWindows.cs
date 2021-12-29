@@ -604,8 +604,8 @@ namespace Crosstales.RTVoice.Provider
                         {
                            word = reply.Substring(idWord.Length + 1);
 
-                           //if (Util.Constants.DEV_DEBUG) //TODO comment!
-                           Debug.Log($"Word spoken: {word}");
+                           if (Util.Constants.DEV_DEBUG)
+                              Debug.Log($"Word spoken: {word}");
 
                            if (wordIndex < speechTextArray.Length)
                            {

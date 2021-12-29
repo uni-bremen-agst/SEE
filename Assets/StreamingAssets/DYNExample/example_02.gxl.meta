@@ -1,11 +1,6 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/StreamingAssets/DYNExample/example_02.gxl.meta
-guid: 9a4ba138a609f4a45ab6178de4ccfc16
+guid: 68869add88adbc047a7a157fa0356aad
 DefaultImporter:
-=======
-guid: 32dcfd6f0d58c7642bcc6fb2b1e7c8ff
-TextScriptImporter:
->>>>>>> master:Assets/Lean/package.json.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

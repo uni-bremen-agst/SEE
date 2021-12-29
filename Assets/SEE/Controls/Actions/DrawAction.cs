@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class DrawAction : AbstractPlayerAction
+    internal class DrawAction : AbstractPlayerAction
     {
         /// <summary>
         /// A new instance of <see cref="DrawAction"/>.
@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
+        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/>
         /// before that).
         /// See <see cref="ReversibleAction.Undo()"/>.
         /// </summary>
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set</returns>

@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 
 namespace Lean.Common
@@ -97,6 +96,8 @@ namespace Lean.Common
 #if UNITY_EDITOR
 namespace Lean.Common.Editor
 {
+	using UnityEditor;
+
 	[CustomEditor(typeof(LeanChaseRigidbody))]
 	public class LeanChaseRigidbody_Editor : LeanChase_Editor
 	{

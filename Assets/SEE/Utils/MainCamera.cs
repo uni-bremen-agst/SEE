@@ -8,13 +8,13 @@ namespace SEE.Utils
     {
         /// <summary>
         /// The main camera in the scene. The main camera is the first enabled
-        /// camera tagged "MainCamera". An exception will be thrown when there 
+        /// camera tagged "MainCamera". An exception will be thrown when there
         /// is no such camera.
-        /// 
+        ///
         /// Unlike the equivalent Camera.main property, the main camera will be
         /// cached and re-used upon every other access. This helps to avoid the
         /// relatively expensive lookup of Camera.main.
-        /// 
+        ///
         /// If there are multiple cameras in the scene, a warning will be logged
         /// and all cameras will be enumerated in the log.
         /// </summary>
@@ -33,8 +33,7 @@ namespace SEE.Utils
                             camera = Camera.main;
                             break;
                         default:
-                            Debug.LogWarningFormat("There are {0} cameras in the scene. Expect unexpected visual results.\n",
-                                                   Camera.allCameras.Length);
+                            Debug.LogWarning($"There are {Camera.allCameras.Length} cameras in the scene. Expect unexpected visual results.\n");
                             foreach (Camera c in Camera.allCameras)
                             {
                                 // Analogous to Camera.main we are returning the first enabled camera tagged "MainCamera".
@@ -42,7 +41,7 @@ namespace SEE.Utils
                                 {
                                     camera = c;
                                 }
-                                Debug.LogWarningFormat("Camera: {0}\n", c.name);                                
+                                Debug.LogWarning($"Camera: {c.gameObject.GetFullName()}\n");
                             }
                             camera = Camera.main;
                             break;

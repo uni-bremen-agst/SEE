@@ -1,11 +1,6 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/StreamingAssets/DYNExample/empty.csv.meta
-guid: 9205078be43e1d8459c362985fdfb950
+guid: 2d9e200e150f65a4496a11a8be6f714a
 DefaultImporter:
-=======
-guid: 01e11f1e9cb24e64b96be1db27e437d8
-AssemblyDefinitionImporter:
->>>>>>> master:Assets/Lean/Touch/Examples/Scripts/LeanTouchExamples.asmdef.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

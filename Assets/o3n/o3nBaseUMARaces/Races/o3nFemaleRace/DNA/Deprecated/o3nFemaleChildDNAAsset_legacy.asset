@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28add7ad4625f8748a81d045544985b2, type: 3}
+  m_Name: o3nFemaleChildDNAAsset_legacy
+  m_EditorClassIdentifier: 
+  dnaTypeHash: 2108612994
+  lastKnownAssetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/Deprecated/o3nFemaleChildDNAAsset_legacy.asset
+  lastKnownDuplicateAssetPath: Assets/o3n/o3nBaseUMARaces/Races/o3nFemaleRace/DNA/Deprecated/o3nFemaleChildDNAAsset_legacy
+    1.asset
+  lastKnownInstanceID: 5682
+  Names:
+  - child

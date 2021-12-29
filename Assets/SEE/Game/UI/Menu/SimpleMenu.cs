@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
@@ -27,7 +28,7 @@ namespace SEE.Game.UI.Menu
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
     public partial class SimpleMenu<T>: PlatformDependentComponent where T : MenuEntry
-    {        
+    {
         /// <summary>
         /// Event type which is used for the <see cref="OnMenuEntrySelected"/> event.
         /// Has the <see cref="MenuEntry"/> type <typeparamref name="T"/> as a parameter.
@@ -70,13 +71,13 @@ namespace SEE.Game.UI.Menu
         /// Its parameter will be the chosen <see cref="MenuEntry"/> with type <typeparamref name="T"/>.
         /// </summary>
         public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new MenuEntrySelectedEvent();
-        
+
         /// <summary>
         /// A list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
         protected readonly List<T> entries = new List<T>();
-        
+
         /// <summary>
         /// A read-only wrapper around the list of menu entries for this menu.
         /// </summary>
@@ -91,6 +92,24 @@ namespace SEE.Game.UI.Menu
         {
             MenuShown = show;
             Listen(show);
+        }
+
+        /// <summary>
+        /// Whether this menu can be closed by the built-in mechanisms.
+        /// </summary>
+        protected bool closingIsEnabled = true;
+
+        /// <summary>
+        /// Enables/disables all built-in mechanisms to close this dialog.
+        /// If the built-in mechanisms are disabled, a client needs to use
+        /// other means, e.g., Destroy this game object.
+        ///
+        /// Note: closing is enabled by default.
+        /// </summary>
+        /// <param name="enable">whether built-in mechanisms for closing should be enabled</param>
+        public void EnableClosing(bool enable)
+        {
+            closingIsEnabled = enable;
         }
 
         /// <summary>
@@ -128,21 +147,23 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// Returns the titles of all <see cref="entries"/> plus
-        /// <see cref="CloseMenuCommand"/> appended at the end.
+        /// <see cref="CloseMenuCommand"/> appended at the end
+        /// if <see cref="closingIsEnabled"/>.
         /// </summary>
-        /// <returns>titles of all <see cref="entries"/> appended by 
+        /// <returns>titles of all <see cref="entries"/> appended by
         /// <see cref="CloseMenuCommand"/></returns>
         private string[] GetMenuEntryTitles()
         {
-            return entries.Select(x => x.Title).Append(CloseMenuCommand).ToArray();
+            IEnumerable<string> result = entries.Select(x => x.Title);
+            return (closingIsEnabled ? result : result.Append(CloseMenuCommand)).ToArray();
         }
 
         /// <summary>
         /// Callback registered in <see cref="Listen(bool)"/> to be called when
         /// one of the menu entry titles was recognized (spoken by the user).
-        /// Triggers the corresponding action of the selected entry if the 
-        /// corresponding entry title was recognized and then closes the menu 
-        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no 
+        /// Triggers the corresponding action of the selected entry if the
+        /// corresponding entry title was recognized and then closes the menu
+        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
@@ -214,7 +235,7 @@ namespace SEE.Game.UI.Menu
                 RemoveDesktopButton(entry);
             }
         }
-        
+
         /// <summary>
         /// Removes the given <paramref name="menuEntries"/> from the menu.
         /// If the <paramref name="menuEntries"/> are not present in the menu, nothing will happen.
@@ -259,7 +280,7 @@ namespace SEE.Game.UI.Menu
             // Load default icon (can't be done during instantiation, only in Awake() or Start())
             Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
-        
+
         protected override void StartTouchGamepad() => StartDesktop();
 
         protected override void StartVR() => StartDesktop();
