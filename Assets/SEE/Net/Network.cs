@@ -277,31 +277,34 @@ namespace SEE.Net
             switch (VoiceChat)
             {
                 case VoiceChatSystems.Vivox:
+                    EnableDissonance(false);
                     VivoxInitialize();
                     break;
                 case VoiceChatSystems.Dissonance:
-                    DissonanceInitialize();
+                    EnableDissonance(true);
                     break;
                 case VoiceChatSystems.None:
-                    // nothing to be done
+                    EnableDissonance(false);
                     break;
                 default:
+                    EnableDissonance(false);
                     throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
             }
         }
 
         /// <summary>
-        /// Initalizes Dissonance as the voice chat system.
+        /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
-        private void DissonanceInitialize()
+        /// <param name="enable">whether to enable Dissonance</param>
+        private void EnableDissonance(bool enable)
         {
-            // The DissonanceComms is initially inactive and the local player is muted and deafened.
+            // The DissonanceComms is initially active and the local player is not muted and not deafened.
             DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
             if (dissonanceComms != null)
             {
-                dissonanceComms.IsMuted = false;
-                dissonanceComms.IsDeafened = false;
-                dissonanceComms.enabled = true;
+                dissonanceComms.IsMuted = !enable;
+                dissonanceComms.IsDeafened = !enable;
+                dissonanceComms.enabled = enable;
             }
             else
             {
