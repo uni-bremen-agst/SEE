@@ -44,7 +44,7 @@ namespace SEE.Net
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
-        public int ServerActionPort = 55555;
+        public int ServerActionPort = 12345;
 
         /// <summary>
         /// The port where the server listens to NetCode and Dissonance traffic.
