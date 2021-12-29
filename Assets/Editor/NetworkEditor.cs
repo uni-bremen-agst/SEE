@@ -75,6 +75,8 @@ namespace SEEEditor
             EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+            Buttons();
         }
 
         /// <summary>
@@ -97,6 +99,24 @@ namespace SEEEditor
                 Debug.LogError($"Property {propertyName} does not exist for {typeof(SEE.Net.Network)}.\n");
             }
             return property;
+        }
+
+        /// <summary>
+        /// Creates the buttons for loading and saving a network configuration.
+        /// </summary>
+        protected virtual void Buttons()
+        {
+            SEE.Net.Network seeCity = target as SEE.Net.Network;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Load"))
+            {
+                seeCity.Load();
+            }
+            if (GUILayout.Button("Save"))
+            {
+                seeCity.Save();
+            }
+            EditorGUILayout.EndHorizontal();
         }
     }
 }
