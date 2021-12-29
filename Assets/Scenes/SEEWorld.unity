@@ -15661,6 +15661,10 @@ MonoBehaviour:
   - {fileID: 223132874815050282, guid: 4ae18712e3e90e54783307947de7ff71, type: 3}
   - {fileID: 2148359632239371273, guid: d29c2b8a1bf586a49aa969b83210166c, type: 3}
   - {fileID: 3413141361298906494, guid: c78211f36da6bc74093166055fbe27a5, type: 3}
+  - {fileID: 1119361092242382542, guid: e18558cd1cec9cf44a76097b7e541483, type: 3}
+  - {fileID: 7704617729666261720, guid: cc8fbe2ffa34728439843fa0953c8d1c, type: 3}
+  - {fileID: 3430662996609522360, guid: c062a229b1fe2eb46957d8e26b52c47d, type: 3}
+  - {fileID: 6417270086092738961, guid: e1e6a1e44a01a0d4bb0bb38d1c7df536, type: 3}
   InitialPosition: {x: 0, y: 0, z: -1}
   InitialRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &1989357559
