@@ -513,14 +513,29 @@ namespace SEE.Net
 
         /// <summary>
         /// Loads the <see cref="GameScene"/>. Will be called when the server was started.
+        /// Registers <see cref="OnSceneLoaded(Scene, LoadSceneMode)"/> to be called when
+        /// the scene is fully loaded.
         /// </summary>
         private void OnServerStarted()
         {
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        /// <summary>
+        /// Starts the voice-chat system selected. Unregisters itself from
+        /// <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        /// <param name="mode">the mode in which the scene was loaded</param>
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
             // Now we have loaded the scene that is supposed to contain settings for the voice chat
             // system. We can now turn on the voice chat system.
-            Debug.Log($"Loaded scene {GameScene}.\n");
+            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
             StartVoiceChat();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         /// <summary>
