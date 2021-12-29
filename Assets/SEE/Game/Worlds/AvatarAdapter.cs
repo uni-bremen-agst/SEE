@@ -11,7 +11,12 @@ using UnityEngine;
 
 namespace SEE.Game.Worlds
 {
-    class AvatarAdapter : NetworkBehaviour
+    /// <summary>
+    /// Makes the necessary adaptations of an avatar to work in SEE using SALSA's lip sync
+    /// and Dissonance.
+    /// This behaviour is intended to be added to a game object representing a player's avatar.
+    /// </summary>
+    internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
         /// If this code is execute for the local player, the necessary player type
