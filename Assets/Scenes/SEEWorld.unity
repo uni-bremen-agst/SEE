@@ -2543,7 +2543,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1517357890693092, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1643126648504472, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
@@ -16370,15 +16370,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 824823894133727455, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
       propertyPath: _isMuted
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 824823894133727455, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 824823894133727455, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
-      propertyPath: _isDeafened
+      propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 824823894133727455, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
+      propertyPath: _isDeafened
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c50758a6d3b8114a8ce30a2fd9e4380, type: 3}
