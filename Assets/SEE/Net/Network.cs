@@ -54,24 +54,45 @@ namespace SEE.Net
         {
             set
             {
-                if (value < 0 ||value > MaxServerPort)
+                if (value < 0 || value > MaxServerPort)
                 {
                     throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
                 }
-                Unity.Netcode.Transports.UNET.UNetTransport netTransport
-                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
-                    as Unity.Netcode.Transports.UNET.UNetTransport;
+                UNetTransport netTransport = GetNetworkTransport();
                 netTransport.ConnectPort = value;
                 netTransport.ServerListenPort = value;
 
             }
             get
             {
-                Unity.Netcode.Transports.UNET.UNetTransport netTransport
-                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
-                      as Unity.Netcode.Transports.UNET.UNetTransport;
+                UNetTransport netTransport = GetNetworkTransport();
                 return netTransport.ServerListenPort;
             }
+        }
+
+        /// <summary>
+        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
+        /// This information is retrieved differently depending upon whether we are running
+        /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
+        /// available only during run-time.
+        /// </summary>
+        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        private UNetTransport GetNetworkTransport()
+        {
+#if UNITY_EDITOR
+            if (gameObject.TryGetComponentOrLog(out NetworkManager networkManager))
+            {
+                return networkManager.NetworkConfig.NetworkTransport as UNetTransport;
+            }
+            else
+            {
+                return null;
+            }
+
+#else
+            // NetworkManager.Singleton is available only during run-time.
+            return NetworkManager.Singleton.NetworkConfig.NetworkTransport as UNetTransport;
+#endif
         }
 
         /// <summary>
@@ -85,20 +106,22 @@ namespace SEE.Net
                 {
                     throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
                 }
-                Unity.Netcode.Transports.UNET.UNetTransport netTransport
-                    = NetworkManager.Singleton.NetworkConfig.NetworkTransport
-                    as Unity.Netcode.Transports.UNET.UNetTransport;
+                UNetTransport netTransport = GetNetworkTransport();
                 netTransport.ConnectAddress = value;
             }
 
             get
             {
-                Unity.Netcode.Transports.UNET.UNetTransport netTransport
-                   = NetworkManager.Singleton.NetworkConfig.NetworkTransport
-                     as Unity.Netcode.Transports.UNET.UNetTransport;
+                UNetTransport netTransport = GetNetworkTransport();
                 return netTransport.ConnectAddress;
             }
         }
+
+        /// <summary>
+        /// The name of the scene to be loaded when the game starts.
+        /// </summary>
+        [Tooltip("The name of the game scene.")]
+        public string GameScene = "SEEWorld";
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
@@ -237,7 +260,6 @@ namespace SEE.Net
                     Server.Initialize();
                 }
                 Client.Initialize();
-                StartVoiceChat();
             }
             catch (Exception e)
             {
@@ -273,7 +295,7 @@ namespace SEE.Net
         /// </summary>
         private void DissonanceInitialize()
         {
-            // The DissonanceComms is initialized inactive and the local player is muted and deafened.
+            // The DissonanceComms is initially inactive and the local player is muted and deafened.
             DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
             if (dissonanceComms != null)
             {
@@ -490,17 +512,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The name of the scene to be loaded when the game starts.
-        /// </summary>
-        [Tooltip("The name of the game scene.")]
-        public string GameScene = "SEEWorld";
-
-        /// <summary>
         /// Loads the <see cref="GameScene"/>. Will be called when the server was started.
         /// </summary>
         private void OnServerStarted()
         {
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            // Now we have loaded the scene that is supposed to contain settings for the voice chat
+            // system. We can now turn on the voice chat system.
+            Debug.Log($"Loaded scene {GameScene}.\n");
+            StartVoiceChat();
         }
 
         /// <summary>
@@ -691,7 +711,7 @@ namespace SEE.Net
             }
         }
 
-        #region Vivox
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -822,7 +842,7 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        #endregion
+#endregion
     }
 
 }
