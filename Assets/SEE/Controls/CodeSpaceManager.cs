@@ -3,6 +3,7 @@ using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.StateIndicator;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -139,6 +140,10 @@ namespace SEE.Controls
                 Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "code windows across the network! No new indicator will be created.\n");
+                foreach (CodeSpaceManager manager in FindObjectsOfType<CodeSpaceManager>())
+                {
+                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.GetFullName()}.\n");
+                }
             }
             else
             {
