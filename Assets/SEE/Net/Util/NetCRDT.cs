@@ -11,7 +11,7 @@ namespace SEE.Net
     /// <summary>
     /// This class connects the <see cref="CRDT"/> to all clients in the network.
     /// </summary>
-    public class NetCRDT : AbstractAction
+    public class NetCRDT : AbstractNetAction
     {
         /// <summary>
         /// The state that determines which action should be performed.
