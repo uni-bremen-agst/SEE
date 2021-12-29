@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
 
 namespace Lean.Common
 {
@@ -60,16 +60,6 @@ namespace Lean.Common
 			serializedObject.ApplyModifiedProperties();
 
 			ClearData();
-		}
-
-		public virtual void OnSceneGUI()
-		{
-			OnScene();
-
-			if (GUI.changed == true)
-			{
-				EditorUtility.SetDirty(target);
-			}
 		}
 
 		protected void Each<T>(T[] tgts, System.Action<T> update, bool dirty = false)
@@ -456,10 +446,6 @@ namespace Lean.Common
 		}
 
 		protected virtual void OnInspector()
-		{
-		}
-
-		protected virtual void OnScene()
 		{
 		}
 	}

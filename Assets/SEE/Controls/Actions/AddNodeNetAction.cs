@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions
     /// This class is responsible for adding a node via network from one client to all others and
     /// to the server.
     /// </summary>
-    public class AddNodeNetAction : AbstractAction
+    public class AddNodeNetAction : AbstractNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.

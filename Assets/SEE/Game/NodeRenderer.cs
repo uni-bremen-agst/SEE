@@ -594,7 +594,6 @@ namespace SEE.Game
 
             // Add decorators specific to the shape of inner nodes (circle decorators for circles
             // and donut decorators for donuts).
-
             switch (innerNodeKinds)
             {
                 case InnerNodeKinds.Empty:

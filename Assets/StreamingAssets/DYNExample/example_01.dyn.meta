@@ -1,11 +1,6 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/StreamingAssets/DYNExample/example_01.dyn.meta
-guid: 071a6012f2d98b048bbf951f6a66d291
+guid: 384087be150c4c34ab41f7bba9ebdbe5
 DefaultImporter:
-=======
-guid: 0e61dc046618c394d8d69f70fda62ce1
-TextScriptImporter:
->>>>>>> master:Assets/Lean/Third-Party Notices.txt.meta
   externalObjects: {}
   userData: 
   assetBundleName: 

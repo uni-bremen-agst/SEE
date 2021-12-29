@@ -17,7 +17,16 @@ namespace SEE.Controls
         /// For instance, pressing W would enter the text "W" and move the player
         /// forward.
         /// </summary>
-        public static bool KeyboardShortcutsEnabled = true;
+        private static bool keyboardShortcutsEnabled = true;
+
+        public static bool KeyboardShortcutsEnabled
+        {
+            get => keyboardShortcutsEnabled;
+            set
+            {
+                keyboardShortcutsEnabled = value;
+            }
+        }
 
         //-----------------------------------------------------
         // General key bindings
@@ -384,7 +393,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to drag the city in it's entirety or parts of it.
+        /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()

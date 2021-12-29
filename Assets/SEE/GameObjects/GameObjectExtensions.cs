@@ -338,7 +338,6 @@ namespace SEE.GO
                                + $"on game object '{gameObject.name}'.\n");
                 return false;
             }
-
             return true;
         }
 
@@ -605,6 +604,21 @@ namespace SEE.GO
             }
         }
 
+        /// <summary>
+        /// Returns the full name of the game object, that is, its name and the
+        /// names of its ancestors in the game-object hierarchy separated by /.
+        /// </summary>
+        /// <param name="gameObject">game object for which to retrieve the full name</param>
+        public static string GetFullName(this GameObject gameObject)
+        {
+            string result = gameObject.name;
+            while (gameObject.transform.parent != null)
+            {
+                gameObject = gameObject.transform.parent.gameObject;
+                result = gameObject.name + "/" + result;
+            }
+            return result;
+        }
 
         /// <summary>
         /// Updates the portal of this game object by setting the boundaries of itself

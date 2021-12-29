@@ -10,7 +10,7 @@ namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
     /// A UI dialog consisting of several groups, each representing a list of configurable properties.
-    /// 
+    ///
     /// This file contains the implementation for the desktop environment.
     /// </summary>
     public partial class PropertyDialog
@@ -29,7 +29,7 @@ namespace SEE.Game.UI.PropertyDialog
         private GameObject dialog;
         /// <summary>
         /// The component <see cref="ModalWindowManager"/> attached to the instantiated <see cref="dialog"/>.
-        /// This component allows us to set the icon, title, description of the dialog and to retrieve 
+        /// This component allows us to set the icon, title, description of the dialog and to retrieve
         /// the OK and Cancel buttons we need to react to.
         /// </summary>
         private ModalWindowManager modal;
@@ -39,7 +39,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// and makes it a child of the <see cref="Canvas"/>.
         /// In addition, a <see cref="ModalWindowManager"/> is attached to it (<see cref="modal"/>)
         /// with the attributes <see cref="Title"/> and <see cref="Description"/> and the <see cref="Icon"/>.
-        /// Every <see cref="groups"/> element is created and added as child to the dialog's ascendant 
+        /// Every <see cref="groups"/> element is created and added as child to the dialog's ascendant
         /// named <see cref="ContentChildName"/>.
         /// </summary>
         protected override void StartDesktop()
@@ -66,7 +66,7 @@ namespace SEE.Game.UI.PropertyDialog
 
                 Transform contentChild = dialog.transform.Find(ContentChildName);
                 foreach (PropertyGroup group in groups)
-                {                    
+                {
                     group.SetParent(contentChild.gameObject);
                 }
 
@@ -105,6 +105,7 @@ namespace SEE.Game.UI.PropertyDialog
                     // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
                     // so that this dialog is rendered over any other potentially existing item on the UI canvas.
                     modal.transform.SetAsLastSibling();
+                    GetReady();
                     modal.OpenWindow();
                 }
                 else
@@ -112,7 +113,18 @@ namespace SEE.Game.UI.PropertyDialog
                     modal.CloseWindow();
                 }
                 dialogIsShown = !dialogIsShown;
-            }            
+            }
+        }
+
+        /// <summary>
+        /// Calls <see cref="PropertyGroup.GetReady()"/> for each group in <see cref="groups"/>.
+        /// </summary>
+        private void GetReady()
+        {
+            foreach (PropertyGroup group in groups)
+            {
+                group.GetReady();
+            }
         }
     }
 }
