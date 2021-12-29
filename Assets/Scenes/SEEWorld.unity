@@ -4990,7 +4990,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -7941,8 +7941,7 @@ MonoBehaviour:
   umaData: {fileID: 0}
   defaultRendererAsset: {fileID: 0}
   umaRecipe: {fileID: 11400000, guid: 30e5e8eaf5d2b434cbe238cda80a8fac, type: 2}
-  umaAdditionalRecipes:
-  - {fileID: 11400000, guid: 1f292487d7383514f97c491cadfb0442, type: 2}
+  umaAdditionalRecipes: []
   umaGenerator: {fileID: 1623245156}
   animationController: {fileID: 9100000, guid: 57b1d6954cb3ae94191fe4d27761024d, type: 2}
   CharacterCreated:
