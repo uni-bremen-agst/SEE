@@ -78,12 +78,18 @@ namespace SEE.Controls
             /// <param name="length">The length of the code range.</param>
             public void HighlightNodeReferences(string path, string name, int line, int column, int length)
             {
+                HashSet<GameObject> objects = new HashSet<GameObject>();
                 if (ideIntegration.cachedObjects.TryGetValue(path, out IDictionary<string, ICollection<GameObject>> dictionary) && dictionary
                     .TryGetValue(ideIntegration.GenerateKey(name, line, column, length), out ICollection<GameObject> collection))
                 {
-                    SetInteractableObjects(SceneQueries.Find(new HashSet<string>(collection.
-                        Select(x => x.ID()))));
+                    UniTask.Run(async () =>
+                    {
+                        await UniTask.SwitchToMainThread();
+                        SetInteractableObjects(SceneQueries.Find(new HashSet<string>(
+                            collection.SelectMany(x => x.GetNode().Incomings).Select(x => x.ID))));
+                    });
                 }
+                SetInteractableObjects(objects);
             }
 
             /// <summary>
