@@ -55,8 +55,6 @@ namespace Crosstales.RTVoice
       public static readonly System.Collections.Generic.List<string> FilesToDelete = new System.Collections.Generic.List<string>();
       */
 
-      private readonly System.Collections.Generic.Dictionary<string, AudioSource> removeSources = new System.Collections.Generic.Dictionary<string, AudioSource>();
-
       private float cleanUpTimer;
 
       private Provider.IVoiceProvider voiceProvider;
@@ -606,36 +604,25 @@ namespace Crosstales.RTVoice
 
             if (genericSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
-               {
-                  removeSources.Add(source.Key, source.Value);
-               }
+               //Debug.Log(genericSources.Count);
 
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in removeSources)
+               System.Collections.Generic.KeyValuePair<string, AudioSource>[] sources = genericSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()).ToArray();
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in sources)
                {
                   genericSources.Remove(source.Key);
                   Destroy(source.Value);
                }
-
-               removeSources.Clear();
             }
 
             if (providedSources.Count > 0)
             {
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()))
+               System.Collections.Generic.KeyValuePair<string, AudioSource>[] sources = providedSources.Where(source => source.Value != null && source.Value.clip != null && !source.Value.CTHasActiveClip()).ToArray();
+
+               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in sources)
                {
                   //source.Value.clip = null; //remove clip
-
-                  removeSources.Add(source.Key, source.Value);
-               }
-
-               foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in removeSources)
-               {
-                  //genericSources.Remove(source.Key);
                   providedSources.Remove(source.Key);
                }
-
-               removeSources.Clear();
             }
          }
       }
@@ -1190,6 +1177,9 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the speaker.</returns>
       public string SpeakNative(string text, Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, forceSSML);
 
          SpeakNativeWithUID(wrapper);
@@ -1201,6 +1191,9 @@ namespace Crosstales.RTVoice
       /// <param name="wrapper">Speak wrapper.</param>
       public void SpeakNativeWithUID(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakNativeWithUID called: {wrapper}", this);
          if (wrapper != null)
@@ -1259,6 +1252,9 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the speaker.</returns>
       public string SpeakNative(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          if (wrapper != null)
          {
             SpeakNativeWithUID(wrapper);
@@ -1284,6 +1280,9 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the speaker.</returns>
       public string Speak(string text, AudioSource source = null, Model.Voice voice = null, bool speakImmediately = true, float rate = 1f, float pitch = 1f, float volume = 1f, string outputFile = "", bool forceSSML = true)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, source, speakImmediately, outputFile, forceSSML);
 
          SpeakWithUID(wrapper);
@@ -1295,6 +1294,9 @@ namespace Crosstales.RTVoice
       /// <param name="wrapper">Speak wrapper.</param>
       public void SpeakWithUID(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakWithUID called: {wrapper}", this);
 
@@ -1379,6 +1381,9 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the speaker.</returns>
       public string Speak(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          if (wrapper != null)
          {
             SpeakWithUID(wrapper);
@@ -1395,6 +1400,9 @@ namespace Crosstales.RTVoice
       /// <param name="wrapper">Speak wrapper.</param>
       public void SpeakMarkedWordsWithUID(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakMarkedWordsWithUID called: {wrapper}", this);
 
@@ -1463,6 +1471,9 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the generator.</returns>
       public string Generate(Model.Wrapper wrapper)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          if (wrapper != null)
          {
             if (Util.Helper.isEditorMode)
@@ -1517,55 +1528,21 @@ namespace Crosstales.RTVoice
       /// <returns>UID of the generator.</returns>
       public string Generate(string text, string outputFile, Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
       {
+         if (this != null && !isActiveAndEnabled)
+            return "disabled";
+
          Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, null, false, outputFile, forceSSML);
 
          return Generate(wrapper);
-      }
-
-      /// <summary>Silence all active TTS-voices.</summary>
-      private void silence()
-      {
-         if (Util.Constants.DEV_DEBUG)
-            Debug.LogWarning("Silence called", this);
-
-         if (voiceProvider != null)
-         {
-            voiceProvider.Silence();
-
-            /*
-            if (instance != null && voiceProvider.hasCoRoutines)
-                StopAllCoroutines();
-            */
-
-            foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null))
-            {
-               source.Value.Stop();
-               Destroy(source.Value, 0.1f);
-            }
-
-            genericSources.Clear();
-
-            foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null))
-            {
-               source.Value.Stop();
-            }
-         }
-         else
-         {
-            providedSources.Clear();
-
-            if (!Common.Util.BaseHelper.isEditorMode)
-               logVPIsNull();
-         }
-
-         SpeechCount = 0;
-         BusyCount = 0;
       }
 
       /// <summary>Silence all active TTS-voices (optional with a UID).</summary>
       /// <param name="uid">UID of the speaker (optional)</param>
       public void Silence(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Common.Util.BaseConstants.DEV_DEBUG)
             Debug.LogWarning($"Silence called: {uid}", this);
 
@@ -1580,18 +1557,12 @@ namespace Crosstales.RTVoice
                if (genericSources.ContainsKey(uid))
                {
                   if (genericSources.TryGetValue(uid, out AudioSource source))
-                  {
                      source.Stop();
-                     genericSources.Remove(uid);
-                  }
                }
                else if (providedSources.ContainsKey(uid))
                {
                   if (providedSources.TryGetValue(uid, out AudioSource source))
-                  {
                      source.Stop();
-                     providedSources.Remove(uid);
-                  }
                }
                else
                {
@@ -1611,6 +1582,9 @@ namespace Crosstales.RTVoice
       /// <param name="uid">UID of the speaker (optional)</param>
       public void Pause(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"Pause called: {uid}", this);
 
@@ -1680,6 +1654,9 @@ namespace Crosstales.RTVoice
       /// <param name="uid">UID of the speaker (optional)</param>
       public void UnPause(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"UnPause called: {uid}", this);
 
@@ -1755,6 +1732,9 @@ namespace Crosstales.RTVoice
       /// <param name="uid">UID of the speaker (optional)</param>
       public void PauseOrUnPause(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (isPaused)
          {
             UnPause(uid);
@@ -1769,6 +1749,9 @@ namespace Crosstales.RTVoice
       /// <param name="uid">UID of the speaker (optional)</param>
       public void Mute(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"Mute called: {uid}", this);
 
@@ -1816,6 +1799,9 @@ namespace Crosstales.RTVoice
       /// <param name="uid">UID of the speaker (optional)</param>
       public void UnMute(string uid = null)
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          if (Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"UnMute called: {uid}", this);
 
@@ -1876,6 +1862,9 @@ namespace Crosstales.RTVoice
       /// <summary>Reloads the provider.</summary>
       public void ReloadProvider()
       {
+         if (this != null && !isActiveAndEnabled)
+            return;
+
          Silence();
          initProvider();
       }
@@ -1911,6 +1900,45 @@ namespace Crosstales.RTVoice
 
 
       #region Private methods
+
+      private void silence()
+      {
+         if (Util.Constants.DEV_DEBUG)
+            Debug.LogWarning("Silence called", this);
+
+         if (voiceProvider != null)
+         {
+            voiceProvider.Silence();
+
+            /*
+            if (instance != null && voiceProvider.hasCoRoutines)
+                StopAllCoroutines();
+            */
+
+            foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in genericSources.Where(source => source.Value != null))
+            {
+               source.Value.Stop();
+               Destroy(source.Value, 0.1f);
+            }
+
+            genericSources.Clear();
+
+            foreach (System.Collections.Generic.KeyValuePair<string, AudioSource> source in providedSources.Where(source => source.Value != null))
+            {
+               source.Value.Stop();
+            }
+         }
+         else
+         {
+            providedSources.Clear();
+
+            if (!Common.Util.BaseHelper.isEditorMode)
+               logVPIsNull();
+         }
+
+         SpeechCount = 0;
+         BusyCount = 0;
+      }
 
       private void deleteAudioFiles(string audioDataPath)
       {

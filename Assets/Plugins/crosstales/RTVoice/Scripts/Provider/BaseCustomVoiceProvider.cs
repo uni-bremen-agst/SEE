@@ -69,9 +69,37 @@ namespace Crosstales.RTVoice.Provider
 
       #region MonoBehaviour methods
 
-      private void Start()
+      protected virtual void Start()
       {
-         //do nothing, just allow to enable/disable the script
+#if CT_OC
+         if (isOnlineService)
+            OnlineCheck.OnlineCheck.Instance.OnOnlineStatusChange += onOnlineStatusChange;
+#endif
+         if (isPlatformSupported && Speaker.Instance.CustomProvider == this)
+         {
+            if (isOnlineService && !Util.Helper.isInternetAvailable)
+            {
+               Speaker.Instance.CustomMode = false;
+#if CT_OC
+               Debug.LogWarning($"'{GetType().Name}' needs an Internet connection. Falling back to the default provider until a connection becomes available.", this);
+#else
+               Debug.LogWarning($"'{GetType().Name}' needs an Internet connection. Falling back to the default provider. If you want to automatically re-enable this provider as soon as a connection is available again, please consider installing 'Online Check': {Util.Constants.ASSET_OC}", this);
+#endif
+            }
+         }
+         else
+         {
+            Speaker.Instance.CustomMode = false;
+            Debug.LogWarning($"'{GetType().Name}' is not supported under the current build platform or Unity Editor. Falling back to the default provider.", this);
+         }
+      }
+
+      protected virtual void OnDestroy()
+      {
+#if CT_OC
+         if (isOnlineService && OnlineCheck.OnlineCheck.Instance != null)
+            OnlineCheck.OnlineCheck.Instance.OnOnlineStatusChange -= onOnlineStatusChange;
+#endif
       }
 
       #endregion
@@ -198,13 +226,14 @@ namespace Crosstales.RTVoice.Provider
       protected virtual string getOutputFile(string uid, bool isPersistentData = false /*, bool createFile = false*/)
       {
          string filename = Util.Constants.AUDIOFILE_PREFIX + uid + AudioFileExtension;
-         string outputFile;
 
+         string outputFile;
          if (isPersistentData)
          {
             //outputFile = Util.Helper.ValidatePath(Application.persistentDataPath) + filename;
             outputFile = Util.Helper.ValidatePath(Application.temporaryCachePath) + filename;
          }
+
          else
          {
             outputFile = Util.Config.AUDIOFILE_PATH + filename;
@@ -527,6 +556,25 @@ namespace Crosstales.RTVoice.Provider
 
       #region Event-trigger methods
 
+#if CT_OC
+      private void onOnlineStatusChange(bool isconnected)
+      {
+         if (isPlatformSupported && isOnlineService && Speaker.Instance.CustomProvider == this)
+         {
+            Speaker.Instance.CustomMode = isconnected;
+
+            if (isconnected)
+            {
+               if (Util.Config.DEBUG)
+                  Debug.Log($"'{GetType().Name}' has now again an Internet connection.", this);
+            }
+            else
+            {
+               Debug.LogWarning($"'{GetType().Name}' needs an Internet connection. Falling back to the default provider until a connection becomes available.", this);
+            }
+         }
+      }
+#endif
       protected void onVoicesReady()
       {
          if (Util.Config.DEBUG)

@@ -31,7 +31,7 @@
             if (NumberOfNonCachedSpeeches > 0)
                return (float)NumberOfCachedSpeeches / NumberOfNonCachedSpeeches;
 
-            return 0;
+            return NumberOfCachedSpeeches;
          }
       }
 

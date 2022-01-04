@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: NoseSneer
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: CheekBone_L
+    hash: 1863153293
+    position: {x: -0.00086036697, y: 0, z: 0}
+    rotation: {x: -0.00000006877226, y: -0.00000012598206, z: 0.00000011457015, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: CheekBone_R
+    hash: -1795011602
+    position: {x: -0.00086036697, y: 0, z: 0}
+    rotation: {x: 0.00000021978889, y: -0.000000109658416, z: -0.000000041029555,
+      w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: NoseBridge
+    hash: -1000059093
+    position: {x: 0.0017207265, y: 0, z: 0}
+    rotation: {x: -0.00000005917633, y: 0.0000010220075, z: 0.000001276628, w: 1}
+    scale: {x: 0.6392059, y: 1, z: 0.9997955}
+  - bone: NoseMiddle
+    hash: 865884795
+    position: {x: 0.0025701597, y: 0, z: 0.0013611689}
+    rotation: {x: 0.0000000014764141, y: -0.000000086735014, z: 0.000000003988408,
+      w: 1}
+    scale: {x: 0.8830555, y: 1, z: 1}
+  - bone: Nosetril_L
+    hash: 1299832500
+    position: {x: -0.0005314201, y: 0, z: -0.0039645433}
+    rotation: {x: -0.009404461, y: 0.039444778, z: -0.00016407535, w: 0.9992713}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: Nosetril_R
+    hash: -1216945193
+    position: {x: -0.0005314201, y: 0, z: -0.0039645433}
+    rotation: {x: 0.009404509, y: 0.03944478, z: 0.00016406251, w: 0.9992713}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: NoseTop
+    hash: 463827395
+    position: {x: 0.0017207265, y: 0, z: 0}
+    rotation: {x: 0.00000021001735, y: 0.0000010997344, z: -0.000005644606, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

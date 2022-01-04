@@ -3,6 +3,7 @@ using System.Linq;
 using SEE.Game.UI.CodeWindow;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.StateIndicator;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -26,7 +27,7 @@ namespace SEE.Controls
         /// String representing no player, i.e. no code windows being displayed.
         /// </summary>
         public const string NO_PLAYER = "None";
-        
+
         /// <summary>
         /// The name of the player whose code window is currently displayed.
         /// </summary>
@@ -49,7 +50,7 @@ namespace SEE.Controls
         private SelectionMenu CodeWindowMenu;
 
         /// <summary>
-        /// A <see cref="StateIndicator"/> which displays the IP address of the window we're viewing currently. 
+        /// A <see cref="StateIndicator"/> which displays the IP address of the window we're viewing currently.
         /// </summary>
         private StateIndicator SpaceIndicator;
 
@@ -87,7 +88,7 @@ namespace SEE.Controls
             {
                 CodeSpaces[playerName] = CodeSpace.FromValueObject(valueObject, gameObject);
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
-                                                  DeactivateCurrentSpace, playerName, 
+                                                  DeactivateCurrentSpace, playerName,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
                 CodeSpaces[playerName].CodeSpaceName += $" ({playerName})";
                 CodeSpaces[playerName].enabled = false;
@@ -96,7 +97,7 @@ namespace SEE.Controls
             else
             {
                 // We will try to do a partial update, otherwise we'd have to re-read each file on every update
-                
+
                 // Check for new entries
                 List<CodeWindow> closedWindows = new List<CodeWindow>(CodeSpaces[playerName].CodeWindows);
                 foreach (CodeWindow.CodeWindowValues windowValue in valueObject.CodeWindows)
@@ -113,7 +114,7 @@ namespace SEE.Controls
                     {
                         // Visible line may have changed
                         CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title).VisibleLine = windowValue.VisibleLine;
-                        
+
                         // Window is still open, so it's not closed
                         closedWindows.RemoveAll(x => x.Title == windowValue.Title);
                     }
@@ -121,7 +122,7 @@ namespace SEE.Controls
 
                 // Close windows which are no longer open
                 closedWindows.ForEach(CodeSpaces[playerName].CloseCodeWindow);
-                
+
                 // Set active window if it changed
                 if (CodeSpaces[playerName].ActiveCodeWindow.Title != valueObject.ActiveCodeWindow.Title)
                 {
@@ -134,9 +135,13 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<CodeSpaceManager>().Length > 1)
             {
-                Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
+                Debug.LogError($"Warning: More than one {typeof(CodeSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "code windows across the network! No new indicator will be created.\n");
+                foreach (CodeSpaceManager manager in FindObjectsOfType<CodeSpaceManager>())
+                {
+                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.GetFullName()}.\n");
+                }
             }
             else
             {
@@ -148,7 +153,7 @@ namespace SEE.Controls
                 SpaceIndicator.Pivot = Vector2.zero;
                 ManagerInstance = this;
             }
-            
+
             // Create local code space and associate it with current player
             if (!TryGetComponent(out CodeSpace space))
             {
@@ -156,9 +161,9 @@ namespace SEE.Controls
             }
             CodeSpaces[LOCAL_PLAYER] = space;
             space.OnActiveCodeWindowChanged.AddListener(OnActiveCodeWindowChanged.Invoke);
-            
+
             ManagerInstance.SpaceIndicator.ChangeState(LOCAL_PLAYER, Color.black);
-            
+
             SetUpWindowSelectionMenu();
         }
 
@@ -178,17 +183,17 @@ namespace SEE.Controls
         {
             //TODO: Icons
             CodeWindowMenu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER), 
+            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER),
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER, 
+            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
                                                             "This option hides all code windows.", Color.grey);
             CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.AddEntry(localEntry);
             foreach (KeyValuePair<string, CodeSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
                 CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
-                                                  DeactivateCurrentSpace, space.Key, 
+                                                  DeactivateCurrentSpace, space.Key,
                                                   $"Code window from player with IP address '{space.Key}'.", Color.white));
             }
             CodeWindowMenu.Title = "Code Window Selection";

@@ -238,6 +238,13 @@ namespace Crosstales.RTVoice.EditorIntegration
 
             EditorHelper.SeparatorUI();
 
+            GUILayout.Label("PlatformProvider");
+
+            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'PlatformProvider'-prefab to the scene.")))
+               EditorHelper.InstantiatePrefab("PlatformProvider", $"{EditorConfig.ASSET_PATH}Extras/PlatformProvider/Resources/Prefabs/");
+
+            EditorHelper.SeparatorUI();
+
             GUILayout.Label("MaryTTS");
 
             if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'MaryTTS'-prefab to the scene.")))
