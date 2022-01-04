@@ -16,7 +16,8 @@ namespace SEE.Net
         /// Every hovered object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> HoveredObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> HoveredObjects
+            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The id of the interactable.
@@ -105,7 +106,8 @@ namespace SEE.Net
         /// Every selected object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> SelectedObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> SelectedObjects
+            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The id of the interactable.
@@ -194,7 +196,8 @@ namespace SEE.Net
         /// Every grabbed object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> GrabbedObjects = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> GrabbedObjects
+            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The id of the interactable.

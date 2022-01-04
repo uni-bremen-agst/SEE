@@ -234,7 +234,8 @@ namespace SEE.Controls.Actions
             }
             else if (SEEInput.Drag()) // start or continue movement
             {
-                if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
+                if (SEEInput.StartDrag() && hoveredObject
+                    && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
                     // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to
@@ -274,7 +275,7 @@ namespace SEE.Controls.Actions
             }
             else if (SEEInput.Reset()) // reset to center of table
             {
-                if (hoveredObject && !moving)
+                if (cityRootNode && !moving)
                 {
                     GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
                     cityRootNode.position = plane.CenterTop;
@@ -284,14 +285,12 @@ namespace SEE.Controls.Actions
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
             }
-            // No canceling, no dragging, no reset.
-            else if (moving) // finalize movement
+            else if (moving)
             {
+                InteractableObject interactableObjectToBeUngrabbed = hit.interactableObject;
+                // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
                 {
-                    hit.interactableObject.SetGrab(false, true);
-                    gizmo.gameObject.SetActive(false);
-
                     GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject);
                     if (parent != null)
                     {
@@ -309,10 +308,14 @@ namespace SEE.Controls.Actions
                         Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                         hit.hoveredObject.position = originalPosition;
                         new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                        // The following assignment will override hit.interactableObject; that is why we
+                        // stored its value in interactableObjectToBeUngrabbed above.
                         hit = new Hit();
                     }
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
+                interactableObjectToBeUngrabbed.SetGrab(false, true);
+                gizmo.gameObject.SetActive(false);
                 moving = false;
             }
 

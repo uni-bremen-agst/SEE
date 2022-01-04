@@ -61,14 +61,13 @@ namespace SEE.Net
         {
             if (!initialized)
             {
-                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c.Equals(Connection)) { Network.SwitchToOfflineMode(); } });
-
-                void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => PacketHandler.Push(packetHeader, connection, data);
+                void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
+                    => PacketHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
 
                 List<IPEndPoint> endPoints = Network.HostServer
                     ? (from connectionListener in Server.ConnectionListeners select connectionListener.LocalListenEndPoint as IPEndPoint).ToList()
-                    : new List<IPEndPoint> { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.RemoteServerPort) };
+                    : new List<IPEndPoint> { new IPEndPoint(IPAddress.Parse(Network.RemoteServerIPAddress), Network.Instance.ServerActionPort) };
 
                 bool success = false;
                 foreach (ConnectionInfo connectionInfo in from endPoint in endPoints select new ConnectionInfo(endPoint))
@@ -80,7 +79,7 @@ namespace SEE.Net
                         Logger.Log($"Connection with server established: {Connection}");
                         break;
                     }
-                    catch (ConnectionSetupException) 
+                    catch (ConnectionSetupException)
                     {
                         Logger.Log($"No server connection could be established using : {connectionInfo}");
                     }
@@ -88,7 +87,6 @@ namespace SEE.Net
                 if (!success)
                 {
                     Logger.Log($"No server connection could be established using. You may want to check your firewall configuration.");
-                    Network.SwitchToOfflineMode();
                     throw new ConnectionSetupException();
                 }
 
@@ -114,6 +112,7 @@ namespace SEE.Net
         {
             if (initialized)
             {
+                Logger.Log($"Client connected via {Connection} is shut down.");
                 initialized = false;
 
                 Connection?.CloseConnection(false);

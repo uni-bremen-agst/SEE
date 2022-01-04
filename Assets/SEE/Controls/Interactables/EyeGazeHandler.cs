@@ -9,7 +9,7 @@ namespace SEE.Controls
 {
     /// <summary>
     /// Receives input events from the <see cref="BaseEyeFocusHandler"/> and passes it on to the
-    /// <see cref="InteractableObject"/> component of its game objects. 
+    /// <see cref="InteractableObject"/> component of its game objects.
     /// </summary>
     public class EyeGazeHandler : BaseEyeFocusHandler
     {
@@ -28,16 +28,16 @@ namespace SEE.Controls
         /// Used to avoid concurrency shenanigans.
         /// </summary>
         private bool shouldDehover = true;
-        
+
         private void Awake()
         {
-            PlayerSettings settings = PlayerSettings.GetPlayerSettings();
-            if (settings.playerInputType != PlayerInputType.HoloLensPlayer || !settings.EyeGazeHover)
+            SceneSettings settings = SceneSettings.Settings();
+            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer || !settings.EyeGazeHover)
             {
                 Destroyer.DestroyComponent(this);
                 return;
             }
-            
+
             // The only way to change the delay until OnEyeFocusDwell triggers is by reflection, which is
             // pretty ugly and error-prone. The only way to really fix this, however, would be to submit
             // a pull request to the MRTK upstream which adds a protected (instead of private) setter for this field.

@@ -5,7 +5,7 @@ namespace SEE.Net
 {
     /// <summary>
     /// Responsible for the synchronization of the start- and end-position of the local ray.
-    /// 
+    ///
     /// This script searches for the local ray game object and copies its start- and end-position
     /// into synchonized transforms. These are synchronized via <see cref="TransformView"/>s. This
     /// script is part of the prefab <b>SEENetViveControllerRay</b>, which can be instantiated by
@@ -39,16 +39,6 @@ namespace SEE.Net
         /// </summary>
         private void Start()
         {
-            ViewContainer viewContainer = GetComponent<ViewContainer>();
-
-            // We don't need this script, if this client did not instantiate the prefab containing
-            // this script.
-            if (viewContainer == null || !viewContainer.IsOwner())
-            {
-                Destroy(this);
-                return;
-            }
-
             Assert.IsNotNull(startTransform);
             Assert.IsNotNull(endTransform);
             GameObject lineRendererGameObject = GameObject.Find(Name);

@@ -5,7 +5,7 @@ namespace SEE.Net
 {
     /// <summary>
     /// Responsible for the synchronization of the start- and end-position of a remote ray.
-    /// 
+    ///
     /// If a remote player instantiates the prefab <b>SEENetViveControllerRay</b> via
     /// <see cref="InstantiatePrefabAction"/>, that remote player synchonizes the start- and end-
     /// position of their local ray into <see cref="startTransform"/> and
@@ -30,16 +30,6 @@ namespace SEE.Net
 
         private void Start()
         {
-            ViewContainer viewContainer = GetComponent<ViewContainer>();
-
-            // We don't need this script, if this client did instantiate the prefab containing this
-            // script.
-            if (viewContainer == null || viewContainer.IsOwner())
-            {
-                Destroy(this);
-                return;
-            }
-
             Assert.IsNotNull(startTransform);
             Assert.IsNotNull(endTransform);
             Assert.IsNotNull(lineRenderer);
