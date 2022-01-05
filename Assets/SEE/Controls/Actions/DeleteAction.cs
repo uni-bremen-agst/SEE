@@ -109,13 +109,6 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
-        /// The subgraph of the underlying graph from which <see cref="deletedGameObjects"/> were
-        /// removed. This information is kept because it is needed to revive the
-        /// <see cref="deletedGameObjects"/> upon an <see cref="Undo"/> request.
-        /// </summary>
-        private GraphElementsMemento deletedSubgraph = null;
-
-        /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -129,7 +122,7 @@ namespace SEE.Controls.Actions
                 hitGraphElement = raycastHit.collider.gameObject;
                 Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
                 InteractableObject.UnselectAll(true);
-                (deletedSubgraph, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
+                (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
                 new DeleteNetAction(hitGraphElement.name).Execute();
                 currentState = ReversibleAction.Progress.Completed;
                 return true; // the selected objects are deleted and this action is done now

@@ -5,7 +5,9 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Utils;
 using UnityEngine;
+using static SEE.Game.Portal.IncludeDescendants;
 
 namespace SEE.GO
 {
@@ -129,7 +131,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns all ancestors of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
-        /// The result will also inlcude inactive game objects, but does not contained <paramref name="gameObject"/> itself.
+        /// The result will also include inactive game objects, but does not contained <paramref name="gameObject"/> itself.
         /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
         /// Precondition: <paramref name="gameObjectIDs"/> is not null.
@@ -170,27 +172,39 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// The color property of materials and used by the shader.
-        /// Ideally, string-based property lookups should be avoided due to being inefficient.
-        /// This can be solved by creating a field for this class such as this.
-        /// This property can then be used instead of "_Color".
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
         ///
-        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has attribute _Color.
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
         /// </summary>
-        /// <param name="gameObject">objects whose color is to be set</param>
+        /// <seealso cref="Material.color"/>
+        /// <param name="gameObject">object whose color is to be set</param>
         /// <param name="color">the new color to be set</param>
         public static void SetColor(this GameObject gameObject, Color color)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                Material material = renderer.sharedMaterial;
-                material.SetColor(ColorProperty, color);
+                renderer.sharedMaterial.color = color;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the color from this <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
+        /// </summary>
+        /// <param name="gameObject">object whose color is to be returned</param>
+        /// <returns>Color of this <paramref name="gameObject"/></returns>
+        /// <exception cref="InvalidOperationException">
+        /// If this <paramref name="gameObject"/> has no renderer attached to it.
+        /// </exception>
+        public static Color GetColor(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return renderer.sharedMaterial.color;
+            }
+
+            throw new InvalidOperationException($"GameObject {gameObject.name} has no renderer component.");
         }
 
         /// <summary>
@@ -198,14 +212,13 @@ namespace SEE.GO
         /// to <paramref name="alpha"/>.
         /// </summary>
         /// <param name="gameObject">game objects whose transparency is to be set</param>
-        /// <param name="alpha">a value in between 0 and 1 for transparence</param>
+        /// <param name="alpha">a value in between 0 and 1 for transparency</param>
         public static void SetTransparency(this GameObject gameObject, float alpha)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
                 Color oldColor = renderer.material.color;
-                Color newColor = new Color(oldColor.r, oldColor.g, oldColor.b, alpha);
-                renderer.material.SetColor(ColorProperty, newColor);
+                renderer.material.color = oldColor.WithAlpha(alpha);
             }
         }
 
@@ -325,7 +338,6 @@ namespace SEE.GO
                                + $"on game object '{gameObject.name}'.\n");
                 return false;
             }
-
             return true;
         }
 
@@ -351,14 +363,15 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it.
+        /// component attached to it that is actually referring to a valid node
+        /// (i.e., its Value is not null).
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
         /// component attached to it</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent(out NodeRef _);
+            return gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null;
         }
 
         /// <summary>
@@ -588,6 +601,52 @@ namespace SEE.GO
             else
             {
                 throw new Exception($"Game object {gameObject.name} is not an edge. It has no target node.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the full name of the game object, that is, its name and the
+        /// names of its ancestors in the game-object hierarchy separated by /.
+        /// </summary>
+        /// <param name="gameObject">game object for which to retrieve the full name</param>
+        public static string GetFullName(this GameObject gameObject)
+        {
+            string result = gameObject.name;
+            while (gameObject.transform.parent != null)
+            {
+                gameObject = gameObject.transform.parent.gameObject;
+                result = gameObject.name + "/" + result;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Updates the portal of this game object by setting the boundaries of itself
+        /// (and its descendants, depending on <paramref name="includeDescendants"/>)
+        /// to the code city they're contained in.
+        /// If they're not contained in a code city and <paramref name="warnOnFailure"/> is true,
+        /// a warning log message will be emitted, otherwise nothing will happen.
+        /// </summary>
+        /// <param name="gameObject">The game object whose portal shall be updated</param>
+        /// <param name="warnOnFailure">
+        /// Whether a warning log message shall be emitted if the <paramref name="gameObject"/>
+        /// is not attached to any code city
+        /// </param>
+        /// <param name="includeDescendants">
+        /// Whether the portal of the descendants of this <paramref name="gameObject"/> shall be updated too
+        /// </param>
+        public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
+                                        Portal.IncludeDescendants includeDescendants = ONLY_SELF)
+        {
+            GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (rootCity != null)
+            {
+                Portal.SetPortal(rootCity, gameObject, includeDescendants);
+            }
+            else if (warnOnFailure)
+            {
+                Debug.LogWarning("Couldn't update portal: No code city has been found"
+                                 + $" attached to game object {gameObject.name}.\n");
             }
         }
     }

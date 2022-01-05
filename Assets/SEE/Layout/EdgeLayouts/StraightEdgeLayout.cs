@@ -1,4 +1,5 @@
 ﻿using SEE.Layout.Utils;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -64,8 +65,36 @@ namespace SEE.Layout.EdgeLayouts
                     start = source.Ground;
                     end = target.Ground;
                 }
-                edge.Points = LinePoints.StraightLinePoints(start, end, edgeLevel);
+                edge.Spline = CreateSpline(start, end, edgeLevel);
             }
+        }
+
+        /// <summary>
+        /// Returns a spline (sequence of lines) from <paramref name="start"/> to <paramref name="end"/>
+        /// on an offset straight line led on the given <paramref name="yLevel"/>. The first
+        /// point is <paramref name="start"/>. The second point has the same x and z
+        /// co-ordinate as <paramref name="start"/> but its y co-ordinate is <paramref name="yLevel"/>.
+        /// The third point has the same x and z co-ordinate as <paramref name="end"/> but again
+        /// its y co-ordinate is <paramref name="yLevel"/>. The last point is <paramref name="end"/>.
+        /// </summary>
+        /// <param name="start">start of the line</param>
+        /// <param name="end">end of the line</param>
+        /// <param name="yLevel">the y co-ordinate of the two other points in between <paramref name="start"/>
+        /// and <paramref name="end"/></param>
+        /// <returns>the four points of the offset straight line</returns>
+        private TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, float yLevel)
+        {
+            Vector3[] points = new Vector3[4];
+            points[0] = start;
+            points[1] = points[0]; // we are maintaining the x and z co-ordinates,
+            points[1].y = yLevel;   // but adjust the y co-ordinate
+            points[2] = end;
+            points[2].y = yLevel;
+            points[3] = end;
+            return new TinySpline.BSpline(4, 3, 1)
+            {
+                ControlPoints = TinySplineInterop.VectorsToList(points)
+            };
         }
     }
 }

@@ -6,7 +6,7 @@ namespace SEE.Net
     /// <summary>
     /// Creates a new edge through the network on each client.
     /// </summary>
-    public class AddEdgeNetAction : AbstractAction
+    public class AddEdgeNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the gameObject from which the edge should be drawn (source node).
@@ -22,20 +22,19 @@ namespace SEE.Net
         /// The unique id of the edge. May be empty or null, in which case a random
         /// unique ID will be created on the client side.
         /// </summary>
-        public string EdgeID;
+        public string EdgeType;
 
         /// <summary>
         /// Constructs an AddEdgeNetAction.
         /// </summary>
         /// <param name="fromId">The id of the gameObject from which the edge should be drawn</param>
         /// <param name="toId">The id of the gameObject to which the edge should be drawn</param>
-        /// <param name="edgeID">The unique ID of the edge; may be null or empty in which case
-        /// a random ID will used</param>
-        public AddEdgeNetAction(string fromId, string toId, string edgeID)
+        /// <param name="edgeType">The type of the edge</param>
+        public AddEdgeNetAction(string fromId, string toId, string edgeType)
         {
             this.FromId = fromId;
             this.ToId = toId;
-            this.EdgeID = edgeID;
+            this.EdgeType = edgeType;
         }
 
         /// <summary>
@@ -59,16 +58,16 @@ namespace SEE.Net
                     GameObject toGO = GameObject.Find(ToId);
                     if (toGO)
                     {
-                        GameEdgeAdder.Add(fromGO, toGO, EdgeID);
+                        GameEdgeAdder.Add(fromGO, toGO, EdgeType);
                     }
                     else
                     {
-                        Debug.LogError($"There is no game node named {ToId} for the target of new edge {EdgeID}.\n");
+                        Debug.LogError($"There is no game node named {ToId} for the target of new edge {EdgeType}.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no game node named {FromId} for the source of new edge {EdgeID}.\n");
+                    Debug.LogError($"There is no game node named {FromId} for the source of new edge {EdgeType}.\n");
                 }
             }
         }
