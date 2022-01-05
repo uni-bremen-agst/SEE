@@ -31,6 +31,12 @@ namespace SEE.Game.Avatars
         [Tooltip("Will keep the aim target at a distance.")]
         public float minAimDistance = 0.5f;
 
+        [Tooltip("The target to point to when a neutral pose is to be taken (not aiming).")]
+        public Transform NeutralAimTarget;
+
+        [Tooltip("The target to look to when a neutral pose is to be taken (not aiming).")]
+        public Transform NeutralLookTarget;
+
         /// <summary>
         /// The pose of the <see cref="aimPoser"/> while aiming at the target.
         /// </summary>
@@ -42,13 +48,88 @@ namespace SEE.Game.Avatars
         private AimPoser.Pose lastPose;
 
         /// <summary>
+        /// Whether the avatar is currently pointing, i.e., whether it has an aiming or looking target.
+        /// </summary>
+        private bool isPointing = true;
+
+        /// <summary>
+        /// The <see cref="AimIK"/> component attached to this avatar. It is used for aiming.
+        /// We are using it to switch between the original aiming target (retrieved from
+        /// <see cref="aimIK.solver.target"/> and <see cref="NeutralAimTarget"/>.
+        /// </summary>
+        private AimIK aimIK;
+
+        /// <summary>
+        /// The <see cref="LookAtIK"/> component attached to this avatar. It is used for looking
+        /// at a particular target.
+        /// We are using it to switch between the original looking target (retrieved from
+        /// <see cref="lookAtIK.solver.target"/> and <see cref="NeutralLookTarget"/>.
+        /// </summary>
+        private LookAtIK lookAtIK;
+
+        /// <summary>
+        /// The original aimed target of the avatar as retrieved via <see cref="aimIK.solver.target"/>.
+        /// It is used to switch back from non-pointing to pointing. May be null.
+        /// </summary>
+        private Transform originalAimTarget;
+
+        /// <summary>
+        /// The original aimed target of the avatar as retrieved via <see cref="lookAtIK.solver.target"/>.
+        /// It is used to switch back from non-pointing to pointing. May be null.
+        /// </summary>
+        private Transform originalLookTarget;
+
+        /// <summary>
+        /// Toggles between pointing and not pointing.
+        /// </summary>
+        public void TogglePointing()
+        {
+            isPointing = !isPointing;
+            if (isPointing)
+            {
+                aimIK.solver.target = originalAimTarget;
+                lookAtIK.solver.target = originalLookTarget;
+            }
+            else
+            {
+                originalAimTarget = aimIK.solver.target;
+                originalLookTarget = lookAtIK.solver.target;
+                aimIK.solver.target = NeutralAimTarget;
+                lookAtIK.solver.target = NeutralLookTarget;
+            }
+        }
+
+        /// <summary>
         /// Disables the IK components <see cref="aim"/> and <see cref="lookAt"/>
-        /// so that we can manage their updating order by ourselves.
+        /// so that we can manage their updating order by ourselves. Sets
+        /// <see cref="aimIK"/>, <see cref="originalAimTarget"/>, <see cref="lookAtIK"/>,
+        /// <see cref="originalLookTarget"/>, and <see cref="isPointing"/>.
         /// </summary>
         private void Start()
         {
             aim.enabled = false;
             lookAt.enabled = false;
+
+            if (TryGetComponent(out aimIK))
+            {
+                originalAimTarget = aimIK.solver.target;
+            }
+            if (TryGetComponent(out lookAtIK))
+            {
+                originalLookTarget = lookAtIK.solver.target;
+            }
+            isPointing = originalLookTarget != null || originalAimTarget != null;
+        }
+
+        /// <summary>
+        /// If <see cref="KeyCode.P"/> is entered, toggles pointing.
+        /// </summary>
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                TogglePointing();
+            }
         }
 
         /// <summary>
@@ -79,6 +160,7 @@ namespace SEE.Game.Avatars
 
             // Get the aiming direction
             Vector3 direction = aim.solver.IKPosition - aim.solver.bones[0].transform.position;
+
             // Getting the direction relative to the root transform
             Vector3 localDirection = transform.InverseTransformDirection(direction);
 
