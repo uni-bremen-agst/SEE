@@ -3,7 +3,10 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_ANDROID
+#else
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -53,7 +56,7 @@ namespace SEE.Game.UI.StateIndicator
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
-        protected Color StartColor = Color.gray.ColorWithAlpha(0.5f);
+        protected Color StartColor = Color.gray.WithAlpha(0.5f);
 
         /// <summary>
         /// The text of the state indicator after it has been instantiated.
@@ -69,13 +72,13 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (HasStarted)
             {
-                ModePanelImage.color = color.ColorWithAlpha(0.5f);
+                ModePanelImage.color = color.WithAlpha(0.5f);
                 ModePanelText.text = text;
             }
             else
             {
                 // Indicator has not yet been initialized
-                StartColor = color.ColorWithAlpha(0.5f);
+                StartColor = color.WithAlpha(0.5f);
                 StartText = text;
             }
         }

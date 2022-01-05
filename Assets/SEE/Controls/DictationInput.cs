@@ -1,3 +1,5 @@
+#if UNITY_ANDROID
+#else
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using static UnityEngine.Windows.Speech.DictationRecognizer;
@@ -196,3 +198,4 @@ namespace SEE.Controls
         }
     }
 }
+#endif

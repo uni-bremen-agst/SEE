@@ -1,5 +1,9 @@
 ﻿using SEE.Controls.Actions;
+using SEE.Utils;
+#if UNITY_ANDROID
+#else
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -16,7 +20,11 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (newState != null)
             {
+#if UNITY_ANDROID
+                ChangeState(newState.Name, newState.Color.WithAlpha(0.5f));
+#else
                 ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
+#endif
             }
         }
     }

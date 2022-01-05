@@ -4,7 +4,10 @@ using System.Linq;
 using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_ANDROID
+#else
 using UnityEngine.Windows.Speech;
+#endif
 
 namespace SEE.Game.UI.Menu
 {
@@ -90,22 +93,29 @@ namespace SEE.Game.UI.Menu
         public void ShowMenu(bool show)
         {
             MenuShown = show;
+#if UNITY_ANDROID
+#else
             Listen(show);
+#endif
         }
 
         /// <summary>
         /// The keyword recognizer used to detect the spoken menu entry titles.
         /// </summary>
+#if UNITY_ANDROID
+#else
         private KeywordInput keywordInput;
-
-        /// <summary>
-        /// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
-        /// is started to listen to the menu entry titles and one of the entries
-        /// can be triggered by saying its title. If <paramref name="listen"/> is
-        /// false instead, the <see cref="keywordInput"/> will be disposed.
-        /// </summary>
-        /// <param name="listen">whether <see cref="keywordInput"/> should be
-        /// listening</param>
+#endif
+/// <summary>
+/// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
+/// is started to listen to the menu entry titles and one of the entries
+/// can be triggered by saying its title. If <paramref name="listen"/> is
+/// false instead, the <see cref="keywordInput"/> will be disposed.
+/// </summary>
+/// <param name="listen">whether <see cref="keywordInput"/> should be
+/// listening</param>
+#if UNITY_ANDROID
+#else
         private void Listen(bool listen)
         {
             if (listen)
@@ -120,6 +130,7 @@ namespace SEE.Game.UI.Menu
                 keywordInput.Dispose();
             }
         }
+#endif
 
         /// <summary>
         /// The keyword to be used to close the menu verbally.
@@ -146,6 +157,8 @@ namespace SEE.Game.UI.Menu
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
+#if UNITY_ANDROID
+#else
         private void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
         {
             int i = 0;
@@ -163,6 +176,7 @@ namespace SEE.Game.UI.Menu
                 i++;
             }
         }
+#endif
 
         /// <summary>
         /// Displays the menu when it's hidden, and vice versa.

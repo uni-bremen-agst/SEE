@@ -28,7 +28,8 @@ namespace SEE.Controls
                 "move down",
                 "stop talking"
                };
-
+#if UNITY_ANDROID
+#else
         [UnityTest]
         public IEnumerator TestDialog()
         {
@@ -48,6 +49,7 @@ namespace SEE.Controls
             input.Unregister(OnPhraseRecognized);
             input.Dispose();
         }
+#endif
 
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {

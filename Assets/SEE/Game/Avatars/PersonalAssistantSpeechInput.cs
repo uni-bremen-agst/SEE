@@ -3,7 +3,10 @@ using SEE.GO;
 using System;
 using System.IO;
 using UnityEngine;
+#if UNITY_ANDROID
+#else
 using UnityEngine.Windows.Speech;
+#endif
 
 namespace SEE.Game.Avatars
 {
@@ -23,7 +26,10 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
         /// </summary>
+#if UNITY_ANDROID
+#else
         private GrammarInput input;
+#endif
 
         /// <summary>
         /// The brain of the personal assistant.
@@ -49,7 +55,12 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
+#if UNITY_ANDROID
+            try
+            {
 
+            }
+#else
             try
             {
                 input = new GrammarInput(GrammarFilePath.Path);
@@ -60,6 +71,7 @@ namespace SEE.Game.Avatars
                     enabled = false;
                 }
             }
+#endif
             catch (Exception e)
             {
                 Debug.LogError($"Failure in starting speech recognition with grammar file {GrammarFilePath}: {e.Message}\n");
@@ -72,6 +84,8 @@ namespace SEE.Game.Avatars
         /// sentence was recognized.
         /// </summary>
         /// <param name="args">details about the recognized sentence</param>
+#if UNITY_ANDROID
+#else
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
             // Debug.Log($"Detected phrase '{args.text}' with confidence {args.confidence}\n");
@@ -147,5 +161,6 @@ namespace SEE.Game.Avatars
             input?.Stop();
             input?.Unregister(OnPhraseRecognized);
         }
+#endif
     }
 }

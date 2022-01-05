@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#if UNITY_ANDROID
+#else
+using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Windows.Speech;
@@ -56,3 +58,4 @@ namespace SEE.Controls
         }
     }
 }
+#endif

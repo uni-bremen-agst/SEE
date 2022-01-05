@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_ANDROID
+#else
+using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -54,3 +56,4 @@ namespace SEE.Controls
         }
     }
 }
+#endif

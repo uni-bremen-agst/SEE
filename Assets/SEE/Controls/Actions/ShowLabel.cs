@@ -6,7 +6,10 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+#if UNITY_ANDROID
+#else
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Controls.Actions
 {
@@ -263,7 +266,7 @@ namespace SEE.Controls.Actions
                 startLabelPosition,
                 (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
                 lift: true,
-                textColor: Color.black.ColorWithAlpha(0f));
+                textColor: Color.black.WithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
 
@@ -340,7 +343,7 @@ namespace SEE.Controls.Actions
             AnimateLabelText();
             AnimateLabelLine();
 
-            #region Local Methods
+#region Local Methods
             void AnimateLabelText()
             {
                 // Animated label to move to top and fade in
@@ -382,8 +385,8 @@ namespace SEE.Controls.Actions
                 {
                     nodeLabel.transform.position = endLabelPosition;
                     text.alpha = endAlpha;
-                    line.startColor = line.startColor.ColorWithAlpha(lineStartAlpha);
-                    line.endColor = line.endColor.ColorWithAlpha(endAlpha);
+                    line.startColor = line.startColor.WithAlpha(lineStartAlpha);
+                    line.endColor = line.endColor.WithAlpha(endAlpha);
                     line.SetPosition(1, endLinePosition);
                 }
                 else
@@ -391,7 +394,7 @@ namespace SEE.Controls.Actions
                     Debug.LogError("Couldn't find required component in newly created label.\n");
                 }
             }
-            #endregion
+#endregion
         }
 
         /// <summary>

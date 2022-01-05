@@ -36,12 +36,13 @@ namespace SEE.Game.UI.ConfigMenu
         /// The initial length of the laser pointer's beam.
         /// </summary>
         public float DefaultLength = 5.0f;
-
+#if UNITY_ANDROID
+#else
         /// <summary>
         /// The input for the pointer.
         /// </summary>
         public VRInputModule InputModule;
-
+#endif
         /// <summary>
         /// The laser points consists of a line with a dot (sphere) at
         /// the end of the line. This game object represents the dot.
@@ -61,6 +62,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         void Update()
         {
+#if UNITY_ANDROID
+#else
             PointerEventData data = InputModule.GetData();
             float targetLength = data.pointerCurrentRaycast.distance == 0 ? DefaultLength
                 : data.pointerCurrentRaycast.distance;
@@ -75,6 +78,7 @@ namespace SEE.Game.UI.ConfigMenu
 
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, endPosition);
+#endif
         }
 
         /// <summary>

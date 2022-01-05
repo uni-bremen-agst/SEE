@@ -1,7 +1,11 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_ANDROID
+#else
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.UI.Menu
 {
@@ -45,7 +49,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        public Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
+        public Color DisabledColor => EntryColor.WithAlpha(0.2f);
 
         /// <summary>
         /// Instantiates and returns a new MenuEntry.

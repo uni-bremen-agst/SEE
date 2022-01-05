@@ -75,10 +75,14 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetComponentInChild("Label", out labelText);
 
             dropdown.dropdownItems.Clear();
+#if UNITY_ANDROID
+//TODO: forEach mobile menu item
+#else
             foreach (string kind in ConfigMenu.EnumToStr<DataPath.RootKind>())
             {
                 dropdown.CreateNewItemFast(kind, null);
             }
+#endif
             dropdown.selectedItemIndex =
                 dropdown.dropdownItems.FindIndex(
                     item => item.itemName == DataPathInstance.Root.ToString());

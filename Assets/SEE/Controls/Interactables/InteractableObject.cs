@@ -7,7 +7,10 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_ANDROID
+#else
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Controls
 {
@@ -215,7 +218,10 @@ namespace SEE.Controls
         /// The interactable component, that is used by SteamVR. The interactable
         /// component is attached to <code>this.gameObject</code>.
         /// </summary>
+#if UNITY_ANDROID
+#else
         private Interactable interactable;
+#endif
 
         /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
@@ -227,7 +233,10 @@ namespace SEE.Controls
         {
             ID = nextID++;
             idToInteractableObjectDict.Add(ID, this);
+#if UNITY_ANDROID
+#else
             gameObject.TryGetComponentOrLog(out interactable);
+#endif
             GraphElemRef = GetComponent<GraphElementRef>();
         }
 
@@ -246,7 +255,10 @@ namespace SEE.Controls
                 SetGrab(false, true);
             }
             GraphElemRef = null;
+#if UNITY_ANDROID
+#else
             interactable = null;
+#endif
             idToInteractableObjectDict.Remove(ID);
             ID = uint.MaxValue;
         }
@@ -281,7 +293,7 @@ namespace SEE.Controls
             return graphToSelectedIOs[graph];
         }
 
-        #region Interaction
+#region Interaction
 
         /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if
@@ -602,7 +614,10 @@ namespace SEE.Controls
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
                 {
+#if UNITY_ANDROID
+#else
                     InteractableSynchronizer = interactable.gameObject.AddComponent<Net.Synchronizer>();
+#endif
                 }
                 else
                 {
@@ -624,9 +639,9 @@ namespace SEE.Controls
             }
         }
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         ///------------------------------------------------------------------
         /// Actions can register on selection, hovering, and grabbing events.
@@ -944,7 +959,8 @@ namespace SEE.Controls
         // These methods are called by SteamVR by way of the interactable.
         // <see cref="Hand.Update"/>
         //----------------------------------------------------------------
-
+#if UNITY_ANDROID
+#else
         private const Hand.AttachmentFlags AttachmentFlags
             = Hand.defaultAttachmentFlags
             & ~Hand.AttachmentFlags.SnapOnAttach
@@ -953,8 +969,9 @@ namespace SEE.Controls
 
         private void OnHandHoverBegin(Hand hand) => SetHoverFlag(HoverFlag.World, true, true);
         private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
+#endif
 
-        #endregion
+#endregion
 
     }
 }

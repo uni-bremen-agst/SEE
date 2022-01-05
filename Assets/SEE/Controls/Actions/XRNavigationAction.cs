@@ -1,4 +1,6 @@
-﻿using SEE.GO;
+﻿#if UNITY_ANDROID
+#else
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
@@ -334,3 +336,4 @@ namespace SEE.Controls.Actions
         }
     }
 }
+#endif

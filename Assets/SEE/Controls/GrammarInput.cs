@@ -1,4 +1,6 @@
-﻿using UnityEngine.Windows.Speech;
+﻿#if UNITY_ANDROID
+#else
+using UnityEngine.Windows.Speech;
 using static UnityEngine.Windows.Speech.PhraseRecognizer;
 
 namespace SEE.Controls
@@ -96,3 +98,4 @@ namespace SEE.Controls
         }
     }
 }
+#endif
