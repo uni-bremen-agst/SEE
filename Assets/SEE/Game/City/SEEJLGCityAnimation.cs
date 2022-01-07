@@ -193,7 +193,6 @@ namespace SEE.Game.City
         /// </summary>
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
-        /// Start is called before the first frame update
         private void Start()
         {
             JLGParser jlgParser = new JLGParser(JLGPath.Path);
