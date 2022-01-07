@@ -55,12 +55,12 @@ namespace SEE.Game
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
             // Save edge layout so that we can restore it if we need to select a default layout.
-            EdgeLayoutKind savedEdgeLayout = settings.EdgeLayoutSettings.Kind;
+            EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
             if (savedEdgeLayout == EdgeLayoutKind.None)
             {
                 Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
                 // Select default layout
-                settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
+                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
             }
 
             // Creating the game object representing the edge.
@@ -107,7 +107,7 @@ namespace SEE.Game
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
             // Reset original edge layout.
-            settings.EdgeLayoutSettings.Kind = savedEdgeLayout;
+            Settings.EdgeLayoutSettings.Kind = savedEdgeLayout;
             return resultingEdge;
         }
 
@@ -206,11 +206,11 @@ namespace SEE.Game
 #endif
             EdgeFactory edgeFactory = new EdgeFactory(
                 layout,
-                settings.EdgeLayoutSettings.EdgeWidth,
-                settings.EdgeSelectionSettings.TubularSegments,
-                settings.EdgeSelectionSettings.Radius,
-                settings.EdgeSelectionSettings.RadialSegments,
-                settings.EdgeSelectionSettings.AreSelectable);
+                Settings.EdgeLayoutSettings.EdgeWidth,
+                Settings.EdgeSelectionSettings.TubularSegments,
+                Settings.EdgeSelectionSettings.Radius,
+                Settings.EdgeSelectionSettings.RadialSegments,
+                Settings.EdgeSelectionSettings.AreSelectable);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
             // Calculate only
@@ -228,34 +228,34 @@ namespace SEE.Game
 
 #if UNITY_EDITOR
             p.End();
-            Debug.Log($"Calculated \"  {settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
+            Debug.Log($"Calculated \"  {Settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
                       + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
 #endif
             return result;
         }
 
         /// <summary>
-        /// Yields the edge layout as specified in the <see cref="settings"/>.
+        /// Yields the edge layout as specified in the <see cref="Settings"/>.
         /// </summary>
         /// <returns>specified edge layout</returns>
         private IEdgeLayout GetEdgeLayout()
         {
-            float minimalEdgeLevelDistance = 2.5f * settings.EdgeLayoutSettings.EdgeWidth;
-            bool edgesAboveBlocks = settings.EdgeLayoutSettings.EdgesAboveBlocks;
-            float rdp = settings.EdgeLayoutSettings.RDP;
-            switch (settings.EdgeLayoutSettings.Kind)
+            float minimalEdgeLevelDistance = 2.5f * Settings.EdgeLayoutSettings.EdgeWidth;
+            bool edgesAboveBlocks = Settings.EdgeLayoutSettings.EdgesAboveBlocks;
+            float rdp = Settings.EdgeLayoutSettings.RDP;
+            switch (Settings.EdgeLayoutSettings.Kind)
             {
                 case EdgeLayoutKind.Straight:
                     return new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
                 case EdgeLayoutKind.Spline:
                    return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
                 case EdgeLayoutKind.Bundling:
-                    return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, settings.EdgeLayoutSettings.Tension, rdp);
+                    return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, Settings.EdgeLayoutSettings.Tension, rdp);
                 case EdgeLayoutKind.None:
                     // nothing to be done
                     return null;
                 default:
-                    throw new Exception("Unhandled edge layout " + settings.EdgeLayoutSettings.Kind);
+                    throw new Exception("Unhandled edge layout " + Settings.EdgeLayoutSettings.Kind);
             }
         }
 
