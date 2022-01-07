@@ -34,7 +34,7 @@ namespace SEE.Game.Evolution
     /// for reuse during query. Each GameObject is identified by the ID of
     /// a node and can be retrieved via any node with the same ID.
     /// </summary>
-    public class ObjectManager
+    internal class ObjectManager
     {
         /// <summary>
         /// The graph renderer used to create the game objects. It is used for creating missing
@@ -193,6 +193,20 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Sets <paramref name="gameEdge"/> to a cached GameObject for an edge
+        /// or creates a new one if none has existed. The game object is identified
+        /// by the attribute ID of <paramref name="edge"/>.
+        /// If a game object existed already, the given <paramref name="edge"/> will be
+        /// attached to <paramref name="gameEdge"/> replacing its previously attached graph
+        /// edge and that previously attached graph edge will be returned. If no such game object
+        /// existed before, <paramref name="edge"/> will be attached to the new game object
+        /// and null will be returned.
+        /// </summary>
+        /// <param name="edge">the edge to be represented by <paramref name="gameEdge"/></param>
+        /// <param name="gameEdge">the resulting GameObject representing <paramref name="edge"/></param>
+        /// <returns>the formerly attached graph edge of <paramref name="gameEdge"/> if
+        /// such a game object existed or null if the game edge was newly created</returns>
         public Edge GetEdge(Edge edge, out GameObject gameEdge)
         {
             if (edges.TryGetValue(edge.ID, out gameEdge))

@@ -19,7 +19,7 @@ namespace SEE.Utils
     /// <paramref name="Knots"/> must be structured.
     /// </summary>
     [Serializable]
-    public class SerializableSpline
+    internal class SerializableSpline
     {
         /// <summary>
         /// Degree of the piecewise polynomials.
@@ -42,7 +42,7 @@ namespace SEE.Utils
     /// <summary>
     /// Utility functions for interoperability between TinySpline and Unity.
     /// </summary>
-    class TinySplineInterop
+    internal class TinySplineInterop
     {
         /// <summary>
         /// Converts the given list of Unity Vector3 to a list of doubles

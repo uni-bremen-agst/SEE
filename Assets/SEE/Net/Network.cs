@@ -69,7 +69,8 @@ namespace SEE.Net
         /// <summary>
         /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
         /// </summary>
-        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
+        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets
+            = new Dictionary<Connection, List<string>>();
 
         /// <summary>
         /// True if we are running a host or server.
@@ -464,9 +465,9 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The IP address of the server.
+        /// The IPv4 address of the server.
         /// </summary>
-        public string IPAddress { set; get; } = "127.0.0.1";
+        public string IPv4Address { set; get; } = "127.0.0.1";
 
         /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
@@ -640,5 +641,4 @@ namespace SEE.Net
 
         #endregion
     }
-
 }

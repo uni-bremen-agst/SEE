@@ -11,7 +11,7 @@ namespace SEE.UI
     /// Implements the behaviour of the in-game menu for the selection of the networking
     /// configuration (host, server, client, settings) that is shown at the start up.
     /// </summary>
-    public class OpeningDialog : MonoBehaviour
+    internal class OpeningDialog : MonoBehaviour
     {
         /// <summary>
         /// The UI object representing the menu the user chooses the action from.
@@ -119,10 +119,10 @@ namespace SEE.UI
         /// </summary>
         private void Settings()
         {
-            // Note: We arrive here because the user pressed on of the buttons of the
-            // actionMenu, which - in turn - will call actionMenu.ShowMenu(false). Thus
-            // at this time, actionMenu is no longer visible. When the following dialog
-            // is finished, Reactive will be called to turn the actionMenu on again.
+            /// Note: We arrive here because the user pressed on of the buttons of the
+            /// actionMenu, which - in turn - will call actionMenu.ShowMenu(false). Thus
+            /// at this time, actionMenu is no longer visible. When the following dialog
+            /// is finished, <see cref="Reactivate"/> will be called to turn the actionMenu on again.
             NetworkPropertyDialog dialog = new NetworkPropertyDialog(network, Reactivate);
             dialog.Open();
         }
@@ -137,7 +137,7 @@ namespace SEE.UI
 
         /// <summary>
         /// Sets <see cref="network"/> if it exists as a component attached to
-        /// this game object; otherwise this component is diabled.
+        /// this game object; otherwise this component is disabled.
         /// </summary>
         private void Awake()
         {
