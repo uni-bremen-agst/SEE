@@ -20,7 +20,7 @@ namespace SEE.Game
     public partial class GraphRenderer
     {
         /// <summary>
-        /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>
+        /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>)
         /// of given <paramref name="gameNode"/> and lets the node reference
         /// of it refer to <paramref name="node"/>.
         /// </summary>
@@ -218,7 +218,7 @@ namespace SEE.Game
             LOD[] lods = new LOD[1];
             Renderer[] renderers = new Renderer[1];
             renderers[0] = gameObject.GetComponent<Renderer>();
-            lods[0] = new LOD(settings.LODCulling, renderers);
+            lods[0] = new LOD(Settings.LODCulling, renderers);
             lodGroup.SetLODs(lods);
             lodGroup.RecalculateBounds();
         }
@@ -256,8 +256,9 @@ namespace SEE.Game
             bool isLeaf = node.IsLeaf();
             NodeFactory nodeFactory = isLeaf ? leafNodeFactory : innerNodeFactory;
             uint numberOfStyles = nodeFactory.NumberOfStyles();
-            string colorMetric = isLeaf ? settings.LeafNodeSettings.ColorMetric
-                                        : settings.InnerNodeSettings.ColorMetric;
+            string colorMetric = isLeaf ? Settings.LeafNodeSettings.ColorMetric
+                                        : Settings.InnerNodeSettings.ColorMetric;
+
             float metricMaximum;
             if (TryGetFloat(colorMetric, out float metricValue))
             {
@@ -269,7 +270,7 @@ namespace SEE.Game
             {
                 if (!node.TryGetNumeric(colorMetric, out float _))
                 {
-                    Debug.LogWarning($"value of color metric {colorMetric} for node {node.ID} is undefined.\n");
+                    Debug.LogWarning($"Value of color metric {colorMetric} for node {node.ID} is undefined.\n");
                     return 0;
                 }
 
@@ -289,7 +290,7 @@ namespace SEE.Game
         /// <param name="floatString">string to be parsed for a floating point number</param>
         /// <param name="value">parsed floating point value; defined only if this method returns true</param>
         /// <returns>true if a floating point number could be parsed successfully</returns>
-        private bool TryGetFloat(string floatString, out float value)
+        private static bool TryGetFloat(string floatString, out float value)
         {
             try
             {
@@ -372,7 +373,7 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                float value = GetMetricValueOfLeaf(nodeRef.Value, settings.InnerNodeSettings.HeightMetric);
+                float value = GetMetricValueOfLeaf(nodeRef.Value, Settings.InnerNodeSettings.HeightMetric);
                 innerNodeFactory.SetHeight(gameNode, value);
             }
             else
@@ -433,7 +434,7 @@ namespace SEE.Game
                     Vector3 scale = GetScaleOfLeaf(node);
 
                     // Scale according to the metrics.
-                    if (settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+                    if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
                     {
                         // FIXME: This is ugly. The graph renderer should not need to care what
                         // kind of layout was applied.
@@ -485,7 +486,7 @@ namespace SEE.Game
         private Vector3 GetScaleOfLeaf(Node node)
         {
             Assert.IsTrue(node.IsLeaf());
-            LeafNodeAttributes attribs = settings.LeafNodeSettings;
+            LeafNodeAttributes attribs = Settings.LeafNodeSettings;
             return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
                                GetMetricValueOfLeaf(node, attribs.HeightMetric),
                                GetMetricValueOfLeaf(node, attribs.DepthMetric));
@@ -507,8 +508,8 @@ namespace SEE.Game
         private float GetMetricValueOfLeaf(Node node, string metricName)
         {
             return Mathf.Clamp(GetMetricValue(node, metricName),
-                        settings.LeafNodeSettings.MinimalBlockLength,
-                        settings.LeafNodeSettings.MaximalBlockLength);
+                        Settings.LeafNodeSettings.MinimalBlockLength,
+                        Settings.LeafNodeSettings.MaximalBlockLength);
         }
 
         /// <summary>
@@ -548,7 +549,7 @@ namespace SEE.Game
         /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddDecorations(gameNodes, settings.InnerNodeSettings.Kind, settings.NodeLayoutSettings.Kind);
+            AddDecorations(gameNodes, Settings.InnerNodeSettings.Kind, Settings.NodeLayoutSettings.Kind);
         }
 
         /// <summary>
@@ -564,18 +565,18 @@ namespace SEE.Game
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
             // Add software erosion decorators for all nodes if requested.
-            if (settings.ErosionSettings.ShowInnerErosions)
+            if (Settings.ErosionSettings.ShowInnerErosions)
             {
                 //FIXME: This should instead check whether each node has non-aggregated metrics available,
                 // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
-                ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory,
-                                                                 scaler, settings.ErosionSettings.ErosionScalingFactor);
+                ErosionIssues issueDecorator = new ErosionIssues(Settings.InnerIssueMap(), innerNodeFactory,
+                                                                 scaler, Settings.ErosionSettings.ErosionScalingFactor);
                 issueDecorator.Add(innerNodes);
             }
-            if (settings.ErosionSettings.ShowLeafErosions)
+            if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory,
-                                                                 scaler, settings.ErosionSettings.ErosionScalingFactor * 5);
+                ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(), leafNodeFactory,
+                                                                 scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
             }
 
@@ -615,8 +616,8 @@ namespace SEE.Game
                     break;
                 case InnerNodeKinds.Donuts:
                     {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerNodeSettings.InnerDonutMetric,
-                                                                      settings.AllInnerNodeIssues().ToArray());
+                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, Settings.InnerNodeSettings.InnerDonutMetric,
+                                                                      Settings.AllInnerNodeIssues().ToArray());
                         // the circle segments and the inner circle for the donut are added as children by Add();
                         // that is why we do not add the result to decorations.
                         decorator.Add(innerNodes);
@@ -629,7 +630,7 @@ namespace SEE.Game
                     break;
                 default:
                     throw new InvalidOperationException("Unhandled GraphSettings.InnerNodeKinds "
-                                                        + $"{settings.InnerNodeSettings.Kind}");
+                                                        + $"{Settings.InnerNodeSettings.Kind}");
             }
         }
 
