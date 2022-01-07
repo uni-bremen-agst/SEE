@@ -15,7 +15,8 @@ namespace SEE.Game.Avatars
     /// This component is assumed to be attached to a game object representing
     /// an avatar (representing a local or remote player). It will adapt that
     /// avatar according to the platform we are currently running on
-    /// (<see cref="PlayerSettings.GetInputType()"/>.
+    /// (<see cref="PlayerSettings.GetInputType()"/>. In particular, it will
+    /// enable SALSA's lip sync and Dissonance.
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
     {

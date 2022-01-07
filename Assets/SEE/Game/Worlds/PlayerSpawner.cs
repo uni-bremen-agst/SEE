@@ -17,13 +17,13 @@ namespace SEE.Game.Worlds
         [Tooltip("Ground position where a player is spawned.")]
         public Vector3 InitialPosition = Vector3.zero;
 
-        [Tooltip("Initial rotation of a spawned player along the y axis."), Range(0, 360-float.Epsilon)]
-        public float InitialRotation = 0;
+        [Tooltip("Initial rotation of a spawned player.")]
+        public Vector3 InitialRotation = Vector3.zero;
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
         /// </summary>
-        private DissonanceComms comms = null;
+        private DissonanceComms dissonanceComms = null;
 
         /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
@@ -33,6 +33,12 @@ namespace SEE.Game.Worlds
             StartCoroutine(SpawnPlayerCoroutine());
         }
 
+        /// <summary>
+        /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
+        /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
+        /// the first local client.
+        /// </summary>
+        /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
             NetworkManager networkManager = NetworkManager.Singleton;
@@ -50,9 +56,9 @@ namespace SEE.Game.Worlds
             // The following code will be executed only on the server.
 
             // Wait until Dissonance is created
-            while (ReferenceEquals(comms, null))
+            while (ReferenceEquals(dissonanceComms, null))
             {
-                comms = FindObjectOfType<DissonanceComms>();
+                dissonanceComms = FindObjectOfType<DissonanceComms>();
                 yield return null;
             }
 
@@ -78,7 +84,7 @@ namespace SEE.Game.Worlds
         {
             numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
-                                            InitialPosition, Quaternion.Euler(0, InitialRotation, 0));
+                                            InitialPosition, Quaternion.Euler(InitialRotation));
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
@@ -91,6 +97,12 @@ namespace SEE.Game.Worlds
             }
         }
 
+        /// <summary>
+        /// True if <paramref name="owner"/> identifies the local player.
+        /// </summary>
+        /// <param name="owner">the network ID of the owner</param>
+        /// <returns>true iff <paramref name="owner"/> identifies
+        /// <see cref="NetworkManager.Singleton.LocalClientId"/></returns>
         private bool IsLocal(ulong owner)
         {
             return owner == NetworkManager.Singleton.LocalClientId;

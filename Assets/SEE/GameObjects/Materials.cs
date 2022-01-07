@@ -204,20 +204,21 @@ namespace SEE.GO
         /// material</param>
         /// <param name="color">requested color of the new material</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
+        /// <param name="forHoloLens">whether materials suitable for the HoloLens should be used</param>
         /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0)
+        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0, bool forHoloLens = false)
         {
             string name = null;
 
             // When the user is on a HoloLens, the special MRTK shader variants should be used
-            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
+            if (forHoloLens)
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque:             name = OpaqueMaterialName; break;
-                    case ShaderType.Transparent:        name = TransparentMaterialName; break;
-                    case ShaderType.TransparentLine:    name = TransparentLineMaterialName; break;
-                    case ShaderType.Invisible:          name = InvisibleMaterialName; break;
+                    case ShaderType.Opaque: name = MRTKOpaqueMaterialName; break;
+                    case ShaderType.Transparent: name = MRTKTransparentMaterialName; break;
+                    case ShaderType.TransparentLine: name = MRTKTransparentLineMaterialName; break;
+                    case ShaderType.Invisible: name = MRTKInvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
@@ -225,10 +226,10 @@ namespace SEE.GO
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque:             name = MRTKOpaqueMaterialName; break;
-                    case ShaderType.Transparent:        name = MRTKTransparentMaterialName; break;
-                    case ShaderType.TransparentLine:    name = MRTKTransparentLineMaterialName; break;
-                    case ShaderType.Invisible:          name = MRTKInvisibleMaterialName; break;
+                    case ShaderType.Opaque: name = OpaqueMaterialName; break;
+                    case ShaderType.Transparent: name = TransparentMaterialName; break;
+                    case ShaderType.TransparentLine: name = TransparentLineMaterialName; break;
+                    case ShaderType.Invisible: name = InvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
