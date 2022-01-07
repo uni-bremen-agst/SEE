@@ -193,21 +193,21 @@ namespace SEE.Controls
         /// scene required for the particular player to work correctly.
         /// </summary>
         /// <param name="inputType">the kind of environment the player is to run</param>
-        /// <returns>new player for given <paramref name="inputType"/></returns>
+        /// <returns>new player for given <paramref name="inputType"/>, <c>null</c>
+        /// if <paramref name="inputType"/> equals <see cref="PlayerInputType.DesktopPlayer"/></returns>
+        [Obsolete("Do not use. This method will be superseded by SEE.Game.Avatars.AvatarAdapter.")]
         private GameObject CreatePlayer(PlayerInputType inputType)
         {
             GameObject player;
 
             switch (inputType)
             {
+                /// FIXME: This could should be moved to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                 case PlayerInputType.DesktopPlayer:
-                    return null; // FIXME
-                    if (FocusPlane == null)
-                    {
-                        Debug.Log("No focus plane set for the desktop player. You can set this value in the inspector.\n");
-                    }
-                    player = PlayerFactory.CreateDesktopPlayer(FocusPlane);
-                    break;
+                    /// The code original executed here has now be moved to
+                    /// <see cref="SEE.Game.Avatars.AvatarAdapter"/>. The other
+                    /// code must be moved there, too.
+                    return null;
                 case PlayerInputType.VRPlayer:
                     {
                         player = PlayerFactory.CreateVRPlayer();
