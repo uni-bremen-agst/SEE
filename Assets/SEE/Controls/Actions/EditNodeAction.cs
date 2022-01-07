@@ -11,7 +11,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to edit an existing node's attributes.
     /// </summary>
-    public class EditNodeAction : AbstractPlayerAction
+    internal class EditNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// The life cycle of this edit action.
@@ -183,19 +183,19 @@ namespace SEE.Controls.Actions
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
-        public override HashSet<string> GetChangedObjects() => 
+        public override HashSet<string> GetChangedObjects() =>
             memento.node == null ? new HashSet<string>() : new HashSet<string> { memento.node.ID };
 
         /// <summary>
         /// Opens a dialog where the user can enter the node name and type.
         /// If the user presses the OK button, the SourceName and Type of
-        /// <see cref="memento.node"/> will have the new values entered 
-        /// and <see cref="memento.newName"/> and <see cref="memento.newType"/> 
+        /// <see cref="memento.node"/> will have the new values entered
+        /// and <see cref="memento.newName"/> and <see cref="memento.newType"/>
         /// will be set to memorize these and <see cref="progress"/> is
-        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>. 
-        /// If the user presses the Cancel button, the <see cref="memento"/> 
-        /// including <see cref="memento.node"/> will not be changed and 
-        /// <see cref="progress"/> is moved forward to 
+        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>.
+        /// If the user presses the Cancel button, the <see cref="memento"/>
+        /// including <see cref="memento.node"/> will not be changed and
+        /// <see cref="progress"/> is moved forward to
         /// <see cref="ProgressState.EditIsCanceled"/>.
         /// </summary>
         private void OpenDialog()
