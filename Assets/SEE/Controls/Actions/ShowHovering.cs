@@ -6,9 +6,9 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline around a game object being hovered over and makes it opaque.
+    /// Draws or modifies, respectively, an outline around a game object being hovered over and makes it opaque.
     /// </summary>
-    public class ShowHovering : InteractableObjectHoveringAction
+    internal class ShowHovering : InteractableObjectHoveringAction
     {
         /// <summary>
         /// The local hovering color of the outline.
@@ -36,7 +36,8 @@ namespace SEE.Controls.Actions
         private Outline outline;
 
         /// <summary>
-        /// The material of the game object being hovered over.
+        /// The AlphaEnforcer that ensures that the hovered game object always has the correct
+        /// alpha value.
         /// </summary>
         private AlphaEnforcer enforcer;
 
