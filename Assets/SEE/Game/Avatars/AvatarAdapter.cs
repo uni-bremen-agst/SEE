@@ -9,7 +9,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace SEE.Game.Worlds
+namespace SEE.Game.Avatars
 {
     /// <summary>
     /// This component is assumed to be attached to a game object representing
