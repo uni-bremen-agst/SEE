@@ -60,7 +60,7 @@ namespace Dissonance.Demo
             if (!_isInputtingText)
             {
                 var global = false; // Input.GetKey(KeyCode.Y);
-                var red = false; Input.GetKey(KeyCode.U);
+                var red = false; //Input.GetKey(KeyCode.U);
                 var blue = false;// Input.GetKey(KeyCode.I);
 
                 //If a key is pressed
