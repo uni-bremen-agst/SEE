@@ -28,6 +28,24 @@ namespace SEE.Controls
             }
         }
 
+        //----------------------------------------------------
+        // Chat
+        //----------------------------------------------------
+        public static bool GlobalChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.Y);
+        }
+        public static bool RedChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.U);
+        }
+        public static bool BlueChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.I);
+        }
+
+
+
         //-----------------------------------------------------
         // General key bindings
         //-----------------------------------------------------
