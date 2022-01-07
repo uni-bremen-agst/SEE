@@ -11,7 +11,7 @@ namespace SEE.Game.UI.PropertyDialog
     /// <summary>
     /// A dialog to enter the network properties (<see cref="NetworkConfig"/>).
     /// </summary>
-    public class NetworkPropertyDialog
+    internal class NetworkPropertyDialog
     {
         /// <summary>
         /// Callback to be called when this dialog closes.
@@ -21,7 +21,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the network configuration to be manipulated by this dialog</param>
+        /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
         /// <param name="callBack">delegate to be called when this dialog is closed</param>
         public NetworkPropertyDialog(Net.Network networkConfig, OnClosed callBack = null)
         {
@@ -38,7 +38,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// The maximal valid network port number.
         /// </summary>
-        private const int MaximalPortNumber = 65353;
+        private const int MaximalPortNumber = 65535;
 
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
@@ -109,23 +109,23 @@ namespace SEE.Game.UI.PropertyDialog
 
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
-                ipAddress.Name = "IP4 Address";
-                ipAddress.Value = networkConfig.IPAddress;
-                ipAddress.Description = "IP4 Address of the server";
+                ipAddress.Name = "IPv4 Address";
+                ipAddress.Value = networkConfig.IPv4Address;
+                ipAddress.Description = "IPv4 address of the server";
                 group.AddProperty(ipAddress);
             }
             {
                 serverPort = dialog.AddComponent<StringProperty>();
-                serverPort.Name = "Server Port";
+                serverPort.Name = "Server TCP Port";
                 serverPort.Value = networkConfig.ServerPort.ToString();
-                serverPort.Description = "Server port for NetCode and Voice Chat";
+                serverPort.Description = "Server TCP port for NetCode and Voice Chat";
                 group.AddProperty(serverPort);
             }
             {
                 serverActionPort = dialog.AddComponent<StringProperty>();
-                serverActionPort.Name = "Server Action Port";
+                serverActionPort.Name = "Server Action TCP Port";
                 serverActionPort.Value = networkConfig.ServerActionPort.ToString();
-                serverActionPort.Description = "Server port for SEE actions";
+                serverActionPort.Description = "Server TCP port for SEE actions";
                 group.AddProperty(serverActionPort);
             }
             {
@@ -172,12 +172,12 @@ namespace SEE.Game.UI.PropertyDialog
         {
             {
                 string ipAddressValue = ipAddress.Value.Trim();
-                if (!HasCorrectIPAddressSyntax(ipAddressValue))
+                if (!HasCorrectIPv4AddressSyntax(ipAddressValue))
                 {
-                    ShowNotification.Error("IP Syntax Error",
-                        "IP addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
+                    ShowNotification.Error("IPv4 Syntax Error",
+                        "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
                 }
-                networkConfig.IPAddress = ipAddressValue;
+                networkConfig.IPv4Address = ipAddressValue;
             }
             {
                 if (Int32.TryParse(serverPort.Value.Trim(), out int serverPortNumber) && 0 <= serverPortNumber && serverPortNumber <= MaximalPortNumber)
@@ -186,7 +186,6 @@ namespace SEE.Game.UI.PropertyDialog
                 }
                 else
                 {
-                    Debug.LogError($"{serverPort.Value.Trim()} {serverPortNumber}  {0 <= serverPortNumber}  {serverPortNumber <= MaximalPortNumber}\n");
                     ShowPortError("Server");
                 }
             }
@@ -214,13 +213,13 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
-        /// True if <paramref name="ipAddress"/> conforms to the syntax of numeric IP
+        /// True if <paramref name="ipAddress"/> conforms to the syntax of numeric IPv4
         /// addresses, i.e., number.number.number.number where number is an integer in
         /// the range of 0 to 255.
         /// </summary>
         /// <param name="ipAddress">the IP address to be validated syntactically</param>
         /// <returns>true if <paramref name="ipAddress"/> conforms to the syntax</returns>
-        private bool HasCorrectIPAddressSyntax(string ipAddress)
+        private bool HasCorrectIPv4AddressSyntax(string ipAddress)
         {
             if (String.IsNullOrWhiteSpace(ipAddress))
             {

@@ -20,7 +20,7 @@ namespace SEE.Game.Avatars
     internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
-        /// If this code is execute for the local player, the necessary player type
+        /// If this code is executed for the local player, the necessary player type
         /// for the environment we are currently running on are added to this game object.
         /// </summary>
         private void Start()
@@ -176,7 +176,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
-        /// as a child and an <see cref="DesktopPlayerMovement"/> component.
+        /// as a child and a <see cref="DesktopPlayerMovement"/> component.
         /// </summary>
         private void PrepareForDesktop()
         {
