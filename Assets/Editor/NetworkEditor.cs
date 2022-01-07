@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SEEEditor
 {
+    /// <summary>
+    /// Custom editor for <see cref="SEE.Net.Network"/>.
+    /// </summary>
     [CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
@@ -48,7 +51,7 @@ namespace SEEEditor
                 {
                     SetProperty("GameScene", "Loaded Scene", "The name of the scene to be loaded when the game is started.");
                     SetProperty("loadCityOnStart", "Load City On Start", "Whether the city should be loaded on start of the application.");
-                    SetProperty("serverActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
+                    SetProperty("ServerActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
                     SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
                     SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
                 }
@@ -72,8 +75,11 @@ namespace SEEEditor
                     EditorGUI.EndDisabledGroup();
                 }
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+            Buttons();
         }
 
         /// <summary>
@@ -96,6 +102,24 @@ namespace SEEEditor
                 Debug.LogError($"Property {propertyName} does not exist for {typeof(SEE.Net.Network)}.\n");
             }
             return property;
+        }
+
+        /// <summary>
+        /// Creates the buttons for loading and saving a network configuration.
+        /// </summary>
+        protected virtual void Buttons()
+        {
+            SEE.Net.Network seeCity = target as SEE.Net.Network;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Load"))
+            {
+                seeCity.Load();
+            }
+            if (GUILayout.Button("Save"))
+            {
+                seeCity.Save();
+            }
+            EditorGUILayout.EndHorizontal();
         }
     }
 }

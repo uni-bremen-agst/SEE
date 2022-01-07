@@ -253,7 +253,7 @@ MonoBehaviour:
   MessageBufferSize: 5120
   MaxConnections: 100
   MaxSentMessageQueueSize: 128
-  ConnectAddress: 192.168.178.120
+  ConnectAddress: 127.0.0.1
   ConnectPort: 7777
   ServerListenPort: 7777
   MessageSendMode: 0
@@ -294,6 +294,26 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 3413141361298906494, guid: c78211f36da6bc74093166055fbe27a5, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 1119361092242382542, guid: e18558cd1cec9cf44a76097b7e541483, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 7704617729666261720, guid: cc8fbe2ffa34728439843fa0953c8d1c, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 3430662996609522360, guid: c062a229b1fe2eb46957d8e26b52c47d, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 6417270086092738961, guid: e1e6a1e44a01a0d4bb0bb38d1c7df536, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
@@ -338,14 +358,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localServerPort: 55555
-  remoteServerPort: 55555
+  ServerActionPort: 55555
+  GameScene: SEEWorld
   loadCityOnStart: 0
   networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1
   minimalSeverity: 2
-  GameScene: SEEWorld
-  VoiceChat: 0
+  VoiceChat: 1
   vivoxChannelName: 
 --- !u!1 &1859932782
 GameObject:

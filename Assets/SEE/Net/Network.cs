@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Dissonance;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
+using SEE.Utils;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -34,14 +36,92 @@ namespace SEE.Net
         public static Network Instance { get; set; }
 
         /// <summary>
-        /// The port of the server where the server listens to SEE action requests.
+        /// The maximal port number.
         /// </summary>
-        public int ServerActionPort = 55555;
+        private const int MaxServerPort = 65535;
+
+        /// <summary>
+        /// The port of the server where the server listens to SEE action requests.
+        /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
+        /// </summary>
+        public int ServerActionPort = 12345;
 
         /// <summary>
         /// The port where the server listens to NetCode and Dissonance traffic.
+        /// Valid range is [0, 65535].
         /// </summary>
-        public int ServerPort { set; get; } = 55555;
+        public int ServerPort
+        {
+            set
+            {
+                if (value < 0 || value > MaxServerPort)
+                {
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                }
+                UNetTransport netTransport = GetNetworkTransport();
+                netTransport.ConnectPort = value;
+                netTransport.ServerListenPort = value;
+
+            }
+            get
+            {
+                UNetTransport netTransport = GetNetworkTransport();
+                return netTransport.ServerListenPort;
+            }
+        }
+
+        /// <summary>
+        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
+        /// This information is retrieved differently depending upon whether we are running
+        /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
+        /// available only during run-time.
+        /// </summary>
+        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        private UNetTransport GetNetworkTransport()
+        {
+#if UNITY_EDITOR
+            if (gameObject.TryGetComponentOrLog(out NetworkManager networkManager))
+            {
+                return networkManager.NetworkConfig.NetworkTransport as UNetTransport;
+            }
+            else
+            {
+                return null;
+            }
+
+#else
+            // NetworkManager.Singleton is available only during run-time.
+            return NetworkManager.Singleton.NetworkConfig.NetworkTransport as UNetTransport;
+#endif
+        }
+
+        /// <summary>
+        /// The IP4 address of the server.
+        /// </summary>
+        public string ServerIP4Address
+        {
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
+                }
+                UNetTransport netTransport = GetNetworkTransport();
+                netTransport.ConnectAddress = value;
+            }
+
+            get
+            {
+                UNetTransport netTransport = GetNetworkTransport();
+                return netTransport.ConnectAddress;
+            }
+        }
+
+        /// <summary>
+        /// The name of the scene to be loaded when the game starts.
+        /// </summary>
+        [Tooltip("The name of the game scene.")]
+        public string GameScene = "SEEWorld";
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
@@ -181,7 +261,6 @@ namespace SEE.Net
                     Server.Initialize();
                 }
                 Client.Initialize();
-                StartVoiceChat();
             }
             catch (Exception e)
             {
@@ -199,26 +278,39 @@ namespace SEE.Net
             switch (VoiceChat)
             {
                 case VoiceChatSystems.Vivox:
+                    EnableDissonance(false);
                     VivoxInitialize();
                     break;
                 case VoiceChatSystems.Dissonance:
-                    DissonanceInitialize();
+                    EnableDissonance(true);
                     break;
                 case VoiceChatSystems.None:
-                    // nothing to be done
+                    EnableDissonance(false);
                     break;
                 default:
+                    EnableDissonance(false);
                     throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
             }
         }
 
         /// <summary>
-        /// Initalizes Dissonance as the voice chat system.
+        /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
-        private void DissonanceInitialize()
+        /// <param name="enable">whether to enable Dissonance</param>
+        private void EnableDissonance(bool enable)
         {
-            // FIXME: Needs to be implemented.
-            throw new NotImplementedException();
+            // The DissonanceComms is initially active and the local player is not muted and not deafened.
+            DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
+            if (dissonanceComms != null)
+            {
+                dissonanceComms.IsMuted = !enable;
+                dissonanceComms.IsDeafened = !enable;
+                dissonanceComms.enabled = enable;
+            }
+            else
+            {
+                Debug.LogError($"There is no {typeof(DissonanceComms)} in the current scene.\n");
+            }
         }
 
         /// <summary>
@@ -424,17 +516,30 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The name of the scene to be loaded when the game starts.
-        /// </summary>
-        [Tooltip("The name of the game scene.")]
-        public string GameScene = "SEEWorld";
-
-        /// <summary>
         /// Loads the <see cref="GameScene"/>. Will be called when the server was started.
+        /// Registers <see cref="OnSceneLoaded(Scene, LoadSceneMode)"/> to be called when
+        /// the scene is fully loaded.
         /// </summary>
         private void OnServerStarted()
         {
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        /// <summary>
+        /// Starts the voice-chat system selected. Unregisters itself from
+        /// <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        /// <param name="mode">the mode in which the scene was loaded</param>
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Now we have loaded the scene that is supposed to contain settings for the voice chat
+            // system. We can now turn on the voice chat system.
+            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
+            StartVoiceChat();
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         /// <summary>
@@ -467,13 +572,13 @@ namespace SEE.Net
         /// <summary>
         /// The IPv4 address of the server.
         /// </summary>
-        public string IPv4Address { set; get; } = "127.0.0.1";
+        public string ServerIPv4Address { set; get; } = "127.0.0.1";
 
         /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
         /// chat whatsoever.
         /// </summary>
-        private enum VoiceChatSystems
+        public enum VoiceChatSystems
         {
             None = 0,       // no voice chat
             Dissonance = 1, // Dissonance voice chat
@@ -485,8 +590,8 @@ namespace SEE.Net
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [SerializeField]
-        private VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
         /// Shuts down the voice-chat system.
@@ -499,6 +604,7 @@ namespace SEE.Net
                     // nothing to be done
                     break;
                 case VoiceChatSystems.Dissonance:
+                    // nothing to be done
                     break;
                 case VoiceChatSystems.Vivox:
                     VivoxClient?.Uninitialize();
@@ -508,7 +614,128 @@ namespace SEE.Net
             }
         }
 
-        #region Vivox
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerActionPortLabel = "serverActionPort";
+        /// <summary>
+        /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
+        /// </summary>
+        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        /// <summary>
+        /// Label of attribute <see cref="GameScene"/> in the configuration file.
+        /// </summary>
+        private const string GameSceneLabel = "gameScene";
+        /// <summary>
+        /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
+        /// </summary>
+        private const string VoiceChatLabel = "voiceChat";
+        /// <summary>
+        /// Label of attribute <see cref="ServerPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerPortLabel = "serverPort";
+        /// <summary>
+        /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
+        /// </summary>
+        private const string ServerIP4AddressLabel = "serverIP4Address";
+
+        /// <summary>
+        /// Default name of the configuration file (just the filename, not the path).
+        /// </summary>
+        private const string ConfigFile = "network.cfg";
+
+        /// <summary>
+        /// Default path of the configuration file.
+        /// </summary>
+        /// <returns></returns>
+        private string ConfigPath()
+        {
+            return Filenames.OnCurrentPlatform(Application.streamingAssetsPath + "/" + ConfigFile);
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        public void Save()
+        {
+            Save(ConfigPath());
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        public void Load()
+        {
+            string filename = ConfigPath();
+            if (File.Exists(filename))
+            {
+                Load(filename);
+            }
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file in which the settings are stored</param>
+        public void Save(string filename)
+        {
+            using ConfigWriter writer = new ConfigWriter(filename);
+            Save(writer);
+        }
+
+        /// <summary>
+        /// Reads the settings of this network configuration from <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file from which the settings are restored</param>
+        public void Load(string filename)
+        {
+            using ConfigReader stream = new ConfigReader(filename);
+            Restore(stream.Read());
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">the writer to be used to save the settings</param>
+        protected virtual void Save(ConfigWriter writer)
+        {
+            writer.Save(ServerActionPort, ServerActionPortLabel);
+            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
+            writer.Save(GameScene, GameSceneLabel);
+            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
+            writer.Save(ServerPort, ServerPortLabel);
+            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">the attributes from which to restore the settings</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
+            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            {
+                int value = ServerPort;
+                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ServerPort = value;
+            }
+            {
+                string value = ServerIP4Address;
+                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ServerIP4Address = value;
+            }
+        }
+
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -639,6 +866,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        #endregion
+#endregion
     }
 }
