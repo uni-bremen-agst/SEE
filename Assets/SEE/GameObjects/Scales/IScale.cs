@@ -97,6 +97,23 @@ namespace SEE.GO
         public abstract float GetNormalizedValueForLevel(string metric, float value, int level);
 
         /// <summary>
+        /// Yields the maximal value of the given <paramref name="metric"/> (not normalized).
+        /// </summary>
+        /// <param name="metric">metric for which to return the maximum</param>
+        /// <returns>maximum</returns>
+        public float GetMaximum(string metric)
+        {
+            if (metricMaxima.TryGetValue(metric, out float max))
+            {
+                return max;
+            }
+            else
+            {
+                throw new Exception("A metric named " + metric + " does not exist.");
+            }
+        }
+
+        /// <summary>
         /// Yields the normalized value of the maximum of the given metric.
         /// </summary>
         /// <param name="metric">metric for which to return the normalized maximum</param>
