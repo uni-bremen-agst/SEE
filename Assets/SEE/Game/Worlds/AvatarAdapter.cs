@@ -11,7 +11,13 @@ using UnityEngine;
 
 namespace SEE.Game.Worlds
 {
-    class AvatarAdapter : NetworkBehaviour
+    /// <summary>
+    /// This component is assumed to be attached to a game object representing
+    /// an avatar (representing a local or remote player). It will adapt that
+    /// avatar according to the platform we are currently running on
+    /// (<see cref="PlayerSettings.GetInputType()"/>.
+    /// </summary>
+    internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
         /// If this code is execute for the local player, the necessary player type
@@ -32,7 +38,7 @@ namespace SEE.Game.Worlds
                         PrepareForXR();
                         break;
                     default:
-                        throw new System.NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
+                        throw new NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;

@@ -4,9 +4,16 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline around a game object being grabbed and makes it opaque.
+    /// Draws or modifies, respectively, an outline around a game object being grabbed and makes it opaque.
+    ///
+    /// FIXME: An outline is meanwhile added for every node, hence, outlining the
+    /// grabbed object makes no visibile difference. We need another way to highlight
+    /// a grabbed object.
+    ///
+    /// FIXME: <see cref="ShowGrabbing"/>,  <see cref="ShowSelection"/>, and <see cref="ShowHovering"/>
+    /// are all so similiar to each other. We should consider to remove this redundancy.
     /// </summary>
-    public class ShowGrabbing : InteractableObjectGrabAction
+    internal class ShowGrabbing : InteractableObjectGrabAction
     {
         /// <summary>
         /// The local grabbing color of the outline.
@@ -24,15 +31,16 @@ namespace SEE.Controls.Actions
         private Outline outline;
 
         /// <summary>
-        /// The material of the game object being selected.
+        /// The AlphaEnforcer that ensures that the grabbed game object always has the correct
+        /// alpha value.
         /// </summary>
         private AlphaEnforcer enforcer;
-        
+
         /// <summary>
         /// Color of the node before being grabbed.
         /// </summary>
         private Color initialColor = Color.black;
-        
+
         /// <summary>
         /// Alpha value of the node before being hovered over.
         /// </summary>
@@ -55,6 +63,16 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Called when the object is grabbed. Remembers the current color
+        /// of the outline in <see cref="initialColor"/> and sets the outline's
+        /// color to <see cref="LocalGrabColor"/> or <see cref="RemoteGrabColor"/>,
+        /// respectively, depending upon <paramref name="isInitiator"/>.
+        /// If <paramref name="isInitiator"/>, the <see cref="enforcer"/>'s
+        /// current <see cref="TargetAlpha"/> is saved and then set to 1.
+        /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             initialColor = outline.OutlineColor;
@@ -66,6 +84,13 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Called when the object is no longer grabbed. Resets the outline's
+        /// color and the <see cref="enforcer"/>'s <see cref="TargetAlpha"/>
+        /// to their original values before the object was grabbed.
+        /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
             if (!interactable.IsHovered && !interactable.IsSelected)

@@ -17,30 +17,34 @@ namespace SEE.Controls.Actions
         {
             internal Hit(Transform hoveredObject)
             {
-                cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
-                this.hoveredObject = hoveredObject;
-                interactableObject = hoveredObject.GetComponent<InteractableObject>();
-                plane = new Plane(Vector3.up, cityRootNode.position);
+                CityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
+                this.HoveredObject = hoveredObject;
+                InteractableObject = hoveredObject.GetComponent<InteractableObject>();
+                Plane = new Plane(Vector3.up, CityRootNode.position);
             }
             /// <summary>
-            /// The root of the code city. This the top-most game object representing a node,
+            /// The root of the code city. This is the top-most game object representing a node,
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
-            internal Transform cityRootNode;
+            internal Transform CityRootNode;
             /// <summary>
-            /// The game object currently being hovered over. It is a descendant of <see cref="cityRootNode"/>
-            /// or <see cref="cityRootNode"/> itself.
+            /// The game object currently being hovered over. It is a descendant of <see cref="CityRootNode"/>
+            /// or <see cref="CityRootNode"/> itself.
             /// </summary>
-            internal Transform hoveredObject;
+            internal Transform HoveredObject;
             /// <summary>
-            /// The interactable component attached to <see cref="hoveredObject"/>.
+            /// The interactable component attached to <see cref="HoveredObject"/>.
             /// </summary>
-            internal InteractableObject interactableObject;
-            internal Plane plane;
+            internal InteractableObject InteractableObject;
+            internal Plane Plane;
         }
 
+        /// <summary>
+        /// The number of degrees in a full circle.
+        /// </summary>
+        private const float FullCircleDegree = 360.0f;
         private const float SnapStepCount = 8;
-        private const float SnapStepAngle = 360.0f / SnapStepCount;
+        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
@@ -82,9 +86,9 @@ namespace SEE.Controls.Actions
         /// <returns>empty set because this action does not change anything</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento != null && memento.gameObject != null)
+            if (memento != null && memento.GameObject != null)
             {
-                return new HashSet<string> { memento.gameObject.name };
+                return new HashSet<string> { memento.GameObject.name };
             }
             else
             {
@@ -109,25 +113,25 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The transform of the game object that was moved.
             /// </summary>
-            public Transform gameObject;
+            internal Transform GameObject;
             /// <summary>
-            /// The parent of <see cref="gameObject"/> at the time before it was moved.
+            /// The parent of <see cref="GameObject"/> at the time before it was moved.
             /// This will be used to restore the original parent upon <see cref="Undo"/>.
             /// </summary>
             private Transform oldParent;
             /// <summary>
-            /// The position of <see cref="gameObject"/> in world space at the time before it was moved.
+            /// The position of <see cref="GameObject"/> in world space at the time before it was moved.
             /// This will be used to restore the original world-space position upon <see cref="Undo"/>.
             /// </summary>
             private Vector3 oldPosition;
             /// <summary>
-            /// The new parent of <see cref="gameObject"/> at the time after it was moved.
+            /// The new parent of <see cref="GameObject"/> at the time after it was moved.
             /// Maybe the same value as <see cref="oldParent"/>.
             /// This will be used to restore the new parent upon <see cref="Redo"/>.
             /// </summary>
             private GameObject newParent;
             /// <summary>
-            /// The new position of <see cref="gameObject"/> in world space at the time after it was moved.
+            /// The new position of <see cref="GameObject"/> in world space at the time after it was moved.
             /// This will be used to restore the new position upon <see cref="Redo"/>.
             /// </summary>
             private Vector3 newPosition;
@@ -138,25 +142,25 @@ namespace SEE.Controls.Actions
             /// <param name="movedGameNode">the transform of the game node that was moved</param>
             internal Memento(Transform movedGameNode)
             {
-                this.gameObject = movedGameNode;
+                this.GameObject = movedGameNode;
                 this.oldParent = movedGameNode.transform.parent;
                 this.oldPosition = movedGameNode.position;
             }
 
             /// <summary>
-            /// Restores the original state of <see cref="gameObject"/> before it was moved
+            /// Restores the original state of <see cref="GameObject"/> before it was moved
             /// regarding its original parent and position. Will also propagate that state
             /// through the network to all clients.
             /// </summary>
             internal void Undo()
             {
-                gameObject.position = oldPosition;
-                gameObject.SetParent(oldParent);
-                new ReparentNetAction(gameObject.name, oldParent.name, oldPosition).Execute();
+                GameObject.position = oldPosition;
+                GameObject.SetParent(oldParent);
+                new ReparentNetAction(GameObject.name, oldParent.name, oldPosition).Execute();
             }
 
             /// <summary>
-            /// Restores the state of <see cref="gameObject"/> after it was moved regarding its
+            /// Restores the state of <see cref="GameObject"/> after it was moved regarding its
             /// new parent and position. Will also propagate that state through the network to
             /// all clients.
             ///
@@ -164,13 +168,13 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void Redo()
             {
-                gameObject.position = newPosition;
-                gameObject.SetParent(newParent.transform);
-                new ReparentNetAction(gameObject.name, newParent.name, gameObject.position).Execute();
+                GameObject.position = newPosition;
+                GameObject.SetParent(newParent.transform);
+                new ReparentNetAction(GameObject.name, newParent.name, GameObject.position).Execute();
             }
 
             /// <summary>
-            /// Memorizes the new position of <see cref="gameObject"/> after it was moved.
+            /// Memorizes the new position of <see cref="GameObject"/> after it was moved.
             /// Relevant for <see cref="Redo"/>.
             /// </summary>
             /// <param name="position">new position</param>
@@ -180,7 +184,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Memorizes the new parent of <see cref="gameObject"/> after it was moved.
+            /// Memorizes the new parent of <see cref="GameObject"/> after it was moved.
             /// Can be the original parent. Relevant for <see cref="Redo"/>.
             /// </summary>
             /// <param name="parent">new parent</param>
@@ -218,9 +222,9 @@ namespace SEE.Controls.Actions
             {
                 if (moving)
                 {
-                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
-                    Positioner.Set(hit.hoveredObject, originalPosition);
-                    hit.interactableObject.SetGrab(false, true);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    Positioner.Set(hit.HoveredObject, originalPosition);
+                    hit.InteractableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
                     moving = false;
@@ -229,7 +233,8 @@ namespace SEE.Controls.Actions
                 }
                 else if (hoveredObject)
                 {
-                    InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
+                    // TODO(torben): this should be in SelectAction.cs
+                    InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true);
                 }
             }
             else if (SEEInput.Drag()) // start or continue movement
@@ -245,14 +250,14 @@ namespace SEE.Controls.Actions
                     hit = new Hit(draggedObject);
                     memento = new Memento(draggedObject);
 
-                    hit.interactableObject.SetGrab(true, true);
+                    hit.InteractableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
-                    dragStartTransformPosition = hit.hoveredObject.position;
-                    dragStartOffset = planeHitPoint - hit.hoveredObject.position;
-                    dragCanonicalOffset = dragStartOffset.DividePairwise(hit.hoveredObject.localScale);
+                    dragStartTransformPosition = hit.HoveredObject.position;
+                    dragStartOffset = planeHitPoint - hit.HoveredObject.position;
+                    dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
                 }
 
-                if (moving && Raycasting.RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
+                if (moving && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
                     Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
                     if (SEEInput.Snap())
@@ -265,9 +270,9 @@ namespace SEE.Controls.Actions
                         Vector2 proj = dir * Vector2.Dot(point2, dir);
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
-                    Positioner.Set(hit.hoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.hoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
+                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
                     gizmo.SetPositions(startPoint, endPoint);
 
                     synchronize = true;
@@ -287,17 +292,17 @@ namespace SEE.Controls.Actions
             }
             else if (moving)
             {
-                InteractableObject interactableObjectToBeUngrabbed = hit.interactableObject;
+                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
-                if (hit.hoveredObject != hit.cityRootNode) // only reparent non-root nodes
+                if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.hoveredObject.gameObject);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
                     if (parent != null)
                     {
                         // The move has come to a successful end.
-                        new ReparentNetAction(hit.hoveredObject.gameObject.name, parent.name, hit.hoveredObject.position).Execute();
+                        new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
                         memento.SetNewParent(parent);
-                        memento.SetNewPosition(hit.hoveredObject.position);
+                        memento.SetNewPosition(hit.HoveredObject.position);
                         currentState = ReversibleAction.Progress.Completed;
                         result = true;
                     }
@@ -305,9 +310,10 @@ namespace SEE.Controls.Actions
                     {
                         // An attempt was made to move the hovered object outside of the city.
                         // We need to reset it to its original position. And then we start from scratch.
-                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
-                        hit.hoveredObject.position = originalPosition;
-                        new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                        hit.HoveredObject.position = originalPosition;
+                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
                         // The following assignment will override hit.interactableObject; that is why we
                         // stored its value in interactableObjectToBeUngrabbed above.
                         hit = new Hit();
@@ -321,7 +327,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
+                new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
@@ -332,12 +338,18 @@ namespace SEE.Controls.Actions
             return result;
         }
 
+        /// <summary>
+        /// <see cref="ReversibleAction.Undo"/>.
+        /// </summary>
         public override void Undo()
         {
             base.Undo();
             memento?.Undo();
         }
 
+        /// <summary>
+        /// <see cref="ReversibleAction.Redo"/>.
+        /// </summary>
         public override void Redo()
         {
             base.Redo();

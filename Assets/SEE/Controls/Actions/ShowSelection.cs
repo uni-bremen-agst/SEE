@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline for a selected object and makes it opaque.
+    /// Draws or modifies, respectively, an outline around a selected game object and makes it opaque.
     /// </summary>
     public class ShowSelection : InteractableObjectSelectionAction
     {
@@ -24,7 +24,8 @@ namespace SEE.Controls.Actions
         private Outline outline;
 
         /// <summary>
-        /// The material of the game object being selected.
+        /// The AlphaEnforcer that ensures that the selected game object always has the correct
+        /// alpha value.
         /// </summary>
         private AlphaEnforcer enforcer;
 
