@@ -6,7 +6,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for cylinder game objects.
     /// </summary>
-    public class CylinderFactory : InnerNodeFactory
+    internal class CylinderFactory : InnerNodeFactory
     {
         /// <summary>
         /// Constructor.
@@ -173,7 +173,7 @@ namespace SEE.GO
             bool leftSided = true;
             int leftIndex = 0;
             int rightIndex = 0;
-            int middleIndex = 0;
+            int middleIndex;
             int topCapVertexOffset = numVertices - numVertexColumns;
             for (int i = 0; i < numCapTris; i++)
             {

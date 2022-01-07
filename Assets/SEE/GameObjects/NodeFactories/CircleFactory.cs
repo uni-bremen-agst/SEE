@@ -6,7 +6,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for circle inner game objects.
     /// </summary>
-    public class CircleFactory : LineInnerNodeFactory
+    internal class CircleFactory : LineInnerNodeFactory
     {
         /// <summary>
         /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.

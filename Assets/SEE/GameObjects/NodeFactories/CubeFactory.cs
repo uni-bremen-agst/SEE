@@ -11,7 +11,7 @@ namespace SEE.GO
     /// used for inner nodes, too, they must provide SetLineWidth() even though
     /// it does not do anything.
     /// </summary>
-    public class CubeFactory : InnerNodeFactory
+    internal class CubeFactory : InnerNodeFactory
     {
         private readonly Mesh cubeMesh;
 
