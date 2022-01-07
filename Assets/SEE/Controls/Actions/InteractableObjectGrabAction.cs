@@ -20,7 +20,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogErrorFormat("InteractableObjectGrabAction.OnEnable for {0} has NO interactable.\n", name);
+                Debug.LogError($"InteractableObjectGrabAction.OnEnable for {name} has NO interactable.\n");
             }
         }
 
@@ -36,7 +36,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogErrorFormat("InteractableObjectGrabAction.OnDisable for {0} has NO interactable.\n", name);
+                Debug.LogError($"InteractableObjectGrabAction.OnDisable for {name} has NO interactable.\n");
             }
         }
 
