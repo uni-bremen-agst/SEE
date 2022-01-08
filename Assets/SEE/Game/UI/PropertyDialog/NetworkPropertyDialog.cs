@@ -83,6 +83,11 @@ namespace SEE.Game.UI.PropertyDialog
         private SelectionProperty voiceChatSelector;
 
         /// <summary>
+        /// The dialog for the user input.
+        /// </summary>
+        private PropertyDialog propertyDialog;
+
+        /// <summary>
         /// Creates and opens the dialog.
         /// </summary>
         public void Open()
@@ -126,10 +131,15 @@ namespace SEE.Game.UI.PropertyDialog
                 group.AddProperty(voiceChatSelector);
             }
             // Dialog
-            PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
+            propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Network settings";
             propertyDialog.Description = "Enter the network settings";
             propertyDialog.AddGroup(group);
+
+            // Because we will validate the input, we do not want the propertyDialog
+            // to be closed until the input valid. That is why we will handle the
+            // closing ourselves.
+            propertyDialog.AllowClosing(false);
 
             // Register listeners
             propertyDialog.OnConfirm.AddListener(OKButtonPressed);
@@ -154,6 +164,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void CancelButtonPressed()
         {
+            propertyDialog.Close();
             OnCancel.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
@@ -167,15 +178,22 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void OKButtonPressed()
         {
+            bool errorOccurred = false;
+
             {
                 // Server IP Address
                 string ipAddressValue = ipAddress.Value.Trim();
-                if (!HasCorrectIPv4AddressSyntax(ipAddressValue))
+                if (HasCorrectIPv4AddressSyntax(ipAddressValue))
                 {
-                    ShowNotification.Error("IPv4 Syntax Error",
-                        "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
+                    networkConfig.ServerIPv4Address = ipAddressValue;
                 }
-                networkConfig.ServerIPv4Address = ipAddressValue;
+                else
+                {
+                    ShowNotification.Error
+                       ("IPv4 Syntax Error",
+                        "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
+                    errorOccurred = true;
+                }
             }
             {
                 // Server Port Number
@@ -187,6 +205,7 @@ namespace SEE.Game.UI.PropertyDialog
                 else
                 {
                     ShowPortError("Server");
+                    errorOccurred = true;
                 }
             }
             {
@@ -199,6 +218,7 @@ namespace SEE.Game.UI.PropertyDialog
                 else
                 {
                     ShowPortError("Server Action");
+                    errorOccurred = true;
                 }
             }
             {
@@ -210,16 +230,20 @@ namespace SEE.Game.UI.PropertyDialog
                 }
                 else
                 {
-                    Debug.LogError($"Invalid value for {typeof(VoiceChatSystems)}: {value}.\n");
                     ShowNotification.Error("Invalid Voice Chat", "Your choice is not available");
+                    errorOccurred = true;
                 }
             }
 
-            OnConfirm.Invoke();
-            SEEInput.KeyboardShortcutsEnabled = true;
-            Close();
-            callBack?.Invoke();
-            networkConfig.Save();
+            if (!errorOccurred)
+            {
+                propertyDialog.Close();
+                networkConfig.Save();
+                OnConfirm.Invoke();
+                SEEInput.KeyboardShortcutsEnabled = true;
+                Close();
+                callBack?.Invoke();
+            }
 
             static void ShowPortError(string portPrefix)
             {
