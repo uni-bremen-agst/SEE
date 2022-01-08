@@ -11,7 +11,7 @@ namespace SEE.Game.UI
     /// Inheritors are expected to override the respective Start() and Update() methods (e.g. <see cref="StartVR()"/>.
     /// If the current platform's start method was not overridden, the component will be destroyed.
     /// If the current platform's update method was not overridden, nothing will happen.
-    /// 
+    ///
     /// This approach is especially well suited for UI components, as their presentation is almost always different
     /// based on the platform.
     /// </summary>
@@ -22,7 +22,7 @@ namespace SEE.Game.UI
         /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
         /// </summary>
         private const string UI_CANVAS_NAME = "UI Canvas";
-        
+
         /// <summary>
         /// Path to where the UI Canvas prefab is stored.
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
@@ -82,7 +82,7 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
         protected virtual void UpdateHoloLens() { }
-        
+
         protected void Start()
         {
             Canvas = GameObject.Find(UI_CANVAS_NAME);
@@ -92,9 +92,9 @@ namespace SEE.Game.UI
                 Canvas = PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
-            
+
             HasStarted = true;
-            
+
             // Execute platform dependent code
             Platform = PlayerSettings.GetInputType();
             switch (Platform)
@@ -107,10 +107,10 @@ namespace SEE.Game.UI
                     //TODO: Apply CurvedUI to canvas
                     break;
                 case PlayerInputType.HoloLensPlayer: StartHoloLens();
-                    //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended 
+                    //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
-                    break;  
+                    break;
                 default: PlatformUnsupported();
                     break;
             }
@@ -130,7 +130,7 @@ namespace SEE.Game.UI
                 case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
-                    break;  
+                    break;
                 default: PlatformUnsupported();
                     break;
             }
