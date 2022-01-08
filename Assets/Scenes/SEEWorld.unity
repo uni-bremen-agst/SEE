@@ -7684,8 +7684,8 @@ MonoBehaviour:
   useAudioAnalysis: 1
   needAudioSource: 1
   inspStateFoldoutProcessing: 1
-  inspStateFoldoutSettings: 0
-  inspStateFoldoutVisemes: 0
+  inspStateFoldoutSettings: 1
+  inspStateFoldoutVisemes: 1
   inspCollectionDisplayMode: 0
   inspAnalysisDisplay: 0
   inspOverrideSecondaryMix: 0
@@ -12649,10 +12649,10 @@ MonoBehaviour:
       Data: 0|SEE.Game.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 2
+      Data: 3
     - Name: relativePath
       Entry: 1
-      Data: 
+      Data: /mini/CodeFacts.cfg
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -12837,7 +12837,7 @@ MonoBehaviour:
       Data: 0.01
     - Name: MaximalBlockLength
       Entry: 4
-      Data: 5
+      Data: 0.5
     - Name: 
       Entry: 8
       Data: 
@@ -12858,10 +12858,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.0412513167
+      Data: 0.04125132
     - Name: 
       Entry: 4
-      Data: 0.734719336
+      Data: 0.7347193
     - Name: 
       Entry: 4
       Data: 0.9716981
@@ -13020,12 +13020,8 @@ MonoBehaviour:
       Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 14|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13037,11 +13033,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13053,11 +13049,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13069,11 +13065,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13094,7 +13090,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.City.ErosionAttributes, SEE
+      Data: 17|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -13160,8 +13156,8 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   CityPath:
-    Root: 2
-    relativePath: 
+    Root: 3
+    relativePath: /mini/CodeFacts.cfg
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
@@ -13186,7 +13182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0045906305
+  HeightOffset: 0.0080500245
 --- !u!65 &1535691041
 BoxCollider:
   m_ObjectHideFlags: 0
