@@ -61,7 +61,7 @@ namespace SEE.Net
         {
             if (!initialized)
             {
-                void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
+                static void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data)
                     => PacketHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
 
@@ -86,8 +86,8 @@ namespace SEE.Net
                 }
                 if (!success)
                 {
-                    Logger.Log($"No server connection could be established using. You may want to check your firewall configuration.");
-                    throw new ConnectionSetupException();
+                    Logger.Log($"No server connection could be established. You may want to check your firewall configuration.");
+                    throw new NoServerConnection($"Cannot connect to server {Network.RemoteServerIPAddress}:{Network.Instance.ServerActionPort}.");
                 }
 
                 initialized = true;
