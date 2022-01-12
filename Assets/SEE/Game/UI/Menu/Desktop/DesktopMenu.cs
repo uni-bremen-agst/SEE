@@ -71,13 +71,17 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// Sets up the window of the menu. In this case, we use a <see cref="ModalWindowManager"/>, which
-        /// uses the given title, description, and icon.
+        /// uses the given title, description, and icon. If we find managers attached to a game object
+        /// whose name equals <see cref="Title"/>, this manager will be re-used. Otherwise a new
+        /// <see cref="MenuGameObject"/> will be created and a new <see cref="Manager"/> will be
+        /// attached to it.
         /// </summary>
         protected void SetUpDesktopWindow()
         {
             // Find ModalWindowManager with matching name
             ModalWindowManager[] managers = Canvas.GetComponentsInChildren<ModalWindowManager>();
             Manager = managers.FirstOrDefault(component => component.gameObject.name.Equals(Title));
+
             if (Manager == null)
             {
                 // Create it from prefab if it doesn't exist yet
@@ -89,13 +93,13 @@ namespace SEE.Game.UI.Menu
             {
                 MenuGameObject = Manager.gameObject;
             }
-            EnableClosingDesktop(MenuGameObject, closingIsEnabled);
+            EnableClosingDesktop(MenuGameObject, allowNoSelection);
 
             // Set menu properties
             Manager.titleText = Title;
             Manager.descriptionText = Description;
             Manager.icon = Icon;
-            Manager.onConfirm.AddListener(() => ShowMenu(false));
+            HandleHideMenuRegistration();
 
             // Create tooltip
             Tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
@@ -106,6 +110,54 @@ namespace SEE.Game.UI.Menu
             {
                 Debug.LogError("Couldn't find required components on MenuGameObject.");
             }
+        }
+
+        /// <summary>
+        /// Whether the menu should be hidden after the user has made a selection.
+        /// </summary>
+        private bool hideAfterSelection = true;
+
+        /// <summary>
+        /// Declares whether the menu should be hidden (<see cref="ShowMenu(false)"/>) when
+        /// the user has made a selection.
+        /// The default is to hide the menu after selection.
+        /// </summary>
+        /// <param name="hide">if true, the menu will be hidden after a selection</param>
+        private void HideAfterSelectionDesktop(bool hide)
+        {
+            /// The <see cref="Manager"/> may exist only when <see cref="SetUpDesktopWindow()"/>
+            /// has been called. For this reason, we save the client's wish here and either
+            /// fulfill it now or later.
+            hideAfterSelection = hide;
+            if (Manager)
+            {
+                HandleHideMenuRegistration();
+            }
+        }
+
+        /// <summary>
+        /// If <see cref="hideAfterSelection"/> is true, <see cref="HideMenu"/> will be
+        /// called when a user made a selection. If <see cref="hideAfterSelection"/> is
+        /// false, the menu stays open after a selection.
+        /// </summary>
+        private void HandleHideMenuRegistration()
+        {
+            if (hideAfterSelection)
+            {
+                Manager.onConfirm.RemoveListener(HideMenu);
+            }
+            else
+            {
+                Manager.onConfirm.AddListener(HideMenu);
+            }
+        }
+
+        /// <summary>
+        /// Equivalent to <see cref="ShowMenu(false)"/>.
+        /// </summary>
+        protected void HideMenu()
+        {
+            ShowMenu(false);
         }
 
         /// <summary>
