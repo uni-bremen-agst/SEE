@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Michsky.UI.ModernUIPack;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI.Menu
 {
@@ -61,16 +62,78 @@ namespace SEE.Game.UI.Menu
             buttons[3] = buttonRotate;
             buttons[4] = buttonMove;
 
+            //initially set all buttons but the first ones inactive
+            for (int i = 1; i < buttons.Length; i++)
+            {
+                for (int j = 0; j < buttons[i].Length; j++)
+                {
+                    buttons[i][j].SetActive(false);
+                }
+
+            }
+
             for (int i = 0; i < buttons.Length; i++)
             {
-                buttons[i][0].transform.parent = menuPanelVertical;
+                for (int j = 0; j < buttons[i].Length; j++)
+                {
+                    if (j == 0)
+                    {
+                        buttons[i][j].transform.SetParent(menuPanelVertical);
+                        //add listener to expand menu
+                        buttons[i][j].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => CollapseMenu());
+                        int clickedIndex = i;
+                        buttons[i][j].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => SortButtons(clickedIndex));
+                    }
+                    else
+                    {
+                        buttons[i][j].transform.SetParent(menuPanelHorizontal);
+                    }
+                }       
+            }
+            Debug.Log(buttons);
+        }
+
+        private void SortButtons(int ClickedIndex)
+        {
+            for (int i = 1; i < buttons.Length; i++)
+            {
+                if (i == ClickedIndex)
+                {
+                    GameObject[] tmpButtons = new GameObject[buttons[i].Length];
+                    tmpButtons = buttons[i];
+                    buttons[i] = buttons[0];
+                    buttons[0] = tmpButtons;
+
+                    for (int j = 1; j < buttons[i].Length; j++)
+                    {
+                        buttons[i][j].SetActive(false);
+                    }
+                    for (int j = 1;j < buttons[0].Length; j++)
+                    {
+                        buttons[0][j].SetActive(true);
+                    }
+                }
             }
         }
 
-        // Update is called once per frame
-        void Update()
+        private void CollapseMenu()
         {
-
+            if (buttons[1][0].activeSelf == true)
+            {
+                for (int i = 1; i < buttons.Length; i++)
+                {
+                    buttons[i][0].SetActive(false);
+                }
+            }
+            else
+            {
+                for (int i = 1; i < buttons.Length; i++)
+                {
+                    buttons[i][0].SetActive(true);
+                }
+            }
+            
         }
+
     }
 }
