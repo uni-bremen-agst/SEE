@@ -95,21 +95,51 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Whether this menu can be closed by the built-in mechanisms.
+        /// If true, the user can close this menu by not making any selectiion,
+        /// that is, this menu can be closed by the built-in mechanisms without
+        /// triggering any action.
         /// </summary>
-        protected bool closingIsEnabled = true;
+        protected bool allowNoSelection = true;
 
         /// <summary>
-        /// Enables/disables all built-in mechanisms to close this dialog.
-        /// If the built-in mechanisms are disabled, a client needs to use
-        /// other means, e.g., Destroy this game object.
-        ///
-        /// Note: closing is enabled by default.
+        /// If <paramref name="enable"/> is true, the user can close this menu
+        /// by not making any selectiion, that is, this menu can be closed by
+        /// the built-in mechanisms without triggering any action.
+        /// Note: by default the user is offered a way to get out of this menu without
+        /// making any selection.
         /// </summary>
-        /// <param name="enable">whether built-in mechanisms for closing should be enabled</param>
-        public void EnableClosing(bool enable)
+        /// <param name="enable">whether built-in mechanisms for closing without
+        /// triggering any action should be enabled</param>
+        public void AllowNoSelection(bool enable)
         {
-            closingIsEnabled = enable;
+            allowNoSelection = enable;
+        }
+
+        /// <summary>
+        /// Declares whether the menu should be hidden (<see cref="ShowMenu(false)"/>) when
+        /// the user has made a selection.
+        /// The default is to hide the menu after selection.
+        /// </summary>
+        /// <param name="hide">if true, the menu will be hidden after a selection</param>
+        public void HideAfterSelection(bool hide)
+        {
+            switch (Platform)
+            {
+                case PlayerInputType.DesktopPlayer:
+                    HideAfterSelectionDesktop(hide);
+                    break;
+                case PlayerInputType.TouchGamepadPlayer:
+                    break;
+                case PlayerInputType.VRPlayer:
+                    break;
+                case PlayerInputType.HoloLensPlayer:
+                    break;
+                case PlayerInputType.None: // no UI has to be rendered
+                    break;
+                default:
+                    PlatformUnsupported();
+                    break;
+            }
         }
 
         /// <summary>
@@ -129,14 +159,29 @@ namespace SEE.Game.UI.Menu
         {
             if (listen)
             {
+                // We may already be listening.
+                StopListening();
                 keywordInput = new KeywordInput(GetMenuEntryTitles());
                 keywordInput.Register(OnMenuEntryTitleRecognized);
                 keywordInput.Start();
             }
-            else if (keywordInput != null)
+            else
+            {
+                StopListening();
+            }
+        }
+
+        /// <summary>
+        /// Stops the <see cref="keywordInput"/> if not null. <see cref="keywordInput"/>
+        /// will be null afterwards.
+        /// </summary>
+        private void StopListening()
+        {
+            if (keywordInput != null)
             {
                 keywordInput.Unregister(OnMenuEntryTitleRecognized);
                 keywordInput.Dispose();
+                keywordInput = null;
             }
         }
 
@@ -148,14 +193,14 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Returns the titles of all <see cref="entries"/> plus
         /// <see cref="CloseMenuCommand"/> appended at the end
-        /// if <see cref="closingIsEnabled"/>.
+        /// if <see cref="allowNoSelection"/>.
         /// </summary>
         /// <returns>titles of all <see cref="entries"/> appended by
         /// <see cref="CloseMenuCommand"/></returns>
         private string[] GetMenuEntryTitles()
         {
             IEnumerable<string> result = entries.Select(x => x.Title);
-            return (closingIsEnabled ? result : result.Append(CloseMenuCommand)).ToArray();
+            return (allowNoSelection ? result : result.Append(CloseMenuCommand)).ToArray();
         }
 
         /// <summary>
@@ -275,9 +320,12 @@ namespace SEE.Game.UI.Menu
             entry.DoAction();
         }
 
+        /// <summary>
+        /// Loads default icon (cannot be done during instantiation, only in <see cref="Awake"/>
+        /// or <see cref="Start"/>).
+        /// </summary>
         private void Awake()
         {
-            // Load default icon (can't be done during instantiation, only in Awake() or Start())
             Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
 
