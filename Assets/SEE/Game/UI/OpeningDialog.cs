@@ -4,6 +4,8 @@ using SEE.Utils;
 using SEE.GO;
 using UnityEngine;
 using SEE.Game.UI.PropertyDialog;
+using System;
+using SEE.Game.UI.Notification;
 
 namespace SEE.UI
 {
@@ -16,25 +18,25 @@ namespace SEE.UI
         /// <summary>
         /// The UI object representing the menu the user chooses the action from.
         /// </summary>
-        private SelectionMenu actionMenu;
+        private SimpleMenu menu;
 
         /// <summary>
         /// This creates and returns the action menu, with which a user can configure the
         /// networking.
         /// </summary>
-        /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
-        /// new game object will be created.</param>
         /// <returns>the newly created action menu component.</returns>
-        private SelectionMenu CreateModeMenu(GameObject attachTo = null)
+        private SimpleMenu CreateMenu()
         {
-            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionMenuGO = attachTo ? attachTo : new GameObject { name = "Network Menu" };
+            GameObject actionMenuGO = new GameObject { name = "Network Menu" };
             IList<ToggleMenuEntry> entries = SelectionEntries();
-            SelectionMenu actionMenu = actionMenuGO.AddComponent<SelectionMenu>();
-            actionMenu.EnableClosing(false); // the menu cannot be closed; user must make a decision
+            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
+            actionMenu.AllowNoSelection(false); // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
             actionMenu.Description = "Please select the network configuration you want to activate.";
             actionMenu.AddEntries(entries);
+            // We will handle the closing of the menu ourselves: we need to wait until a network
+            // connection can be established.
+            actionMenu.HideAfterSelection(false);
             return actionMenu;
         }
 
@@ -95,7 +97,15 @@ namespace SEE.UI
         /// </summary>
         private void StartHost()
         {
-            network.StartHost();
+            try
+            {
+                network.StartHost();
+                menu.ShowMenu(false);
+            }
+            catch (Exception exception)
+            {
+                ShowNotification.Error("Host cannot be started", exception.Message);
+            }
         }
 
         /// <summary>
@@ -103,7 +113,15 @@ namespace SEE.UI
         /// </summary>
         private void StartClient()
         {
-            network.StartClient();
+            try
+            {
+                network.StartClient();
+                menu.ShowMenu(false);
+            }
+            catch (Exception exception)
+            {
+                ShowNotification.Error("Server connection failed", exception.Message);
+            }
         }
 
         /// <summary>
@@ -111,7 +129,15 @@ namespace SEE.UI
         /// </summary>
         private void StartServer()
         {
-            network.StartServer();
+            try
+            {
+                network.StartServer();
+                menu.ShowMenu(false);
+            }
+            catch (Exception exception)
+            {
+                ShowNotification.Error("Server cannot be started", exception.Message);
+            }
         }
 
         /// <summary>
@@ -128,11 +154,11 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Turns on the <see cref="actionMenu"/>.
+        /// Turns on the <see cref="menu"/>.
         /// </summary>
         private void Reactivate()
         {
-            actionMenu.ShowMenu(true);
+            menu.ShowMenu(true);
         }
 
         /// <summary>
@@ -148,12 +174,12 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Creates and shows the <see cref="actionMenu"/>.
+        /// Creates and shows the <see cref="menu"/>.
         /// </summary>
         private void Start()
         {
-            actionMenu = CreateModeMenu();
-            actionMenu.ShowMenu(true);
+            menu = CreateMenu();
+            menu.ShowMenu(true);
         }
     }
 }
