@@ -93,13 +93,13 @@ namespace SEE.Game
                 {
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
+                    if (nodeRef != null && nodeRef.Value != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
                         // Reflexion analysis: Dropping implementation node on architecture node
                         if (nodeRef.Value.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
                         {
-                            ShowNotification.Info("Reflexion Analysis", $"Mapping node {movingNode.SourceName} "
-                                                                        + $"onto {nodeRef.Value.SourceName}.");
+                            ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
+                                                                        + $"onto '{nodeRef.Value.SourceName}'.");
                         }
                         else if (nodeRef.Value.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
                         {
