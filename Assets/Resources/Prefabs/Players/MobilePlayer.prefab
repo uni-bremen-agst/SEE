@@ -35,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -455.00006, y: -74.99997}
-  m_SizeDelta: {x: 625, y: 125}
+  m_AnchoredPosition: {x: -392.50006, y: -74.99994}
+  m_SizeDelta: {x: 750, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3605664009419463739
 CanvasRenderer:
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_ReverseArrangement: 1
 --- !u!1 &4686446212303944763
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,7 +253,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a752f0b7c2ecca4787ca16a20fc31ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonPrefab: {fileID: 7825028887019599639, guid: 5c3cdf191cf375544bc62edfdc8b3b38, type: 3}
+  iconButtonPrefab: {fileID: 7825028887019599639, guid: 5c3cdf191cf375544bc62edfdc8b3b38, type: 3}
+  textButtonPrefab: {fileID: 2158185613370194654, guid: f145bd44dd6c18046ad430dc2201471e, type: 3}
   menuPanelHorizontal: {fileID: 5411322441146925093}
   menuPanelVertical: {fileID: 354811182598140641}
 --- !u!1 &7854012676899949441
@@ -291,8 +292,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -80, y: -325}
-  m_SizeDelta: {x: 125, y: 625}
+  m_AnchoredPosition: {x: -80, y: -387.49994}
+  m_SizeDelta: {x: 125, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1262667018164695044
 CanvasRenderer:
