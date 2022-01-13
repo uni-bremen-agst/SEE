@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Codice.Client.BaseCommands;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -219,6 +220,24 @@ namespace SEE.Game.City
                                                            && !x.HasToggle(ArchitectureLabel) 
                                                            && x.Type != GraphRenderer.RootType);
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
+        }
+
+        public static void Map(Node from, Node to)
+        {
+            from.AssertNotNull(nameof(from));
+            to.AssertNotNull(nameof(to));
+            if (!from.HasToggle(ImplementationLabel) || !to.HasToggle(ArchitectureLabel))
+            {
+                throw new ArgumentException($"{nameof(from)} must be an implementation node, and"
+                                            + $"{nameof(to)} must be an architecture node!");
+            }
+            if (!ReferenceEquals(from.ItsGraph, to.ItsGraph))
+            {
+                throw new ArgumentException("The two nodes must be in the same graph!");
+            }
+
+            Edge mapEdge = new Edge(from, to, "Maps_To");
+            from.ItsGraph.AddEdge(mapEdge);
         }
 
         public override void SaveData()

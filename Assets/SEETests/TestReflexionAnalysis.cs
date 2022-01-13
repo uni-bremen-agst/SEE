@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
 using System.Collections.Generic;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
 namespace SEE.Tools.Architecture
@@ -112,7 +113,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsConvergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.convergent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Convergent);
         }
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.allowed);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Allowed);
         }
 
         /// <summary>
@@ -140,7 +141,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.absent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Absent);
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsImplicitlyAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed);
+            return HasNewState(edgeChanges, source, target, edgeType, State.ImplicitlyAllowed);
         }
 
         /// <summary>
@@ -168,7 +169,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowedAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.AllowedAbsent);
         }
 
         /// <summary>
@@ -182,7 +183,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsDivergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.divergent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Divergent);
         }
 
         /// <summary>
