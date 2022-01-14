@@ -123,6 +123,8 @@ namespace SEE.Game.UI.Menu
                     {
                             if (j == 0)
                             {
+                                //set parent to null to keep right order 
+                                buttons[i][j].transform.SetParent(null);
                                 buttons[i][j].SetActive(false);
                                 buttons[i][j].transform.SetParent(menuPanelVertical);
                             }
