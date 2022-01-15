@@ -113,6 +113,11 @@ namespace SEE.Tools.ReflexionAnalysis
         private const string StateAttribute = "Reflexion.State";
 
         /// <summary>
+        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
+        /// </summary>
+        public const string MapsToType = "Maps_To";
+
+        /// <summary>
         /// Returns the state of an architecture dependency.
         /// Precondition: edge must be in the architecture graph.
         /// </summary>
@@ -452,11 +457,6 @@ namespace SEE.Tools.ReflexionAnalysis
                 Map(subtree, to);
             }
         }
-
-        /// <summary>
-        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
-        /// </summary>
-        private const string MapsToType = "Maps_To";
 
         /// <summary>
         /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
@@ -1705,7 +1705,7 @@ namespace SEE.Tools.ReflexionAnalysis
 #if DEBUG
                 //Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
 #endif
-                List<Edge> outs = cursor.Outgoings;
+                ISet<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
                 {
