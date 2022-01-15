@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Codice.Client.BaseCommands;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -22,7 +22,7 @@ namespace SEE.Game.City
         /// Label for the architecture toggle added to each graph element of the architecture city.
         /// </summary>
         public const string ArchitectureLabel = "Architecture";
-        
+
         /// <summary>
         /// Label for the implementation toggle added to each graph element of the implementation city.
         /// </summary>
@@ -42,7 +42,7 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
         public DataPath GxlMappingPath = new DataPath();
-        
+
         /// <summary>
         /// The path to the CSV file containing the implementation metric data.
         /// </summary>
@@ -86,7 +86,7 @@ namespace SEE.Game.City
             }
 
             #region Local Functions
-            
+
             async UniTaskVoid LoadAllGraphs()
             {
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
@@ -112,27 +112,32 @@ namespace SEE.Game.City
                 {
                     tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
+
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
                     tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
+
                 await UniTask.WhenAll(tasks);
-                
+
                 LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             }
 
             #endregion
         }
-        
+
         /// <summary>
-        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of the given <paramref name="graph"/>.
+        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
+        /// the given <paramref name="graph"/>.  The root node will <b>not</b> get such a label!
         /// </summary>
         /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
         /// <param name="label">The value of the toggle attribute</param>
         private static void MarkGraphNodes(Graph graph, string label)
         {
-            IEnumerable<GraphElement> graphElements = graph.Nodes().Concat<GraphElement>(graph.Edges());
+            //
+            IEnumerable<GraphElement> graphElements = graph.Nodes().Where(node => node.Type != GraphRenderer.RootType)
+                                                           .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
                 graphElement.SetToggle(label);
@@ -148,7 +153,7 @@ namespace SEE.Game.City
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        private static Graph GenerateFullGraph(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, 
+        private static Graph GenerateFullGraph(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph,
                                                string Name)
         {
             if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
@@ -171,14 +176,16 @@ namespace SEE.Game.City
             {
                 throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
             }
+
             if (edgesOverlap.Count > 0)
             {
                 suffix = "-A";
                 Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
+
             Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
-            
+
             // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
             edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
             suffix = null;
@@ -188,9 +195,9 @@ namespace SEE.Game.City
                 Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
+
             return mergedGraph.MergeWith(MappingGraph, suffix);
 
-            
             #region Local Functions
 
             // Returns the intersection of the node IDs of the two graphs.
@@ -198,7 +205,7 @@ namespace SEE.Game.City
 
             // Returns the intersection of the edge IDs of the two graphs.
             IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-            
+
             #endregion
         }
 
@@ -212,16 +219,29 @@ namespace SEE.Game.City
         /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
         private static (Graph implementation, Graph architecture, Graph mapping) DisassembleFullGraph(Graph FullGraph)
         {
-            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] {ImplementationLabel});
-            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] {ArchitectureLabel});
-            // Mapping graph elements will have neither architecture nor implementation label.
-            // However, we must not include the artificial root node, if one was generated for this graph.
-            Graph MappingGraph = FullGraph.SubgraphBy(x => !x.HasToggle(ImplementationLabel) 
-                                                           && !x.HasToggle(ArchitectureLabel) 
-                                                           && x.Type != GraphRenderer.RootType);
+            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] { ImplementationLabel });
+            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] { ArchitectureLabel });
+            // Mapping graph's edges will have neither architecture nor implementation label and will only contain
+            // nodes connected to those edges.
+            Graph MappingGraph = FullGraph.SubgraphByEdges(x => !x.HasToggle(ImplementationLabel)
+                                                                && !x.HasToggle(ArchitectureLabel));
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
 
+        /// <summary>
+        /// Maps the node <paramref name="from"/> to the node <paramref name="to"/>.
+        /// This will result in a "Maps_To" edge being created between the two, and will cause
+        /// the <paramref name="from"/> node to be moved to the <paramref name="to"/> node.
+        /// Because "Maps_To" should be a mapping corresponding to an injective function,
+        /// existing outgoing "Maps_To" edges from the <paramref name="from"/> node and incoming "Maps_To" edges to the
+        /// <paramref name="to"/> node will be replaced.
+        /// </summary>
+        /// <param name="from">The node to map from.</param>
+        /// <param name="to">The node to map to.</param>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="from"/> and <paramref name="to"/> are not in the same graph, or if
+        /// the mapping isn't from an implementation node to an architecture node.
+        /// </exception>
         public static void Map(Node from, Node to)
         {
             from.AssertNotNull(nameof(from));
@@ -231,13 +251,42 @@ namespace SEE.Game.City
                 throw new ArgumentException($"{nameof(from)} must be an implementation node, and"
                                             + $"{nameof(to)} must be an architecture node!");
             }
+
             if (!ReferenceEquals(from.ItsGraph, to.ItsGraph))
             {
                 throw new ArgumentException("The two nodes must be in the same graph!");
             }
+            
+            RemoveOutgoing();
+            
+            RemoveIncoming();
 
-            Edge mapEdge = new Edge(from, to, "Maps_To");
+            Edge mapEdge = new Edge(from, to, Reflexion.MapsToType);
             from.ItsGraph.AddEdge(mapEdge);
+
+            #region Local Functions
+            
+            void RemoveOutgoing()
+            {
+                // Note: We use "Single" instead of "First" because it's an invariant that "Maps_To" is a function.
+                Edge outgoing = from.Outgoings.SingleOrDefault(x => x.Type == Reflexion.MapsToType);
+                if (outgoing != null && from.ItsGraph.ContainsEdge(outgoing))
+                {
+                    from.ItsGraph.RemoveEdge(outgoing);
+                }
+            }
+
+            void RemoveIncoming()
+            {
+                // Note: We use "Single" instead of "First" because it's an invariant that "Maps_To" is injective.
+                Edge incoming = to.Incomings.SingleOrDefault(x => x.Type == Reflexion.MapsToType);
+                if (incoming != null && to.ItsGraph.ContainsEdge(incoming))
+                {
+                    to.ItsGraph.RemoveEdge(incoming);
+                }
+            }
+            
+            #endregion
         }
 
         public override void SaveData()
@@ -249,7 +298,7 @@ namespace SEE.Game.City
             if (NoPathGraphs.Count > 0)
             {
                 Debug.LogError($"Couldn't find any graph at path{(NoPathGraphs.Count > 1 ? "s" : "")} " +
-                    string.Join(", ", NoPathGraphs) + ".\n");
+                               string.Join(", ", NoPathGraphs) + ".\n");
             }
             else
             {
@@ -272,12 +321,12 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GxlArchitecturePath"/> in the configuration file.
         /// </summary>
         private const string GxlArchitectureLabel = "ArchitectureGXL";
-        
+
         /// <summary>
         /// Label of attribute <see cref="GxlImplementationPath"/> in the configuration file.
         /// </summary>
         private const string GxlImplementationLabel = "ImplementationGXL";
-        
+
         /// <summary>
         /// Label of attribute <see cref="GxlMappingPath"/> in the configuration file.
         /// </summary>
@@ -287,7 +336,7 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="CsvArchitecturePath"/> in the configuration file.
         /// </summary>
         private const string CsvArchitectureLabel = "ArchitectureCSV";
-        
+
         /// <summary>
         /// Label of attribute <see cref="CsvImplementationPath"/> in the configuration file.
         /// </summary>

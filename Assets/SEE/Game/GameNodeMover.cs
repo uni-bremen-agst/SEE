@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -100,6 +101,7 @@ namespace SEE.Game
                         {
                             ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                         + $"onto '{nodeRef.Value.SourceName}'.");
+                            Map(movingNode, nodeRef.Value);
                         }
                         else if (nodeRef.Value.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
                         {
