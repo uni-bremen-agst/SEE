@@ -98,7 +98,7 @@ namespace SEE.Utils
         /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.
         /// </param>
         /// <returns>true if the mouse was over at least one node</returns>
-        public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, Node referenceNode = null)
+        public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, NodeRef referenceNode = null)
         {
             RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
             int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
@@ -112,11 +112,11 @@ namespace SEE.Utils
             for (int i = 0; i < numberOfHits; i++)
             {
                 RaycastHit hit = hits[i];
-                if (referenceNode == null || hit.collider.gameObject != referenceNode)
+                if (referenceNode == null || hit.collider.gameObject != referenceNode.gameObject)
                 {
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value != null && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.ItsGraph))
+                    if (nodeRef != null && nodeRef.Value != null && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph))
                     {
                         // update newParent when we found a node deeper into the tree
                         if (hitNode == null || nodeRef.Value.Level > hitNode.Level)
