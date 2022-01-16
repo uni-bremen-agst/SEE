@@ -96,20 +96,8 @@ namespace SEE.Game
                     // Is it a node at all and if so, are they in the same graph?
                     if (nodeRef != null && nodeRef.Value != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
                     {
-                        // Reflexion analysis: Dropping implementation node on architecture node
-                        if (nodeRef.Value.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
-                        {
-                            ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
-                                                                        + $"onto '{nodeRef.Value.SourceName}'.");
-                            Map(movingNode, nodeRef.Value);
-                        }
-                        else if (nodeRef.Value.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
-                        {
-                            ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
-                                                                         + "architecture, not the other way around.");
-                        }
                         // update newParent when we found a node deeper into the tree
-                        else if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
+                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
                         {
                             newGraphParent = nodeRef.Value;
                             newGameParent = hit.collider.gameObject;
@@ -121,20 +109,33 @@ namespace SEE.Game
 
             if (newGraphParent != null)
             {
-                movingObject.transform.position = newPosition;
-                PutOn(movingObject.transform, newGameParent);
-                if (movingNode.Parent != newGraphParent)
+                // Reflexion analysis: Dropping implementation node on architecture node
+                if (newGraphParent.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
                 {
-                    movingNode.Reparent(newGraphParent);
-                    movingObject.transform.SetParent(newGameParent.transform);
+                    ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
+                                                                + $"onto '{newGraphParent.SourceName}'.");
+                    Map(movingNode, newGraphParent);
                 }
-                return newGameParent;
+                else if (newGraphParent.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
+                {
+                    ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
+                                                                 + "architecture, not the other way around.");
+                }
+                else
+                {
+                    movingObject.transform.position = newPosition;
+                    PutOn(movingObject.transform, newGameParent);
+                    if (movingNode.Parent != newGraphParent)
+                    {
+                        movingNode.Reparent(newGraphParent);
+                        movingObject.transform.SetParent(newGameParent.transform);
+                    }
+                    return newGameParent;
+                }
             }
-            else
-            {
-                // Attempt to move the node outside of any node in the node hierarchy.
-                return null;
-            }
+
+            // Attempt to move the node outside of any node in the node hierarchy.
+            return null;
         }
 
         /// <summary>
