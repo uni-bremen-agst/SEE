@@ -23,7 +23,7 @@ namespace SEE.Utils
     public static class Raycasting
     {
         /// <summary>
-        /// Number of raycast hits we can store in the buffer for <see cref="FinalizePosition"/>.
+        /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
         /// </summary>
         private const int RAYCAST_BUFFER_SIZE = 500;
         
@@ -104,7 +104,7 @@ namespace SEE.Utils
             int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
             if (numberOfHits == RAYCAST_BUFFER_SIZE)
             {
-                Debug.LogWarning("We possibly got more hits than buffer space is available.");
+                Debug.LogWarning("We possibly got more hits than buffer space is available.\n");
             }
 
             raycastHit = null;
