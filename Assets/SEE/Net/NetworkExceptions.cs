@@ -30,4 +30,19 @@ namespace SEE.Net
         public NoServerConnection(string message) : base(message)
         { }
     }
+
+    /// <summary>
+    /// Thrown if a server cannot be started.
+    /// </summary>
+    internal class CannotStartServer : NetworkException
+    {
+        /// <summary>
+        /// Initializes a new instance of this exception class with the
+        /// specified error <paramref name="message"/>.
+        /// </summary>
+        /// <param name="message">error message</param>
+        public CannotStartServer(string message) : base(message)
+        { }
+    }
+
 }
