@@ -13020,8 +13020,12 @@ MonoBehaviour:
       Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 14|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -13033,11 +13037,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13049,11 +13053,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13065,11 +13069,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13090,7 +13094,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 17|SEE.Game.City.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -13182,7 +13186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0080500245
+  HeightOffset: 0.004694462
 --- !u!65 &1535691041
 BoxCollider:
   m_ObjectHideFlags: 0
