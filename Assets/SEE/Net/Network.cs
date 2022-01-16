@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -202,10 +203,19 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// List of dead connections. If packets can not be sent, this list is searched
+        /// List of dead connections. If packets cannot be sent, this list is searched
         /// to reduce the frequency of warning messages.
         /// </summary>
         private static readonly List<Connection> deadConnections = new List<Connection>();
+
+        private void Awake()
+        {
+            /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
+            /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
+            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
+            /// main thread here.
+            MainThread = Thread.CurrentThread;
+        }
 
         /// <summary>
         /// Makes sure that we have only one <see cref="Instance"/>.
@@ -235,12 +245,6 @@ namespace SEE.Net
         /// </summary>
         private void StartUp()
         {
-            /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
-            /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
-            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
-            /// main thread here.
-            MainThread = Thread.CurrentThread;
-
 #if UNITY_EDITOR
             if (networkCommsLoggingEnabled)
             {
@@ -254,18 +258,11 @@ namespace SEE.Net
                 NetworkComms.DisableLogging();
 #endif
 
-            try
+            if (HostServer)
             {
-                if (HostServer)
-                {
-                    Server.Initialize();
-                }
-                Client.Initialize();
+                Server.Initialize();
             }
-            catch (Exception e)
-            {
-                Util.Logger.LogError("Some network error happened! Exception: " + e);
-            }
+            Client.Initialize();
 
             InitializeGame();
         }
@@ -408,6 +405,11 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
+            ShutdownNetwork();
+        }
+
+        private void ShutdownNetwork()
+        {
             Server.Shutdown();
             Client.Shutdown();
 
@@ -543,30 +545,194 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Starts a host process, i.e., a server and a local client.
+        /// Callback delegate used by <see cref="StartHost(CallBack)"/>, <see cref="StartClient(CallBack)"/>,
+        /// and <see cref="StartServer(CallBack)"/> after they have been finished (they are using
+        /// co-routines).
         /// </summary>
-        public void StartHost()
+        /// <param name="success">if true, the operation was successful</param>
+        /// <param name="message">a description of what happened</param>
+        public delegate void CallBack(bool success, string message);
+
+        /// <summary>
+        /// Starts a host process, i.e., a server and a local client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartHost(CallBack callBack)
         {
-            NetworkManager.Singleton.StartHost();
-            StartUp();
+            StartCoroutine(RestartNetwork(InternalStartHost));
+
+            void InternalStartHost()
+            {
+                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartHost())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+                callBack(true, $"Host started at {ServerIP4Address}:{ServerPort}.");
+            }
         }
 
         /// <summary>
         /// Starts a client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
         /// </summary>
-        public void StartClient()
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartClient(CallBack callBack)
         {
-            NetworkManager.Singleton.StartClient();
-            StartUp();
+            StartCoroutine(RestartNetwork(InternalStartClient));
+
+            void InternalStartClient()
+            {
+                Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartClient())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+
+                StartCoroutine(WaitUntilConnected());
+            }
+
+            IEnumerator WaitUntilConnected()
+            {
+                float waitingTime = 0;
+                float waitingTimePerIteration = 0.5f;
+
+                while (!NetworkManager.Singleton.IsConnectedClient)
+                {
+                    Debug.Log($"Client is waiting for connection {waitingTime}/{MaxWaitingTime}...\n");
+                    yield return new WaitForSeconds(waitingTimePerIteration);
+                    waitingTime += waitingTimePerIteration;
+                    if (waitingTime > MaxWaitingTime)
+                    {
+                        break;
+                    }
+                }
+                if (NetworkManager.Singleton.IsConnectedClient)
+                {
+                    callBack(true, $"Client is connected to server {ServerIP4Address}:{ServerPort}.");
+                }
+                else
+                {
+                    callBack(false, $"Could not connect to server {ServerIP4Address}:{ServerPort}.");
+                    throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                }
+            }
         }
 
         /// <summary>
-        /// Starts a dedicated server without client.
+        /// The maximal waiting time in seconds a client is willing to wait until a connection
+        /// can be established.
         /// </summary>
-        public void StartServer()
+        private const float MaxWaitingTime = 5 * 60;
+
+        /// <summary>
+        /// Starts a dedicated server without client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartServer(CallBack callBack)
         {
-            NetworkManager.Singleton.StartServer();
-            StartUp();
+            StartCoroutine(RestartNetwork(InternalStartServer));
+
+            void InternalStartServer()
+            {
+                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartServer())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new CannotStartServer($"Could not start server {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+                callBack(true, $"Server is listening at {ServerIP4Address}:{ServerPort}.");
+            }
+        }
+
+        /// <summary>
+        /// A delegate that will be called in <see cref="RestartNetwork(StartNetwork)"/> when
+        /// the network has been shut down (if needed at all) to (re-)start the network.
+        /// </summary>
+        delegate void StartNetwork();
+
+        /// <summary>
+        /// If the network is already running, it will be shut down. Finally, <paramref name="startNetwork"/>
+        /// will be called.
+        ///
+        /// This method is used as a co-routine started in <see cref="StartHost(CallBack)"/>,
+        /// <see cref="StartServer(CallBack)"/>, and <see cref="StartClient(CallBack)"/>.
+        /// </summary>
+        /// <param name="startNetwork">function to be called to start the network</param>
+        /// <returns>whether to continue this co-routine</returns>
+        private IEnumerator RestartNetwork(StartNetwork startNetwork)
+        {
+            // In case we are connected, we will first disconnect.
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
+            {
+                Debug.Log("Network is shutting down...\n");
+
+                // NetworkManager.Singleton.Shutdown() can be called by clients, server, and host.
+                // It will take of the necessary shutdown actions required for these respective
+                // roles.
+                NetworkManager.Singleton.Shutdown();
+
+                // The shutdown is not immediate. We will need to wait until this process has
+                // finished, i.e., until NetworkManager.Singleton.ShutdownInProgress becomes false.
+                while (NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    yield return null;
+                }
+            }
+
+            ShutdownNetwork();
+
+            startNetwork();
         }
 
         /// <summary>
@@ -613,6 +779,8 @@ namespace SEE.Net
                     throw new NotImplementedException();
             }
         }
+
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -735,7 +903,9 @@ namespace SEE.Net
             }
         }
 
-#region Vivox
+        #endregion
+
+        #region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -866,6 +1036,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-#endregion
+        #endregion
     }
 }
