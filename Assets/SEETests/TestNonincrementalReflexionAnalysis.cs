@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 
 using SEE.DataModel.DG;
+using SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.Tools.Architecture
 {

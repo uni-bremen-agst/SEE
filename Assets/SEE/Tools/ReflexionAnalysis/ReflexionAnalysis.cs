@@ -33,19 +33,19 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
 
-namespace SEE.Tools
+namespace SEE.Tools.ReflexionAnalysis
 {
     /// <summary>
     /// Super class for all exceptions thrown by the architecture analysis.
     /// </summary>
-    public class DG_Exception : Exception { }
+    public class ArchitectureAnalysisException : Exception { }
 
     /// <summary>
     /// Thrown if the hierarchy is not a tree structure.
     /// </summary>
-    public class Hierarchy_Is_Not_A_Tree : DG_Exception { }
+    public class HierarchyIsNotATreeException : ArchitectureAnalysisException { }
 
-    public class Corrupt_State : DG_Exception { }
+    public class CorruptStateException : ArchitectureAnalysisException { }
 
     /// <summary>
     /// State of a dependency in the architecture or implementation within the
@@ -53,179 +53,17 @@ namespace SEE.Tools
     /// </summary>
     public enum State
     {
-        undefined = 0,          // initial undefined state
-        allowed = 1,            // allowed propagated dependency towards a convergence; only for implementation dependencies
-        divergent = 2,          // disallowed propagated dependency (divergence); only for implementation dependencies
-        absent = 3,             // specified architecture dependency without corresponding implementation dependency (absence); only for architecture dependencies
-        convergent = 4,         // specified architecture dependency with corresponding implementation dependency (convergence); only for architecture dependencies
-        implicitly_allowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
-        allowed_absent = 6,     // absence, but Architecture.Is_Optional attribute set
-        specified = 7           // tags an architecture edge that was created by the architect,
+        Undefined = 0,          // initial undefined state
+        Allowed = 1,            // allowed propagated dependency towards a convergence; only for implementation dependencies
+        Divergent = 2,          // disallowed propagated dependency (divergence); only for implementation dependencies
+        Absent = 3,             // specified architecture dependency without corresponding implementation dependency (absence); only for architecture dependencies
+        Convergent = 4,         // specified architecture dependency with corresponding implementation dependency (convergence); only for architecture dependencies
+        ImplicitlyAllowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
+        AllowedAbsent = 6,     // absence, but Architecture.Is_Optional attribute set
+        Specified = 7           // tags an architecture edge that was created by the architect,
                                 // i.e., is a specified edge; this is the initial state of a specified
                                 // architecture dependency; only for architecture dependencies
     };
-
-    /// <summary>
-    /// A change event fired when the state of an edge changed.
-    /// </summary>
-    public class EdgeChange : ChangeEvent
-    {
-        /// <summary>
-        /// The edge being changed.
-        /// </summary>
-        public Edge edge;
-        /// <summary>
-        /// The previous state of the edge before the change.
-        /// </summary>
-        public State oldState;
-        /// <summary>
-        /// The new state of the edge after the change.
-        /// </summary>
-        public State newState;
-
-        /// <summary>
-        /// Constructor for a change of an edge event.
-        /// </summary>
-        /// <param name="edge">edge being changed</param>
-        /// <param name="old_state">the old state of the edge</param>
-        /// <param name="new_state">the new state of the edge after the change</param>
-        public EdgeChange(Edge edge, State oldState, State newState)
-        {
-            this.edge = edge;
-            this.oldState = oldState;
-            this.newState = newState;
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + ": " + edge.ToString() + " changed from " + oldState + " to " + newState;
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when an implementation dependency was either propagated to
-    /// the architecture or unpropagated from the architecture.
-    /// </summary>
-    public abstract class PropagatedEdge : ChangeEvent
-    {
-        /// <summary>
-        /// The implementation dependency propagated from the implementation to the architecture.
-        /// </summary>
-        public Edge propagatedEdge;
-
-        /// <summary>
-        /// Constructor preserving the implementation dependency that is or was
-        /// propagated to the architecture graph.
-        /// </summary>
-        /// <param name="propagatedEdge">the propagated edge</param>
-        public PropagatedEdge(Edge propagatedEdge)
-        {
-            this.propagatedEdge = propagatedEdge;
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when an implementation dependency was propagated to
-    /// the architecture.
-    ///
-    /// Note: This event is fired only once for the very first time a corresponding
-    /// new propagated edge was created in the architecture. If there is already such
-    /// a propagated edge in the architecture, this existing edge is re-used and only
-    /// its counter is updated.
-    /// </summary>
-    public class PropagatedEdgeAdded : PropagatedEdge
-    {
-        /// <summary>
-        /// Constructor preserving the implementation dependency propagated from the
-        /// implementation to the architecture.
-        /// </summary>
-        /// <param name="propagatedEdge">the propagated edge</param>
-        public PropagatedEdgeAdded(Edge propagatedEdge) : base(propagatedEdge)
-        {
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + ": new propagated edge " + propagatedEdge.ToString();
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when a propagated dependency edge was removed from the architecture.
-    /// </summary>
-    public class PropagatedEdgeRemoved : PropagatedEdge
-    {
-        /// <summary>
-        /// Constructor passing on the edge to be removed.
-        /// </summary>
-        /// <param name="propagatedEdge">edge to be removed</param>
-        public PropagatedEdgeRemoved(Edge propagatedEdge) : base(propagatedEdge)
-        {
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + ": unpropagated edge " + propagatedEdge.ToString();
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when a Maps_To edge was added to the mapping or removed from it.
-    /// </summary>
-    public abstract class MapsToEdge : ChangeEvent
-    {
-        /// <summary>
-        /// The Maps_To edge added to the mapping or removed from it.
-        /// </summary>
-        public Edge mapsToEdge;
-
-        /// <summary>
-        /// Constructor preserving the Maps_To edge added to the mapping or removed from it.
-        /// </summary>
-        /// <param name="mapsToEdge">the Maps_To edge being added or removed</param>
-        public MapsToEdge(Edge mapsToEdge)
-        {
-            this.mapsToEdge = mapsToEdge;
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when a Maps_To edge was added to the mapping.
-    /// </summary>
-    public class MapsToEdgeAdded : MapsToEdge
-    {
-        /// <summary>
-        /// Constructor preserving the Maps_To edge added to the mapping.
-        /// </summary>
-        /// <param name="mapsToEdge">the Maps_To edge being added</param>
-        public MapsToEdgeAdded(Edge mapsToEdge) : base(mapsToEdge)
-        {
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + ": new Maps_To edge " + mapsToEdge.ToString();
-        }
-    }
-
-    /// <summary>
-    /// A change event fired when a Maps_To edge was removed from the mapping.
-    /// </summary>
-    public class MapsToEdgeRemoved : MapsToEdge
-    {
-        /// <summary>
-        /// Constructor preserving the Maps_To edge removed from the mapping.
-        /// </summary>
-        /// <param name="mapsToEdge">the Maps_To edge being removed</param>
-        public MapsToEdgeRemoved(Edge mapsToEdge) : base(mapsToEdge)
-        {
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + ": removed Maps_To edge " + mapsToEdge.ToString();
-        }
-    }
 
     /// <summary>
     /// Implements the reflexion analysis, which compares an implementation against an expected
@@ -241,16 +79,16 @@ namespace SEE.Tools
         /// <param name="implementation">the implementation graph</param>
         /// <param name="architecture">the architecture model</param>
         /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
-        /// <param name="allow_dependencies_to_parents">whether descendants may access their ancestors</param>
+        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
         public Reflexion(Graph implementation,
                          Graph architecture,
                          Graph mapping,
-                         bool allow_dependencies_to_parents = true)
+                         bool allowDependenciesToParents = true)
         {
             _implementation = implementation;
             _architecture = architecture;
             _mapping = mapping;
-            _allow_dependencies_to_parents = allow_dependencies_to_parents;
+            _allow_dependencies_to_parents = allowDependenciesToParents;
         }
 
         /// <summary>
@@ -260,8 +98,8 @@ namespace SEE.Tools
         public void Run()
         {
             RegisterNodes();
-            Add_Transitive_Mapping();
-            From_Scratch();
+            AddTransitiveMapping();
+            FromScratch();
             //DumpResults();
         }
 
@@ -272,7 +110,12 @@ namespace SEE.Tools
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
-        private const string state_attribute = "Reflexion.State";
+        private const string StateAttribute = "Reflexion.State";
+
+        /// <summary>
+        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
+        /// </summary>
+        public const string MapsToType = "Maps_To";
 
         /// <summary>
         /// Returns the state of an architecture dependency.
@@ -282,13 +125,13 @@ namespace SEE.Tools
         /// <returns>the state of 'edge' in the architecture</returns>
         public static State Get_State(Edge edge)
         {
-            if (edge.TryGetInt(state_attribute, out int value))
+            if (edge.TryGetInt(StateAttribute, out int value))
             {
                 return (State)value;
             }
             else
             {
-                return State.undefined;
+                return State.Undefined;
             }
         }
 
@@ -300,7 +143,7 @@ namespace SEE.Tools
         /// <param name="initial_state">the initial state to be set</param>
         private static void Set_Initial(Edge edge, State initial_state)
         {
-            edge.SetInt(state_attribute, (int)initial_state);
+            edge.SetInt(StateAttribute, (int)initial_state);
         }
 
         /// <summary>
@@ -311,7 +154,7 @@ namespace SEE.Tools
         /// <param name="new_state">the state to be set</param>
         private static void Set_State(Edge edge, State new_state)
         {
-            edge.SetInt(state_attribute, (int)new_state);
+            edge.SetInt(StateAttribute, (int)new_state);
         }
 
         /// <summary>
@@ -340,7 +183,7 @@ namespace SEE.Tools
         private bool Is_Specified(Edge edge)
         {
             State state = Get_State(edge);
-            return state == State.specified || state == State.convergent || state == State.absent;
+            return state == State.Specified || state == State.Convergent || state == State.Absent;
         }
 
         // --------------------------------------------------------------------
@@ -614,11 +457,6 @@ namespace SEE.Tools
                 Map(subtree, to);
             }
         }
-
-        /// <summary>
-        /// The edge type maps-to edges mapping implementation entities onto architecture entities.
-        /// </summary>
-        private const string MapsToType = "Maps_To";
 
         /// <summary>
         /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
@@ -1285,7 +1123,7 @@ namespace SEE.Tools
         /// know immediately where an implementation entity is mapped to.
         /// The result is stored in _explicit_maps_to_table and _implicit_maps_to_table.
         /// </summary>
-        private void Add_Transitive_Mapping()
+        private void AddTransitiveMapping()
         {
             // Because add_subtree_to_implicit_map() will check whether a node is a
             // mapper, which is done by consulting _explicit_maps_to_table, we need
@@ -1393,11 +1231,11 @@ namespace SEE.Tools
 
             if (old_value == 0)
             {
-                Transition(edge, state, State.convergent);
+                Transition(edge, state, State.Convergent);
             }
             else if (new_value == 0)
             {
-                Transition(edge, state, State.absent);
+                Transition(edge, state, State.Absent);
             }
             Set_Counter(edge, new_value);
         }
@@ -1409,7 +1247,7 @@ namespace SEE.Tools
         /// <summary>
         /// Runs reflexion analysis from scratch, i.e., non-incrementally.
         /// </summary>
-        private void From_Scratch()
+        private void FromScratch()
         {
             Reset();
             RegisterNodes();
@@ -1439,15 +1277,15 @@ namespace SEE.Tools
                 State state = Get_State(edge);
                 switch (state)
                 {
-                    case State.undefined:
-                    case State.specified:
+                    case State.Undefined:
+                    case State.Specified:
                         Set_Counter(edge, 0); // Note: architecture edges have a counter
-                        Set_Initial(edge, State.specified); // initial state must be State.specified
+                        Set_Initial(edge, State.Specified); // initial state must be State.specified
                         break;
-                    case State.absent:
-                    case State.convergent:
+                    case State.Absent:
+                    case State.Convergent:
                         // The initial state of an architecture dependency that was not propagated is specified.
-                        Transition(edge, state, State.specified);
+                        Transition(edge, state, State.Specified);
                         Set_Counter(edge, 0); // Note: architecture edges have a counter
                         break;
                     default:
@@ -1525,15 +1363,15 @@ namespace SEE.Tools
             foreach (Edge edge in _architecture.Edges())
             {
                 State state = Get_State(edge);
-                if (Is_Specified(edge) && state != State.convergent)
+                if (Is_Specified(edge) && state != State.Convergent)
                 {
                     if (edge.HasToggle("Architecture.Is_Optional"))
                     {
-                        Transition(edge, state, State.allowed_absent);
+                        Transition(edge, state, State.AllowedAbsent);
                     }
                     else
                     {
-                        Transition(edge, state, State.absent);
+                        Transition(edge, state, State.Absent);
                     }
                 }
             }
@@ -1796,12 +1634,12 @@ namespace SEE.Tools
             if (Lift(arch_source, arch_target, edge_type, counter, out allowing_edge_out))
             {
                 // found a matching specified architecture dependency allowing propagated_architecture_dep
-                Transition(propagated_architecture_dep, State.undefined, State.allowed);
+                Transition(propagated_architecture_dep, State.Undefined, State.Allowed);
             }
             else if (arch_source == arch_target)
             {
                 // by default, every entity may use itself
-                Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
+                Transition(propagated_architecture_dep, State.Undefined, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
                 allowing_edge_out = null;
@@ -1809,7 +1647,7 @@ namespace SEE.Tools
             else if (_allow_dependencies_to_parents
                      && Is_Descendant_Of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
             {
-                Transition(propagated_architecture_dep, State.undefined, State.implicitly_allowed);
+                Transition(propagated_architecture_dep, State.Undefined, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Dependencies from descendants to ancestors are implicitly allowed if
                 // _allow_dependencies_to_parents is true.
@@ -1817,7 +1655,7 @@ namespace SEE.Tools
             }
             else
             {
-                Transition(propagated_architecture_dep, State.undefined, State.divergent);
+                Transition(propagated_architecture_dep, State.Undefined, State.Divergent);
                 allowing_edge_out = null;
             }
             return propagated_architecture_dep;
@@ -1867,7 +1705,7 @@ namespace SEE.Tools
 #if DEBUG
                 //Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
 #endif
-                List<Edge> outs = cursor.Outgoings;
+                ISet<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
                 {
