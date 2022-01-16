@@ -4,7 +4,6 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Tools;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
@@ -26,7 +25,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly Graph mapping;
 
-        private InteractableObject lastSelection;
+        private readonly InteractableObject lastSelection;
         //private Reflexion reflexion;
 
         #endregion
@@ -369,7 +368,7 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeAdded.ToString());
 
-            Edge edge = mapsToEdgeAdded.mapsToEdge;
+            Edge edge = mapsToEdgeAdded.TheMapsToEdge;
             //LineRenderer lineRenderer = CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID);
             //edgeToFinalizedMappingEdges[edge] = lineRenderer;
         }
@@ -378,7 +377,7 @@ namespace SEE.Controls.Actions
         {
             Debug.Log(mapsToEdgeRemoved.ToString());
 
-            Edge edge = mapsToEdgeRemoved.mapsToEdge;
+            Edge edge = mapsToEdgeRemoved.TheMapsToEdge;
             //LineRenderer r = edgeToFinalizedMappingEdges[edge];
             //edgeToFinalizedMappingEdges.Remove(edge);
             //UnityEngine.Object.Destroy(r.gameObject);
