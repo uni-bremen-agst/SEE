@@ -26,7 +26,7 @@ namespace SEE.Utils
         /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
         /// </summary>
         private const int RAYCAST_BUFFER_SIZE = 500;
-        
+
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.
         /// The hit will be set, if no GUI element is hit.
@@ -50,12 +50,12 @@ namespace SEE.Utils
             {
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out NodeRef nodeRef))
-                {                    
+                {
                     elementRef = nodeRef;
                     return HitGraphElement.Node;
                 }
                 else if (hit.transform.TryGetComponent(out EdgeRef edgeRef))
-                {                    
+                {
                     elementRef = edgeRef;
                     return HitGraphElement.Edge;
                 }
@@ -94,7 +94,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
         /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
-        /// <param name="referenceNode">If given, all nodes which are not in the same graph as
+        /// <param name="referenceNode">if given, all nodes which are not in the same graph as
         /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.
         /// </param>
         /// <returns>true if the mouse was over at least one node</returns>
@@ -116,7 +116,8 @@ namespace SEE.Utils
                 {
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value != null && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph))
+                    if (nodeRef != null && nodeRef.Value != null
+                        && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph))
                     {
                         // update newParent when we found a node deeper into the tree
                         if (hitNode == null || nodeRef.Value.Level > hitNode.Level)
@@ -166,7 +167,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
-        /// 
+        ///
         /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fails
         /// and <c>false</c> will be returned.
         /// </summary>
