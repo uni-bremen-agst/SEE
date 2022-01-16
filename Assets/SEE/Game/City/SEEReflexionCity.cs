@@ -135,7 +135,6 @@ namespace SEE.Game.City
         /// <param name="label">The value of the toggle attribute</param>
         private static void MarkGraphNodes(Graph graph, string label)
         {
-            //
             IEnumerable<GraphElement> graphElements = graph.Nodes().Where(node => node.Type != GraphRenderer.RootType)
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
