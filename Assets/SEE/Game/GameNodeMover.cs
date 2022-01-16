@@ -2,9 +2,9 @@
 using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.City.SEEReflexionCity;
+using static SEE.Utils.Raycasting;
 
 namespace SEE.Game
 {
@@ -17,11 +17,6 @@ namespace SEE.Game
         /// The speed by which to move a selected object.
         /// </summary>
         private static float MovingSpeed = 1.0f;
-
-        /// <summary>
-        /// Number of raycast hits we can store in the buffer for <see cref="FinalizePosition"/>.
-        /// </summary>
-        private const int RAYCAST_BUFFER_SIZE = 100;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
@@ -68,47 +63,15 @@ namespace SEE.Game
         {
             // The underlying graph node of the moving object.
             Node movingNode = movingObject.GetComponent<NodeRef>().Value;
-            // The new parent of the movingNode in the underlying graph.
-            Node newGraphParent = null;
-            // The new parent of the movingNode in the game-object hierarchy.
-            GameObject newGameParent = null;
             // The new position of the movingNode in world space.
             Vector3 newPosition = Vector3.negativeInfinity;
 
-            // Note that the order of the results of RaycastAll() is undefined.
-            // Hence, we need to identify the node in the node hierarchy that
-            // is at the lowest level in the tree (more precisely, the one with
-            // the greatest value of the node attribute Level; Level counting
-            // starts at the root and increases downward into the tree).
-            RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
-            int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
-            if (numberOfHits == RAYCAST_BUFFER_SIZE)
-            {
-                Debug.LogWarning("We possibly got more hits than buffer space is available.");
-            }
-            for (int i = 0; i < numberOfHits; i++)
-            {
-                RaycastHit hit = hits[i];
-                // Must be different from the movingObject itself
-                if (hit.collider.gameObject != movingObject)
-                {
-                    NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
-                    // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
-                    {
-                        // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
-                        {
-                            newGraphParent = nodeRef.Value;
-                            newGameParent = hit.collider.gameObject;
-                            newPosition = hit.point;
-                        }
-                    }
-                }
-            }
+            RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNode);
 
-            if (newGraphParent != null)
+            if (newGraphParent != null && raycastHit != null)
             {
+                // The new parent of the movingNode in the game-object hierarchy.
+                GameObject newGameParent = raycastHit.Value.collider.gameObject;
                 // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
                 {
@@ -216,16 +179,6 @@ namespace SEE.Game
         // -------------------------------------------------------------
         // User input
         // -------------------------------------------------------------
-
-        /// <summary>
-        /// A ray from the user.
-        /// </summary>
-        /// <returns>ray from the user</returns>
-        private static Ray UserPointsTo()
-        {
-            // FIXME: We need to an interaction for VR, too.
-            return MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-        }
 
         /// <summary>
         /// Returns the position of the tip of the ray drawn from the camera towards
