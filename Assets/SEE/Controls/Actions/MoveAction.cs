@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 using SEE.Game;
 using SEE.Game.UI3D;
+using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static SEE.Utils.Raycasting;
+using Node = SEE.DataModel.DG.Node;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -21,22 +25,28 @@ namespace SEE.Controls.Actions
                 this.hoveredObject = hoveredObject;
                 interactableObject = hoveredObject.GetComponent<InteractableObject>();
                 plane = new Plane(Vector3.up, cityRootNode.position);
+                node = hoveredObject.GetComponent<NodeRef>();
             }
+
             /// <summary>
             /// The root of the code city. This the top-most game object representing a node,
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
             internal Transform cityRootNode;
+
             /// <summary>
             /// The game object currently being hovered over. It is a descendant of <see cref="cityRootNode"/>
             /// or <see cref="cityRootNode"/> itself.
             /// </summary>
             internal Transform hoveredObject;
+
             /// <summary>
             /// The interactable component attached to <see cref="hoveredObject"/>.
             /// </summary>
             internal InteractableObject interactableObject;
+
             internal Plane plane;
+            internal NodeRef node;
         }
 
         private const float SnapStepCount = 8;
@@ -48,6 +58,7 @@ namespace SEE.Controls.Actions
         /// Whether moving a node has been initiated.
         /// </summary>
         private bool moving = false;
+
         private Hit hit = new Hit();
         private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
@@ -110,22 +121,26 @@ namespace SEE.Controls.Actions
             /// The transform of the game object that was moved.
             /// </summary>
             public Transform gameObject;
+
             /// <summary>
             /// The parent of <see cref="gameObject"/> at the time before it was moved.
             /// This will be used to restore the original parent upon <see cref="Undo"/>.
             /// </summary>
             private Transform oldParent;
+
             /// <summary>
             /// The position of <see cref="gameObject"/> in world space at the time before it was moved.
             /// This will be used to restore the original world-space position upon <see cref="Undo"/>.
             /// </summary>
             private Vector3 oldPosition;
+
             /// <summary>
             /// The new parent of <see cref="gameObject"/> at the time after it was moved.
             /// Maybe the same value as <see cref="oldParent"/>.
             /// This will be used to restore the new parent upon <see cref="Redo"/>.
             /// </summary>
             private GameObject newParent;
+
             /// <summary>
             /// The new position of <see cref="gameObject"/> in world space at the time after it was moved.
             /// This will be used to restore the new position upon <see cref="Redo"/>.
@@ -197,6 +212,16 @@ namespace SEE.Controls.Actions
         private Memento memento;
 
         /// <summary>
+        /// Original color of the object the user hovered over.
+        /// </summary>
+        private Color hitObjectColor;
+
+        /// <summary>
+        /// Material of the object the user hovered over.
+        /// </summary>
+        private Material hitObjectMaterial;
+
+        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -231,10 +256,12 @@ namespace SEE.Controls.Actions
                 {
                     InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
                 }
+
+                ResetHitObjectColor();
             }
             else if (SEEInput.Drag()) // start or continue movement
             {
-                if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
+                if (SEEInput.StartDrag() && hoveredObject && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
                     // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to
@@ -251,7 +278,7 @@ namespace SEE.Controls.Actions
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.hoveredObject.localScale);
                 }
 
-                if (moving && Raycasting.RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
+                if (moving && RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
                 {
                     Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
                     if (SEEInput.Snap())
@@ -264,10 +291,13 @@ namespace SEE.Controls.Actions
                         Vector2 proj = dir * Vector2.Dot(point2, dir);
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
+
                     Positioner.Set(hit.hoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.hoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                     gizmo.SetPositions(startPoint, endPoint);
+
+                    SetHitObjectColor(hit.node);
 
                     synchronize = true;
                 }
@@ -283,6 +313,8 @@ namespace SEE.Controls.Actions
 
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
+
+                ResetHitObjectColor();
             }
             // No canceling, no dragging, no reset.
             else if (moving) // finalize movement
@@ -311,8 +343,11 @@ namespace SEE.Controls.Actions
                         new MoveNodeNetAction(hit.hoveredObject.name, hit.hoveredObject.position).Execute();
                         hit = new Hit();
                     }
+
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
+
+                ResetHitObjectColor();
                 moving = false;
             }
 
@@ -327,6 +362,35 @@ namespace SEE.Controls.Actions
             }
 
             return result;
+
+            #region Local Functions
+
+            void SetHitObjectColor(NodeRef movingNode)
+            {
+                ResetHitObjectColor();
+
+                RaycastLowestNode(out RaycastHit? raycastHit, out Node _, movingNode);
+                if (raycastHit != null)
+                {
+                    hitObjectMaterial = raycastHit.Value.collider.GetComponent<Renderer>().material;
+                    // We persist hoveredObjectColor in case we want to use something different than simple 
+                    // inversion in the future, such as a constant color (we would then need the original color).
+                    hitObjectColor = hitObjectMaterial.color;
+                    hitObjectMaterial.color = hitObjectColor.Invert();
+                }
+            }
+
+            void ResetHitObjectColor()
+            {
+                if (hitObjectMaterial != null)
+                {
+                    hitObjectMaterial.color = hitObjectColor;
+                }
+
+                hitObjectMaterial = null;
+            }
+
+            #endregion
         }
 
         public override void Undo()
