@@ -63,13 +63,14 @@ namespace SEE.UI
                                           description: "Starts a local client connection to a server.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Client")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: StartServer,
-                                          exitAction: null,
-                                          title: "Server",
-                                          description: "Starts a dedicated server without local client.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Server")),
+                      // FIXME: Running only a server is currently not working.
+                      //new ToggleMenuEntry(active: false,
+                      //                    entryAction: StartServer,
+                      //                    exitAction: null,
+                      //                    title: "Server",
+                      //                    description: "Starts a dedicated server without local client.",
+                      //                    entryColor: NextColor(),
+                      //                    icon: Resources.Load<Sprite>("Icons/Server")),
                       new ToggleMenuEntry(active: false,
                                           entryAction: Settings,
                                           exitAction: null,
@@ -99,11 +100,16 @@ namespace SEE.UI
         {
             try
             {
-                network.StartHost();
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
                 menu.ShowMenu(false);
+                network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
+                menu.ShowMenu(true);
                 ShowNotification.Error("Host cannot be started", exception.Message);
             }
         }
@@ -115,28 +121,55 @@ namespace SEE.UI
         {
             try
             {
-                network.StartClient();
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
                 menu.ShowMenu(false);
+                network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
+                menu.ShowMenu(true);
                 ShowNotification.Error("Server connection failed", exception.Message);
             }
         }
 
         /// <summary>
-        /// Starts a dedicated server on this machine.
+        /// Starts a dedicated server on this machine (only server, no client).
         /// </summary>
         private void StartServer()
         {
             try
             {
-                network.StartServer();
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
                 menu.ShowMenu(false);
+                network.StartServer(NetworkCallBack);
             }
             catch (Exception exception)
             {
+                menu.ShowMenu(true);
                 ShowNotification.Error("Server cannot be started", exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.
+        ///
+        /// This method is used as a callback in <see cref="StartClient"/>, <see cref="StartServer"/>,
+        /// and <see cref="StartHost"/>.
+        /// </summary>
+        /// <param name="success">true tells us that the network could be started successfully</param>
+        /// <param name="message">a description of what happened</param>
+        private void NetworkCallBack(bool success, string message)
+        {
+            menu.ShowMenu(!success);
+            if (!success)
+            {
+                ShowNotification.Error("Network problem", message);
             }
         }
 
@@ -145,10 +178,10 @@ namespace SEE.UI
         /// </summary>
         private void Settings()
         {
-            /// Note: We arrive here because the user pressed on of the buttons of the
-            /// actionMenu, which - in turn - will call actionMenu.ShowMenu(false). Thus
-            /// at this time, actionMenu is no longer visible. When the following dialog
-            /// is finished, <see cref="Reactivate"/> will be called to turn the actionMenu on again.
+            /// Note: We arrive here because the user pressed one of the buttons of the
+            /// menu, which - in turn - will call menu.ShowMenu(false). Thus
+            /// at this time, menu is no longer visible. When the following dialog
+            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new NetworkPropertyDialog(network, Reactivate);
             dialog.Open();
         }
