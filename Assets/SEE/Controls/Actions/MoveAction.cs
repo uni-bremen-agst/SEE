@@ -1,10 +1,16 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using SEE.Game;
 using SEE.Game.UI3D;
+using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.Assertions;
+using static SEE.Utils.Raycasting;
+using Node = SEE.DataModel.DG.Node;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -21,6 +27,7 @@ namespace SEE.Controls.Actions
                 this.hoveredObject = hoveredObject;
                 interactableObject = hoveredObject.GetComponent<InteractableObject>();
                 plane = new Plane(Vector3.up, cityRootNode.position);
+                node = hoveredObject.GetComponent<NodeRef>();
             }
             /// <summary>
             /// The root of the code city. This the top-most game object representing a node,
@@ -37,6 +44,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal InteractableObject interactableObject;
             internal Plane plane;
+            internal NodeRef node;
         }
 
         private const float SnapStepCount = 8;
@@ -196,6 +204,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Memento memento;
 
+        private Color hitObjectColor;
+
+        private Material hitObjectMaterial = null;
+
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -231,10 +243,11 @@ namespace SEE.Controls.Actions
                 {
                     InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true); // TODO(torben): this should be in SelectAction.cs
                 }
+                ResetHitObjectColor();
             }
             else if (SEEInput.Drag()) // start or continue movement
             {
-                if (SEEInput.StartDrag() && hoveredObject && Raycasting.RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
+                if (SEEInput.StartDrag() && hoveredObject && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
                     // If SEEInput.StartDrag() is combined with SEEInput.DragHovered(), the hoveredObject is to
@@ -251,7 +264,7 @@ namespace SEE.Controls.Actions
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.hoveredObject.localScale);
                 }
 
-                if (moving && Raycasting.RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
+                if (moving && RaycastPlane(hit.plane, out planeHitPoint)) // continue movement
                 {
                     Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
                     if (SEEInput.Snap())
@@ -268,6 +281,8 @@ namespace SEE.Controls.Actions
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.hoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.hoveredObject.localScale);
                     gizmo.SetPositions(startPoint, endPoint);
+                    
+                    SetHitObjectColor(hit.node);
 
                     synchronize = true;
                 }
@@ -283,6 +298,7 @@ namespace SEE.Controls.Actions
 
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
                 }
+                ResetHitObjectColor();
             }
             // No canceling, no dragging, no reset.
             else if (moving) // finalize movement
@@ -313,6 +329,7 @@ namespace SEE.Controls.Actions
                     }
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
+                ResetHitObjectColor();
                 moving = false;
             }
 
@@ -327,6 +344,35 @@ namespace SEE.Controls.Actions
             }
 
             return result;
+
+            #region Local Functions
+            
+            void SetHitObjectColor(NodeRef movingNode)
+            {
+                ResetHitObjectColor();
+
+                RaycastLowestNode(out RaycastHit? raycastHit, out Node _, movingNode);
+                if (raycastHit != null)
+                {
+                    hitObjectMaterial = raycastHit.Value.collider.GetComponent<Renderer>().material;
+                    // We persist hoveredObjectColor in case we want to use something different than simple 
+                    // inversion in the future, such as a constant color (we would then need the original color).
+                    hitObjectColor = hitObjectMaterial.color;
+                    hitObjectMaterial.color = hitObjectColor.Invert();
+                }
+            }
+
+            void ResetHitObjectColor()
+            {
+                if (hitObjectMaterial != null)
+                {
+                    hitObjectMaterial.color = hitObjectColor;
+                }
+
+                hitObjectMaterial = null;
+            }
+            
+            #endregion
         }
 
         public override void Undo()

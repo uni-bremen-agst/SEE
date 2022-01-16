@@ -62,16 +62,17 @@ namespace SEE.Game
         public static GameObject FinalizePosition(GameObject movingObject)
         {
             // The underlying graph node of the moving object.
-            Node movingNode = movingObject.GetComponent<NodeRef>().Value;
+            NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
             // The new position of the movingNode in world space.
             Vector3 newPosition = Vector3.negativeInfinity;
 
-            RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNode);
+            RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
 
             if (newGraphParent != null && raycastHit != null)
             {
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
+                Node movingNode = movingNodeRef.Value;
                 // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
                 {
