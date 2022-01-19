@@ -36,18 +36,6 @@ using UnityEngine;
 namespace SEE.Tools.ReflexionAnalysis
 {
     /// <summary>
-    /// Super class for all exceptions thrown by the architecture analysis.
-    /// </summary>
-    public class ArchitectureAnalysisException : Exception { }
-
-    /// <summary>
-    /// Thrown if the hierarchy is not a tree structure.
-    /// </summary>
-    public class HierarchyIsNotATreeException : ArchitectureAnalysisException { }
-
-    public class CorruptStateException : ArchitectureAnalysisException { }
-
-    /// <summary>
     /// State of a dependency in the architecture or implementation within the
     /// reflexion model.
     /// </summary>
