@@ -6,7 +6,7 @@ namespace SEE.Net
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
-    public class DeleteNetAction : AbstractAction
+    public class DeleteNetAction : AbstractNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -23,7 +23,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
-            this.GameObjectID = gameObjectID;
+            GameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
                 }
             }
         }

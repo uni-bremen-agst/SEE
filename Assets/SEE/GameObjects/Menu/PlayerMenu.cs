@@ -126,20 +126,17 @@ namespace SEE.GO.Menu
                 if (SEEInput.Undo())
                 {
                     GlobalActionHistory.Undo();
-                    if (!GlobalActionHistory.IsEmpty())
+
+                    if (GlobalActionHistory.IsEmpty())
                     {
-                        ActionStateType currentAction = GlobalActionHistory.Current();
-                        SetPlayerMenu(currentAction.Name);
-                        Indicator.ChangeActionState(currentAction);
+                        // We always want to have an action running.
+                        // The default action will be the first action state type.
+                        ActionStateType firstType = ActionStateType.AllTypes.First();
+                        GlobalActionHistory.Execute(firstType);
                     }
-                    else
-                    {
-                        // This case will be reached if there is no finished action in the undo history.
-                        // Special case: The user is executing his first action after moving while running the application,
-                        // but this action is not finished yet. Then, the user executes undo.
-                        ModeMenu.ActiveEntry = ModeMenu.Entries.Single(x => x.Title == ActionStateType.Move.Name);
-                        Indicator.ChangeActionState(ActionStateType.Move);
-                    }
+                    ActionStateType currentAction = GlobalActionHistory.Current();
+                    SetPlayerMenu(currentAction.Name);
+                    Indicator.ChangeActionState(currentAction);
                 }
                 else if (SEEInput.Redo())
                 {
@@ -155,7 +152,7 @@ namespace SEE.GO.Menu
             {
                 ShowNotification.Error("Action Error", e.Message);
 #if UNITY_EDITOR
-                Debug.LogError(e.StackTrace);
+                throw;
 #endif
             }
         }
