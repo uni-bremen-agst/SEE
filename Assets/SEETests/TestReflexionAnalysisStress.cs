@@ -54,7 +54,7 @@ namespace SEE.Tools.Architecture
                 Node target = arch.GetNode(map.Target.ID);
                 Assert.NotNull(source);
                 Assert.NotNull(target);
-                reflexion.Add_To_Mapping(source, target);
+                reflexion.AddToMapping(source, target);
             }
             p.End();
         }

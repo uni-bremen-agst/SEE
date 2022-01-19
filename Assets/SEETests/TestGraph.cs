@@ -60,7 +60,7 @@ namespace SEE.DataModel.DG
         ///   graph.RemoveEdge
         ///   graph.RemoveNode
         ///   node.Outgoings
-        ///   node.From_To
+        ///   node.FromTo
         /// </summary>
         [Test]
         public void AddingRemovingGraphElements()
@@ -88,10 +88,10 @@ namespace SEE.DataModel.DG
             use_n1_n3_b.SetToggle("Duplicated");
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b }, AsSet(n1.Outgoings));
 
-            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n3, "none")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_b }, AsSet(n1.From_To(n3, "abuse")));
+            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.FromTo(n3, "none")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.FromTo(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.FromTo(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_b }, AsSet(n1.FromTo(n3, "abuse")));
 
             Edge call_n2_n3 = NewEdge(g, n2, n3);
 
@@ -113,11 +113,11 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(nodes, g.Nodes());
             Assert.AreEqual(edges, g.Edges());
 
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n2 }, AsSet(n1.From_To(n2, "call")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.From_To(n1, "call")));
-            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n2, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.FromTo(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.FromTo(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n2 }, AsSet(n1.FromTo(n2, "call")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.FromTo(n1, "call")));
+            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.FromTo(n2, "use")));
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
         }
 

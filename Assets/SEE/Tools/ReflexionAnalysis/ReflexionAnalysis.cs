@@ -29,28 +29,62 @@ Open issues: implementation of incremental analysis is missing.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
     /// <summary>
-    /// State of a dependency in the architecture or implementation within the
-    /// reflexion model.
+    /// State of a dependency in the architecture or implementation within the reflexion model.
     /// </summary>
     public enum State
     {
-        Undefined = 0,          // initial undefined state
-        Allowed = 1,            // allowed propagated dependency towards a convergence; only for implementation dependencies
-        Divergent = 2,          // disallowed propagated dependency (divergence); only for implementation dependencies
-        Absent = 3,             // specified architecture dependency without corresponding implementation dependency (absence); only for architecture dependencies
-        Convergent = 4,         // specified architecture dependency with corresponding implementation dependency (convergence); only for architecture dependencies
-        ImplicitlyAllowed = 5, // self-usage is always implicitly allowed; only for implementation dependencies
-        AllowedAbsent = 6,     // absence, but Architecture.Is_Optional attribute set
-        Specified = 7           // tags an architecture edge that was created by the architect,
-                                // i.e., is a specified edge; this is the initial state of a specified
-                                // architecture dependency; only for architecture dependencies
+        /// <summary>
+        /// Initial undefined state.
+        /// </summary>
+        Undefined = 0,
+
+        /// <summary>
+        /// Allowed propagated dependency towards a convergence; only for implementation dependencies.
+        /// </summary>
+        Allowed = 1,
+
+        /// <summary>
+        /// Disallowed propagated dependency (divergence); only for implementation dependencies.
+        /// </summary>
+        Divergent = 2,
+
+        /// <summary>
+        /// Specified architecture dependency without corresponding implementation dependency (absence);
+        /// only for architecture dependencies.
+        /// </summary>
+        Absent = 3,
+
+        /// <summary>
+        /// Specified architecture dependency with corresponding implementation dependency (convergence);
+        /// only for architecture dependencies.
+        /// </summary>
+        Convergent = 4,
+
+        /// <summary>
+        /// Self-usage is always implicitly allowed; only for implementation dependencies.
+        /// </summary>
+        ImplicitlyAllowed = 5,
+
+        /// <summary>
+        /// Absence, but "Architecture.Is_Optional" attribute set.
+        /// </summary>
+        AllowedAbsent = 6,
+
+        /// <summary>
+        /// Tags an architecture edge that was created by the architect,
+        /// i.e., is a specified edge; this is the initial state of a specified
+        /// architecture dependency; only for architecture dependencies
+        /// </summary>
+        Specified = 7
     };
 
     /// <summary>
@@ -61,22 +95,24 @@ namespace SEE.Tools.ReflexionAnalysis
     {
         /// <summary>
         /// Constructor for setting up and running the reflexion analysis.
-        /// Note: This does not really run the reflexion analysis. Use
-        /// method Run() to start the analysis.
         /// </summary>
         /// <param name="implementation">the implementation graph</param>
         /// <param name="architecture">the architecture model</param>
         /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
         /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
+        /// <remarks>
+        /// This does not really run the reflexion analysis. Use
+        /// method Run() to start the analysis.
+        /// </remarks>
         public Reflexion(Graph implementation,
                          Graph architecture,
                          Graph mapping,
                          bool allowDependenciesToParents = true)
         {
-            _implementation = implementation;
-            _architecture = architecture;
-            _mapping = mapping;
-            _allow_dependencies_to_parents = allowDependenciesToParents;
+            this.Implementation = implementation;
+            this.Architecture = architecture;
+            this.Mapping = mapping;
+            this.allowDependenciesToParents = allowDependenciesToParents;
         }
 
         /// <summary>
@@ -86,15 +122,13 @@ namespace SEE.Tools.ReflexionAnalysis
         public void Run()
         {
             RegisterNodes();
-            AddTransitiveMapping();
+            ConstructTransitiveMapping();
             FromScratch();
             //DumpResults();
         }
 
-        // --------------------------------------------------------------------
-        // State edge attribute
-        // --------------------------------------------------------------------
-
+        #region State Edge Attribute
+        
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
@@ -110,8 +144,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: edge must be in the architecture graph.
         /// </summary>
         /// <param name="edge">a dependency in the architecture</param>
-        /// <returns>the state of 'edge' in the architecture</returns>
-        public static State Get_State(Edge edge)
+        /// <returns>the state of <paramref name="edge"/> in the architecture</returns>
+        public static State GetState(Edge edge)
         {
             if (edge.TryGetInt(StateAttribute, out int value))
             {
@@ -124,130 +158,119 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Sets the initial state of edge to state.
-        /// Precondition: edge has no state attribute yet.
+        /// Sets the initial state of <paramref name="edge"/> to <paramref name="initialState"/>.
+        /// Precondition: <paramref name="edge"/> has no state attribute yet.
         /// </summary>
         /// <param name="edge">edge whose initial state is to be set</param>
-        /// <param name="initial_state">the initial state to be set</param>
-        private static void Set_Initial(Edge edge, State initial_state)
-        {
-            edge.SetInt(StateAttribute, (int)initial_state);
-        }
+        /// <param name="initialState">the initial state to be set</param>
+        // TODO(falko17): Do we really need this proxy method?
+        private static void SetInitial(Edge edge, State initialState) => SetState(edge, initialState);
 
         /// <summary>
-        /// Sets the state of edge to new state.
-        /// Precondition: edge has a state attribute.
+        /// Sets the state of <paramref name="edge"/> to <paramref name="newState"/>.
+        /// Precondition: <paramref name="edge"/> has a state attribute.
         /// </summary>
         /// <param name="edge">edge whose state is to be set</param>
-        /// <param name="new_state">the state to be set</param>
-        private static void Set_State(Edge edge, State new_state)
+        /// <param name="newState">the state to be set</param>
+        private static void SetState(Edge edge, State newState)
         {
-            edge.SetInt(StateAttribute, (int)new_state);
+            edge.SetInt(StateAttribute, (int)newState);
         }
 
         /// <summary>
-        /// Transfers edge from its old_state to new_state; notifies all observers
-        /// if old_state and new_state actually differ.
+        /// Transfers edge from its <paramref name="oldState"/> to <paramref name="newState"/>;
+        /// notifies all observers if <paramref name="oldState"/> and <paramref name="newState"/> actually differ.
         /// </summary>
         /// <param name="edge">edge being changed</param>
-        /// <param name="old_state">the old state of the edge</param>
-        /// <param name="new_state">the new state of the edge after the change</param>
-        private void Transition(Edge edge, State old_state, State new_state)
+        /// <param name="oldState">the old state of the edge</param>
+        /// <param name="newState">the new state of the edge after the change</param>
+        private void Transition(Edge edge, State oldState, State newState)
         {
-            if (old_state != new_state)
+            if (oldState != newState)
             {
-                Set_State(edge, new_state);
-                Notify(new EdgeChange(edge, old_state, new_state));
+                SetState(edge, newState);
+                Notify(new EdgeChange(edge, oldState, newState));
             }
         }
 
         /// <summary>
-        /// Returns true if edge is a specified edge in the architecture (has one of the
+        /// Returns true if <paramref name="edge"/> is a specified edge in the architecture (has one of the
         /// following states: specified, convergent, absent).
-        /// Precondition: edge must be in the architecture graph.
+        /// Precondition: <paramref name="edge"/> must be in the architecture graph.
         /// </summary>
         /// <param name="edge">architecture dependency</param>
         /// <returns>true if edge is a specified architecture dependency</returns>
-        private bool Is_Specified(Edge edge)
+        private static bool IsSpecified(Edge edge)
         {
-            State state = Get_State(edge);
+            State state = GetState(edge);
             return state == State.Specified || state == State.Convergent || state == State.Absent;
         }
+        
+        #endregion
 
-        // --------------------------------------------------------------------
-        // Edge counter attribute
-        // --------------------------------------------------------------------
+        #region Edge counter attribute
 
         /// <summary>
         /// Name of the edge attribute for the counter of a dependency.
         /// </summary>
-        private const string counter_attribute = "Reflexion.Counter";
+        private const string CounterAttribute = "Reflexion.Counter";
 
         /// <summary>
-        /// Sets counter of given architecture dependency to given value.
-        /// Precondition: edge is in the architecture graph.
+        /// Sets counter of given architecture dependency to given <paramref name="value"/>.
+        /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be set</param>
         /// <param name="value">value to be set</param>
-        private void Set_Counter(Edge edge, int value)
+        private static void SetCounter(Edge edge, int value)
         {
-            edge.SetInt(counter_attribute, value);
+            edge.SetInt(CounterAttribute, value);
         }
 
         /// <summary>
-        /// Adds value to the counter attribute of given edge. The value may be negative.
-        /// Precondition: edge is in the architecture graph.
+        /// Adds <paramref name="value"/> to the counter attribute of given <paramref name="edge"/>.
+        /// The value may be negative.
+        /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be changed</param>
         /// <param name="value">value to be added</param>
-        private void Change_Counter(Edge edge, int value)
+        private void AddToCounter(Edge edge, int value)
         {
-            if (edge.TryGetInt(counter_attribute, out int oldValue))
+            if (edge.TryGetInt(CounterAttribute, out int oldValue))
             {
-                edge.SetInt(counter_attribute, oldValue + value);
+                edge.SetInt(CounterAttribute, oldValue + value);
             }
             else
             {
-                edge.SetInt(counter_attribute, value);
+                edge.SetInt(CounterAttribute, value);
             }
         }
 
         /// <summary>
-        /// Returns the the counter of given architecture dependency 'edge'.
-        /// Precondition: edge is in the architecture graph.
+        /// Returns the the counter of given architecture dependency <paramref name="edge"/>.
+        /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
-        /// <returns>the counter of 'edge'</returns>
-        public static int Get_Counter(Edge edge)
-        {
-            if (edge.TryGetInt(counter_attribute, out int value))
-            {
-                return value;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        /// <returns>the counter of <paramref name="edge"/></returns>
+        public static int GetCounter(Edge edge) => edge.TryGetInt(CounterAttribute, out int value) ? value : 0;
 
         /// <summary>
-        /// Increases counter of edge by value (may be negative).
+        /// Increases counter of <paramref name="edge"/> by <paramref name="value"/> (may be negative).
         /// If its counter drops to zero, the edge is removed.
         /// Notifies if edge's state changes.
-        /// Precondition: edge is a dependency in architecture graph that
-        /// was propagated from the implementation graph (i.e., !is_specified(edge)).
+        /// Precondition: <paramref name="edge"/> is a dependency in architecture graph that
+        /// was propagated from the implementation graph (i.e., !IsSpecified(<paramref name="edge"/>)).
         /// </summary>
         /// <param name="edge">propagated dependency in architecture graph</param>
         /// <param name="value">value to be added</param>
-        private void Change_Impl_Ref(Edge edge, int value)
+        private void AddToImplRef(Edge edge, int value)
         {
-            int old_value = Get_Counter(edge);
-            int new_value = old_value + value;
-            //Debug.LogFormat("Change_Impl_Ref: changed counter from {0} to {1} for edge {2}\n", old_value, new_value, edge);
-            if (new_value <= 0)
+            int oldValue = GetCounter(edge);
+            int newValue = oldValue + value;
+            if (newValue <= 0)
             {
+                // TODO(falko17): Why was this needed — do we still need this code fragment?
                 /*
-                if (Get_State(edge) == State.divergent)
+                if (GetState(edge) == State.divergent)
                 {
                     Transition(edge, State.divergent, State.undefined);
                 }
@@ -255,66 +278,52 @@ namespace SEE.Tools.ReflexionAnalysis
                 // We can drop this edge; it is no longer needed. Because the edge is
                 // dropped and all observers are informed about the removal of this
                 // edge, we do not need to inform them about its state change from
-                // divergent/allowed/implicitly_allowed to undefined.
-                Set_Counter(edge, 0);
+                // divergent/allowed/implicitlyAllowed to undefined.
+                SetCounter(edge, 0);
                 Notify(new PropagatedEdgeRemoved(edge));
-                _architecture.RemoveEdge(edge);
+                Architecture.RemoveEdge(edge);
             }
             else
             {
-                Set_Counter(edge, new_value);
+                SetCounter(edge, newValue);
             }
         }
 
         /// <summary>
         /// Returns the value of the counter attribute of an implementation dependency.
-        /// Currently, always 1 is returned.
-        /// Precondition: edge is in the implementation graph.
+        /// Currently, 1 is always returned.
+        /// Precondition: <paramref name="edge"/> is in the implementation graph.
         /// </summary>
-        /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
+        /// <param name="edge">an implementation dependency whose counter is to be retrieved</param>
         /// <returns>value of the counter attribute of given implementation dependency</returns>
-        private int Get_Impl_Counter(Edge edge = null)
+        private int GetImplCounter(Edge edge = null)
         {
             // returns the value of the counter attribute of edge
             // at present, dependencies extracted from the source
             // do not have an edge counter; therefore, we return just 1
+            // TODO(falko17): Should this get its own counter if none has been initialized yet?
             return 1;
         }
+        
+        #endregion 
 
-        // --------------------------------------------------------------------
-        //                      context information
-        // --------------------------------------------------------------------
+        #region Context Information
 
-        /// <summary>
-        /// Returns the implementation graph for which the reflexion data are calculated.
-        /// </summary>
-        /// <returns>implementation graph</returns>
-        public Graph Get_Implementation()
-        {
-            return _implementation;
-        }
+        /// The implementation graph for which the reflexion data is calculated.
+        public Graph Implementation { get; }
 
-        /// <summary>
-        /// Returns the architecture graph for which the reflexion data are calculated.
-        /// </summary>
-        /// <returns>architecture graph</returns>
-        public Graph Get_Architecture()
-        {
-            return _architecture;
-        }
+        /// The architecture graph for which the reflexion data is calculated.
+        public Graph Architecture { get; }
 
         /// <summary>
         /// Returns the mapping graph for which the reflexion data are calculated.
         /// </summary>
         /// <returns>mapping graph</returns>
-        public Graph Get_Mapping()
-        {
-            return _mapping;
-        }
+        public Graph Mapping { get; }
 
-        // --------------------------------------------------------------------
-        //                             modifiers
-        // --------------------------------------------------------------------
+        #endregion
+
+        #region Modifiers
         // The following operations manipulate the relevant graphs of the
         // context and trigger the incremental update of the reflexion results;
         // if anything in the reflexion results changes, all observers are informed
@@ -334,6 +343,7 @@ namespace SEE.Tools.ReflexionAnalysis
         // its source and target node if there are not yet contained in the target graph.
         // NODE section
 
+        // TODO(falko17): Why are the Mapping modifier methods commented out?
         /// <summary>
         /// Adds given node to the mapping graph.
         /// Precondition: node must not be contained in the mapping graph.
@@ -341,7 +351,7 @@ namespace SEE.Tools.ReflexionAnalysis
         //   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the mapping graph</param>
-        //public void Add_To_Mapping(Node node)
+        //public void AddToMapping(Node node)
         //{
         //    throw new NotImplementedException(); // FIXME
         //}
@@ -353,57 +363,57 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">node to be removed from the mapping</param>
-        //public void Delete_From_Mapping(Node node)
+        //public void DeleteFromMapping(Node node)
         //{
         //    throw new NotImplementedException(); // FIXME
         //}
 
         /// <summary>
-        /// Adds given node to architecture graph.
+        /// Adds given <paramref name="node"/> to architecture graph.
         ///
-        /// Precondition: node must not be contained in the architecture graph.
-        /// Postcondition: node is contained in the architecture graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Precondition: <paramref name="node"/> must not be contained in the architecture graph.
+        /// Postcondition: <paramref name="node"/> is contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the architecture graph</param>
-        public void Add_To_Architecture(Node node)
+        public void AddToArchitecture(Node node)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Removes given node from architecture graph.
-        /// Precondition: node must be contained in the architecture graph.
-        /// Postcondition: node is no longer contained in the architecture graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Removes given <paramref name="node"/> from architecture graph.
+        /// Precondition: <paramref name="node"/> must be contained in the architecture graph.
+        /// Postcondition: <paramref name="node"/> is no longer contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the architecture graph</param>
-        public void Delete_From_Architecture(Node node)
+        public void DeleteFromArchitecture(Node node)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Adds given node to implementation graph.
-        /// Precondition: node must not be contained in the implementation graph.
-        /// Postcondition: node is contained in the implementation graph; all observers are
+        /// Adds given <paramref name="node"/> to implementation graph.
+        /// Precondition: <paramref name="node"/> must not be contained in the implementation graph.
+        /// Postcondition: <paramref name="node"/> is contained in the implementation graph; all observers are
         /// informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the implementation graph</param>
-        public void Add_To_Implementation(Node node)
+        public void AddToImplementation(Node node)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Removes the given node from the implementation graph (and all its incoming and
+        /// Removes the given <paramref name="node"/> from the implementation graph (and all its incoming and
         /// outgoing edges).
-        /// Precondition: node must be contained in the implementation graph.
-        /// Postcondition: node is no longer contained in the implementation graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Precondition: <paramref name="node"/> must be contained in the implementation graph.
+        /// Postcondition: <paramref name="node"/> is no longer contained in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the implementation graph</param>
-        public void Delete_From_Implementation(Node node)
+        public void DeleteFromImplementation(Node node)
         {
             throw new NotImplementedException(); // FIXME
         }
@@ -411,201 +421,203 @@ namespace SEE.Tools.ReflexionAnalysis
         // EDGE section
 
         /// <summary>
-        /// Adds a new Maps_To edge from 'from' to 'to' to the mapping graph and
+        /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
         /// re-runs the reflexion analysis incrementally.
-        /// Preconditions: from is contained in the implementation graph and not yet mapped explicitly
-        /// and to is contained in the architecture graph.
-        /// Postcondition: edge is contained in the mapping graph and the reflexion
+        /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
+        /// explicitly and <paramref name="to"/> is contained in the architecture graph.
+        /// Postcondition: Created edge is contained in the mapping graph and the reflexion
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="from">the source of the maps_to edge to be added to the mapping graph</param>
-        /// <param name="to">the target of the maps_to edge to be added to the mapping graph</param>
-        public void Add_To_Mapping(Node from, Node to)
+        /// <param name="from">the source of the Maps_To edge to be added to the mapping graph</param>
+        /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
+        public void AddToMapping(Node from, Node to)
         {
-            if (Is_Explicitly_Mapped(from))
+            if (IsExplicitlyMapped(from))
             {
-                throw new Exception("node " + from.ID + " is already mapped explicitly.");
+                throw new ArgumentException($"Node {from.ID} is already mapped explicitly.");
             }
             else
             {
                 // all nodes that should be mapped onto 'to', too, as a consequence of
                 // mapping 'from'
-                List<Node> subtree = Mapped_Subtree(from);
+                List<Node> subtree = MappedSubtree(from);
                 // was 'to' mapped implicitly at all?
-                if (_implicit_maps_to_table.TryGetValue(from.ID, out Node oldTarget))
+                // TODO(falko17): Documentation above: Isn't this checking 'from' rather than 'to'?
+                if (implicitMapsToTable.TryGetValue(from.ID, out Node oldTarget))
                 {
                     // from was actually mapped implicitly onto oldTarget
                     Unmap(subtree, oldTarget);
                 }
-                Add_To_Mapping_Graph(from, to);
+                AddToMappingGraph(from, to);
                 // adjust explicit mapping
-                _explicit_maps_to_table[from.ID] = to;
+                explicitMapsToTable[from.ID] = to;
                 // adjust implicit mapping
-                Change_Map(subtree, to);
+                ChangeMap(subtree, to);
                 Map(subtree, to);
             }
         }
 
         /// <summary>
-        /// Adds a clone of 'from' and a clone of 'to' to the mapping graph if
+        /// Adds a clone of <paramref name="from"/> and a clone of <paramref name="to"/> to the mapping graph if
         /// they do not have one already and adds a Maps_To edge in between.
         ///
-        /// Precondition: from is contained in the implementation graph and to is
+        /// Precondition: <paramref name="from"/> is contained in the implementation graph and <paramref name="to"/> is
         /// contained in the architecture graph.
-        /// Postcondition: a clone F of from and a clone T of to exist in the
-        /// mapping graph and there is a maps_to edge from F to T in the mapping
+        /// Postcondition: a clone F of <paramref name="from"/> and a clone T of <paramref name="to"/> exist in the
+        /// mapping graph and there is a Maps_To edge from F to T in the mapping
         /// graph.
         /// </summary>
-        /// <param name="from">source of the maps-to edge</param>
-        /// <param name="to">target of the maps-to edge</param>
-        private void Add_To_Mapping_Graph(Node from, Node to)
+        /// <param name="from">source of the Maps_To edge</param>
+        /// <param name="to">target of the Maps_To edge</param>
+        private void AddToMappingGraph(Node from, Node to)
         {
-            Node from_clone = CloneInMapping(from);
-            Node to_clone = CloneInMapping(to);
-            // add maps_to edge to _mapping
-            Edge mapsTo = new Edge(from_clone, to_clone, MapsToType);
-            _mapping.AddEdge(mapsTo);
+            Node fromClone = CloneInMapping(from);
+            Node toClone = CloneInMapping(to);
+            // add Maps_To edge to Mapping
+            Edge mapsTo = new Edge(fromClone, toClone, MapsToType);
+            Mapping.AddEdge(mapsTo);
             Notify(new MapsToEdgeAdded(mapsTo));
         }
 
         /// <summary>
-        /// Returns the node with the same ID as given node contained
-        /// in _mapping. If no such node exists, a clone of the given node is
-        /// created, added to _mapping, and returned.
+        /// Returns the node with the same ID as given <paramref name="node"/> contained
+        /// in <see cref="Mapping"/>. If no such node exists, a clone of the given node is
+        /// created, added to <see cref="Mapping"/>, and returned.
         /// </summary>
-        /// <param name="node">node whose clone in _mapping is needed</param>
-        /// <returns>clone of node in _mapping</returns>
+        /// <param name="node">node whose clone in <see cref="Mapping"/> is needed</param>
+        /// <returns>clone of node in <see cref="Mapping"/></returns>
         private Node CloneInMapping(Node node)
         {
-            Node clone = _mapping.GetNode(node.ID);
+            Node clone = Mapping.GetNode(node.ID);
             if (clone == null)
             {
                 clone = (Node)node.Clone();
-                _mapping.AddNode(clone);
+                Mapping.AddNode(clone);
             }
             return clone;
         }
 
         /// <summary>
-        /// All nodes in given subtree are implicitly mapped onto given target architecture node
-        /// if target != null. If target == null, all nodes in given subtree are removed from
-        /// _implicit_maps_to_table.
+        /// All nodes in given <paramref name="subtree"/> are implicitly mapped onto given <paramref name="target"/>
+        /// architecture node if <paramref name="target"/> != null. If <paramref name="target"/> == null,
+        /// all nodes in given subtree are removed from implicitMapsToTable.
         ///
-        /// Precondition: target is in the architecture graph and all nodes in subtree are in
-        /// the implementation graph.
+        /// Precondition: <paramref name="target"/> is in the architecture graph and all nodes in
+        /// <paramref name="subtree"/> are in the implementation graph.
         /// </summary>
-        /// <param name="subtree">list of nodes to be mapped onto target</param>
-        /// <param name="target">architecture node onto which to map all nodes in subtree</param>
-        private void Change_Map(List<Node> subtree, Node target)
+        /// <param name="subtree">list of nodes to be mapped onto <paramref name="target"/></param>
+        /// <param name="target">architecture node onto which to map all nodes in <paramref name="subtree"/></param>
+        private void ChangeMap(List<Node> subtree, Node target)
         {
             if (target == null)
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table.Remove(node.ID);
+                    implicitMapsToTable.Remove(node.ID);
                 }
             }
             else
             {
                 foreach (Node node in subtree)
                 {
-                    _implicit_maps_to_table[node.ID] = target;
+                    implicitMapsToTable[node.ID] = target;
                 }
             }
         }
 
+        // TODO(falko17): Add parameter documentation
         /// <summary>
-        /// A function delegate that can be used to handle changes of the mapping by Handle_Mapped_Subtree.
+        /// A function delegate that can be used to handle changes of the mapping by HandleMappedSubtree.
         /// </summary>
         /// <param name="edge"></param>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        private delegate void Handle_Mapping_Change(Edge edge, Node from, Node to);
+        private delegate void HandleMappingChange(Edge edge, Node from, Node to);
 
         /// <summary>
-        /// Handles every dependency edges (incoming as well as outgoing) of every node in given subtree
-        /// as follows:
+        /// Handles every dependency edge (incoming as well as outgoing) of every node in given
+        /// <paramref name="subtree"/> as follows:
         ///
-        /// Let e = (i1, i2) be a dependency edge where either i1 or i2 or both are contained in subtree.
-        /// Then e falls into one of the following categories:
+        /// Let e = (i1, i2) be a dependency edge where either i1 or i2 or both are contained in
+        /// <paramref name="subtree"/>. Then e falls into one of the following categories:
         ///  (1) inner dependency: it is in between two entities, i1 and i2, mapped onto the same entity:
-        ///      maps_to(i1) != null and maps_to(i2) != null and maps_to(i1) = maps_to(i2)
+        ///      mapsTo(i1) != null and mapsTo(i2) != null and mapsTo(i1) = mapsTo(i2)
         ///  (2) cross dependency: it is in between two entities, i1 and i2, mapped onto different entities:
-        ///      maps_to(i1) != null and maps_to(i2) != null and maps_to(i1) != maps_to(i2)
+        ///      mapsTo(i1) != null and mapsTo(i2) != null and mapsTo(i1) != mapsTo(i2)
         ///  (3) dangling dependency: it is in between two entities, i1 and i2, not yet both mapped:
-        ///      maps_to(i1) = null or maps_to(i2) = null
+        ///      mapsTo(i1) = null or mapsTo(i2) = null
         ///
-        /// Dangling dependencies will be ignored. For every inner or cross dependency, e, the given handler
-        /// will be applied with the following arguments:
+        /// Dangling dependencies will be ignored. For every inner or cross dependency, e, the given
+        /// <paramref name="handler"/> will be applied with the following arguments:
         ///
         ///   if e is an outgoing cross dependency, i.e., e.Source is contained in subtree:
-        ///     handler(e, arch_node, maps_to(e.Target))
+        ///     handler(e, archNode, mapsTo(e.Target))
         ///   if e is an incoming cross dependency, i.e., e.Target is contained in subtree:
-        ///     handler(e, maps_to(e.Source), arch_node)
+        ///     handler(e, mapsTo(e.Source), archNode)
         ///   if e is an inner dependency:
-        ///     handler(e, arch_node, arch_node)
+        ///     handler(e, archNode, archNode)
         ///
-        /// Precondition: given arch_node is in the architecture graph and all nodes in subtree are in the
-        /// implementation graph.
+        /// Precondition: given <paramref name="archNode"/> is in the architecture graph and
+        /// all nodes in <paramref name="subtree"/> are in the implementation graph.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be adjusted</param>
-        /// <param name="arch_node">architecture node related to the nodes in subtree (to be mapped or unmapped);
+        /// <param name="archNode">architecture node related to the nodes in subtree (to be mapped or unmapped);
         /// this may either be the architecture node onto which the nodes in subtree were mapped originally
         /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree
         /// are to be mapped as new</param>
         /// <param name="handler">delegate handling the necessary adjustment</param>
-        private void Handle_Mapped_Subtree(List<Node> subtree, Node arch_node, Handle_Mapping_Change handler)
+        private void HandleMappedSubtree(List<Node> subtree, Node archNode, HandleMappingChange handler)
         {
-            // An inner dependency may occur twice in the iteration below, once it the set
+            // An inner dependency may occur twice in the iteration below, once in the set
             // of outgoing edges and once in the set of incoming edges of any nodes in the subtree.
-            // We may call the handler only once for these that is why we need to keep a log of
+            // We may call the handler only once for these; that is why we need to keep a log of
             // inner edges already handled.
-            HashSet<Edge> innerEdgesAlreadyHandled = new HashSet<Edge>();
-            foreach (Node impl_node in subtree)
+            ISet<Edge> innerEdgesAlreadyHandled = new HashSet<Edge>();
+            foreach (Node implNode in subtree)
             {
-                // assert: impl_node is in implementation graph
-                foreach (Edge outgoing in impl_node.Outgoings)
+                Assert.IsTrue(Implementation.ContainsNode(implNode));
+                foreach (Edge outgoing in implNode.Outgoings)
                 {
-                    // assert: outgoing is in implementation graph
-                    if (_implicit_maps_to_table.TryGetValue(outgoing.Target.ID, out Node oldTarget))
+                    Assert.IsTrue(Implementation.ContainsEdge(outgoing));
+                    if (implicitMapsToTable.TryGetValue(outgoing.Target.ID, out Node oldTarget))
                     {
                         // outgoing is not dangling; it is either an inner or cross dependency
-                        if (oldTarget == arch_node)
+                        if (oldTarget == archNode)
                         {
                             // outgoing is an inner dependency
                             if (innerEdgesAlreadyHandled.Add(outgoing))
                             {
-                                // Note: HashSet.Add(e) yields true if e has not been contained in the set so far.
+                                // Note: ISet.Add(e) yields true if e has not been contained in the set so far.
                                 // That is, outgoing has not been processed yet.
-                                handler(outgoing, arch_node, arch_node);
+                                handler(outgoing, archNode, archNode);
                             }
                         }
                         else
                         {
                             // outgoing is an outgoing cross dependency
-                            handler(outgoing, arch_node, oldTarget);
+                            handler(outgoing, archNode, oldTarget);
                         }
                     }
                 }
-                foreach (Edge incoming in impl_node.Incomings)
+                foreach (Edge incoming in implNode.Incomings)
                 {
-                    // assert: incoming is in implementation graph
-                    if (_implicit_maps_to_table.TryGetValue(incoming.Source.ID, out Node oldTarget))
+                    Assert.IsTrue(Implementation.ContainsEdge(incoming));
+                    if (implicitMapsToTable.TryGetValue(incoming.Source.ID, out Node oldTarget))
                     {
                         // incoming is not dangling; it is either an incoming cross or inner dependency
-                        if (oldTarget == arch_node)
+                        if (oldTarget == archNode)
                         {
                             // outgoing is an inner dependency
                             if (innerEdgesAlreadyHandled.Add(incoming))
                             {
-                                // Note: HashSet.Add(e) yields true if e has not been contained in the set so far.
+                                // Note: ISet.Add(e) yields true if e has not been contained in the set so far.
                                 // That is, incoming has not been processed yet.
-                                handler(incoming, arch_node, arch_node);
+                                handler(incoming, archNode, archNode);
                             }
                         }
                         else
                         {
-                            handler(incoming, oldTarget, arch_node);
+                            handler(incoming, oldTarget, archNode);
                         }
                     }
                 }
@@ -613,208 +625,206 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Reverts the effect of the mapping of every node in the given subtree onto the
+        /// Reverts the effect of the mapping of every node in the given <paramref name="subtree"/> onto the
         /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
         /// node in the subtree will be "unpropagated" and "unlifted".
-        /// Precondition: given oldTarget is non-null and contained in the architecture graph and all nodes
-        /// in subtree are in the implementation graph. All nodes in subtree were originally mapped onto oldTarget.
+        /// Precondition: given <paramref name="oldTarget"/> is non-null and contained in the architecture graph
+        /// and all nodes in <paramref name="subtree"/> are in the implementation graph.
+        /// All nodes in <paramref name="subtree"/> were originally mapped onto <paramref name="oldTarget"/>.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be reverted</param>
-        /// <param name="oldTarget">architecture node onto which the nodes in subtree were mapped originally</param>
+        /// <param name="oldTarget">architecture node onto which the nodes in <paramref name="subtree"/>
+        /// were mapped originally</param>
         private void Unmap(List<Node> subtree, Node oldTarget)
         {
-            Handle_Mapped_Subtree(subtree, oldTarget, Decrease_And_Lift);
+            HandleMappedSubtree(subtree, oldTarget, DecreaseAndLift);
         }
 
         /// <summary>
-        /// Maps every node in the given subtree onto newTarget. That is, every non-dangling incoming
-        /// and outgoing dependency of every node in the subtree will be propagated and lifted.
-        /// Precondition: given newTarget is non-null and contained in the architecture graph and all nodes
-        /// in subtree are in the implementation graph. All nodes in subtree are to be mapped onto newTarget.
+        /// Maps every node in the given subtree onto <paramref name="newTarget"/>. That is, every non-dangling incoming
+        /// and outgoing dependency of every node in the <paramref name="subtree"/> will be propagated and lifted.
+        /// Precondition: given <paramref name="newTarget"/> is non-null and contained in the architecture graph
+        /// and all nodes in <paramref name="subtree"/> are in the implementation graph.
+        /// All nodes in <paramref name="subtree"/> are to be mapped onto <paramref name="newTarget"/>.
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be put into effect</param>
         /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
         private void Map(List<Node> subtree, Node newTarget)
         {
-            Handle_Mapped_Subtree(subtree, newTarget, Increase_And_Lift);
+            HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
         }
 
         /// <summary>
-        /// If both 'from' and 'to' are not null, the propagated architecture dependency corresponding
-        /// to given 'implementation_dependency' is lifted where the counter of the matching specified
+        /// If both <paramref name="from"/> and <paramref name="to"/> are not null,
+        /// the propagated architecture dependency corresponding
+        /// to given <paramref name="implementationDependency"/> is lifted where the counter of the matching specified
         /// architecture dependency and the counter of this propagated architecture dependency are decreased
-        /// by the absolute value of implementation_dependency's counter.
+        /// by the absolute value of <paramref name="implementationDependency"/>'s counter.
         /// Otherwise, nothing is done.
-        /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
-        /// and 'to' and 'from' are contained in the architecture graph.
+        /// Precondition: <paramref name="implementationDependency"/> is a dependency edge contained
+        /// in implementation graph and <paramref name="to"/> and <paramref name="from"/> are
+        /// contained in the architecture graph.
         /// </summary>
-        /// <param name="implementation_dependency">an implementation dependency whose corresponding propagated dependency
-        /// in the architecture graph is to be decreased and lifted</param>
-        /// <param name="from">architecture node = Maps_To(implementation_dependency.Source)</param>
-        /// <param name="to">architecture node = Maps_To(implementation_dependency.Target)</param>
-        private void Decrease_And_Lift(Edge implementation_dependency, Node from, Node to)
+        /// <param name="implementationDependency">an implementation dependency whose corresponding
+        /// propagated dependency in the architecture graph is to be decreased and lifted</param>
+        /// <param name="from">architecture node = Maps_To(implementationDependency.Source)</param>
+        /// <param name="to">architecture node = Maps_To(implementationDependency.Target)</param>
+        private void DecreaseAndLift(Edge implementationDependency, Node from, Node to)
         {
             if (from != null && to != null)
             {
-                Edge propagated_edge = Get_Propagated_Dependency(from, to, implementation_dependency.Type);
+                Edge propagatedEdge = GetPropagatedDependency(from, to, implementationDependency.Type);
                 // It can happen that one of the edges end is not mapped, hence, no edge was propagated.
-                if (propagated_edge != null)
+                if (propagatedEdge != null)
                 {
-                    int counter = -Get_Impl_Counter(implementation_dependency);
-                    if (Lift(propagated_edge.Source, propagated_edge.Target, propagated_edge.Type, counter, out Edge allowing_edge))
+                    int counter = -GetImplCounter(implementationDependency);
+                    if (Lift(propagatedEdge.Source, propagatedEdge.Target, propagatedEdge.Type, counter, out Edge _))
                     {
                         // matching specified architecture dependency found; no state change
                     }
-                    //Debug.LogFormat("Decreasing counter of edge {0} by {1}\n", propagated_edge.ToString(), counter);
-                    Change_Impl_Ref(propagated_edge, counter);
+                    AddToImplRef(propagatedEdge, counter);
                 }
             }
         }
 
         /// <summary>
-        /// Propagates and lifts given implementation_dependency.
-        /// Precondition: 'implementation_dependency' is a dependency edge contained in implementation graph
-        /// and 'to' and 'from' are contained in the architecture graph.
+        /// Propagates and lifts given <paramref name="implementationDependency"/>.
+        /// Precondition: <paramref name="implementationDependency"/> is a dependency edge contained
+        /// in implementation graph and <paramref name="to"/> and <paramref name="from"/>
+        /// are contained in the architecture graph.
         ///
-        /// Note: from and to are actually ignored (intentionally).
         /// </summary>
-        /// <param name="implementation_dependency">an implementation dependency whose corresponding propagated dependency
+        /// <param name="implementationDependency">an implementation dependency whose corresponding propagated
+        /// dependency
         /// in the architecture graph is to be decreased and lifted</param>
-        /// <param name="from">architecture node = Maps_To(implementation_dependency.Source)</param>
-        /// <param name="to">architecture node = Maps_To(implementation_dependency.Target)</param>
-        private void Increase_And_Lift(Edge implementation_dependency, Node from, Node to)
+        /// <param name="from">architecture node = Maps_To(implementationDependency.Source)</param>
+        /// <param name="to">architecture node = Maps_To(implementationDependency.Target)</param>
+        /// <remarks>
+        /// <paramref name="from"/> and <paramref name="to"/> are actually ignored (intentionally).
+        /// </remarks>
+        private void IncreaseAndLift(Edge implementationDependency, Node from, Node to)
         {
             // safely ignore from and to
-            Propagate_And_Lift_Dependency(implementation_dependency);
+            PropagateAndLiftDependency(implementationDependency);
         }
 
         /// <summary>
-        /// Returns the list of nodes in the subtree rooted by given node (including this
+        /// Returns the list of nodes in the subtree rooted by given <paramref name="node"/> (including this
         /// node itself) excluding those descendants in nested subtrees rooted by a mapper node,
         /// that is, are mapped elsewhere.
-        /// Precondition: node is contained in implementation graph and not Is_Mapper(node).
+        /// Precondition: <paramref name="node"/> is contained in implementation graph and not Is_Mapper(node).
         /// Postcondition: all nodes in the result are in the implementation graph and mapped
         /// onto the same architecture node as the given node; the given node is included
         /// in the result.
         /// </summary>
         /// <param name="node">root node of the subtree</param>
-        /// <returns></returns>
-        private List<Node> Mapped_Subtree(Node node)
+        private List<Node> MappedSubtree(Node node)
         {
-            List<Node> result = new List<Node> { node };
-            foreach (Node child in node.Children())
-            {
-                if (!Is_Explicitly_Mapped(child))
-                {
-                    result.AddRange(Mapped_Subtree(child));
-                }
-            }
-            return result;
+            return node.Children().Where(x => !IsExplicitlyMapped(x))
+                       .SelectMany(MappedSubtree).Prepend(node).ToList();
         }
 
         /// <summary>
-        /// Removes the given Maps_To edge from the mapping graph.
-        /// Precondition: edge must be contained in the mapping graph and must have type Maps_To.
-        /// Postcondition: edge is no longer contained in the mapping graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Removes the given Maps_To <paramref name="edge"/> from the mapping graph.
+        /// Precondition: <paramref name="edge"/> must be contained in the mapping graph and must have type Maps_To.
+        /// Postcondition: <paramref name="edge"/> is no longer contained in the mapping graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the Maps_To edge to be removed from the mapping graph</param>
-        public void Delete_From_Mapping(Edge edge)
+        public void DeleteFromMapping(Edge edge)
         {
             // The mapping target in the architecture graph.
-            Node arch_target = _architecture.GetNode(edge.Target.ID);
-            if (arch_target == null)
+            Node archTarget = Architecture.GetNode(edge.Target.ID);
+            if (archTarget == null)
             {
-                throw new Exception("Mapping target node " + edge.Target.ID + " is not in the architecture.");
+                throw new ArgumentException($"Mapping target node {edge.Target.ID} is not in the architecture.");
             }
-            else
+            // The mapping source in the implementation graph.
+            Node implSource = Implementation.GetNode(edge.Source.ID);
+            if (implSource == null)
             {
-                // The mapping source in the implementation graph.
-                Node impl_source = _implementation.GetNode(edge.Source.ID);
-                if (impl_source == null)
-                {
-                    throw new Exception("Mapping source node " + edge.Source.ID + " is not in the implementation.");
-                }
-                else
-                {
-                    Delete_Maps_To(impl_source, arch_target, edge);
-                }
+                throw new ArgumentException($"Mapping source node {edge.Source.ID} is not in the implementation.");
             }
+            DeleteMapsTo(implSource, archTarget, edge);
         }
 
         /// <summary>
-        /// Reverts the effect of mapping from impl_source onto arch_target.
-        /// Precondition: impl_source is in the implementation graph and is a mapper, arch_target is in the architecture
-        /// graph, and maps_to is in the mapping graph, where maps_to.Source.ID == impl_source.ID
-        /// and maps_to.Target.ID = arch_target.ID.
+        /// Reverts the effect of mapping from <paramref name="implSource"/> onto <paramref name="archTarget"/>.
+        /// Precondition: <paramref name="implSource"/> is in the implementation graph and is a mapper,
+        /// <paramref name="archTarget"/> is in the architecture graph,
+        /// and mapsTo is in the mapping graph, where
+        /// <paramref name="mapsTo"/>.Source.ID == <paramref name="implSource"/>.ID
+        /// and <paramref name="mapsTo"/>.Target.ID = <paramref name="archTarget"/>.ID.
         /// Postconditions:
-        /// (1) <paramref name="maps_to"/> is removed from _mapping
-        /// (2) <paramref name="impl_source"/> is removed from _explicit_mapping
-        /// (3) all nodes in the mapped subtree rooted by <paramref name="impl_source"/> are first unmapped
-        /// and then -- if <paramref name="impl_source"/> has a mapped parent -- mapped onto the same target
-        /// as the mapped parent of <paramref name="impl_source"/>; _implicit_mapping is adjusted accordingly
-        /// (4) all other reflexion data are adjusted and all observers are notified
+        /// (1) <paramref name="mapsTo"/> is removed from <see cref="Mapping"/>
+        /// (2) <paramref name="implSource"/> is removed from <see cref="explicitMapsToTable"/>
+        /// (3) all nodes in the mapped subtree rooted by <paramref name="implSource"/> are first unmapped
+        /// and then -- if <paramref name="implSource"/> has a mapped parent -- mapped onto the same target
+        /// as the mapped parent of <paramref name="implSource"/>; <see cref="implicitMapsToTable"/>
+        /// is adjusted accordingly
+        /// (4) all other reflexion data is adjusted and all observers are notified
         /// </summary>
-        /// <param name="impl_source">source of the mapping contained in _implementation</param>
-        /// <param name="arch_target">target of the mapping contained in _architecture</param>
-        /// <param name="maps_to">the mapping of impl_source onto arch_target as represented in _mapping</param>
-        private void Delete_Maps_To(Node impl_source, Node arch_target, Edge maps_to)
+        /// <param name="implSource">source of the mapping contained in <see cref="Implementation"/></param>
+        /// <param name="archTarget">target of the mapping contained in <see cref="Architecture"/></param>
+        /// <param name="mapsTo">the mapping of <paramref name="implSource"/> onto <paramref name="archTarget"/>
+        /// as represented in <see cref="Mapping"/></param>
+        private void DeleteMapsTo(Node implSource, Node archTarget, Edge mapsTo)
         {
-            if (!Is_Explicitly_Mapped(impl_source))
+            if (!IsExplicitlyMapped(implSource))
             {
-                throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
+                throw new ArgumentException($"Implementation node {implSource} is not mapped explicitly.");
             }
-            else if (!_explicit_maps_to_table.Remove(impl_source.ID))
+            else if (!explicitMapsToTable.Remove(implSource.ID))
             {
-                throw new Exception("Implementation node " + impl_source + " is not mapped explicitly.");
+                throw new ArgumentException($"Implementation node {implSource} is not mapped explicitly.");
+            }
+            
+            // All nodes in the subtree rooted by implSource and mapped onto the same target as implSource.
+            List<Node> subtree = MappedSubtree(implSource);
+            Unmap(subtree, archTarget);
+            Node implSourceParent = implSource.Parent;
+            if (implSourceParent == null)
+            {
+                // If implSource has no parent, all nodes in subtree are not mapped at all any longer.
+                ChangeMap(subtree, null);
             }
             else
             {
-                // All nodes in the subtree rooted by impl_source and mapped onto the same target as impl_source.
-                List<Node> subtree = Mapped_Subtree(impl_source);
-                Unmap(subtree, arch_target);
-                Node impl_source_parent = impl_source.Parent;
-                if (impl_source_parent == null)
+                // If implSource has a parent, all nodes in subtree should be mapped onto
+                // the architecture node onto which the parent is mapped -- if the parent
+                // is mapped at all (implicitly or explicitly).
+                if (implicitMapsToTable.TryGetValue(implSourceParent.ID, out Node newTarget))
                 {
-                    // If impl_source has no parent, all nodes in subtree are not mapped at all any longer.
-                    Change_Map(subtree, null);
+                    // new_target is the architecture node onto which the parent of implSource is mapped.
+                    ChangeMap(subtree, newTarget);
                 }
-                else
+                if (newTarget != null)
                 {
-                    // If impl_source has a parent, all nodes in subtree should be mapped onto
-                    // the architecture node onto which the parent is mapped -- if the parent
-                    // is mapped at all (implicitly or explicitly).
-                    if (_implicit_maps_to_table.TryGetValue(impl_source_parent.ID, out Node new_target))
-                    {
-                        // new_target is the architecture node onto which the parent of impl_source is mapped.
-                        Change_Map(subtree, new_target);
-                    }
-                    if (new_target != null)
-                    {
-                        Map(subtree, new_target);
-                    }
+                    Map(subtree, newTarget);
                 }
-                // First notify before we delete the maps_to edge for good.
-                Notify(new MapsToEdgeRemoved(maps_to));
-                // When an edge is removed from the graph, its source and target and graph containment are
-                // deleted.
-                _mapping.RemoveEdge(maps_to);
-                _mapping.RemoveNode(maps_to.Source);
-                if (maps_to.Target.Incomings.Count == 0)
-                {
-                    _mapping.RemoveNode(maps_to.Target);
-                }
+            }
+            // First notify before we delete the mapsTo edge for good.
+            Notify(new MapsToEdgeRemoved(mapsTo));
+            // When an edge is removed from the graph, its source and target and graph containment are
+            // deleted.
+            Mapping.RemoveEdge(mapsTo);
+            Mapping.RemoveNode(mapsTo.Source);
+            if (mapsTo.Target.Incomings.Count == 0)
+            {
+                Mapping.RemoveNode(mapsTo.Target);
             }
         }
 
         /// <summary>
-        /// Removes the Maps_To edge between 'from' and 'to' from the mapping graph (more precisely,
-        /// the nodes corresponding to <paramref name="from"/> and <paramref name="to"/> in the
+        /// Removes the Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
+        /// from the mapping graph (more precisely, the nodes corresponding to
+        /// <paramref name="from"/> and <paramref name="to"/> in the
         /// mapping graph; where two nodes correspond if they have the same ID).
-        /// Precondition: a Maps_To edge between 'from' and 'to' must be contained in the mapping graph,
-        /// 'from' is contained in implementation graph and 'to' is contained in the architecture graph.
+        /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
+        /// must be contained in the mapping graph, <paramref name="from"/> is contained in implementation graph
+        /// and <paramref name="to"/> is contained in the architecture graph.
         /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
@@ -823,125 +833,115 @@ namespace SEE.Tools.ReflexionAnalysis
         public void Delete_From_Mapping(Node from, Node to)
         {
             // The node corresponding to 'from' in the mapping.
-            Node map_from = _mapping.GetNode(from.ID);
-            if (map_from == null)
+            Node mapFrom = Mapping.GetNode(from.ID);
+            if (mapFrom == null)
             {
-                throw new Exception("Node " + from + " is not mapped.");
+                throw new ArgumentException($"Node {from} is not mapped.");
             }
-            else
+            // The node corresponding to 'to' in the mapping.
+            Node mapTo = Mapping.GetNode(to.ID);
+            if (mapTo == null)
             {
-                // The node corresponding to 'to' in the mapping.
-                Node map_to = _mapping.GetNode(to.ID);
-                if (map_to == null)
-                {
-                    throw new Exception("Node " + to + " is no mapping target.");
-                }
-                else
-                {
-                    // The maps_to edges in between from map_from to map_to. There should be
-                    // exactly one such edge.
-                    List<Edge> maps_to_edges = map_from.From_To(map_to, "Maps_To");
-                    if (maps_to_edges.Count == 0)
-                    {
-                        throw new Exception("There is no mapping from " + from + " onto " + to + ".");
-                    }
-                    else if (maps_to_edges.Count > 1)
-                    {
-                        throw new Exception("There are multiple mappings in between " + from + " and " + to + ".");
-                    }
-                    else
-                    {
-                        // Deletes the unique Maps_To edge from map_from to map_to in mapping graph
-                        Delete_Maps_To(from, to, maps_to_edges[0]);
-                    }
-                }
+                throw new ArgumentException($"Node {to} is no mapping target.");
             }
+            
+            // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
+            Edge mapsToEdge = mapFrom.FromTo(mapTo, "Maps_To").SingleOrDefault();
+            if (mapsToEdge == null)
+            {
+                throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
+            }
+            
+            // Deletes the unique Maps_To edge from mapFrom to mapTo in mapping graph
+            DeleteMapsTo(from, to, mapsToEdge);
         }
 
         /// <summary>
-        /// Adds the given dependency edge to the architecture graph. This edge will
+        /// Adds the given dependency <paramref name="edge"/> to the architecture graph. This edge will
         /// be considered as a specified dependency.
-        /// Precondition: edge must not be contained in the architecture graph and must
+        /// Precondition: <paramref name="edge"/> must not be contained in the architecture graph and must
         /// represent a dependency.
-        /// Postcondition: edge is contained in the architecture graph and the reflexion
+        /// Postcondition: <paramref name="edge"/> is contained in the architecture graph and the reflexion
         ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the dependency edge to be added to the architecture graph</param>
-        public void Add_To_Architecture(Edge edge)
+        public void AddToArchitecture(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Removes the given specified dependency edge from the architecture.
-        /// Precondition: edge must be contained in the architecture graph
-        ///   and edge must represent a specified dependency.
-        /// Postcondition: edge is no longer contained in the architecture graph and the reflexion
+        /// Removes the given specified dependency <paramref name="edge"/> from the architecture.
+        /// Precondition: <paramref name="edge"/> must be contained in the architecture graph
+        ///   and must represent a specified dependency.
+        /// Postcondition: <paramref name="edge"/> is no longer contained in the architecture graph and the reflexion
         ///   data are updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
-        public void Delete_From_Architecture(Edge edge)
+        public void DeleteFromArchitecture(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Adds given dependency edge to the implementation graph.
-        /// Precondition: edge must not be contained in the implementation graph
-        /// Postcondition: edge is contained in the implementation graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Adds given dependency <paramref name="edge"/> to the implementation graph.
+        /// Precondition: <paramref name="edge"/> must not be contained in the implementation graph
+        /// Postcondition: <paramref name="edge"/> is contained in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the dependency edge to be added to the implementation graph</param>
-        public void Add_To_Dependencies(Edge edge)
+        public void AddToDependencies(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Removes the given dependency edge from the implementation graph.
-        /// Precondition: edge must be contained in the implementation graph
+        /// Removes the given dependency <paramref name="edge"/> from the implementation graph.
+        /// Precondition: <paramref name="edge"/> must be contained in the implementation graph
         ///   and edge must be a dependency.
-        /// Postcondition: edge is no longer contained in the implementation graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Postcondition: <paramref name="edge"/> is no longer contained in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the dependency edge to be removed from the implementation graph</param>
-        private void Delete_From_Dependencies(Edge edge)
+        private void DeleteFromDependencies(Edge edge)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Adds given child as a direct descendant of given parent in the node hierarchy of
-        /// the implementation graph.
-        /// Precondition: child and parent must be contained in the hierarchy graph;
-        ///    child has no current parent.
-        /// Postcondition: parent is a parent of child in the implementation graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
+        /// in the node hierarchy of the implementation graph.
+        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
+        /// hierarchy graph; <paramref name="child"/> has no current parent.
+        /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
+        /// implementation graph and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="child">child node</param>
         /// <param name="parent">parent node</param>
-        public void Add_Child_In_Implementation(Node child, Node parent)
+        public void AddChildInImplementation(Node child, Node parent)
         {
             throw new NotImplementedException(); // FIXME
         }
 
         /// <summary>
-        /// Removes given child from its parent in the node hierarchy of
+        /// Removes given <paramref name="child"/> from its parent in the node hierarchy of
         /// the implementation graph.
-        /// Precondition: child and parent must be contained in the hierarchy graph;
+        /// Precondition: <paramref name="child"/> and parent must be contained in the hierarchy graph;
         ///    child has a parent.
-        /// Postcondition: child has no longer a parent in the implementation graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
+        /// Postcondition: <paramref name="child"/> has no longer a parent in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="child">child node</param>
-        public void Unparent_In_Implementation(Node child)
+        public void UnparentInImplementation(Node child)
         {
             throw new NotImplementedException(); // FIXME
         }
 
-        // --------------------------------------------------------------------
-        // Summaries
-        // --------------------------------------------------------------------
+        #endregion
+        
+        // FIXME(falko17) --- Continue refactoring from here ---
+        
+        #region Summaries
 
         /// <summary>
         /// Prints a summary of the number of edges in each state using Unity's standard logger.
@@ -959,13 +959,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// State values. When indexed by a State value, it yields the number of edges in the
         /// architecture that are in this state.
         /// </summary>
-        /// <param name="summary"></param>
+        /// <param name="summary">Number of edges in the architecture indexed by state value</param>
         public void PrintSummary(int[] summary)
         {
             string[] stateNames = Enum.GetNames(typeof(State));
-            foreach (int s in Enum.GetValues(typeof(State)))
+            foreach (int stateValue in Enum.GetValues(typeof(State)))
             {
-                Debug.LogFormat("number of edges in state {0} = {1}\n", stateNames[s], summary[s]);
+                Debug.Log($"number of edges in state {stateNames[stateValue]} = {summary[stateValue]}\n");
             }
         }
 
@@ -979,13 +979,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>summary of the number of edges in the architecture for each respective state</returns>
         public int[] Summary()
         {
-            Graph _architecture = Get_Architecture();
             string[] stateNames = Enum.GetNames(typeof(State));
             int[] summary = new int[stateNames.Length];
 
-            foreach (Edge edge in _architecture.Edges())
+            foreach (Edge edge in Architecture.Edges())
             {
-                summary[(int)Get_State(edge)] += Get_Counter(edge);
+                summary[(int)GetState(edge)] += GetCounter(edge);
             }
             return summary;
         }
@@ -993,30 +992,16 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
-        private readonly bool _allow_dependencies_to_parents;
+        private readonly bool allowDependenciesToParents;
+        
+        #endregion
 
+        // TODO(falko17): What does the below mean?
         // *****************************************
         // involved graphs
         // *****************************************
 
-        /// <summary>
-        /// The graph representing the implementation.
-        /// </summary>
-        private readonly Graph _implementation;
-
-        /// <summary>
-        /// The graph representing the specified architecture model.
-        /// </summary>
-        private readonly Graph _architecture;
-
-        /// <summary>
-        /// The graph describing the mapping of implementation entities onto architecture entities.
-        /// </summary>
-        private readonly Graph _mapping;
-
-        // ******************************************************************
-        // node mappings from node IDs onto nodes in the various graphs
-        // ******************************************************************
+        #region Node Mappings
 
         /// <summary>
         /// Mapping of IDs onto nodes in the implementation graph.
@@ -1031,10 +1016,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         private Dictionary<string, Node> InMapping;
 
-        // ********************************************************************************
-        // predicates for nodes and edges from implementation relevant for reflexion analysis
-        // ********************************************************************************
+        #endregion
 
+        #region Node and Edge predicates
+
+        // TODO(falko17): Do "template instances" refer to C++ templates? What do they mean in this context?
         /// <summary>
         /// Returns false for given node if it should be ignored in the reflexion analysis.
         /// For instance, artificial nodes, template instances, and nodes with ambiguous definitions
@@ -1043,7 +1029,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node should be considered in the reflexion analysis</returns>
-        private bool Is_Relevant(Node node)
+        private bool IsRelevant(Node node)
         {
             return true;
             // FIXME: For the time being, we consider every node to be relevant.
@@ -1075,24 +1061,25 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">implementation dependency</param>
         /// <returns>true if edge should be considered in the reflexion analysis</returns>
-        private bool Is_Relevant(Edge edge)
+        private bool IsRelevant(Edge edge)
         {
-            return Is_Relevant(edge.Source) && Is_Relevant(edge.Target);
+            return IsRelevant(edge.Source) && IsRelevant(edge.Target);
             // FIXME: For the time being, we consider every edge to be relevant as long as their
             // source and target are relevant.
         }
 
-        // *****************************************
-        // mapping
-        // *****************************************
+
+        #endregion
+
+        #region Mapping
 
         /// <summary>
-        /// The implicit mapping as derived from _explicit_maps_to_table.
+        /// The implicit mapping as derived from explicitMapsToTable.
         /// Note 1: the mapping key is the ID of a node in implementation and the mapping value a node in architecture
         /// Note 2: not every node in implementation is a key in this dictionary; node in the implementation
         /// neither mapped explicitly nor implicitly will not be contained.
         /// </summary>
-        private Dictionary<string, Node> _implicit_maps_to_table;
+        private Dictionary<string, Node> implicitMapsToTable;
 
         /// <summary>
         /// The explicit mapping from implementation node ID onto architecture nodes
@@ -1104,133 +1091,107 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Note: key is a node in the implementation and target a node in the
         /// architecture graph.
         /// </summary>
-        private Dictionary<string, Node> _explicit_maps_to_table;
+        private Dictionary<string, Node> explicitMapsToTable;
 
         /// <summary>
         /// Creates the transitive closure for the mapping so that we
         /// know immediately where an implementation entity is mapped to.
-        /// The result is stored in _explicit_maps_to_table and _implicit_maps_to_table.
+        /// The result is stored in explicitMapsToTable and implicitMapsToTable.
         /// </summary>
-        private void AddTransitiveMapping()
+        private void ConstructTransitiveMapping()
         {
-            // Because add_subtree_to_implicit_map() will check whether a node is a
-            // mapper, which is done by consulting _explicit_maps_to_table, we need
+            // Because AddSubtreeToImplicitMap() will check whether a node is a
+            // mapper, which is done by consulting explicitMapsToTable, we need
             // to first create the explicit mapping and can only then map the otherwise
             // unmapped children
-            _explicit_maps_to_table = new Dictionary<string, Node>();
-            foreach (Edge mapsto in _mapping.Edges())
+            explicitMapsToTable = new Dictionary<string, Node>();
+            foreach (Edge mapsTo in Mapping.Edges())
             {
-                Node source = mapsto.Source;
-                Node target = mapsto.Target;
-                Debug.Assert(!String.IsNullOrEmpty(source.ID));
-                Debug.Assert(!String.IsNullOrEmpty(target.ID));
-                //Debug.Log(source.ID + "\n");
+                Node source = mapsTo.Source;
+                Node target = mapsTo.Target;
+                Debug.Assert(!string.IsNullOrEmpty(source.ID));
+                Debug.Assert(!string.IsNullOrEmpty(target.ID));
                 Debug.Assert(InImplementation[source.ID] != null);
-                //Debug.Log(target.ID + "\n");
                 Debug.Assert(InArchitecture[target.ID] != null);
-                _explicit_maps_to_table[source.ID] = InArchitecture[target.ID];
-                //_explicit_maps_to_table[InImplementation[source.ID]] = InArchitecture[target.ID];
+                explicitMapsToTable[source.ID] = InArchitecture[target.ID];
+                //explicitMapsToTable[InImplementation[source.ID]] = InArchitecture[target.ID];
             }
 
-            _implicit_maps_to_table = new Dictionary<string, Node>();
-            foreach (Edge mapsto in _mapping.Edges())
+            implicitMapsToTable = new Dictionary<string, Node>();
+            foreach (Edge mapsTo in Mapping.Edges())
             {
-                Node source = mapsto.Source;
-                Node target = mapsto.Target;
-                Add_Subtree_To_Implicit_Map(InImplementation[source.ID], InArchitecture[target.ID]);
+                Node source = mapsTo.Source;
+                Node target = mapsTo.Target;
+                AddSubtreeToImplicitMap(InImplementation[source.ID], InArchitecture[target.ID]);
             }
-
-#if DEBUG
-            /*
-            Debug.Log("\nexplicit mapping\n");
-            dump_table(_explicit_maps_to_table);
-
-            Debug.Log("\nimplicit mapping\n");
-            dump_table(_implicit_maps_to_table);
-            */
-#endif
         }
 
         /// <summary>
-        /// Returns true if node is explicitly mapped, that is, contained in _explicit_maps_to_table
-        /// as a key.
-        /// Precondition: node is a node of the implementation graph
+        /// Returns true if <paramref name="node"/> is explicitly mapped, that is,
+        /// contained in <see cref="explicitMapsToTable"/>  as a key.
+        /// Precondition: <paramref name="node"/> is a node of the implementation graph
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node is explicitly mapped</returns>
-        public bool Is_Explicitly_Mapped(Node node)
-        {
-            return _explicit_maps_to_table.ContainsKey(node.ID);
-        }
+        public bool IsExplicitlyMapped(Node node) => explicitMapsToTable.ContainsKey(node.ID);
 
         /// <summary>
-        /// Adds all descendants of 'root' in the implementation that are implicitly
-        /// mapped onto the same target as 'root' to the implicit mapping table
-        /// _implicit_maps_to_table and maps them onto 'target'. This function recurses
+        /// Adds all descendants of <paramref name="root"/> in the implementation that are implicitly
+        /// mapped onto the same target as <paramref name="root"/> to the implicit mapping table
+        /// <see cref="implicitMapsToTable"/> and maps them onto <paramref name="target"/>. This function recurses
         /// into all subtrees unless the root of a subtree is an explicitly mapped node.
         /// Preconditions:
-        /// (1) root is a node in implementation
-        /// (2) target is a node in architecture
+        /// (1) <paramref name="root"/> is a node in implementation
+        /// (2) <paramref name="target"/> is a node in architecture
         /// </summary>
         /// <param name="root">implementation node that is the root of a subtree to be mapped implicitly</param>
         /// <param name="target">architecture node that is the target of the implicit mapping</param>
-        private void Add_Subtree_To_Implicit_Map(Node root, Node target)
+        private void AddSubtreeToImplicitMap(Node root, Node target)
         {
             List<Node> children = root.Children();
-#if DEBUG
-            // Debug.LogFormat("node {0} has {1} children\n", root.ID, children.Count);
-#endif
             foreach (Node child in children)
             {
-#if DEBUG
-                //Debug.LogFormat("mapping child {0} of {1}\n", child.ID, root.ID);
-#endif
                 // child is contained in implementation
-                if (!Is_Explicitly_Mapped(child))
+                if (!IsExplicitlyMapped(child))
                 {
-                    Add_Subtree_To_Implicit_Map(child, target);
-                }
-                else
-                {
-#if DEBUG
-                    //Debug.LogFormat("child {0} of {1} is a mapper\n", child.ID, root.ID);
-#endif
+                    AddSubtreeToImplicitMap(child, target);
                 }
             }
-            _implicit_maps_to_table[root.ID] = target;
+            implicitMapsToTable[root.ID] = target;
         }
 
-        // *****************************************
-        // DG utilities
-        // *****************************************
+        #endregion
+
+
+        #region DG Utilities
 
         /// <summary>
-        /// Adds value to counter of edge and transforms its state.
+        /// Adds value to counter of <paramref name="edge"/> and transforms its state.
         /// Notifies if edge state changes.
-        /// Precondition: edge is in architecture graph.
+        /// Precondition: <paramref name="edge"/> is in architecture graph.
         /// </summary>
         /// <param name="edge">architecture dependency to be changed</param>
         /// <param name="value">the value to be added to the edge's counter</param>
-        private void Change_Architecture_Dependency(Edge edge, int value)
+        private void ChangeArchitectureDependency(Edge edge, int value)
         {
-            int old_value = Get_Counter(edge);
-            int new_value = old_value + value;
-            State state = Get_State(edge);
+            int oldValue = GetCounter(edge);
+            int newValue = oldValue + value;
+            State state = GetState(edge);
 
-            if (old_value == 0)
+            if (oldValue == 0)
             {
                 Transition(edge, state, State.Convergent);
             }
-            else if (new_value == 0)
+            else if (newValue == 0)
             {
                 Transition(edge, state, State.Absent);
             }
-            Set_Counter(edge, new_value);
+            SetCounter(edge, newValue);
         }
 
-        // *****************************************
-        // analysis steps
-        // *****************************************
+        #endregion
+
+        #region Analysis Steps
 
         /// <summary>
         /// Runs reflexion analysis from scratch, i.e., non-incrementally.
@@ -1239,8 +1200,8 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             Reset();
             RegisterNodes();
-            Calculate_Convergences_And_Divergences();
-            Calculate_Absences();
+            CalculateConvergencesAndDivergences();
+            CalculateAbsences();
         }
 
         /// <summary>
@@ -1260,21 +1221,21 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             List<Edge> toBeRemoved = new List<Edge>();
 
-            foreach (Edge edge in _architecture.Edges())
+            foreach (Edge edge in Architecture.Edges())
             {
-                State state = Get_State(edge);
+                State state = GetState(edge);
                 switch (state)
                 {
                     case State.Undefined:
                     case State.Specified:
-                        Set_Counter(edge, 0); // Note: architecture edges have a counter
-                        Set_Initial(edge, State.Specified); // initial state must be State.specified
+                        SetCounter(edge, 0); // Note: architecture edges have a counter
+                        SetInitial(edge, State.Specified); // initial state must be State.specified
                         break;
                     case State.Absent:
                     case State.Convergent:
                         // The initial state of an architecture dependency that was not propagated is specified.
                         Transition(edge, state, State.Specified);
-                        Set_Counter(edge, 0); // Note: architecture edges have a counter
+                        SetCounter(edge, 0); // Note: architecture edges have a counter
                         break;
                     default:
                         // The edge is a left-over from a previous analysis and should be
@@ -1284,11 +1245,11 @@ namespace SEE.Tools.ReflexionAnalysis
                         break;
                 }
             }
-            // Removal of edges from _architecture must be done outside of the loop
-            // because the loop iterates on _architecture.Edges().
+            // Removal of edges from architecture must be done outside of the loop
+            // because the loop iterates on architecture.Edges().
             foreach (Edge edge in toBeRemoved)
             {
-                _architecture.RemoveEdge(edge);
+                Architecture.RemoveEdge(edge);
             }
         }
 
@@ -1299,21 +1260,21 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             // Mapping of IDs onto nodes in the implementation graph.
             InImplementation = new SerializableDictionary<string, Node>();
-            foreach (Node n in _implementation.Nodes())
+            foreach (Node n in Implementation.Nodes())
             {
                 InImplementation[n.ID] = n;
             }
 
             // Mapping of IDs onto nodes in the architecture graph.
             InArchitecture = new SerializableDictionary<string, Node>();
-            foreach (Node n in _architecture.Nodes())
+            foreach (Node n in Architecture.Nodes())
             {
                 InArchitecture[n.ID] = n;
             }
 
             // Mapping of IDs onto nodes in the mapping graph.
             InMapping = new SerializableDictionary<string, Node>();
-            foreach (Node n in _mapping.Nodes())
+            foreach (Node n in Mapping.Nodes())
             {
                 InMapping[n.ID] = n;
             }
@@ -1322,20 +1283,20 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Calculates convergences and divergences non-incrementally.
         /// </summary>
-        private void Calculate_Convergences_And_Divergences()
+        private void CalculateConvergencesAndDivergences()
         {
-            // Iterate on all nodes in the domain of implicit_maps_to_table
+            // Iterate on all nodes in the domain of implicitMapsToTable
             // (N.B.: these are nodes that are in 'implementation'), and
             // propagate and lift their dependencies in the architecture
-            foreach (KeyValuePair<string, Node> mapsto in _implicit_maps_to_table)
+            foreach (KeyValuePair<string, Node> mapsTo in implicitMapsToTable)
             {
-                // source_node is in implementation
-                Node source_node = InImplementation[mapsto.Key];
-                System.Diagnostics.Debug.Assert(source_node.ItsGraph == _implementation);
-                if (Is_Relevant(source_node))
+                // sourceNode is in implementation
+                Node sourceNode = InImplementation[mapsTo.Key];
+                Debug.Assert(sourceNode.ItsGraph == Implementation);
+                if (IsRelevant(sourceNode))
                 {
-                    // Node is contained in implementation graph and _implicit_maps_to_table
-                    Propagate_And_Lift_Outgoing_Dependencies(source_node);
+                    // Node is contained in implementation graph and implicitMapsToTable
+                    PropagateAndLiftOutgoingDependencies(sourceNode);
                 }
             }
         }
@@ -1343,24 +1304,18 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Calculates absences non-incrementally.
         /// </summary>
-        private void Calculate_Absences()
+        private void CalculateAbsences()
         {
-            // after calculate_convergences_and_divergences() all
+            // after CalculateConvergesAndDivergences() all
             // architectural dependencies not marked as 'convergent'
-            // are 'absent' (unless the architecture edge is marked 'optional'
-            foreach (Edge edge in _architecture.Edges())
+            // are 'absent' (unless the architecture edge is marked 'optional')
+            foreach (Edge edge in Architecture.Edges())
             {
-                State state = Get_State(edge);
-                if (Is_Specified(edge) && state != State.Convergent)
+                State state = GetState(edge);
+                if (IsSpecified(edge) && state != State.Convergent)
                 {
-                    if (edge.HasToggle("Architecture.Is_Optional"))
-                    {
-                        Transition(edge, state, State.AllowedAbsent);
-                    }
-                    else
-                    {
-                        Transition(edge, state, State.Absent);
-                    }
+                    Transition(edge, state, 
+                               edge.HasToggle("Architecture.Is_Optional") ? State.AllowedAbsent : State.Absent);
                 }
             }
         }
@@ -1369,121 +1324,96 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns propagated dependency in architecture graph matching the type of
         /// of the implementation dependency Edge exactly if one exists;
         /// returns null if none can be found.
-        /// Precondition: From and To are two architecture entities in architecture
-        /// graph onto which an implementation dependency of type Its_Type was
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/>
+        /// are two architecture entities in architecture
+        /// graph onto which an implementation dependency of type <paramref name="itsType"/> was
         /// possibly propagated.
         /// Postcondition: resulting edge is in architecture or null
         /// </summary>
         /// <param name="source">source node of propagated dependency in architecture</param>
         /// <param name="target">target node of propagated dependency in architecture</param>
-        /// <param name="its_type">the edge type of the propagated dependency</param>
+        /// <param name="itsType">the edge type of the propagated dependency</param>
         /// <returns>the propagated edge in the architecture graph between source and target
         /// with given type; null if there is no such edge</returns>
-        private Edge Get_Propagated_Dependency(
+        private static Edge GetPropagatedDependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
-            string its_type) // the edge type that must match exactly
+            string itsType) // the edge type that must match exactly
         {
-            List<Edge> connectings = source.From_To(target, its_type);
-
-            foreach (Edge edge in connectings)
-            {
-                // There may be multiple (more precisely, two or less) edges from source to target with its_type,
-                // but at most one that was specified by the user in the architecture model (we assume that
-                // the architecture graph does not have redundant specified dependencies).
-                // All others (more precisely, at most one) are dependencies that were propagated from the
-                // implementation graph to the architecture graph.
-                if (!Is_Specified(edge))
-                {
-                    return edge;
-                }
-            }
-            return null;
+            // There may be multiple (more precisely, two or less) edges from source to target with itsType,
+            // but at most one that was specified by the user in the architecture model (we assume that
+            // the architecture graph does not have redundant specified dependencies).
+            // All others (more precisely, at most one) are dependencies that were propagated from the
+            // implementation graph to the architecture graph.
+            return source.FromTo(target, itsType).FirstOrDefault(edge => !IsSpecified(edge));
         }
 
         /// <summary>
         /// Propagates and lifts dependency edge from implementation to architecture graph.
         ///
-        /// Precondition: implementation_dep is in implementation graph.
+        /// Precondition: <paramref name="implementationDependency"/> is in implementation graph.
         /// </summary>
-        /// <param name="implementation_dep">the implementation edge to be propagated</param>
-        private void Propagate_And_Lift_Dependency(Edge implementation_dep)
+        /// <param name="implementationDependency">the implementation edge to be propagated</param>
+        private void PropagateAndLiftDependency(Edge implementationDependency)
         {
-#if DEBUG
+            Debug.Assert(implementationDependency.ItsGraph == Implementation);
+            Node implSource = implementationDependency.Source;
+            Node implTarget = implementationDependency.Target;
+            // Assert: implSource and implTarget are in implementation
+            string implType = implementationDependency.Type;
 
-            //Debug.LogFormat("propagate_and_lift_dependency: propagated implementation_dep = {0}\n",
-            //                Edge_Name(implementation_dep, true));
-#endif
-            System.Diagnostics.Debug.Assert(implementation_dep.ItsGraph == _implementation);
-            Node impl_source = implementation_dep.Source;
-            Node impl_target = implementation_dep.Target;
-            // Assert: impl_source and impl_target are in implementation
-            string impl_type = implementation_dep.Type;
+            Node archSource = MapsTo(implSource);
+            Node archTarget = MapsTo(implTarget);
+            // Assert: archSource and archTarget are in architecture or null
 
-            Node arch_source = Maps_To(impl_source);
-            Node arch_target = Maps_To(impl_target);
-            // Assert: arch_source and arch_target are in architecture or null
-
-            if (arch_source == null || arch_target == null)
+            if (archSource == null || archTarget == null)
             {
                 // source or target are not mapped; so we cannot do anything
-#if DEBUG
-                //Debug.Log("source or target are not mapped; bailing out\n");
-#endif
                 return;
             }
-            Edge propagated_architecture_dep = Get_Propagated_Dependency(arch_source, arch_target, impl_type);
-            // Assert: architecture_dep is in architecture graph or null.
-            System.Diagnostics.Debug.Assert(propagated_architecture_dep == null || propagated_architecture_dep.ItsGraph == _architecture);
-            Edge allowing_edge = null;
-            if (propagated_architecture_dep == null)
-            {   // a propagated dependency has not existed yet; we need to create one
-                propagated_architecture_dep
-                  = New_Impl_Dep_In_Architecture
-                      (arch_source, arch_target, impl_type, ref allowing_edge);
-                // Assert: architecture_dep is in architecture graph (it is propagated; not specified)
-#if DEBUG
-                //Debug.LogFormat("new propagated dependency in architecture created: {0}\n", propagated_architecture_dep);
-#endif
+            Edge architectureDependency = GetPropagatedDependency(archSource, archTarget, implType);
+            // Assert: architectureDependency is in architecture graph or null.
+            Debug.Assert(architectureDependency == null || architectureDependency.ItsGraph == Architecture);
+            Edge allowingEdge = null;
+            if (architectureDependency == null)
+            {   
+                // a propagated dependency has not existed yet; we need to create one
+                architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, out allowingEdge);
+                // Assert: architectureDependency is in architecture graph (it is propagated; not specified)
             }
             else
             {
                 // a propagated dependency exists already
-#if DEBUG
-                //Debug.Log("a propagated dependency exists already\n");
-#endif
-                int impl_counter = Get_Impl_Counter(implementation_dep);
-                // Assert: architecture_dep.Source and architecture_dep.Target are in architecture.
-                Lift(propagated_architecture_dep.Source,
-                     propagated_architecture_dep.Target,
-                     impl_type,
-                     impl_counter,
-                     out allowing_edge);
-                Change_Impl_Ref(propagated_architecture_dep, impl_counter);
+                int implCounter = GetImplCounter(implementationDependency);
+                // Assert: architectureDependency.Source and architectureDependency.Target are in architecture.
+                Lift(architectureDependency.Source, architectureDependency.Target,
+                     implType, implCounter, out allowingEdge);
+                AddToImplRef(architectureDependency, implCounter);
             }
             // keep a trace of dependency propagation
+            // TODO(falko17): Why is this commented out (and in C++), is this not required?
             //causing.insert(std::pair<Edge*, Edge*>
-            // (allowing_edge ? allowing_edge : architecture_dep, implementation_dep));
+            // (allowing_edge ? allowing_edge : architecture_dep, implementationDependency));
         }
 
         /// <summary>
-        /// Propagates the outgoing dependencies of node from implementation to architecture
+        /// Propagates the outgoing dependencies of <paramref name="node"/> from implementation to architecture
         /// graph and lifts them in architecture (if and only if an outgoing dependency is
         /// relevant).
         ///
-        /// Precondition: node is in implementation graph.
+        /// Precondition: <paramref name="node"/> is in implementation graph.
         /// </summary>
         /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
-        private void Propagate_And_Lift_Outgoing_Dependencies(Node node)
+        private void PropagateAndLiftOutgoingDependencies(Node node)
         {
-            System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
+            Debug.Assert(node.ItsGraph == Implementation);
             foreach (Edge edge in node.Outgoings)
             {
                 // edge is in implementation
                 // only relevant dependencies may be propagated and lifted
-                if (Is_Relevant(edge))
+                if (IsRelevant(edge))
                 {
-                    Propagate_And_Lift_Dependency(edge);
+                    PropagateAndLiftDependency(edge);
                 }
             }
         }
@@ -1496,49 +1426,42 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="node"></param>
         /// <returns>the architecture node upon which node is mapped or null</returns>
-        private Node Maps_To(Node node)
+        private Node MapsTo(Node node)
         {
-            System.Diagnostics.Debug.Assert(node.ItsGraph == _implementation);
-            if (_implicit_maps_to_table.TryGetValue(node.ID, out Node target))
-            {
-                return target;
-            }
-            else
-            {
-                return null;
-            }
+            Debug.Assert(node.ItsGraph == Implementation);
+            return implicitMapsToTable.TryGetValue(node.ID, out Node target) ? target : null;
         }
 
         /// <summary>
         /// Returns true if this causing implementation edge is a dependency from child to
         /// parent in the sense of the "allow dependencies to parents" option.
         ///
-        /// Precondition: edge is in implementation graph.
+        /// Precondition: <paramref name="edge"/> is in implementation graph.
         /// </summary>
         /// <param name="edge">dependency edge to be checked</param>
-        /// <returns>true if this causing edge is a dependency from child to
-        /// parent</returns>
-        private bool Is_Dependency_To_Parent(Edge edge)
+        /// <returns>true if this causing edge is a dependency from child to parent</returns>
+        private bool IsDependencyToParent(Edge edge)
         {
-            Node mapped_source = Maps_To(edge.Source);
-            Node mapped_target = Maps_To(edge.Target);
-            // Assert: mapped_source and mapped_target are in architecture
-            if (mapped_source != null && mapped_target != null)
+            Node mappedSource = MapsTo(edge.Source);
+            Node mappedTarget = MapsTo(edge.Target);
+            // Assert: mappedSource and mappedTarget are in architecture
+            if (mappedSource != null && mappedTarget != null)
             {
-                return Is_Descendant_Of(mapped_source, mapped_target);
+                return IsDescendantOf(mappedSource, mappedTarget);
             }
             return false;
         }
 
         /// <summary>
-        /// Returns true if 'descendant' is a descendant of 'ancestor' in the node hierarchy.
+        /// Returns true if <paramref name="descendant"/> is a descendant of <paramref name="ancestor"/>
+        /// in the node hierarchy.
         ///
-        /// Precondition: descendant and ancestor are in the same graph.
+        /// Precondition: <paramref name="descendant"/> and <paramref name="ancestor"/> are in the same graph.
         /// </summary>
         /// <param name="descendant">source node</param>
         /// <param name="ancestor">target node</param>
-        /// <returns>true if 'descendant' is a descendant of 'ancestor'</returns>
-        private bool Is_Descendant_Of(Node descendant, Node ancestor)
+        /// <returns>true if <paramref name="descendant"/> is a descendant of <paramref name="ancestor"/></returns>
+        private static bool IsDescendantOf(Node descendant, Node ancestor)
         {
             Node cursor = descendant.Parent;
             while (cursor != null && cursor != ancestor)
@@ -1549,190 +1472,175 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Creates and returns a new edge of type its_type from 'from' to 'to' in given 'graph'.
+        /// Creates and returns a new edge of type <paramref name="itsType"/> from <paramref name="from"/> to
+        /// <paramref name="to"/> in given <paramref name="graph"/>.
         /// Use this function for source dependencies.
         /// Source dependencies are a special case because there may be two
         /// equivalent source dependencies between the same node pair: one
         /// specified and one propagated.
         ///
-        /// Precondition: from and to are already in the graph.
+        /// Precondition: <paramref name="from"/> and <paramref name="to"/> are already in the graph.
         /// </summary>
         /// <param name="from">the source of the edge</param>
         /// <param name="to">the target of the edge</param>
-        /// <param name="its_type">the type of the edge</param>
+        /// <param name="itsType">the type of the edge</param>
         /// <param name="graph">the graph the new edge should be added to</param>
         /// <returns>the new edge</returns>
-        private Edge Add(Node from, Node to, string its_type, Graph graph)
+        private static Edge Add(Node from, Node to, string itsType, Graph graph)
         {
-            // Note: there may be a specified as well as a propagated edge between the
-            // same two architectural entities; hence, we may have multiple edges
-            // in between. Because of that and because the edge's ID is generated
-            // based on its source, target, and type, we need to set the ID ourselves
-            // to make sure it is unique.
-            Edge result = new Edge(from, to, its_type);
-            // The edge ID must be changed before the edge is added to the graph.
-            result.ID = Guid.NewGuid().ToString();
+            // Note: a propagated edge between the same two architectural entities may be specified as well;
+            // hence, we may have multiple edges in between.
+            // Because of that and because the edge's ID is generated based on its source, target, and type,
+            // we need to set the ID ourselves to make sure it is unique.
+            Edge result = new Edge(from, to, itsType)
+            {
+                // The edge ID must be changed before the edge is added to the graph.
+                ID = Guid.NewGuid().ToString()
+            };
             graph.AddEdge(result);
             return result;
         }
 
         /// <summary>
         /// Adds a propagated dependency to the architecture graph
-        /// from arch_source to arch_target with given edge type. This edge is lifted
-        /// to an allowing specified architecture dependency if there is one (if that
-        /// is the case the specified architecture dependency allowing this implementation
-        /// dependency is returned in the output parameter allowing_edge_out. The state
+        /// from <paramref name="archSource"/> to <paramref name="archTarget"/> with given <paramref name="edgeType"/>.
+        /// This edge is lifted to an allowing specified architecture dependency if there is one
+        /// (if that is the case the specified architecture dependency allowing this implementation
+        /// dependency is returned in the output parameter allowingEdgeOut). The state
         /// of the allowing specified architecture dependency is set to convergent if
         /// such an edge exists. Likewise, the state of the propagated dependency is
-        /// set to either allowed, implicitly_allowed, or divergent.
+        /// set to either allowed, implicitlyAllowed, or divergent.
         ///
         /// Preconditions:
-        /// (1) there is no propagated edge from arch_source to arch_target with the given edge_type yet
-        /// (2) arch_source and arch_target are in the architecture graph
+        /// (1) there is no propagated edge from <paramref name="archSource"/> to <paramref name="archTarget"/>
+        /// with the given <paramref name="edgeType"/> yet
+        /// (2) <paramref name="archSource"/> and <paramref name="archTarget"/> are in the architecture graph
         /// Postcondition: the newly created and returned dependency is contained in
         /// the architecture graph and marked as propagated.
         /// </summary>
-        /// <param name="arch_source">architecture node that is the source of the propagated edge</param>
-        /// <param name="arch_target">architecture node that is the target of the propagated edge</param>
-        /// <param name="edge_type">type of the propagated implementation edge</param>
-        /// <param name="allowing_edge_out">the specified architecture dependency allowing the implementation
-        /// dependency if there is one; otherwise null; allowing_edge_out is also null if the implementation
-        /// dependency form a self-loop (arch_source == arch_target); self-dependencies are implicitly
+        /// <param name="archSource">architecture node that is the source of the propagated edge</param>
+        /// <param name="archTarget">architecture node that is the target of the propagated edge</param>
+        /// <param name="edgeType">type of the propagated implementation edge</param>
+        /// <param name="allowingEdgeOut">the specified architecture dependency allowing the implementation
+        /// dependency if there is one; otherwise null; allowingEdgeOut is also null if the implementation
+        /// dependency form a self-loop (archSource == archTarget); self-dependencies are implicitly
         /// allowed, but do not necessarily have a specified architecture dependency</param>
         /// <returns>a new propagated dependency in the architecture graph</returns>
-        private Edge New_Impl_Dep_In_Architecture(Node arch_source,
-                                                  Node arch_target,
-                                                  string edge_type,
-                                                  ref Edge allowing_edge_out)
+        private Edge NewImplDepInArchitecture(Node archSource,
+                                                  Node archTarget,
+                                                  string edgeType,
+                                                  out Edge allowingEdgeOut)
         {
+            // TODO(falko17): This counter is never changed. Is that intentional?
             int counter = 1;
-            Edge propagated_architecture_dep = Add(arch_source, arch_target, edge_type, _architecture);
+            Edge propagatedArchitectureDep = Add(archSource, archTarget, edgeType, Architecture);
             // architecture_dep is a propagated dependency in the architecture graph
-            Set_Counter(propagated_architecture_dep, counter);
+            SetCounter(propagatedArchitectureDep, counter);
 
-            // TODO: Mark architecture_dep as propagated. Or maybe that is not necessary at all
+            // TODO: Mark architecturDep as propagated. Or maybe that is not necessary at all
             // because we have the edge state from which we can derive whether an edge is specified
             // or propagated.
 
-            // architecture_dep is a dependency propagated from the implementation onto the architecture;
+            // architectureDep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
             // because it has just come into existence, we need to let our observers know about it
-            Notify(new PropagatedEdgeAdded(propagated_architecture_dep));
+            Notify(new PropagatedEdgeAdded(propagatedArchitectureDep));
 
-            if (Lift(arch_source, arch_target, edge_type, counter, out allowing_edge_out))
+            if (Lift(archSource, archTarget, edgeType, counter, out allowingEdgeOut))
             {
-                // found a matching specified architecture dependency allowing propagated_architecture_dep
-                Transition(propagated_architecture_dep, State.Undefined, State.Allowed);
+                // found a matching specified architecture dependency allowing propagatedArchitectureDep
+                Transition(propagatedArchitectureDep, State.Undefined, State.Allowed);
             }
-            else if (arch_source == arch_target)
+            else if (archSource == archTarget)
             {
                 // by default, every entity may use itself
-                Transition(propagated_architecture_dep, State.Undefined, State.ImplicitlyAllowed);
+                Transition(propagatedArchitectureDep, State.Undefined, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
-                allowing_edge_out = null;
+                allowingEdgeOut = null;
             }
-            else if (_allow_dependencies_to_parents
-                     && Is_Descendant_Of(propagated_architecture_dep.Source, propagated_architecture_dep.Target))
+            else if (allowDependenciesToParents
+                     && IsDescendantOf(propagatedArchitectureDep.Source, propagatedArchitectureDep.Target))
             {
-                Transition(propagated_architecture_dep, State.Undefined, State.ImplicitlyAllowed);
+                Transition(propagatedArchitectureDep, State.Undefined, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Dependencies from descendants to ancestors are implicitly allowed if
-                // _allow_dependencies_to_parents is true.
-                allowing_edge_out = null;
+                // AllowDependenciesToParents is true.
+                allowingEdgeOut = null;
             }
             else
             {
-                Transition(propagated_architecture_dep, State.Undefined, State.Divergent);
-                allowing_edge_out = null;
+                Transition(propagatedArchitectureDep, State.Undefined, State.Divergent);
+                allowingEdgeOut = null;
             }
-            return propagated_architecture_dep;
+            return propagatedArchitectureDep;
         }
 
         /// <summary>
         /// Returns true if a matching architecture dependency is found, also
-        /// sets allowing_edge_out to that edge in that case. If no such matchitng
-        /// edge is found, false is returned and allowing_edge_out is null.
-        /// Precondition: from and to are in the architecture graph.
-        /// Postcondition: allowing_edge_out is a specified dependency in architecture graph or null.
+        /// sets <paramref name="allowingEdgeOut"/> to that edge in that case.
+        /// If no such matching/ edge is found, false is returned and <paramref name="allowingEdgeOut"/> is null.
+        /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph.
+        /// Postcondition: <paramref name="allowingEdgeOut"/> is a specified dependency in architecture graph or null.
         /// </summary>
         /// <param name="from">source of the edge</param>
         /// <param name="to">target of the edge</param>
-        /// <param name="edge_type">type of the edge</param>
+        /// <param name="edgeType">type of the edge</param>
         /// <param name="counter">the multiplicity of the edge, i.e. the number of other
         /// edges covered by it</param>
-        /// <param name="allowing_edge_out">the specified architecture dependency allowing the implementation
+        /// <param name="allowingEdgeOut">the specified architecture dependency allowing the implementation
         /// dependency if there is any; otherwise null</param>
-        /// <returns></returns>
+        /// <returns>True if a matching architecture dependency is found</returns>
         private bool Lift(Node from,
                           Node to,
-                          string edge_type,
+                          string edgeType,
                           int counter,
-                          out Edge allowing_edge_out)
+                          out Edge allowingEdgeOut)
 
         {
             List<Node> parents = to.Ascendants();
             // Assert: all parents are in architecture
             Node cursor = from;
             // Assert: cursor is in architecture
-#if DEBUG
-            //Debug.Log("lift: lift an edge from "
-            //    + Qualified_Node_Name(from, true)
-            //    + " to "
-            //    + Qualified_Node_Name(to, true)
-            //    + " of type "
-            //    + edge_type
-            //    + " and counter value "
-            //    + counter
-            //    + "\n");
-            //dump_node_set(parents, "parents(to)");
-#endif
-
+            
             while (cursor != null)
             {
-#if DEBUG
-                //Debug.Log("cursor: " + qualified_node_name(cursor, false) + "\n");
-#endif
                 ISet<Edge> outs = cursor.Outgoings;
                 // Assert: all edges in outs are in architecture.
                 foreach (Edge edge in outs)
                 {
-                    // Assert: edge is in architecture; edge_type is the type of edge
+                    // Assert: edge is in architecture; edgeType is the type of edge
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
-                    if (Is_Specified(edge)
-                        // && edge.Has_Supertype_Of(edge_type) FIXME: We consider that edges match independent of their types
+                    if (IsSpecified(edge)
+                        // && edge.Has_Supertype_Of(edgeType) FIXME: We consider that edges match independent of their types
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
-                        Change_Architecture_Dependency(edge, counter);
-                        allowing_edge_out = edge;
+                        ChangeArchitectureDependency(edge, counter);
+                        allowingEdgeOut = edge;
                         return true;
                     }
                 }
                 cursor = cursor.Parent;
             }
             // no matching architecture dependency found
-#if DEBUG
-            //Debug.Log("lift: no matching architecture dependency found" + "\n");
-#endif
-            allowing_edge_out = null;
+            allowingEdgeOut = null;
             return false;
         }
 
-        //------------------------------------------------------------------
-        // Helper methods for debugging
-        //------------------------------------------------------------------
+        #endregion
+        
+        #region Helper methods for debugging
 
         /// <summary>
-        /// Returns the Source.File attribute of the given attributable if it exists, otherwise
+        /// Returns the Source.File attribute of the given <paramref name="graphElement"/> if it exists, otherwise
         /// the empty string.
         /// </summary>
         /// <param name="graphElement">attributable element</param>
         /// <returns>Source.File attribute or empty string</returns>
-        private static string Get_Filename(GraphElement graphElement)
+        private static string GetFilename(GraphElement graphElement)
         {
-            string result = graphElement.Filename();
-            return result == null ? string.Empty : result;
+            return graphElement.Filename() ?? string.Empty;
         }
 
         /// <summary>
@@ -1740,7 +1648,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="graphElement">attributable element</param>
         /// <returns>Source.Line attribute or empty string</returns>
-        private static string Get_Source_Line(GraphElement graphElement)
+        private static string GetSourceLine(GraphElement graphElement)
         {
             int? result = graphElement.SourceLine();
             return result.HasValue ? result.ToString() : string.Empty;
@@ -1751,50 +1659,42 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="edge">edge whose identifier is required</param>
-        /// <param name="be_verbose">currently ignored</param>
+        /// <param name="beVerbose">currently ignored</param>
         /// <returns>an identifier for the given edge</returns>
-        private static string Edge_Name(Edge edge, bool be_verbose = false)
+        private static string EdgeName(Edge edge, bool beVerbose = false)
         {
             return edge.ToString();
         }
 
+        // TODO(falko17): Documentation is not up-to-date
         /// <summary>
         /// Returns a human-readable identifier for the given node.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="node">node whose identifier is required</param>
-        /// <param name="be_verbose">currently ignored</param>
+        /// <param name="beVerbose">currently ignored</param>
         /// <returns>an identifier for the given node</returns>
-        private static string Node_Name(Node node, bool be_verbose = false)
+        private static string NodeName(Node node, bool beVerbose = false)
         {
             string name = node.SourceName;
-
-            if (be_verbose)
-            {
-                return name
-                + " (" + node.ID + ") "
-                + node.GetType().Name;
-            }
-            else
-            {
-                return name;
-            }
+            return beVerbose ? $"{name} ({node.ID}) {node.GetType().Name}" : name;
         }
 
+        // TODO(falko17): Documentation is not up-to-date
         /// <summary>
         /// Returns a human-readable identifier for the given node further qualified with
         /// its source location if available.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
         /// <param name="node">node whose identifier is required</param>
-        /// <param name="be_verbose">currently ignored</param>
+        /// <param name="beVerbose">currently ignored</param>
         /// <returns>an identifier for the given node</returns>
         // returns node name
-        private static string Qualified_Node_Name(Node node, bool be_verbose = false)
+        private static string QualifiedNodeName(Node node, bool beVerbose = false)
         {
-            string filename = Get_Filename(node);
-            string loc = Get_Source_Line(node);
-            return Node_Name(node, be_verbose) + "@" + filename + ":" + loc;
+            string filename = GetFilename(node);
+            string loc = GetSourceLine(node);
+            return $"{NodeName(node, beVerbose)}@{filename}:{loc}";
         }
 
         /// <summary>
@@ -1802,10 +1702,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">edge whose clause is expected</param>
         /// <returns>the edge as a clause</returns>
-        private static string As_Clause(Edge edge)
+        private static string AsClause(Edge edge)
         {
-            return edge.GetType().Name + "(" + Node_Name(edge.Source, false) + ", "
-                                             + Node_Name(edge.Target, false) + ")";
+            return edge.GetType().Name + "(" + NodeName(edge.Source, false) + ", "
+                                             + NodeName(edge.Target, false) + ")";
         }
 
         /// <summary>
@@ -1813,37 +1713,37 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">edge whose qualified clause is expected</param>
         /// <returns>qualified clause</returns>
-        private static string As_Qualified_Clause(Edge edge)
+        private static string AsQualifiedClause(Edge edge)
         {
-            return edge.GetType().Name + "(" + Qualified_Node_Name(edge.Source, false) + ", "
-                                 + Qualified_Node_Name(edge.Target, false) + ")"
-                                 + "@" + Get_Filename(edge) + ":" + Get_Source_Line(edge);
+            return edge.GetType().Name + "(" + QualifiedNodeName(edge.Source, false) + ", "
+                                 + QualifiedNodeName(edge.Target, false) + ")"
+                                 + "@" + GetFilename(edge) + ":" + GetSourceLine(edge);
         }
 
         /// <summary>
-        /// Dumps given node_set after given message was dumped.
+        /// Dumps given <paramref name="nodeSet"/> after given message was dumped.
         /// </summary>
-        /// <param name="node_set">list of nodes whose qualified name is to be dumped</param>
+        /// <param name="nodeSet">list of nodes whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the nodes</param>
-        private static void Dump_Node_Set(List<Node> node_set, string message)
+        private static void DumpNodeSet(List<Node> nodeSet, string message)
         {
             Debug.Log(message + "\n");
-            foreach (Node node in node_set)
+            foreach (Node node in nodeSet)
             {
-                Debug.Log(Qualified_Node_Name(node, true) + "\n");
+                Debug.Log(QualifiedNodeName(node, true) + "\n");
             }
         }
 
         /// <summary>
-        /// Dumps given edge_set after given message was dumped.
+        /// Dumps given <paramref name="edgeSet"/> after given message was dumped.
         /// </summary>
-        /// <param name="edge_set">list of edges whose qualified name is to be dumped</param>
+        /// <param name="edgeSet">list of edges whose qualified name is to be dumped</param>
         /// <param name="message">message to be emitted before the edges</param>
-        private static void Dump_Edge_Set(List<Edge> edge_set)
+        private static void DumpEdgeSet(List<Edge> edgeSet)
         {
-            foreach (Edge edge in edge_set)
+            foreach (Edge edge in edgeSet)
             {
-                Debug.Log(As_Qualified_Clause(edge) + "\n");
+                Debug.Log(AsQualifiedClause(edge) + "\n");
             }
         }
 
@@ -1853,7 +1753,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public void DumpArchitecture()
         {
-            DumpGraph(_architecture);
+            DumpGraph(Architecture);
             //Debug.LogFormat("REFLEXION RESULT ({0} nodes and {1} edges): \n", _architecture.NodeCount, _architecture.EdgeCount);
             //Debug.Log("NODES\n");
             //foreach (Node node in _architecture.Nodes())
@@ -1864,7 +1764,7 @@ namespace SEE.Tools.ReflexionAnalysis
             //foreach (Edge edge in _architecture.Edges())
             //{
             //    // edge counter state
-            //    Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
+            //    Debug.LogFormat("{0} {1} {2}\n", AsClause(edge), GetCounter(edge), GetState(edge));
             //}
         }
 
@@ -1884,18 +1784,18 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (Edge edge in graph.Edges())
             {
                 // edge counter state
-                Debug.LogFormat("{0} {1} {2}\n", As_Clause(edge), Get_Counter(edge), Get_State(edge));
+                Debug.LogFormat("{0} {1} {2}\n", AsClause(edge), GetCounter(edge), GetState(edge));
             }
         }
 
         public void DumpMapping()
         {
             Debug.Log("EXPLICITLY MAPPED NODES\n");
-            DumpTable(_explicit_maps_to_table);
+            DumpTable(explicitMapsToTable);
             Debug.Log("IMPLICITLY MAPPED NODES\n");
-            DumpTable(_implicit_maps_to_table);
+            DumpTable(implicitMapsToTable);
             Debug.Log("MAPPING GRAPH\n");
-            DumpGraph(_mapping);
+            DumpGraph(Mapping);
         }
 
         public static void DumpTable(Dictionary<string, Node> table)
@@ -1906,5 +1806,6 @@ namespace SEE.Tools.ReflexionAnalysis
             }
         }
 
-    } // ReflexionAnalysis
-} // namespace
+        #endregion
+    }
+}
