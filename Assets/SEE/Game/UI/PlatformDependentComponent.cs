@@ -63,6 +63,10 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Start()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
         protected virtual void StartHoloLens() => PlatformUnsupported();
+        /// <summary>
+        /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
+        /// </summary>
+        protected virtual void StartMobile() => PlatformUnsupported();
 
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the Desktop platform.
@@ -108,6 +112,8 @@ namespace SEE.Game.UI
                     break;
                 case PlayerInputType.HoloLensPlayer: StartHoloLens();
                     //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended 
+                    break;
+                case PlayerInputType.MobilePlayer: StartMobile();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;  

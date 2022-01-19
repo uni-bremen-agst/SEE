@@ -57,6 +57,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Executes the given kind of <paramref name="actionType"/> as new.
+        /// </summary>
+        /// <param name="actionType">kind of action to be executed</param>
+        public static void ExecuteMoblie(MobileActionStateType actionType)
+        {
+            ActionState.MobileValue = actionType;
+            ReversibleAction action = actionType.CreateReversible();
+            history.Execute(action);
+        }
+
+        /// <summary>
         /// Pushes new actions to the history of executed actions.
         /// </summary>
         /// <param name="action">The action and all of its specific values which are needed for the history</param>
