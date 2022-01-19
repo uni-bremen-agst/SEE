@@ -23,6 +23,11 @@ namespace SEE.Utils
     public static class Raycasting
     {
         /// <summary>
+        /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
+        /// </summary>
+        private const int RAYCAST_BUFFER_SIZE = 500;
+
+        /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.
         /// The hit will be set, if no GUI element is hit.
         ///
@@ -41,17 +46,16 @@ namespace SEE.Utils
         /// attached, <see cref="HitGraphElement.None"/> is returned.
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-            if (!IsMouseOverGUI() && Physics.Raycast(ray, out RaycastHit hit))
+            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
             {
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out NodeRef nodeRef))
-                {                    
+                {
                     elementRef = nodeRef;
                     return HitGraphElement.Node;
                 }
                 else if (hit.transform.TryGetComponent(out EdgeRef edgeRef))
-                {                    
+                {
                     elementRef = edgeRef;
                     return HitGraphElement.Edge;
                 }
@@ -79,7 +83,53 @@ namespace SEE.Utils
         public static bool RaycastAnything(out RaycastHit raycastHit)
         {
             raycastHit = new RaycastHit();
-            return !IsMouseOverGUI() && Physics.Raycast(MainCamera.Camera.ScreenPointToRay(Input.mousePosition), out raycastHit);
+            return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit);
+        }
+
+        /// <summary>
+        /// Raycasts the scene from the camera in the direction the mouse is pointing and chooses the
+        /// node that is lowest in the node hierarchy, so in the lowest level of the tree
+        /// (more precisely, the one with the greatest value of the node attribute Level;
+        /// Level counting starts at the root and increases downward into the tree).
+        /// </summary>
+        /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
+        /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
+        /// <param name="referenceNode">if given, all nodes which are not in the same graph as
+        /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.
+        /// </param>
+        /// <returns>true if the mouse was over at least one node</returns>
+        public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, NodeRef referenceNode = null)
+        {
+            RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
+            int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
+            if (numberOfHits == RAYCAST_BUFFER_SIZE)
+            {
+                Debug.LogWarning("We possibly got more hits than buffer space is available.\n");
+            }
+
+            raycastHit = null;
+            hitNode = null;
+            for (int i = 0; i < numberOfHits; i++)
+            {
+                RaycastHit hit = hits[i];
+                if (referenceNode == null || hit.collider.gameObject != referenceNode.gameObject)
+                {
+                    NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
+                    // Is it a node at all and if so, are they in the same graph?
+                    if (nodeRef != null && nodeRef.Value != null
+                        && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph))
+                    {
+                        // update newParent when we found a node deeper into the tree
+                        if (hitNode == null || nodeRef.Value.Level > hitNode.Level)
+                        {
+                            hitNode = nodeRef.Value;
+                            raycastHit = hit;
+                        }
+                    }
+                }
+            }
+
+            return numberOfHits > 0;
         }
 
         /// <summary>
@@ -95,8 +145,7 @@ namespace SEE.Utils
 
             raycastHit = new RaycastHit();
             obj = null;
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-            if (!IsMouseOverGUI() && Physics.Raycast(ray, out RaycastHit hit))
+            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
             {
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out InteractableObject io))
@@ -118,7 +167,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
-        /// 
+        ///
         /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fails
         /// and <c>false</c> will be returned.
         /// </summary>
@@ -137,7 +186,7 @@ namespace SEE.Utils
         /// <returns>Whether the plane was hit.</returns>
         public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = UserPointsTo();
             bool result = plane.Raycast(ray, out float enter);
             if (result)
             {
@@ -159,7 +208,7 @@ namespace SEE.Utils
         /// <param name="hitPointOnPlane">The hit position on the plane or <see cref="Vector3.zero"/>, if the plane was not hit.</param>
         public static void RaycastClippingPlane(GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
         {
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = UserPointsTo();
             UnityEngine.Plane raycastPlane = new UnityEngine.Plane(Vector3.up, clippingPlane.transform.position);
             hit = raycastPlane.Raycast(ray, out float enter);
             if (hit)
@@ -179,6 +228,16 @@ namespace SEE.Utils
                 hitInsideClippingArea = false;
                 hitPointOnPlane = Vector3.zero;
             }
+        }
+
+        /// <summary>
+        /// A ray from the user's mouse.
+        /// </summary>
+        /// <returns>ray from the user's mouse</returns>
+        public static Ray UserPointsTo()
+        {
+            // FIXME: We need to an interaction for VR, too.
+            return MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
         }
     }
 }

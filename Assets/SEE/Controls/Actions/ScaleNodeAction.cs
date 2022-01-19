@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to scale a node.
     /// </summary>
-    public class ScaleNodeAction : AbstractPlayerAction
+    internal class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
@@ -233,9 +233,9 @@ namespace SEE.Controls.Actions
         private bool scalingGizmosAreDrawn = false;
 
         /// <summary
-        /// See <see cref="ReversibleAction.Update"/>. 
-        /// 
-        /// Note: The action is finalized only if the user selects anything except the 
+        /// See <see cref="ReversibleAction.Update"/>.
+        ///
+        /// Note: The action is finalized only if the user selects anything except the
         /// <see cref="objectToScale"/> or any of the scaling gizmos.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -324,7 +324,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Looks at all the incoming and outgoing edges of a node and replaces these edges depending on the new scaling of the node. 
+        /// Looks at all the incoming and outgoing edges of a node and replaces these edges depending on the new scaling of the node.
         /// </summary>
         private void AdjustEdge()
         {
@@ -332,7 +332,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos. 
+        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos.
         /// </summary>
         private void Scaling()
         {
@@ -551,7 +551,7 @@ namespace SEE.Controls.Actions
                     firstCornerSphere.transform.position = pos;
                     firstCornerOldSpherePos = pos;
                 }
-                // south-east corner 
+                // south-east corner
                 {
                     Vector3 pos = Corner(xOffset, -zOffset);
                     secondCornerSphere.transform.position = pos;
@@ -642,7 +642,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> is any of our scaling gizmos, 
+        /// If <paramref name="gameObject"/> is any of our scaling gizmos,
         /// this gizmo will be returned; otherwise null
         /// </summary>
         /// <param name="gameObject">the hit game object</param>
