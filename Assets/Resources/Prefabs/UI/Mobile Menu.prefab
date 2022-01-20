@@ -110,7 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 707006721046267996}
   m_Layer: 5
-  m_Name: MobileMenu
+  m_Name: Mobile Menu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

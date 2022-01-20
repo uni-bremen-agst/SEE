@@ -86,7 +86,12 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
         /// </summary>
         protected virtual void UpdateHoloLens() { }
-        
+
+        /// <summary>
+        /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
+        /// </summary>
+        protected virtual void UpdateMobile() { }
+
         protected void Start()
         {
             Canvas = GameObject.Find(UI_CANVAS_NAME);
@@ -134,6 +139,8 @@ namespace SEE.Game.UI
                 case PlayerInputType.VRPlayer: UpdateVR();
                     break;
                 case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
+                    break;
+                case PlayerInputType.MobilePlayer: UpdateMobile();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;  

@@ -24,49 +24,47 @@ namespace SEE.Controls.Actions
 
         #region Static Types
 
-        //Vertical Buttons
+        //select
         public static MobileActionStateType Select { get; } =
             new MobileActionStateType(0, "Select", "Mode to select objects",
                 Color.white.Darker(), "Materials/Charts/MoveIcon.png", DeleteAction.CreateReversibleAction);
-        public static MobileActionStateType Delete { get; } =
-            new MobileActionStateType(1, "Delete", "Delete a node on touch",
-                Color.white.Darker(), "Materials/ModernUIPack/Trash", DeleteAction.CreateReversibleAction);
-        public static MobileActionStateType DeleteMulti { get; } =
-            new MobileActionStateType(2, "Delete Multi", "Delete Multi Mode",
-                Color.white.Darker(), "Materials/ModernUIPack/Minus", DeleteAction.CreateReversibleAction);
-        public static MobileActionStateType Rotate { get; } =
-            new MobileActionStateType(3, "Rotate", "Rotation Mode",
-                Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
-        public static MobileActionStateType Move { get; } =
-            new MobileActionStateType(4, "Move", "Move Mode",
-                Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
-
-        // Horizontal Groups
-        //select
         public static MobileActionStateType Deselect { get; } =
-            new MobileActionStateType(5, "Deselect", "Deselect object",
+            new MobileActionStateType(1, "Deselect", "Deselect object",
                 Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
+        //delete
+        public static MobileActionStateType Delete { get; } =
+            new MobileActionStateType(2, "Delete", "Delete a node on touch",
+                Color.white.Darker(), "Materials/ModernUIPack/Trash", DeleteAction.CreateReversibleAction);
         //delete multi
+        public static MobileActionStateType DeleteMulti { get; } =
+            new MobileActionStateType(3, "Delete Multi", "Delete Multi Mode",
+                Color.white.Darker(), "Materials/ModernUIPack/Minus", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType CancelDeletion { get; } =
-            new MobileActionStateType(6, "Cancel Deletion", "Cancel the deletion of the selected objects",
+            new MobileActionStateType(4, "Cancel Deletion", "Cancel the deletion of the selected objects",
                 Color.white.Darker(), "Materials/ModernUIPack/CancelBold", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType AcceptDeletion { get; } =
-            new MobileActionStateType(7, "Accept Deletion", "Accept the deletion of the selected objects",
+            new MobileActionStateType(5, "Accept Deletion", "Accept the deletion of the selected objects",
                 Color.white.Darker(), "Materials/ModernUIPack/CheckBold", DeleteAction.CreateReversibleAction);
         //rotate
+        public static MobileActionStateType Rotate { get; } =
+            new MobileActionStateType(6, "Rotate", "Rotation Mode",
+                Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType RotateCity { get; } =
-            new MobileActionStateType(8, "Rotate City", "Rotate the City",
+            new MobileActionStateType(7, "Rotate City", "Rotate the City",
                 Color.white.Darker(), "placeholderN", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType RotateObject { get; } =
-            new MobileActionStateType(9, "Rotate Object", "Rotate an Object",
+            new MobileActionStateType(8, "Rotate Object", "Rotate an Object",
                 Color.white.Darker(), "placeholder1", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType LockedRotate { get; } =
-            new MobileActionStateType(10, "Locked Rotation Mode", "Locked Rotation Mode",
+            new MobileActionStateType(9, "Locked Rotation Mode", "Locked Rotation Mode",
                 Color.white.Darker(), "placeholder", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType LockedCenter { get; } =
-            new MobileActionStateType(11, "Locked Around Center Mode", "Locked Around Center Mode",
+            new MobileActionStateType(10, "Locked Around Center Mode", "Locked Around Center Mode",
                 Color.white.Darker(), "placeholder", DeleteAction.CreateReversibleAction);
         //move
+        public static MobileActionStateType Move { get; } =
+            new MobileActionStateType(11, "Move", "Move Mode",
+                Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType MoveCity { get; } =
             new MobileActionStateType(12, "Move City", "Move hole City",
                 Color.white.Darker(), "PlaceholderN", DeleteAction.CreateReversibleAction);
@@ -163,9 +161,9 @@ namespace SEE.Controls.Actions
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
         /// </exception>
-        private MobileActionStateType(int value, string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
+        private MobileActionStateType(int mobileValue, string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
         {
-            MobileValue = value;
+            MobileValue = mobileValue;
             Name = name;
             Description = description;
             Color = color;
@@ -173,14 +171,14 @@ namespace SEE.Controls.Actions
             CreateReversible = createReversible;
 
             // Check for duplicates
-            if (AllTypes.Any(x => x.MobileValue == value || x.Name == name))
+            if (AllTypes.Any(x => x.MobileValue == mobileValue || x.Name == name))
             {
                 throw new ArgumentException("Duplicate ActionStateTypes may not exist!\n");
             }
 
             // Check whether the ID is always increased by 1. For this, it suffices to check
             // the most recently added element, as all added elements go through this check.
-            if (value != AllTypes.Select(x => x.MobileValue + 1).DefaultIfEmpty(0).Last())
+            if (mobileValue != AllTypes.Select(x => x.MobileValue + 1).DefaultIfEmpty(0).Last())
             {
                 throw new ArgumentException("ActionStateType IDs must be increasing by one!\n");
             }
@@ -214,12 +212,12 @@ namespace SEE.Controls.Actions
                 return true;
             }
 
-            return obj.GetType() == GetType() && ((ActionStateType)obj).Value == Value;
+            return obj.GetType() == GetType() && ((MobileActionStateType)obj).MobileValue == MobileValue;
         }
 
         public override int GetHashCode()
         {
-            return Value;
+            return MobileValue;
         }
 
         #endregion

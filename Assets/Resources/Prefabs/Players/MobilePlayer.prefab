@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 6413344168845724053}
   - component: {fileID: 8290020959034815534}
   - component: {fileID: 5064252750894475637}
-  - component: {fileID: 4577341899801511922}
+  - component: {fileID: 1611887940387925080}
+  - component: {fileID: 4572111345579134104}
   m_Layer: 0
   m_Name: MobilePlayer
   m_TagString: MainCamera
@@ -121,7 +122,19 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4686446212303944763}
   m_Enabled: 1
---- !u!114 &4577341899801511922
+--- !u!114 &1611887940387925080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4686446212303944763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa9cbc3fa50de64b9d53e48df94a51c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4572111345579134104
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
