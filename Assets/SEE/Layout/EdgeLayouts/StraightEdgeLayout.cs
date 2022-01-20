@@ -32,7 +32,7 @@ namespace SEE.Layout.EdgeLayouts
         /// </summary> 
         /// <param name="nodes">nodes whose edges are to be drawn (ignored)</param>
         /// <param name="edges">edges for which to add way points</param>
-        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
+        public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
             MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
 
@@ -48,8 +48,8 @@ namespace SEE.Layout.EdgeLayouts
             // The level at which edges are drawn.
             float edgeLevel = edgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
 
-            Debug.LogFormat("offset={0} edgeLevel={1} maxHeight={2}\n", offset, edgeLevel, maxHeight);
-            foreach (ILayoutEdge edge in edges)
+            Debug.LogFormat($"offset={offset} edgeLevel={edgeLevel} maxHeight={maxHeight}\n");
+            foreach (ILayoutEdge<T> edge in edges)
             {
                 ILayoutNode source = edge.Source;
                 ILayoutNode target = edge.Target;

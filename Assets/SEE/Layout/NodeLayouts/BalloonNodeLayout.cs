@@ -52,7 +52,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -69,18 +69,16 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // the maximal radius over all root circles; required to create the plane underneath
-            float max_radius = 0.0f;
+            float maxRadius = 0.0f;
 
             // First calculate all radii including those for the roots as well as max_radius.
             {
-                int i = 0;
                 foreach (ILayoutNode root in roots)
                 {
-                    CalculateRadius2D(root, out float out_rad);
-                    i++;
-                    if (out_rad > max_radius)
+                    CalculateRadius2D(root, out float outRadius);
+                    if (outRadius > maxRadius)
                     {
-                        max_radius = out_rad;
+                        maxRadius = outRadius;
                     }
                 }
             }

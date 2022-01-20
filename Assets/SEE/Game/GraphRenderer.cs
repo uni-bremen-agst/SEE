@@ -164,10 +164,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>mapping of graph node onto its corresponding game node</returns>
-        private static Dictionary<Node, AbstractLayoutNode> NodeToGameNodeMap(ICollection<AbstractLayoutNode> gameNodes)
+        private static Dictionary<Node, T> NodeToGameNodeMap<T>(IEnumerable<T> gameNodes) where T : AbstractLayoutNode
         {
-            Dictionary<Node, AbstractLayoutNode> map = new Dictionary<Node, AbstractLayoutNode>();
-            foreach (AbstractLayoutNode node in gameNodes)
+            Dictionary<Node, T> map = new Dictionary<Node, T>();
+            foreach (T node in gameNodes)
             {
                 map[node.ItsNode] = node;
             }
@@ -337,7 +337,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="plane">plane upon which <paramref name="layoutNodes"/> should be stacked</param>
         /// <param name="layoutNodes">the layout nodes to be stacked</param>
-        public static void Stack(GameObject plane, ICollection<ILayoutNode> layoutNodes)
+        public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
         {
             NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
         }
@@ -370,7 +370,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
         /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        public static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
+        public static void Fit(GameObject parent, IEnumerable<ILayoutNode> layoutNodes)
         {
             NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
             NodeLayout.MoveTo(layoutNodes, parent.transform.position);
