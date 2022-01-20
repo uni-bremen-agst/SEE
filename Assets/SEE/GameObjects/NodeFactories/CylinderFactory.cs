@@ -75,10 +75,11 @@ namespace SEE.GO
                 return modelMesh;
             }
             //create the mesh
-            modelMesh = new Mesh();
-            modelMesh.name = "CylinderMesh";
+            modelMesh = new Mesh
+            {
+                name = "CylinderMesh"
+            };
 
-            int numVertexColumns, numVertexRows;  // columns and rows of vertices
             float radius = DEFAULT_RADIUS;
             float length = DEFAULT_HEIGHT;
 
@@ -94,8 +95,8 @@ namespace SEE.GO
             }
 
             //calculate how many vertices we need
-            numVertexColumns = radialSegments + 1;  //+1 for welding
-            numVertexRows = heightSegments + 1;
+            int numVertexColumns = radialSegments + 1;  // +1 for welding
+            int numVertexRows = heightSegments + 1;
 
             //calculate sizes
             int numVertices = numVertexColumns * numVertexRows;
@@ -145,7 +146,6 @@ namespace SEE.GO
                     {
                         // nothing to do on the first and last "floor" on the tris, capping
                         // is done below; also nothing to do on the last column of vertices
-                        continue;
                     }
                     else
                     {
@@ -173,13 +173,13 @@ namespace SEE.GO
             bool leftSided = true;
             int leftIndex = 0;
             int rightIndex = 0;
-            int middleIndex;
             int topCapVertexOffset = numVertices - numVertexColumns;
             for (int i = 0; i < numCapTris; i++)
             {
                 int bottomCapBaseIndex = i * 3;
                 int topCapBaseIndex = (numCapTris + numSideTris) * 3 + i * 3;
 
+                int middleIndex;
                 if (i == 0)
                 {
                     middleIndex = 0;
