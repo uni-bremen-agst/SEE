@@ -27,7 +27,7 @@ namespace SEE.Controls.Actions
         //select
         public static MobileActionStateType Select { get; } =
             new MobileActionStateType(0, "Select", "Mode to select objects",
-                Color.white.Darker(), "Materials/Charts/MoveIcon.png", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/Charts/MoveIcon", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Deselect { get; } =
             new MobileActionStateType(1, "Deselect", "Deselect object",
                 Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
@@ -41,36 +41,36 @@ namespace SEE.Controls.Actions
                 Color.white.Darker(), "Materials/ModernUIPack/Minus", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType CancelDeletion { get; } =
             new MobileActionStateType(4, "Cancel Deletion", "Cancel the deletion of the selected objects",
-                Color.white.Darker(), "Materials/ModernUIPack/CancelBold", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType AcceptDeletion { get; } =
             new MobileActionStateType(5, "Accept Deletion", "Accept the deletion of the selected objects",
-                Color.white.Darker(), "Materials/ModernUIPack/CheckBold", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/ModernUIPack/Check Bold", DeleteAction.CreateReversibleAction);
         //rotate
         public static MobileActionStateType Rotate { get; } =
             new MobileActionStateType(6, "Rotate", "Rotation Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType RotateCity { get; } =
             new MobileActionStateType(7, "Rotate City", "Rotate the City",
-                Color.white.Darker(), "placeholderN", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "n", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType RotateObject { get; } =
             new MobileActionStateType(8, "Rotate Object", "Rotate an Object",
-                Color.white.Darker(), "placeholder1", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "1", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType LockedRotate { get; } =
             new MobileActionStateType(9, "Locked Rotation Mode", "Locked Rotation Mode",
-                Color.white.Darker(), "placeholder", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_rotate_90_degrees_ccw_white_48dp", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType LockedCenter { get; } =
             new MobileActionStateType(10, "Locked Around Center Mode", "Locked Around Center Mode",
-                Color.white.Darker(), "placeholder", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_settings_backup_restore_white_48dp", DeleteAction.CreateReversibleAction);
         //move
         public static MobileActionStateType Move { get; } =
             new MobileActionStateType(11, "Move", "Move Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType MoveCity { get; } =
             new MobileActionStateType(12, "Move City", "Move hole City",
-                Color.white.Darker(), "PlaceholderN", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "n", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType MoveObject { get; } =
             new MobileActionStateType(13, "Move Object", "Move Object Mode",
-                Color.white.Darker(), "Placeholder 8", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "8", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType EightDirections { get; } =
             new MobileActionStateType(14, "8-Directions Mode", "8-Directions Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Plus", DeleteAction.CreateReversibleAction);
@@ -78,19 +78,19 @@ namespace SEE.Controls.Actions
         // Quick Menu Group
         public static MobileActionStateType Redo { get; } =
             new MobileActionStateType(15, "Redo Action", "Redo Action",
-                Color.white.Darker(), "placeholderRedo", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_redo_white_48dp", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Undo { get; } =
             new MobileActionStateType(16, "Undo", "Undo Action",
-                Color.white.Darker(), "placeholder Undo", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_undo_white_48dp", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType CameraLock { get; } =
             new MobileActionStateType(17, "Camera Lock Mode", "Camera Lock Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Lock Open", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Rerotate { get; } =
             new MobileActionStateType(18, "Rerotate", "Set Rotation back to standart",
-                Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_history_white_48dp", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Recenter { get; } =
             new MobileActionStateType(19, "Recenter", "Recenter the City",
-                Color.white.Darker(), "Materials/ModernUIPack/Button", DeleteAction.CreateReversibleAction);
+                Color.white.Darker(), "Materials/GoogleIcons/ic_open_with_white_48dp", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Collapse { get; } =
             new MobileActionStateType(20, "Collapse", "Collapse the Quick Menu",
                 Color.white.Darker(), "Materials/ModernUIPack/Arrow Bold", DeleteAction.CreateReversibleAction);
@@ -110,7 +110,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Color for this action.
-        /// Will be used in the <see cref="DesktopMenu"/> and <see cref="ActionStateIndicator"/>.
+        /// Will eventually be used in the <see cref="MobileMenu"/>.
         /// </summary>
         public Color Color { get; }
 
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Numeric value of this action.
         /// Must be unique across all types.
-        /// Must increase by one for each new instantiation of an <see cref="ActionStateType"/>.
+        /// Must increase by one for each new instantiation of an <see cref="MobileActionStateType"/>.
         /// </summary>
         public int MobileValue { get; }
 
@@ -139,7 +139,7 @@ namespace SEE.Controls.Actions
         /// 
         /// This constructor is needed for the test cases which implement
         /// their own variants of <see cref="ReversibleAction"/> and 
-        /// which need to provide an <see cref="ActionStateType"/> of
+        /// which need to provide an <see cref="MobileActionStateType"/> of
         /// their own.
         /// </summary>
         /// <param name="createReversible">value for <see cref="CreateReversible"/></param>

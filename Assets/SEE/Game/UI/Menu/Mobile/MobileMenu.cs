@@ -34,14 +34,34 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private GameObject MobileMenuGameObject;
 
+        /// <summary>
+        /// Multidimensional array for the buttons in the mobile menu on the right screen side 
+        /// </summary>
         private GameObject[][] buttons = new GameObject[5][];
 
+        /// <summary>
+        /// Array for the quick menu on the left side of the mobile device
+        /// </summary>
         private GameObject[] quickButtons = new GameObject[6];
 
+        /// <summary>
+        /// bool if the menu on the right is expanded or not 
+        /// </summary>
         private bool expanded = false;
 
+        /// <summary>
+        /// Vertical menu panel on the right
+        /// </summary>
         private Transform menuPanelVertical;
+
+        /// <summary>
+        /// Horizontal panel on the right
+        /// </summary>
         private Transform menuPanelHorizontal;
+
+        /// <summary>
+        /// Panel on the left top side 
+        /// </summary>
         private Transform quickMenuPanel;
 
         protected override void StartMobile()
@@ -113,7 +133,10 @@ namespace SEE.Game.UI.Menu
             #endregion
         }
 
-        //most ugly code I've ever writen 
+        /// <summary>
+        /// Adds the given <param name="buttonEntries"></param> as buttons to the mobile Menu
+        /// </summary>
+        /// <param name="buttonEntries">The entries to add to the menu</param> 
         protected void addMobileButtons(IEnumerable<T> buttonEntries)
         {
             GameObject[] selectButtons = new GameObject[2];
@@ -155,6 +178,24 @@ namespace SEE.Game.UI.Menu
                     deleteCnt++;
                     cnt++;
                 }
+                else if(cnt == 7)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    rotateButtons[rotateCnt] = iconButton;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().buttonText = "n";
+                    rotateCnt++;
+                    cnt++;
+                }
+                else if (cnt == 8)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    rotateButtons[rotateCnt] = iconButton;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().buttonText = "1";
+                    rotateCnt++;
+                    cnt++;
+                }
                 else if (cnt < 11)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
@@ -162,6 +203,24 @@ namespace SEE.Game.UI.Menu
                     rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
                     rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
                     rotateCnt++;
+                    cnt++;
+                }
+                else if (cnt == 12)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    moveButtons[moveCnt] = iconButton;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().buttonText = "n";
+                    moveCnt++;
+                    cnt++;
+                }
+                else if (cnt == 13)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    moveButtons[moveCnt] = iconButton;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().buttonText = "8";
+                    moveCnt++;
                     cnt++;
                 }
                 else if (cnt < 15)
@@ -191,6 +250,10 @@ namespace SEE.Game.UI.Menu
             
         }
 
+        /// <summary>
+        /// Selects the clicked button by its <param name="ClickedIndex"></param> and moves it to the top
+        /// </summary>
+        /// <param name="ClickedIndex">Index of the clicked button</param>
         private void selectMode(int ClickedIndex)
         {
             if (expanded)
@@ -233,6 +296,11 @@ namespace SEE.Game.UI.Menu
             }
         }
 
+        /// <summary>
+        /// Expands/minimizes the quick menu on the left top side 
+        /// </summary>
+        /// <param name="left">Arrow Sprite to the left</param>
+        /// <param name="right">Arrow Sprite to the right</param>
         private void expandButton(Sprite left, Sprite right)
         {
             for (int i = 0; i < quickButtons.Length - 1; ++i)
