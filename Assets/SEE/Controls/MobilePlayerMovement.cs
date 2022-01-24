@@ -7,9 +7,11 @@ namespace SEE.Controls
     {
         [Tooltip("Speed of movements")]
         public float Speed = 0.5f;
-        [Tooltip("Boost factor of speed, applied when shift is pressed.")]
-        public float BoostFactor = 2.0f;
+
+        [Tooltip("Handels camera direction")]
         public Joystick joystickRight;
+
+        [Tooltip("Handels player movement")]
         public Joystick joystickLeft;
 
         private struct CameraState
@@ -52,41 +54,14 @@ namespace SEE.Controls
             Camera mainCamera = MainCamera.Camera;
             if (SEEInput.ToggleCameraLock())
             {
-                cameraState.freeMode = !cameraState.freeMode;
-                if (!cameraState.freeMode)
-                {
-                    Vector3 positionToFocusedObject = focusedObject.CenterTop - transform.position;
-                    cameraState.distance = positionToFocusedObject.magnitude;
-                    transform.forward = positionToFocusedObject;
-                    Vector3 pitchYawRoll = transform.rotation.eulerAngles;
-                    cameraState.pitch = pitchYawRoll.x;
-                    cameraState.yaw = pitchYawRoll.y;
-                }
+                //TODO
             }
 
             float speed = Speed * Time.deltaTime;
-            if (SEEInput.BoostCameraSpeed())
-            {
-                speed *= BoostFactor;
-            }
 
             if (!cameraState.freeMode)
             {
-                float d = 0.0f;
-                if (SEEInput.MoveForward())
-                {
-                    d += speed;
-                }
-                if (SEEInput.MoveBackward())
-                {
-                    d -= speed;
-                }
-                cameraState.distance -= d;
-
-                HandleRotation();
-                mainCamera.transform.position = focusedObject.CenterTop;
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+                //TODO
             }
             else // cameraState.freeMode == true
             {
@@ -111,7 +86,9 @@ namespace SEE.Controls
             }
         }
 
-
+        /// <summary>
+        /// Handels the rotation, repeats at 0 after turning 360°
+        /// </summary>
         private void HandleRotation()
         {
             //Taking the joystick inputs
