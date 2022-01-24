@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SEE.Layout
 {
@@ -12,9 +13,10 @@ namespace SEE.Layout
         /// for every other node the level is its distance to its root.
         /// </summary>
         /// <param name="layoutNodes">nodes whose level is to be set</param>
-        public static void SetLevels(ICollection<ILayoutNode> layoutNodes)
+        public static void SetLevels<T>(ICollection<T> layoutNodes)
+        where T : class, ILayoutNode
         {
-            foreach (ILayoutNode root in GetRoots(layoutNodes))
+            foreach (T root in GetRoots(layoutNodes))
             {
                 root.Level = 0;
                 foreach (ILayoutNode child in root.Children())
@@ -45,17 +47,9 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">layout nodes for which to collect all roots</param>
         /// <returns>list of root nodes</returns>
-        public static IList<ILayoutNode> GetRoots(ICollection<ILayoutNode> layoutNodes)
+        public static IList<T> GetRoots<T>(IEnumerable<T> layoutNodes) where T : ILayoutNode
         {
-            IList<ILayoutNode> roots = new List<ILayoutNode>();
-            foreach (ILayoutNode layoutNode in layoutNodes)
-            {
-                if (layoutNode.Parent == null)
-                {
-                    roots.Add(layoutNode);
-                }
-            }
-            return roots;
+            return layoutNodes.Where(layoutNode => layoutNode.Parent == null).ToList();
         }
     }
 }
