@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Michsky.UI.ModernUIPack;
 using SEE.Utils;
-using UnityEditor;
 
 namespace SEE.Game.UI.Menu
 {
@@ -118,8 +117,8 @@ namespace SEE.Game.UI.Menu
                 }       
             }
 
-            Sprite arrowLeftSprite = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Modern UI Pack/Textures/Icon/Navigation/Arrow Bold.png", typeof(Sprite));
-            Sprite arrowRightSprite = (Sprite)AssetDatabase.LoadAssetAtPath("Assets/Resources/Icons/Arrow Bold Right.png", typeof(Sprite));
+            Sprite arrowLeftSprite = Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold");
+            Sprite arrowRightSprite = Resources.Load<Sprite>("Icons/Arrow Bold Right");
 
             quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
 
