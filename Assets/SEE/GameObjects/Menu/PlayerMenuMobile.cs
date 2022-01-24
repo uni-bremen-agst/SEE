@@ -25,7 +25,6 @@ namespace SEE.GO.Menu
         /// <returns>the newly created menu component.</returns>
         private static SimpleMenu CreateMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(MobileActionStateType.AllTypes.Count == 21);
 
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
