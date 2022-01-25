@@ -7,8 +7,8 @@ namespace SEE.Controls
     /// <summary>
     /// Allows a user to select the kind of environment in which the game
     /// runs: (1) desktop with keyboard and mouse input, (2) touch devices
-    /// or gamepads using InControl, (3) virtual reality, or (4) augmented
-    /// reality.
+    /// or gamepads using InControl, (3) virtual reality, (4) augmented
+    /// reality or (5) mobile device.
     /// </summary>
     public class PlayerSettings : MonoBehaviour
     {

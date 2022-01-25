@@ -41,7 +41,7 @@ namespace SEE.GO.Menu
             GlobalActionHistory.ExecuteMoblie(firstType);
 
             SimpleMenu menu = modeMenuGO.AddComponent<SimpleMenu>();
-            menu.Title = "Mode Selection";
+            menu.Title = "Mobile Menu";
             menu.Description = "Please select the mode you want to activate.";
             menu.AddEntries(entries);
 
