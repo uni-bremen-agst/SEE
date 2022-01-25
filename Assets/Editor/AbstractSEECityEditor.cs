@@ -317,6 +317,7 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
+                settings.ShowNames = EditorGUILayout.Toggle("Show persistent names", settings.ShowNames);
                 EditorGUI.EndDisabledGroup();
                 LabelSettings(ref settings.LabelSettings);
 
