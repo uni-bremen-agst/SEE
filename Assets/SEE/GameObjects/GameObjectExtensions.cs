@@ -646,7 +646,7 @@ namespace SEE.GO
             else if (warnOnFailure)
             {
                 Debug.LogWarning("Couldn't update portal: No code city has been found"
-                                 + $" attached to game object {gameObject.name}.\n");
+                                 + $" attached to game object {gameObject.GetFullName()}.\n");
             }
         }
     }
