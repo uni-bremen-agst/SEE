@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -51,6 +50,9 @@ namespace SEE.Controls.Interactables
             }
         }
 
+        [SerializeField, Range(0f, 10f)]
+        private float outlineWidth = 1f;
+
         private float OutlineWidth
         {
             set
@@ -69,8 +71,6 @@ namespace SEE.Controls.Interactables
         [SerializeField] private Mode outlineMode;
 
         [SerializeField] private Color outlineColor = Color.white;
-
-        [SerializeField, Range(0f, 10f)] private float outlineWidth = 2f;
 
         [Header("Optional")]
         [SerializeField, Tooltip(
@@ -93,7 +93,12 @@ namespace SEE.Controls.Interactables
         /// </summary>
         private bool needsUpdate;
 
-        public static Outline Create(GameObject go, Color color)
+        /// <summary>
+        /// The default width of outline.
+        /// </summary>
+        public const float DefaultWidth = 1.0f;
+
+        public static Outline Create(GameObject go, Color color, float outlineWidth = DefaultWidth)
         {
             Outline result = null;
 
@@ -102,7 +107,7 @@ namespace SEE.Controls.Interactables
                 result = go.AddComponent<Outline>();
                 result.OutlineMode = Mode.OutlineAll;
                 result.OutlineColor = color;
-                result.OutlineWidth = 4.0f;
+                result.OutlineWidth = outlineWidth;
             }
 
             return result;

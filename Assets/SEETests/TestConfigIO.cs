@@ -763,6 +763,7 @@ namespace SEE.Utils
             city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             city.InnerNodeSettings.ShowNames = true;
             city.InnerNodeSettings.InnerDonutMetric = "X";
+            city.InnerNodeSettings.OutlineWidth = 99999;
             WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
         }
 
@@ -787,6 +788,7 @@ namespace SEE.Utils
             city.LeafNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             city.LeafNodeSettings.MinimalBlockLength = 90000;
             city.LeafNodeSettings.MaximalBlockLength = 1000000;
+            city.LeafNodeSettings.OutlineWidth = 99999;
             WipeOutLabelSettings(ref city.LeafNodeSettings.LabelSettings);
         }
 
