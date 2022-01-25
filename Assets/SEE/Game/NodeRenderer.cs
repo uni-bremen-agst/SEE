@@ -661,7 +661,6 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
-        /// <returns>the game objects created for the text labels</returns>
         private static void AddLabels(IEnumerable<GameObject> gameNodes, NodeFactory innerNodeFactory)
         {
             GameObject codeCity = null;
