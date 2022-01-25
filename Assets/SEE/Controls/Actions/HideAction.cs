@@ -90,7 +90,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void OpenDialog()
         {
-            SEE.Game.UI.PropertyDialog.HidePropertyDialog dialog = new SEE.Game.UI.PropertyDialog.HidePropertyDialog();
+            Game.UI.PropertyDialog.HidePropertyDialog dialog = new Game.UI.PropertyDialog.HidePropertyDialog();
 
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(Cancelled);
@@ -129,7 +129,7 @@ namespace SEE.Controls.Actions
             switch (mode)
             {
                 case HideModeSelector.HideAll:
-                    if (HideAll())
+                    if (HideAllEdges())
                     {
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
@@ -438,10 +438,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Hides all nodes and edges of the selected city.
+        /// Hides all edges of the selected city.
         /// </summary>
-        /// <returns> true if all nodes and edges could be successfully hidden </returns>
-        private bool HideAll()
+        /// <returns>true if all edges could be successfully hidden </returns>
+        private bool HideAllEdges()
         {
             if (selectedObject != null)
             {
@@ -450,8 +450,11 @@ namespace SEE.Controls.Actions
 
                 foreach (GameObject g in nodesEdges)
                 {
-                    g.SetVisibility(false);
-                    hiddenObjects.Add(g);
+                    if (g.CompareTag(Tags.Edge))
+                    {
+                        g.SetVisibility(false);
+                        hiddenObjects.Add(g);
+                    }
                 }
 
                 return true;
@@ -793,7 +796,7 @@ namespace SEE.Controls.Actions
         /// Returns the set of IDs of all game objects hidden by this action.
         /// <see cref="ReversibleAction.GetChangedObjects"/>.
         /// </summary>
-        /// <returns>The set of the IDs of all game objects hidden by this action</returns> 
+        /// <returns>The set of the IDs of all game objects hidden by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>(hiddenObjects.Select(o => o.name));
