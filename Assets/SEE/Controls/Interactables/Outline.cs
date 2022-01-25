@@ -182,8 +182,6 @@ namespace SEE.Controls.Interactables
                     renderer.materials = materials;
                 }
             }
-
-            gameObject.UpdatePortal(true);
         }
 
         private void OnValidate()

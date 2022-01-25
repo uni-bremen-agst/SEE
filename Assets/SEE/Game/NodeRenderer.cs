@@ -84,12 +84,21 @@ namespace SEE.Game
 
         /// <summary>
         /// Adds LOD to <paramref name="gameNode"/> and prepares it for interaction.
+        /// If <paramref name="city"/> is different from null, <paramref name="gameNode"/>
+        /// and all its descendants will respect the <paramref name="city"/> as portal.
         /// </summary>
         /// <param name="gameNode">game node to be finished</param>
-        private void FinishGameNode(GameObject gameNode)
+        /// <param name="city">the game object representing the city in which to draw this node;
+        /// it has the settings attached and the information about the scale, position, and
+        /// portal of the city</param>
+        private void FinishGameNode(GameObject gameNode, GameObject city = null)
         {
             AddLOD(gameNode);
             InteractionDecorator.PrepareForInteraction(gameNode);
+            if (city != null)
+            {
+                Portal.SetPortal(city, gameNode, Portal.IncludeDescendants.ALL_DESCENDANTS);
+            }
         }
 
         /// <summary>
@@ -102,13 +111,16 @@ namespace SEE.Game
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
         /// </summary>
         /// <param name="node">leaf node</param>
+        /// <param name="city">the game object representing the city in which to draw this node;
+        /// it has the settings attached and the information about the scale, position, and
+        /// portal of the city</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
-        public GameObject DrawLeafNode(Node node)
+        public GameObject DrawLeafNode(Node node, GameObject city = null)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
 
             GameObject result = CreateLeafGameNode(node);
-            FinishGameNode(result);
+            FinishGameNode(result, city);
             return result;
         }
 
@@ -126,11 +138,14 @@ namespace SEE.Game
         /// hierarchy.
         /// </summary>
         /// <param name="node">graph node for which to create the game node</param>
+        /// <param name="city">the game object representing the city in which to draw this node;
+        /// it has the settings attached and the information about the scale, position, and
+        /// portal of the city</param>
         /// <returns>new game object for the inner node</returns>
-        public GameObject DrawInnerNode(Node node)
+        public GameObject DrawInnerNode(Node node, GameObject city = null)
         {
             GameObject result = CreateInnerGameNode(node);
-            FinishGameNode(result);
+            FinishGameNode(result, city);
             return result;
         }
 
