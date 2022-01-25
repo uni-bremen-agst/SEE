@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: CheekPuff_L
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: Cheek_L
+    hash: 1472834112
+    position: {x: 0.0014747716, y: -0.009102549, z: 0.0047205836}
+    rotation: {x: 0.00000018653373, y: -0.000000017672395, z: 0.000000014078996, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

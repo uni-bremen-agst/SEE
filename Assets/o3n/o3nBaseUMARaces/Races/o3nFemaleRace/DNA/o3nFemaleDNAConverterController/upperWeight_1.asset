@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: upperWeight_1
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LowerarmAdjust_L
+    hash: -2093180980
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.4}
+  - bone: LowerarmAdjustTwist_R
+    hash: -1658587981
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.4}
+  - bone: LowerBackAdjust
+    hash: -1471957022
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.6}
+  - bone: Cheek_R
+    hash: -1379494109
+    position: {x: 0.0075000003, y: 0.0075000003, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: UpperarmAdjustTwist_R
+    hash: -1165476616
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.5000001, z: 1.5}
+  - bone: UpperarmAdjust_L
+    hash: -850964066
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.5000001, z: 1.5000001}
+  - bone: PectoralAdjust_L
+    hash: -839341100
+    position: {x: 0.075, y: 0, z: 0.065000005}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1.4, y: 1.2, z: 1.4}
+  - bone: ClavicleAdjust_R
+    hash: -700384942
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1.0500001, y: 1.6, z: 1.2000002}
+  - bone: hand_R
+    hash: -581508890
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1, z: 1.15}
+  - bone: Upperarm_R
+    hash: -502421651
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 7.074428e-10, y: -0.05233596, z: -0.0000000014240759, w: 0.9986296}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: Upperarm_L
+    hash: 402823694
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0.05226424, y: -0.05226424, z: -0.002739058, w: 0.99726105}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: Spine01Adjust
+    hash: 461968207
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.3}
+  - bone: hand_L
+    hash: 660200837
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+    scale: {x: 1, y: 1, z: 1.15}
+  - bone: LowerChinAdjust
+    hash: 685398504
+    position: {x: 0, y: 0, z: 0.01}
+    rotation: {x: -2.4691586e-15, y: -0.19509032, z: 1.8177422e-14, w: 0.9807853}
+    scale: {x: 1, y: 1.25, z: 1}
+  - bone: ClavicleAdjust_L
+    hash: 743425073
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1.05, y: 1.6, z: 1.2}
+  - bone: UpperarmAdjust_R
+    hash: 927493373
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.5000001, z: 1.5}
+  - bone: PectoralAdjust_R
+    hash: 938972855
+    position: {x: 0.075, y: 0, z: 0.065}
+    rotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+    scale: {x: 1.4, y: 1.2000002, z: 1.4}
+  - bone: UpperarmAdjustTwist_L
+    hash: 1082589595
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.5, z: 1.5}
+  - bone: Cheek_L
+    hash: 1472834112
+    position: {x: 0.0075000003, y: -0.0075000003, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: NeckAdjust
+    hash: 1605701185
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.3, z: 1.4}
+  - bone: LowerarmAdjustTwist_L
+    hash: 1730988496
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.4}
+  - bone: BellyAdjust
+    hash: 1810081474
+    position: {x: -0.02, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1.1, y: 1.2, z: 1.7}
+  - bone: SpineAdjust
+    hash: 1842365421
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0.99999994}
+    scale: {x: 1, y: 1.7, z: 1.6999999}
+  - bone: LowerarmAdjust_R
+    hash: 2033429167
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 1.4, z: 1.4}
+  tweenPoses: []
+  tweenWeights: []

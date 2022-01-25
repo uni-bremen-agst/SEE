@@ -9,7 +9,7 @@ namespace SEE.Controls
     /// <summary>
     /// A camera movement action for virtual reality.
     /// </summary>
-    public class XRPlayerMovement : MonoBehaviour
+    public class XRPlayerMovement : PlayerMovement
     {
         /// <summary>
         /// Gravity of the player. This is required to let a player jump down from platforms.

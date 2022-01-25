@@ -13,7 +13,7 @@ namespace SEE.GO
     /// completely strict. Yet, because they can be used for inner nodes, they
     /// must have SetLineWidth().
     /// </summary>
-    public abstract class InnerNodeFactory : NodeFactory
+    internal abstract class InnerNodeFactory : NodeFactory
     {
         public InnerNodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
         {

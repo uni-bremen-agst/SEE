@@ -39,16 +39,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn += SelectionOn;
-                interactable.SelectOut += SelectionOff;
-                interactable.HoverIn += HoverOn;
-                interactable.HoverOut += HoverOff;
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
             }
             else
             {
-                Debug.LogErrorFormat("ShowLabel.OnEnable for {0} has NO interactable.\n", name);
+                Debug.LogError($"ShowLabel.OnEnable for {name} has NO interactable.\n");
             }
         }
 
@@ -57,16 +57,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= SelectionOn;
-                interactable.SelectOut -= SelectionOff;
-                interactable.HoverIn -= HoverOn;
-                interactable.HoverOut -= HoverOff;
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
             }
             else
             {
-                Debug.LogErrorFormat("ShowLabel.OnDisable for {0} has NO interactable.\n", name);
+                Debug.LogError($"ShowLabel.OnDisable for {name} has NO interactable.\n");
             }
         }
 

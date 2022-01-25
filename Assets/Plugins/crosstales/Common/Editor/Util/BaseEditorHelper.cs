@@ -145,66 +145,71 @@ namespace Crosstales.Common.EditorUtil
       /// <param name="executeMethod">Executed method after the restart (optional)</param>
       public static void RestartUnity(string executeMethod = "")
       {
-         UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
-
-         bool success = false;
-
-         using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+         if (UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
          {
-            try
+            bool success = false;
+
+            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
             {
-               process.StartInfo.CreateNoWindow = true;
-               process.StartInfo.UseShellExecute = false;
-
-               string scriptfile;
-
-               switch (Application.platform)
+               try
                {
-                  case RuntimePlatform.WindowsEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.cmd";
+                  process.StartInfo.CreateNoWindow = true;
+                  process.StartInfo.UseShellExecute = false;
 
-                     System.IO.File.WriteAllText(scriptfile, generateWindowsRestartScript(executeMethod));
+                  string scriptfile;
 
-                     process.StartInfo.FileName = "cmd.exe";
-                     process.StartInfo.Arguments = $"/c start  \"\" \"{scriptfile}\"";
-                     break;
-                  case RuntimePlatform.OSXEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+                  switch (Application.platform)
+                  {
+                     case RuntimePlatform.WindowsEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.cmd";
 
-                     System.IO.File.WriteAllText(scriptfile, generateMacRestartScript(executeMethod));
+                        System.IO.File.WriteAllText(scriptfile, generateWindowsRestartScript(executeMethod));
 
-                     process.StartInfo.FileName = "/bin/sh";
-                     process.StartInfo.Arguments = $"\"{scriptfile}\" &";
-                     break;
-                  case RuntimePlatform.LinuxEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+                        process.StartInfo.FileName = "cmd.exe";
+                        process.StartInfo.Arguments = $"/c start  \"\" \"{scriptfile}\"";
+                        break;
+                     case RuntimePlatform.OSXEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
 
-                     System.IO.File.WriteAllText(scriptfile, generateLinuxRestartScript(executeMethod));
+                        System.IO.File.WriteAllText(scriptfile, generateMacRestartScript(executeMethod));
 
-                     process.StartInfo.FileName = "/bin/sh";
-                     process.StartInfo.Arguments = $"\"{scriptfile}\" &";
-                     break;
-                  default:
-                     Debug.LogError($"Unsupported Unity Editor: {Application.platform}");
-                     return;
+                        process.StartInfo.FileName = "/bin/sh";
+                        process.StartInfo.Arguments = $"\"{scriptfile}\" &";
+                        break;
+                     case RuntimePlatform.LinuxEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+
+                        System.IO.File.WriteAllText(scriptfile, generateLinuxRestartScript(executeMethod));
+
+                        process.StartInfo.FileName = "/bin/sh";
+                        process.StartInfo.Arguments = $"\"{scriptfile}\" &";
+                        break;
+                     default:
+                        Debug.LogError($"Unsupported Unity Editor: {Application.platform}");
+                        return;
+                  }
+
+                  process.Start();
+
+                  if (isWindowsEditor)
+                     process.WaitForExit(Util.BaseConstants.PROCESS_KILL_TIME);
+
+                  success = true;
                }
-
-               process.Start();
-
-               if (isWindowsEditor)
-                  process.WaitForExit(Util.BaseConstants.PROCESS_KILL_TIME);
-
-               success = true;
+               catch (System.Exception ex)
+               {
+                  string errorMessage = $"Could restart Unity: {ex}";
+                  Debug.LogError(errorMessage);
+               }
             }
-            catch (System.Exception ex)
-            {
-               string errorMessage = $"Could restart Unity: {ex}";
-               Debug.LogError(errorMessage);
-            }
+
+            if (success)
+               EditorApplication.Exit(0);
          }
-
-         if (success)
-            EditorApplication.Exit(0);
+         else
+         {
+            Debug.LogWarning("User canceled the restart.");
+         }
       }
 
       /// <summary>Shows a separator-UI.</summary>

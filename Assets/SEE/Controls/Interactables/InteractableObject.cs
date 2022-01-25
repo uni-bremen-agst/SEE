@@ -11,6 +11,7 @@ using UnityEngine.Assertions;
 #else
 using Valve.VR.InteractionSystem;
 #endif
+using SEE.Game;
 
 namespace SEE.Controls
 {
@@ -219,6 +220,11 @@ namespace SEE.Controls
         /// </summary>
         public Net.Synchronizer InteractableSynchronizer { get; private set; }
 
+        /// <summary>
+        /// Will be used to flash the selected object while it is selected.
+        /// </summary>
+        private GameObjectFlasher flasher;
+
         private void Awake()
         {
 #if UNITY_ANDROID
@@ -226,6 +232,7 @@ namespace SEE.Controls
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
+            flasher = new GameObjectFlasher(gameObject);
         }
 
         private void OnDestroy()
@@ -254,7 +261,7 @@ namespace SEE.Controls
         /// not exist.
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
-        /// <returns></returns>
+        /// <returns>the interactable with the given <paramref name="id"/>; null if none exists</returns>
         public static InteractableObject Get(string id)
         {
             if (!idToInteractableObjectDict.TryGetValue(id, out InteractableObject result))
@@ -296,7 +303,7 @@ namespace SEE.Controls
         /// additionally. This <see cref="InteractableObject"/> will be removed from the set of <see cref="HoveredObjects"/>.
         ///
         /// At any rate, if we are running in multiplayer mode and <paramref name="isInitiator"/> is true,
-        /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>.
+        /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>
         /// and this <see cref="InteractableObject"/>.
         /// </summary>
         /// <param name="hoverFlags">New value for <see cref="HoverFlags"./></param>
@@ -366,7 +373,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetHoverAction(this, hoverFlags).Execute();
             }
@@ -443,6 +450,8 @@ namespace SEE.Controls
                 }
                 graphToSelectedIOs[graph].Add(this);
 
+                flasher.StartFlashing();
+
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
                 AnySelectIn?.Invoke(this, isInitiator);
@@ -462,6 +471,8 @@ namespace SEE.Controls
                 // Update all selected object list per graph
                 graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
 
+                flasher.StopFlashing();
+
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
                 AnySelectOut?.Invoke(this, isInitiator);
@@ -474,7 +485,7 @@ namespace SEE.Controls
                 }
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetSelectAction(this, select).Execute();
             }
@@ -595,7 +606,7 @@ namespace SEE.Controls
                 GrabbedObjects.Remove(this);
             }
 
-            if (!Net.Network.UseInOfflineMode && isInitiator)
+            if (isInitiator)
             {
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
@@ -870,8 +881,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer && !Raycasting.IsMouseOverGUI())
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -879,20 +889,27 @@ namespace SEE.Controls
 
         /// <summary>
         /// The mouse cursor is still positioned above a GUIElement or Collider in this frame.
+        /// If the <see cref="Hoverflag.World"/> flag is set, but we are currently hovering over the GUI,
+        /// we need to reset the <see cref="Hoverflag.World"/> flag to false.
+        /// If the <see cref="Hoverflag.World"/> flag is not set and we are not hovering over the GUI,
+        /// we need to set the <see cref="Hoverflag.World"/> flag to true again.
         /// </summary>
         private void OnMouseOver()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer)
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
                 if (isFlagSet && isMouseOverGUI)
                 {
+                    // If the Hoverflag.World flag is set, but we are currently hovering over the GUI,
+                    // we need to reset the Hoverflag.World flag to false.
                     SetHoverFlag(HoverFlag.World, false, true);
                 }
                 else if (!isFlagSet && !isMouseOverGUI)
                 {
+                    // If the Hoverflag.World flag is not set and no longer hovering over the GUI,
+                    // we need to set the Hoverflag.World flag to true again.
                     SetHoverFlag(HoverFlag.World, true, true);
                 }
             }
@@ -903,8 +920,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            bool isDesktopPlayer = PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer;
-            if (isDesktopPlayer && IsHoverFlagSet(HoverFlag.World))
+            if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer
+                && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);
             }

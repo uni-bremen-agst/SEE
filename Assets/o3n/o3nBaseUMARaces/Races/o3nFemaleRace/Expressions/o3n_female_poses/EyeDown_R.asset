@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: EyeDown_R
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: Eye_R
+    hash: -1235437638
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0.000000019259964, y: -0.25881898, z: 5.1263366e-10, w: 0.9659258}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LidLower_R
+    hash: 291324663
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.00000019625328, y: 0.04203842, z: -0.000000001522604, w: 0.9993316}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LidUpper_R
+    hash: -1547962444
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0.00000013559733, y: 0.085990496, z: 0.0000002123076, w: 0.9964289}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

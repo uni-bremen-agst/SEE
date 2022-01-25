@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: jawsPosition_1
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LowMaxilar_L
+    hash: -1870545250
+    position: {x: 0, y: 0, z: 0.015}
+    rotation: {x: 7.059859e-10, y: -0.087155744, z: -0.0000000013525491, w: 0.9961948}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LowMaxilar_R
+    hash: 1787724797
+    position: {x: 0, y: 0, z: 0.014999999}
+    rotation: {x: -2.1832375e-10, y: -0.087155744, z: 3.9372497e-10, w: 0.9961948}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

@@ -28,17 +28,17 @@ namespace SEE.Game
         /// <param name="graph">the graph to be rendered</param>
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
-            this.settings = settings;
+            this.Settings = settings;
 
-            ColorRange leafColorRange = this.settings.LeafNodeSettings.ColorRange;
-            leafNodeFactory = this.settings.LeafNodeSettings.Kind switch
+            ColorRange leafColorRange = this.Settings.LeafNodeSettings.ColorRange;
+            leafNodeFactory = this.Settings.LeafNodeSettings.Kind switch
             {
                 LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
                 _ => throw new Exception($"Unhandled {nameof(LeafNodeKinds)}")
             };
 
-            ColorRange innerColorRange = this.settings.InnerNodeSettings.ColorRange;
-            switch (this.settings.InnerNodeSettings.Kind)
+            ColorRange innerColorRange = this.Settings.InnerNodeSettings.ColorRange;
+            switch (this.Settings.InnerNodeSettings.Kind)
             {
                 case InnerNodeKinds.Empty:
                 case InnerNodeKinds.Donuts:
@@ -95,7 +95,7 @@ namespace SEE.Game
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly AbstractSEECity settings;
+        public readonly AbstractSEECity Settings;
 
         /// <summary>
         /// The factory used to create blocks for leaves.
@@ -124,7 +124,7 @@ namespace SEE.Game
         /// <returns>True if edges are actually drawn.</returns>
         public bool AreEdgesDrawn()
         {
-            return settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+            return Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
         }
 
         /// <summary>
@@ -135,15 +135,15 @@ namespace SEE.Game
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            List<string> nodeMetrics = settings.AllDefaultMetrics();
+            List<string> nodeMetrics = Settings.AllDefaultMetrics();
 
-            if (settings.ZScoreScale)
+            if (Settings.ZScoreScale)
             {
-                scaler = new ZScoreScale(graphs, nodeMetrics, settings.ScaleOnlyLeafMetrics);
+                scaler = new ZScoreScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
             else
             {
-                scaler = new LinearScale(graphs, nodeMetrics, settings.ScaleOnlyLeafMetrics);
+                scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
         }
 
@@ -202,7 +202,7 @@ namespace SEE.Game
             GameObject plane;
 
             Performance p;
-            if (settings.NodeLayoutSettings.Kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
+            if (Settings.NodeLayoutSettings.Kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
             {
                 try
                 {
@@ -214,11 +214,11 @@ namespace SEE.Game
                     List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
                     foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
                     {
-                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, graph, settings);
+                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, graph, Settings);
                         sublayout.Layout();
                     }
 
-                    p = Performance.Begin($"Node layout {settings.NodeLayoutSettings.Kind} (with sublayouts)");
+                    p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} (with sublayouts)");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
@@ -281,13 +281,13 @@ namespace SEE.Game
                     RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
 
                     // 1) Calculate the layout
-                    p = Performance.Begin("node layout " + settings.NodeLayoutSettings.Kind + " for " + gameNodes.Count + " nodes");
+                    p = Performance.Begin("node layout " + Settings.NodeLayoutSettings.Kind + " for " + gameNodes.Count + " nodes");
                     // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
                     // (GameNode implements ILayoutNode).
                     ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
                     nodeLayout.Apply(layoutNodes);
                     p.End();
-                    Debug.Log($"Built \"{settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
+                    Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
 
                     // 2) Apply the calculated layout to the game objects
 
@@ -454,15 +454,15 @@ namespace SEE.Game
         /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
         /// <returns>a list with sublayout nodes</returns>
         private List<SublayoutNode> CreateSublayoutNodes(IReadOnlyCollection<Node> nodes) =>
-            (from dir in settings.CoseGraphSettings.ListInnerNodeToggle
+            (from dir in Settings.CoseGraphSettings.ListInnerNodeToggle
              where dir.Value
              select dir.Key into name
-             where settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name)
-                   && settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name)
+             where Settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name)
+                   && Settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name)
              let matches = nodes.Where(i => i.ID.Equals(name))
              where matches.Any()
-             select new SublayoutNode(matches.First(), settings.CoseGraphSettings.InnerNodeShape[name],
-                                      settings.CoseGraphSettings.InnerNodeLayout[name])).ToList();
+             select new SublayoutNode(matches.First(), Settings.CoseGraphSettings.InnerNodeShape[name],
+                                      Settings.CoseGraphSettings.InnerNodeLayout[name])).ToList();
 
         /// <summary>
         /// Calculate the child/ removed nodes for each sublayout
@@ -614,7 +614,7 @@ namespace SEE.Game
         /// <param name="parent">the parent in which to fit the nodes</param>
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout(GameObject parent) =>
-            settings.NodeLayoutSettings.Kind switch
+            Settings.NodeLayoutSettings.Kind switch
             {
                 NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel, NodeFactory.Unit),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit),
@@ -622,9 +622,9 @@ namespace SEE.Game
                 NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
-                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, settings.NodeLayoutSettings.LayoutPath.Path),
-                _ => throw new Exception("Unhandled node layout " + settings.NodeLayoutSettings.Kind)
+                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, Settings),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
+                _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
             };
 
         /// <summary>

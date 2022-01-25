@@ -75,7 +75,8 @@ namespace SEE.Controls.Interactables
         [Header("Optional")]
         [SerializeField, Tooltip(
              "Precompute enabled: Per-vertex calculations are performed in the editor and serialized with the object. "
-             + "Precompute disabled: Per-vertex calculations are performed at runtime in Awake(). This may cause a pause for large meshes.")]
+             + "Precompute disabled: Per-vertex calculations are performed at runtime in Awake(). "
+             + "This may cause a pause for large meshes.")]
         private bool precomputeOutline;
 
         private readonly List<Mesh> bakeKeys = new List<Mesh>();
@@ -87,10 +88,9 @@ namespace SEE.Controls.Interactables
         private Material outlineFillMaterial;
 
         /// <summary>
-        /// The game object of the code city this outline is attached to. May be null if no such city exists.
+        /// Whether the material properties must be updated, i.e., whether
+        /// <see cref="UpdateMaterialProperties"/> must be called.
         /// </summary>
-        private GameObject rootCity;
-
         private bool needsUpdate;
 
         public static Outline Create(GameObject go, Color color)
@@ -182,8 +182,6 @@ namespace SEE.Controls.Interactables
                     renderer.materials = materials;
                 }
             }
-
-            gameObject.UpdatePortal(true);
         }
 
         private void OnValidate()

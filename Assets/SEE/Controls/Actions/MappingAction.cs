@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
 
         private MappingAction(MappingAction mappingAction)
         {
-            mapping = (Graph)mappingAction.mapping.Clone();
+            mapping = (Graph)mappingAction.mapping?.Clone();
             lastSelection = mappingAction.lastSelection;
         }
 

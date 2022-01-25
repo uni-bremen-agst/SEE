@@ -63,8 +63,6 @@ namespace SEE.Game
         {
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
-            // The new position of the movingNode in world space.
-            Vector3 newPosition = Vector3.negativeInfinity;
 
             RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
 
@@ -87,6 +85,8 @@ namespace SEE.Game
                 }
                 else
                 {
+                    // The new position of the movingNode in world space.
+                    Vector3 newPosition = raycastHit.Value.point;
                     movingObject.transform.position = newPosition;
                     PutOn(movingObject.transform, newGameParent);
                     if (movingNode.Parent != newGraphParent)

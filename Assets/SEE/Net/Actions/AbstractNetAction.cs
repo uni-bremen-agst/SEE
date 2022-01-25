@@ -92,7 +92,7 @@ namespace SEE.Net
         /// otherwise.</returns>
         protected bool IsRequester()
         {
-            if (Network.UseInOfflineMode || RequesterIPAddress == null || RequesterPort == -1)
+            if (RequesterIPAddress == null || RequesterPort == -1)
             {
                 return true;
             }
@@ -128,45 +128,31 @@ namespace SEE.Net
         /// The action will be sent to the server and from there broadcast to every
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
-        ///
-        /// If <see cref="Network.UseInOfflineMode"/> is <code>true</code>, this will be
-        /// simulated locally without sending networked packets.
-        ///
+        /// </summary>
         /// <param name="recipients">The recipients of this action. If <code>null</code>,
         /// this actions will be executed everywhere.</param>
-        /// </summary>
-        ///
-        /// <param name="recipients">The recipients of the actions.</param>
         public void Execute(IPEndPoint[] recipients = null)
         {
-            if (Network.UseInOfflineMode)
+            if (recipients == null)
             {
-                ExecuteOnServerBase();
-                ExecuteOnClientBase();
+                RecipientsIPAddresses = null;
+                RecipientsPorts = null;
             }
             else
             {
-                if (recipients == null)
+                RecipientsIPAddresses = new string[recipients.Length];
+                RecipientsPorts = new int[recipients.Length];
+                for (int i = 0; i < recipients.Length; i++)
                 {
-                    RecipientsIPAddresses = null;
-                    RecipientsPorts = null;
+                    RecipientsIPAddresses[i] = recipients[i].Address.ToString();
+                    RecipientsPorts[i] = recipients[i].Port;
                 }
-                else
-                {
-                    RecipientsIPAddresses = new string[recipients.Length];
-                    RecipientsPorts = new int[recipients.Length];
-                    for (int i = 0; i < recipients.Length; i++)
-                    {
-                        RecipientsIPAddresses[i] = recipients[i].Address.ToString();
-                        RecipientsPorts[i] = recipients[i].Port;
-                    }
-                }
-#if UNITY_EDITOR
-                DebugAssertCanBeSerialized();
-#endif
-                ExecuteActionPacket packet = new ExecuteActionPacket(this);
-                Network.SubmitPacket(Client.Connection, packet);
             }
+#if UNITY_EDITOR
+            DebugAssertCanBeSerialized();
+#endif
+            ExecuteActionPacket packet = new ExecuteActionPacket(this);
+            Network.SubmitPacket(Client.Connection, packet);
         }
 
         /// Executes the action on the server locally. This function is only called by

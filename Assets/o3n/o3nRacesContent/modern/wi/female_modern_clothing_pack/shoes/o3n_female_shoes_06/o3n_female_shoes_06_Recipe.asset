@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
+  m_Name: o3n_female_shoes_06_Recipe
+  m_EditorClassIdentifier: 
+  recipeType: Wardrobe
+  DisplayValue: Shoes 06
+  compatibleRaces:
+  - o3n Female
+  wardrobeRecipeThumbs:
+  - race: o3n Female
+    filename: 
+    thumb: {fileID: 21300000, guid: bcb91ea6bf1352a46b2a949388ec903f, type: 3}
+  wardrobeSlot: Feet
+  Hides: []
+  suppressWardrobeSlots: []
+  activeWardrobeSet: []
+  MeshHideAssets:
+  - {fileID: 11400000, guid: b75cac133e1241a45939d0533c6cb20e, type: 2}
+  - {fileID: 11400000, guid: 45ee22c6c897f8f4ebcb7b07fa23d92f, type: 2}
+  - {fileID: 11400000, guid: 24d40a0083b2bb54faea7f443bbd53d3, type: 2}
+  - {fileID: 11400000, guid: 48574f7b6e0a8db4ea3108ab993bff24, type: 2}
+  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"o3n_female_shoes_06_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_06_Overlay","colorIdx":0,"rect":[0,0,0,0],"data":[]},{"id":"o3n_female_shoes_06_ties_Overlay","colorIdx":1,"rect":[0,0,0,0],"data":[]},{"id":"o3n_female_shoes_06_bottom_Overlay","colorIdx":2,"rect":[0,0,0,0],"data":[]}]},{"id":"o3n_female_feet_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_06_alpha_mask_Overlay","colorIdx":3,"rect":[0,0,0,0],"data":[]}]}],"colors":[],"fColors":[{"name":"Footwear01","colors":[255,117,77,255,0,0,0,0,178,178,178,255,0,0,0,0,178,178,178,255,0,0,0,0]},{"name":"Footwear02","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"Footwear03","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"-","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":3,"race":"","packedDna":[]}'
+  replaces: Nothing
