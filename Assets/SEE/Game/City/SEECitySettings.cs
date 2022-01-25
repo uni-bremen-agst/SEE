@@ -99,25 +99,74 @@ namespace SEE.Game.City
         [OdinSerialize]
         public LabelAttributes LabelSettings = new LabelAttributes();
         /// <summary>
+        /// Width of the outline for leaf and inner nodes.
+        /// </summary>
+        public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+
+        /// <summary>
         /// Label in the configuration file for the kind of object drawn for a node.
+        /// It must be visible to the subclasses.
         /// </summary>
         protected const string NodeKindsLabel = "Kind";
         /// <summary>
         /// Label in the configuration file for a color range.
         /// </summary>
-        protected const string ColorRangeLabel = "ColorRange";
+        private const string ColorRangeLabel = "ColorRange";
         /// <summary>
         /// Label in the configuration file for a node style (color actually).
         /// </summary>
-        protected const string StyleMetricLabel = "StyleMetric";
+        private const string StyleMetricLabel = "StyleMetric";
         /// <summary>
         /// Label in the configuration file for a height metric.
         /// </summary>
-        protected const string HeightMetricLabel = "HeightMetric";
+        private const string HeightMetricLabel = "HeightMetric";
         /// <summary>
         /// Label in the configuration file for the label settings for leaf and inner nodes.
         /// </summary>
-        protected const string LabelSettingsLabel = "LabelSettings";
+        private const string LabelSettingsLabel = "LabelSettings";
+        /// <summary>
+        /// Label in the configuration file for the width of the outline for leaf and inner nodes.
+        /// </summary>
+        private const string OutlineWidthLabel = "OutlineWidth";
+
+        /// <summary>
+        /// Saves the settings in the configuration file.
+        /// Note: This does not save the enclosing group label. This method
+        /// is intended to be called by the subclasses which do save the
+        /// enclosing group label.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings (will be ignored)</param>
+        public override void Save(ConfigWriter writer, string label)
+        {
+            writer.Save(HeightMetric, HeightMetricLabel);
+            writer.Save(ColorMetric, StyleMetricLabel);
+            ColorRange.Save(writer, ColorRangeLabel);
+            LabelSettings.Save(writer, LabelSettingsLabel);
+            writer.Save(OutlineWidth, OutlineWidthLabel);
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// This method is intended to be called by subclasses to restore the shared attributes.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        public override void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
+                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
+                ColorRange.Restore(values, ColorRangeLabel);
+                LabelSettings.Restore(values, LabelSettingsLabel);
+                ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
+            }
+        }
     }
 
     /// <summary>
@@ -155,13 +204,10 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            base.Save(writer, null);
             writer.Save(Kind.ToString(), NodeKindsLabel);
             writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
             writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
-            LabelSettings.Save(writer, LabelSettingsLabel);
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
             writer.EndGroup();
@@ -176,17 +222,15 @@ namespace SEE.Game.City
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
+            base.Restore(attributes, label);
+
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
                 ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
-                LabelSettings.Restore(values, LabelSettingsLabel);
                 ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
                 ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
             }
@@ -233,29 +277,24 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            base.Save(writer, null);
             writer.Save(Kind.ToString(), NodeKindsLabel);
             writer.Save(ShowNames, ShowNamesLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
-            LabelSettings.Save(writer, LabelSettingsLabel);
             writer.EndGroup();
         }
 
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
+            base.Restore(attributes, label);
+
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
                 ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
-                LabelSettings.Restore(values, LabelSettingsLabel);
             }
         }
 

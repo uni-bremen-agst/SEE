@@ -317,7 +317,8 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                settings.ShowNames = EditorGUILayout.Toggle("Show persistent names", settings.ShowNames);
+                settings.ShowNames = EditorGUILayout.Toggle("Persistent names", settings.ShowNames);
+                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
                 EditorGUI.EndDisabledGroup();
                 LabelSettings(ref settings.LabelSettings);
 
@@ -348,6 +349,7 @@ namespace SEEEditor
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
                 settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
                 settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
+                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
                 EditorGUI.EndDisabledGroup();
                 LabelSettings(ref settings.LabelSettings);
 
