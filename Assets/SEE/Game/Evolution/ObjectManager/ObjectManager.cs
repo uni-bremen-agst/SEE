@@ -178,12 +178,12 @@ namespace SEE.Game.Evolution
                 {
                     /// <see cref="DrawLeafNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>
                     /// and will also set the scale and style of gameNode.
-                    gameNode = graphRenderer.DrawLeafNode(node);
+                    gameNode = graphRenderer.DrawLeafNode(node, city);
                 }
                 else
                 {
                     /// <see cref="DrawInnerNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>.
-                    gameNode = graphRenderer.DrawInnerNode(node);
+                    gameNode = graphRenderer.DrawInnerNode(node, city);
                     // Note: The scale of inner nodes will be adjusted later when
                     // we have the layout.
                 }
