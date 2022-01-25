@@ -237,7 +237,9 @@ namespace SEE.Utils
         public static Ray UserPointsTo()
         {
             // FIXME: We need to an interaction for VR, too.
-            return MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+            Camera mainCamera = MainCamera.Camera;
+            return mainCamera != null ? mainCamera.ScreenPointToRay(Input.mousePosition)
+                                      : new Ray(origin: Vector3.zero, direction: Vector3.zero);
         }
     }
 }

@@ -163,7 +163,7 @@ namespace SEE.GO.Menu
         /// <param name="actionName">name of the menu entry to be </param>
         private void SetPlayerMenu(string actionName)
         {
-            if (PlayerSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            if (SceneSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.ModeMenu.ActiveEntry = playerMenu.ModeMenu.Entries.First(x => x.Title.Equals(actionName));

@@ -1,6 +1,4 @@
 ﻿using SEE.Game.Evolution;
-using System;
-using System.Collections.Generic;
 
 namespace SEE.Game
 {

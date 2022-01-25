@@ -4,10 +4,10 @@ using UnityEngine;
 namespace SEE.GO
 {
     /// <summary>
-    /// Abstract super class of all inner nodes that use a line renderer 
+    /// Abstract super class of all inner nodes that use a line renderer
     /// for being drawn.
     /// </summary>
-    public abstract class LineInnerNodeFactory : InnerNodeFactory
+    internal abstract class LineInnerNodeFactory : InnerNodeFactory
     {
         /// <summary>
         /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.
@@ -28,7 +28,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Sets the width of lines drawn for the given object.
-        /// 
+        ///
         /// Precondition: circle must have been created by this factory and must contain
         /// a LineRenderer component.
         /// </summary>

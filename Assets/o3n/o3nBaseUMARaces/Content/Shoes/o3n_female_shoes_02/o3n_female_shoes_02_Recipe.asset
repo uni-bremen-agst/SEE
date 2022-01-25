@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
+  m_Name: o3n_female_shoes_02_Recipe
+  m_EditorClassIdentifier: 
+  recipeType: Wardrobe
+  DisplayValue: High Heels
+  compatibleRaces:
+  - o3n Female
+  wardrobeRecipeThumbs:
+  - race: o3n Female
+    filename: 
+    thumb: {fileID: 21300000, guid: a89ec82845f066541a79752b935a399c, type: 3}
+  wardrobeSlot: Feet
+  Hides: []
+  suppressWardrobeSlots: []
+  activeWardrobeSet: []
+  MeshHideAssets:
+  - {fileID: 11400000, guid: e5d7c81a63553db44b7064f320cdb4f5, type: 2}
+  - {fileID: 11400000, guid: 56dd966688f6995458465c4f8b4b7c3a, type: 2}
+  - {fileID: 11400000, guid: 68aa9277084c4df438015acd7a0fb186, type: 2}
+  - {fileID: 11400000, guid: 8e24ae207fe57484a83c5b7702b1525b, type: 2}
+  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"o3n_female_feet_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_02_alpha_mask_overlay","colorIdx":4,"rect":[0,0,0,0],"data":[]}]},{"id":"o3n_female_shoes_02_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_02_Overlay","colorIdx":0,"rect":[0,0,0,0],"data":[]},{"id":"o3n_female_shoes_02_inner_Overlay","colorIdx":1,"rect":[0,0,0,0],"data":[]},{"id":"o3n_female_shoes_02_bottom_Overlay","colorIdx":2,"rect":[0,0,0,0],"data":[]},{"id":"o3n_female_shoes_02_beltring_Overlay","colorIdx":3,"rect":[0,0,0,0],"data":[]}]}],"colors":[],"fColors":[{"name":"Footwear01","colors":[230,199,176,255,0,0,0,255,255,255,255,255,0,0,0,0,255,255,255,255,20,20,20,80]},{"name":"Footwear02","colors":[243,225,211,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"Footwear03","colors":[104,63,33,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"Footwear04","colors":[254,255,193,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"-","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":4,"race":"","packedDna":[]}'
+  replaces: Nothing

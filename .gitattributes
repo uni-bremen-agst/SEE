@@ -13,3 +13,20 @@
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
+
+# These should not show up in diffs or language statistics.
+# We exclude Assets by default, then whitelist all SEE-specific stuff.
+/Assets/** linguist-generated=true
+/Assets/Animations/** linguist-generated=false
+/Assets/Editor/** linguist-generated=false
+/Assets/Native/** linguist-generated=false
+/Assets/Parser/** linguist-generated=false
+/Assets/Prefabs/** linguist-generated=false
+/Assets/Resources/** linguist-generated=false
+/Assets/Scenes/** linguist-generated=false
+/Assets/SEE/** linguist-generated=false
+/Assets/SEEPlayModeTests/** linguist-generated=false
+/Assets/SEETests/** linguist-generated=false
+/Assets/StreamingAssets/** linguist-generated=false
+/Assets/Trailer/** linguist-generated=false
+/Packages/** linguist-generated=true

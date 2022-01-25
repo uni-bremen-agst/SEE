@@ -446,15 +446,17 @@ namespace Crosstales.Common.Util
       /// <summary>Validates a given path and add missing slash.</summary>
       /// <param name="path">Path to validate</param>
       /// <param name="addEndDelimiter">Add delimiter at the end of the path (optional, default: true)</param>
+      /// <param name="preserveFile">Preserves a given file in the path (optional, default: true)</param>
       /// <returns>Valid path</returns>
-      public static string ValidatePath(string path, bool addEndDelimiter = true)
+      public static string ValidatePath(string path, bool addEndDelimiter = true, bool preserveFile = true)
       {
          if (!string.IsNullOrEmpty(path))
          {
             if (isValidURL(path))
                return path;
 
-            string pathTemp = path.Trim();
+            string pathTemp = !preserveFile && System.IO.File.Exists(path.Trim()) ? System.IO.Path.GetDirectoryName(path.Trim()) : path.Trim();
+
             string result;
 
             if ((isWindowsBasedPlatform || isWindowsEditor) && !isMacOSEditor && !isLinuxEditor)
@@ -483,6 +485,7 @@ namespace Crosstales.Common.Util
             }
 
             return string.Join(string.Empty, result.Split(System.IO.Path.GetInvalidPathChars()));
+            //return result;
          }
 
          return path;

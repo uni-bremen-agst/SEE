@@ -4,32 +4,33 @@ using UnityEngine.EventSystems;
 namespace Crosstales.RTVoice.UI
 {
    /// <summary>Speaks a TextMesh Pro input field.</summary>
-   [RequireComponent(typeof(TMPro.TMP_InputField))]
    [HelpURL("https://crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_r_t_voice_1_1_u_i_1_1_speak_u_i_t_m_p_input_field.html")]
    public class SpeakUITMPInputField : SpeakUIBase
    {
-#if false || CT_DEVELOP //Change this to "true" is you have TextMesh Pro installed
-
-      #region Variables
+      //#region Variables
 
       public bool ChangeColor = true;
       public Color TextColor = Color.green;
       public bool ClearTags = true;
 
-      protected TMPro.TMP_InputField inputComponent;
+#if false || CT_DEVELOP //Change this to "true" is you have TextMesh Pro installed
+      public TMPro.TMP_InputField InputComponent;
+
       private Color originalColor;
       private Color originalPHColor;
 
-      #endregion
+      //#endregion
 
 
       #region MonoBehaviour methods
 
       private void Awake()
       {
-         inputComponent = GetComponent<TMPro.TMP_InputField>();
-         originalColor = inputComponent.textComponent.color;
-         originalPHColor = inputComponent.placeholder.color;
+         if (InputComponent == null)
+            InputComponent = GetComponent<TMPro.TMP_InputField>();
+
+         originalColor = InputComponent.textComponent.color;
+         originalPHColor = InputComponent.placeholder.color;
       }
 
       private void Update()
@@ -40,18 +41,18 @@ namespace Crosstales.RTVoice.UI
 
             if (elapsedTime > Delay && uid == null && (!SpeakOnlyOnce || !spoken))
             {
-               string text;
-               if (!string.IsNullOrEmpty(inputComponent.textComponent.text))
+               string text = InputComponent.textComponent.text;
+               if (!string.IsNullOrEmpty(text) && text.Length > 1)
                {
                   if (ChangeColor)
-                     inputComponent.textComponent.color = TextColor;
-                  text = inputComponent.textComponent.text;
+                     InputComponent.textComponent.color = TextColor;
                }
                else
                {
                   if (ChangeColor)
-                     inputComponent.placeholder.color = TextColor;
-                  text = inputComponent.placeholder.GetComponent<TMPro.TMP_Text>().text;
+                     InputComponent.placeholder.color = TextColor;
+
+                  text = InputComponent.placeholder.GetComponent<TMPro.TMP_Text>().text;
                }
 
                uid = speak(ClearTags ? text.CTClearTags() : text);
@@ -73,8 +74,8 @@ namespace Crosstales.RTVoice.UI
       {
          base.OnPointerExit(eventData);
 
-         inputComponent.textComponent.color = originalColor;
-         inputComponent.placeholder.color = originalPHColor;
+         InputComponent.textComponent.color = originalColor;
+         InputComponent.placeholder.color = originalPHColor;
       }
 
       protected override void onSpeakComplete(Model.Wrapper wrapper)
@@ -83,18 +84,30 @@ namespace Crosstales.RTVoice.UI
          {
             base.onSpeakComplete(wrapper);
 
-            inputComponent.textComponent.color = originalColor;
-            inputComponent.placeholder.color = originalPHColor;
+            InputComponent.textComponent.color = originalColor;
+            InputComponent.placeholder.color = originalPHColor;
          }
       }
 
       #endregion
-
 #else
       private void Awake()
       {
-         Debug.LogWarning("Is TextMesh Pro installed? If so, please change line 9 of 'SpeakUITMPInputField.cs' to 'true'");
+         Debug.LogWarning("Is TextMesh Pro installed? If so, please change line 16 of 'SpeakUITMPInputField.cs' to 'true'");
       }
+
+#if UNITY_EDITOR
+      [UnityEditor.CustomEditor(typeof(SpeakUITMPInputField))]
+      public class CTHelperEditor : UnityEditor.Editor
+      {
+         public override void OnInspectorGUI()
+         {
+            UnityEditor.EditorGUILayout.HelpBox("Is TextMesh Pro installed? If so, please change line 16 of 'SpeakUITMPInputField.cs' to 'true'.", UnityEditor.MessageType.Warning);
+
+            DrawDefaultInspector();
+         }
+      }
+#endif
 #endif
    }
 }

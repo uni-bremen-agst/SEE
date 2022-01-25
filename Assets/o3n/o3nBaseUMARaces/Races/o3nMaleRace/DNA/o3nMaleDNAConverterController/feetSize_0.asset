@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: feetSize_0
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: Foot_R
+    hash: -77922604
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: -0.0000000011569172, y: 0.02614108, z: 0.0013699974, w: 0.9996574}
+    scale: {x: 0.875, y: 0.8, z: 1}
+  - bone: Foot_L
+    hash: 22397879
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0.000000006855041, y: 0.026141066, z: 0.0013699969, w: 0.99965745}
+    scale: {x: 0.875, y: 0.8, z: 1}
+  tweenPoses: []
+  tweenWeights: []

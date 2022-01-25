@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: BrowInnerUp
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: EyebrowLow_L
+    hash: 2067594143
+    position: {x: -0.0027717948, y: -0.000015038997, z: 0}
+    rotation: {x: -0.000000022930145, y: 0.000000008948646, z: 0.00000016563116, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: EyebrowLow_R
+    hash: -2127313156
+    position: {x: -0.003000021, y: 0, z: 0}
+    rotation: {x: 0.000000021718279, y: 0.000000030483616, z: 0.0043085143, w: 1.0000083}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: NoseTop
+    hash: 463827395
+    position: {x: -0.0069975406, y: 0, z: 0}
+    rotation: {x: 0.00000021001735, y: 0.0000010997344, z: -0.000005644606, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

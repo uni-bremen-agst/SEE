@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
     /// A property that can be set by the user in a dialog.
     /// </summary>
-    public abstract class Property : PlatformDependentComponent 
+    public abstract class Property : PlatformDependentComponent
     {
         /// <summary>
         /// The name of the property.
@@ -21,6 +22,13 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         /// <param name="parent">new parent of the property</param>
         public abstract void SetParent(GameObject parent);
+
+        /// <summary>
+        /// Will be called just before the dialog containing this property
+        /// is shown to the user. Subclasses can place their preparation
+        /// for this event there.
+        /// </summary>
+        public virtual void GetReady() {}
     }
 
     /// <summary>
@@ -28,7 +36,7 @@ namespace SEE.Game.UI.PropertyDialog
     /// </summary>
     /// <typeparam name="T">The type of the property's value.</typeparam>
     public abstract class Property<T> : Property
-    {        
+    {
         /// <summary>
         /// The value of the property.
         /// </summary>

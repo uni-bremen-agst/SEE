@@ -10,14 +10,15 @@ namespace Crosstales.Common.Util
       [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
       private static void initialize()
       {
+         //Debug.Log("initalize");
          BaseHelper.ApplicationIsPlaying = true;
       }
 
       [RuntimeInitializeOnLoadMethod]
       private static void create()
       {
+         //Debug.Log("create");
          BaseHelper.ApplicationIsPlaying = true;
-         //Debug.Log("initialize");
 
          if (!BaseHelper.isEditorMode)
          {
@@ -34,6 +35,7 @@ namespace Crosstales.Common.Util
 
       private void OnApplicationQuit()
       {
+         //Debug.Log("OnApplicationQuit", this);
          BaseHelper.ApplicationIsPlaying = false;
       }
    }

@@ -273,7 +273,7 @@ MonoBehaviour:
     Method: 0
     Layers:
       serializedVersion: 2
-      m_Bits: 4294967291
+      m_Bits: 32
     Search: 1
     RequiredTag: 
     Camera: {fileID: 0}
@@ -779,7 +779,7 @@ MonoBehaviour:
     Method: 0
     Layers:
       serializedVersion: 2
-      m_Bits: 4294967291
+      m_Bits: 32
     Search: 1
     RequiredTag: 
     Camera: {fileID: 0}
@@ -1386,7 +1386,7 @@ GameObject:
   - component: {fileID: 1352667340}
   - component: {fileID: 1352667339}
   m_Layer: 0
-  m_Name: Drop Spheres (Respawn)
+  m_Name: Drop Spheres (Tag = Respawn)
   m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1496,7 +1496,7 @@ GameObject:
   - component: {fileID: 1396482597}
   - component: {fileID: 1396482596}
   m_Layer: 0
-  m_Name: Drop Cubes (Player)
+  m_Name: Drop Cubes (Tag = Player)
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1891,7 +1891,7 @@ MonoBehaviour:
     Method: 0
     Layers:
       serializedVersion: 2
-      m_Bits: 4294967291
+      m_Bits: 32
     Search: 1
     RequiredTag: 
     Camera: {fileID: 0}
@@ -2140,7 +2140,7 @@ GameObject:
   - component: {fileID: 1818811939}
   - component: {fileID: 1818811938}
   m_Layer: 0
-  m_Name: Drop Capsules (Finish)
+  m_Name: Drop Capsules (Tag = Finish)
   m_TagString: Finish
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
