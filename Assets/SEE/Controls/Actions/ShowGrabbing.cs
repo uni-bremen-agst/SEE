@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsHovered && !interactable.IsSelected)
+            if (!Interactable.IsHovered && !Interactable.IsSelected)
             {
                 ResetOutlineColorAndAlpha(isInitiator);
             }
@@ -52,10 +52,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnEnable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.GrabIn += On;
-                interactable.GrabOut += Off;
+                Interactable.GrabIn += On;
+                Interactable.GrabOut += Off;
             }
             else
             {
@@ -68,10 +68,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.GrabIn -= On;
-                interactable.GrabOut -= Off;
+                Interactable.GrabIn -= On;
+                Interactable.GrabOut -= Off;
             }
             else
             {
