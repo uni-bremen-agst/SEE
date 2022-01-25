@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsGrabbed)
+            if (!Interactable.IsGrabbed)
             {
                 SetOutlineColorAndAlpha(isInitiator);
             }
@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsHovered && !interactable.IsGrabbed)
+            if (!Interactable.IsHovered && !Interactable.IsGrabbed)
             {
                 ResetOutlineColorAndAlpha(isInitiator);
             }
@@ -50,11 +50,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnEnable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn += On;
-                interactable.SelectOut += Off;
-                interactable.GrabOut += GrabOff;
+                Interactable.SelectIn += On;
+                Interactable.SelectOut += Off;
+                Interactable.GrabOut += GrabOff;
             }
             else
             {
@@ -67,11 +67,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= On;
-                interactable.SelectOut -= Off;
-                interactable.GrabOut -= GrabOff;
+                Interactable.SelectIn -= On;
+                Interactable.SelectOut -= Off;
+                Interactable.GrabOut -= GrabOff;
             }
             else
             {
@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected void GrabOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsSelected)
+            if (Interactable.IsSelected)
             {
                 ResetOutlineColorAndAlpha(isInitiator);
             }

@@ -12,14 +12,14 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The interactable component attached to the same object as a sibling of this action.
         /// </summary>
-        protected InteractableObject interactable;
+        protected InteractableObject Interactable;
 
         /// <summary>
-        /// Sets <see cref="interactable"/>. In case of failure, this action will be disabled.
+        /// Sets <see cref="Interactable"/>. In case of failure, this action will be disabled.
         /// </summary>
         protected virtual void Awake()
         {
-            if (!gameObject.TryGetComponentOrLog(out interactable))
+            if (!gameObject.TryGetComponentOrLog(out Interactable))
             {
                 enabled = false;
             }

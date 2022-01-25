@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using SEE.Controls.Interactables;
 using SEE.Utils;
 using UnityEngine;
 
@@ -50,7 +49,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
                 SetInitialAndNewOutlineColor(isInitiator);
                 if (isInitiator)
@@ -71,7 +70,7 @@ namespace SEE.Controls.Actions
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
             //FIXME: Outline color is not correctly set if we hover off while a node is selected
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
                 ResetOutlineColor();
                 if (isInitiator)
@@ -84,7 +83,7 @@ namespace SEE.Controls.Actions
 
         protected void SelectOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsGrabbed)
+            if (Interactable.IsHovered && !Interactable.IsGrabbed)
             {
                 SetOutlineColor(isInitiator);
                 if (isInitiator)
@@ -97,7 +96,7 @@ namespace SEE.Controls.Actions
 
         protected void GrabOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsSelected)
+            if (Interactable.IsHovered && !Interactable.IsSelected)
             {
                 SetOutlineColor(isInitiator);
                 if (isInitiator)
@@ -113,12 +112,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnEnable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.HoverIn += On;
-                interactable.HoverOut += Off;
-                interactable.SelectOut += SelectOff;
-                interactable.GrabOut += GrabOff;
+                Interactable.HoverIn += On;
+                Interactable.HoverOut += Off;
+                Interactable.SelectOut += SelectOff;
+                Interactable.GrabOut += GrabOff;
             }
             else
             {
@@ -131,12 +130,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected virtual void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.HoverIn -= On;
-                interactable.HoverOut -= Off;
-                interactable.SelectOut -= SelectOff;
-                interactable.GrabOut -= GrabOff;
+                Interactable.HoverIn -= On;
+                Interactable.HoverOut -= Off;
+                Interactable.SelectOut -= SelectOff;
+                Interactable.GrabOut -= GrabOff;
             }
             else
             {
