@@ -225,10 +225,16 @@ namespace SEE.Game.City
         /// </summary>
         public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
+        /// <summary>
+        /// If true, persistent text labels will be added to inner nodes.
+        /// </summary>
+        public bool ShowNames = false;
+
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeKindsLabel);
+            writer.Save(ShowNames, ShowNamesLabel);
             writer.Save(HeightMetric, HeightMetricLabel);
             writer.Save(ColorMetric, StyleMetricLabel);
             ColorRange.Save(writer, ColorRangeLabel);
@@ -244,6 +250,7 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
+                ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
                 ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
                 ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
                 ColorRange.Restore(values, ColorRangeLabel);
@@ -253,6 +260,7 @@ namespace SEE.Game.City
         }
 
         private const string InnerDonutMetricLabel = "InnerDonutMetric";
+        private const string ShowNamesLabel = "ShowNames";
     }
 
     /// <summary>

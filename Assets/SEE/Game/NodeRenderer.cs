@@ -596,9 +596,7 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon
-                || nodeLayout == NodeLayoutKind.EvoStreets
-                || nodeLayout == NodeLayoutKind.CirclePacking)
+            if (Settings.InnerNodeSettings.ShowNames)
             {
                 AddLabels(innerNodes, innerNodeFactory);
             }
