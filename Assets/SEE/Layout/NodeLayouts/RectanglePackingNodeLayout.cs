@@ -38,21 +38,22 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">nodes to be laid out</param>
         /// <returns>retangle packing layout</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
-            if (layoutNodes.Count == 1)
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            if (layoutNodeList.Count == 1)
             {
-                ILayoutNode layoutNode = layoutNodes.FirstOrDefault();
-                layout_result[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.LocalScale);
-                return layout_result;
+                ILayoutNode layoutNode = layoutNodeList.First();
+                layoutResult[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.LocalScale);
+                return layoutResult;
             }
 
             // Do we have only leaves?
             {
                 int numberOfLeaves = 0;
-                foreach (ILayoutNode node in layoutNodes)
+                foreach (ILayoutNode node in layoutNodeList)
                 {
                     if (node.IsLeaf)
                     {
@@ -63,23 +64,23 @@ namespace SEE.Layout.NodeLayouts
                         Vector3 scale = node.LocalScale;
                         scale.x += 2.0f * padding;
                         scale.z += 2.0f * padding;
-                        layout_result[node] = new NodeTransform(Vector3.zero, scale);
+                        layoutResult[node] = new NodeTransform(Vector3.zero, scale);
                         numberOfLeaves++;
                     }
                 }
-                if (numberOfLeaves == layoutNodes.Count)
+                if (numberOfLeaves == layoutNodeList.Count)
                 {
                     // There are only leaves.
-                    Pack(layout_result, layoutNodes.Cast<ILayoutNode>().ToList());
-                    RemovePadding(layout_result, padding);
-                    return layout_result;
+                    Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList());
+                    RemovePadding(layoutResult, padding);
+                    return layoutResult;
                 }
             }
             // Not all nodes are leaves.
-            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
+            ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodeList);
             if (roots.Count == 0)
             {
-                return layout_result;
+                return layoutResult;
             }
             else if (roots.Count > 1)
             {
@@ -88,16 +89,16 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 ILayoutNode root = roots.FirstOrDefault();
-                Vector2 area = PlaceNodes(layout_result, root);
+                Vector2 area = PlaceNodes(layoutResult, root);
                 Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
-                layout_result[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
-                RemovePadding(layout_result, padding);
-                /// Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
-                /// for each node hierarchy level anew. That is why we need to adjust the layout so
-                /// that all rectangles are truly nested.
-                MakeContained(layout_result, root);
-                return layout_result;
+                layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
+                RemovePadding(layoutResult, padding);
+                // Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
+                // for each node hierarchy level anew. That is why we need to adjust the layout so
+                // that all rectangles are truly nested.
+                MakeContained(layoutResult, root);
+                return layoutResult;
             }
         }
 

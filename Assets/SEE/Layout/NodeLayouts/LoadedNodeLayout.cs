@@ -1,9 +1,11 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using SEE.Utils;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Layout.IO;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
@@ -31,22 +33,22 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
             if (File.Exists(filename))
             {
+                IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
                 if (Filenames.HasExtension(filename, Filenames.GVLExtension))
                 {
-                    new SEE.Layout.IO.GVLReader(filename, layoutNodes.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
-
+                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
                 }
                 else
                 {
-                    SEE.Layout.IO.SLDReader.Read(filename, layoutNodes.Cast<IGameNode>().ToList());
+                    SLDReader.Read(filename, layoutNodeList.Cast<IGameNode>().ToList());
                 }
 
-                foreach (ILayoutNode node in layoutNodes)
+                foreach (ILayoutNode node in layoutNodeList)
                 {
                     Vector3 position = node.CenterPosition;
                     Vector3 absoluteScale = node.AbsoluteScale;
@@ -58,14 +60,14 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                Debug.LogErrorFormat("Layout file {0} does not exist. No layout could be loaded.\n", filename);
+                Debug.LogError($"Layout file {filename} does not exist. No layout could be loaded.\n");
             }
             return result;
         }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override bool UsesEdgesAndSublayoutNodes()

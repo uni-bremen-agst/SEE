@@ -17,11 +17,39 @@ namespace SEE.GameObjects
         /// </summary>
         private Transform mainCamera;
 
+        /// <summary>
+        /// Sets <see cref="mainCamera"/> to the transform of <see cref="MainCamera.Camera"/>
+        /// if there is such a camera. Otherwise registers this component to be informed
+        /// when the camera becomes available (via <see cref="OnCameraAvailable(Camera)"/>
+        /// and disables itself until then.
+        /// </summary>
         private void Start()
         {
-            mainCamera = MainCamera.Camera.transform;
+            Camera camera = MainCamera.GetCameraNowOrLater(OnCameraAvailable);
+            if (camera)
+            {
+                mainCamera = camera.transform;
+            }
+            else
+            {
+                // Disable until we have a camera.
+                enabled = false;
+            }
         }
 
+        /// <summary>
+        /// A delegate to be called when a camera is available.
+        /// </summary>
+        /// <param name="camera">the availabe camera</param>
+        private void OnCameraAvailable(Camera camera)
+        {
+            mainCamera = camera.transform;
+            enabled = true;
+        }
+
+        /// <summary>
+        /// Rotates this game object towards <see cref="mainCamera"/>.
+        /// </summary>
         private void LateUpdate()
         {
             Quaternion rotation = mainCamera.localRotation;

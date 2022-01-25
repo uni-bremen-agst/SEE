@@ -9,17 +9,19 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace SEE.Game.Worlds
+namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Makes the necessary adaptations of an avatar to work in SEE using SALSA's lip sync
-    /// and Dissonance.
-    /// This behaviour is intended to be added to a game object representing a player's avatar.
+    /// This component is assumed to be attached to a game object representing
+    /// an avatar (representing a local or remote player). It will adapt that
+    /// avatar according to the platform we are currently running on
+    /// (<see cref="PlayerSettings.GetInputType()"/>. In particular, it will
+    /// enable SALSA's lip sync and Dissonance.
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
-        /// If this code is execute for the local player, the necessary player type
+        /// If this code is executed for the local player, the necessary player type
         /// for the environment we are currently running on are added to this game object.
         /// </summary>
         private void Start()
@@ -37,7 +39,7 @@ namespace SEE.Game.Worlds
                         PrepareForXR();
                         break;
                     default:
-                        throw new System.NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
+                        throw new NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;
@@ -175,7 +177,7 @@ namespace SEE.Game.Worlds
 
         /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
-        /// as a child and an <see cref="DesktopPlayerMovement"/> component.
+        /// as a child and a <see cref="DesktopPlayerMovement"/> component.
         /// </summary>
         private void PrepareForDesktop()
         {

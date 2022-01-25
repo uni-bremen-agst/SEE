@@ -25,7 +25,7 @@ namespace SEE.Game.City
     /// Note: This component needs to be initialized via
     /// <see cref="Init(EdgeLayoutAttributes, EdgeSelectionAttributes)"/>.
     /// </summary>
-    public class EdgeMeshScheduler : SerializedMonoBehaviour
+    internal class EdgeMeshScheduler : SerializedMonoBehaviour
     {
         /// <summary>
         /// Number of edges to be processed in each frame (i.e., when
@@ -70,12 +70,12 @@ namespace SEE.Game.City
         /// Registers the given edge object for mesh creation. If
         /// <paramref name="edge"/> already has a mesh (i.e., a
         /// <see cref="MeshFilter"/> is attached to it), it is ignored.
+        /// Likewise, if <paramref name="edge"/> is null, nothing happens.
         /// </summary>
         /// <param name="edge">Edge to be registered</param>
         public void Add(GameObject edge)
         {
-            if (edge == null) return;
-            if (!edge.TryGetComponent<MeshFilter>(out var _))
+            if (edge != null && !edge.TryGetComponent(out MeshFilter _))
             {
                 edges.Enqueue(edge);
             }
@@ -102,7 +102,10 @@ namespace SEE.Game.City
         {
             for (int i = 0; i < EdgesPerFrame; i++)
             {
-                if (edges.Count == 0) break;
+                if (edges.Count == 0)
+                {
+                    break;
+                }
                 GameObject edge = edges.Dequeue();
 
                 // fail-safe
