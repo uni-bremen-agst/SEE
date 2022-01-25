@@ -49,9 +49,9 @@ namespace SEE.Game.UI.PropertyDialog
         public HideInInspector selectedMode;
 
         /// <summary>
-        /// Button to hide all elements
+        /// Button to hide all edges.
         /// </summary>
-        private ButtonProperty bHideAll;
+        private ButtonProperty bHideAllEdges;
 
         /// <summary>
         /// Button to hide all incoming edges and connected nodes
@@ -121,7 +121,7 @@ namespace SEE.Game.UI.PropertyDialog
             indicator.DescriptionDone = "Confirm selection";
             indicator.HideMode = hidemode;
             indicator.ChangeState("Select Objects");
-           
+
             // Register listeners for selection menu
             indicator.OnSelected.AddListener(() => SetMode(indicator.HideMode, indicator.ConfirmCancel));
         }
@@ -134,23 +134,23 @@ namespace SEE.Game.UI.PropertyDialog
             // Creating a new dialog
             dialog = new GameObject("HideAction mode selector");
 
-            // Create new buttons 
-            bHideAll = dialog.AddComponent<ButtonProperty>();
-            bHideAll.Name = "Hide all";
-            bHideAll.Description = "Hides everything";
-            bHideAll.buttonColor = Color.red.Darker();
-            bHideAll.Value = HideModeSelector.HideAll;
-            bHideAll.selectionType = HideModeSelector.SelectSingle;
+            // Create new buttons
+            bHideAllEdges = dialog.AddComponent<ButtonProperty>();
+            bHideAllEdges.Name = "Hide all edges";
+            bHideAllEdges.Description = "Hides all edges";
+            bHideAllEdges.buttonColor = Color.red.Darker();
+            bHideAllEdges.Value = HideModeSelector.HideAll;
+            bHideAllEdges.selectionType = HideModeSelector.SelectSingle;
 
             bHideIncoming = dialog.AddComponent<ButtonProperty>();
-            bHideIncoming.Name = "Hide incoming";
+            bHideIncoming.Name = "Hide incomings";
             bHideIncoming.Description = "Hides only incoming edges";
             bHideIncoming.buttonColor = Color.blue.Darker();
             bHideIncoming.Value = HideModeSelector.HideIncoming;
             bHideIncoming.selectionType = HideModeSelector.SelectSingle;
 
             bHideOutgoing = dialog.AddComponent<ButtonProperty>();
-            bHideOutgoing.Name = "Hide outgoing";
+            bHideOutgoing.Name = "Hide outgoings";
             bHideOutgoing.Description = "Hides only outgoing edges";
             bHideOutgoing.buttonColor = Color.magenta.Darker();
             bHideOutgoing.Value = HideModeSelector.HideOutgoing;
@@ -207,7 +207,7 @@ namespace SEE.Game.UI.PropertyDialog
 
             // Group for buttons
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
-            group.AddProperty(bHideAll);
+            group.AddProperty(bHideAllEdges);
             group.AddProperty(bHideIncoming);
             group.AddProperty(bHideOutgoing);
             group.AddProperty(bHideForwardTransitiveClosure);
@@ -219,7 +219,7 @@ namespace SEE.Game.UI.PropertyDialog
             group.AddProperty(bHighlightConnectingEdges);
 
             // Register listeners for buttons
-            bHideAll.OnSelected.AddListener(() => SetMode(bHideAll.hideMode, bHideAll.selectionType));
+            bHideAllEdges.OnSelected.AddListener(() => SetMode(bHideAllEdges.hideMode, bHideAllEdges.selectionType));
             bHideIncoming.OnSelected.AddListener(() => SetMode(bHideIncoming.hideMode, bHideIncoming.selectionType));
             bHideOutgoing.OnSelected.AddListener(() => SetMode(bHideOutgoing.hideMode, bHideOutgoing.selectionType));
             bHideForwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideForwardTransitiveClosure.hideMode, bHideForwardTransitiveClosure.selectionType));
