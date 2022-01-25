@@ -1,6 +1,6 @@
+using UnityEngine;
 using System.Collections.Generic;
 using Lean.Common;
-using UnityEngine;
 using FSA = UnityEngine.Serialization.FormerlySerializedAsAttribute;
 
 namespace Lean.Touch
@@ -36,7 +36,7 @@ namespace Lean.Touch
 		/// <summary>If the spawned object is dropped on top of the wrong GameObject (e.g. UI), destroy it?</summary>
 		public bool DestroyIfBlocked { set { destroyIfBlocked = value; } get { return destroyIfBlocked; } } [SerializeField] private bool destroyIfBlocked;
 
-		public LeanScreenQuery BlockedScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast);
+		public LeanScreenQuery BlockedScreenQuery = new LeanScreenQuery(LeanScreenQuery.MethodType.Raycast, 1 << 5); // Layer 5 = UI
 
 		/// <summary>If the spawned object isn't dropped on top of the specified GameObjects, destroy it?</summary>
 		public bool DestroyIfMissing { set { destroyIfMissing = value; } get { return destroyIfMissing; } } [SerializeField] private bool destroyIfMissing;

@@ -54,13 +54,17 @@ namespace Lean.Common
 
 		private static List<KeyValuePair<GameObject, int>> tempLayers = new List<KeyValuePair<GameObject, int>>();
 
-		public LeanScreenQuery(MethodType newMethod)
+		public LeanScreenQuery(MethodType newMethod) : this(newMethod, Physics.DefaultRaycastLayers)
+		{
+		}
+
+		public LeanScreenQuery(MethodType newMethod, LayerMask layers)
 		{
 			Method      = newMethod;
 			Search      = SearchType.GetComponentInParent;
 			RequiredTag = null;
 			Camera      = null;
-			Layers      = Physics.DefaultRaycastLayers;
+			Layers      = layers;
 			Distance    = 50.0f;
 		}
 

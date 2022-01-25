@@ -6,18 +6,18 @@ namespace SEE.Controls
     /// <summary>
     /// Speech input based on a predefined set of keywords.
     /// Only this fixed set of keywords can be detected.
-    /// 
-    /// KeywordInput listens to speech input and attempts to match 
+    ///
+    /// KeywordInput listens to speech input and attempts to match
     /// uttered phrases to a list of registered keywords.
-    /// There can be many KeywordInputs active at any given time, 
+    /// There can be many KeywordInputs active at any given time,
     /// but no two KeywordInputs may be listening for the same keyword.
-    /// 
+    ///
     /// As an example on how to use this class, take a look at the test
     /// case TestKeywordInput.
-    /// 
+    ///
     /// IMPORTANT NOTE.
-    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be 
-    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput 
+    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be
+    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput
     /// cannot be active and vice versa.
     /// </summary>
     public class KeywordInput : SpeechInput

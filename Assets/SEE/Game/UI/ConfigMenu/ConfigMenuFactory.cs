@@ -39,16 +39,23 @@ namespace SEE.Game.UI.ConfigMenu
     {
         private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
 
-        private readonly SteamVR_Action_Boolean openAction = SteamVR_Actions._default.OpenSettingsMenu;
+        private SteamVR_Action_Boolean openAction;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
 
         private GameObject configMenuPrefab;
         private ConfigMenu configMenu;
         private void Awake()
         {
+
             configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
             BuildConfigMenu(ConfigMenu.DefaultEditableInstance(), false);
         }
+
+        private void Start()
+        {
+            openAction = SteamVR_Actions._default?.OpenSettingsMenu;
+        }
+
         /// <summary>
         /// Creates a new configuration menu for <paramref name="instanceToEdit"/>. If
         /// <paramref name="turnMenuOn"/>, the configuration menu will be turned on.
@@ -97,7 +104,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void HandleVRUpdate()
         {
-            if (openAction.GetStateDown(inputSource))
+            if (openAction != null && openAction.GetStateDown(inputSource))
             {
                 configMenu.Toggle();
             }

@@ -6,7 +6,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for cylinder game objects.
     /// </summary>
-    public class CylinderFactory : InnerNodeFactory
+    internal class CylinderFactory : InnerNodeFactory
     {
         /// <summary>
         /// Constructor.
@@ -179,7 +179,7 @@ namespace SEE.GO
                 int bottomCapBaseIndex = i * 3;
                 int topCapBaseIndex = (numCapTris + numSideTris) * 3 + i * 3;
 
-                int middleIndex = 0;
+                int middleIndex;
                 if (i == 0)
                 {
                     middleIndex = 0;

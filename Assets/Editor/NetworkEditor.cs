@@ -5,7 +5,9 @@ using UnityEngine;
 
 namespace SEEEditor
 {
-
+    /// <summary>
+    /// Custom editor for <see cref="SEE.Net.Network"/>.
+    /// </summary>
     [CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
@@ -26,17 +28,7 @@ namespace SEEEditor
 
         public override void OnInspectorGUI()
         {
-            SerializedProperty remoteServerIPAddress = serializedObject.FindProperty("remoteServerIPAddress");
-            SerializedProperty localServerPort = serializedObject.FindProperty("localServerPort");
-            SerializedProperty remoteServerPort = serializedObject.FindProperty("remoteServerPort");
-            SerializedProperty loadCityOnStart = serializedObject.FindProperty("loadCityOnStart");
-            SerializedProperty useInOfflineMode = serializedObject.FindProperty("useInOfflineMode");
-            SerializedProperty hostServer = serializedObject.FindProperty("hostServer");
-            SerializedProperty networkCommsLoggingEnabled = serializedObject.FindProperty("networkCommsLoggingEnabled");
-            SerializedProperty internalLoggingEnabled = serializedObject.FindProperty("internalLoggingEnabled");
-            SerializedProperty minimalSeverity = serializedObject.FindProperty("minimalSeverity");
-
-            // Infos
+            // Infos (all read-only)
             showInfos = EditorGUILayout.BeginFoldoutHeaderGroup(showInfos, "Infos");
             if (showInfos)
             {
@@ -57,45 +49,11 @@ namespace SEEEditor
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUILayout.PropertyField(useInOfflineMode);
-
-                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    {
-                        EditorGUILayout.PropertyField(hostServer);
-                    }
-                    EditorGUI.EndDisabledGroup();
-
-                    EditorGUI.BeginDisabledGroup(!useInOfflineMode.boolValue && !hostServer.boolValue);
-                    {
-                        EditorGUILayout.PropertyField(loadCityOnStart, new GUIContent("Load City On Start", "Whether the city should be loaded on start of the application."));
-                    }
-                    EditorGUI.EndDisabledGroup();
-
-                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    {
-                        EditorGUI.BeginDisabledGroup(!hostServer.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(localServerPort, new GUIContent("Local Server Port", "The Port of the local server."));
-                        }
-                        EditorGUI.EndDisabledGroup();
-
-                        EditorGUI.BeginDisabledGroup(hostServer.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(remoteServerIPAddress, new GUIContent("Remote IP-Address", "The IP-Address of the remote server."));
-                            EditorGUILayout.PropertyField(remoteServerPort, new GUIContent("Remote Server Port", "The Port of the remote server."));
-                        }
-                        EditorGUI.EndDisabledGroup();
-                    }
-                    EditorGUI.EndDisabledGroup();
-
-                    #region Vivox
-                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    {
-                        SerializedProperty vivoxChannelName = serializedObject.FindProperty("vivoxChannelName");
-                        EditorGUILayout.PropertyField(vivoxChannelName, new GUIContent("Voice Channel Name", "The name of the voice channel."));
-                    }
-                    EditorGUI.EndDisabledGroup();
-                    #endregion
+                    SetProperty("GameScene", "Loaded Scene", "The name of the scene to be loaded when the game is started.");
+                    SetProperty("loadCityOnStart", "Load City On Start", "Whether the city should be loaded on start of the application.");
+                    SetProperty("ServerActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
+                    SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
+                    SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -106,25 +64,64 @@ namespace SEEEditor
             {
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    EditorGUI.BeginDisabledGroup(useInOfflineMode.boolValue);
-                    {
-                        EditorGUILayout.PropertyField(internalLoggingEnabled, new GUIContent("Internal"));
+                    SetProperty("internalLoggingEnabled", "Internal", "Whether the internal logging should be enabled.");
 
-                        EditorGUILayout.PropertyField(networkCommsLoggingEnabled, new GUIContent("NetworkComms"));
-                        EditorGUI.BeginDisabledGroup(!networkCommsLoggingEnabled.boolValue);
-                        {
-                            EditorGUILayout.PropertyField(minimalSeverity, new GUIContent("NetworkComms Severity"));
-                        }
-                        EditorGUI.EndDisabledGroup();
+                    SerializedProperty networkCommsLoggingEnabled
+                        = SetProperty("networkCommsLoggingEnabled", "NetworkComms", "Whether the logging of NetworkComms should be enabled.");
+                    EditorGUI.BeginDisabledGroup(networkCommsLoggingEnabled != null && !networkCommsLoggingEnabled.boolValue);
+                    {
+                        SetProperty("minimalSeverity", "NetworkComms Severity", "The minimal logged severity.");
                     }
                     EditorGUI.EndDisabledGroup();
                 }
             }
+            EditorGUILayout.EndFoldoutHeaderGroup();
 
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+            Buttons();
+        }
+
+        /// <summary>
+        /// Allows the user to set the property of the <see cref="SEE.Net.Network"/> instance
+        /// edited by this <see cref="NetworkEditor"/>.
+        /// </summary>
+        /// <param name="propertyName">name of the property</param>
+        /// <param name="label">label to be shown to the user</param>
+        /// <param name="toolTip">tool tip to be shown to the user</param>
+        /// <returns>the property with <paramref name="propertyName"/> if any, otherwise null</returns>
+        private SerializedProperty SetProperty(string propertyName, string label, string toolTip)
+        {
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            if (property != null)
+            {
+                EditorGUILayout.PropertyField(property, new GUIContent(label, toolTip));
+            }
+            else
+            {
+                Debug.LogError($"Property {propertyName} does not exist for {typeof(SEE.Net.Network)}.\n");
+            }
+            return property;
+        }
+
+        /// <summary>
+        /// Creates the buttons for loading and saving a network configuration.
+        /// </summary>
+        protected virtual void Buttons()
+        {
+            SEE.Net.Network seeCity = target as SEE.Net.Network;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Load"))
+            {
+                seeCity.Load();
+            }
+            if (GUILayout.Button("Save"))
+            {
+                seeCity.Save();
+            }
+            EditorGUILayout.EndHorizontal();
         }
     }
-
 }
 
 #endif
