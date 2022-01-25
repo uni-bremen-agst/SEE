@@ -49,9 +49,9 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="nodes">nodes whose edges are to be drawn or which are 
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
-        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
+        public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
-            MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
+            MinMaxBlockY(nodes, out _, out _, out float maxHeight);
 
             // The offset of the edges above or below the ground chosen relative 
             // to the height of the largest block.
@@ -63,10 +63,10 @@ namespace SEE.Layout.EdgeLayouts
             // or above the house (depending on the orientation).
             float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
 
-            foreach (ILayoutEdge edge in edges)
+            foreach (ILayoutEdge<T> edge in edges)
             {
-                ILayoutNode source = edge.Source;
-                ILayoutNode target = edge.Target;
+                T source = edge.Source;
+                T target = edge.Target;
                 // define the points along the line
                 Vector3 start;
                 Vector3 end;
