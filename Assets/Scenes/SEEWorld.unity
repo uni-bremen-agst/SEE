@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 11b30e62ce68af4478c801d9ca4e972b, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.14211552, g: 0.1494268, b: 0.16841255, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1414,6 +1414,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
@@ -1504,12 +1507,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 5
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -8217,14 +8226,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658210135}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: -0.00000016292068}
+  m_LocalRotation: {x: -0, y: -0.9396927, z: 0, w: -0.34202012}
   m_LocalPosition: {x: -1.421, y: 0.017, z: 1.045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1857875285}
   m_Father: {fileID: 0}
   m_RootOrder: 13
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -220, z: 0}
 --- !u!1 &670490534
 GameObject:
   m_ObjectHideFlags: 0
@@ -8962,6 +8971,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
@@ -9052,12 +9064,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -9510,8 +9528,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 838370050}
-  m_LocalRotation: {x: 0.009525288, y: 0.04280458, z: 0.005310355, w: 0.999024}
-  m_LocalPosition: {x: -1.0936024, y: -0.00022280558, z: 0.025373483}
+  m_LocalRotation: {x: 0.00952531, y: 0.04280457, z: 0.005310325, w: 0.99902403}
+  m_LocalPosition: {x: -1.0936027, y: -0.00022287681, z: 0.025373349}
   m_LocalScale: {x: 1.0000002, y: 1, z: 1}
   m_Children:
   - {fileID: 1923101515}
@@ -10479,6 +10497,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
@@ -10569,12 +10590,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11491,8 +11518,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1305833927}
-  m_LocalRotation: {x: -0.000000004948354, y: 7.1054265e-15, z: -0, w: 1}
-  m_LocalPosition: {x: 0.019999998, y: 0.0000000018626451, z: 5.6667476e-11}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.02, y: 0.0000000055879354, z: 5.9604627e-10}
   m_LocalScale: {x: 0.83679825, y: 0.83679825, z: 0.83679825}
   m_Children:
   - {fileID: 838370051}
@@ -11709,6 +11736,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
@@ -11799,12 +11829,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12509,8 +12545,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463535303}
-  m_LocalRotation: {x: 0.5000002, y: 0.49999988, z: -0.5000002, w: 0.49999988}
-  m_LocalPosition: {x: 0.0000000034246215, y: 0.010510089, z: -0.011465507}
+  m_LocalRotation: {x: 0.5000001, y: 0.49999988, z: -0.5000001, w: 0.49999985}
+  m_LocalPosition: {x: -0.000000007450581, y: 0.010510037, z: -0.011465516}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1305833928}
@@ -12842,6 +12878,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 2
     - Name: Kind
       Entry: 3
       Data: 0
@@ -12932,12 +12971,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 2
     - Name: Kind
       Entry: 3
       Data: 5
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -13039,12 +13084,8 @@ MonoBehaviour:
       Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 7
-      Data: 14|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13056,11 +13097,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13072,11 +13113,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13088,11 +13129,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 14
+      Data: 3
     - Name: 
       Entry: 12
       Data: 0
@@ -13113,7 +13154,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 18|SEE.Game.City.ErosionAttributes, SEE
+      Data: 17|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -14285,6 +14326,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 0
@@ -14375,12 +14419,18 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 0
     - Name: Kind
       Entry: 3
       Data: 5
     - Name: InnerDonutMetric
       Entry: 1
       Data: Metric.IssuesTotal
+    - Name: ShowNames
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
