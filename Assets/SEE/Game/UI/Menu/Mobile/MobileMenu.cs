@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Michsky.UI.ModernUIPack;
 using SEE.Utils;
+using SEE.GO;
+using UnityEngine.UI;
+using TMPro;
 
 namespace SEE.Game.UI.Menu
 {
@@ -63,6 +66,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private Transform quickMenuPanel;
 
+
         protected override void StartMobile()
         {
             initialiseMobileMenu(); 
@@ -70,7 +74,28 @@ namespace SEE.Game.UI.Menu
 
         protected override void UpdateMobile()
         {
-            // Empty method because mobile UI doesn't need to be changed per frame
+            if (MenuShown != CurrentMenuShown)
+            {
+                if (MenuShown)
+                {
+                    // Move window to the top of the hierarchy (which, confusingly, is actually at the bottom)
+                    // so that this menu is rendered over any other potentially existing menu on the UI canvas
+                    MenuGameObject.transform.SetAsLastSibling();
+                    if (Manager)
+                    {
+                        Manager.OpenWindow();
+                    }
+                }
+                else
+                {
+                    if (Manager)
+                    {
+                        Manager.CloseWindow();
+                    }
+                }
+
+                CurrentMenuShown = MenuShown;
+            }
         }
 
         /// <summary>
@@ -80,55 +105,63 @@ namespace SEE.Game.UI.Menu
         {
             #region set up buttons
 
-            MobileMenuGameObject = PrefabInstantiator.InstantiatePrefab(MOBLIE_MENU_PREFAB, Canvas.transform, false);
-
-            menuPanelVertical = MobileMenuGameObject.transform.Find("Vertical Panel");
-            menuPanelHorizontal = MobileMenuGameObject.transform.Find("Horizontal Panel");
-            quickMenuPanel = MobileMenuGameObject.transform.Find("Left Panel");
-
-
-            addMobileButtons(Entries);
-
-            //initially set all buttons but the first ones inactive
-            for (int i = 1; i < buttons.Length; i++)
+            if (Entries.Count == 3)
             {
-                for (int j = 0; j < buttons[i].Length; j++)
+                SetUpDesktopWindow();
+                SetUpDesktopContent();
+            }
+            else // count == 21
+            {
+                MobileMenuGameObject = PrefabInstantiator.InstantiatePrefab(MOBLIE_MENU_PREFAB, Canvas.transform, false);
+
+                menuPanelVertical = MobileMenuGameObject.transform.Find("Vertical Panel");
+                menuPanelHorizontal = MobileMenuGameObject.transform.Find("Horizontal Panel");
+                quickMenuPanel = MobileMenuGameObject.transform.Find("Left Panel");
+
+                addMobileButtons(Entries);
+
+                //initially set all buttons but the first ones inactive
+                for (int i = 1; i < buttons.Length; i++)
                 {
-                    buttons[i][j].SetActive(false);
+                    for (int j = 0; j < buttons[i].Length; j++)
+                    {
+                        buttons[i][j].SetActive(false);
+                    }
                 }
-            }
 
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                //add listener to expand menu
-                int clickedIndex = i;
-                buttons[i][0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => selectMode(clickedIndex));
-                for (int j = 0; j < buttons[i].Length; j++)
+                for (int i = 0; i < buttons.Length; i++)
                 {
-                    if (j == 0 && i > 0)
+                    //add listener to expand menu
+                    int clickedIndex = i;
+                    buttons[i][0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => selectMode(clickedIndex));
+                    for (int j = 0; j < buttons[i].Length; j++)
                     {
-                        buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Vertical Panel"));
-                        
+                        if (j == 0 && i > 0)
+                        {
+                            buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Vertical Panel"));
+
+                        }
+                        else
+                        {
+                            buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Horizontal Panel"));
+                        }
                     }
-                    else
-                    {
-                        buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Horizontal Panel"));
-                    }
-                }       
+                }
+
+                Sprite arrowLeftSprite = Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold");
+
+                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
+                Sprite arrowRightSprite = Resources.Load<Sprite>("Icons/Arrow Bold Right");
+
+                for (int i = 0; i < quickButtons.Length; i++)
+                {
+                    quickButtons[i].SetActive(false);
+                }
+
+                quickButtons[5].SetActive(true);
+                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => expandButton(arrowLeftSprite, arrowRightSprite));
             }
-
-            Sprite arrowLeftSprite = Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold");
-            Sprite arrowRightSprite = Resources.Load<Sprite>("Icons/Arrow Bold Right");
-
-            quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
-
-            for (int i = 0; i < quickButtons.Length; i++)
-            {
-                quickButtons[i].SetActive(false);
-            }
-
-            quickButtons[5].SetActive(true);
-            quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => expandButton(arrowLeftSprite, arrowRightSprite));
+            
             #endregion
         }
 

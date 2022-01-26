@@ -172,6 +172,11 @@ namespace SEE.Game.UI.Tooltip
             }
         }
 
+        protected override void StartMobile()
+        {
+            // mobile does not need tooltip because there is no hovering
+        }
+
         private void OnDestroy()
         {
             fadeIn.Kill();

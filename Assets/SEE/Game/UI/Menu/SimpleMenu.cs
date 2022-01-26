@@ -140,6 +140,9 @@ namespace SEE.Game.UI.Menu
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     break;
+                case PlayerInputType.MobilePlayer:
+                    HideAfterSelectionDesktop(hide);
+                    break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
                 default:

@@ -84,6 +84,8 @@ namespace SEE.Game.UI.PropertyDialog
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     break;
+                case PlayerInputType.MobilePlayer:
+                    break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
                 default:
@@ -108,6 +110,8 @@ namespace SEE.Game.UI.PropertyDialog
                 case PlayerInputType.VRPlayer:
                     break;
                 case PlayerInputType.HoloLensPlayer:
+                    break;
+                case PlayerInputType.MobilePlayer:
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;

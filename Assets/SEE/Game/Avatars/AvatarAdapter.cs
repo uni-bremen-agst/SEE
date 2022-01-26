@@ -156,7 +156,7 @@ namespace SEE.Game.Avatars
             GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
             vrPlayer.name = PlayerInputType.DesktopPlayer.ToString();
             vrPlayer.transform.SetParent(gameObject.transform);
- //           gameObject.AddComponent<XRPlayerMovement>();
+            gameObject.AddComponent<XRPlayerMovement>();
         }
 
         /// <summary>
@@ -196,13 +196,9 @@ namespace SEE.Game.Avatars
 
         private void PrepareForMobile()
         {
-            // Set up the desktop player at the top of the player just in front of it.
             GameObject mobilePlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/MobilePlayer");
             mobilePlayer.name = PlayerInputType.MobilePlayer.ToString();
             mobilePlayer.transform.SetParent(gameObject.transform);
-            mobilePlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
-            mobilePlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
-
             gameObject.AddComponent<MobilePlayerMovement>();
         }
     }
