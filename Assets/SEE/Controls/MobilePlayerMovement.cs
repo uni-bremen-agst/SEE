@@ -7,7 +7,7 @@ namespace SEE.Controls
     public class MobilePlayerMovement : PlayerMovement
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 0.5f;
+        public float Speed = 1f;
 
         /// <summary>
         /// Handles the camera movement
@@ -125,10 +125,10 @@ namespace SEE.Controls
               
                 v.Normalize();
                 v *= speed; 
-                mainCamera.transform.position += v;
+                transform.position += v;
 
                 HandleRotation();
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
             }
         }
 
@@ -142,8 +142,8 @@ namespace SEE.Controls
             float _yMovementInput = joystickRight.Vertical;
 
             //roatation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
-            cameraState.pitch = Mathf.Repeat(cameraState.pitch - _yMovementInput * Speed, 360f);
-            cameraState.yaw = Mathf.Repeat(cameraState.yaw + _xMovementInput * Speed, 360f);
+            cameraState.pitch = Mathf.Repeat(cameraState.pitch - _yMovementInput, 360f);
+            cameraState.yaw = Mathf.Repeat(cameraState.yaw + _xMovementInput, 360f);
 
         }
     }

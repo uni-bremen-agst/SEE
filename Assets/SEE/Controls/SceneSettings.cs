@@ -12,8 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+#if UNITY_ANDROID
+#else
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Controls
 {
@@ -168,6 +171,8 @@ namespace SEE.Controls
         private void Start()
         {
             SetInstance();
+#if UNITY_ANDROID
+#else
             // Turn off VR controller hints if requested in the user settings.
             if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
@@ -182,6 +187,7 @@ namespace SEE.Controls
                     Teleport.instance.CancelTeleportHint();
                 }
             }
+#endif
 #if UNITY_EDITOR
             KeyBindings.PrintBindings();
 #endif
@@ -261,7 +267,10 @@ namespace SEE.Controls
                     Vector3 position = Ground.transform.position;
                     position.y += 0.01f;
                     GameObject clonedFloor = Instantiate(Ground, position, Ground.transform.rotation);
+#if UNITY_ANDROID
+#else
                     clonedFloor.AddComponent<TeleportArea>();
+#endif
                 }
                 {
                     // Assign the VR camera to the chart manager so that charts can move along with the camera.
@@ -305,10 +314,11 @@ namespace SEE.Controls
             // Add a city collection
             GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
             cityCollection.name = CityCollectionName;
-
+#if UNITY_ANDROID
+#else
             // Hide all decoration to improve performance.
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
-
+#endif
             {
                 // Set selected experience scale.
                 MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = ExperienceScale;
@@ -335,7 +345,7 @@ namespace SEE.Controls
                 }
             }
 
-            #region Local Methods
+#region Local Methods
             //Scales the city by factor and pretend it to collection
             static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
             {
@@ -376,7 +386,7 @@ namespace SEE.Controls
                 return cityContainer;
             }
 
-            #endregion
+#endregion
         }
 
         /// <summary>
@@ -387,6 +397,8 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
+#if UNITY_ANDROID
+#else
             if (playerInputType == PlayerInputType.VRPlayer)
             {
                 foreach (Hand hand in Player.instance.hands)
@@ -403,6 +415,7 @@ namespace SEE.Controls
                     }
                 }
             }
+#endif
             if (SEEInput.Help())
             {
                 KeyBindings.PrintBindings();

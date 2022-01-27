@@ -199,6 +199,8 @@ namespace SEE.Game.Avatars
             GameObject mobilePlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/MobilePlayer");
             mobilePlayer.name = PlayerInputType.MobilePlayer.ToString();
             mobilePlayer.transform.SetParent(gameObject.transform);
+            mobilePlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
+            mobilePlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
             gameObject.AddComponent<MobilePlayerMovement>();
         }
     }
