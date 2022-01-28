@@ -208,8 +208,7 @@ namespace SEE.Controls
         /// The interactable component, that is used by SteamVR. The interactable
         /// component is attached to <code>this.gameObject</code>.
         /// </summary>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private Interactable interactable;
 #endif
 
