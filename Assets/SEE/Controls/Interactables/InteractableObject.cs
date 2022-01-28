@@ -7,8 +7,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using Valve.VR.InteractionSystem;
 #endif
 using SEE.Game;
