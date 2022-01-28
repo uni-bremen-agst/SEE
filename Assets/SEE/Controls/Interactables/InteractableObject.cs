@@ -957,8 +957,7 @@ namespace SEE.Controls
         // These methods are called by SteamVR by way of the interactable.
         // <see cref="Hand.Update"/>
         //----------------------------------------------------------------
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private const Hand.AttachmentFlags AttachmentFlags
             = Hand.defaultAttachmentFlags
             & ~Hand.AttachmentFlags.SnapOnAttach
