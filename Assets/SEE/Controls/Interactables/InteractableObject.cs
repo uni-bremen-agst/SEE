@@ -247,8 +247,7 @@ namespace SEE.Controls
                 SetGrab(false, true);
             }
             GraphElemRef = null;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             interactable = null;
 #endif
         }
