@@ -607,8 +607,7 @@ namespace SEE.Controls
                 new Net.SetGrabAction(this, grab).Execute();
                 if (grab)
                 {
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
                     InteractableSynchronizer = interactable.gameObject.AddComponent<Net.Synchronizer>();
 #endif
                 }
