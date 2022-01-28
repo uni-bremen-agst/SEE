@@ -193,7 +193,9 @@ namespace SEE.Game.Avatars
 
             gameObject.AddComponent<DesktopPlayerMovement>();
         }
-
+        /// <summary>
+        /// Prepares the avatar for a mobile environment. Simular to <see cref="PrepareForDesktop()"/>
+        /// </summary>
         private void PrepareForMobile()
         {
             GameObject mobilePlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/MobilePlayer");

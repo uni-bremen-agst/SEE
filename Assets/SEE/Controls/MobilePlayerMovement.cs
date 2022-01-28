@@ -3,7 +3,9 @@ using UnityEngine;
 using SEE.UI;
 namespace SEE.Controls
 {
-
+    /// <summary>
+    /// Moves a player in a mobile environment (via virtual joysticks).
+    /// </summary>
     public class MobilePlayerMovement : PlayerMovement
     {
         [Tooltip("Speed of movements")]
@@ -49,6 +51,9 @@ namespace SEE.Controls
         /// </summary>
         private const string JOYSTICK_PREFAB_RIGHT = "Prefabs/UI/FixedJoystickRight";
 
+        /// <summary>
+        /// State of the main camera in the szene
+        /// </summary>
         private struct CameraState
         {
             internal float distance;
@@ -87,7 +92,7 @@ namespace SEE.Controls
             }
             else
             {
-                // Use the inital camera rotation.
+                // Use the initial camera rotation.
                 Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
                 cameraState.yaw = rotation.y;
                 cameraState.pitch = rotation.x;
@@ -113,19 +118,19 @@ namespace SEE.Controls
             {
                 
                 //Taking the joystick inputs
-                float _xMovementInput = joystickLeft.Horizontal;
-                float _yMovementInput = joystickLeft.Vertical;
+                float xMovementInput = joystickLeft.Horizontal;
+                float yMovementInput = joystickLeft.Vertical;
 
                 //calculating velocity vectors
-                Vector3 _movementHorizontal = transform.right * _xMovementInput;
-                Vector3 _movementVertical = transform.forward * _yMovementInput;
+                Vector3 movementHorizontal = transform.right * xMovementInput;
+                Vector3 movementVertical = transform.forward * yMovementInput;
 
                 //calculate final movement velocity vector
-                Vector3 v = (_movementHorizontal + _movementVertical);
+                Vector3 velocity = (movementHorizontal + movementVertical);
               
-                v.Normalize();
-                v *= speed; 
-                transform.position += v;
+                velocity.Normalize();
+                velocity *= speed; 
+                transform.position += velocity;
 
                 HandleRotation();
                 transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
@@ -138,12 +143,12 @@ namespace SEE.Controls
         private void HandleRotation()
         {
             //Taking the joystick inputs
-            float _xMovementInput = joystickRight.Horizontal;
-            float _yMovementInput = joystickRight.Vertical;
+            float xMovementInput = joystickRight.Horizontal;
+            float yMovementInput = joystickRight.Vertical;
 
-            //roatation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
-            cameraState.pitch = Mathf.Repeat(cameraState.pitch - _yMovementInput, 360f);
-            cameraState.yaw = Mathf.Repeat(cameraState.yaw + _xMovementInput, 360f);
+            //rotation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
+            cameraState.pitch = Mathf.Repeat(cameraState.pitch - yMovementInput, 360f);
+            cameraState.yaw = Mathf.Repeat(cameraState.yaw + xMovementInput, 360f);
 
         }
     }

@@ -26,8 +26,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
         /// </summary>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private GrammarInput input;
 #endif
 
@@ -55,12 +54,8 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
-#if UNITY_ANDROID
-            try
-            {
+#if !UNITY_ANDROID
 
-            }
-#else
             try
             {
                 input = new GrammarInput(GrammarFilePath.Path);
@@ -71,12 +66,13 @@ namespace SEE.Game.Avatars
                     enabled = false;
                 }
             }
-#endif
+
             catch (Exception e)
             {
                 Debug.LogError($"Failure in starting speech recognition with grammar file {GrammarFilePath}: {e.Message}\n");
                 enabled = false;
             }
+#endif
         }
 
         /// <summary>
@@ -84,8 +80,7 @@ namespace SEE.Game.Avatars
         /// sentence was recognized.
         /// </summary>
         /// <param name="args">details about the recognized sentence</param>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
             // Debug.Log($"Detected phrase '{args.text}' with confidence {args.confidence}\n");

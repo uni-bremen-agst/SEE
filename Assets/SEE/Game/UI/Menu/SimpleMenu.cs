@@ -5,8 +5,7 @@ using SEE.Controls;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using UnityEngine.Windows.Speech;
 #endif
 
@@ -94,8 +93,7 @@ namespace SEE.Game.UI.Menu
         public void ShowMenu(bool show)
         {
             MenuShown = show;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             Listen(show);
 #endif
         }
@@ -154,8 +152,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The keyword recognizer used to detect the spoken menu entry titles.
         /// </summary>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private KeywordInput keywordInput;
 #endif
 /// <summary>
@@ -166,8 +163,7 @@ namespace SEE.Game.UI.Menu
 /// </summary>
 /// <param name="listen">whether <see cref="keywordInput"/> should be
 /// listening</param>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private void Listen(bool listen)
         {
             if (listen)
@@ -226,8 +222,7 @@ namespace SEE.Game.UI.Menu
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
         private void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
         {
             int i = 0;

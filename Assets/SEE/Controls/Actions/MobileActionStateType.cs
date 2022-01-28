@@ -24,18 +24,19 @@ namespace SEE.Controls.Actions
 
         #region Static Types
 
-        //select
+        // Comment are just for orientation because the entries below will only be passed in AllTypes list
+        // select button group on the right side
         public static MobileActionStateType Select { get; } =
             new MobileActionStateType(0, "Select", "Mode to select objects",
                 Color.white.Darker(), "Materials/Charts/MoveIcon", DeleteAction.CreateReversibleAction);
         public static MobileActionStateType Deselect { get; } =
             new MobileActionStateType(1, "Deselect", "Deselect object",
                 Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
-        //delete
+        // delete button group on the right side
         public static MobileActionStateType Delete { get; } =
             new MobileActionStateType(2, "Delete", "Delete a node on touch",
                 Color.white.Darker(), "Materials/ModernUIPack/Trash", DeleteAction.CreateReversibleAction);
-        //delete multi
+        // delete multi button group on the right side
         public static MobileActionStateType DeleteMulti { get; } =
             new MobileActionStateType(3, "Delete Multi", "Delete Multi Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Minus", DeleteAction.CreateReversibleAction);
@@ -45,7 +46,7 @@ namespace SEE.Controls.Actions
         public static MobileActionStateType AcceptDeletion { get; } =
             new MobileActionStateType(5, "Accept Deletion", "Accept the deletion of the selected objects",
                 Color.white.Darker(), "Materials/ModernUIPack/Check Bold", DeleteAction.CreateReversibleAction);
-        //rotate
+        // rotate button group on the right side
         public static MobileActionStateType Rotate { get; } =
             new MobileActionStateType(6, "Rotate", "Rotation Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
@@ -61,7 +62,7 @@ namespace SEE.Controls.Actions
         public static MobileActionStateType LockedCenter { get; } =
             new MobileActionStateType(10, "Locked Around Center Mode", "Locked Around Center Mode",
                 Color.white.Darker(), "Materials/GoogleIcons/ic_settings_backup_restore_white_48dp", DeleteAction.CreateReversibleAction);
-        //move
+        // move button groube on the right side
         public static MobileActionStateType Move { get; } =
             new MobileActionStateType(11, "Move", "Move Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
@@ -75,7 +76,7 @@ namespace SEE.Controls.Actions
             new MobileActionStateType(14, "8-Directions Mode", "8-Directions Mode",
                 Color.white.Darker(), "Materials/ModernUIPack/Plus", DeleteAction.CreateReversibleAction);
 
-        // Quick Menu Group
+        // Quick Menu Group on the left side
         public static MobileActionStateType Redo { get; } =
             new MobileActionStateType(15, "Redo Action", "Redo Action",
                 Color.white.Darker(), "Materials/GoogleIcons/ic_redo_white_48dp", DeleteAction.CreateReversibleAction);

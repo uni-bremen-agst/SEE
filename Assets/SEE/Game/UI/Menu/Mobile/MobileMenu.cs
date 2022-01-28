@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Michsky.UI.ModernUIPack;
 using SEE.Utils;
-using SEE.GO;
-using UnityEngine.UI;
-using TMPro;
 
 namespace SEE.Game.UI.Menu
 {
@@ -47,7 +44,7 @@ namespace SEE.Game.UI.Menu
         private GameObject[] quickButtons = new GameObject[6];
 
         /// <summary>
-        /// bool if the menu on the right is expanded or not 
+        /// Whether the menu on the right is expanded or not 
         /// </summary>
         private bool expanded = false;
 
@@ -93,7 +90,6 @@ namespace SEE.Game.UI.Menu
                         Manager.CloseWindow();
                     }
                 }
-
                 CurrentMenuShown = MenuShown;
             }
         }
@@ -105,12 +101,14 @@ namespace SEE.Game.UI.Menu
         {
             #region set up buttons
 
-            if (Entries.Count == 3)
+            if (Entries.Count == 3) // for the entry menu the entries count is 3 (Host, Client, Settings),
+                                    // therefore the menu need to be set up in the desktop way  
             {
                 SetUpDesktopWindow();
                 SetUpDesktopContent();
             }
-            else // count == 21
+            else // count == 21 -> represents all entries in the mobile menu. The following set uo depends on 
+                 // a correct count and order of the entries
             {
                 MobileMenuGameObject = PrefabInstantiator.InstantiatePrefab(MOBLIE_MENU_PREFAB, Canvas.transform, false);
 
@@ -120,15 +118,6 @@ namespace SEE.Game.UI.Menu
 
                 addMobileButtons(Entries);
 
-                //initially set all buttons but the first ones inactive
-                for (int i = 1; i < buttons.Length; i++)
-                {
-                    for (int j = 0; j < buttons[i].Length; j++)
-                    {
-                        buttons[i][j].SetActive(false);
-                    }
-                }
-
                 for (int i = 0; i < buttons.Length; i++)
                 {
                     //add listener to expand menu
@@ -136,39 +125,44 @@ namespace SEE.Game.UI.Menu
                     buttons[i][0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => selectMode(clickedIndex));
                     for (int j = 0; j < buttons[i].Length; j++)
                     {
+                        if (i > 0)
+                        {
+                            buttons[i][j].SetActive(false);
+                        }
                         if (j == 0 && i > 0)
                         {
-                            buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Vertical Panel"));
-
+                            buttons[i][j].transform.SetParent(menuPanelVertical);
                         }
                         else
                         {
-                            buttons[i][j].transform.SetParent(MobileMenuGameObject.transform.Find("Horizontal Panel"));
+                            buttons[i][j].transform.SetParent(menuPanelHorizontal);
                         }
                     }
                 }
 
                 Sprite arrowLeftSprite = Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold");
-
-                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
                 Sprite arrowRightSprite = Resources.Load<Sprite>("Icons/Arrow Bold Right");
 
-                for (int i = 0; i < quickButtons.Length; i++)
+                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
+
+                foreach (GameObject btn in quickButtons)
                 {
-                    quickButtons[i].SetActive(false);
+                    btn.SetActive(false);
                 }
 
                 quickButtons[5].SetActive(true);
-                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => expandButton(arrowLeftSprite, arrowRightSprite));
+                quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() 
+                    => expandButton(arrowLeftSprite, arrowRightSprite));
             }
             
             #endregion
         }
 
         /// <summary>
-        /// Adds the given <param name="buttonEntries"></param> as buttons to the mobile Menu
+        /// Adds the given <paramref name="buttonEntries"></param> as buttons to the mobile Menu.
+        /// The entries are to be expected in order such as declared./>
         /// </summary>
-        /// <param name="buttonEntries">The entries to add to the menu</param> 
+        /// <param name="buttonEntries">The entries to add to the menu in an orderd IEnumerable</param> 
         protected void addMobileButtons(IEnumerable<T> buttonEntries)
         {
             GameObject[] selectButtons = new GameObject[2];
@@ -283,7 +277,7 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Selects the clicked button by its <param name="ClickedIndex"></param> and moves it to the top
+        /// Selects the clicked button by its <paramref name="ClickedIndex"></param> and moves it to the top
         /// </summary>
         /// <param name="ClickedIndex">Index of the clicked button</param>
         private void selectMode(int ClickedIndex)
