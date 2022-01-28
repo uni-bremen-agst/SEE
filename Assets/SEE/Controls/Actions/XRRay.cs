@@ -1,5 +1,4 @@
-﻿#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
