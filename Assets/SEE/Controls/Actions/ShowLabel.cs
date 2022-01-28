@@ -6,8 +6,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using Valve.VR.InteractionSystem;
 #endif
 
