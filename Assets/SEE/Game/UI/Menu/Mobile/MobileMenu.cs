@@ -316,7 +316,7 @@ namespace SEE.Game.UI.Menu
                     buttons[ClickedIndex][k].transform.SetParent(menuPanelHorizontal);
                     buttons[ClickedIndex][k].SetActive(true);
                 }
-            expanded = false;
+                expanded = false;
             }
             else
             {
