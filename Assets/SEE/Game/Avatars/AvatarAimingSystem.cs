@@ -138,14 +138,21 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            // Switch aim poses (Legacy animation)
-            Pose();
-
-            // Update IK solvers
-            aim.solver.Update();
-            if (lookAt != null)
+            if (isPointing)
             {
-                lookAt.solver.Update();
+                // Switch aim poses (Legacy animation)
+                Pose();
+
+                // Update IK solvers
+                aim.solver.Update();
+                if (lookAt != null)
+                {
+                    lookAt.solver.Update();
+                }
+            }
+            else
+            {
+                AimTowards(Vector3.down);
             }
         }
 
@@ -164,6 +171,11 @@ namespace SEE.Game.Avatars
             // Getting the direction relative to the root transform
             Vector3 localDirection = transform.InverseTransformDirection(direction);
 
+            AimTowards(localDirection);
+        }
+
+        private void AimTowards(Vector3 localDirection)
+        {
             // Get the Pose from AimPoser
             aimPose = aimPoser.GetPose(localDirection);
 
