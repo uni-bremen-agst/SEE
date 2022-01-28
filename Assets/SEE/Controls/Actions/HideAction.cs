@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
-        private HashSet<GameObject> selectedObjects = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> selectedObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// The list of currently hidden objects.
@@ -421,9 +421,6 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null)
             {
-                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject;
-                List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
-
                 foreach (GameObject g in transparentObjects)
                 {
                     g.SetTransparency(1f);
