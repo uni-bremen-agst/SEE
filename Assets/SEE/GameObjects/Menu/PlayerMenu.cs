@@ -22,6 +22,11 @@ namespace SEE.GO.Menu
         private SelectionMenu ModeMenu;
 
         /// <summary>
+        /// The UI object representing the  mobile menu the user chooses the action state from.
+        /// </summary>
+        private SimpleMenu MobileMenu;
+
+        /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
         private ActionStateIndicator Indicator;
@@ -70,6 +75,44 @@ namespace SEE.GO.Menu
 
             #endregion
         }
+        /// <summary>
+        /// This creates and returns the mobile menu, with which you can select the active game mode.
+        ///
+        /// Available modes can be found in <see cref="MobileActionStateType"/>.
+        /// </summary>
+        /// <returns>the newly created menu component.</returns>
+        private static SimpleMenu CreateMenu(GameObject attachTo = null)
+        {
+
+            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
+
+            // IMPORTANT NOTE: Because an ActionStateType value will be used as an index into
+            // the following field of menu entries, the rank of an entry in this field of entry
+            // must correspond to the ActionStateType value. If this is not the case, we will
+            // run into an endless recursion.
+
+            MobileActionStateType firstType = MobileActionStateType.AllTypes.First();
+            List<MenuEntry> entries = MobileActionStateType.AllTypes.Select(ToMenuEntry).ToList();
+
+            // Initial state will be the first action state type
+            GlobalActionHistory.ExecuteMoblie(firstType);
+
+            SimpleMenu menu = modeMenuGO.AddComponent<SimpleMenu>();
+            menu.Title = "Mobile Menu";
+            menu.Description = "Please select the mode you want to activate.";
+            menu.AddEntries(entries);
+
+            return menu;
+
+            // Constructs a toggle menu entry for the mode menu from the given action state type.
+            MenuEntry ToMenuEntry(MobileActionStateType type) =>
+                new MenuEntry(
+                    action: () => GlobalActionHistory.ExecuteMoblie(type), title: type.Name,
+                    description: type.Description, entryColor: type.Color,
+                    icon: Resources.Load<Sprite>(type.IconPath));
+
+        }
 
         /// <summary>
         /// This creates and returns the <see cref="StateIndicator.ActionStateIndicator"/>, which displays the current mode.
@@ -89,17 +132,26 @@ namespace SEE.GO.Menu
 
         private void Start()
         {
-            ModeMenu = CreateModeMenu(gameObject);
-            Indicator = CreateActionStateIndicator(gameObject);
-            // Whenever the state is changed, the action state indicator should reflect that
-            ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
-            // Initialize action state indicator to current action state
-            SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
-
-            void SetIndicatorStateToEntry(ToggleMenuEntry entry)
+            if (PlayerSettings.GetInputType() == PlayerInputType.MobilePlayer)
             {
-                Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+                CreateMenu(gameObject);
+
             }
+            else
+            {
+                ModeMenu = CreateModeMenu(gameObject);
+                Indicator = CreateActionStateIndicator(gameObject);
+                // Whenever the state is changed, the action state indicator should reflect that
+                ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
+                // Initialize action state indicator to current action state
+                SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
+
+                void SetIndicatorStateToEntry(ToggleMenuEntry entry)
+                {
+                    Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+                }
+            }
+            
         }
 
         /// <summary>
@@ -108,53 +160,57 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            try
+            if (PlayerSettings.GetInputType() != PlayerInputType.MobilePlayer)
             {
-                // Select action state via numbers on the keyboard
-                for (int i = 0; i < ModeMenu.Entries.Count; i++)
+                try
                 {
-                    if (SEEInput.DigitKeyPressed(i))
+                    // Select action state via numbers on the keyboard
+                    for (int i = 0; i < ModeMenu.Entries.Count; i++)
                     {
-                        ModeMenu.SelectEntry(i);
-                        break;
+                        if (SEEInput.DigitKeyPressed(i))
+                        {
+                            ModeMenu.SelectEntry(i);
+                            break;
+                        }
                     }
-                }
-                if (SEEInput.ToggleMenu())
-                {
-                    ModeMenu.ToggleMenu();
-                }
-                if (SEEInput.Undo())
-                {
-                    GlobalActionHistory.Undo();
+                    if (SEEInput.ToggleMenu())
+                    {
+                        ModeMenu.ToggleMenu();
+                    }
+                    if (SEEInput.Undo())
+                    {
+                        GlobalActionHistory.Undo();
 
-                    if (GlobalActionHistory.IsEmpty())
-                    {
-                        // We always want to have an action running.
-                        // The default action will be the first action state type.
-                        ActionStateType firstType = ActionStateType.AllTypes.First();
-                        GlobalActionHistory.Execute(firstType);
+                        if (GlobalActionHistory.IsEmpty())
+                        {
+                            // We always want to have an action running.
+                            // The default action will be the first action state type.
+                            ActionStateType firstType = ActionStateType.AllTypes.First();
+                            GlobalActionHistory.Execute(firstType);
+                        }
+                        ActionStateType currentAction = GlobalActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
                     }
-                    ActionStateType currentAction = GlobalActionHistory.Current();
-                    SetPlayerMenu(currentAction.Name);
-                    Indicator.ChangeActionState(currentAction);
+                    else if (SEEInput.Redo())
+                    {
+                        GlobalActionHistory.Redo();
+                        ActionStateType currentAction = GlobalActionHistory.Current();
+                        SetPlayerMenu(currentAction.Name);
+                        Indicator.ChangeActionState(currentAction);
+                    }
+                    GlobalActionHistory.Update();
                 }
-                else if (SEEInput.Redo())
+                //TODO: This probably shouldn't catch *all* exceptions in this way.
+                catch (Exception e)
                 {
-                    GlobalActionHistory.Redo();
-                    ActionStateType currentAction = GlobalActionHistory.Current();
-                    SetPlayerMenu(currentAction.Name);
-                    Indicator.ChangeActionState(currentAction);
-                }
-                GlobalActionHistory.Update();
-            }
-            //TODO: This probably shouldn't catch *all* exceptions in this way.
-            catch (Exception e)
-            {
-                ShowNotification.Error("Action Error", e.Message);
+                    ShowNotification.Error("Action Error", e.Message);
 #if UNITY_EDITOR
-                throw;
+                    throw;
 #endif
+                }
             }
+            
         }
 
         /// <summary>
