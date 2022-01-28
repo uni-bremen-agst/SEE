@@ -12,8 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 #endif
