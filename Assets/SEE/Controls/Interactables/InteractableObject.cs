@@ -225,8 +225,7 @@ namespace SEE.Controls
 
         private void Awake()
         {
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
