@@ -1,5 +1,4 @@
-﻿#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
 using UnityEngine.Windows.Speech;
 using static UnityEngine.Windows.Speech.PhraseRecognizer;
 
