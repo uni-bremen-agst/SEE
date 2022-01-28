@@ -20,7 +20,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The name of the animator's parameter for forward speed.
         /// </summary>
-        private const string ForwardSpeedParameterName = "ForwardXSpeed";
+        private const string ForwardSpeedParameterName = "ForwardSpeed";
         /// <summary>
         /// The name of the animator's parameter for sideward speed.
         /// </summary>
