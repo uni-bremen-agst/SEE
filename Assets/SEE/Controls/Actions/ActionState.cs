@@ -36,6 +36,11 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// The type of the state-based action. Upon changing this type,
+        /// the event <see cref="OnStateChangedFn"/> will be triggered with
+        /// the currently set action type. 
+        /// </summary>
         public static MobileActionStateType MobileValue
         {
             get => mobileValue;
@@ -70,12 +75,18 @@ namespace SEE.Controls.Actions
         /// <param name="value">the new action state</param>
         public delegate void OnStateChangedFn(ActionStateType value);
 
+        /// <summary>
+        /// A delegate to be called upon a change of the action state.
+        /// </summary>
+        /// <param name="mobileValue">the new action state</param>
         public delegate void OnMobileStateChangedFn(MobileActionStateType mobileValue);
         /// <summary>
         /// Event that is triggered when the action is assigned a new action state to.
         /// </summary>
         public static event OnStateChangedFn OnStateChanged;
-
+        /// <summary>
+        /// Event that is triggered when the action is assigned a new action state to.
+        /// </summary>
         public static event OnMobileStateChangedFn OnMobileStateChanged;
     }
 }

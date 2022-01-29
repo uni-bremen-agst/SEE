@@ -1,12 +1,14 @@
 using SEE.Utils;
 using UnityEngine;
 using SEE.UI;
+using SEE.Game.UI;
+
 namespace SEE.Controls
 {
     /// <summary>
     /// Moves a player in a mobile environment (via virtual joysticks).
     /// </summary>
-    public class MobilePlayerMovement : PlayerMovement
+    public class MobilePlayerMovement :PlatformDependentComponent
     {
         [Tooltip("Speed of movements")]
         public float Speed = 1f;
@@ -20,26 +22,6 @@ namespace SEE.Controls
         /// Handels the player movement
         /// </summary>
         private Joystick joystickLeft;
-
-        /// <summary>
-        /// Name of the canvas on which UI elements are placed.
-        /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
-        /// </summary>
-        private const string UI_CANVAS_NAME = "UI Canvas";
-
-        /// <summary>
-        /// Path to where the UI Canvas prefab is stored.
-        /// This prefab should contain all components necessary for the UI canvas, such as an event system,
-        /// a graphic raycaster, etc.
-        /// </summary>
-        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
-
-        /// <summary>
-        /// The canvas on which UI elements are placed.
-        /// This GameObject must be named <see cref="UI_CANVAS_NAME"/>.
-        /// If it doesn't exist yet, it will be created from a prefab.
-        /// </summary>
-        protected GameObject Canvas;
 
         /// <summary>
         /// Path to the left Joystick prefab
@@ -67,15 +49,8 @@ namespace SEE.Controls
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
 
-        private void Start()
+        protected override void StartMobile()
         {
-            Canvas = GameObject.Find(UI_CANVAS_NAME);
-            if (Canvas == null)
-            {
-                // Create Canvas from prefab if it doesn't exist yet
-                Canvas = PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
-                Canvas.name = UI_CANVAS_NAME;
-            }
             Joystick joystickRightPrefab = Resources.Load<Joystick>(JOYSTICK_PREFAB_RIGHT);
             Joystick joystickLeftPrefab = Resources.Load<Joystick>(JOYSTICK_PREFAB_LEFT);
             joystickLeft = Instantiate(joystickLeftPrefab, Canvas.transform, false);
@@ -100,7 +75,7 @@ namespace SEE.Controls
             }
         }
 
-        private void Update()
+        protected override void UpdateMobile()
         {
             Camera mainCamera = MainCamera.Camera;
             if (SEEInput.ToggleCameraLock())

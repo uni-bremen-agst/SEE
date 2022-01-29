@@ -100,15 +100,16 @@ namespace SEE.Game.UI.Menu
         protected void initialiseMobileMenu()
         {
             #region set up buttons
-
-            if (Entries.Count == 3) // for the entry menu the entries count is 3 (Host, Client, Settings),
-                                    // therefore the menu need to be set up in the desktop way  
+            // for the entry menu the entries count is 3 (Host, Client, Settings),
+            // therefore the menu need to be set up in the desktop way
+            if (Entries.Count == 3) 
             {
                 SetUpDesktopWindow();
                 SetUpDesktopContent();
             }
-            else // count == 21 -> represents all entries in the mobile menu. The following set uo depends on 
-                 // a correct count and order of the entries
+            // count == 21 -> represents all entries in the mobile menu. The following set uo depends on 
+            // a correct count and order of the entries
+            else
             {
                 MobileMenuGameObject = PrefabInstantiator.InstantiatePrefab(MOBLIE_MENU_PREFAB, Canvas.transform, false);
 
@@ -159,10 +160,11 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Adds the given <paramref name="buttonEntries"></param> as buttons to the mobile Menu.
-        /// The entries are to be expected in order such as declared./>
+        /// Adds the given <paramref name="buttonEntries"> as buttons to the mobile Menu.
+        /// The entries are to be expected in order such as declared.
         /// </summary>
-        /// <param name="buttonEntries">The entries to add to the menu in an orderd IEnumerable</param> 
+        /// <param name="buttonEntries">The entries to add to the menu in an ordered
+        /// IEnumerable</param> 
         protected void addMobileButtons(IEnumerable<T> buttonEntries)
         {
             GameObject[] selectButtons = new GameObject[2];
@@ -277,7 +279,7 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Selects the clicked button by its <paramref name="ClickedIndex"></param> and moves it to the top
+        /// Selects the clicked button by its <paramref name="ClickedIndex"> and moves it to the top
         /// </summary>
         /// <param name="ClickedIndex">Index of the clicked button</param>
         private void selectMode(int ClickedIndex)
