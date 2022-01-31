@@ -99,7 +99,7 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// If true, the user can close this menu by not making any selectiion,
+        /// If true, the user can close this menu by not making any selection,
         /// that is, this menu can be closed by the built-in mechanisms without
         /// triggering any action.
         /// </summary>
@@ -107,7 +107,7 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// If <paramref name="enable"/> is true, the user can close this menu
-        /// by not making any selectiion, that is, this menu can be closed by
+        /// by not making any selection, that is, this menu can be closed by
         /// the built-in mechanisms without triggering any action.
         /// Note: by default the user is offered a way to get out of this menu without
         /// making any selection.
@@ -148,22 +148,20 @@ namespace SEE.Game.UI.Menu
                     break;
             }
         }
-
+#if !UNITY_ANDROID
         /// <summary>
         /// The keyword recognizer used to detect the spoken menu entry titles.
         /// </summary>
-#if !UNITY_ANDROID
         private KeywordInput keywordInput;
-#endif
-/// <summary>
-/// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
-/// is started to listen to the menu entry titles and one of the entries
-/// can be triggered by saying its title. If <paramref name="listen"/> is
-/// false instead, the <see cref="keywordInput"/> will be disposed.
-/// </summary>
-/// <param name="listen">whether <see cref="keywordInput"/> should be
-/// listening</param>
-#if !UNITY_ANDROID
+
+        /// <summary>
+        /// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
+        /// is started to listen to the menu entry titles and one of the entries
+        /// can be triggered by saying its title. If <paramref name="listen"/> is
+        /// false instead, the <see cref="keywordInput"/> will be disposed.
+        /// </summary>
+        /// <param name="listen">whether <see cref="keywordInput"/> should be
+        /// listening</param>
         private void Listen(bool listen)
         {
             if (listen)

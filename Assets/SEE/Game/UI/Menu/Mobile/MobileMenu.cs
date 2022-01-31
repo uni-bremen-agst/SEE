@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Michsky.UI.ModernUIPack;
 using SEE.Utils;
+using UnityEngine.Assertions;
+using SEE.Controls.Actions;
 
 namespace SEE.Game.UI.Menu
 {
@@ -66,7 +68,7 @@ namespace SEE.Game.UI.Menu
 
         protected override void StartMobile()
         {
-            initialiseMobileMenu(); 
+            InitializeMobileMenu(); 
         }
 
         protected override void UpdateMobile()
@@ -95,19 +97,19 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Initialises the mobile Menu with all the icon buttons
+        /// Initializes the mobile Menu with all the icon buttons
         /// </summary>
-        protected void initialiseMobileMenu()
+        protected void InitializeMobileMenu()
         {
             #region set up buttons
             // for the entry menu the entries count is 3 (Host, Client, Settings),
             // therefore the menu need to be set up in the desktop way
-            if (Entries.Count == 3) 
+            if (Entries.Count < 21) 
             {
                 SetUpDesktopWindow();
                 SetUpDesktopContent();
             }
-            // count == 21 -> represents all entries in the mobile menu. The following set uo depends on 
+            // count == 21 -> represents all entries in the mobile menu. The following set up depends on 
             // a correct count and order of the entries
             else
             {
@@ -117,13 +119,15 @@ namespace SEE.Game.UI.Menu
                 menuPanelHorizontal = MobileMenuGameObject.transform.Find("Horizontal Panel");
                 quickMenuPanel = MobileMenuGameObject.transform.Find("Left Panel");
 
-                addMobileButtons(Entries);
+                Assert.IsTrue(MobileActionStateType.AllTypes.Count == 21);
+
+                AddMobileButtons(Entries);
 
                 for (int i = 0; i < buttons.Length; i++)
                 {
                     //add listener to expand menu
                     int clickedIndex = i;
-                    buttons[i][0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => selectMode(clickedIndex));
+                    buttons[i][0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => SelectMode(clickedIndex));
                     for (int j = 0; j < buttons[i].Length; j++)
                     {
                         if (i > 0)
@@ -153,7 +157,7 @@ namespace SEE.Game.UI.Menu
 
                 quickButtons[5].SetActive(true);
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() 
-                    => expandButton(arrowLeftSprite, arrowRightSprite));
+                    => ExpandButton(arrowLeftSprite, arrowRightSprite));
             }
             
             #endregion
@@ -165,7 +169,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="buttonEntries">The entries to add to the menu in an ordered
         /// IEnumerable</param> 
-        protected void addMobileButtons(IEnumerable<T> buttonEntries)
+        protected void AddMobileButtons(IEnumerable<T> buttonEntries)
         {
             GameObject[] selectButtons = new GameObject[2];
             GameObject[] deleteButton = new GameObject[1];
@@ -282,11 +286,11 @@ namespace SEE.Game.UI.Menu
         /// Selects the clicked button by its <paramref name="ClickedIndex"> and moves it to the top
         /// </summary>
         /// <param name="ClickedIndex">Index of the clicked button</param>
-        private void selectMode(int ClickedIndex)
+        private void SelectMode(int ClickedIndex)
         {
             if (expanded)
             {
-                //set inactive first for right order 
+                // Set inactive first for right order. 
                 for (int i = 0; i < buttons.Length; i++)
                 {
                     for (int j = 0; j < buttons[i].Length; j++)
@@ -304,7 +308,7 @@ namespace SEE.Game.UI.Menu
                             }
                     }
                 }
-                //finally set the selected button active
+                // Finally set the selected button active.
                 for (int k = 0; k < buttons[ClickedIndex].Length; k++)
                 {
                     //set parent to null to keep right order 
@@ -329,7 +333,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="left">Arrow Sprite to the left</param>
         /// <param name="right">Arrow Sprite to the right</param>
-        private void expandButton(Sprite left, Sprite right)
+        private void ExpandButton(Sprite left, Sprite right)
         {
             for (int i = 0; i < quickButtons.Length - 1; ++i)
             {

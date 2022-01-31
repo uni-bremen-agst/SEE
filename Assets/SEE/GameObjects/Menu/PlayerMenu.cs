@@ -96,7 +96,7 @@ namespace SEE.GO.Menu
             List<MenuEntry> entries = MobileActionStateType.AllTypes.Select(ToMenuEntry).ToList();
 
             // Initial state will be the first action state type
-            GlobalActionHistory.ExecuteMoblie(firstType);
+            GlobalActionHistory.ExecuteMobile(firstType);
 
             SimpleMenu menu = modeMenuGO.AddComponent<SimpleMenu>();
             menu.Title = "Mobile Menu";
@@ -108,7 +108,7 @@ namespace SEE.GO.Menu
             // Constructs a toggle menu entry for the mode menu from the given action state type.
             MenuEntry ToMenuEntry(MobileActionStateType type) =>
                 new MenuEntry(
-                    action: () => GlobalActionHistory.ExecuteMoblie(type), title: type.Name,
+                    action: () => GlobalActionHistory.ExecuteMobile(type), title: type.Name,
                     description: type.Description, entryColor: type.Color,
                     icon: Resources.Load<Sprite>(type.IconPath));
 
@@ -206,7 +206,7 @@ namespace SEE.GO.Menu
                 {
                     ShowNotification.Error("Action Error", e.Message);
 #if UNITY_EDITOR
-                    throw;
+                throw;
 #endif
                 }
             }

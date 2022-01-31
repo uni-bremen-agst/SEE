@@ -19,13 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#if UNITY_ANDROID
-#else
+
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+#if !UNITY_ANDROID
 using Valve.VR;
+#endif
 using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI.ConfigMenu
@@ -39,10 +40,10 @@ namespace SEE.Game.UI.ConfigMenu
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
         private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
-
+#if !UNITY_ANDROID
         private SteamVR_Action_Boolean openAction;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
-
+#endif
         private GameObject configMenuPrefab;
 
         private ConfigMenu configMenu;
@@ -55,7 +56,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Start()
         {
+#if !UNITY_ANDROID
             openAction = SteamVR_Actions._default?.OpenSettingsMenu;
+#endif
         }
 
         /// <summary>
@@ -106,11 +109,12 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void HandleVRUpdate()
         {
+#if !UNITY_ANDROID
             if (openAction != null && openAction.GetStateDown(inputSource))
             {
                 configMenu.Toggle();
             }
+#endif
         }
     }
 }
-#endif

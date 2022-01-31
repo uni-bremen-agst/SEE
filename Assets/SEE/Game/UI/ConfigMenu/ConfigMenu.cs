@@ -19,8 +19,6 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#if UNITY_ANDROID
-#else
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -192,9 +190,11 @@ namespace SEE.Game.UI.ConfigMenu
                 // Replace the default input system with our VR input system.
                 GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
                 vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
+
                 VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
                 vrInputModule.PointerCamera = pointerCamera;
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
+
 
                 // Set the canvas to world space and adjust its positition.
                 MustGetComponentInChild("Canvas", out RectTransform rectTransform);
@@ -667,4 +667,3 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 }
-#endif

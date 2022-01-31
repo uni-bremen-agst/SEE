@@ -19,11 +19,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#if UNITY_ANDROID
-#else
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if !UNITY_ANDROID
 using Valve.VR;
+#endif
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -34,8 +34,11 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class VRInputModule : BaseInputModule
     {
+#if !UNITY_ANDROID
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.LeftHand;
         private readonly SteamVR_Action_Boolean clickAction = SteamVR_Actions._default.InteractUI;
+#endif
+
 
         private GameObject currentObject;
         private PointerEventData data;
@@ -62,7 +65,7 @@ namespace SEE.Game.UI.ConfigMenu
 
             HandlePointerExitAndEnter(data, currentObject);
             ExecuteEvents.Execute(data.pointerDrag, data, ExecuteEvents.dragHandler);
-
+#if !UNITY_ANDROID
             if (clickAction.GetStateDown(inputSource))
             {
                 ProcessPress(data);
@@ -71,6 +74,7 @@ namespace SEE.Game.UI.ConfigMenu
             {
                 ProcessRelease(data);
             }
+#endif
         }
         public PointerEventData GetData() => data;
         private void ProcessPress(PointerEventData data)
@@ -110,4 +114,3 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 }
-#endif

@@ -64,7 +64,7 @@ namespace SEE.Game.UI
         /// </summary>
         protected virtual void StartHoloLens() => PlatformUnsupported();
         /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
+        /// Called when the <see cref="Start()"/> method of this component is executed on the Mobile platform.
         /// </summary>
         protected virtual void StartMobile() => PlatformUnsupported();
 
@@ -88,7 +88,7 @@ namespace SEE.Game.UI
         protected virtual void UpdateHoloLens() { }
 
         /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
+        /// Called when the <see cref="Update()"/> method of this component is executed on the Mobile platform.
         /// </summary>
         protected virtual void UpdateMobile() { }
 
@@ -108,39 +108,48 @@ namespace SEE.Game.UI
             Platform = PlayerSettings.GetInputType();
             switch (Platform)
             {
-                case PlayerInputType.DesktopPlayer: StartDesktop();
+                case PlayerInputType.DesktopPlayer:
+                    StartDesktop();
                     break;
-                case PlayerInputType.TouchGamepadPlayer: StartTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer:
+                    StartTouchGamepad();
                     break;
-                case PlayerInputType.VRPlayer: StartVR();
+                case PlayerInputType.VRPlayer:
+                    StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
-                case PlayerInputType.HoloLensPlayer: StartHoloLens();
+                case PlayerInputType.HoloLensPlayer:
+                    StartHoloLens();
                     //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended
                     break;
-                case PlayerInputType.MobilePlayer: StartMobile();
+                case PlayerInputType.MobilePlayer:
+                    StartMobile();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
                 default: PlatformUnsupported();
                     break;
             }
-
         }
 
         protected void Update()
         {
             switch (Platform)
             {
-                case PlayerInputType.DesktopPlayer: UpdateDesktop();
+                case PlayerInputType.DesktopPlayer:
+                    UpdateDesktop();
                     break;
-                case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer:
+                    UpdateTouchGamepad();
                     break;
-                case PlayerInputType.VRPlayer: UpdateVR();
+                case PlayerInputType.VRPlayer:
+                    UpdateVR();
                     break;
-                case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
+                case PlayerInputType.HoloLensPlayer:
+                    UpdateHoloLens();
                     break;
-                case PlayerInputType.MobilePlayer: UpdateMobile();
+                case PlayerInputType.MobilePlayer:
+                    UpdateMobile();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;

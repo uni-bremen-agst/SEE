@@ -62,7 +62,7 @@ namespace SEE.Controls.Actions
             new MobileActionStateType(10, "Locked Around Center Mode", "Locked Around Center Mode",
                                       Color.white.Darker(), "Materials/GoogleIcons/ic_settings_backup_restore_white_48dp", DeleteAction.CreateReversibleAction);
 
-        // move button groube on the right side
+        // move button group on the right side
         public static MobileActionStateType Move { get; } =
             new MobileActionStateType(11, "Move", "Move Mode",
                                       Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
             new MobileActionStateType(14, "8-Directions Mode", "8-Directions Mode",
                                       Color.white.Darker(), "Materials/ModernUIPack/Plus", DeleteAction.CreateReversibleAction);
 
-        // Quick Menu Group on the left side
+        // Quick Menu group on the left side
         public static MobileActionStateType Redo { get; } =
             new MobileActionStateType(15, "Redo Action", "Redo Action",
                                       Color.white.Darker(), "Materials/GoogleIcons/ic_redo_white_48dp", DeleteAction.CreateReversibleAction);

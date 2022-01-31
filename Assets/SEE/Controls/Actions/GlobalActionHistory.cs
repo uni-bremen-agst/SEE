@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions
         /// Executes the given kind of <paramref name="actionType"/> as new.
         /// </summary>
         /// <param name="actionType">kind of action to be executed</param>
-        public static void ExecuteMoblie(MobileActionStateType actionType)
+        public static void ExecuteMobile(MobileActionStateType actionType)
         {
             ActionState.MobileValue = actionType;
             ReversibleAction action = actionType.CreateReversible();

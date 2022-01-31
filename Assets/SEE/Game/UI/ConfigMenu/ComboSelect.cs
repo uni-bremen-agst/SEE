@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-#if UNITY_ANDROID
-#else
+
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
@@ -103,8 +102,9 @@ namespace SEE.Game.UI.ConfigMenu
         /// 'DropdownCombo/DictateButton'. This element represents a kind of
         /// button to turn on/off dictation of the input value.
         /// </summary>
+#if !UNITY_ANDROID
         private Dictaphone dictaphone;
-
+#endif
         private readonly Queue<List<string>> valuesUpdates = new Queue<List<string>>();
         private readonly Queue<string> valueUpdates = new Queue<string>();
 
@@ -130,7 +130,9 @@ namespace SEE.Game.UI.ConfigMenu
             MustGetComponentInChild("DropdownCombo/Dropdown", out dropdown);
             MustGetComponentInChild("DropdownCombo/Input", out customInput);
             MustGetComponentInChild("Label", out labelText);
+#if !UNITY_ANDROID
             MustGetComponentInChild("DropdownCombo/DictateButton", out dictaphone);
+#endif
         }
 
         private void Start()
@@ -144,8 +146,9 @@ namespace SEE.Game.UI.ConfigMenu
             dropdown.isListItem = true;
             dropdown.listParent = FindCanvas(gameObject);
             labelText.text = Label;
-
+#if !UNITY_ANDROID
             dictaphone.OnDictationFinished += text => customInput.text = text;
+#endif
         }
 
         private void Update()
@@ -179,7 +182,9 @@ namespace SEE.Game.UI.ConfigMenu
                 dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
             dropdown.SetupDropdown();
             customInput.gameObject.SetActive(true);
+#if !UNITY_ANDROID
             dictaphone.gameObject.SetActive(true);
+#endif
             if (customValue != null)
             {
                 customInput.text = customValue;
@@ -191,7 +196,9 @@ namespace SEE.Game.UI.ConfigMenu
             dropdown.selectedItemIndex = newIndex;
             dropdown.SetupDropdown();
             customInput.gameObject.SetActive(false);
+#if !UNITY_ANDROID
             dictaphone.gameObject.SetActive(false);
+#endif
         }
 
         private void FigureOutInputMode(string value)
@@ -267,4 +274,3 @@ namespace SEE.Game.UI.ConfigMenu
         }
     }
 }
-#endif

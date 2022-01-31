@@ -19,7 +19,7 @@ namespace SEE.Controls
         private Joystick joystickRight;
 
         /// <summary>
-        /// Handels the player movement
+        /// Handles the player movement
         /// </summary>
         private Joystick joystickLeft;
 
@@ -34,7 +34,7 @@ namespace SEE.Controls
         private const string JOYSTICK_PREFAB_RIGHT = "Prefabs/UI/FixedJoystickRight";
 
         /// <summary>
-        /// State of the main camera in the szene
+        /// State of the main camera in the scene
         /// </summary>
         private struct CameraState
         {
@@ -80,31 +80,31 @@ namespace SEE.Controls
             Camera mainCamera = MainCamera.Camera;
             if (SEEInput.ToggleCameraLock())
             {
-                //TODO
+                // TODO
             }
 
-            float speed = Speed * Time.deltaTime;
+            float distance = Speed * Time.deltaTime;
 
             if (!cameraState.freeMode)
             {
-                //TODO
+                // TODO
             }
             else // cameraState.freeMode == true
             {
                 
-                //Taking the joystick inputs
+                // Taking the joystick inputs
                 float xMovementInput = joystickLeft.Horizontal;
                 float yMovementInput = joystickLeft.Vertical;
 
-                //calculating velocity vectors
+                // calculating velocity vectors
                 Vector3 movementHorizontal = transform.right * xMovementInput;
                 Vector3 movementVertical = transform.forward * yMovementInput;
 
-                //calculate final movement velocity vector
+                // calculate final movement velocity vector
                 Vector3 velocity = (movementHorizontal + movementVertical);
               
                 velocity.Normalize();
-                velocity *= speed; 
+                velocity *= distance; 
                 transform.position += velocity;
 
                 HandleRotation();
@@ -113,18 +113,17 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Handels the rotation, repeats at 0 after turning 360°
+        /// Handles the rotation, repeats at 0 after turning 360°
         /// </summary>
         private void HandleRotation()
         {
-            //Taking the joystick inputs
+            // Taking the joystick inputs
             float xMovementInput = joystickRight.Horizontal;
             float yMovementInput = joystickRight.Vertical;
 
-            //rotation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
+            // rotation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
             cameraState.pitch = Mathf.Repeat(cameraState.pitch - yMovementInput, 360f);
             cameraState.yaw = Mathf.Repeat(cameraState.yaw + xMovementInput, 360f);
-
         }
     }
 }
