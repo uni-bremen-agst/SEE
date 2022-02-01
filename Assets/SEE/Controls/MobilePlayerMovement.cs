@@ -8,7 +8,7 @@ namespace SEE.Controls
     /// <summary>
     /// Moves a player in a mobile environment (via virtual joysticks).
     /// </summary>
-    public class MobilePlayerMovement :PlatformDependentComponent
+    public class MobilePlayerMovement :PlayerMovement
     {
         [Tooltip("Speed of movements")]
         public float Speed = 1f;
@@ -34,6 +34,13 @@ namespace SEE.Controls
         private const string JOYSTICK_PREFAB_RIGHT = "Prefabs/UI/FixedJoystickRight";
 
         /// <summary>
+        /// The canvas on which UI elements are placed.
+        /// This GameObject must be named <see cref="CanvasUtils.UI_CANVAS_NAME"/>.
+        /// If it doesn't exist yet, it will be created from a prefab.
+        /// </summary>
+        protected GameObject Canvas;
+
+        /// <summary>
         /// State of the main camera in the scene
         /// </summary>
         private struct CameraState
@@ -49,8 +56,9 @@ namespace SEE.Controls
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane focusedObject;
 
-        protected override void StartMobile()
+        protected void Start()
         {
+            Canvas = CanvasUtils.GetCanvas();
             Joystick joystickRightPrefab = Resources.Load<Joystick>(JOYSTICK_PREFAB_RIGHT);
             Joystick joystickLeftPrefab = Resources.Load<Joystick>(JOYSTICK_PREFAB_LEFT);
             joystickLeft = Instantiate(joystickLeftPrefab, Canvas.transform, false);
@@ -75,7 +83,7 @@ namespace SEE.Controls
             }
         }
 
-        protected override void UpdateMobile()
+        protected void Update()
         {
             Camera mainCamera = MainCamera.Camera;
             if (SEEInput.ToggleCameraLock())
