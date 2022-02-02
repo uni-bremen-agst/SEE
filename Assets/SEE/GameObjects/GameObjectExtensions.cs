@@ -102,24 +102,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the first ancestor of the given <paramref name="gameObject"/> with the given <paramref name="id"/>.
+        /// Returns the first ancestor of the given <paramref name="gameObject"/> with the given <paramref name="name"/>
+        /// (attribute 'name' of a GameObject).
         /// Will also return inactive game objects. If no such ancestor exists, null will be returned.
         /// Unlike <see cref="Transform.Find(string)"/>, this method will descend into the game-object hierarchy.
         /// </summary>
         /// <param name="gameObject">root object</param>
-        /// <param name="id">id of the ancestor to be found</param>
+        /// <param name="name">name of the ancestor to be found</param>
         /// <returns>found game object or null</returns>
-        public static GameObject Ancestor(this GameObject gameObject, string id)
+        public static GameObject Ancestor(this GameObject gameObject, string name)
         {
             foreach (Transform child in gameObject.transform)
             {
-                if (child.name == id)
+                if (child.name == name)
                 {
                     return child.gameObject;
                 }
                 else
                 {
-                    GameObject ancestor = child.gameObject.Ancestor(id);
+                    GameObject ancestor = child.gameObject.Ancestor(name);
                     if (ancestor != null)
                     {
                         return ancestor;
