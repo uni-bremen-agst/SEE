@@ -21,7 +21,8 @@ namespace SEEEditor
                 GameObject go = Selection.activeGameObject;
                 Debug.Log($"{go.name} world position = {go.transform.position.ToString("F6")} "
                     + $"world scale = {go.transform.lossyScale.ToString("F6")} "
-                    + $"local scale = {go.transform.localScale.ToString("F6")}\n");
+                    + $"local scale = {go.transform.localScale.ToString("F6")} "
+                    + $"world rotation = {go.transform.rotation.eulerAngles.ToString("F6")}\n");
             }
         }
     }
