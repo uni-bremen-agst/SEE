@@ -25,12 +25,6 @@ namespace SEE.Game.UI.Menu
         private const string ICON_BUTTON_PREFAB = "Prefabs/UI/IconButton";
 
         /// <summary>
-        /// The path to the prefab for the menu game object.
-        /// Will be added for each menu entry in <see cref="entries"/>.
-        /// </summary>
-        private const string TEXT_BUTTON_PREFAB = "Prefabs/UI/TextButton";
-
-        /// <summary>
         /// The GameObject which has the three panels attached
         /// </summary>
         private GameObject MobileMenuGameObject;
@@ -119,7 +113,7 @@ namespace SEE.Game.UI.Menu
                 menuPanelHorizontal = MobileMenuGameObject.transform.Find("Horizontal Panel");
                 quickMenuPanel = MobileMenuGameObject.transform.Find("Left Panel");
 
-                Assert.IsTrue(MobileActionStateType.AllTypes.Count == 21);
+                Assert.IsTrue(ActionStateType.MobileMenuTypes.Count == 21);
 
                 AddMobileButtons(Entries);
 
@@ -184,6 +178,7 @@ namespace SEE.Game.UI.Menu
             int quickButtonCnt = 0;
             foreach (T entry in buttonEntries)
             {
+                // The count smaller than 2 marks the select button group.
                 if (cnt < 2)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
@@ -193,6 +188,7 @@ namespace SEE.Game.UI.Menu
                     cnt++;
                     selectCnt++;
                 }
+                // The count 3 marks the delete Button.
                 else if (cnt == 3)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelVertical, false);
@@ -201,6 +197,7 @@ namespace SEE.Game.UI.Menu
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
                     cnt++;
                 }
+                // The count smaller 6 marks the delete multi button group.
                 else if (cnt < 6)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
@@ -210,24 +207,7 @@ namespace SEE.Game.UI.Menu
                     deleteCnt++;
                     cnt++;
                 }
-                else if(cnt == 7)
-                {
-                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    rotateButtons[rotateCnt] = iconButton;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().buttonText = "n";
-                    rotateCnt++;
-                    cnt++;
-                }
-                else if (cnt == 8)
-                {
-                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    rotateButtons[rotateCnt] = iconButton;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasic>().buttonText = "1";
-                    rotateCnt++;
-                    cnt++;
-                }
+                // The count smaller 11 marks the rotate button group.
                 else if (cnt < 11)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
@@ -237,24 +217,7 @@ namespace SEE.Game.UI.Menu
                     rotateCnt++;
                     cnt++;
                 }
-                else if (cnt == 12)
-                {
-                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    moveButtons[moveCnt] = iconButton;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().buttonText = "n";
-                    moveCnt++;
-                    cnt++;
-                }
-                else if (cnt == 13)
-                {
-                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(TEXT_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    moveButtons[moveCnt] = iconButton;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().name = entry.Title;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasic>().buttonText = "8";
-                    moveCnt++;
-                    cnt++;
-                }
+                // The count smaller 15 marks the move button group.
                 else if (cnt < 15)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
@@ -264,6 +227,7 @@ namespace SEE.Game.UI.Menu
                     moveCnt++;
                     cnt++;
                 }
+                // The count smaller 21 marks the quick menu button group.
                 else if (cnt < 21)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, quickMenuPanel, false);

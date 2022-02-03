@@ -41,7 +41,7 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-            Assert.IsTrue(ActionStateType.AllTypes.Count == 11);
+            Assert.IsTrue(ActionStateType.DesktopMenuTypes.Count == 11);
 
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
@@ -51,8 +51,8 @@ namespace SEE.GO.Menu
             // must correspond to the ActionStateType value. If this is not the case, we will
             // run into an endless recursion.
 
-            ActionStateType firstType = ActionStateType.AllTypes.First();
-            List<ToggleMenuEntry> entries = ActionStateType.AllTypes.Select(ToModeMenuEntry).ToList();
+            ActionStateType firstType = ActionStateType.DesktopMenuTypes.First();
+            List<ToggleMenuEntry> entries = ActionStateType.DesktopMenuTypes.Select(ToModeMenuEntry).ToList();
 
             // Initial state will be the first action state type
             GlobalActionHistory.Execute(firstType);
@@ -92,11 +92,11 @@ namespace SEE.GO.Menu
             // must correspond to the ActionStateType value. If this is not the case, we will
             // run into an endless recursion.
 
-            MobileActionStateType firstType = MobileActionStateType.AllTypes.First();
-            List<MenuEntry> entries = MobileActionStateType.AllTypes.Select(ToMenuEntry).ToList();
+            ActionStateType firstType = ActionStateType.MobileMenuTypes.First();
+            List<MenuEntry> entries = ActionStateType.MobileMenuTypes.Select(ToMenuEntry).ToList();
 
             // Initial state will be the first action state type
-            GlobalActionHistory.ExecuteMobile(firstType);
+            GlobalActionHistory.Execute(firstType);
 
             SimpleMenu menu = modeMenuGO.AddComponent<SimpleMenu>();
             menu.Title = "Mobile Menu";
@@ -106,9 +106,9 @@ namespace SEE.GO.Menu
             return menu;
 
             // Constructs a toggle menu entry for the mode menu from the given action state type.
-            MenuEntry ToMenuEntry(MobileActionStateType type) =>
+            MenuEntry ToMenuEntry(ActionStateType type) =>
                 new MenuEntry(
-                    action: () => GlobalActionHistory.ExecuteMobile(type), title: type.Name,
+                    action: () => GlobalActionHistory.Execute(type), title: type.Name,
                     description: type.Description, entryColor: type.Color,
                     icon: Resources.Load<Sprite>(type.IconPath));
 
