@@ -40,9 +40,14 @@ namespace SEE.Game.UI.Menu
         private GameObject[] quickButtons = new GameObject[6];
 
         /// <summary>
+        /// Whether the menu on the left is expanded or not 
+        /// </summary>
+        private bool QuickMenuShown = false;
+        
+        /// <summary>
         /// Whether the menu on the right is expanded or not 
         /// </summary>
-        private bool expanded = false;
+        private bool MobileMenuShown = false;
 
         /// <summary>
         /// Vertical menu panel on the right
@@ -107,6 +112,7 @@ namespace SEE.Game.UI.Menu
             // a correct count and order of the entries
             else
             {
+                MenuShown = false;
                 MobileMenuGameObject = PrefabInstantiator.InstantiatePrefab(MOBLIE_MENU_PREFAB, Canvas.transform, false);
 
                 menuPanelVertical = MobileMenuGameObject.transform.Find("Vertical Panel");
@@ -252,7 +258,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="ClickedIndex">Index of the clicked button</param>
         private void SelectMode(int ClickedIndex)
         {
-            if (expanded)
+            if (MobileMenuShown)
             {
                 // Set inactive first for right order. 
                 for (int i = 0; i < buttons.Length; i++)
@@ -280,7 +286,7 @@ namespace SEE.Game.UI.Menu
                     buttons[ClickedIndex][k].transform.SetParent(menuPanelHorizontal);
                     buttons[ClickedIndex][k].SetActive(true);
                 }
-                expanded = false;
+                MobileMenuShown = false;
             }
             else
             {
@@ -288,7 +294,7 @@ namespace SEE.Game.UI.Menu
                 {
                     buttons[i][0].SetActive(true);
                 }
-                expanded = true;
+                MobileMenuShown = true;
             }
         }
 
@@ -301,7 +307,7 @@ namespace SEE.Game.UI.Menu
         {
             for (int i = 0; i < quickButtons.Length - 1; ++i)
             {
-                if (expanded)
+                if (QuickMenuShown)
                 {
                     quickButtons[i].SetActive(false);
                 }
@@ -310,15 +316,15 @@ namespace SEE.Game.UI.Menu
                     quickButtons[i].SetActive(true);
                 }
             }
-            if (expanded)
+            if (QuickMenuShown)
             {
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = right;
-                expanded = false;
+                QuickMenuShown = false;
             }
             else
             {
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = left;
-                expanded = true;
+                QuickMenuShown = true;
             }
         }
 
