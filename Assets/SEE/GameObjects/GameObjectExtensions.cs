@@ -85,9 +85,9 @@ namespace SEE.GO
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
-        /// <param name="tag">tag the ancestors must have</param>
+        /// <param name="tag">tag the descendants must have</param>
         /// <returns>all transitive children with <paramref name="tag"/></returns>
-        public static List<GameObject> AllAncestors(this GameObject gameObject, string tag)
+        public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
             List<GameObject> result = new List<GameObject>();
             if (gameObject.CompareTag(tag))
@@ -96,21 +96,21 @@ namespace SEE.GO
             }
             foreach (Transform child in gameObject.transform)
             {
-                result.AddRange(child.gameObject.AllAncestors(tag));
+                result.AddRange(child.gameObject.AllDescendants(tag));
             }
             return result;
         }
 
         /// <summary>
-        /// Returns the first ancestor of the given <paramref name="gameObject"/> with the given <paramref name="name"/>
+        /// Returns the first descendant of the given <paramref name="gameObject"/> with the given <paramref name="name"/>
         /// (attribute 'name' of a GameObject).
-        /// Will also return inactive game objects. If no such ancestor exists, null will be returned.
+        /// Will also return inactive game objects. If no such descendant exists, null will be returned.
         /// Unlike <see cref="Transform.Find(string)"/>, this method will descend into the game-object hierarchy.
         /// </summary>
         /// <param name="gameObject">root object</param>
-        /// <param name="name">name of the ancestor to be found</param>
+        /// <param name="name">name of the descendant to be found</param>
         /// <returns>found game object or null</returns>
-        public static GameObject Ancestor(this GameObject gameObject, string name)
+        public static GameObject Descendant(this GameObject gameObject, string name)
         {
             foreach (Transform child in gameObject.transform)
             {
@@ -120,7 +120,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    GameObject ancestor = child.gameObject.Ancestor(name);
+                    GameObject ancestor = child.gameObject.Descendant(name);
                     if (ancestor != null)
                     {
                         return ancestor;
@@ -131,8 +131,8 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns all ancestors of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
-        /// The result will also include inactive game objects, but does not contained <paramref name="gameObject"/> itself.
+        /// Returns all descendants of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
+        /// The result will also include inactive game objects, but does not contain <paramref name="gameObject"/> itself.
         /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
         /// Precondition: <paramref name="gameObjectIDs"/> is not null.
@@ -140,7 +140,7 @@ namespace SEE.GO
         /// <param name="gameObject">root of the game-object hierarchy to be searched</param>
         /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
         /// <returns>found game objects</returns>
-        public static IList<GameObject> Ancestors(this GameObject gameObject, ISet<string> gameObjectIDs)
+        public static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
             List<GameObject> result = new List<GameObject>();
             foreach (Transform child in gameObject.transform)
@@ -149,7 +149,7 @@ namespace SEE.GO
                 {
                     result.Add(child.gameObject);
                 }
-                result.AddRange(child.gameObject.Ancestors(gameObjectIDs));
+                result.AddRange(child.gameObject.Descendants(gameObjectIDs));
             }
             return result;
         }
