@@ -246,7 +246,7 @@ namespace SEE.Game.City
         private Dictionary<string, GameObject> GetNodes()
         {
             Dictionary<string, GameObject> result = new Dictionary<string, GameObject>();
-            foreach(GameObject node in gameObject.AllAncestors(Tags.Node))
+            foreach(GameObject node in gameObject.AllDescendants(Tags.Node))
             {
                 result[node.name] = node;
             }
