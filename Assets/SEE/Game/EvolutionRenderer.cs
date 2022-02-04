@@ -586,12 +586,12 @@ namespace SEE.Game
                     edgeAnimators.Clear();
                     foreach (Edge edge in next.Graph.Edges())
                     {
-                        if (!next.EdgeLayout.TryGetValue(edge.ID, out LayoutEdge target))
+                        if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> target))
                         {
                             Debug.LogWarning($"Missing layout edge for graph edge with id '{edge.ID}'; skipping it.\n");
                             continue;
                         }
-                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out LayoutEdge source))
+                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> source))
                         {
                             objectManager.GetEdge(edge, out GameObject edgeObject);
                             if (!edgeObject.TryGetComponent(out SplineMorphism morphism))
@@ -1260,7 +1260,7 @@ namespace SEE.Game
             }
             if (edgesAreDrawn)
             {
-                if (EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout) || edgeLayout == null)
+                if (!EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout) )
                 {
                     Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
                     return false;
