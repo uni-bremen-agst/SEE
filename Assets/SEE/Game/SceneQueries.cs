@@ -320,7 +320,7 @@ namespace SEE.Game
             {
                 if (root.CompareTag(Tags.CodeCity))
                 {
-                    GameObject ancestor = root.Ancestor(id);
+                    GameObject ancestor = root.Descendant(id);
                     if (ancestor != null)
                     {
                         return ancestor;
@@ -349,7 +349,7 @@ namespace SEE.Game
             {
                 if (root.CompareTag(Tags.CodeCity))
                 {
-                    result.UnionWith(root.Ancestors(gameObjectIDs));
+                    result.UnionWith(root.Descendants(gameObjectIDs));
                 }
             }
             return result;
