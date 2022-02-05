@@ -164,8 +164,8 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
 
-                    //TODO: After evaluation reenable this line
-                    //new Net.ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
+
+                    new Net.ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
                 }
                 else
                 {
