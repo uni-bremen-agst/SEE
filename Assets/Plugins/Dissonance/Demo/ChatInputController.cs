@@ -59,9 +59,9 @@ namespace Dissonance.Demo
             //Monitor keyboard keys if we're not inputting text
             if (!_isInputtingText)
             {
-                var global = false; // Input.GetKey(KeyCode.Y);
-                var red = false; //Input.GetKey(KeyCode.U);
-                var blue = false;// Input.GetKey(KeyCode.I);
+                var global = Input.GetKey(KeyCode.Y);
+                var red = Input.GetKey(KeyCode.U);
+                var blue = Input.GetKey(KeyCode.I);
 
                 //If a key is pressed
                 if (global)

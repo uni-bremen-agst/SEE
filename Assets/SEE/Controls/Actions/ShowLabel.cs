@@ -250,12 +250,6 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
             string shownText = node.SourceName;
-            if (node.IntAttributes.ContainsKey("Metric.Lines.LOC"))
-            {
-                shownText += " " + node.IntAttributes["Metric.Lines.LOC"].ToString();
-            }
-           
-
             Vector3 roof = gameObject.transform.position;
             roof.y += gameObject.transform.lossyScale.y / 2;
             // Now we create the label.
