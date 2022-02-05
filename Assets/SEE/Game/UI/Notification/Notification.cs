@@ -49,13 +49,13 @@ namespace SEE.Game.UI.Notification
         /// Setting this won't have an effect after Start() has been called.
         /// </summary>
         public float Timer = -1f;
-        
+
         /// <summary>
         /// The normalized position in the canvas that the upper right corner is anchored to.
         /// Changes will only have an effect before Start() is called.
         /// </summary>
         public Vector2 AnchorMin = Vector2.one;
-        
+
         /// <summary>
         /// The normalized position in the canvas that the lower left corner is anchored to.
         /// Changes will only have an effect before Start() is called.
@@ -112,15 +112,14 @@ namespace SEE.Game.UI.Notification
         /// </summary>
         protected override void StartDesktop()
         {
-            Debug.Log("ru nning");
             GameObject notification = PrefabInstantiator.InstantiatePrefab(NOTIFICATION_PREFAB, Canvas.transform, false);
-            
+
             // Setup anchoring
             RectTransform rectTransform = (RectTransform) notification.transform;
             rectTransform.pivot = Pivot;
             rectTransform.anchorMax = AnchorMax;
             rectTransform.anchorMin = AnchorMin;
-            
+
             // Setup colors
             if (notification.transform.Find("Background").gameObject.TryGetComponentOrLog(out Image image))
             {
@@ -136,7 +135,7 @@ namespace SEE.Game.UI.Notification
                     iconImage.color = idealColor;
                 }
             }
-            
+
             // Setup notification
             if (notification.TryGetComponentOrLog(out manager))
             {
