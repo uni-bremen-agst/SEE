@@ -88,13 +88,13 @@ namespace SEE.Utils
             return GetInstanceByName(file).GetIndexByPosition(position);
         }
 
-        public static void RemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
+        public static void RemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition */, string file)
         {
-            GetInstanceByName(file).RemoteAddChar(c, position, prePosition);
+            GetInstanceByName(file).RemoteAddChar(c, position /*, prePosition*/);
         } 
-        public static void SingleRemoteAddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
+        public static void SingleRemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/, string file)
         {
-            GetInstanceByName(file).SingleRemoteAddChar(c, position, prePosition);
+            GetInstanceByName(file).SingleRemoteAddChar(c, position/*, prePosition*/);
         }
 
         public static void RemoteDeleteChar(Identifier[] position, string file)
