@@ -26,7 +26,7 @@ namespace SEE.Game.UI.Menu
         /// Will be added for each menu entry in <see cref="entries"/>.
         /// </summary>
         private const string BUTTON_PREFAB = "Prefabs/UI/Button";
-        
+
         /// <summary>
         /// The path to the prefab for the list game object.
         /// Will be added as a child to the <see cref="MenuGameObject"/>.
@@ -37,7 +37,7 @@ namespace SEE.Game.UI.Menu
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
         protected GameObject MenuContent;
-        
+
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
@@ -66,7 +66,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Rect Transform on which the icon's and title's layout group reside.
         /// </summary>
-        private RectTransform IconTitleContent;
+        private RectTransform iconTitleContent;
 
         protected override void StartDesktop()
         {
@@ -103,16 +103,16 @@ namespace SEE.Game.UI.Menu
 
             // Create tooltip
             Tooltip = gameObject.AddComponent<Tooltip.Tooltip>();
-            
+
             // Find content GameObject for menu entries.
             MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
-            IconTitleContent = MenuGameObject.transform.Find("Main Content/Icon Title Mask/Content") as RectTransform;
-            if (MenuContent == null || IconTitleContent == null)
+            iconTitleContent = MenuGameObject.transform.Find("Main Content/Icon Title Mask/Content") as RectTransform;
+            if (MenuContent == null || iconTitleContent == null)
             {
                 Debug.LogError("Couldn't find required components on MenuGameObject.");
             }
         }
-        
+
         /// <summary>
         /// Sets up the content of the previously created desktop window (<see cref="SetUpDesktopWindow"/>).
         /// In this case, buttons are created for each menu entry and added to the content GameObject.
@@ -203,7 +203,7 @@ namespace SEE.Game.UI.Menu
                 }
             }
         }
-        
+
         /// <summary>
         /// Changes the title in the menu to the string currently in <see cref="Title"/>.
         /// </summary>
@@ -218,12 +218,12 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// Updates the title, description, and icon in the manager after they've changed.
-        /// Should not be called when <see cref="Manager"/> or <see cref="IconTitleContent"/> is <c>null</c>.
+        /// Should not be called when <see cref="Manager"/> or <see cref="iconTitleContent"/> is <c>null</c>.
         /// </summary>
         private void UpdateUI()
         {
             Manager.UpdateUI();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(IconTitleContent);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(iconTitleContent);
         }
 
         /// <summary>
@@ -237,7 +237,7 @@ namespace SEE.Game.UI.Menu
                 UpdateUI();
             }
         }
-        
+
         /// <summary>
         /// Changes the title in the menu to the string currently in <see cref="Title"/>.
         /// </summary>
