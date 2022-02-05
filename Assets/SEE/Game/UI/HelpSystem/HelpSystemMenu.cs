@@ -1,3 +1,20 @@
+// Copyright 2022 Thore Frenzel.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+// THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Game.UI.Menu;
@@ -6,48 +23,66 @@ using UnityEngine;
 
 namespace SEE.Game.UI.HelpSystem
 {
+    /// <summary>
+    /// The menu of the help system.
+    /// </summary>
     public class HelpSystemMenu : MonoBehaviour
     {
         /// <summary>
-        /// The name of the PersonalAssistant-GameObject
+        /// The name of the PersonalAssistant GameObject
         /// </summary>
-        public const string PersonalAssistant = "PersonalAssistant";
+        private const string PersonalAssistantName = "PersonalAssistant";
 
         /// <summary>
-        /// The name of the HelpSystem-GameObject
+        /// The personal assistant.
         /// </summary>
-        public const string HelpSystem = "HelpSystem";
+        private static Transform personalAssistant;
 
         /// <summary>
         /// The NestedMenu of the HelpSystem - responsible for the navigation
-        /// inside of the use-cases.
+        /// inside of the use cases.
         /// </summary>
-        public NestedMenu mainMenu;
+        private NestedMenu mainMenu;
 
         /// <summary>
-        /// True, if an entry is currently displayed. That means, 
-        /// that there should be no interaction possible with the collider of see 
-        /// for opening the nestedMenu while Entry is opened.
+        /// True, if an entry is currently displayed. That means,
+        /// that there should be no interaction possible with the collider of the
+        /// personal assistant for opening the menu while an entry is opened.
         /// </summary>
         public static bool IsEntryOpened { get; set; } = false;
 
-        // Start is called before the first frame update
-        void Start()
+        /// <summary>
+        /// Creates the menu. Sets <see cref="personalAssistant"/> if not already set.
+        /// </summary>
+        private void Start()
         {
+            if (personalAssistant == null)
+            {
+                GameObject personalAssistantObject = GameObject.Find(PersonalAssistantName);
+                if (personalAssistantObject == null)
+                {
+                    Debug.LogError($"There is no personal assistant named {PersonalAssistantName}\n");
+                }
+                personalAssistant = personalAssistantObject.transform;
+            }
             CreateStartMenu();
         }
 
-        public void Update()
+        /// <summary>
+        /// Shows the menu when the user clicks on the personal assistant.
+        /// </summary>
+        private void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit))
-                    if (hit.transform == GameObject.Find(PersonalAssistant).transform && mainMenu.MenuShown == false && !IsEntryOpened)
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    if (hit.transform == personalAssistant && !mainMenu.MenuShown && !IsEntryOpened)
                     {
                         mainMenu.ShowMenu(true);
                     }
+                }
             }
         }
 
@@ -72,72 +107,72 @@ namespace SEE.Game.UI.HelpSystem
 
             // Hint for LinkedLists:
             // These lists are important for the Voice-Output of SEE and the displayed notes.
-            // The LinkedListEntries needs an index starting with number 1 ascending, the displayed and said text and the start-position, 
+            // The LinkedListEntries needs an index starting with number 1 ascending, the displayed and said text and the start-position,
             // where the text should appear and said by SEE. The first start-position has to be at point 0.
             // The linked list has to be inserted into a menu entry at the end of the function.
 
             LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
-            addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
-            addEdge.AddLast(new LinkedListEntry(2, "Left click on the entry new edge", 6));
-            addEdge.AddLast(new LinkedListEntry(3, "Left click on a node to select the start node", 12));
-            addEdge.AddLast(new LinkedListEntry(4, "Left click on a node to select the target node", 18));
-            addEdge.AddLast(new LinkedListEntry(5, "Press key F11 to reset the selected start node", 27));
+            addEdge.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu.", 0));
+            addEdge.AddLast(new LinkedListEntry(2, "Left click on the entry new edge.", 6));
+            addEdge.AddLast(new LinkedListEntry(3, "Left click on a node to select the start node.", 12));
+            addEdge.AddLast(new LinkedListEntry(4, "Left click on a node to select the target node.", 18));
+            addEdge.AddLast(new LinkedListEntry(5, "Press key F11 to reset the selected start node.", 27));
 
             LinkedList<LinkedListEntry> editNode = new LinkedList<LinkedListEntry>();
-            editNode.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu", 0));
-            editNode.AddLast(new LinkedListEntry(2, "Left click on the entry edit node", 8));
-            editNode.AddLast(new LinkedListEntry(3, "Left click on the node you want to edit", 14));
-            editNode.AddLast(new LinkedListEntry(4, "You can see all editable metrics inside of this new window", 21));
-            editNode.AddLast(new LinkedListEntry(5, "Insert new values, if so desired", 25));
-            editNode.AddLast(new LinkedListEntry(6, "Finish the editing process by pushing the Okay button", 30));
-            editNode.AddLast(new LinkedListEntry(7, "Your newly inserted values are now visible", 34));
+            editNode.AddLast(new LinkedListEntry(1, "Press Space for opening the player menu.", 0));
+            editNode.AddLast(new LinkedListEntry(2, "Left click on the entry edit node.", 8));
+            editNode.AddLast(new LinkedListEntry(3, "Left click on the node you want to edit.", 14));
+            editNode.AddLast(new LinkedListEntry(4, "You can see all editable metrics inside of this new window.", 21));
+            editNode.AddLast(new LinkedListEntry(5, "Insert new values, if so desired.", 25));
+            editNode.AddLast(new LinkedListEntry(6, "Finish the editing process by pushing the Okay button.", 30));
+            editNode.AddLast(new LinkedListEntry(7, "Your newly inserted values are now visible.", 34));
 
             LinkedList<LinkedListEntry> searchNode = new LinkedList<LinkedListEntry>();
-            searchNode.AddLast(new LinkedListEntry(1, "Press key F for opening the search menu", 0));
-            searchNode.AddLast(new LinkedListEntry(2, "Insert the name of the node or part of it into the input field", 5));
-            searchNode.AddLast(new LinkedListEntry(3, "Press the button Okay", 13));
-            searchNode.AddLast(new LinkedListEntry(4, "You can see the 5 best matching nodes ascending by their matching score", 16));
-            searchNode.AddLast(new LinkedListEntry(5, "If you left click on one node entry, the respective node will be highlighted", 23));
-            searchNode.AddLast(new LinkedListEntry(6, "The node is blinking and a light beam strikes for a few seconds", 30));
+            searchNode.AddLast(new LinkedListEntry(1, "Press key F for opening the search menu.", 0));
+            searchNode.AddLast(new LinkedListEntry(2, "Insert the name of the node or part of it into the input field.", 5));
+            searchNode.AddLast(new LinkedListEntry(3, "Press the button Okay.", 13));
+            searchNode.AddLast(new LinkedListEntry(4, "You can see the 5 best matching nodes, ascending by their matching score.", 16));
+            searchNode.AddLast(new LinkedListEntry(5, "If you left click on one node entry, the respective node will be highlighted.", 23));
+            searchNode.AddLast(new LinkedListEntry(6, "The node is blinking and a light beam strikes for a few seconds.", 30));
 
             LinkedList<LinkedListEntry> simpleNavigation = new LinkedList<LinkedListEntry>();
-            simpleNavigation.AddLast(new LinkedListEntry(1, "To switch your point of view, hold the right mouse button and move the mouse", 0));
-            simpleNavigation.AddLast(new LinkedListEntry(2, "Press Key W or S to move forwards or backwards", 10));
-            simpleNavigation.AddLast(new LinkedListEntry(3, "If your view is unlocked, you can move to the right or left with Key A or D", 20));
+            simpleNavigation.AddLast(new LinkedListEntry(1, "To switch your point of view, hold the right mouse button and move the mouse.", 0));
+            simpleNavigation.AddLast(new LinkedListEntry(2, "Press Key W or S to move forwards or backwards.", 10));
+            simpleNavigation.AddLast(new LinkedListEntry(3, "If your view is unlocked, you can move to the right or left with Key A or D.", 20));
 
             LinkedList<LinkedListEntry> switchTable = new LinkedList<LinkedListEntry>();
-            switchTable.AddLast(new LinkedListEntry(1, "By default, your focussed view is locked on the architecture-table", 0));
-            switchTable.AddLast(new LinkedListEntry(2, "Press key L for unlock your view to move free in space", 10));
-            switchTable.AddLast(new LinkedListEntry(3, "Now you can move free in space to other tables", 20));
-            switchTable.AddLast(new LinkedListEntry(4, "If you press key L again, your view is focussed on the architecture again", 28));
+            switchTable.AddLast(new LinkedListEntry(1, "By default, your focussed view may be locked on a code city.", 0));
+            switchTable.AddLast(new LinkedListEntry(2, "Press key L for unlock your view to move free in space.", 10));
+            switchTable.AddLast(new LinkedListEntry(3, "Now you can move free in space to other tables.", 20));
+            switchTable.AddLast(new LinkedListEntry(4, "If you press key L again, your view is focussed on the architecture again.", 28));
 
             LinkedList<LinkedListEntry> zoomIntoCity = new LinkedList<LinkedListEntry>();
-            zoomIntoCity.AddLast(new LinkedListEntry(1, "Hover with the mouse over the city you want to zoom into", 0));
-            zoomIntoCity.AddLast(new LinkedListEntry(2, "Now, you can scroll the mouse wheel up for zooming", 6));
-            zoomIntoCity.AddLast(new LinkedListEntry(3, "The zooming is focussed on the mouse pointer", 10));
-            zoomIntoCity.AddLast(new LinkedListEntry(4, "If you want to zoom out, scroll with the mouse wheel down", 15));
-            zoomIntoCity.AddLast(new LinkedListEntry(5, "If the city is not centered anymore, press key R to reset the layout to centered", 26));
+            zoomIntoCity.AddLast(new LinkedListEntry(1, "Hover with the mouse over the city you want to zoom into.", 0));
+            zoomIntoCity.AddLast(new LinkedListEntry(2, "Now, you can scroll the mouse wheel up for zooming.", 6));
+            zoomIntoCity.AddLast(new LinkedListEntry(3, "The zooming is focussed on the mouse pointer.", 10));
+            zoomIntoCity.AddLast(new LinkedListEntry(4, "If you want to zoom out, scroll with the mouse wheel down.", 15));
+            zoomIntoCity.AddLast(new LinkedListEntry(5, "If the city is not centered anymore, press key R to reset the layout to centered.", 26));
 
             LinkedList<LinkedListEntry> hideNode = new LinkedList<LinkedListEntry>();
-            hideNode.AddLast(new LinkedListEntry(1, "For hiding one or more nodes press space to open the player menu and select hide node ", 0));
-            hideNode.AddLast(new LinkedListEntry(2, "Scroll down and select hide selected or hide unselected",9 ));
-            hideNode.AddLast(new LinkedListEntry(3, "Select the node to hide or stay by left click on it", 22));
-            hideNode.AddLast(new LinkedListEntry(4, "For the selection of multiple nodes, hold key Control while klicking", 30));
-            hideNode.AddLast(new LinkedListEntry(5, "If you are ready, confirm your selection with the button done", 39));
+            hideNode.AddLast(new LinkedListEntry(1, "For hiding one or more nodes press space to open the player menu and select hide node.", 0));
+            hideNode.AddLast(new LinkedListEntry(2, "Scroll down and select hide selected or hide unselected.",9 ));
+            hideNode.AddLast(new LinkedListEntry(3, "Select the node to hide or stay by left clicking on it.", 22));
+            hideNode.AddLast(new LinkedListEntry(4, "For the selection of multiple nodes, hold key Control while clicking.", 30));
+            hideNode.AddLast(new LinkedListEntry(5, "If you are ready, confirm your selection with the button done.", 39));
             hideNode.AddLast(new LinkedListEntry(6, "Hint: If you hide a parent node, all connected edges and child nodes will be hidden too.", 50));
 
             LinkedList<LinkedListEntry> playEvolution = new LinkedList<LinkedListEntry>();
-            playEvolution.AddLast(new LinkedListEntry(1, "You can start the evolution with the play button at the navigation bar", 0));
-            playEvolution.AddLast(new LinkedListEntry(2, "You can see the current version of all versions on the lower right side", 10));
-            playEvolution.AddLast(new LinkedListEntry(3, "If you want to pause the evolution, press the pause button, which appears after pushing the play button", 20));
-            playEvolution.AddLast(new LinkedListEntry(4, "The other play button is for backward playing and works as same as the normal play button", 27));
-            playEvolution.AddLast(new LinkedListEntry(5, "Pushing multiple times on the double play buttons determines the play speed", 34));
-            playEvolution.AddLast(new LinkedListEntry(6, "You also can skip by moving the dragger of the navigation bar by left click on it", 44));
-            playEvolution.AddLast(new LinkedListEntry(7, "Yellow beams representing changes in classes", 49));
-            playEvolution.AddLast(new LinkedListEntry(8, "Green beams representing new classes", 52));
-            playEvolution.AddLast(new LinkedListEntry(9, "Red beams representing deleted classes", 55));
+            playEvolution.AddLast(new LinkedListEntry(1, "You can start the evolution with the play button at the navigation bar.", 0));
+            playEvolution.AddLast(new LinkedListEntry(2, "You can see the current version of all versions on the lower right side.", 10));
+            playEvolution.AddLast(new LinkedListEntry(3, "If you want to pause the evolution, press the pause button, which appears after pushing the play button.", 20));
+            playEvolution.AddLast(new LinkedListEntry(4, "The other play button is for backward playing and works as same as the normal play button.", 27));
+            playEvolution.AddLast(new LinkedListEntry(5, "Pushing multiple times on the double play buttons determines the play speed.", 34));
+            playEvolution.AddLast(new LinkedListEntry(6, "You also can skip by moving the dragger of the navigation bar by left click on it.", 44));
+            playEvolution.AddLast(new LinkedListEntry(7, "Yellow beams represent changes in classes.", 49));
+            playEvolution.AddLast(new LinkedListEntry(8, "Green beams represent new classes.", 52));
+            playEvolution.AddLast(new LinkedListEntry(9, "Red beams represent deleted classes.", 55));
 
-            // Important note: You have to define the lowest hierachy-level first. 
+            // Important note: You have to define the lowest hierachy-level first.
             // That means, the mainMenu will be defined at the end and the lowest entry-list first.
             // A list has to be filled with values before the higher hierachy-level will be filled with values and so on.
 
@@ -178,11 +213,11 @@ namespace SEE.Game.UI.HelpSystem
 
             mainMenuEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use-Cases related to the architecture", Color.magenta),
-            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use-Cases related to software-evolution", Color.red),
-            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use-Cases related to software-debugging ", Color.blue),
-            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use-Cases related to the software-quality", Color.cyan),
-            HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use-Cases related to the navigation in SEE", Color.green)
+            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use cases related to the architecture", Color.magenta),
+            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use cases related to software-evolution", Color.red),
+            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use cases related to software-debugging ", Color.blue),
+            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use cases related to the software-quality", Color.cyan),
+            HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use cases related to the navigation in SEE", Color.green)
             };
 
             mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
