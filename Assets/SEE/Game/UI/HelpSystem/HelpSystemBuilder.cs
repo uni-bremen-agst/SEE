@@ -1,3 +1,20 @@
+// Copyright 2022 Thore Frenzel.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+// THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using System.Collections.Generic;
 using System.IO;
 using SEE.Controls;
@@ -31,7 +48,7 @@ namespace SEE.Game.UI.HelpSystem
         private const string RefIcon = "Materials/ModernUIPack/Plus";
 
         /// <summary>
-        /// The LinkedListEntries of the current selected HelpSystemEntry.
+        /// The LinkedListEntries of the currently selected HelpSystemEntry.
         /// </summary>
         public static LinkedList<LinkedListEntry> currentEntries;
 
@@ -41,12 +58,12 @@ namespace SEE.Game.UI.HelpSystem
         public static GameObject EntrySpace;
 
         /// <summary>
-        /// The headline-gameObject of the helpSystemEntry or rather the headline which is inside of the dynamicPanel.
+        /// The headline gameObject of the helpSystemEntry or rather the headline which is inside of the dynamicPanel.
         /// </summary>
         public static GameObject Headline;
 
         /// <summary>
-        /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu. 
+        /// Creates a new HelpSystemEntry. That means, it should be inserted as the last element of a branch inside of the help-system-menu.
         /// As a difference to a normal HelpSystemMenu-Entry, onclick, there will be started an HelpSystemEntry which explains the specific use-Case.
         /// </summary>
         /// <param name="title">The title of the HelpSystemMenu-Entry.</param>
@@ -91,8 +108,8 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Creates the Main-Menu of the HelpSystemMenu. 
-        /// More specific, it creates the highest Hierachy-Layer, 
+        /// Creates the Main-Menu of the HelpSystemMenu.
+        /// More specific, it creates the highest Hierachy-Layer,
         /// where new Layers can be attached to with the functions above.
         /// </summary>
         /// <param name="title">The title of the HelpSystem-MainMenu.</param>
