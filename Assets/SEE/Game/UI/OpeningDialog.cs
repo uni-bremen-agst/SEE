@@ -4,6 +4,8 @@ using SEE.Utils;
 using SEE.GO;
 using UnityEngine;
 using SEE.Game.UI.PropertyDialog;
+using System;
+using SEE.Game.UI.Notification;
 
 namespace SEE.UI
 {
@@ -11,30 +13,30 @@ namespace SEE.UI
     /// Implements the behaviour of the in-game menu for the selection of the networking
     /// configuration (host, server, client, settings) that is shown at the start up.
     /// </summary>
-    public class OpeningDialog : MonoBehaviour
+    internal class OpeningDialog : MonoBehaviour
     {
         /// <summary>
         /// The UI object representing the menu the user chooses the action from.
         /// </summary>
-        private SelectionMenu actionMenu;
+        private SimpleMenu menu;
 
         /// <summary>
         /// This creates and returns the action menu, with which a user can configure the
         /// networking.
         /// </summary>
-        /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
-        /// new game object will be created.</param>
         /// <returns>the newly created action menu component.</returns>
-        private SelectionMenu CreateModeMenu(GameObject attachTo = null)
+        private SimpleMenu CreateMenu()
         {
-            // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionMenuGO = attachTo ? attachTo : new GameObject { name = "Network Menu" };
+            GameObject actionMenuGO = new GameObject { name = "Network Menu" };
             IList<ToggleMenuEntry> entries = SelectionEntries();
-            SelectionMenu actionMenu = actionMenuGO.AddComponent<SelectionMenu>();
-            actionMenu.EnableClosing(false); // the menu cannot be closed; user must make a decision
+            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
+            actionMenu.AllowNoSelection(false); // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
             actionMenu.Description = "Please select the network configuration you want to activate.";
             actionMenu.AddEntries(entries);
+            // We will handle the closing of the menu ourselves: we need to wait until a network
+            // connection can be established.
+            actionMenu.HideAfterSelection(false);
             return actionMenu;
         }
 
@@ -61,13 +63,14 @@ namespace SEE.UI
                                           description: "Starts a local client connection to a server.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Client")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: StartServer,
-                                          exitAction: null,
-                                          title: "Server",
-                                          description: "Starts a dedicated server without local client.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Server")),
+                      // FIXME: Running only a server is currently not working.
+                      //new ToggleMenuEntry(active: false,
+                      //                    entryAction: StartServer,
+                      //                    exitAction: null,
+                      //                    title: "Server",
+                      //                    description: "Starts a dedicated server without local client.",
+                      //                    entryColor: NextColor(),
+                      //                    icon: Resources.Load<Sprite>("Icons/Server")),
                       new ToggleMenuEntry(active: false,
                                           entryAction: Settings,
                                           exitAction: null,
@@ -95,7 +98,20 @@ namespace SEE.UI
         /// </summary>
         private void StartHost()
         {
-            network.StartHost();
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu(false);
+                network.StartHost(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu(true);
+                ShowNotification.Error("Host cannot be started", exception.Message);
+            }
         }
 
         /// <summary>
@@ -103,15 +119,58 @@ namespace SEE.UI
         /// </summary>
         private void StartClient()
         {
-            network.StartClient();
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu(false);
+                network.StartClient(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu(true);
+                ShowNotification.Error("Server connection failed", exception.Message);
+            }
         }
 
         /// <summary>
-        /// Starts a dedicated server on this machine.
+        /// Starts a dedicated server on this machine (only server, no client).
         /// </summary>
         private void StartServer()
         {
-            network.StartServer();
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu(false);
+                network.StartServer(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu(true);
+                ShowNotification.Error("Server cannot be started", exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.
+        ///
+        /// This method is used as a callback in <see cref="StartClient"/>, <see cref="StartServer"/>,
+        /// and <see cref="StartHost"/>.
+        /// </summary>
+        /// <param name="success">true tells us that the network could be started successfully</param>
+        /// <param name="message">a description of what happened</param>
+        private void NetworkCallBack(bool success, string message)
+        {
+            menu.ShowMenu(!success);
+            if (!success)
+            {
+                ShowNotification.Error("Network problem", message);
+            }
         }
 
         /// <summary>
@@ -119,25 +178,25 @@ namespace SEE.UI
         /// </summary>
         private void Settings()
         {
-            // Note: We arrive here because the user pressed on of the buttons of the
-            // actionMenu, which - in turn - will call actionMenu.ShowMenu(false). Thus
-            // at this time, actionMenu is no longer visible. When the following dialog
-            // is finished, Reactive will be called to turn the actionMenu on again.
+            /// Note: We arrive here because the user pressed one of the buttons of the
+            /// menu, which - in turn - will call menu.ShowMenu(false). Thus
+            /// at this time, menu is no longer visible. When the following dialog
+            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new NetworkPropertyDialog(network, Reactivate);
             dialog.Open();
         }
 
         /// <summary>
-        /// Turns on the <see cref="actionMenu"/>.
+        /// Turns on the <see cref="menu"/>.
         /// </summary>
         private void Reactivate()
         {
-            actionMenu.ShowMenu(true);
+            menu.ShowMenu(true);
         }
 
         /// <summary>
         /// Sets <see cref="network"/> if it exists as a component attached to
-        /// this game object; otherwise this component is diabled.
+        /// this game object; otherwise this component is disabled.
         /// </summary>
         private void Awake()
         {
@@ -148,12 +207,12 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Creates and shows the <see cref="actionMenu"/>.
+        /// Creates and shows the <see cref="menu"/>.
         /// </summary>
         private void Start()
         {
-            actionMenu = CreateModeMenu();
-            actionMenu.ShowMenu(true);
+            menu = CreateMenu();
+            menu.ShowMenu(true);
         }
     }
 }

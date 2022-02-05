@@ -115,6 +115,7 @@ namespace SEE.Game.City
         private static void RemoveTransparency()
         {
             // Remove transparency of all nodes and edges
+            // FIXME: This may clash with the AlphaEnforcer component.
             foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
             {
                 MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();

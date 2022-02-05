@@ -193,7 +193,11 @@ namespace SEE.Game.City
         /// </summary>
         private Stack<GameObject> functionCalls = new Stack<GameObject>();
 
-        /// Start is called before the first frame update
+        /// <summary>
+        /// Reads the JLG data from <see cref="JLGPath"/>, initializes <see cref="parsedJLG"/>,
+        /// <see cref="statementCounter"/>, <see cref="nodesGOs"/>, and <see cref="currentGO"/>.
+        /// In case of any error, this components disables itself.
+        /// </summary>
         private void Start()
         {
             JLGParser jlgParser = new JLGParser(JLGPath.Path);
@@ -218,7 +222,7 @@ namespace SEE.Game.City
                 if (nodesGOs.Count == 0)
                 {
                     enabled = false;
-                    Debug.LogError("[JLG] There are no nodes.\n");
+                    Debug.LogError("[JLG] There are no nodes. Your first need to create a code city with at least one node.\n");
                 }
                 else if (GetNodeForStatement(statementCounter.Value) == null)
                 {

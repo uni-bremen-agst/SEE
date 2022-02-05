@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
+using SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.Tools.Architecture
 {
@@ -162,15 +163,15 @@ namespace SEE.Tools.Architecture
         private void AssertMapped(Node implNode, Node archNode)
         {
             Assert.AreEqual(1, mapsToEdgesAdded.Count);
-            Assert.AreEqual(implNode.ID, mapsToEdgesAdded[0].mapsToEdge.Source.ID);
-            Assert.AreEqual(archNode.ID, mapsToEdgesAdded[0].mapsToEdge.Target.ID);
+            Assert.AreEqual(implNode.ID, mapsToEdgesAdded[0].TheMapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, mapsToEdgesAdded[0].TheMapsToEdge.Target.ID);
         }
 
         private void AssertUnmapped(Node implNode, Node archNode)
         {
             Assert.AreEqual(1, mapsToEdgesRemoved.Count);
-            Assert.AreEqual(implNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Source.ID);
-            Assert.AreEqual(archNode.ID, mapsToEdgesRemoved[0].mapsToEdge.Target.ID);
+            Assert.AreEqual(implNode.ID, mapsToEdgesRemoved[0].TheMapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, mapsToEdgesRemoved[0].TheMapsToEdge.Target.ID);
         }
 
         /// <summary>
