@@ -1,3 +1,20 @@
+// Copyright 2022 Thore Frenzel.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial
+// portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+// LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+// THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +32,9 @@ using UnityEngine.Video;
 
 namespace SEE.Game.UI.HelpSystem
 {
+    /// <summary>
+    /// An entry in the help menu.
+    /// </summary>
     public class HelpSystemEntry : PlatformDependentComponent
     {
         /// <summary>
@@ -43,12 +63,12 @@ namespace SEE.Game.UI.HelpSystem
         private const string titleManager = "Unnamed Menu";
 
         /// <summary>
-        /// The video-player which is responsible for interaction with the video such as play, pause, skip etc.
+        /// The video-player which is responsible for interaction with the video such as play, pause, skip, etc.
         /// </summary>
         private VideoPlayer videoPlayer;
 
         /// <summary>
-        /// The pause or rather the pause/play- button which pauses or plays the video
+        /// The pause or rather the pause/play button which pauses or plays the video, respectively.
         /// </summary>
         private ButtonManagerBasicIcon pauseButton;
 
@@ -79,7 +99,7 @@ namespace SEE.Game.UI.HelpSystem
         private TextMeshProUGUI progress;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         GameObject keywordDisplay;
 
@@ -167,8 +187,8 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Sets the TextMeshPro-Text which represents the progress of the video. It is
-        /// splitted in parts of texts, e.g. 1/5 or 2/5 instead of time.
+        /// Sets the TextMeshPro text which represents the progress of the video. It is
+        /// split in parts of texts, e.g., 1/5 or 2/5, instead of time.
         /// </summary>
         private void SetTmpProgress()
         {
@@ -185,7 +205,7 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Shows the HelpSystemEntry with the inserted values. Per default - it will be started directly by showing the entry.
+        /// Shows the HelpSystemEntry with the inserted values. Per default, it will be started directly by showing the entry.
         /// </summary>
         public void ShowEntry()
         {
@@ -194,7 +214,7 @@ namespace SEE.Game.UI.HelpSystem
             HelpSystemBuilder.EntrySpace = helpSystemSpace;
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
-            dynamicPanel.sizeDelta = new Vector2(550, 425); 
+            dynamicPanel.sizeDelta = new Vector2(550, 425);
             helpSystemEntry.transform.Find("Content/Lower Video/Scrollable/Code")
               .gameObject.TryGetComponentOrLog(out text);
             text.fontSize = 20;
@@ -227,7 +247,7 @@ namespace SEE.Game.UI.HelpSystem
             Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
             PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
             tab.Label = "";
-            GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"), 
+            GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"),
                                                           helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform, false);
             HelpSystemBuilder.Headline = headline;
             headline.GetComponent<TextMeshProUGUI>().text = titleManager;
@@ -242,7 +262,7 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Closes the HelpSystemEntry, stops the displayed video and resets the HelpSystemMenu too to the start.
+        /// Closes the HelpSystemEntry, stops the displayed video and also resets the HelpSystemMenu to the start.
         /// </summary>
         public void Close()
         {
@@ -260,7 +280,6 @@ namespace SEE.Game.UI.HelpSystem
             audioSource.Stop();
             Destroy(helpSystemSpace);
             EntryShown = false;
-
         }
 
         /// <summary>
@@ -319,7 +338,7 @@ namespace SEE.Game.UI.HelpSystem
                     videoPlayer.time = currentKeyword.CumulatedTime;
                     tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 1));
                 }
-                catch (ArgumentOutOfRangeException e)
+                catch (ArgumentOutOfRangeException _)
                 {
                     tmp.text = string.Empty;
                     foreach (LinkedListEntry s in HelpSystemBuilder.currentEntries)
@@ -332,7 +351,7 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Closes the HelpSystemEntry and reopens the HelpSystemMenu for the option of selecting another entry.
+        /// Closes the HelpSystemEntry and re-opens the HelpSystemMenu for the option of selecting another entry.
         /// </summary>
         public void Back()
         {
@@ -351,8 +370,8 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Toggles the "IsPlaying" - state. If the entry is running, it will be paused, if it is paused,
-        /// it will be played on. 
+        /// Toggles the "IsPlaying" state. If the entry is running, it will be paused; if it is paused,
+        /// it will be played on.
         /// </summary>
         public void TogglePlaying()
         {
