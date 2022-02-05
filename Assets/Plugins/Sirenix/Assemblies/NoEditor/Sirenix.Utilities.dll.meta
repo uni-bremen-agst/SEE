@@ -85,7 +85,16 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
+<<<<<<< HEAD
       Standalone: OSXUniversal
+=======
+      Standalone: Linux64
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Win64
+>>>>>>> origin/master
     second:
       enabled: 1
       settings: {}

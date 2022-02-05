@@ -18,6 +18,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace SEE.Game.Evolution
         private AnimationDataModel animationDataModel; // not serialized; will be set in Init()
 
         /// <summary>
-        /// The in-game canvas containing the menu for selecting the shown graph revision. 
+        /// The in-game canvas containing the menu for selecting the shown graph revision.
         /// It is shown when the user enters the ESC key. Beside the revision selection
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
@@ -77,14 +78,14 @@ namespace SEE.Game.Evolution
         private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
         /// <summary>
-        /// The container for the markers, needed for serialization 
+        /// The container for the markers, needed for serialization
         /// </summary>
         private SliderMarkerContainer sliderMarkerContainer; // not serialized; will be set in Init()
 
         /// <summary>
         /// The currently selected marker
         /// </summary>
-        private Button selectedMarker; 
+        private Button selectedMarker;
 
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
@@ -138,8 +139,7 @@ namespace SEE.Game.Evolution
             AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
             RevisionSelectionCanvas = GetCanvas(RevisionSelectionCanvasGameObjectName, RevisionSelectionCanvasPrefab);
 
-            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
-            canvas.worldCamera = MainCamera.Camera;
+            StartCoroutine(SetAnimationCanvasCamera());
 
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
@@ -151,7 +151,7 @@ namespace SEE.Game.Evolution
             revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
             animationDataModel.Slider.minValue = 1;
-            animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount-1;
+            animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount - 1;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
             animationDataModel.PlayButton.onClick.AddListener(TaskOnClickPlayButton);
@@ -171,8 +171,8 @@ namespace SEE.Game.Evolution
             try
             {
                 sliderMarkerContainer = SliderMarkerContainer.Load(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
-                
-            } catch(FileNotFoundException)
+            }
+            catch (FileNotFoundException)
             {
                 sliderMarkerContainer = new SliderMarkerContainer();
             }
@@ -190,10 +190,32 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Waits until a camera becomes a available. When a camera is
+        /// available, the world camera of the <see cref="AnimationCanvas"/>
+        /// will be set to this camera.
+        ///
+        /// Intended to be run as a co-routine.
+        /// </summary>
+        /// <returns>whether to continue the co-routine</returns>
+        private IEnumerator SetAnimationCanvasCamera()
+        {
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            Camera camera = Camera.main;
+
+            while (camera == null)
+            {
+                yield return new WaitForSeconds(0.5f);
+                camera = Camera.main;
+            }
+
+            canvas.worldCamera = camera;
+        }
+
+        /// <summary>
         /// If a child with <paramref name="canvasGameObjectName"/> exists in <see cref="gameObject"/>,
         /// this child will be returned. If no such child exists, a new child with that name will
         /// be created under <see cref="gameObject"/> as an instantiation of the given <paramref name="canvasPrefab"/>.
-        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception 
+        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception
         /// be thrown.
         /// </summary>
         /// <param name="canvasGameObjectName">name of the child</param>
@@ -234,7 +256,7 @@ namespace SEE.Game.Evolution
                 SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(p.Key.transform.position);
                 sliderMarker.SetComment(p.Value.text);
             }
-          
+
             sliderMarkerContainer?.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
         }
 
@@ -264,7 +286,7 @@ namespace SEE.Game.Evolution
                     evolutionRenderer.ToggleAutoPlay();
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -302,11 +324,11 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickFastForwardButton()
         {
-            if (evolutionRenderer.IsAutoPlayReverse) 
+            if (evolutionRenderer.IsAutoPlayReverse)
             {
                 return;
             }
-            if (isFastBackward) 
+            if (isFastBackward)
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
@@ -342,7 +364,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickFastBackwardButton()
         {
-            if (evolutionRenderer.IsAutoPlay) 
+            if (evolutionRenderer.IsAutoPlay)
             {
                 return;
             }
@@ -405,7 +427,7 @@ namespace SEE.Game.Evolution
             commentField.transform.localScale = new Vector3(16f, 1f, 1f);
             commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
-            if (comment != null) 
+            if (comment != null)
             {
                 commentField.text = comment;
             }
@@ -433,7 +455,7 @@ namespace SEE.Game.Evolution
                 sliderMarkerContainer.SliderMarkers.Add(newSliderMarker);
             }
             InputField commentField = AddCommentToMarker(newMarker, comment);
-            commentField.gameObject.SetActive(false);      
+            commentField.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -476,16 +498,16 @@ namespace SEE.Game.Evolution
                 else if (SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
-                } 
+                }
                 else if (SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null) 
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
                     {
                         AddMarker(markerPos, null);
-                    }                    
-                } 
+                    }
+                }
                 else if (SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
@@ -509,10 +531,10 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Toggles between the animation-interaction mode and the revision-selection
-        /// mode. 
+        /// mode.
         /// In the animation-interaction mode, the user can see and control
         /// the animations of the graph revisions through the AnimationCanvas
-        /// and freely move in the city. 
+        /// and freely move in the city.
         /// In the revision-selection mode, the user can select the revision to be shown
         /// through the RevisionSelectionCanvas. No movement is possible in that mode.
         /// </summary>
@@ -525,16 +547,16 @@ namespace SEE.Game.Evolution
         /// Toggles between the animation-interaction mode and the revision-selection
         /// mode. If <paramref name="enabled"/> is true, the revision-selection mode
         /// is activated; otherwise the animation-interaction mode is turned on.
-        /// 
+        ///
         /// In the revision-selection mode, the user can select the revision to be shown
         /// through the RevisionSelectionCanvas. No movement is possible in that mode.
-        /// 
+        ///
         /// In the animation-interaction mode, the user can see and control
         /// the animations of the graph revisions through the AnimationCanvas
-        /// and freely move in the city. 
-        /// 
+        /// and freely move in the city.
+        ///
         /// Both modes are mutually exclusive.
-        /// 
+        ///
         /// Auto-play animation is always turned off independent of <paramref name="enabled"/>.
         /// </summary>
         /// <param name="enabled">if true, revision-selection mode is turned on; otherwise

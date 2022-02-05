@@ -36,12 +36,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn += SelectionOn;
-                interactable.SelectOut += SelectionOff;
-                interactable.HoverIn += HoverOn;
-                interactable.HoverOut += HoverOff;
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
             }
             else
             {
@@ -54,12 +54,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= SelectionOn;
-                interactable.SelectOut -= SelectionOff;
-                interactable.HoverIn -= HoverOn;
-                interactable.HoverOut -= HoverOff;
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
             }
             else
             {

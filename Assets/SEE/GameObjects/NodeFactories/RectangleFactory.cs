@@ -6,7 +6,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for rectangle inner game objects.
     /// </summary>
-    public class RectangleFactory : LineInnerNodeFactory
+    internal class RectangleFactory : LineInnerNodeFactory
     {
         /// <summary>
         /// Constructor allowing to set the initial unit for the width of the lines that render this inner node.
@@ -72,7 +72,7 @@ namespace SEE.GO
             line.SetPositions(positions);
 
             // Connect the start and end positions of the line together to form a continuous loop.
-            line.loop = true;            
+            line.loop = true;
         }
     }
 }

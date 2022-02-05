@@ -13,10 +13,6 @@ namespace SEE.Game
     public class LayoutGameNode : AbstractLayoutNode
     {
         /// <summary>
-        /// The game object his layout node encapsulates.
-        /// </summary>
-        private readonly GameObject gameObject;
-        /// <summary>
         /// The node factory that created the game object. Required to obtain scaling information.
         /// </summary>
         private readonly NodeFactory nodeFactory;

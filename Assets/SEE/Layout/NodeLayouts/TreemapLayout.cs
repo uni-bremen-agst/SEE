@@ -3,7 +3,10 @@ using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.NodeLayouts.TreeMap;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -54,36 +57,40 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">nodes to be laid out</param>
         /// <returns>treemap layout scaled in x and z axes</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
-            if (layoutNodes.Count == 0)
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            switch (layoutNodeList.Count)
             {
-                throw new Exception("No nodes to be laid out.");
-            }
-            else if (layoutNodes.Count == 1)
-            {
-                IEnumerator<ILayoutNode> enumerator = layoutNodes.GetEnumerator();
-                if (enumerator.MoveNext())
+                case 0:
+                    throw new ArgumentException("No nodes to be laid out.");
+                case 1:
                 {
-                    // MoveNext() must be called before we can call Current.
-                    ILayoutNode gameNode = enumerator.Current;
-                    UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
-                    layout_result[gameNode] = new NodeTransform(Vector3.zero,
-                                                                new Vector3(width, gameNode.LocalScale.y, depth));
+                    using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();
+                    if (enumerator.MoveNext())
+                    {
+                        // MoveNext() must be called before we can call Current.
+                        ILayoutNode gameNode = enumerator.Current;
+                        UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
+                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                            new Vector3(width, gameNode.LocalScale.y, depth));
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, "We should never arrive here.\n");
+                    }
+
+                    break;
                 }
-                else
-                {
-                    Debug.LogError("We should never arrive here.\n");
-                }
+                default:
+                    roots = LayoutNodes.GetRoots(layoutNodeList);
+                    CalculateSize();
+                    CalculateLayout();
+                    break;
             }
-            else
-            {
-                roots = LayoutNodes.GetRoots(layoutNodes);
-                CalculateSize();
-                CalculateLayout();
-            }
+
             return layout_result;
         }
 
