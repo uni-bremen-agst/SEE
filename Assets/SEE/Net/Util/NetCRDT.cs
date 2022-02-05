@@ -93,11 +93,11 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file); 
                     
                         break;
                     case RemoteAction.SingleAddChar:
-                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file), ICRDT.StringToPosition(prePosition, file), file); 
+                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file); 
                     
                        break;
 
@@ -126,25 +126,25 @@ namespace SEE.Net
             Execute(null);
         }
 
-        public void AddChar(char c, Identifier[] position, Identifier[] prePosition, string file)
+        public void AddChar(char c, Identifier[] position /*, Identifier[] prePosition*/, string file)
         {
-            
+            Debug.Log("ADD" + c + position);
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
-            this.prePosition = ICRDT.PositionToString(prePosition, file);
+            //this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
            
         }
 
-        public void SingleAddChar(char c, Identifier[] position, Identifier[] prePosition, string file, IPEndPoint[] recipient)
+        public void SingleAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/, string file, IPEndPoint[] recipient)
         {
 
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
-            this.prePosition = ICRDT.PositionToString(prePosition, file);
+            //this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.SingleAddChar;
             Execute(recipient);
 
@@ -152,6 +152,7 @@ namespace SEE.Net
 
         public void AddString(string text, string filename)
         {
+            Debug.Log("ADD" + text);
             this.file = filename;
             this.listAsString = text;
             this.state = RemoteAction.AddString;
