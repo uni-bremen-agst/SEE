@@ -17,7 +17,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using SEE.Controls;
 using SEE.Game.UI.Menu;
 using SEE.GO;
 using TMPro;
@@ -28,14 +27,85 @@ namespace SEE.Game.UI.HelpSystem
 {
     /// <summary>
     /// Contains all important functions for the creation of the helpSystemMenu.
-    /// Contains the business-logic of the helpSystemEntry-execution, too.
+    /// Contains the business logic of the helpSystemEntry execution, too.
     /// </summary>
     public static class HelpSystemBuilder
     {
         /// <summary>
-        /// The name of the HelpSystem GameObject.
+        /// The name of the HelpSystem GameObject. Must be present in the scene.
         /// </summary>
-        public const string HelpSystemGO = "HelpSystem";
+        private const string HelpSystemName = "HelpSystem";
+
+        /// <summary>
+        /// The root menu entry of the help system. It is assumed to be a component
+        /// attached to the game object named <see cref="HelpSystemName"/>.
+        /// </summary>
+        private static HelpSystemEntry helpMenuRootEntry;
+
+        /// <summary>
+        /// Returns the root menu entry of the help system.
+        /// Precondition: There must be a game object in the scene named <see cref="HelpSystemName"/>
+        /// holding a <see cref="HelpSystemEntry"/> component.
+        /// </summary>
+        /// <returns>the root menu entry of the help system</returns>
+        /// <exception cref="System.Exception">thrown if there is no game object in the scene
+        /// named <see cref="HelpSystemName"/> or - if one exists - that object is not
+        /// holding a <see cref="HelpSystemEntry"/> component</exception>
+        public static HelpSystemEntry GetHelpMenuRootEntry()
+        {
+            if (helpMenuRootEntry == null)
+            {
+                GameObject helpSystem = HelpSystemObject();
+                if (!helpSystem.TryGetComponent(out helpMenuRootEntry))
+                {
+                    throw new System.Exception($"The help system named {HelpSystemName} does not have a {typeof(HelpSystemEntry)} component.");
+                }
+            }
+            return helpMenuRootEntry;
+        }
+
+        /// <summary>
+        /// The help-system menu. It is assumed to be a component
+        /// attached to the game object named <see cref="HelpSystemName"/>.
+        /// </summary>
+        private static HelpSystemMenu helpSystemMenu;
+
+        /// <summary>
+        /// Returns the help-system menu.
+        /// Precondition: There must be a game object in the scene named <see cref="HelpSystemName"/>
+        /// holding a <see cref="HelpSystemMenu"/> component.
+        /// </summary>
+        /// <returns>the help-system menu</returns>
+        /// <exception cref="System.Exception">thrown if there is no game object in the scene
+        /// named <see cref="HelpSystemName"/> or - if one exists - that object is not
+        /// holding a <see cref="HelpSystemMenu"/> component</exception>
+        public static HelpSystemMenu GetHelpSystemMenu()
+        {
+            if (helpSystemMenu == null)
+            {
+                GameObject helpSystem = HelpSystemObject();
+                if (!helpSystem.TryGetComponent(out helpSystemMenu))
+                {
+                    throw new System.Exception($"The help system named {HelpSystemName} does not have a {typeof(HelpSystemMenu)} component.");
+                }
+            }
+            return helpSystemMenu;
+        }
+
+        /// <summary>
+        /// Returns the game object named <see cref="HelpSystemName"/>.
+        /// </summary>
+        /// <returns>the game object named <see cref="HelpSystemName"/></returns>
+        /// <exception cref="System.Exception">throw if there is no such object in the scene</exception>
+        private static GameObject HelpSystemObject()
+        {
+            GameObject helpSystem = GameObject.Find(HelpSystemName);
+            if (helpSystem == null)
+            {
+                throw new System.Exception($"There is no help system named {HelpSystemName} in the scene.");
+            }
+            return helpSystem;
+        }
 
         /// <summary>
         /// The path to the default-icon for an HelpSystemEntry in the nested menu.
@@ -119,7 +189,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <returns>The Main-Menu as a NestedMenu.</returns>
         public static NestedMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
         {
-            NestedMenu mainMenu = GameObject.Find(HelpSystemGO).AddComponent<NestedMenu>();
+            NestedMenu mainMenu = GameObject.Find(HelpSystemName).AddComponent<NestedMenu>();
             mainMenu.Title = title;
             mainMenu.Description = description;
             mainMenu.Icon = Resources.Load<Sprite>(icon);
@@ -143,16 +213,17 @@ namespace SEE.Game.UI.HelpSystem
         {
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();
-            GameObject go = GameObject.Find(HelpSystemGO);
+            GameObject go = GameObject.Find(HelpSystemName);
             go.TryGetComponentOrLog(out NestedMenu menu);
-            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+            HelpSystemEntry entry = GetHelpMenuRootEntry();
 
             if (!GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer))
             {
-                throw new System.Exception("No Video-Player found");
+                throw new System.Exception("No video player found");
             }
             if (entryTitle != null)
             {
+                // FIXME: Is the following line useless? The out parameter text is not actually used.
                 EntrySpace.transform.Find("DynamicPanel/PanelHeader").gameObject.TryGetComponent<TextMeshProUGUI>(out TextMeshProUGUI text);
                 Headline.GetComponent<TextMeshProUGUI>().text = entryTitle;
             }

@@ -15,10 +15,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Game.UI.Menu;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Game.UI.HelpSystem
@@ -62,18 +62,20 @@ namespace SEE.Game.UI.HelpSystem
                 if (personalAssistantObject == null)
                 {
                     Debug.LogError($"There is no personal assistant named {PersonalAssistantName}\n");
+                    enabled = false;
+                    return;
                 }
                 personalAssistant = personalAssistantObject.transform;
+                mainMenu = CreateStartMenu();
             }
-            CreateStartMenu();
         }
 
         /// <summary>
-        /// Shows the menu when the user clicks on the personal assistant.
+        /// Shows the menu when the user clicks on the personal assistant or otherwise requests help.
         /// </summary>
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) || SEEInput.Help())
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit))
@@ -87,12 +89,14 @@ namespace SEE.Game.UI.HelpSystem
         }
 
         /// <summary>
-        /// Contains all Hierachy-Layers of the Help-System-Menu from the lowest to the highest layer.
-        /// It creates all Sub-Menu's, RefEntries and HelpSystemEntrys and should be expanded by the developers.
+        /// Contains all hierarchy layers of the help-system menu from the lowest to the highest layer.
+        /// It creates all sub-menus, RefEntries and HelpSystemEntrys and should be expanded by the developers.
         /// </summary>
-        private void CreateStartMenu()
+        /// <param name="menuHolder">the game object holding the <see cref="HelpSystemEntry"/> which is the root of the help menu</param>
+        /// <returns>the created help menu</returns>
+        private static NestedMenu CreateStartMenu()
         {
-            PlayerSettings.LocalPlayer.TryGetComponentOrLog(out HelpSystemEntry entry);
+            HelpSystemEntry entry = HelpSystemBuilder.GetHelpMenuRootEntry();
 
             // Initialisation of all Lists for the NestedMenuEntries or MenuEntries.
             List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
@@ -107,8 +111,8 @@ namespace SEE.Game.UI.HelpSystem
 
             // Hint for LinkedLists:
             // These lists are important for the Voice-Output of SEE and the displayed notes.
-            // The LinkedListEntries needs an index starting with number 1 ascending, the displayed and said text and the start-position,
-            // where the text should appear and said by SEE. The first start-position has to be at point 0.
+            // The LinkedListEntries needs an index starting with number 1 ascending, the displayed and said text and the start position,
+            // where the text should appear and said by SEE. The first start position has to be at point 0.
             // The linked list has to be inserted into a menu entry at the end of the function.
 
             LinkedList<LinkedListEntry> addEdge = new LinkedList<LinkedListEntry>();
@@ -220,7 +224,23 @@ namespace SEE.Game.UI.HelpSystem
             HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use cases related to the navigation in SEE", Color.green)
             };
 
-            mainMenu = HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific Use-Case", "Materials/Notification/info", mainMenuEntries);
+            return HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific use case", "Materials/Notification/info", mainMenuEntries);
+        }
+
+        /// <summary>
+        /// Displays the menu when it is hidden, and vice versa.
+        /// </summary>
+        internal void ToggleMenu()
+        {
+            mainMenu.ToggleMenu();
+        }
+
+        /// <summary>
+        /// Resets the menu to the state it was before any entry was selected.
+        /// </summary>
+        internal void Reset()
+        {
+            mainMenu.ResetToBase();
         }
     }
 }
