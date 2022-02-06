@@ -289,7 +289,7 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Displays the menu when it's hidden, and vice versa.
+        /// Displays the menu when it is hidden, and vice versa.
         /// </summary>
         public void ToggleMenu()
         {
