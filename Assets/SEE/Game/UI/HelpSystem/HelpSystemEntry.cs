@@ -266,14 +266,11 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void Close()
         {
-            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
             if (videoPlayer == null)
             {
-                throw new Exception("No Video-Player found");
+                throw new Exception("No video player found");
             }
-
-            go.TryGetComponentOrLog(out NestedMenu menu);
-            menu.ResetToBase();
+            HelpSystemBuilder.GetHelpSystemMenu().Reset();
             videoPlayer.Stop();
             IsPlaying = false;
             HelpSystemMenu.IsEntryOpened = false;
@@ -290,7 +287,7 @@ namespace SEE.Game.UI.HelpSystem
         {
             if (videoPlayer == null)
             {
-                throw new Exception("No Video-Player found");
+                throw new Exception("No video player found");
             }
             videoPlayer.time = currentKeyword.CumulatedTime;
         }
@@ -304,7 +301,7 @@ namespace SEE.Game.UI.HelpSystem
             TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
             if (videoPlayer == null)
             {
-                throw new Exception("No Video-Player found");
+                throw new Exception("No video player found");
             }
             // play the current keyword again
             if (HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous == null)
@@ -338,7 +335,7 @@ namespace SEE.Game.UI.HelpSystem
                     videoPlayer.time = currentKeyword.CumulatedTime;
                     tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 1));
                 }
-                catch (ArgumentOutOfRangeException _)
+                catch (ArgumentOutOfRangeException)
                 {
                     tmp.text = string.Empty;
                     foreach (LinkedListEntry s in HelpSystemBuilder.currentEntries)
@@ -355,12 +352,10 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void Back()
         {
-            GameObject go = GameObject.Find(HelpSystemBuilder.HelpSystemGO);
-            go.TryGetComponentOrLog(out NestedMenu menu);
-            menu.ToggleMenu();
+            HelpSystemBuilder.GetHelpSystemMenu().ToggleMenu();
             if (videoPlayer == null)
             {
-                throw new Exception("No Video-Player found");
+                throw new Exception("No video player found");
             }
             audioSource.Stop();
             videoPlayer.Stop();
@@ -379,6 +374,7 @@ namespace SEE.Game.UI.HelpSystem
                         .gameObject.TryGetComponentOrLog(out pauseButton);
             if (!IsPlaying)
             {
+                // FIXME: Should this resource really be loaded each time playing is toggled?
                 pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
@@ -387,6 +383,7 @@ namespace SEE.Game.UI.HelpSystem
             }
             else
             {
+                // FIXME: Should this resource really be loaded each time playing is toggled?
                 pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
