@@ -20,12 +20,12 @@ namespace SEE.Game.UI.Menu
         protected override void AddDesktopButtons(IEnumerable<ToggleMenuEntry> menuEntries)
         {
             base.AddDesktopButtons(menuEntries);
-            // Changes in comparison to the base method: 
+            // Changes in comparison to the base method:
             // 1. selecting an entry will close the menu
             // 2. the selected entry is highlighted
             foreach (ButtonManagerBasicWithIcon buttonManager in ButtonManagers)
             {
-                buttonManager.clickEvent.AddListener(ToggleMenu);
+                buttonManager.clickEvent.AddListener(HideMenu);
             }
         }
 

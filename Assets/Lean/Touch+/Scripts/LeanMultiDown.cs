@@ -126,8 +126,6 @@ namespace Lean.Touch.Editor
 	[UnityEditor.CustomEditor(typeof(TARGET))]
 	public class LeanMultiDown_Editor : LeanEditor
 	{
-		private bool showUnusedEvents;
-
 		protected override void OnInspector()
 		{
 			TARGET tgt; TARGET[] tgts; GetTargets(out tgt, out tgts);

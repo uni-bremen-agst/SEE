@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
-using SEE.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using SEE.Tools;
 using UnityEngine;
-using Constraint = SEE.Tools.Constraint;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -55,7 +54,7 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Test for a simple artifically created graph.
+        /// Test for a simple artificially created graph.
         /// </summary>
         [Test]
         public void TestGraphWriter()
@@ -137,6 +136,12 @@ namespace SEE.DataModel.DG.IO
         {
             string filename = basename + extension;
 
+            // We need to finalize the node hierarchy so that the integer node attribute
+            // Metric.Level is calculated for outgraph. Otherwise its node would not have
+            // this attribute, but the nodes loaded from the saved graph would, which would
+            // lead to an artifical discrepancy.
+            outGraph.FinalizeNodeHierarchy();
+
             // Write outGraph
             GraphWriter.Save(filename, outGraph, hierarchicalEdgeType);
 
@@ -144,13 +149,13 @@ namespace SEE.DataModel.DG.IO
             Graph inGraph = LoadGraph(filename);
             Assert.AreEqual(filename, inGraph.Path);
 
-            // Write the loaded saved inital graph again as a backup
+            // Write the loaded saved initial graph again as a backup
             string backupFilename = basename + backupSuffix + extension;
             GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
             // Read the backup graph again
             Graph backupGraph = LoadGraph(backupFilename);
-            // The path of backupGraph will be backupFilename. 
+            // The path of backupGraph will be backupFilename.
             Assert.AreEqual(backupFilename, backupGraph.Path);
             // For the comparison, we need to reset the path.
             backupGraph.Path = inGraph.Path;
@@ -161,17 +166,19 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string>() { hierarchicalEdgeType });
+            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType });
             graphReader.Load();
             return graphReader.GetGraph();
         }
 
         private static Node NewNode(Graph graph, string linkname)
         {
-            Node result = new Node();
-            result.ID = linkname;
-            result.SourceName = linkname;
-            result.Type = "Routine";
+            Node result = new Node
+            {
+                ID = linkname,
+                SourceName = linkname,
+                Type = "Routine"
+            };
             result.SetToggle("Linkage.Is_Definition");
             result.SetString("stringAttribute", "somestring");
             result.SetFloat("Metric.Halstead.Volume", 49.546f);
@@ -182,10 +189,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge(type + "#" + from.ID + "#" + to.ID);
-            result.Type = type;
-            result.Source = from;
-            result.Target = to;
+            Edge result = new Edge(from, to, type);
             result.SetToggle("Is Real");
             result.SetString("Source.Path", "path");
             result.SetFloat("Pi", 3.14f);

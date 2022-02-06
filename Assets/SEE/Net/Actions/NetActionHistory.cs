@@ -9,7 +9,7 @@ namespace SEE.Net
     /// <summary>
     /// Syncs the action history through the network on each client.
     /// </summary>
-    public class NetActionHistory : AbstractAction
+    public class NetActionHistory : AbstractNetAction
     {
         /// <summary>
         /// The state that determines which action should be performed.

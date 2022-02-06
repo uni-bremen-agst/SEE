@@ -1,8 +1,9 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using SEE.Layout.NodeLayouts.EvoStreets;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Layout.NodeLayouts.Cose;
+using SEE.Layout.NodeLayouts.EvoStreets;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
@@ -47,43 +48,44 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private int maximalDepth;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
-            if (gameNodes.Count == 0)
+            IList<ILayoutNode> layoutNodes = gameNodes.ToList();
+            if (layoutNodes.Count == 0)
             {
-                throw new System.Exception("No nodes to be laid out.");
+                throw new Exception("No nodes to be laid out.");
             }
-            else if (gameNodes.Count == 1)
+
+            if (layoutNodes.Count == 1)
             {
-                ILayoutNode singleNode = gameNodes.FirstOrDefault();
-                Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>
+                ILayoutNode singleNode = layoutNodes.First();
+                Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>
                 {
                     [singleNode] = new NodeTransform(Vector3.zero, singleNode.LocalScale)
                 };
-                return layout_result;
+                return layoutResult;
             }
-            else
+
+            roots = LayoutNodes.GetRoots(layoutNodes);
+            if (roots.Count == 0)
             {
-                roots = LayoutNodes.GetRoots(gameNodes);
-                if (roots.Count == 0)
-                {
-                    throw new System.Exception("Graph has no root node.");
-                }
-                else if (roots.Count > 1)
-                {
-                    throw new System.Exception("Graph has multiple roots.");
-                }
-                else
-                {
-                    ILayoutNode root = roots.FirstOrDefault();
-                    ENode rootNode = GenerateHierarchy(root);
-                    maximalDepth = MaxDepth(root);
-                    SetScalePivotsRotation(rootNode);
-                    CalculationNodeLocation(rootNode, Vector3.zero);
-                    Dictionary<ILayoutNode, NodeTransform> layout_result = new Dictionary<ILayoutNode, NodeTransform>();
-                    To_Layout(rootNode, ref layout_result);
-                    return layout_result;
-                }
+                throw new Exception("Graph has no root node.");
+            }
+
+            if (roots.Count > 1)
+            {
+                throw new Exception("Graph has multiple roots.");
+            }
+
+            {
+                ILayoutNode root = roots.FirstOrDefault();
+                ENode rootNode = GenerateHierarchy(root);
+                maximalDepth = MaxDepth(root);
+                SetScalePivotsRotation(rootNode);
+                CalculationNodeLocation(rootNode, Vector3.zero);
+                Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
+                To_Layout(rootNode, ref layoutResult);
+                return layoutResult;
             }
         }
 
@@ -456,7 +458,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override bool UsesEdgesAndSublayoutNodes()

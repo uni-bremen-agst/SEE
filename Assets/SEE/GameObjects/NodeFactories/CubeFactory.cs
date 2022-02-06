@@ -11,7 +11,7 @@ namespace SEE.GO
     /// used for inner nodes, too, they must provide SetLineWidth() even though
     /// it does not do anything.
     /// </summary>
-    public class CubeFactory : InnerNodeFactory
+    internal class CubeFactory : InnerNodeFactory
     {
         private readonly Mesh cubeMesh;
 
@@ -106,7 +106,6 @@ namespace SEE.GO
         public override GameObject NewBlock(int style, int renderQueueOffset = 0)
         {
             GameObject result = new GameObject("Cube") { tag = Tags.Node };
-            //SetHeight(result, DefaultHeight);
 
             result.AddComponent<MeshFilter>().mesh = cubeMesh;
             result.AddComponent<BoxCollider>();

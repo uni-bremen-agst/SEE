@@ -5,23 +5,23 @@ using System.Runtime.CompilerServices;
 
 namespace SEE.DataModel.DG
 {
-    // When you hit the play button in the editor, all the objects in the active scene are 
-    // serialized and saved, so that unity can deserialize and return them to their original 
-    // state when you stop the execution in the editor. Unity also creates copies of all 
-    // objects in the scene, so the changes you do during play mode change the copies, not 
-    // the original objects in the scene. During this copy process it deserializes the 
-    // objects with the data it saved just before copying, so no visible change is done 
+    // When you hit the play button in the editor, all the objects in the active scene are
+    // serialized and saved, so that unity can deserialize and return them to their original
+    // state when you stop the execution in the editor. Unity also creates copies of all
+    // objects in the scene, so the changes you do during play mode change the copies, not
+    // the original objects in the scene. During this copy process it deserializes the
+    // objects with the data it saved just before copying, so no visible change is done
     // on the objects.
-    // 
-    // All the scripts which inherit from MonoBehaviour are serializable, but custom classes 
-    // are not. To inform unity that you want your class to be serialized you have to use 
-    // the [System.Serializable] attribute. 
     //
-    // Also, unity only serializes the public members in your class, if you want your 
-    // private members to be serialized too, you should inform unity with the [SerializeField] 
+    // All the scripts which inherit from MonoBehaviour are serializable, but custom classes
+    // are not. To inform unity that you want your class to be serialized you have to use
+    // the [System.Serializable] attribute.
+    //
+    // Also, unity only serializes the public members in your class, if you want your
+    // private members to be serialized too, you should inform unity with the [SerializeField]
     // attribute. Note: Unity does not serialize static fields.
     //
-    // More on Unity's serialization can be found here: 
+    // More on Unity's serialization can be found here:
     // https://docs.unity3d.com/Manual/script-Serialization.html
 
     /// <summary>
@@ -41,13 +41,21 @@ namespace SEE.DataModel.DG
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
-        public ICollection<string> ToggleAttributes => toggleAttributes;
+        public ISet<string> ToggleAttributes => toggleAttributes;
 
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Add(attributeName);
+            }
+        }
+
+        public void UnsetToggle(string attributeName)
+        {
+            if (toggleAttributes.Contains(attributeName))
+            {
+                toggleAttributes.Remove(attributeName);
             }
         }
 
@@ -160,6 +168,32 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Returns the value of a numeric (integer or float) attribute for the
+        /// attributed named <paramref name="attributeName"/> if it exists.
+        /// Otherwise an exception is thrown.
+        ///
+        /// Note: It could happen that the same name is given to a float and
+        /// integer attribute, in which case the float attribute will be
+        /// preferred.
+        /// </summary>
+        /// <param name="attributeName">name of an integer or float attribute</param>
+        /// <returns>value of numeric attribute <paramref name="attributeName"/></returns>
+        public float GetNumeric(string attributeName)
+        {
+            if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
+            {
+                return floatValue;
+            }
+            else if (IntAttributes.TryGetValue(attributeName, out int intValue))
+            {
+                return intValue;
+            }
+            {
+                throw new UnknownAttribute(attributeName);
+            }
+        }
+
         //----------------------------------
         // General
         //----------------------------------
@@ -244,7 +278,7 @@ namespace SEE.DataModel.DG
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using only those two attribute kinds to avoid unnecessary 
+            // we are using only those two attribute kinds to avoid unnecessary
             // computation in the hope that they suffice; nodes and edges should
             // have some attributes of this kind sufficiently different to others
             return IntAttributes.GetHashCode() ^ StringAttributes.GetHashCode();
@@ -295,7 +329,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
         /// </summary>
         /// <param name="clone">the clone receiving the copied attributes</param>
@@ -305,7 +339,7 @@ namespace SEE.DataModel.DG
             // The dictionaries must be newly created and assigned because MemberwiseClone() creates
             // a shallow copy in which those attributes will all refer to the dictionaries of the
             // original attributable.
-            // Because the keys and values are primitive types, the following are deep copies of the 
+            // Because the keys and values are primitive types, the following are deep copies of the
             // attributes.
             target.toggleAttributes = new HashSet<string>(toggleAttributes);
             target.StringAttributes = new Dictionary<string, string>(StringAttributes);

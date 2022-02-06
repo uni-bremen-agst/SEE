@@ -6,18 +6,18 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    public static class SEEInput
+    internal static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
-        /// If false, we will not listen to keyboard inputs for any of the logical 
-        /// input queries. This flag is provided to disable the keyboard shortcuts 
+        /// If false, we will not listen to keyboard inputs for any of the logical
+        /// input queries. This flag is provided to disable the keyboard shortcuts
         /// when there are dialogs asking the user for keybord inputs. If the shortcuts
         /// were enabled, they would interfere with the user's input for the dialog.
         /// For instance, pressing W would enter the text "W" and move the player
         /// forward.
         /// </summary>
-        public static bool KeyboardShortcutsEnabled = true;
+        public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
         //-----------------------------------------------------
         // General key bindings
@@ -53,7 +53,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed. Used as shortcuts for the menu entries.
-        /// 
+        ///
         /// Precondition: 0 &lt;= <paramref name="digit"/> &lt;= 9.
         /// </summary>
         /// <param name="digit">the checked digit</param>
@@ -69,15 +69,15 @@ namespace SEE.Controls
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Undo()
-        {            
+        {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
 #if UNITY_EDITOR == false
-            } 
+            }
             else
             {
                 return false;
@@ -93,12 +93,12 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
 #if UNITY_EDITOR == false
-            } 
+            }
             else
             {
                 return false;
@@ -273,7 +273,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to drag the city in it's entirety or parts of it.
+        /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
@@ -358,12 +358,12 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action</returns>
         public static bool RotateCamera()
         {
-            return Input.GetMouseButton(RightMouseButton) 
+            return Input.GetMouseButton(RightMouseButton)
                 || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
         }
 
         //--------------------------
-        // Evolution 
+        // Evolution
         //--------------------------
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace SEE.Controls
         }
 
         //--------------------------
-        // Debugging 
+        // Debugging
         //--------------------------
 
         /// <summary>
@@ -505,7 +505,7 @@ namespace SEE.Controls
         //-------------------
 
         /// <summary>
-        /// If true, selection is enabled. Selection can be disabled by action directly 
+        /// If true, selection is enabled. Selection can be disabled by action directly
         /// determining whether anything is selected; for instance, the <see cref="DeleteAction"/>
         /// listens to a selection interaction to determine the graph element to be deleted.
         /// This selection interaction should not interfere with the general <see cref="SelectAction"/>.

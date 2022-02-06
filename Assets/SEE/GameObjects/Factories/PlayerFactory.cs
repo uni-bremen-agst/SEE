@@ -23,7 +23,7 @@ namespace SEE.GO
             GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
             player.name = PlayerInputType.DesktopPlayer.ToString();
             player.tag = Tags.MainCamera;
-            player.GetComponent<DesktopPlayerMovement>().focusedObject = plane;
+            player.GetComponent<DesktopPlayerMovement>().FocusedObject = plane;
             return player;
         }
 

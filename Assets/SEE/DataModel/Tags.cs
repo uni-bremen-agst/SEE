@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace SEE.DataModel
+﻿namespace SEE.DataModel
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
@@ -45,8 +43,7 @@ namespace SEE.DataModel
         /// <summary>
         /// All existing tags in one.
         /// </summary>
-        public static readonly string[] All = new string[]
-            { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
+        public static readonly string[] All = { Graph, Node, Edge, NodePrefab, Text, Erosion, Decoration,
               Path, Runtime, FunctionCall, CullingPlane, ChartManager, ChartContainer, Chart,
               JLGVisualization, UI, MainCamera};
     }

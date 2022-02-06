@@ -17,9 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using SEE.Layout;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -38,26 +35,9 @@ namespace SEE.Game.Evolution
             : base (maxAnimationTime)
         { }
 
-        /// <summary>
-        /// Moves the game object to its target location through animation. The scale and style are instantly applied.
-        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
-        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as
-        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
-        /// equals null, no callback happens.
-        /// </summary>
-        /// <param name="gameObject">game object to be animated</param>
-        /// <param name="layout">the node transform to be applied</param>
-        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was added,
-        /// modified, or deleted w.r.t. to the previous graph</param>
-        /// <param name="callback">method to be called when the animation has finished</param>
-        protected override void AnimateToInternalWithCallback
-                  (GameObject gameObject,
-                   ILayoutNode layout,
-                   Difference difference,
-                   Action<object> callback)
+        protected override Vector3 ShakeStrength()
         {
-            gameObject.transform.localScale = layout.LocalScale;
-            Tweens.Move(gameObject, layout.CenterPosition, MaxAnimationTime, callback);
+            return Vector3.zero;
         }
     }
 }

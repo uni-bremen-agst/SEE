@@ -17,9 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using SEE.Layout;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -38,34 +35,9 @@ namespace SEE.Game.Evolution
             : base(maxAnimationTime)
         { }
 
-        /// <summary>
-        /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
-        /// At the end of the animation, the method <paramref name="callbackName"/> will be called for the
-        /// game object <paramref name="callBackTarget"/> with <paramref name="gameObject"/> as
-        /// parameter if <paramref name="callBackTarget"/> is not null. If <paramref name="callBackTarget"/>
-        /// equals null, no callback happens.
-        /// </summary>
-        /// <param name="gameObject">game object to be animated</param>
-        /// <param name="layout">the node transformation to be applied</param>
-        /// <param name="difference">whether the node attached to <paramref name="gameObject"/> was modified w.r.t. to the previous graph</param>
-        /// <param name="callback">method to be called when the animation has finished</param>
-        protected override void AnimateToInternalWithCallback
-                  (GameObject gameObject,
-                   ILayoutNode layout,
-                   Difference difference,
-                   Action<object> callback)
+        protected override Vector3 ShakeStrength()
         {
-            Vector3 position = layout.CenterPosition;
-
-            // layout.scale is in world space, while the animation by iTween
-            // is in local space. Our game objects may be nested in other game objects,
-            // hence, the two spaces may be different.
-            // We may need to transform nodeTransform.scale from world space to local space.
-            Vector3 localScale = gameObject.transform.parent == null ?
-                                     layout.LocalScale
-                                   : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
-
-            Tweens.MoveScaleShakeRotate(gameObject, position: position, localScale: localScale, strength: new Vector3(0, 10, 0), duration: MaxAnimationTime, callback);
+            return new Vector3(0, 10, 0);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -21,9 +22,9 @@ namespace SEEEditor
         private AbstractSEECity city;
 
         /// <summary>
-        /// Whether the foldout for the global attributes of the city should be expanded.
+        /// Whether the foldout for the general attributes of the city should be expanded.
         /// </summary>
-        private bool showGlobalAttributes = false;
+        private bool showGeneralAttributes = false;
 
         /// <summary>
         /// Whether the leaf node attribute foldout should be expanded.
@@ -111,8 +112,8 @@ namespace SEEEditor
         /// </summary>
         private void GlobalAttributes()
         {
-            showGlobalAttributes = EditorGUILayout.Foldout(showGlobalAttributes, "General", true, EditorStyles.foldoutHeader);
-            if (showGlobalAttributes)
+            showGeneralAttributes = EditorGUILayout.Foldout(showGeneralAttributes, "General", true, EditorStyles.foldoutHeader);
+            if (showGeneralAttributes)
             {
                 city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 GUILayout.BeginHorizontal();
@@ -237,6 +238,9 @@ namespace SEEEditor
             }
         }
 
+        /// <summary>
+        /// Renders the GUI for attributes for the edge selection.
+        /// </summary>
         private void EdgeSelection()
         {
             showEdgeSelection = EditorGUILayout.Foldout(showEdgeSelection, "Edge selection", true, EditorStyles.foldoutHeader);
@@ -341,6 +345,8 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
+                settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
+                settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
                 EditorGUI.EndDisabledGroup();
                 LabelSettings(ref settings.LabelSettings);
 
@@ -349,15 +355,15 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Allows the user to set the attributes of <paramref name="labelSettings"/>.
+        /// Allows the user to set the attributes of <paramref name="labelAttributes"/>.
         /// </summary>
-        /// <param name="labelSettings">settings to be retrieved from the user</param>
-        private static void LabelSettings(ref LabelAttributes labelSettings)
+        /// <param name="labelAttributes">settings regarding the label above game nodes to be retrieved from the user</param>
+        private static void LabelSettings(ref LabelAttributes labelAttributes)
         {
-            labelSettings.Show = EditorGUILayout.Toggle("Show labels", labelSettings.Show);
-            labelSettings.Distance = EditorGUILayout.FloatField("Label distance", labelSettings.Distance);
-            labelSettings.FontSize = EditorGUILayout.FloatField("Label font size", labelSettings.FontSize);
-            labelSettings.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelSettings.AnimationDuration);
+            labelAttributes.Show = EditorGUILayout.Toggle("Show labels", labelAttributes.Show);
+            labelAttributes.Distance = EditorGUILayout.FloatField("Label distance", labelAttributes.Distance);
+            labelAttributes.FontSize = EditorGUILayout.FloatField("Label font size", labelAttributes.FontSize);
+            labelAttributes.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelAttributes.AnimationDuration);
         }
     }
 }

@@ -171,8 +171,6 @@ namespace Lean.Common.Editor
 	[UnityEditor.CustomEditor(typeof(TARGET))]
 	public class LeanDelayedValue_Editor : LeanEditor
 	{
-		private bool showUnusedEvents;
-
 		protected override void OnInspector()
 		{
 			TARGET tgt; TARGET[] tgts; GetTargets(out tgt, out tgts);

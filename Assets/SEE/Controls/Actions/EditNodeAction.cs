@@ -1,17 +1,17 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.Game.UI.PropertyDialog;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections.Generic;
-using System;
 using UnityEngine;
-using SEE.Game.UI.PropertyDialog;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Action to edit an existing node's attributes.
     /// </summary>
-    public class EditNodeAction : AbstractPlayerAction
+    internal class EditNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// The life cycle of this edit action.
@@ -144,7 +144,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            base.Undo();
             memento.node.SourceName = memento.originalName;
             memento.node.Type = memento.originalType;
             NotifyClients(memento.node);
@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> property.
+            base.Redo();
             memento.node.SourceName = memento.newName;
             memento.node.Type = memento.newType;
             NotifyClients(memento.node);
@@ -165,66 +165,47 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new EditNodeAction();
-        }
+        public static ReversibleAction CreateReversibleAction() => new EditNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
-        }
+        public override ReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns><see cref="ActionStateType.EditNode"/></returns>
-        public override ActionStateType GetActionStateType()
-        {
-            return ActionStateType.EditNode;
-        }
+        public override ActionStateType GetActionStateType() => ActionStateType.EditNode;
 
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
-        public override HashSet<string> GetChangedObjects()
-        {
-            if (memento.node == null)
-            {
-                return new HashSet<string>();
-            }
-            else
-            {
-                return new HashSet<string> { memento.node.ID };
-            }
-        }
+        public override HashSet<string> GetChangedObjects() =>
+            memento.node == null ? new HashSet<string>() : new HashSet<string> { memento.node.ID };
 
         /// <summary>
         /// Opens a dialog where the user can enter the node name and type.
         /// If the user presses the OK button, the SourceName and Type of
-        /// <see cref="memento.node"/> will have the new values entered 
-        /// and <see cref="memento.newName"/> and <see cref="memento.newType"/> 
+        /// <see cref="memento.node"/> will have the new values entered
+        /// and <see cref="memento.newName"/> and <see cref="memento.newType"/>
         /// will be set to memorize these and <see cref="progress"/> is
-        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>. 
-        /// If the user presses the Cancel button, the <see cref="memento"/> 
-        /// including <see cref="memento.node"/> will not be changed and 
-        /// <see cref="progress"/> is moved forward to 
+        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>.
+        /// If the user presses the Cancel button, the <see cref="memento"/>
+        /// including <see cref="memento.node"/> will not be changed and
+        /// <see cref="progress"/> is moved forward to
         /// <see cref="ProgressState.EditIsCanceled"/>.
         /// </summary>
         private void OpenDialog()
         {
             // This dialog will set the source name and type of memento.node.
             NodePropertyDialog dialog = new NodePropertyDialog(memento.node);
-            // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
-            dialog.OnConfirm.AddListener(() => OKButtonPressed());
-            // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
-            dialog.OnCancel.AddListener(() => progress = ProgressState.EditIsCanceled);
+            dialog.OnConfirm.AddListener(OKButtonPressed);
+            dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open();
+            SEEInput.KeyboardShortcutsEnabled = false;
 
             void OKButtonPressed()
             {
@@ -232,6 +213,13 @@ namespace SEE.Controls.Actions
                 memento.newName = memento.node.SourceName;
                 memento.newType = memento.node.Type;
                 InteractableObject.UnselectAll(true);
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
+
+            void CancelButtonPressed()
+            {
+                progress = ProgressState.EditIsCanceled;
+                SEEInput.KeyboardShortcutsEnabled = true;
             }
         }
     }

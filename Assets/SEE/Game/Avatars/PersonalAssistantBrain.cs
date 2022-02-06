@@ -237,7 +237,9 @@ namespace SEE.Game.Avatars
             + "use the keys, <prosody rate = \"slow\"><say-as interpret-as= \"characters\">Q </say-as></prosody>, "
             + "and, <prosody rate = \"slow\"><say-as interpret-as= \"characters\"> E </say-as></prosody>, "
             + "to move up and down. "
-            + "To bring up the menu for additional actions, just hit the space bar.";
+            + "To bring up the menu for additional actions, just hit the space bar. "
+            + "If you want to change the visual attributes of a code city, press escape and shift together to bring up a menu to configure those. "
+            + "To close this dialog, press escape and shift together again. ";
 
         /// <summary>
         /// A brief information about SEE and its developers.

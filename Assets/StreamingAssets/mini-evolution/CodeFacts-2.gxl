@@ -11,7 +11,7 @@
         <int>1</int>
       </attr>
       <attr name="Metric.Lines.LOC">
-        <int>5</int>
+        <int>2</int>
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>1</int>
@@ -109,6 +109,9 @@
     </edge>
     <edge id="E6" from="N6" to="N7">
       <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10" from="N3" to="N6">
+      <type xlink:href="Call"/>
     </edge>
   </graph>
 </gxl>

@@ -15,13 +15,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.Utils;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -76,7 +76,7 @@ namespace SEE.Layout
         /// <summary>
         /// A Mapping from ILayoutNodes to ILayoutSublayoutNodes
         /// </summary>
-        private readonly Dictionary<ILayoutNode, ILayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, ILayoutSublayoutNode>();
+        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, LayoutSublayoutNode>();
 
         /// <summary>
         /// abstract see city settings 
@@ -115,7 +115,7 @@ namespace SEE.Layout
 
                 foreach (ILayoutNode layoutNode in sublayoutNodes)
                 {
-                    ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
+                    ILayoutNode sublayoutNode = (layoutNode as LayoutSublayoutNode).Node;
                     sublayoutNode.IsSublayoutNode = true;
                 }
             }
@@ -141,14 +141,14 @@ namespace SEE.Layout
             }
             else
             {
-                sublayoutNodes.Add(new ILayoutSublayoutNode(sublayout.Node, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new LayoutSublayoutNode(sublayout.Node, ILayout_to_CoseSublayoutNode));
 
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (ILayoutNode node in sublayout.RemovedChildren)
                 {
                     if (node.IsSublayoutRoot)
                     {
-                        sublayoutNodes.Add(new ILayoutSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
+                        sublayoutNodes.Add(new LayoutSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
                     }
                 }
             }
@@ -165,7 +165,7 @@ namespace SEE.Layout
             List<ILayoutNode> sublayoutNodes = new List<ILayoutNode>();
             layoutNodes.ForEach(layoutNode =>
             {
-                sublayoutNodes.Add(new ILayoutSublayoutNode(layoutNode, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new LayoutSublayoutNode(layoutNode, ILayout_to_CoseSublayoutNode));
             });
 
             return sublayoutNodes;
@@ -182,7 +182,7 @@ namespace SEE.Layout
 
             foreach (ILayoutNode layoutNode in layout.Keys)
             {
-                ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
+                ILayoutNode sublayoutNode = (layoutNode as LayoutSublayoutNode).Node;
                 NodeTransform transform = layout[layoutNode];
 
                 Vector3 position = transform.position;
@@ -203,7 +203,7 @@ namespace SEE.Layout
                     {
                         foreach (ILayoutNode subNode in sublayoutNode.Sublayout.sublayoutNodes)
                         {
-                            ILayoutNode subSubNode = (subNode as ILayoutSublayoutNode).Node;
+                            ILayoutNode subSubNode = (subNode as LayoutSublayoutNode).Node;
 
                             subSubNode.Rotation = sublayoutNode.Rotation;
 
@@ -212,7 +212,7 @@ namespace SEE.Layout
                                 subSubNode.SetOrigin();
                                 subSubNode.RelativePosition = subSubNode.CenterPosition;
 
-                                sublayoutNodes.Add(new ILayoutSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
+                                sublayoutNodes.Add(new LayoutSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
 
                             }
                         }
@@ -231,7 +231,7 @@ namespace SEE.Layout
 
                 foreach (ILayoutNode layoutNode in sublayoutNodes)
                 {
-                    ILayoutNode sublayoutNode = (layoutNode as ILayoutSublayoutNode).Node;
+                    ILayoutNode sublayoutNode = (layoutNode as LayoutSublayoutNode).Node;
 
                     leftLowerCornerNode = new Vector2()
                     {

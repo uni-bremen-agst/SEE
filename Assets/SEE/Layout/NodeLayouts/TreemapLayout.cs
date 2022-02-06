@@ -3,7 +3,10 @@ using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.NodeLayouts.TreeMap;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -54,40 +57,45 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">nodes to be laid out</param>
         /// <returns>treemap layout scaled in x and z axes</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
-            if (layoutNodes.Count == 0)
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            switch (layoutNodeList.Count)
             {
-                throw new Exception("No nodes to be laid out.");
-            }
-            else if (layoutNodes.Count == 1)
-            {
-                IEnumerator<ILayoutNode> enumerator = layoutNodes.GetEnumerator();
-                if (enumerator.MoveNext())
+                case 0:
+                    throw new ArgumentException("No nodes to be laid out.");
+                case 1:
                 {
-                    // MoveNext() must be called before we can call Current.
-                    ILayoutNode gameNode = enumerator.Current;
-                    layout_result[gameNode] = new NodeTransform(Vector3.zero,
-                                                                new Vector3(width, gameNode.LocalScale.y, depth));
+                    using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();
+                    if (enumerator.MoveNext())
+                    {
+                        // MoveNext() must be called before we can call Current.
+                        ILayoutNode gameNode = enumerator.Current;
+                        UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
+                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                            new Vector3(width, gameNode.LocalScale.y, depth));
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, "We should never arrive here.\n");
+                    }
+
+                    break;
                 }
-                else
-                {
-                    Debug.LogError("We should never arrive here.\n");
-                }
+                default:
+                    roots = LayoutNodes.GetRoots(layoutNodeList);
+                    CalculateSize();
+                    CalculateLayout();
+                    break;
             }
-            else
-            {
-                roots = LayoutNodes.GetRoots(layoutNodes);
-                CalculateSize();
-                CalculateLayout();
-            }
+
             return layout_result;
         }
 
         /// <summary>
-        /// Adds positioning and scales to layout_result for all root nodes (nodes with no parent)
+        /// Adds positioning and scales to <see cref="layout_result"/> for all root nodes (nodes with no parent)
         /// within a rectangle whose center position is Vector3.zero and whose width and depth is
         /// as specified by the constructor call. This function is then called recursively for the
         /// children of each root (until leaves are reached).
@@ -102,6 +110,7 @@ namespace SEE.Layout.NodeLayouts
             if (roots.Count == 1)
             {
                 ILayoutNode root = roots[0];
+                UnityEngine.Assertions.Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
                 layout_result[root] = new NodeTransform(Vector3.zero,
                                                         new Vector3(width, root.LocalScale.y, depth));
                 CalculateLayout(root.Children(), x: -width / 2.0f, z: -depth / 2.0f, width, depth);
@@ -137,6 +146,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Note: nodeTransform.position is the center position, while
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
+                    UnityEngine.Assertions.Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
                     NodeTransform nodeTransform = layout_result[node];
                     CalculateLayout(children,
                                     nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
@@ -222,7 +232,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Adds the transforms (position, scale) of the game objects (nodes) according to their
-        /// corresponding rectangle in rects to layout_result.
+        /// corresponding rectangle in rects to <see cref="layout_result"/>.
         ///
         /// The x and z co-ordinates for the resulting <see cref="NodeTransform"/> are determined
         /// by the rectangles, but the y co-ordinate is the original value of the input
@@ -242,8 +252,8 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
-                UnityEngine.Assertions.Assert.AreEqual(o.LocalScale.y, o.AbsoluteScale.y);
                 Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
+                UnityEngine.Assertions.Assert.AreEqual(o.AbsoluteScale, o.LocalScale);
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }
