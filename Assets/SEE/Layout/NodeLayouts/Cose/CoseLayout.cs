@@ -15,11 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
-using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.Cose
@@ -168,9 +168,9 @@ namespace SEE.Layout.NodeLayouts.Cose
             return layout_result;
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>

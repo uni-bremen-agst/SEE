@@ -123,37 +123,37 @@ namespace SEE.Controls.Actions
             Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
-                Transform t = pair.Key;
-                ZoomState s = pair.Value;
+                Transform transform = pair.Key;
+                ZoomState zoomState = pair.Value;
 
-                if (s.zoomCommands.Count != 0)
+                if (zoomState.zoomCommands.Count != 0)
                 {
-                    float zoomSteps = s.currentTargetZoomSteps;
+                    float zoomSteps = zoomState.currentTargetZoomSteps;
                     int positionCount = 0;
                     Vector2 positionSum = Vector3.zero;
 
-                    for (int i = 0; i < s.zoomCommands.Count; i++)
+                    for (int i = 0; i < zoomState.zoomCommands.Count; i++)
                     {
                         positionCount++;
-                        positionSum += s.zoomCommands[i].ZoomCenter;
-                        if (s.zoomCommands[i].IsFinished())
+                        positionSum += zoomState.zoomCommands[i].ZoomCenter;
+                        if (zoomState.zoomCommands[i].IsFinished())
                         {
-                            s.zoomCommands.RemoveAt(i--);
+                            zoomState.zoomCommands.RemoveAt(i--);
                         }
                         else
                         {
-                            zoomSteps -= s.zoomCommands[i].TargetZoomSteps - s.zoomCommands[i].CurrentDeltaScale();
+                            zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                         }
                     }
-                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, t.position.y, positionSum.y / positionCount);
+                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, transform.position.y, positionSum.y / positionCount);
 
-                    s.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                    Vector3 cityCenterToHitPoint = averagePosition - t.position;
-                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(t.localScale);
+                    zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
+                    Vector3 cityCenterToHitPoint = averagePosition - transform.position;
+                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(transform.localScale);
 
-                    t.position += cityCenterToHitPoint;
-                    t.localScale = s.currentZoomFactor * s.originalScale;
-                    t.position -= Vector3.Scale(cityCenterToHitPointUnscaled, t.localScale);
+                    transform.position += cityCenterToHitPoint;
+                    transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
+                    transform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, transform.localScale);
 
                     // TODO(torben): i believe in desktop mode this made sure that zooming
                     // will always happen towards the current mouse position and not the
@@ -164,19 +164,19 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
 
-                    // TODO(torben): synchronize here
+                    new Net.ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
                 }
                 else
                 {
-                    float lastZoomFactor = s.currentZoomFactor;
-                    s.currentZoomFactor = ConvertZoomStepsToZoomFactor(s.currentTargetZoomSteps);
-                    if (lastZoomFactor != s.currentZoomFactor)
+                    float lastZoomFactor = zoomState.currentZoomFactor;
+                    zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.currentTargetZoomSteps);
+                    if (lastZoomFactor != zoomState.currentZoomFactor)
                     {
-                        t.localScale = s.currentZoomFactor * s.originalScale;
+                        transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
                     }
                 }
 
-                newDict[t] = s;
+                newDict[transform] = zoomState;
             }
             rootTransformToZoomStates = newDict;
         }

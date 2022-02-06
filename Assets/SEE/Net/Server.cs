@@ -4,8 +4,7 @@ using System.Linq;
 using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using UnityEngine;
-using SEE.Net.Util;
+using SEE.Game.City;
 
 namespace SEE.Net
 {
@@ -89,7 +88,8 @@ namespace SEE.Net
 
                 try
                 {
-                    ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
+                    ConnectionListeners.AddRange
+                        (Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.Instance.ServerActionPort), false));
 #if UNITY_EDITOR
                     string message = "Server listening on end-points:";
                     foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
@@ -178,27 +178,18 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Util.Logger.Log("Connection with client established: " + connection);
+                    Util.Logger.Log($"Connection with client established: {connection}");
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
                     {
                         IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
-                        List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
-                        foreach (InstantiatePrefabAction action in actions)
-                        {
-                            action.Execute(recipient);
-                        }
                         if (Network.LoadCityOnStart)
                         {
-                            foreach (Game.AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<Game.AbstractSEECity>())
+                            foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
                             {
                                 new LoadCityAction(city).Execute(recipient);
                             }
-                        }
-                        foreach (Controls.Actions.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.Actions.NavigationAction>())
-                        {
-                            new SyncCitiesAction(navigationAction).Execute(recipient);
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {
@@ -218,15 +209,6 @@ namespace SEE.Net
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
-
-                    // create new player head for every client
-                    new InstantiatePrefabAction(
-                        (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint,
-                        "PlayerHead",
-                        Vector3.zero,
-                        Quaternion.identity,
-                        new Vector3(0.02f, 0.015f, 0.015f)
-                    ).Execute();
                 }
                 else
                 {
@@ -236,10 +218,9 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Handles closing of given connection. Destroys the player prefab of given
-        /// connection.
+        /// Handles closing of given <paramref name="connection"/>.
         /// </summary>
-        /// <param name="connection"></param>
+        /// <param name="connection">connection to be closed</param>
         private static void OnConnectionClosed(Connection connection)
         {
             bool connectionListenerInitialized = ConnectionListeners.Any(listener => listener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint));
@@ -253,12 +234,6 @@ namespace SEE.Net
                     outgoingPacketSequenceIDs.Remove(connection);
 
                     IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
-
-                    ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner(remoteEndPoint);
-                    foreach (ViewContainer viewContainer in viewContainers)
-                    {
-                        new DestroyPrefabAction(viewContainer).Execute();
-                    }
 
                     if (SetGrabAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
                     {

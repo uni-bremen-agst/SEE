@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 namespace Crosstales.RTVoice.UI
 {
@@ -14,8 +13,8 @@ namespace Crosstales.RTVoice.UI
       protected override string speak(string text)
       {
          return Mode == Model.Enum.SpeakMode.Speak
-            ? Speaker.Instance.Speak(text, Source, Speaker.Instance.VoiceForName(textComponent.text), true, Rate, Pitch, Volume)
-            : Speaker.Instance.SpeakNative(text, Speaker.Instance.VoiceForName(textComponent.text), Rate, Pitch, Volume);
+            ? Speaker.Instance.Speak(text, Source, Speaker.Instance.VoiceForName(TextComponent.text), true, Rate, Pitch, Volume)
+            : Speaker.Instance.SpeakNative(text, Speaker.Instance.VoiceForName(TextComponent.text), Rate, Pitch, Volume);
       }
 
       #endregion

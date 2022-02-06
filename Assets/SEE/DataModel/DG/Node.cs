@@ -31,14 +31,17 @@ namespace SEE.DataModel.DG
         /// This will only set the id attribute, but does not alter the
         /// hashed ids of the underlying graph. If the node was already
         /// added to a graph, you cannot change the ID anymore.
-        /// Otherwise expect inconsistencies. If the node has not been added
-        /// to a graph, however, setting this property is safe.
+        /// If the node has not been added to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID
         {
             get => id;
             set
             {
+                if (ItsGraph != null)
+                {
+                    throw new InvalidOperationException("ID must not be changed once added to graph.");
+                }
                 id = value;
                 SetString(LinknameAttribute, id);
             }
@@ -129,7 +132,6 @@ namespace SEE.DataModel.DG
         public int Depth()
         {
             int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
-
             return maxDepth + 1;
         }
 
@@ -162,6 +164,28 @@ namespace SEE.DataModel.DG
                 cursor = cursor.Parent;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns all transitive descendants of this node in a post-order traversal of the
+        /// node hierarchy rooted by this node, including this node itself (will be the last node
+        /// in the returned ordered list).
+        /// </summary>
+        /// <returns>transitive descendants of this node in post order</returns>
+        public IList<Node> PostOrderDescendants()
+        {
+            IList<Node> result = new List<Node>();
+            PostOrderDescendants(this);
+            return result;
+
+            void PostOrderDescendants(Node parent)
+            {
+                foreach (Node child in parent.Children())
+                {
+                    PostOrderDescendants(child);
+                }
+                result.Add(parent);
+            }
         }
 
         /// <summary>
@@ -220,8 +244,8 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The outgoing edges are different.");
                     return false;
                 }
-                else if (incomings.Count != otherNode.incomings.Count
-                         || !GetIDs(incomings).SetEquals(GetIDs(otherNode.incomings)))
+                else if (Incomings.Count != otherNode.Incomings.Count
+                         || !GetIDs(Incomings).SetEquals(GetIDs(otherNode.Incomings)))
                 {
                     Report(ID + ": The incoming edges are different.");
                     return false;
@@ -271,12 +295,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        private List<Edge> incomings = new List<Edge>();
-
-        /// <summary>
-        /// The incoming edges of this node.
-        /// </summary>
-        public List<Edge> Incomings => incomings;
+        public ISet<Edge> Incomings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
@@ -299,7 +318,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                incomings.Add(edge);
+                Incomings.Add(edge);
             }
         }
 
@@ -324,7 +343,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                if (!incomings.Remove(edge))
+                if (!Incomings.Remove(edge))
                 {
                     throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
                 }
@@ -334,18 +353,22 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        public List<Edge> Outgoings { get; private set; } = new List<Edge>();
+        public ISet<Edge> Outgoings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
-        /// Removes all incoming and outgoing edges from this node.
+        /// Resets this node, i.e., removes all incoming and outgoing edges
+        /// and children from this node. Resets its graph and parent to null.
         ///
         /// IMPORTANT NOTE: This method is reserved for Graph and should not
         /// be used by any other client.
         /// </summary>
-        public void RemoveAllEdges()
+        public void Reset()
         {
             Outgoings.Clear();
-            incomings.Clear();
+            Incomings.Clear();
+            children.Clear();
+            Reparent(null);
+            ItsGraph = null;
         }
 
         /// <summary>
@@ -586,8 +609,8 @@ namespace SEE.DataModel.DG
             target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
-            target.Outgoings = new List<Edge>();
-            target.incomings = new List<Edge>();
+            target.Outgoings = new HashSet<Edge>();
+            target.Incomings = new HashSet<Edge>();
         }
 
         /// <summary>
@@ -624,9 +647,39 @@ namespace SEE.DataModel.DG
             return Outgoings.Any(outgoing => outgoing.Target == other && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType));
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="node"/> is not null.
+        /// </summary>
+        /// <param name="node">node to be compared</param>
         public static implicit operator bool(Node node)
         {
             return node != null;
+        }
+
+        /// <summary>
+        /// Removes this node and all its descendants in the node hierarchy
+        /// including their incoming and outgoing edges from the graph.
+        /// All deleted nodes and edges are returned in the result.
+        /// </summary>
+        /// <returns>all deleted nodes and edges including this node</returns>
+        public SubgraphMemento DeleteTree()
+        {
+            SubgraphMemento result = new SubgraphMemento(ItsGraph);
+            foreach (Node node in PostOrderDescendants())
+            {
+                result.Parents[node] = node.Parent;
+                foreach (Edge edge in node.Outgoings)
+                {
+                    result.Edges.Add(edge);
+                }
+                foreach (Edge edge in node.Incomings)
+                {
+                    result.Edges.Add(edge);
+                }
+                // Removing a node will also remove all its incoming and outgoing edges.
+                ItsGraph.RemoveNode(node);
+            }
+            return result;
         }
     }
 }

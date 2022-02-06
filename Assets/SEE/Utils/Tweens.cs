@@ -93,7 +93,7 @@ namespace SEE.Utils
         {
             if (callback != null)
             {
-                gameObject.transform.DOScale(localScale, duration).OnComplete(()=>{callback?.Invoke(gameObject);});
+                gameObject.transform.DOScale(localScale, duration).OnComplete(()=>{callback(gameObject);});
             }
             else
             {
@@ -110,11 +110,12 @@ namespace SEE.Utils
         /// <param name="strength">the shake strength; each component corresponds to one axis (x, y, z)</param>
         /// <param name="duration">the duration of the whole animation in seconds</param>
         /// <param name="callback">the method to be called when the animation has finished</param>
-        public static void MoveScaleShakeRotate(GameObject gameObject, Vector3 position, Vector3 localScale, Vector3 strength, float duration, Action<object> callback)
+        /// <param name="moveCallback">the method to be called when the move animation is about to start</param>
+        public static void MoveScaleShakeRotate(GameObject gameObject, Vector3 position, Vector3 localScale, Vector3 strength, float duration, Action<object> callback, Action<float> moveCallback = null)
         {
             Sequence sequence = DOTween.Sequence();
             sequence.Append(gameObject.transform.DOScale(localScale, duration / 3));
-            sequence.Append(gameObject.transform.DOMove(position, duration / 3));
+            sequence.Append(gameObject.transform.DOMove(position, duration / 3).OnStart(() => { moveCallback?.Invoke(duration / 3); }));
             sequence.Append(gameObject.transform.DOShakeRotation(duration: duration / 3,
                             strength: strength, vibrato: 2, randomness: 0, fadeOut: true).OnComplete(() => { callback?.Invoke(gameObject); }));
         }

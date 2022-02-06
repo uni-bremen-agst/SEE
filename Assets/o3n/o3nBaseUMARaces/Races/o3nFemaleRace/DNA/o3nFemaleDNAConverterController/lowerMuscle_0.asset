@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: lowerMuscle_0
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: ThighAdjust_R
+    hash: -2019048928
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.79999995, z: 0.8}
+  - bone: CalfAdjust_R
+    hash: -646471172
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.8, z: 0.8}
+  - bone: ThighAdjustTwist_L
+    hash: -634524320
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+    scale: {x: 1, y: 0.95, z: 0.95}
+  - bone: CalfAdjustTwist_R
+    hash: -335192228
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.95, z: 0.95}
+  - bone: CalfAdjustTwist_L
+    hash: 369779263
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.95, z: 0.95}
+  - bone: ThighAdjustTwist_R
+    hash: 539152387
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1.0000001}
+    scale: {x: 1, y: 0.95, z: 0.95}
+  - bone: CalfAdjust_L
+    hash: 595106975
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.8, z: 0.8}
+  - bone: ThighAdjust_L
+    hash: 2108227395
+    position: {x: 0, y: 0, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
+    scale: {x: 1, y: 0.8, z: 0.8}
+  tweenPoses: []
+  tweenWeights: []

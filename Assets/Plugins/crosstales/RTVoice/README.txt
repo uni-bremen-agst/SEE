@@ -1,4 +1,4 @@
-﻿# RT-Voice PRO 2021.2.7
+﻿# RT-Voice PRO 2021.3.5
 
 Thank you for buying our asset "RT-Voice PRO"! 
 If you have any questions about this asset, send us an email at [rtvoice@crosstales.com](mailto:rtvoice@crosstales.com). 
@@ -27,15 +27,6 @@ Follow this steps to upgrade the version of "RT-Voice PRO":
 2. Inside the project in Unity, go to menu "File" => "New Scene"
 3. Delete the "Assets/Plugins/crosstales/RTVoice" folder from the Project-view
 4. Import the latest version from the "Unity AssetStore"
-
-
-
-## Notes:
-
-### iOS
-On some device with iOS 13+ the voices can't be found.
-This is due a bug of in the iOS-upgrade which corrupts the voices.
-To solve it, go to the "Settings" (and look further for "Voices" or "Speech") on your device and re-install all needed voices. 
 
 
 
@@ -109,4 +100,4 @@ CH-8002 Zürich
 * [Volumetric Audio](https://assetstore.unity.com/packages/slug/17125?aid=1011lNGT)
 * [WebGL Speech Synthesis](https://assetstore.unity.com/packages/slug/81861?aid=1011lNGT)
 
-`Version: 15.06.2021`
+`Version: 24.11.2021`

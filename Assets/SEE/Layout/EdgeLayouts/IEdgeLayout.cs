@@ -37,7 +37,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="nodes">nodes whose edges are to be drawn or which are 
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
-        public abstract void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges);
+        public abstract void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges) where T : ILayoutNode,
+            IHierarchyNode<ILayoutNode>;
 
         /// <summary>
         /// Name of the layout.
@@ -66,12 +67,13 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="minY">smallest y world co-ordinate</param>
         /// <param name="maxY">largest y world co-ordinate</param>
         /// <param name="maxHeight">maximal height of nodes in world scale</param>
-        protected void MinMaxBlockY(ICollection<ILayoutNode> nodes, out float minY, out float maxY, out float maxHeight)
+        protected static void MinMaxBlockY<T>(IEnumerable<T> nodes, out float minY, out float maxY, out float maxHeight)
+        where T : ILayoutNode
         {
             maxY = Mathf.NegativeInfinity;
             minY = Mathf.Infinity;
             maxHeight = 0.0f;
-            foreach (ILayoutNode node in nodes)
+            foreach (T node in nodes)
             {
                 float cy = node.CenterPosition.y;
                 float height = node.AbsoluteScale.y;

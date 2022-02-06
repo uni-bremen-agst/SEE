@@ -1,0 +1,5 @@
+﻿<linker>
+  <!-- Unity automatically strips out some of the date formatters in System.Globalization even when they're required. This
+       causes the logging system to fail in those locales (e.g. Thailand & Argentina). Force Unity to include that assembly. -->
+  <assembly fullname="System.Globalization" preserve="all"/>
+</linker>

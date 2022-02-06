@@ -1,7 +1,10 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.Game.UI.Notification;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
+using static SEE.Game.City.SEEReflexionCity;
+using static SEE.Utils.Raycasting;
 
 namespace SEE.Game
 {
@@ -20,8 +23,8 @@ namespace SEE.Game
         /// camera. The radius sphere of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
-        /// 
+        /// this sphere. The speed of travel is defined by <see cref="MovingSpeed"/>.
+        ///
         /// This method is expected to be called at every Update().
         /// </summary>
         /// <param name="movingObject">the object to be moved.</param>
@@ -38,85 +41,75 @@ namespace SEE.Game
 
         /// <summary>
         /// Finalizes the position of the <paramref name="movingObject"/>. If the current
-        /// pointer of the user is pointing at a game object with a NodeRef the final
-        /// position of <paramref name="movingObject"/> will be the game object with a NodeRef
-        /// that is at the deepest level of the node hierarchy (the pointer may actually 
-        /// hit multiple nested nodes), in the following called target parent. The 
+        /// pointer of the user is pointing at a game object with a <see cref="NodeRef"/>, the final
+        /// position of <paramref name="movingObject"/> will be the game object with a <see cref="NodeRef"/>
+        /// that is at the deepest level of the node hierarchy (the pointer may actually
+        /// hit multiple nested nodes), in the following called target parent. The
         /// <paramref name="movingObject"/> will then be placed onto the roof of the target
         /// parent and its associated graph node will be become a child of the graph node
         /// associated with the target parent and <paramref name="movingObject"/> becomes
         /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
-        /// must be in sync). 
-        /// 
-        /// If no such target node can be identified, the <paramref name="movingObject"/> will 
-        /// return to its <paramref name="originalPosition"/> and neither the graph-node hierarchy 
-        /// nor the game-node hierarchy will be changed.
+        /// must be in sync). That target node is returned.
         ///
+        /// If no such target node can be identified, neither the graph-node hierarchy
+        /// nor the game-node hierarchy will be changed and null will be returned.
+        ///
+        /// The assumption is that <paramref name="movingObject"/> is not the root node
+        /// of a code city.
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
-        /// <param name="originalPosition">the original world-space position of <paramref name="movingObject"/>
-        /// to be used if the movement cannot be finalized</param>
-        public static void FinalizePosition(GameObject movingObject, Vector3 originalPosition)
+        /// <returns>the game object that is the new parent or null</returns>
+        public static GameObject FinalizePosition(GameObject movingObject)
         {
             // The underlying graph node of the moving object.
-            Node movingNode = movingObject.GetComponent<NodeRef>().Value;
-            // The new parent of the movingNode in the underlying graph.
-            Node newGraphParent = null;
-            // The new parent of the movingNode in the game-object hierarchy.
-            GameObject newGameParent = null;
-            // The new position of the movingNode in world space.
-            Vector3 newPosition = Vector3.negativeInfinity;
+            NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
 
-            // Note that the order of the results of RaycastAll() is undefined.
-            // Hence, we need to identify the node in the node hierarchy that
-            // is at the lowest level in the tree (more precisely, the one with
-            // the greatest value of the node attribute Level; Level counting
-            // starts at the root and increases downward into the tree).            
-            foreach (RaycastHit hit in Physics.RaycastAll(UserPointsTo()))
+            RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
+
+            if (newGraphParent != null && raycastHit != null)
             {
-                // Must be different from the movingObject itself
-                if (hit.collider.gameObject != movingObject)
+                // The new parent of the movingNode in the game-object hierarchy.
+                GameObject newGameParent = raycastHit.Value.collider.gameObject;
+                Node movingNode = movingNodeRef.Value;
+                // Reflexion analysis: Dropping implementation node on architecture node
+                if (newGraphParent.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
                 {
-                    NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
-                    // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value.ItsGraph == movingNode.ItsGraph)
+                    ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
+                                                                + $"onto '{newGraphParent.SourceName}'.");
+                    Map(movingNode, newGraphParent);
+                }
+                else if (newGraphParent.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
+                {
+                    ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
+                                                                 + "architecture, not the other way around.");
+                }
+                else
+                {
+                    // The new position of the movingNode in world space.
+                    Vector3 newPosition = raycastHit.Value.point;
+                    movingObject.transform.position = newPosition;
+                    PutOn(movingObject.transform, newGameParent);
+                    if (movingNode.Parent != newGraphParent)
                     {
-                        // update newParent when we found a node deeper into the tree
-                        if (newGraphParent == null || nodeRef.Value.Level > newGraphParent.Level)
-                        {
-                            newGraphParent = nodeRef.Value;
-                            newGameParent = hit.collider.gameObject;
-                            newPosition = hit.point;
-                        }
+                        movingNode.Reparent(newGraphParent);
+                        movingObject.transform.SetParent(newGameParent.transform);
                     }
+                    return newGameParent;
                 }
             }
 
-            if (newGraphParent != null)
-            {
-                movingObject.transform.position = newPosition;
-                PutOn(movingObject.transform, newGameParent);
-                if (movingNode.Parent != newGraphParent)
-                {
-                    movingNode.Reparent(newGraphParent);
-                    movingObject.transform.SetParent(newGameParent.transform);
-                }
-            }
-            else
-            {
-                // Attempt to move the node outside of any node in the node hierarchy.
-                // => Reset its original transform.
-                Tweens.Move(movingObject, originalPosition, 1.0f);
-            }
+            // Attempt to move the node outside of any node in the node hierarchy.
+            return null;
         }
 
         /// <summary>
-        /// Sets the new parent for <paramref name="child"/> via the network.
+        /// Sets the new parent for <paramref name="child"/> to the game node with <paramref name="parentName"/>
+        /// at the given <paramref name="position"/> in world space.
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
-        /// <param name="parentName">the parent's name (assumed to be unique)</param>
+        /// <param name="parentName">the new parent's name (assumed to be unique)</param>
         /// <param name="position">new position</param>
-        public static void NetworkFinalizeNodePosition(GameObject child, string parentName, Vector3 position)
+        public static void Reparent(GameObject child, string parentName, Vector3 position)
         {
             GameObject parent = GameObject.Find(parentName);
             if (parent != null)
@@ -139,7 +132,7 @@ namespace SEE.Game
         /// <param name="parent">parent</param>
         private static void PutOn(Transform child, GameObject parent)
         {
-            // FIXME: child may not actually fit into parent, in which we should 
+            // FIXME: child may not actually fit into parent, in which we should
             // downscale it until it fits
             Vector3 childCenter = child.position;
             float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
@@ -154,9 +147,9 @@ namespace SEE.Game
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
         /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
-        /// 
+        ///
         /// This method is expected to be called at every Update().
-        /// 
+        ///
         /// You can lock any of the three axes.
         /// </summary>
         /// <param name="movingObject">the object to be moved</param>
@@ -189,21 +182,11 @@ namespace SEE.Game
         // -------------------------------------------------------------
 
         /// <summary>
-        /// A ray from the user.
-        /// </summary>
-        /// <returns>ray from the user</returns>
-        private static Ray UserPointsTo()
-        {
-            // FIXME: We need to an interaction for VR, too.
-            return MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-        }
-
-        /// <summary>
         /// Returns the position of the tip of the ray drawn from the camera towards
-        /// the position the user is currently pointing to. The distance of that 
+        /// the position the user is currently pointing to. The distance of that
         /// point along this ray is the distance between the camera from which the
         /// ray originated and the position of the given <paramref name="selectedObject"/>.
-        /// 
+        ///
         /// That means, the selected object moves on a sphere around the camera
         /// at the distance of the selected object.
         /// </summary>
@@ -211,8 +194,7 @@ namespace SEE.Game
         /// <returns>tip of the ray</returns>
         private static Vector3 TipOfRayPosition(GameObject selectedObject)
         {
-            Ray ray = UserPointsTo();
-            return ray.GetPoint(Vector3.Distance(ray.origin, selectedObject.transform.position));
+            return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
         }
     }
 }

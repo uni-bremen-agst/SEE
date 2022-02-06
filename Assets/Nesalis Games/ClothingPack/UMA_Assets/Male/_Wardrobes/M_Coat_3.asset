@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
+  m_Name: M_Coat_3
+  m_EditorClassIdentifier: 
+  recipeType: Wardrobe
+  DisplayValue: 
+  compatibleRaces:
+  - HumanMaleHighPoly
+  - HumanMale
+  - HumanMaleDCS
+  wardrobeRecipeThumbs:
+  - race: HumanMaleHighPoly
+    filename: 
+    thumb: {fileID: 0}
+  - race: HumanMale
+    filename: 
+    thumb: {fileID: 0}
+  - race: HumanMaleDCS
+    filename: 
+    thumb: {fileID: 0}
+  wardrobeSlot: Shoulders
+  Hides: []
+  suppressWardrobeSlots: []
+  activeWardrobeSet: []
+  MeshHideAssets:
+  - {fileID: 11400000, guid: 4930d0f4d8a694240a32bb23fec2e771, type: 2}
+  - {fileID: 11400000, guid: 44696043edd5a864ca1cc376156e2156, type: 2}
+  - {fileID: 11400000, guid: 3712c162783bae34e9d35e0d94e21a66, type: 2}
+  - {fileID: 11400000, guid: af4e976ee22a8f8468629f30501a70d2, type: 2}
+  - {fileID: 11400000, guid: 741d56541314d5548a07e5031a91b2ab, type: 2}
+  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"M_Coat","scale":100,"copyIdx":-1,"overlays":[{"id":"M_Coat_Overlay_3","colorIdx":0,"rect":[0,0,0,0]}]}],"colors":[],"fColors":[{"name":"Coat","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":1,"race":"","packedDna":[]}'
+  replaces: Nothing

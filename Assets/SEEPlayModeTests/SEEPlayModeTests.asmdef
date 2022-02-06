@@ -1,11 +1,12 @@
 {
     "name": "SEEPlayModeTests",
+    "rootNamespace": "",
     "references": [
         "GUID:cafbae0046a0f094db2fd816ce654fea",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:74fd32818bdd6ed012fb3490ef6e9793",
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:bf06a4913aa6be5409beddfe58700866"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace SEE.DataModel.DG
 {
@@ -50,13 +49,10 @@ namespace SEE.DataModel.DG
         /// </summary>
         private int edgeID = 1;
 
-        private Edge NewEdge(Node source, Node target)
+        private Edge NewEdge(Node source, Node target, string edgeType = "Call")
         {
-            Edge edge = new Edge(edgeID.ToString());
+            Edge edge = new Edge(source, target, edgeType);
             edgeID++;
-            edge.Source = source;
-            edge.Target = target;
-            edge.Type = "Call";
             edge.SetFloat("float", 1.0f);
             edge.SetInt("int", 2);
             edge.SetString("string", "hello");
@@ -104,8 +100,8 @@ namespace SEE.DataModel.DG
             original.AddNode(n3);
 
             Edge e1 = NewEdge(n1, n2);
-            Edge e2 = NewEdge(n2, n3);
-            Edge e3 = NewEdge(n2, n3);
+            Edge e2 = NewEdge(n2, n3, "DynamicCall");
+            Edge e3 = NewEdge(n2, n3, "StaticCall");
             original.AddEdge(e1);
             original.AddEdge(e2);
             original.AddEdge(e3);
@@ -184,8 +180,8 @@ namespace SEE.DataModel.DG
             else
             {
                 Assert.That(!clonedNode.IsRoot(),
-                            clonedNode.ToString() + " should not be a root. Corresponding node in original graph: "
-                            + node.ToString());
+                            clonedNode + " should not be a root. Corresponding node in original graph: "
+                                       + node);
                 Assert.That(node.Parent.ID == clonedNode.Parent.ID);
             }
 

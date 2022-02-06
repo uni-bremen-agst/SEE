@@ -157,7 +157,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// All game-node objects to be listed in the chart for the list view.
-        /// 
+        ///
         /// Invariant: all game objects in listDataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
@@ -165,7 +165,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// All game-node objects to be listed in the chart for the tree view.
-        /// 
+        ///
         /// Invariant: all game objects in treeDataObjects are game objects tagged by
         /// Tags.Node and having a valid graph-node reference.
         /// </summary>
@@ -188,9 +188,9 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Color of added node labels
-        /// </summary> 
+        /// </summary>
         private static readonly Color addedNodesLabelColor = Color.green;
-        
+
         /// <summary>
         /// Color of changed node labels
         /// </summary>
@@ -224,10 +224,10 @@ namespace SEE.Game.Charts
 
         // FIXME: all attributes need documentation no matter whether they are public or private.
 
-        private readonly Dictionary<uint, bool> showInChartDict = new Dictionary<uint, bool>();
+        private readonly Dictionary<string, bool> showInChartDict = new Dictionary<string, bool>();
 
         public delegate void ShowInChartCallbackFn(bool value);
-        private readonly Dictionary<uint, ShowInChartCallbackFn> callbackFnDict = new Dictionary<uint, ShowInChartCallbackFn>();
+        private readonly Dictionary<string, ShowInChartCallbackFn> callbackFnDict = new Dictionary<string, ShowInChartCallbackFn>();
 
         private bool scrollViewIsTree = false;
 
@@ -259,7 +259,7 @@ namespace SEE.Game.Charts
 
             ReloadData();
         }
-        
+
         protected virtual void Start()
         {
             axisDropdownX.Initialize();
@@ -278,7 +278,7 @@ namespace SEE.Game.Charts
                 currentRevisionCountCache = NodeChangesBuffer.GetSingleton().currentRevisionCounter;
                 NodeChangesBuffer.GetSingleton().revisionChanged = false;
             }
-            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because 
+            // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because
             // the data takes some time to update).
             if (!NodeChangesBuffer.GetSingleton().revisionChanged)
             {
@@ -351,28 +351,28 @@ namespace SEE.Game.Charts
 
         public void AttachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
-            Assert.IsTrue(!callbackFnDict.ContainsKey(interactableObject.ID));
-            callbackFnDict[interactableObject.ID] = callbackFn;
+            Assert.IsTrue(!callbackFnDict.ContainsKey(interactableObject.name));
+            callbackFnDict[interactableObject.name] = callbackFn;
         }
 
         public bool DetachShowInChartCallbackFn(InteractableObject interactableObject, ShowInChartCallbackFn callbackFn)
         {
-            return callbackFnDict.Remove(interactableObject.ID);
+            return callbackFnDict.Remove(interactableObject.name);
         }
 
         public bool ShowInChart(InteractableObject interactableObject)
         {
-            return showInChartDict[interactableObject.ID];
+            return showInChartDict[interactableObject.name];
         }
 
         public void SetShowInChart(InteractableObject interactableObject, bool value)
         {
-            if (!showInChartDict.TryGetValue(interactableObject.ID, out bool oldValue))
+            if (!showInChartDict.TryGetValue(interactableObject.name, out bool oldValue))
             {
                 oldValue = true;
             }
-            showInChartDict[interactableObject.ID] = value;
-            if (oldValue != value && callbackFnDict.TryGetValue(interactableObject.ID, out ShowInChartCallbackFn fn))
+            showInChartDict[interactableObject.name] = value;
+            if (oldValue != value && callbackFnDict.TryGetValue(interactableObject.name, out ShowInChartCallbackFn fn))
             {
                 fn(value);
             }
@@ -626,7 +626,7 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Returns all relevant nodes to be shown in the metric chart. 
+        /// Returns all relevant nodes to be shown in the metric chart.
         /// If ChartManager.Instance.CodeCity is defined, we retrieve only the
         /// nodes contained in this city; otherwise all nodes in the scene
         /// are retrieved. If ChartManager.Instance.ShowLeafMetrics is true,
@@ -655,7 +655,7 @@ namespace SEE.Game.Charts
                         {
                             result.Add(nodeRef);
                         }
-                    }                    
+                    }
                 }
                 return result;
             }
@@ -667,7 +667,7 @@ namespace SEE.Game.Charts
         private void FindDataObjects()
         {
             // list
-            listDataObjects = RelevantNodes();            
+            listDataObjects = RelevantNodes();
 
             // Detect node changes and decorate the scrollview
             FillListsWithChanges();
@@ -853,7 +853,7 @@ namespace SEE.Game.Charts
             }
 
             // Note: width and height of dataRect are measured in Unity units
-            float widthFactor = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;            
+            float widthFactor = minX < maxX ? dataRect.width / (maxX - minX) : 0.0f;
             float heightFactor = minY < maxY ? dataRect.height / (maxY - minY) : 0.0f;
             int positionInLayer = 0;
             int currentReusedActiveMarkerIndex = 0;
@@ -875,7 +875,7 @@ namespace SEE.Game.Charts
                 {
                     // We create the next value in our range [1, 2, 3, ...nodeRefsToDraw.Count()].
                     nodeIndex++;
-                    valueX = nodeIndex;                    
+                    valueX = nodeIndex;
                 }
                 nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
                 Vector2 anchoredPosition = new Vector2((valueX - minX) * widthFactor, (valueY - minY) * heightFactor);
@@ -960,7 +960,7 @@ namespace SEE.Game.Charts
                 Vector2 markerPos = marker.transform.position;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<uint> ids = marker.ids;
+                    List<string> ids = marker.ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
                         o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
@@ -968,7 +968,7 @@ namespace SEE.Game.Charts
                 }
                 else if (!toggleHover)
                 {
-                    List<uint> ids = marker.ids;
+                    List<string> ids = marker.ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
                         o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
@@ -991,7 +991,7 @@ namespace SEE.Game.Charts
                 Vector2 markerPos = marker.transform.position;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<uint> ids = marker.ids;
+                    List<string> ids = marker.ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsSelected))
                     {
                         o.SetSelect(true, true);
@@ -999,7 +999,7 @@ namespace SEE.Game.Charts
                 }
                 else if (!toggleSelect)
                 {
-                    List<uint> ids = marker.ids;
+                    List<string> ids = marker.ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsSelected))
                     {
                         o.SetSelect(false, true);
@@ -1021,7 +1021,7 @@ namespace SEE.Game.Charts
             }
             else
             {
-                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric 
+                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric
                                         + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
                 );
             }

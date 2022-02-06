@@ -12,11 +12,11 @@ namespace Crosstales.RTVoice.Provider
 
       private static System.Collections.Generic.List<Model.Voice> cachediOSVoices = new System.Collections.Generic.List<Model.Voice>();
 
-      private static string[] speechTextArray;
-      private static int wordIndex;
       private static bool isWorking;
       private static Model.Wrapper wrapperNative;
       private static bool isPaused;
+      private static string[] speechTextArray;
+      private static int wordIndex;
 
       #endregion
 
@@ -68,7 +68,7 @@ namespace Crosstales.RTVoice.Provider
       /// <param name="voicesText">All voices as text string.</param>
       public static void SetVoices(string voicesText)
       {
-         string[] voices = voicesText.Split(new[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
+         string[] voices = voicesText.Split(new[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
 
          if (voices.Length % 3 == 0)
          {
@@ -103,26 +103,31 @@ namespace Crosstales.RTVoice.Provider
       /// <param name="state">The state of the speaker.</param>
       public static void SetState(string state)
       {
-         if (state.Equals("Start"))
+         switch (state)
          {
-            // do nothing
-         }
-         else if (state.Equals("Finsish"))
-         {
-            isWorking = false;
-         }
-         else
-         {
-            //cancel
-            isWorking = false;
+            case "Start":
+               // do nothing
+               break;
+            case "Finish":
+               isWorking = false;
+               break;
+            default:
+               //cancel
+               isWorking = false;
+               break;
          }
       }
 
       /// <summary>Called every time a new word is spoken.</summary>
-      public static void WordSpoken()
+      public static void WordSpoken(string word)
       {
+         //if (Util.Constants.DEV_DEBUG)
+         Debug.Log($"Word spoken: {word}"); //TODO test word from iOS!
+
          if (wrapperNative != null)
          {
+            Instance.onSpeakCurrentWord(wrapperNative, word);
+
             Instance.onSpeakCurrentWord(wrapperNative, speechTextArray, wordIndex);
             wordIndex++;
          }

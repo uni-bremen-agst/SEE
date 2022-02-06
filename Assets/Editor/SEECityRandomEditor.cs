@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.DataModel.DG.IO;
-using SEE.Game;
+using SEE.Game.City;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;

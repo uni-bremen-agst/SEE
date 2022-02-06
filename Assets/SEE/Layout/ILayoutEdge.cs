@@ -1,38 +1,30 @@
-﻿using UnityEngine;
+using SEE.Utils;
+using TinySpline;
 
 namespace SEE.Layout
 {
     /// <summary>
     /// Layout information about an edge.
     /// </summary>
-    public abstract class ILayoutEdge
+    /// <typeparam name="T">Type of node this edge connects to.</typeparam>
+    public interface ILayoutEdge<out T> where T : ILayoutNode
     {
         /// <summary>
         /// Source of the edge.
         /// </summary>
-        public ILayoutNode Source;
+        public T Source { get; }
+
         /// <summary>
         /// Target of the edge.
         /// </summary>
-        public ILayoutNode Target;
-        /// <summary>
-        /// The points of the polygone for rendering the edge.
-        /// </summary>
-        public Vector3[] Points;
-        /// <summary>
-        /// The control points of the polygon for rendering the edge.
-        /// </summary>
-        public Vector3[] ControlPoints;
+        public T Target { get; }
 
         /// <summary>
-        /// Constructor.
+        /// The shaping spline of the edge. The default spline is a line
+        /// (i.e., a spline of degree 1 with 2 control points) connecting the
+        /// center position (<see cref="IGameNode.CenterPosition"/>) of
+        /// <see cref="Source"/> and <see cref="Target"/>.
         /// </summary>
-        /// <param name="source">Source of the edge.</param>
-        /// <param name="target">Target of the edge.</param>
-        public ILayoutEdge(ILayoutNode source, ILayoutNode target)
-        {
-            Source = source;
-            Target = target;
-        }
+        public BSpline Spline { get; set; }
     }
 }

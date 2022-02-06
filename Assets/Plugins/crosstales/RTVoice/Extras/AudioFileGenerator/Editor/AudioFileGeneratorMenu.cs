@@ -1,8 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using Crosstales.RTVoice.EditorUtil;
-using UnityEngine;
-using UnityEditor.SceneManagement;
 
 namespace Crosstales.RTVoice.EditorIntegration
 {

@@ -1,5 +1,44 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2021.3.5 - 24.11.2021
+* Unnecessary logs removed
+* PlatformProvider improved
+* VoiceProviderMaryTTS: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderSAPI: automatic fallback to default wrapper under unsupported platforms
+* VoiceProviderAWS: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderAzure: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderGoogle: automatic fallback to default wrapper under unsupported platforms and on unavailable Internet connection
+* VoiceProviderWebGL: automatic fallback to default wrapper under unsupported platforms
+
+## 2021.3.4 - 19.11.2021
+* Removal of generic AudioSources improved
+* Updated to Common 2021.3.5
+
+## 2021.3.3 - 12.11.2021
+* PlatformProvider added
+* Update for TextMesh PRO components
+* Check if Speaker is active before executing methods
+* Updated to Common 2021.3.4
+
+## 2021.3.2 - 27.09.2021
+* Azure: support for more than 170 neural voices
+* Fix for iOS
+* Updated to Common 2021.3.3
+
+## 2021.3.1 - 01.09.2021
+* Google Cloud: provider improved
+
+## 2021.3.0 - 31.08.2021
+* Speaker: 
+  * callback "OnSpeakCurrentWordString" added
+  * Support for SystemLanguage, e.g. "VoiceForLanguage"
+* GlobalCache: loading and saving of the cache (even automatically)
+* Android: 
+  * better detection of gender
+  * improved support for Samsung and old devices
+* Code cleanup
+* Updated to Common 2021.3.1
+
 ## 2021.2.7 - 15.06.2021
 * AWS Polly:
   * Improvements for neural voices
@@ -116,7 +155,7 @@
 * Big code overhaul: use "Instance" to access the methods and variables
 * Import of the demo scenes streamlined
 * Caching fixed
-* Dropped support for versions before Unity 2018.4
+* Minimal version is now Unity 2018.4 and newer
 * Updated to Common 2020.4.3
 
 ## 2020.3.2 - 21.07.2020
@@ -277,7 +316,7 @@
 * New voice provider "Azure (Bing Speech)" added! See "3rd party"-folder for the integration
 * SALSA-integration updated to version 2.1.0
 * AWS Polly: fix for IL2CPP under Android
-* Updated for Unity 2017.4 and higher
+* Minimal version is now Unity 2017.4 and newer
 * Added compatibility with assembly definitions
 * Demos: fully qualified access to classes
 * Updated to Common 2019.4.0

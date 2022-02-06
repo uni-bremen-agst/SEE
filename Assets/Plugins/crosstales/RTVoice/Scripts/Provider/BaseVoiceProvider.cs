@@ -40,7 +40,7 @@ namespace Crosstales.RTVoice.Provider
 
       protected bool silence;
 
-      protected static readonly char[] splitCharWords = {' '};
+      protected static readonly char[] splitCharWords = { ' ' };
 
       #endregion
 
@@ -58,6 +58,9 @@ namespace Crosstales.RTVoice.Provider
 
       /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
       public event SpeakCurrentWord OnSpeakCurrentWord;
+
+      /// <summary>An event triggered whenever a new word is spoken (native, Windows and iOS only).</summary>
+      public event SpeakCurrentWordString OnSpeakCurrentWordString;
 
       /// <summary>An event triggered whenever a new phoneme is spoken (native mode, Windows only).</summary>
       public event SpeakCurrentPhoneme OnSpeakCurrentPhoneme;
@@ -148,7 +151,7 @@ namespace Crosstales.RTVoice.Provider
          silence = true;
 
 #if UNITY_STANDALONE || UNITY_EDITOR
-         foreach (System.Collections.Generic.KeyValuePair<string, System.Diagnostics.Process> kvp in processes.Where(kvp => !kvp.Value.HasExited))
+         foreach (System.Collections.Generic.KeyValuePair<string, System.Diagnostics.Process> kvp in processes.Where(kvp => kvp.Value?.HasExited == false))
          {
             kvp.Value.Kill();
          }
@@ -164,7 +167,7 @@ namespace Crosstales.RTVoice.Provider
          {
             if (processes.ContainsKey(uid))
             {
-               if (!processes[uid].HasExited)
+               if (processes[uid] != null && !processes[uid].HasExited)
                   processes[uid].Kill();
 
                processes.Remove(uid);
@@ -205,7 +208,7 @@ namespace Crosstales.RTVoice.Provider
                do
                {
                   yield return null;
-               } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+               } while (!silence && wrapper.Source.CTHasActiveClip());
 
                if (Util.Config.DEBUG)
                   Debug.Log("Text spoken: " + wrapper.Text);
@@ -229,7 +232,7 @@ namespace Crosstales.RTVoice.Provider
       #region Protected methods
 
 #if UNITY_STANDALONE || UNITY_EDITOR
-#if ENABLE_IL2CPP
+#if ENABLE_IL2CPP && CT_PROC
       protected void startProcess(Common.Util.CTProcess process, int timeout = 0, bool eventOutputData =
          false, bool eventErrorData = false, bool redirectOutputData = true, bool redirectErrorData = true)
 #else
@@ -294,6 +297,8 @@ namespace Crosstales.RTVoice.Provider
             outputFile = Util.Config.AUDIOFILE_PATH + filename;
          }
 
+         //Debug.Log("FILE: " + outputFile);
+
          /*
          if (createFile)
          {
@@ -315,6 +320,8 @@ namespace Crosstales.RTVoice.Provider
          AudioType type = AudioType.WAV, bool isNative = false, bool isLocalFile = true,
          System.Collections.Generic.Dictionary<string, string> headers = null)
       {
+         //Debug.Log("URL: " + url);
+
          if (wrapper != null && wrapper.Source != null)
          {
             if (!isLocalFile || isLocalFile && (System.IO.File.Exists(outputFile) && new System.IO.FileInfo(outputFile).Length > 1024))
@@ -387,7 +394,7 @@ namespace Crosstales.RTVoice.Provider
                               do
                               {
                                  yield return null;
-                              } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+                              } while (!silence && wrapper.Source.CTHasActiveClip());
 
                               if (Util.Config.DEBUG)
                                  Debug.Log($"Text spoken: {wrapper.Text}");
@@ -591,21 +598,28 @@ namespace Crosstales.RTVoice.Provider
          OnSpeakComplete?.Invoke(wrapper);
       }
 
+
       protected void onSpeakCurrentWord(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
       {
          if (wordIndex < speechTextArray.Length)
          {
             if (Util.Config.DEBUG)
-               Debug.Log(
-                  "onSpeakCurrentWord: " + speechTextArray[wordIndex] + System.Environment.NewLine + wrapper);
+               Debug.Log("onSpeakCurrentWord: " + speechTextArray[wordIndex] + System.Environment.NewLine + wrapper);
 
             OnSpeakCurrentWord?.Invoke(wrapper, speechTextArray, wordIndex);
          }
          else
          {
-            Debug.LogWarning("Word index is larger than the speech text word count: " + wordIndex + "/" +
-                             speechTextArray.Length);
+            Debug.LogWarning("Word index is larger than the speech text word count: " + wordIndex + "/" + speechTextArray.Length);
          }
+      }
+
+      protected void onSpeakCurrentWord(Model.Wrapper wrapper, string word)
+      {
+         if (Util.Config.DEBUG)
+            Debug.Log("onSpeakCurrentWord: " + word + System.Environment.NewLine + wrapper);
+
+         OnSpeakCurrentWordString?.Invoke(wrapper, word);
       }
 
       protected void onSpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme)

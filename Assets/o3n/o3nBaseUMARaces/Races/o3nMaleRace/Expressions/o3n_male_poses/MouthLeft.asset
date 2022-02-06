@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: MouthLeft
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LipLowerCorner_L
+    hash: 1534549083
+    position: {x: 0, y: -0.0020000003, z: 0}
+    rotation: {x: 0.00000013329662, y: -0.00000036008825, z: -0.00000025461276, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerIn_L
+    hash: -1225183903
+    position: {x: 0.0019566752, y: -0.0036443118, z: 0.00027258391}
+    rotation: {x: -0.015293408, y: 0.005647657, z: -0.12876414, w: 0.991872}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerMiddle
+    hash: -1263147753
+    position: {x: -0.0011791363, y: -0.0066447733, z: 0}
+    rotation: {x: -0.16973217, y: -0.00000003143029, z: 0.021828972, w: 0.98569095}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerOut_L
+    hash: -893089928
+    position: {x: 0.005849581, y: -0.0008128304, z: -0.00024157064}
+    rotation: {x: -0.019731564, y: -0.0013841471, z: -0.16998358, w: 0.98569095}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperAbove
+    hash: 213529522
+    position: {x: -0.0019964501, y: -0.0019999978, z: -0.00020971545}
+    rotation: {x: 0.00000005641625, y: -0.0000000018671285, z: 0.0000010134161, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperCorner_L
+    hash: 1062377319
+    position: {x: 0, y: -0.0020000003, z: 0}
+    rotation: {x: 0.00000026120475, y: 0.000000640182, z: 0.000000048159094, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperIn_L
+    hash: -693713854
+    position: {x: 0.0020643733, y: -0.0042130677, z: 0.00030936394}
+    rotation: {x: 0.0039885473, y: 0.0024024888, z: -0.12970853, w: 0.99187195}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperMiddle
+    hash: -741693195
+    position: {x: -0.00094199926, y: -0.0074685654, z: 0}
+    rotation: {x: 0.13260974, y: 0.000000026528772, z: 0.108167514, w: 0.985691}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperOut_L
+    hash: 1757653475
+    position: {x: 0.006208714, y: -0.001185501, z: -0.00037037418}
+    rotation: {x: 0.025218612, y: 0.0054020816, z: -0.16917577, w: 0.985691}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

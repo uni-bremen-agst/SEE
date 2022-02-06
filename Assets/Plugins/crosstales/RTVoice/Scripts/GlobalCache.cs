@@ -14,12 +14,16 @@ namespace Crosstales.RTVoice
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("ClipCacheSize")] [Header("Cache Settings"), Tooltip("Size of the clip cache in MB (default: 256)"), Range(16, 1024), SerializeField]
       private int clipCacheSize = Util.Constants.DEFAULT_CACHE_SIZE_CLIPS;
 
+      [Tooltip("Automatically loads and saves the cache (default: false)"), SerializeField] private bool persistCache;
+
       ///<summary>Dictionary with all cached clips.</summary>
       public readonly System.Collections.Generic.Dictionary<Model.Wrapper, AudioClip> Clips = new System.Collections.Generic.Dictionary<Model.Wrapper, AudioClip>();
 
       private readonly System.Collections.Generic.List<Model.Wrapper> clipKeys = new System.Collections.Generic.List<Model.Wrapper>();
 
       private Transform tf;
+
+      private static string dataStorePath;
 
       #endregion
 
@@ -36,10 +40,25 @@ namespace Crosstales.RTVoice
       /// <summary>Current size of the clip cache in Bytes.</summary>
       public int CurrentClipCacheSize => Clips.Sum(pair => pair.Value.samples * 2 * 4);
 
+      /// <summary>Automatically loads and saves the cache.</summary>
+      public bool PersistCache
+      {
+         get => persistCache;
+         set => persistCache = value;
+      }
+
       #endregion
 
 
       #region MonoBehaviour methods
+
+      private void Start()
+      {
+         dataStorePath = $"{Application.persistentDataPath}/rtvoice_datastore.xml";
+
+         if (persistCache)
+            LoadCache();
+      }
 
       private void OnValidate()
       {
@@ -55,6 +74,9 @@ namespace Crosstales.RTVoice
 
       protected override void OnApplicationQuit()
       {
+         if (persistCache)
+            SaveCache();
+
          ClearCache();
 
          base.OnApplicationQuit();
@@ -81,6 +103,7 @@ namespace Crosstales.RTVoice
          {
             Clips.TryGetValue(key, out AudioClip data);
 
+            //Debug.LogWarning("DATA: " + data);
             return data;
          }
 
@@ -137,7 +160,58 @@ namespace Crosstales.RTVoice
          ClearClipCache();
       }
 
+      /// <summary>Saves the complete cache.</summary>
+      public void SaveCache()
+      {
+         System.Collections.Generic.List<DataStore> data = Clips.Select(kvp => new DataStore(kvp.Key, Crosstales.Common.Audio.WavMaster.FromAudioClip(kvp.Value))).ToList();
+
+         Common.Util.XmlHelper.SerializeToFile(data, dataStorePath);
+
+         Debug.Log("SaveCache: " + data.Count);
+      }
+
+      /// <summary>Loads the complete cache.</summary>
+      public void LoadCache()
+      {
+         if (System.IO.File.Exists(dataStorePath))
+         {
+            System.Collections.Generic.List<DataStore> data = Common.Util.XmlHelper.DeserializeFromFile<System.Collections.Generic.List<DataStore>>(dataStorePath);
+
+            if (data != null)
+            {
+               foreach (DataStore ds in data)
+               {
+                  AddClip(ds.wrapper, Crosstales.Common.Audio.WavMaster.ToAudioClip(ds.Data));
+               }
+            }
+         }
+
+         Debug.Log("LoadCache: " + Clips.Count);
+      }
+
       #endregion
+   }
+
+   /// <summary>Model for a voice.</summary>
+   [System.Serializable]
+   public class DataStore
+   {
+      public Model.Wrapper wrapper;
+      public byte[] Data;
+
+      /// <summary>Default.</summary>
+      public DataStore()
+      {
+      }
+
+      /// <summary>Instantiate the class.</summary>
+      /// <param name="wrapper">Wrapper of the speech.</param>
+      /// <param name="data">Data of the speech.</param>
+      public DataStore(Model.Wrapper wrapper, byte[] data)
+      {
+         this.wrapper = wrapper;
+         Data = data;
+      }
    }
 }
 // © 2020-2021 crosstales LLC (https://www.crosstales.com)

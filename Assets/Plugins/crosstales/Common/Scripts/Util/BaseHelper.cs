@@ -13,18 +13,14 @@ namespace Crosstales.Common.Util
 
       public static readonly System.Globalization.CultureInfo BaseCulture = new System.Globalization.CultureInfo("en-US"); //TODO set with current user locale?
 
-      //protected static readonly Regex cleanStringRegex = new Regex(@"([^a-zA-Z0-9 ]|[ ]{2,})");
-      protected static readonly System.Text.RegularExpressions.Regex cleanSpacesRegex = new System.Text.RegularExpressions.Regex(@"\s+");
-
-      protected static readonly System.Text.RegularExpressions.Regex cleanTagsRegex = new System.Text.RegularExpressions.Regex(@"<.*?>");
-      //protected static readonly System.Text.RegularExpressions.Regex asciiOnlyRegex = new System.Text.RegularExpressions.Regex(@"[^\u0000-\u00FF]+");
-
       protected static readonly System.Random rnd = new System.Random();
 
       protected const string file_prefix = "file://";
 
       public static bool ApplicationIsPlaying = Application.isPlaying;
       private static string applicationDataPath = Application.dataPath;
+
+      private static string[] args;
 
       #endregion
 
@@ -412,12 +408,10 @@ namespace Crosstales.Common.Util
       /// <summary>Determines if an AudioSource has an active clip.</summary>
       /// <param name="source">AudioSource to check.</param>
       /// <returns>True if the AudioSource has an active clip.</returns>
-      public static bool hasActiveClip(AudioSource source)
+      [System.ObsoleteAttribute("Use the extension method 'CTHasActiveClip' instead")]
+      public static bool hasActiveClip(AudioSource source) //TODO remove in the future
       {
-         return source != null && source.clip != null &&
-                (source.isPlaying ||
-                 source.loop ||
-                 (!source.loop && source.timeSamples > 0 && source.timeSamples < source.clip.samples - 256));
+         return source.CTHasActiveClip();
       }
 
 #if (!UNITY_WSA && !UNITY_XBOXONE) || UNITY_EDITOR
@@ -452,15 +446,17 @@ namespace Crosstales.Common.Util
       /// <summary>Validates a given path and add missing slash.</summary>
       /// <param name="path">Path to validate</param>
       /// <param name="addEndDelimiter">Add delimiter at the end of the path (optional, default: true)</param>
+      /// <param name="preserveFile">Preserves a given file in the path (optional, default: true)</param>
       /// <returns>Valid path</returns>
-      public static string ValidatePath(string path, bool addEndDelimiter = true)
+      public static string ValidatePath(string path, bool addEndDelimiter = true, bool preserveFile = true)
       {
          if (!string.IsNullOrEmpty(path))
          {
             if (isValidURL(path))
                return path;
 
-            string pathTemp = path.Trim();
+            string pathTemp = !preserveFile && System.IO.File.Exists(path.Trim()) ? System.IO.Path.GetDirectoryName(path.Trim()) : path.Trim();
+
             string result;
 
             if ((isWindowsBasedPlatform || isWindowsEditor) && !isMacOSEditor && !isLinuxEditor)
@@ -489,6 +485,7 @@ namespace Crosstales.Common.Util
             }
 
             return string.Join(string.Empty, result.Split(System.IO.Path.GetInvalidPathChars()));
+            //return result;
          }
 
          return path;
@@ -531,6 +528,26 @@ namespace Crosstales.Common.Util
          }
 
          return path;
+      }
+
+      /// <summary>
+      /// Checks a given path for invalid characters
+      /// </summary>
+      /// <param name="path">Path to check for invalid characters</param>
+      /// <returns>Returns true if the path contains invalid chars, otherwise it's false.</returns>
+      public static bool PathHasInvalidChars(string path)
+      {
+         return !string.IsNullOrEmpty(path) && path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0;
+      }
+
+      /// <summary>
+      /// Checks a given file for invalid characters
+      /// </summary>
+      /// <param name="file">File to check for invalid characters</param>
+      /// <returns>Returns true if the file contains invalid chars, otherwise it's false.</returns>
+      public static bool FileHasInvalidChars(string file)
+      {
+         return !string.IsNullOrEmpty(file) && file.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0;
       }
 
       /// <summary>
@@ -605,7 +622,7 @@ namespace Crosstales.Common.Util
             }
          }
 
-         return new string[0];
+         return System.Array.Empty<string>();
       }
 
       /// <summary>
@@ -664,7 +681,7 @@ namespace Crosstales.Common.Util
             }
          }
 
-         return new string[0];
+         return System.Array.Empty<string>();
       }
 
       /// <summary>
@@ -710,7 +727,7 @@ namespace Crosstales.Common.Util
 #endif
          }
 
-         return new string[0];
+         return System.Array.Empty<string>();
       }
 
       /*
@@ -842,25 +859,28 @@ namespace Crosstales.Common.Util
       /// <summary>Cleans a given text from tags.</summary>
       /// <param name="text">Text to clean.</param>
       /// <returns>Clean text without tags.</returns>
-      public static string ClearTags(string text)
+      [System.ObsoleteAttribute("Use the extension method 'CTClearTags' instead")]
+      public static string ClearTags(string text) //TODO remove in the future
       {
-         return text != null ? cleanTagsRegex.Replace(text, string.Empty).Trim() : null;
+         return text.CTClearTags();
       }
 
       /// <summary>Cleans a given text from multiple spaces.</summary>
       /// <param name="text">Text to clean.</param>
       /// <returns>Clean text without multiple spaces.</returns>
-      public static string ClearSpaces(string text)
+      [System.ObsoleteAttribute("Use the extension method 'CTClearSpaces' instead")]
+      public static string ClearSpaces(string text) //TODO remove in the future
       {
-         return text != null ? cleanSpacesRegex.Replace(text, " ").Trim() : null;
+         return text.CTClearSpaces();
       }
 
       /// <summary>Cleans a given text from line endings.</summary>
       /// <param name="text">Text to clean.</param>
       /// <returns>Clean text without line endings.</returns>
-      public static string ClearLineEndings(string text)
+      [System.ObsoleteAttribute("Use the extension method 'CTClearLineEndings' instead")]
+      public static string ClearLineEndings(string text) //TODO remove in the future
       {
-         return text != null ? BaseConstants.REGEX_LINEENDINGS.Replace(text, string.Empty).Trim() : null;
+         return text.CTClearLineEndings();
       }
 
       /// <summary>Split the given text to lines and return it as list.</summary>
@@ -904,7 +924,7 @@ namespace Crosstales.Common.Util
 
          return result;
       }
-
+/*
       /// <summary>Format byte-value to Human-Readable-Form.</summary>
       /// <returns>Formatted byte-value in Human-Readable-Form.</returns>
       public static string FormatBytesToHRF(long bytes)
@@ -921,10 +941,60 @@ namespace Crosstales.Common.Util
          // Adjust the format string to your preferences.
          return $"{len:0.##} {sizes[order]}";
       }
+*/
+
+      /// <summary>Format byte-value to Human-Readable-Form.</summary>
+      /// <param name="bytes">Value in bytes</param>
+      /// <param name="useSI">Use SI-system (default: true, optional)</param>
+      /// <returns>Formatted byte-value in Human-Readable-Form.</returns>
+      public static string FormatBytesToHRF(long bytes, bool useSI = true)
+      {
+         const string ci = "kMGTPE";
+         int index = 0;
+
+         if (useSI)
+         {
+            if (-1000 < bytes && bytes < 1000)
+               return bytes + " B";
+
+            while (bytes <= -999_950 || bytes >= 999_950)
+            {
+               bytes /= 1000;
+               index++;
+            }
+
+            return $"{(bytes / 1000f):N2} {ci[index]}B";
+         }
+
+         long absB = bytes == long.MinValue ? long.MaxValue : System.Math.Abs(bytes);
+         if (absB < 1024)
+            return bytes + " B";
+
+         long value = absB;
+
+         for (int i = 40; i >= 0 && absB > 0xfffccccccccccccL >> i; i -= 10)
+         {
+            value >>= 10;
+            index++;
+         }
+
+         value *= System.Math.Sign(bytes);
+
+         return $"{(value / 1024f):N2} {ci[index]}iB";
+      }
 
       /// <summary>Format seconds to Human-Readable-Form.</summary>
+      /// <param name="seconds">Value in seconds</param>
       /// <returns>Formatted seconds in Human-Readable-Form.</returns>
-      public static string FormatSecondsToHourMinSec(double seconds)
+      public static string FormatSecondsToHourMinSec(double seconds) //TODO remove later
+      {
+         return FormatSecondsToHRF(seconds);
+      }
+
+      /// <summary>Format seconds to Human-Readable-Form.</summary>
+      /// <param name="seconds">Value in seconds</param>
+      /// <returns>Formatted seconds in Human-Readable-Form.</returns>
+      public static string FormatSecondsToHRF(double seconds)
       {
          int totalSeconds = (int)seconds;
          int calcSeconds = totalSeconds % 60;
@@ -1144,15 +1214,21 @@ namespace Crosstales.Common.Util
             {
                if (System.IO.Directory.Exists(path))
                {
-#if ENABLE_IL2CPP && CT_PROC
+#if (ENABLE_IL2CPP && CT_PROC) || (CT_DEVELOP && CT_PROC)
                   using (CTProcess process = new CTProcess())
+#else
+                  using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+                  //using (CTProcess process = new CTProcess())
+#endif
                   {
                      process.StartInfo.Arguments = $"\"{path}\"";
 
                      if (isWindowsPlatform || isWindowsEditor)
                      {
                         process.StartInfo.FileName = "explorer.exe";
+#if (ENABLE_IL2CPP && CT_PROC) || (CT_DEVELOP && CT_PROC)
                         process.StartInfo.UseCmdExecute = true;
+#endif
                         process.StartInfo.CreateNoWindow = true;
                      }
                      else if (isMacOSPlatform || isMacOSEditor)
@@ -1166,9 +1242,6 @@ namespace Crosstales.Common.Util
 
                      process.Start();
                   }
-#else
-                  System.Diagnostics.Process.Start(path);
-#endif
                }
                else
                {
@@ -1229,15 +1302,13 @@ namespace Crosstales.Common.Util
                      if (isMacOSPlatform || isMacOSEditor)
                      {
                         process.StartInfo.FileName = "open";
-                        process.StartInfo.WorkingDirectory =
-                           System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
+                        process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
                         process.StartInfo.Arguments = $"-t \"{System.IO.Path.GetFileName(file)}\"";
                      }
                      else if (isLinuxPlatform || isLinuxEditor)
                      {
                         process.StartInfo.FileName = "xdg-open";
-                        process.StartInfo.WorkingDirectory =
-                           System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
+                        process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
                         process.StartInfo.Arguments = System.IO.Path.GetFileName(file);
                      }
                      else
@@ -1269,7 +1340,7 @@ namespace Crosstales.Common.Util
       /// <summary>Returns the IP of a given host name.</summary>
       /// <param name="host">Host name</param>
       /// <returns>IP of a given host name.</returns>
-      public static string getIP(string host)
+      public static string GetIP(string host)
       {
          if (!string.IsNullOrEmpty(host))
          {
@@ -1283,7 +1354,7 @@ namespace Crosstales.Common.Util
                Debug.LogWarning($"Could not resolve host '{host}': {ex}");
             }
 #else
-            Debug.LogWarning("'getIP' doesn't work in WebGL or WSA! Returning original string.");
+            Debug.LogWarning("'GetIP' doesn't work in WebGL or WSA! Returning original string.");
 #endif
          }
          else
@@ -1334,6 +1405,42 @@ namespace Crosstales.Common.Util
          return text;
       }
 
+/*
+      /// <summary>Generates a string of all latin latin characters (ABC...xyz).</summary>
+      /// <returns>"String of all latin latin characters.</returns>
+      public static string GenerateLatinABC()
+      {
+         return GenerateLatinUppercaseABC() + GenerateLatinLowercaseABC();
+      }
+
+      /// <summary>Generates a string of all latin latin characters in uppercase (ABC...XYZ).</summary>
+      /// <returns>"String of all latin latin characters in uppercase.</returns>
+      public static string GenerateLatinUppercaseABC()
+      {
+         System.Text.StringBuilder result = new System.Text.StringBuilder();
+
+         for (int ii = 65; ii <= 90; ii++)
+         {
+            result.Append((char)ii);
+         }
+
+         return result.ToString();
+      }
+
+      /// <summary>Generates a string of all latin latin characters in lowercase (abc...xyz).</summary>
+      /// <returns>"String of all latin latin characters in lowercase.</returns>
+      public static string GenerateLatinLowercaseABC()
+      {
+         System.Text.StringBuilder result = new System.Text.StringBuilder();
+
+         for (int ii = 97; ii <= 122; ii++)
+         {
+            result.Append((char)ii);
+         }
+
+         return result.ToString();
+      }
+*/
       /// <summary>Converts a SystemLanguage to an ISO639-1 code. Returns "en" if the SystemLanguage could not be converted.</summary>
       /// <param name="language">SystemLanguage to convert.</param>
       /// <returns>"ISO639-1 code for the given SystemLanguage.</returns>
@@ -1525,6 +1632,81 @@ namespace Crosstales.Common.Util
          }
 
          return SystemLanguage.English;
+      }
+
+      /// <summary>Invokes a public static method on a full qualified class.</summary>
+      /// <param name="className">Full qualified name of the class</param>
+      /// <param name="methodName">Public static method of the class to execute</param>
+      /// <param name="parameters">Parameters for the method (optional)</param>
+      public static object InvokeMethod(string className, string methodName, params object[] parameters)
+      {
+         if (string.IsNullOrEmpty(className))
+         {
+            Debug.LogWarning("'className' is null or empty; can not execute.");
+            return null;
+         }
+
+         if (string.IsNullOrEmpty(methodName))
+         {
+            Debug.LogWarning("'methodName' is null or empty; can not execute.");
+            return null;
+         }
+
+         foreach (System.Type type in System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
+         {
+            try
+            {
+               if (type.FullName?.Equals(className) == true)
+                  if (type.IsClass)
+                     return type.GetMethod(methodName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).Invoke(null, parameters);
+            }
+            catch (System.Exception ex)
+            {
+               Debug.LogWarning($"Could not execute method call: {ex}");
+            }
+         }
+
+         return null;
+      }
+
+      /// <summary>Returns an argument for a name from the url or command line.</summary>
+      /// <param name="name">Name for the argument</param>
+      /// <returns>Argument for a name from the url or command line.</returns>
+      public static string GetArgument(string name)
+      {
+         if (!string.IsNullOrEmpty(name))
+         {
+            string[] args = GetArguments();
+
+            for (int ii = 0; ii < args.Length; ii++)
+            {
+               if (name.CTEquals(args[ii]) && args.Length > ii + 1)
+                  return args[ii + 1];
+            }
+         }
+
+         return null;
+      }
+
+      /// <summary>Returns all arguments from the url or command line.</summary>
+      /// <returns>Arguments from the url or command line.</returns>
+      public static string[] GetArguments()
+      {
+         if (args == null)
+         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+//#if (UNITY_WEBGL || UNITY_ANDROID) && !UNITY_EDITOR
+            // url with parameters syntax : http://example.com?arg1=value1&arg2=value2
+            string parameters = Application.absoluteURL.Substring(Application.absoluteURL.IndexOf("?") + 1);
+
+            //Debug.Log("URL parameters: " + parameters);
+            args = parameters.Split(new char[] { '&', '=' });
+#else
+            args = System.Environment.GetCommandLineArgs();
+#endif
+         }
+
+         return args;
       }
 
       #endregion

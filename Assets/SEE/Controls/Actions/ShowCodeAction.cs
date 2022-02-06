@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SEE.Game.UI.CodeWindow;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -10,7 +13,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to display the source code of the currently selected node using <see cref="CodeWindow"/>s.
     /// </summary>
-    internal class ShowCodeAction : MonoBehaviour
+    internal class ShowCodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Manager object which takes care of the player selection menu and code space dictionary for us.
@@ -22,38 +25,27 @@ namespace SEE.Controls.Actions
         /// </summary>
         private SyncCodeSpaceAction syncAction;
 
-        /// <summary>
-        /// The selected node.
-        /// </summary>
-        private NodeRef selectedNode;
-
-        /// <summary>
-        /// The currently selected node.
-        /// This is a cached version of <see cref="selectedNode"/> and used to determine
-        /// whether we need to change which code window is currently displayed.
-        /// </summary>
-        private NodeRef currentlySelectedNode;
-
-        /// <summary>
-        /// The selected node's filename.
-        /// </summary>
-        private string selectedPath;
-
-        private void OnDisable()
+        public override HashSet<string> GetChangedObjects()
         {
-            InteractableObject.LocalAnySelectIn -= LocalAnySelectIn;
-            InteractableObject.LocalAnySelectOut -= LocalAnySelectOut;
+            // Changes to the code space are handled and synced by us separately, so we won't include them here.
+            return new HashSet<string>();
         }
 
-        private void OnEnable()
-        {
-            InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
-            InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
-        }
+        public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
 
-        private void Start()
+        /// <summary>
+        /// Returns a new instance of <see cref="ShowCodeAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction() => new ShowCodeAction();
+
+        public override ReversibleAction NewInstance() => CreateReversibleAction();
+
+        public override void Start()
         {
-            if (!gameObject.TryGetComponent<CodeSpaceManager>(out spaceManager))
+            const string title = "Code Space Manager";
+            GameObject gameObject = GameObject.Find(title) ?? new GameObject(title);
+            if (!gameObject.TryGetComponent(out spaceManager))
             {
                 spaceManager = gameObject.AddComponent<CodeSpaceManager>();
             }
@@ -62,17 +54,26 @@ namespace SEE.Controls.Actions
             spaceManager.OnActiveCodeWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
         }
 
-        private void Update()
+        public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER 
-                && !Equals(selectedNode?.Value, currentlySelectedNode?.Value))
+            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER
+                && Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
             {
-                currentlySelectedNode = selectedNode;
+                NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
+                string selectedPath = selectedNode.Value.Path();
                 // If nothing is selected, there's nothing more we need to do
                 if (selectedNode == null)
                 {
-                    return;
+                    return false;
+                }
+                if (selectedPath == null)
+                {
+                    ShowNotification.Warn("No associated code",
+                                          $"Selected node '{selectedNode.Value.SourceName}' has no source code "
+                                          + "associated with it.");
+                    return false;
                 }
 
                 // Create new code window for active selection, or use existing one
@@ -84,7 +85,7 @@ namespace SEE.Controls.Actions
                     if (selectedFile == null)
                     {
                         Debug.LogError("Source path was set, but source filename was not. Can't show code window.\n");
-                        return;
+                        return false;
                     }
 
                     codeWindow.Title = selectedNode.Value.SourceName;
@@ -104,7 +105,7 @@ namespace SEE.Controls.Actions
                 {
                     codeWindow.VisibleLine = line.Value;
                 }
-                    
+
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
                 {
@@ -112,24 +113,10 @@ namespace SEE.Controls.Actions
                     codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
                 }
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
-                //TODO: Set font size etc per SEECity settings (maybe, or maybe that's too much)
+                //TODO: Set font size etc in settings (maybe, or maybe that's too much)
             }
-        }
 
-        private void LocalAnySelectIn(InteractableObject interactableObject)
-        {
-            if (!interactableObject.gameObject.TryGetComponent(out selectedNode)
-                || (selectedPath = selectedNode.Value.Path()) == null)
-            {
-                    selectedPath = null;
-                    selectedNode = null;
-            }
-        }
-
-        private void LocalAnySelectOut(InteractableObject interactableObject)
-        {
-            selectedPath = null;
-            selectedNode = null;
+            return false;
         }
     }
 }

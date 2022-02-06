@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
+  m_Name: o3n_female_shoes_02_mesh_hide_toeless_feet_LOD1
+  m_EditorClassIdentifier: 
+  _asset: {fileID: 11400000, guid: ea615d56c971e0640b89ad3cad5aeac2, type: 2}
+  _assetSlotName: o3n_female_feet_toeless_LOD1
+  _serializedFlags:
+  - flags: ffffffffffffffffffffffff5100000000493e10000000000000000000fcffffffffffffffffffffffffffffffffffffffffffffffff0f00fcffffffffffffffffff510000000049befbffc0ffffffffffffffffffffffffffffffffffffffffffff0300000000000000000000f8ffff0f000000
+    Count: 900

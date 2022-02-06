@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: LowerLipDown_R
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LipLowerCorner_L
+    hash: 1534549083
+    position: {x: 0.000043548644, y: -0.0000657402, z: 0}
+    rotation: {x: 0.00000013329662, y: -0.00000036008825, z: -0.00000025461276, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerCorner_R
+    hash: -1585946312
+    position: {x: 0.000046286732, y: -0.00012966618, z: 0}
+    rotation: {x: 0.00000017926766, y: 0.00000013698538, z: -0.00000007645858, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerIn_R
+    hash: 1291194370
+    position: {x: 0, y: 0, z: 0.0032699106}
+    rotation: {x: 0.086611114, y: -0.0000000045423, z: 0.0000000024422762, w: 0.9963302}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerOut_R
+    hash: 818657819
+    position: {x: 0.000105284154, y: 0, z: 0}
+    rotation: {x: 0.08661107, y: 0.00000053267433, z: -0.000000025677387, w: 0.99633026}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

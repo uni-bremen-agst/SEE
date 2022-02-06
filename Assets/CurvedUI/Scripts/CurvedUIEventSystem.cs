@@ -12,14 +12,15 @@ namespace CurvedUI
         protected override void Awake()
         {
             base.Awake();
-
             instance = this;
         }
 
+#if !CURVEDUI_UNITY_XR
         protected override void OnApplicationFocus(bool hasFocus)
         {
             base.OnApplicationFocus(true);
         }
+#endif
     }
 
 }

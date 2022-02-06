@@ -87,7 +87,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    Debug.LogWarningFormat("no metric value {0} for node {1}.\n", metrics[i], node.ID);
+                    Debug.LogWarning($"No metric value { metrics[i]} for node {node.ID}.\n");
                     values[i] = 0.0f;
                 }
             }

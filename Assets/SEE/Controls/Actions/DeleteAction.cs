@@ -1,9 +1,10 @@
-﻿using SEE.Game;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Net;
 using SEE.Utils;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -68,9 +69,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         ~DeleteAction()
         {
-            if (implicitlyDeletedNodesAndEdges != null && currentState == ReversibleAction.Progress.Completed)
+            if (deletedGameObjects != null && currentState == ReversibleAction.Progress.Completed)
             {
-                foreach (GameObject nodeOrEdge in implicitlyDeletedNodesAndEdges)
+                foreach (GameObject nodeOrEdge in deletedGameObjects)
                 {
                     if (!nodeOrEdge.activeInHierarchy)
                     {
@@ -105,7 +106,7 @@ namespace SEE.Controls.Actions
         /// eventually be deleted for good when this action ceases to exist, that
         /// is, in the destructor.
         /// </summary>
-        private ISet<GameObject> implicitlyDeletedNodesAndEdges;
+        private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
@@ -121,7 +122,7 @@ namespace SEE.Controls.Actions
                 hitGraphElement = raycastHit.collider.gameObject;
                 Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
                 InteractableObject.UnselectAll(true);
-                implicitlyDeletedNodesAndEdges = GameElementDeleter.Delete(hitGraphElement);
+                (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
                 new DeleteNetAction(hitGraphElement.name).Execute();
                 currentState = ReversibleAction.Progress.Completed;
                 return true; // the selected objects are deleted and this action is done now
@@ -138,8 +139,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            GameElementDeleter.Revive(implicitlyDeletedNodesAndEdges);
-            new ReviveNetAction((from go in implicitlyDeletedNodesAndEdges select go.name).ToList()).Execute();
+            GameElementDeleter.Revive(deletedGameObjects);
+            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
         }
 
         /// <summary>
@@ -148,7 +149,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            GameElementDeleter.Delete(implicitlyDeletedNodesAndEdges);
+            GameElementDeleter.Delete(hitGraphElement);
             new DeleteNetAction(hitGraphElement.name).Execute();
         }
 
@@ -158,13 +159,13 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (implicitlyDeletedNodesAndEdges == null)
+            if (deletedGameObjects == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return new HashSet<string>(implicitlyDeletedNodesAndEdges.Select(x => x.name));
+                return new HashSet<string>(deletedGameObjects.Select(x => x.name));
             }
         }
     }

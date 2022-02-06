@@ -145,66 +145,71 @@ namespace Crosstales.Common.EditorUtil
       /// <param name="executeMethod">Executed method after the restart (optional)</param>
       public static void RestartUnity(string executeMethod = "")
       {
-         UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
-
-         bool success = false;
-
-         using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+         if (UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
          {
-            try
+            bool success = false;
+
+            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
             {
-               process.StartInfo.CreateNoWindow = true;
-               process.StartInfo.UseShellExecute = false;
-
-               string scriptfile;
-
-               switch (Application.platform)
+               try
                {
-                  case RuntimePlatform.WindowsEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.cmd";
+                  process.StartInfo.CreateNoWindow = true;
+                  process.StartInfo.UseShellExecute = false;
 
-                     System.IO.File.WriteAllText(scriptfile, generateWindowsRestartScript(executeMethod));
+                  string scriptfile;
 
-                     process.StartInfo.FileName = "cmd.exe";
-                     process.StartInfo.Arguments = $"/c start  \"\" \"{scriptfile}\"";
-                     break;
-                  case RuntimePlatform.OSXEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+                  switch (Application.platform)
+                  {
+                     case RuntimePlatform.WindowsEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.cmd";
 
-                     System.IO.File.WriteAllText(scriptfile, generateMacRestartScript(executeMethod));
+                        System.IO.File.WriteAllText(scriptfile, generateWindowsRestartScript(executeMethod));
 
-                     process.StartInfo.FileName = "/bin/sh";
-                     process.StartInfo.Arguments = $"\"{scriptfile}\" &";
-                     break;
-                  case RuntimePlatform.LinuxEditor:
-                     scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+                        process.StartInfo.FileName = "cmd.exe";
+                        process.StartInfo.Arguments = $"/c start  \"\" \"{scriptfile}\"";
+                        break;
+                     case RuntimePlatform.OSXEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
 
-                     System.IO.File.WriteAllText(scriptfile, generateLinuxRestartScript(executeMethod));
+                        System.IO.File.WriteAllText(scriptfile, generateMacRestartScript(executeMethod));
 
-                     process.StartInfo.FileName = "/bin/sh";
-                     process.StartInfo.Arguments = $"\"{scriptfile}\" &";
-                     break;
-                  default:
-                     Debug.LogError($"Unsupported Unity Editor: {Application.platform}");
-                     return;
+                        process.StartInfo.FileName = "/bin/sh";
+                        process.StartInfo.Arguments = $"\"{scriptfile}\" &";
+                        break;
+                     case RuntimePlatform.LinuxEditor:
+                        scriptfile = $"{System.IO.Path.GetTempPath()}RestartUnity-{System.Guid.NewGuid()}.sh";
+
+                        System.IO.File.WriteAllText(scriptfile, generateLinuxRestartScript(executeMethod));
+
+                        process.StartInfo.FileName = "/bin/sh";
+                        process.StartInfo.Arguments = $"\"{scriptfile}\" &";
+                        break;
+                     default:
+                        Debug.LogError($"Unsupported Unity Editor: {Application.platform}");
+                        return;
+                  }
+
+                  process.Start();
+
+                  if (isWindowsEditor)
+                     process.WaitForExit(Util.BaseConstants.PROCESS_KILL_TIME);
+
+                  success = true;
                }
-
-               process.Start();
-
-               if (isWindowsEditor)
-                  process.WaitForExit(Util.BaseConstants.PROCESS_KILL_TIME);
-
-               success = true;
+               catch (System.Exception ex)
+               {
+                  string errorMessage = $"Could restart Unity: {ex}";
+                  Debug.LogError(errorMessage);
+               }
             }
-            catch (System.Exception ex)
-            {
-               string errorMessage = $"Could restart Unity: {ex}";
-               Debug.LogError(errorMessage);
-            }
+
+            if (success)
+               EditorApplication.Exit(0);
          }
-
-         if (success)
-            EditorApplication.Exit(0);
+         else
+         {
+            Debug.LogWarning("User canceled the restart.");
+         }
       }
 
       /// <summary>Shows a separator-UI.</summary>
@@ -234,45 +239,12 @@ namespace Crosstales.Common.EditorUtil
             AssetDatabase.Refresh(options);
       }
 
-      /// <summary>Invokes a public static method on a full qualified class.</summary>
-      /// <param name="className">Full qualified name of the class</param>
-      /// <param name="methodName">Public static method of the class to execute</param>
-      /// <param name="parameters">Parameters for the method (optional)</param>
-      public static void InvokeMethod(string className, string methodName, params object[] parameters)
-      {
-         if (string.IsNullOrEmpty(className))
-         {
-            Debug.LogWarning("'className' is null or empty; can not execute.");
-            return;
-         }
-
-         if (string.IsNullOrEmpty(methodName))
-         {
-            Debug.LogWarning("'methodName' is null or empty; can not execute.");
-            return;
-         }
-
-         foreach (System.Type type in System.AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes()))
-         {
-            try
-            {
-               if (type.FullName?.Equals(className) == true)
-                  if (type.IsClass)
-                     type.GetMethod(methodName, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).Invoke(null, parameters);
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogWarning($"Could not execute method call: {ex}");
-            }
-         }
-      }
-
       /// <summary>Returns the true if the BuildTarget is installed in Unity.</summary>
       /// <param name="target">BuildTarget to test</param>
       /// <returns>True if the BuildTarget is installed in Unity.</returns>
       public static bool isValidBuildTarget(BuildTarget target)
       {
-         return (bool)isPlatformSupportLoaded.Invoke(null, new object[] {(string)getTargetStringFromBuildTarget.Invoke(null, new object[] {target})});
+         return (bool)isPlatformSupportLoaded.Invoke(null, new object[] { (string)getTargetStringFromBuildTarget.Invoke(null, new object[] { target }) });
       }
 
       /*
@@ -289,26 +261,10 @@ namespace Crosstales.Common.EditorUtil
       }
       */
 
-      /// <summary>Returns an argument for a name from the command line.</summary>
-      /// <param name="name">Name for the argument</param>
-      /// <returns>True if the BuildTarget is installed in Unity.</returns>
-      public static string getCLIArgument(string name)
-      {
-         string[] args = System.Environment.GetCommandLineArgs();
-
-         for (int ii = 0; ii < args.Length; ii++)
-         {
-            if (name.CTEquals(args[ii]) && args.Length > ii + 1)
-               return args[ii + 1];
-         }
-
-         return null;
-      }
-
       /// <summary>Returns the BuildTarget for a build name, like 'win64'.</summary>
       /// <param name="build">Build name, like 'win64'</param>
       /// <returns>The BuildTarget for a build name.</returns>
-      public static BuildTarget getBuildTargetForBuildName(string build)
+      public static BuildTarget GetBuildTargetForBuildName(string build)
       {
          if ("win32".CTEquals(build) || "win".CTEquals(build))
             return BuildTarget.StandaloneWindows;
@@ -362,7 +318,7 @@ namespace Crosstales.Common.EditorUtil
       /// <summary>Returns the build name for a BuildTarget.</summary>
       /// <param name="build">BuildTarget for a build name</param>
       /// <returns>The build name for a BuildTarget.</returns>
-      public static string getBuildNameFromBuildTarget(BuildTarget build)
+      public static string GetBuildNameFromBuildTarget(BuildTarget build)
       {
          switch (build)
          {

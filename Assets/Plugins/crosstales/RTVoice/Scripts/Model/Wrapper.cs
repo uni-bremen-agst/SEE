@@ -64,14 +64,11 @@ namespace Crosstales.RTVoice.Model
             //return cachedString;
          }
 
-         set
-         {
-            //cachedString = null;
-            text = value;
-         }
+         set => text = value;
       }
 
       /// <summary>AudioSource for the speech.</summary>
+      [System.Xml.Serialization.XmlIgnoreAttribute]
       public AudioSource Source
       {
          get => source;
@@ -138,7 +135,7 @@ namespace Crosstales.RTVoice.Model
       public string Uid
       {
          get => uid;
-         private set => uid = value;
+         set => uid = value;
       }
 
       /// <summary>Returns the creation time of the Wrapper.</summary>
@@ -299,13 +296,13 @@ namespace Crosstales.RTVoice.Model
          if (obj == null || GetType() != obj.GetType())
             return false;
 
-         Wrapper o = (Wrapper)obj;
+         Wrapper other = (Wrapper)obj;
 
-         bool result = Text == o.Text &&
-                       voice == o.voice &&
-                       System.Math.Abs(Rate - o.Rate) < Util.Constants.FLOAT_TOLERANCE &&
-                       System.Math.Abs(Pitch - o.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
-                       System.Math.Abs(Volume - o.Volume) < Util.Constants.FLOAT_TOLERANCE;
+         bool result = Text == other.Text &&
+                       (Voice == null || Voice.Equals(other.Voice)) &&
+                       System.Math.Abs(Rate - other.Rate) < Util.Constants.FLOAT_TOLERANCE &&
+                       System.Math.Abs(Pitch - other.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
+                       System.Math.Abs(Volume - other.Volume) < Util.Constants.FLOAT_TOLERANCE;
 
          return result;
       }
@@ -316,8 +313,8 @@ namespace Crosstales.RTVoice.Model
 
          if (Text != null)
             hash += Text.GetHashCode();
-         if (voice != null)
-            hash += voice.GetHashCode();
+         if (Voice != null)
+            hash += Voice.GetHashCode();
          hash += (int)(Rate * 100) * 17;
          hash += (int)(Pitch * 100) * 17;
          hash += (int)(Volume * 100) * 17;

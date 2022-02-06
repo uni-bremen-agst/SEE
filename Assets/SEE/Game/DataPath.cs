@@ -158,7 +158,7 @@ namespace SEE.Game
         /// the one used for the operating system we are currently running on.
         /// 
         /// Otherwise yields Unity's folders as absolute paths depending upon
-        /// <see cref="<paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
+        /// <paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
         /// The character / will then be used as directory separator for that path.
         /// The last character in the path will never be the directory separator /.
         /// </summary>

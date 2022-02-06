@@ -1,0 +1,4498 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c6edb17218abd469257d07a2bc5559, type: 3}
+  m_Name: o3nMaleDNAConverterController
+  m_EditorClassIdentifier: 
+  _dnaAsset: {fileID: 11400000, guid: c7c7ac57dcbd66149a70f3c48d8cbd7b, type: 2}
+  _plugins:
+  - {fileID: 114709698493970632}
+  - {fileID: 114629930208185216}
+  - {fileID: 114431614755773908}
+  _overallModifiers:
+    _adjustScale: 0
+    _adjustHeight: 1
+    _adjustRadius: 1
+    _adjustMass: 1
+    _updateBounds: 1
+    _tightenBounds: 1
+    _adjustBounds: 0
+    _scale: 1
+    _bone: Position
+    _scaleBoneHash: -1084586333
+    _headRatio: 7.5
+    _radiusAdjustY: 0
+    _radiusAdjust: {x: 0.23, y: 0}
+    _massAdjust: {x: 46, y: 26, z: 26}
+    _boundsAdjust: {x: 0, y: 0, z: 0}
+  _displayValue: 
+--- !u!114 &114431614755773908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ac2aa42c9f4de41a32fbd9228196b5, type: 3}
+  m_Name: BonePoseDNAConverters
+  m_EditorClassIdentifier: 
+  masterWeight:
+    _masterWeightType: 0
+    _globalWeight: 1
+    _DNAForWeight:
+      _calcOption: 0
+      _dnaName: 
+      _dnaNameHash: 0
+      _evaluator:
+        _name: Raw
+        _graph:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 2
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 0.5
+            value: 0.5
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      _multiplier: 1
+      _initialized: 1
+  _converterController: {fileID: 11400000}
+  _poseDNAConverters:
+  - _poseToApply: {fileID: 11400000, guid: 7d0207f286ab66a45a5160faeabb55f3, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: armLength
+        _dnaNameHash: 504758438
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 9dfc744a0886382428c117f8906aec33, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: armLength
+        _dnaNameHash: 504758438
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: d0b1c54f40c211841bf143139db57da2, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: armWidth
+        _dnaNameHash: 1023885308
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: fb00ef3cb9c6c734abb7095b68d4d28f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: armWidth
+        _dnaNameHash: 1023885308
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: f5e71c44461b26842b24229b76a2e277, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: belly
+        _dnaNameHash: -2005660810
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 501a540c5d2c34449bfab8fbcacf8272, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: belly
+        _dnaNameHash: -2005660810
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: db8e6356f3bd76144b806ec2f9f102ee, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: breastSize
+        _dnaNameHash: -1437215794
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b78014f6ee94bf54cb38c720ce3ecf8b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: breastSize
+        _dnaNameHash: -1437215794
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 4775e00eb593209458b4adb00f534adb, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: cheekPosition
+        _dnaNameHash: -2146412263
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 18a361cc1e8341e4694db16a4b564bee, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: cheekPosition
+        _dnaNameHash: -2146412263
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a2d6e7e0298631d4c9809ff5442e300e, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: cheekSize
+        _dnaNameHash: -1727332994
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: f4bd1fa2a004bae4a86446686df1e543, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: cheekSize
+        _dnaNameHash: -1727332994
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: eae57033b6b043b438ee9a501eb2e4fa, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinPosition
+        _dnaNameHash: -1390074964
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 5fb753cc6e7d1c14487a5ef25ddbe380, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinPosition
+        _dnaNameHash: -1390074964
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a3d2cf521dd7d664a83b82600d85acf8, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinPronounced
+        _dnaNameHash: 2080425167
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b4ccb8e38e0640b4e8b76660ca17e6d7, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinPronounced
+        _dnaNameHash: 2080425167
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 04d0d431896c0b347a4fad8643fc9f85, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinSize
+        _dnaNameHash: -61818555
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a3688f48111fa0043bdf8385959702dc, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: chinSize
+        _dnaNameHash: -61818555
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 9dc2cf86eb7b9ee43b3fefda68d1a06b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsPosition
+        _dnaNameHash: -1147901968
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 7aebdb91ababcb84795b2e1f598e68dd, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsPosition
+        _dnaNameHash: -1147901968
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 368347fc87655a34cb700185620e44c2, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsRotation
+        _dnaNameHash: -725345292
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 09e1c0369edb2324699b2b489073fc8c, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsRotation
+        _dnaNameHash: -725345292
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 2872d713a7b249c4d8c4a2fd8f089303, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsSize
+        _dnaNameHash: 1590056058
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 933f2b2a16511064f8615b07ba2a3e92, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: earsSize
+        _dnaNameHash: 1590056058
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a73ab6268e18fa442b4cf3c833fa549e, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeDepth
+        _dnaNameHash: 564182743
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 93b369ab1035cd9459989ca1394a9bdf, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeDepth
+        _dnaNameHash: 564182743
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 9456b4182ee9fde42b0aa7f5c2c7cce8, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeDistance
+        _dnaNameHash: -697645423
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: ded5c88ae7cf6834aab9cb4768a0f539, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeDistance
+        _dnaNameHash: -697645423
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 641743ecea78aa942b2f4776eb3265ec, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyePosition
+        _dnaNameHash: -1932216091
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 03373ab3253c14447b7694b48df43ff4, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyePosition
+        _dnaNameHash: -1932216091
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b949a92f784294a4e90d3585b83c967b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeRotation
+        _dnaNameHash: -477838111
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: df5fde02e04c18d49af471b55d9d1abf, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeRotation
+        _dnaNameHash: -477838111
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a8c9adf87d76c1048874c0bb841ba4d0, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeSize
+        _dnaNameHash: 1336626240
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 371cc7a7b74f62c439dc3848d23c836f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeSize
+        _dnaNameHash: 1336626240
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a9f2e95497443734da5bb5a24ec462c0, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeSquint
+        _dnaNameHash: 1664473495
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 03de85ee860e8454d9c61b4401614c3d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: eyeSquint
+        _dnaNameHash: 1664473495
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 4f3188996fffc1c4e84ed34be41c7e32, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: feetSize
+        _dnaNameHash: -1997170247
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 3519f57e4a27ce34db68bdb1d9f10f52, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: feetSize
+        _dnaNameHash: -1997170247
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b005ef8162439ae4ca7e0f04d0811066, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: forearmLength
+        _dnaNameHash: -1841594250
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: adf0683e697f7a047a4698bfc054e7ab, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: forearmLength
+        _dnaNameHash: -1841594250
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 3b49d7a63fbe34b44b7c9d65f349359d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: forearmWidth
+        _dnaNameHash: -1006953310
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 6494a89a6bae8054db29ec4968ef7c3d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: forearmWidth
+        _dnaNameHash: -1006953310
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 3119c4c7f7b6f274793b47414485f7ba, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: foreheadPosition
+        _dnaNameHash: 1645211981
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 8a9ba5ac0a1e4f44095cb5cbe98365f7, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: foreheadPosition
+        _dnaNameHash: 1645211981
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: ddc8ae352a022eb4cbd416720852415f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: foreheadSize
+        _dnaNameHash: -1728938687
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 6a5c38cca48d4c44a873fa837dfd5be4, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: foreheadSize
+        _dnaNameHash: -1728938687
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 08fc5ef5449da1b4fbeb6835d03e60a1, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: gluteusSize
+        _dnaNameHash: 20512318
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 8a9e5668392759649b59e2e09e2a70a2, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: gluteusSize
+        _dnaNameHash: 20512318
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: bd0c937dc9039d349824cee7f6b9be7b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: gluteusWidth
+        _dnaNameHash: -521525224
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 4cb56d86482d759408996783205b8a0a, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: gluteusWidth
+        _dnaNameHash: -521525224
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 73b21571673805747927b7f4d652fe73, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: handsSize
+        _dnaNameHash: -1646582892
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: c5379887c02b79c4b821b7287d65395b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: handsSize
+        _dnaNameHash: -1646582892
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: c9f1aec4b293a7d469b7182bd24f54df, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: headSize
+        _dnaNameHash: 1712217631
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 49cfc4f3357a0fd4ea0265b33a1d8125, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: headSize
+        _dnaNameHash: 1712217631
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: c04a508682ea7c246be5c5db16821d16, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: headWidth
+        _dnaNameHash: -1394340122
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a63479c070fbd3e41b18115e8e7fad83, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: headWidth
+        _dnaNameHash: -1394340122
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 11049c9224981574ea8bea759b369980, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: height
+        _dnaNameHash: -179444465
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 1061990565d208945b8ee8fb3877f142, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: height
+        _dnaNameHash: -179444465
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 73592d5d9c2889c4792adca0016d4286, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: jawsPosition
+        _dnaNameHash: 791229381
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 28900ca6e97f7a54e81649e7974ccf9e, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: jawsPosition
+        _dnaNameHash: 791229381
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 5b3c9df5167c3ef4b8a2779ae964744f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: jawsSize
+        _dnaNameHash: -684992667
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: ecbdf4121c238bf42bf0a734bde3d4b6, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: jawsSize
+        _dnaNameHash: -684992667
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 62b9d2548c9c2804c9d168d72c1b7d73, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: legSeparation
+        _dnaNameHash: -1628857215
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b49d17fdd2c43d8489e865292b719f96, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: legSeparation
+        _dnaNameHash: -1628857215
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: eb7f8c6c7dff600498583b6daa458cb7, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: legSize
+        _dnaNameHash: -723019757
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 1d980cad18b252a4181d59a3cc18b68b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: legSize
+        _dnaNameHash: -723019757
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 798ceff27794e064c82dd4205ddadb2d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lipsSize
+        _dnaNameHash: 1068408893
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: d9bee46c2e08ba54091219f93ddec8be, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lipsSize
+        _dnaNameHash: 1068408893
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: cfe51fa21d69a1e4daf905851b047ef9, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowCheek
+        _dnaNameHash: -460801948
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: a105254874a5a654aa914d58420fae0d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowCheek
+        _dnaNameHash: -460801948
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 73b1538c09b6b494d96aa37d33d2a024, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowCheekPosition
+        _dnaNameHash: -673784177
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b06c42ede933d4749b791330e436f9cd, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowCheekPosition
+        _dnaNameHash: -673784177
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 70a0eb83e43f36d49b9647af6008c583, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowerMuscle
+        _dnaNameHash: 602183253
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: c54c6b821a38d664bade38dd2c659639, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowerMuscle
+        _dnaNameHash: 602183253
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 741b3f831ec7db24a827c33d649e105f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowerWeight
+        _dnaNameHash: -684139781
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b9d7b7aee6709b944ae3750b341dcf1c, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: lowerWeight
+        _dnaNameHash: -684139781
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 6eb175cf40935f84fa2fbdbc0a396d77, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mandibleSize
+        _dnaNameHash: 420250386
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 180e3845a3cf1de4d983208b8a3fcbb7, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mandibleSize
+        _dnaNameHash: 420250386
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: fbe4ea2c250eb15468d1debcf66d2742, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthPosition
+        _dnaNameHash: 1366929150
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: cfa8dd9fe129c4f41a8b73d7a8f6cedd, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthPosition
+        _dnaNameHash: 1366929150
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 6c7db5f4a2e567a41ba9348c95507c58, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthPronounced
+        _dnaNameHash: 1736767704
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 57ea2986d0b0ce341b093a7298a27a1d, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthPronounced
+        _dnaNameHash: 1736767704
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: ab86e515fb938a341a56c092f9c475e7, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthSize
+        _dnaNameHash: -1275520811
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: bf4743e594f63b248807d7e3ac9f2f1f, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: mouthSize
+        _dnaNameHash: -1275520811
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 125c3b5da8f78f040baee2107f2c128b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: neckHeight
+        _dnaNameHash: -1364826493
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b1e567a1c2f880f4f82e72e44a5e6d96, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: neckHeight
+        _dnaNameHash: -1364826493
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 0d859f01f7bb8234f8701d7ba59005f2, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: neckThickness
+        _dnaNameHash: -1589207448
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 69481b993fafa994cbe40c95441b0c5e, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: neckThickness
+        _dnaNameHash: -1589207448
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 290a06c920feca14a9399841ec0b898b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseBridge
+        _dnaNameHash: -1959179013
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: e3263137fe4e36d4490e13b4253db39e, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseBridge
+        _dnaNameHash: -1959179013
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: fd92939ba9245624187433c1d0ac18b8, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseCurve
+        _dnaNameHash: -1365234306
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: e582db6afd4a2d24b8044cfe53ae47fb, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseCurve
+        _dnaNameHash: -1365234306
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: c03389fed283c164dadcd4f65a67ecc8, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseFlatten
+        _dnaNameHash: -512297083
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 8449da3c10d721c4ea45dd92dbd6f895, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseFlatten
+        _dnaNameHash: -512297083
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 68aa95a7ad1e2c148b282481c5da0475, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseInclination
+        _dnaNameHash: -164646798
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 01b9d1b5880be3247b28eeca7353bdca, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseInclination
+        _dnaNameHash: -164646798
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 2a45deea92db7cd42a27fb4aa9911117, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: nosePosition
+        _dnaNameHash: -1469532099
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 1da133c6576980949841986ce7d39b6b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: nosePosition
+        _dnaNameHash: -1469532099
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 48d2d3a5a3cc4de43a2449b00d3e16cf, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: nosePronounced
+        _dnaNameHash: 1938239509
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 8dc10b34254a809488b5f3f9a63dda97, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: nosePronounced
+        _dnaNameHash: 1938239509
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 6b4e910719aed2e43b8963d14e295bf4, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseSize
+        _dnaNameHash: 2003796726
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 11f5bb05168e5784e87f3fce3243cb6b, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseSize
+        _dnaNameHash: 2003796726
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 5549426d332838f44b26a660968fa1a8, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseWidth
+        _dnaNameHash: 1965241830
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 298d0bf4abb20c445bc655e8a00a84c1, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: noseWidth
+        _dnaNameHash: 1965241830
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 24b03a27e13e19c43bf94d2a88ee7aff, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: upperMuscle
+        _dnaNameHash: 1151065015
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: ea7e0cfffde01cd4db96e8ad645e5cf5, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: upperMuscle
+        _dnaNameHash: 1151065015
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: e6c06e78d7cbf784bbcd0adb30d8740a, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: upperWeight
+        _dnaNameHash: -1337485543
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: dd243672d8afd7747b106fd307482d08, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: upperWeight
+        _dnaNameHash: -1337485543
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: b96a27cd7fcc6bf4282eb3dcf0b3c1a3, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: waist
+        _dnaNameHash: 439759899
+        _evaluator:
+          _name: OneZeroZero
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 1
+              inSlope: 0
+              outSlope: -2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: -2
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+  - _poseToApply: {fileID: 11400000, guid: 327f54dee1c87f14ea67a47207919162, type: 2}
+    _startingPoseWeight: 0
+    _modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: waist
+        _dnaNameHash: 439759899
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+--- !u!114 &114629930208185216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4952de3305cd7194bb51aafa1b220607, type: 3}
+  m_Name: ColorDNAConverters
+  m_EditorClassIdentifier: 
+  masterWeight:
+    _masterWeightType: 0
+    _globalWeight: 1
+    _DNAForWeight:
+      _calcOption: 0
+      _dnaName: 
+      _dnaNameHash: 0
+      _evaluator:
+        _name: Raw
+        _graph:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 2
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 0.5
+            value: 0.5
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      _multiplier: 1
+      _initialized: 1
+  _converterController: {fileID: 11400000}
+  _colorSets:
+  - mode: 1
+    targetName: SkinDark
+    textureChannel: 0
+    modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: skinTone
+        _dnaNameHash: 116851117
+        _evaluator:
+          _name: Raw
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0.5
+              inSlope: 1
+              outSlope: 1
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+    colorModifier:
+      R:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      G:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      B:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      A:
+        enable: 1
+        adjustmentType: 0
+        useDNAValue: 1
+        value: 1
+        adjustValue: 0
+        multiplier: 0.5
+      _testDNAVal: 0
+  - mode: 1
+    targetName: SkinDark
+    textureChannel: 0
+    modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: skinTone
+        _dnaNameHash: 116851117
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+    colorModifier:
+      R:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      G:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      B:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      A:
+        enable: 1
+        adjustmentType: 0
+        useDNAValue: 1
+        value: 1
+        adjustValue: 0
+        multiplier: 1
+      _testDNAVal: 0
+  - mode: 1
+    targetName: MuscleTone
+    textureChannel: 1
+    modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: muscleTone
+        _dnaNameHash: 176181549
+        _evaluator:
+          _name: Raw
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0.5
+              inSlope: 1
+              outSlope: 1
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+    colorModifier:
+      R:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      G:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      B:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      A:
+        enable: 1
+        adjustmentType: 0
+        useDNAValue: 1
+        value: 1
+        adjustValue: 0
+        multiplier: 0.7
+      _testDNAVal: 0
+  - mode: 1
+    targetName: MuscleTone
+    textureChannel: 1
+    modifyingDNA:
+      _dnaEvaluators:
+      - _calcOption: 0
+        _dnaName: muscleTone
+        _dnaNameHash: 176181549
+        _evaluator:
+          _name: ZeroZeroOne
+          _graph:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 2
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 0.5
+              value: 0
+              inSlope: 0
+              outSlope: 2
+              tangentMode: 0
+            - serializedVersion: 2
+              time: 1
+              value: 1
+              inSlope: 2
+              outSlope: 0
+              tangentMode: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 0
+        _multiplier: 1
+        _initialized: 1
+      _aggregationMethod: 0
+    colorModifier:
+      R:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      G:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      B:
+        enable: 0
+        adjustmentType: 0
+        useDNAValue: 0
+        value: 0
+        adjustValue: 0
+        multiplier: 0
+      A:
+        enable: 1
+        adjustmentType: 0
+        useDNAValue: 1
+        value: 1
+        adjustValue: 0
+        multiplier: 1
+      _testDNAVal: 0
+--- !u!114 &114709698493970632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb2689319b4d5a418829cf43a059e3a, type: 3}
+  m_Name: SkeletonDNAConverters
+  m_EditorClassIdentifier: 
+  masterWeight:
+    _masterWeightType: 0
+    _globalWeight: 1
+    _DNAForWeight:
+      _calcOption: 0
+      _dnaName: 
+      _dnaNameHash: 0
+      _evaluator:
+        _name: Raw
+        _graph:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 2
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 0.5
+            value: 0.5
+            inSlope: 1
+            outSlope: 1
+            tangentMode: 0
+          - serializedVersion: 2
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      _multiplier: 1
+      _initialized: 1
+  _converterController: {fileID: 11400000}
+  _skeletonModifiers:
+  - _hashName: Hips
+    _hash: -556726767
+    _property: 0
+    _valuesX:
+      _val:
+        _value: 0
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators:
+          - _calcOption: 0
+            _dnaName: height
+            _dnaNameHash: -179444465
+            _evaluator:
+              _name: Default
+              _graph:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 2
+                  time: 0
+                  value: -0.5
+                  inSlope: 0
+                  outSlope: 1
+                  tangentMode: 0
+                - serializedVersion: 2
+                  time: 0.5
+                  value: 0
+                  inSlope: 1
+                  outSlope: 1
+                  tangentMode: 0
+                - serializedVersion: 2
+                  time: 1
+                  value: 0.5
+                  inSlope: 1
+                  outSlope: 2
+                  tangentMode: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 0
+            _multiplier: -0.01
+            _initialized: 1
+          _aggregationMethod: 1
+      _min: -0.1
+      _max: 0.1
+    _valuesY:
+      _val:
+        _value: 0
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators: []
+          _aggregationMethod: 1
+      _min: -0.1
+      _max: 0.1
+    _valuesZ:
+      _val:
+        _value: 0
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators: []
+          _aggregationMethod: 1
+      _min: -0.1
+      _max: 0.1
+  - _hashName: Mandible
+    _hash: 1574626840
+    _property: 1
+    _valuesX:
+      _val:
+        _value: 0
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators: []
+          _aggregationMethod: 1
+      _min: -360
+      _max: 360
+    _valuesY:
+      _val:
+        _value: -1
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators: []
+          _aggregationMethod: 1
+      _min: -360
+      _max: 360
+    _valuesZ:
+      _val:
+        _value: 0
+        _modifiers: []
+        _modifyingDNA:
+          _dnaEvaluators: []
+          _aggregationMethod: 1
+      _min: -360
+      _max: 360
