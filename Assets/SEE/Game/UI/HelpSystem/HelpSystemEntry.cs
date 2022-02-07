@@ -126,7 +126,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <summary>
         /// The currently displayed help entry.
         /// </summary>
-        private LinkedListEntry currentHelpEntry;
+        private HelpEntry currentHelpEntry;
 
         /// <summary>
         /// The text inside of the HelpSystemEntry. This is the place where the instructions are
@@ -174,7 +174,7 @@ namespace SEE.Game.UI.HelpSystem
                 }
                 if (HelpSystemBuilder.currentEntries != null)
                 {
-                    LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntries;
+                    LinkedList<HelpEntry> currentEntries = HelpSystemBuilder.currentEntries;
                     if (currentEntries.Count > 0)
                     {
                         currentHelpEntry ??= currentEntries.First();
@@ -366,7 +366,7 @@ namespace SEE.Game.UI.HelpSystem
                 catch (ArgumentOutOfRangeException)
                 {
                     tmp.text = string.Empty;
-                    foreach (LinkedListEntry s in HelpSystemBuilder.currentEntries)
+                    foreach (HelpEntry s in HelpSystemBuilder.currentEntries)
                     {
                         tmp.text += s.Text + "\n";
                     }
