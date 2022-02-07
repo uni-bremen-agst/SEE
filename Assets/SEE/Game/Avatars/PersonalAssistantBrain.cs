@@ -1,7 +1,6 @@
 using UnityEngine;
 using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
-using SEE.Controls;
 using System;
 using System.Text;
 
@@ -25,7 +24,7 @@ namespace SEE.Game.Avatars
         private AudioSource audioSource;
 
         /// <summary>
-        /// The voice used to speak. Will be retrieved from the available voices on
+        /// The voice used to speak. Will be retrieved from the available voices of
         /// the current system.
         /// </summary>
         private Voice voice;
@@ -42,6 +41,11 @@ namespace SEE.Game.Avatars
         /// <see cref="animator"/>.
         /// </summary>
         private int isTalking;
+
+        /// <summary>
+        /// The first instance of this class. May be null.
+        /// </summary>
+        public static PersonalAssistantBrain Instance { get; private set; }
 
         /// <summary>
         /// Sets <see cref="audioSource"/>. If no <see cref="AudioSource"/>
@@ -61,6 +65,10 @@ namespace SEE.Game.Avatars
             }
             else
             {
+                if (Instance == null)
+                {
+                    Instance = this;
+                }
                 isTalking = Animator.StringToHash("IsTalking");
                 if (PlayWelcome)
                 {
@@ -68,6 +76,56 @@ namespace SEE.Game.Avatars
                     Invoke(nameof(Welcome), 3);
                 }
             }
+        }
+
+        /// <summary>
+        /// Speaks the given <paramref name="text"/>. The text can be annotated
+        /// in Speech Synthesis Markup Language (SSML).
+        ///
+        /// A female US English voice will be used if available.
+        /// </summary>
+        /// <param name="text">text to be spoken</param>
+        public void Say(string text)
+        {
+            /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
+            /// because we do not want to rely on the order in which the various
+            /// <see cref="Start"/> calls are being made by Unity. RTVoice has
+            /// its own <see cref="Start"/> which retrieves the available voices
+            /// from the system. If that <see cref="Start"/> is called after ours,
+            /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
+            if (voice == null)
+            {
+                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
+                if (voice == null)
+                {
+                    Debug.LogError("Requested voice not found. A default voice will be used. The available voices are:\n");
+                    DumpVoices();
+                }
+            }
+            animator?.SetBool(isTalking, true);
+            Speaker.Instance.Speak(text, audioSource, voice: voice);
+            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
+        }
+
+        /// <summary>
+        /// Callback to reset the state of the animator to idle. It will
+        /// be registered by <see cref="Say"/> and be called when the text
+        /// if completely spoken.
+        /// </summary>
+        /// <param name="message">a message from RT-Voice (currently not used)</param>
+        private void BackToIdle(string message)
+        {
+            Stop();
+            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
+        }
+
+        /// <summary>
+        /// Stops the currently spoken reading and the current animation.
+        /// </summary>
+        internal void Stop()
+        {
+            animator?.SetBool(isTalking, false);
+            audioSource.Stop();
         }
 
         /// <summary>
@@ -135,47 +193,6 @@ namespace SEE.Game.Avatars
             builder.Append(now.Minute);
             builder.Append(" minutes. Time for coffee?");
             Say(builder.ToString());
-        }
-
-        /// <summary>
-        /// Speaks the given <paramref name="text"/>. The text can be annotated
-        /// in Speech Synthesis Markup Language (SSML).
-        ///
-        /// A female US English voice will be used if available.
-        /// </summary>
-        /// <param name="text">text to be spoken</param>
-        public void Say(string text)
-        {
-            /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
-            /// because we do not want to rely on the order in which the various
-            /// <see cref="Start"/> calls are being made by Unity. RTVoice has
-            /// its own <see cref="Start"/> which retrieves the available voices
-            /// from the system. If that <see cref="Start"/> is called after ours,
-            /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
-            if (voice == null)
-            {
-                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
-                if (voice == null)
-                {
-                    Debug.LogError("Requested voice not found. A default voice will be used. The available voices are:\n");
-                    DumpVoices();
-                }
-            }
-            animator?.SetBool(isTalking, true);
-            Speaker.Instance.Speak(text, audioSource, voice: voice);
-            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
-        }
-
-        /// <summary>
-        /// Callback to reset the state of the animator to idle. It will
-        /// be registered by <see cref="Say"/> and be called when the text
-        /// if completely spoken.
-        /// </summary>
-        /// <param name="message">a message from RT-Voice (currently not used)</param>
-        private void BackToIdle(string message)
-        {
-            animator?.SetBool(isTalking, false);
-            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
         }
 
         /// <summary>
