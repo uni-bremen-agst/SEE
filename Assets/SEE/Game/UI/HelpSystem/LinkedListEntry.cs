@@ -25,9 +25,9 @@ namespace SEE.Game.UI.HelpSystem
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="index">the index of the entry.</param>
-        /// <param name="text">the text of the entry.</param>
-        /// <param name="cumulatedTime">the cumulated time of this entry and his previous.</param>
+        /// <param name="index">the index of the entry</param>
+        /// <param name="text">the text of the entry</param>
+        /// <param name="cumulatedTime">the cumulated time for presenting this entry and its previous ones</param>
         public LinkedListEntry(int index, string text, int cumulatedTime)
         {
             Text = text;
