@@ -19,7 +19,7 @@ namespace SEE.Game.UI.Menu
         /// The path to the prefab for the menu game object.
         /// Will be added as a child to the <see cref="Canvas"/> if it doesn't exist yet.
         /// </summary>
-        private const string MENU_PREFAB = "Prefabs/UI/Menu";
+        protected virtual string MENU_PREFAB => "Prefabs/UI/Menu";
 
         /// <summary>
         /// The path to the prefab for the button.
@@ -36,17 +36,17 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The GameObject which contains the actual content of the menu, i.e. its entries.
         /// </summary>
-        private GameObject MenuContent;
+        protected GameObject MenuContent;
 
         /// <summary>
         /// The GameObject which has the <see cref="ModalWindowManager"/> component attached.
         /// </summary>
-        private GameObject MenuGameObject;
+        protected GameObject MenuGameObject;
 
         /// <summary>
         /// The modal window manager which contains the actual menu.
         /// </summary>
-        private ModalWindowManager Manager;
+        protected ModalWindowManager Manager;
 
         /// <summary>
         /// UI game object containing the entries as buttons.
@@ -56,12 +56,17 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The tooltip in which the description is displayed.
         /// </summary>
-        private Tooltip.Tooltip Tooltip;
+        protected Tooltip.Tooltip Tooltip;
 
         /// <summary>
         /// List of all button managers for the buttons used in this menu.
         /// </summary>
         protected readonly List<ButtonManagerBasicWithIcon> ButtonManagers = new List<ButtonManagerBasicWithIcon>();
+
+        /// <summary>
+        /// Rect Transform on which the icon's and title's layout group reside.
+        /// </summary>
+        private RectTransform iconTitleContent;
 
         protected override void StartDesktop()
         {
@@ -97,8 +102,8 @@ namespace SEE.Game.UI.Menu
 
             // Set menu properties
             Manager.titleText = Title;
-            Manager.descriptionText = Description;
-            Manager.icon = Icon;
+            Manager.descriptionText = description;
+            Manager.icon = icon;
             HandleHideMenuRegistration();
 
             // Create tooltip
@@ -106,7 +111,8 @@ namespace SEE.Game.UI.Menu
 
             // Find content GameObject for menu entries.
             MenuContent = MenuGameObject.transform.Find("Main Content/Content Mask/Content")?.gameObject;
-            if (MenuContent == null)
+            iconTitleContent = MenuGameObject.transform.Find("Main Content/Icon Title Mask/Content") as RectTransform;
+            if (MenuContent == null || iconTitleContent == null)
             {
                 Debug.LogError("Couldn't find required components on MenuGameObject.");
             }
@@ -189,14 +195,14 @@ namespace SEE.Game.UI.Menu
             foreach (T entry in buttonEntries)
             {
                 GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, EntryList.transform, false);
-                GameObject text = button.transform.Find("Text").gameObject;
-                GameObject icon = button.transform.Find("Icon").gameObject;
+                GameObject buttonText = button.transform.Find("Text").gameObject;
+                GameObject buttonIcon = button.transform.Find("Icon").gameObject;
 
                 button.name = entry.Title;
                 if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
                     !button.TryGetComponentOrLog(out Image buttonImage) ||
-                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage) ||
+                    !buttonText.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                    !buttonIcon.TryGetComponentOrLog(out Image iconImage) ||
                     !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
@@ -236,7 +242,7 @@ namespace SEE.Game.UI.Menu
             IEnumerable<ButtonManagerBasicWithIcon> managers = ButtonManagers?.Where(x => x.buttonText == entry.Title);
             if (managers != null)
             {
-                foreach (ButtonManagerBasicWithIcon manager in managers)
+                foreach (ButtonManagerBasicWithIcon manager in managers.ToList())
                 {
                     if (manager)
                     {
@@ -246,7 +252,54 @@ namespace SEE.Game.UI.Menu
                     {
                         Debug.LogWarning("Couldn't remove entry, its button was already destroyed.");
                     }
+                    ButtonManagers.Remove(manager);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Changes the title in the menu to the string currently in <see cref="Title"/>.
+        /// </summary>
+        private void UpdateDesktopTitle()
+        {
+            if (Manager)
+            {
+                Manager.titleText = Title;
+                UpdateUI();
+            }
+        }
+
+        /// <summary>
+        /// Updates the title, description, and icon in the manager after they've changed.
+        /// Should not be called when <see cref="Manager"/> or <see cref="iconTitleContent"/> is <c>null</c>.
+        /// </summary>
+        private void UpdateUI()
+        {
+            Manager.UpdateUI();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(iconTitleContent);
+        }
+
+        /// <summary>
+        /// Changes the title in the menu to the string currently in <see cref="Title"/>.
+        /// </summary>
+        private void UpdateDesktopDescription()
+        {
+            if (Manager)
+            {
+                Manager.descriptionText = description;
+                UpdateUI();
+            }
+        }
+
+        /// <summary>
+        /// Changes the title in the menu to the string currently in <see cref="Title"/>.
+        /// </summary>
+        private void UpdateDesktopIcon()
+        {
+            if (Manager)
+            {
+                Manager.icon = icon;
+                UpdateUI();
             }
         }
 
