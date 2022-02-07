@@ -19,8 +19,9 @@ namespace SEE.Game.UI.HelpSystem
 {
     /// <summary>
     /// An entry for the list of help information of the HelpSystem.
+    /// It is just a single item of help (one step in a larger explained use case).
     /// </summary>
-    internal class LinkedListEntry
+    internal class HelpEntry
     {
         /// <summary>
         /// Constructor.
@@ -28,7 +29,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="index">the index of the entry</param>
         /// <param name="text">the text of the entry</param>
         /// <param name="cumulatedTime">the cumulated time for presenting this entry and its previous ones</param>
-        public LinkedListEntry(int index, string text, int cumulatedTime)
+        public HelpEntry(int index, string text, int cumulatedTime)
         {
             Text = text;
             CumulatedTime = cumulatedTime;
@@ -41,7 +42,7 @@ namespace SEE.Game.UI.HelpSystem
         public int CumulatedTime { get; private set; }
 
         /// <summary>
-        /// The text of this entry which will shown to the user and spoken alout by SEE.
+        /// The text of this entry which will be shown to the user and spoken aloud by SEE.
         /// </summary>
         public string Text { get; private set; }
 

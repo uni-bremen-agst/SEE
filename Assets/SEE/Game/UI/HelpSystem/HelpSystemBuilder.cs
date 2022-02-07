@@ -119,7 +119,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <summary>
         /// The LinkedListEntries of the currently selected HelpSystemEntry.
         /// </summary>
-        public static LinkedList<LinkedListEntry> currentEntries;
+        public static LinkedList<HelpEntry> currentEntries;
 
         /// <summary>
         /// The space where the entry is inside.
@@ -147,7 +147,7 @@ namespace SEE.Game.UI.HelpSystem
             string description,
             Color entryColor,
             string videoPath,
-            LinkedList<LinkedListEntry> keywords,
+            LinkedList<HelpEntry> keywords,
             HelpSystemEntry entry = null)
         {
             return new MenuEntry(
@@ -209,7 +209,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
         /// <param name="videoPath">The path of the video which should be displayed.</param>
         /// <param name="instructions">All instructions which should be displayed and spoken aloud.</param>
-        public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<LinkedListEntry> instructions, string videoPath)
+        public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<HelpEntry> instructions, string videoPath)
         {
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();
