@@ -19,11 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Crosstales.RTVoice;
-using Crosstales.RTVoice.Model;
-using Crosstales.RTVoice.Model.Enum;
 using DynamicPanels;
 using Michsky.UI.ModernUIPack;
-using SEE.Game.UI.Menu;
+using SEE.Game.Avatars;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -58,9 +56,23 @@ namespace SEE.Game.UI.HelpSystem
         private const string HELP_SYSTEM_ENTRY_SPACE_PREFAB = "Prefabs/UI/HelpSystemEntrySpace";
 
         /// <summary>
-        /// The name of this menu. Displayed to the user.
+        /// The name of this help-system entry. Displayed to the user.
         /// </summary>
-        private const string titleManager = "Unnamed Menu";
+        private const string title = "No Title";
+
+        /// <summary>
+        /// The path name of the game object holding the TextMeshPro component in which the
+        /// instructions are printed textually. This game object is a descendant of the
+        /// prefab <see cref="HELP_SYSTEM_ENTRY_PREFAB"/>.
+        /// </summary>
+        private const string TextFieldPath = "Content/Lower Video/Scrollable/TextField";
+
+        /// <summary>
+        /// The path name of the game object holding the <see cref="VideoPlayer"/> component that
+        /// is used to play the help videos. This game object is a descendant of the
+        /// prefab <see cref="HELP_SYSTEM_ENTRY_PREFAB"/>.
+        /// </summary>
+        private const string VideoPlayerPath = "Video Player";
 
         /// <summary>
         /// The video-player which is responsible for interaction with the video such as play, pause, skip, etc.
@@ -99,45 +111,45 @@ namespace SEE.Game.UI.HelpSystem
         private TextMeshProUGUI progress;
 
         /// <summary>
-        ///
+        /// The game object holding a TextMeshPro component in which the instructions are printed.
+        /// This game object is a descendant of <see cref="helpSystemEntry"/> with the named
+        /// path <see cref="TextFieldPath"/>.
         /// </summary>
-        GameObject keywordDisplay;
+        private GameObject instructionsDisplay;
 
         /// <summary>
-        /// True, if the current keyword is already displayed at the entry, else false.
+        /// True, if the current help entry is already displayed, else false.
         /// </summary>
         private bool isAdded;
 
         /// <summary>
-        /// The currently displayed keyword of all keywords.
+        /// The currently displayed help entry.
         /// </summary>
-        LinkedListEntry currentKeyword;
+        private LinkedListEntry currentHelpEntry;
 
         /// <summary>
-        /// The audio source used to say the text. Will be retrieved from the character.
-        /// </summary>
-        private AudioSource audioSource;
-
-        /// <summary>
-        /// The voice used to speak. Will be retrieved from the available voices on
-        /// the current system.
-        /// </summary>
-        private Voice voice;
-
-        /// <summary>
-        /// The text inside of the HelpSystemEntry.
+        /// The text inside of the HelpSystemEntry. This is the place where the instructions are
+        /// printed. It is a component attached to <see cref="instructionsDisplay"/>.
         /// </summary>
         private TextMeshProUGUI text;
 
+        /// <summary>
+        /// Sets <see cref="instructionsDisplay"/>.
+        /// </summary>
         protected override void StartDesktop()
         {
-            if (!GameObject.Find("PersonalAssistant").TryGetComponent(out audioSource))
-            {
-                Debug.LogError("No AudioSource found.\n");
-                enabled = false;
-            }
-            keywordDisplay = GameObject.Find("Code");
-            voice = Speaker.Instance.VoiceForGender(Gender.FEMALE, culture: "en-US");
+            instructionsDisplay = GetTextField();
+        }
+
+        /// <summary>
+        /// Returns the game object holding a TextMeshPro component in which the instructions
+        /// are printed. It is the descendant of <see cref="helpSystemEntry"/> with the
+        /// object-name path <see cref="TextFieldPath"/>.
+        /// </summary>
+        /// <returns>the text field where the instructions are printed</returns>
+        private GameObject GetTextField()
+        {
+            return helpSystemEntry.transform.Find(TextFieldPath).gameObject;
         }
 
         protected override void UpdateDesktop()
@@ -147,37 +159,38 @@ namespace SEE.Game.UI.HelpSystem
             {
                 if (videoPlayer.time == 0)
                 {
-                    keywordDisplay = keywordDisplay != null ? keywordDisplay : GameObject.Find("Code");
-                    TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-                    tmp.text = string.Empty;
+                    if (instructionsDisplay == null)
+                    {
+                        instructionsDisplay = GetTextField();
+                    }
+                    instructionsDisplay.GetComponent<TextMeshProUGUI>().text = string.Empty;
                     isAdded = false;
-                    currentKeyword = null;
+                    currentHelpEntry = null;
                 }
                 if (HelpSystemBuilder.currentEntries != null)
                 {
                     LinkedList<LinkedListEntry> currentEntries = HelpSystemBuilder.currentEntries;
                     if (currentEntries.Count > 0)
                     {
-                        currentKeyword ??= currentEntries?.First();
+                        currentHelpEntry ??= currentEntries.First();
                     }
                     SetTmpProgress();
 
-                    if (currentKeyword.Index <= currentEntries.Count)
+                    if (currentHelpEntry.Index <= currentEntries.Count)
                     {
-                        if (Mathf.Round((float)videoPlayer.time) == currentKeyword.CumulatedTime && !isAdded)
+                        if (Mathf.Round((float)videoPlayer.time) == currentHelpEntry.CumulatedTime && !isAdded)
                         {
-                            if (currentKeyword?.Index - 1 == HelpSystemBuilder.currentEntries.Count)
+                            if (currentHelpEntry?.Index - 1 == HelpSystemBuilder.currentEntries.Count)
                             {
-                                TextMeshProUGUI tmpTemp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-                                tmpTemp.text = string.Empty;
+                                instructionsDisplay.GetComponent<TextMeshProUGUI>().text = string.Empty;
                             }
                             isAdded = true;
-                            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
-                            tmp.text += currentKeyword.Text + "\n";
-                            Speaker.Instance.Speak(currentKeyword.Text, audioSource, voice: voice);
-                            currentKeyword = currentEntries.Find(currentKeyword)?.Next?.Value;
+                            TextMeshProUGUI tmp = instructionsDisplay.GetComponent<TextMeshProUGUI>();
+                            tmp.text += currentHelpEntry.Text + "\n";
+                            PersonalAssistantBrain.Instance?.Say(currentHelpEntry.Text);
+                            currentHelpEntry = currentEntries.Find(currentHelpEntry)?.Next?.Value;
                         }
-                        if (videoPlayer.time > currentKeyword?.CumulatedTime && isAdded)
+                        if (videoPlayer.time > currentHelpEntry?.CumulatedTime && isAdded)
                         {
                             isAdded = false;
                         }
@@ -192,16 +205,31 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         private void SetTmpProgress()
         {
-            int currentProgress;
-            if (currentKeyword.Index - 1 != 0)
+            int currentProgress = currentHelpEntry.Index - 1 != 0 ? currentHelpEntry.Index - 1
+                                                                : HelpSystemBuilder.currentEntries.Count;
+            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntries.Count;
+        }
+
+        /// <summary>
+        /// Returns the video player where the instruction videos can be played.
+        /// </summary>
+        /// <returns>video player for instruction videos</returns>
+        /// <exception cref="Exception">thrown if none can be found</exception>
+        public VideoPlayer GetVideoPlayer()
+        {
+            Transform videoPlayer = helpSystemEntry.transform.Find(VideoPlayerPath);
+            if (videoPlayer == null)
             {
-                currentProgress = currentKeyword.Index - 1;
+                throw new Exception($"Help-system entry {helpSystemEntry.GetFullName()} has no video player {VideoPlayerPath}.");
+            }
+            if (videoPlayer.gameObject.TryGetComponent(out VideoPlayer result))
+            {
+                return result;
             }
             else
             {
-                currentProgress = HelpSystemBuilder.currentEntries.Count;
+                throw new Exception($"Help-system entry {helpSystemEntry.GetFullName()} has a video player {VideoPlayerPath} without {typeof(VideoPlayer)} component.");
             }
-            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntries.Count;
         }
 
         /// <summary>
@@ -215,15 +243,18 @@ namespace SEE.Game.UI.HelpSystem
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
-            helpSystemEntry.transform.Find("Content/Lower Video/Scrollable/Code")
-              .gameObject.TryGetComponentOrLog(out text);
-            text.fontSize = 20;
+            helpSystemEntry.transform.Find(TextFieldPath).gameObject.TryGetComponentOrLog(out text);
+            text.fontSize = 18;
 
-            helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
-            manager.clickEvent.AddListener(Back);
-            helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager2);
-            manager2.clickEvent.AddListener(Close);
-            GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out videoPlayer);
+            {
+                helpSystemEntry.transform.Find("Buttons/Content/Back").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
+                manager.clickEvent.AddListener(Back);
+            }
+            {
+                helpSystemEntry.transform.Find("Buttons/Content/Close").gameObject.TryGetComponentOrLog(out ButtonManagerWithIcon manager);
+                manager.clickEvent.AddListener(Close);
+            }
+            videoPlayer = GetVideoPlayer();
 
             if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
             {
@@ -242,7 +273,7 @@ namespace SEE.Game.UI.HelpSystem
                         .gameObject.TryGetComponentOrLog(out backwardButton);
             backwardButton.clickEvent.AddListener(Backward);
 
-            helpSystemEntry.transform.Find("Content/Lower Video/progress").gameObject.TryGetComponentOrLog(out progress);
+            helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
 
             Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
             PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
@@ -250,7 +281,7 @@ namespace SEE.Game.UI.HelpSystem
             GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"),
                                                           helpSystemSpace.transform.Find("DynamicPanel/PanelHeader").gameObject.transform, false);
             HelpSystemBuilder.Headline = headline;
-            headline.GetComponent<TextMeshProUGUI>().text = titleManager;
+            headline.GetComponent<TextMeshProUGUI>().text = title;
 
             PanelNotificationCenter.OnTabClosed += panelTab =>
             {
@@ -266,14 +297,10 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         public void Close()
         {
-            if (videoPlayer == null)
-            {
-                throw new Exception("No video player found");
-            }
             HelpSystemBuilder.GetHelpSystemMenu().Reset();
-            videoPlayer.Stop();
+            videoPlayer?.Stop();
             IsPlaying = false;
-            audioSource.Stop();
+            PersonalAssistantBrain.Instance?.Stop();
             Destroy(helpSystemSpace);
             EntryShown = false;
         }
@@ -281,57 +308,54 @@ namespace SEE.Game.UI.HelpSystem
         /// <summary>
         /// Skips the video forwards.
         /// </summary>
-        /// <param name="deltaTime">The time which has to be skipped</param>
         public void Forward()
         {
             if (videoPlayer == null)
             {
                 throw new Exception("No video player found");
             }
-            videoPlayer.time = currentKeyword.CumulatedTime;
+            videoPlayer.time = currentHelpEntry.CumulatedTime;
         }
 
         /// <summary>
         /// Skips the video backwards.
         /// </summary>
-        /// <param name="deltaTime">The time which has to be skipped.</param>
         public void Backward()
         {
-            TextMeshProUGUI tmp = keywordDisplay.GetComponent<TextMeshProUGUI>();
             if (videoPlayer == null)
             {
                 throw new Exception("No video player found");
             }
             // play the current keyword again
-            if (HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous == null)
+            if (HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous == null)
             {
-                currentKeyword = HelpSystemBuilder.currentEntries.Last.Value;
+                currentHelpEntry = HelpSystemBuilder.currentEntries.Last.Value;
             }
             else
             {
-                currentKeyword = HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous.Value;
+                currentHelpEntry = HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous.Value;
             }
-            string textToBeRemoved2 = currentKeyword.Text;
-            tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved2.Length + 1));
-            videoPlayer.time = currentKeyword.CumulatedTime;
+            TextMeshProUGUI tmp = instructionsDisplay.GetComponent<TextMeshProUGUI>();
+            tmp.text = tmp.text.Substring(0, tmp.text.Length - (currentHelpEntry.Text.Length + 1));
+            videoPlayer.time = currentHelpEntry.CumulatedTime;
 
             // play the previous keyword again
-            if (videoPlayer.time - 1f < currentKeyword.CumulatedTime)
+            if (videoPlayer.time - 1f < currentHelpEntry.CumulatedTime)
             {
                 string textToBeRemoved;
-                if (HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous == null)
+                if (HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous == null)
                 {
-                    currentKeyword = HelpSystemBuilder.currentEntries.Last.Value;
-                    textToBeRemoved = currentKeyword.Text;
+                    currentHelpEntry = HelpSystemBuilder.currentEntries.Last.Value;
+                    textToBeRemoved = currentHelpEntry.Text;
                 }
                 else
                 {
-                    currentKeyword = HelpSystemBuilder.currentEntries.Find(currentKeyword).Previous.Value;
-                    textToBeRemoved = currentKeyword.Text;
+                    currentHelpEntry = HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous.Value;
+                    textToBeRemoved = currentHelpEntry.Text;
                 }
                 try
                 {
-                    videoPlayer.time = currentKeyword.CumulatedTime;
+                    videoPlayer.time = currentHelpEntry.CumulatedTime;
                     tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 1));
                 }
                 catch (ArgumentOutOfRangeException)
@@ -352,12 +376,8 @@ namespace SEE.Game.UI.HelpSystem
         public void Back()
         {
             HelpSystemBuilder.GetHelpSystemMenu().ToggleMenu();
-            if (videoPlayer == null)
-            {
-                throw new Exception("No video player found");
-            }
-            audioSource.Stop();
-            videoPlayer.Stop();
+            PersonalAssistantBrain.Instance?.Stop();
+            videoPlayer?.Stop();
             EntryShown = false;
             Destroy(helpSystemSpace);
         }
