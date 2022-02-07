@@ -18,7 +18,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SEE.Game.UI.Menu;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -29,7 +28,7 @@ namespace SEE.Game.UI.HelpSystem
     /// Contains all important functions for the creation of the helpSystemMenu.
     /// Contains the business logic of the helpSystemEntry execution, too.
     /// </summary>
-    public static class HelpSystemBuilder
+    internal static class HelpSystemBuilder
     {
         /// <summary>
         /// The name of the HelpSystem GameObject. Must be present in the scene.
