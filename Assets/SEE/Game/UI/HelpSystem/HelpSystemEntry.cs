@@ -31,7 +31,8 @@ using UnityEngine.Video;
 namespace SEE.Game.UI.HelpSystem
 {
     /// <summary>
-    /// An entry in the help menu.
+    /// An entry in the help system. It consists of visual, acoustic, and textual
+    /// help information.
     /// </summary>
     public class HelpSystemEntry : PlatformDependentComponent
     {
@@ -152,6 +153,10 @@ namespace SEE.Game.UI.HelpSystem
             return helpSystemEntry.transform.Find(TextFieldPath).gameObject;
         }
 
+        /// <summary>
+        /// Implementation of <see cref="UpdateDesktop"/>. If the help entry is shown,
+        /// updates the presented help information.
+        /// </summary>
         protected override void UpdateDesktop()
         {
             base.UpdateDesktop();
@@ -174,7 +179,7 @@ namespace SEE.Game.UI.HelpSystem
                     {
                         currentHelpEntry ??= currentEntries.First();
                     }
-                    SetTmpProgress();
+                    UpdateProgress();
 
                     if (currentHelpEntry.Index <= currentEntries.Count)
                     {
@@ -203,7 +208,7 @@ namespace SEE.Game.UI.HelpSystem
         /// Sets the TextMeshPro text which represents the progress of the video. It is
         /// split in parts of texts, e.g., 1/5 or 2/5, instead of time.
         /// </summary>
-        private void SetTmpProgress()
+        private void UpdateProgress()
         {
             int currentProgress = currentHelpEntry.Index - 1 != 0 ? currentHelpEntry.Index - 1
                                                                 : HelpSystemBuilder.currentEntries.Count;
