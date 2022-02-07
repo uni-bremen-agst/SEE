@@ -15,7 +15,6 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Game.UI.Menu;
@@ -29,61 +28,30 @@ namespace SEE.Game.UI.HelpSystem
     public class HelpSystemMenu : MonoBehaviour
     {
         /// <summary>
-        /// The name of the PersonalAssistant GameObject
-        /// </summary>
-        private const string PersonalAssistantName = "PersonalAssistant";
-
-        /// <summary>
-        /// The personal assistant.
-        /// </summary>
-        private static Transform personalAssistant;
-
-        /// <summary>
         /// The NestedMenu of the HelpSystem - responsible for the navigation
         /// inside of the use cases.
         /// </summary>
         private NestedMenu mainMenu;
 
         /// <summary>
-        /// True, if an entry is currently displayed. That means,
-        /// that there should be no interaction possible with the collider of the
-        /// personal assistant for opening the menu while an entry is opened.
-        /// </summary>
-        public static bool IsEntryOpened { get; set; } = false;
-
-        /// <summary>
-        /// Creates the menu. Sets <see cref="personalAssistant"/> if not already set.
+        /// Creates the menu.
         /// </summary>
         private void Start()
         {
-            if (personalAssistant == null)
-            {
-                GameObject personalAssistantObject = GameObject.Find(PersonalAssistantName);
-                if (personalAssistantObject == null)
-                {
-                    Debug.LogError($"There is no personal assistant named {PersonalAssistantName}\n");
-                    enabled = false;
-                    return;
-                }
-                personalAssistant = personalAssistantObject.transform;
-                mainMenu = CreateStartMenu();
-            }
+            mainMenu = CreateStartMenu();
         }
 
         /// <summary>
-        /// Shows the menu when the user clicks on the personal assistant or otherwise requests help.
+        /// Shows the help menu when the user requests help.
         /// </summary>
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0) || SEEInput.Help())
+            if (SEEInput.Help())
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                KeyBindings.PrintBindings();
+                if (!mainMenu.MenuShown)
                 {
-                    if (hit.transform == personalAssistant && !mainMenu.MenuShown && !IsEntryOpened)
-                    {
-                        mainMenu.ShowMenu(true);
-                    }
+                    mainMenu.ShowMenu(true);
                 }
             }
         }
@@ -97,6 +65,8 @@ namespace SEE.Game.UI.HelpSystem
         private static NestedMenu CreateStartMenu()
         {
             HelpSystemEntry entry = HelpSystemBuilder.GetHelpMenuRootEntry();
+
+            // FIXME: This should be loaded from a file and not be hard-coded here.
 
             // Initialisation of all Lists for the NestedMenuEntries or MenuEntries.
             List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
