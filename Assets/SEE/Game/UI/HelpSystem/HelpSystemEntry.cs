@@ -34,7 +34,7 @@ namespace SEE.Game.UI.HelpSystem
     /// An entry in the help system. It consists of visual, acoustic, and textual
     /// help information.
     /// </summary>
-    public class HelpSystemEntry : PlatformDependentComponent
+    internal class HelpSystemEntry : PlatformDependentComponent
     {
         /// <summary>
         /// Whether the menu shall be shown.

@@ -25,7 +25,7 @@ namespace SEE.Game.UI.HelpSystem
     /// <summary>
     /// The menu of the help system.
     /// </summary>
-    public class HelpSystemMenu : MonoBehaviour
+    internal class HelpSystemMenu : MonoBehaviour
     {
         /// <summary>
         /// The NestedMenu of the HelpSystem - responsible for the navigation
