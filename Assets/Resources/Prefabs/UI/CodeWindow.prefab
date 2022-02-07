@@ -402,7 +402,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5e16c7aea118d68498053518146c9cf9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cca3ca807d25c1844b79eeb77e944d05, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -988,6 +988,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
+  webglMode: 0
   background: {fileID: 6624044216623302835}
   bar: {fileID: 6624044218412763892}
 --- !u!114 &2986326793358466405
@@ -1563,8 +1564,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5176097539754944351}
   m_HandleRect: {fileID: 8394641887319819999}
   m_Direction: 0
-  m_Value: -0.0000070657256
-  m_Size: 0.5102561
+  m_Value: -0.0000070657265
+  m_Size: 0.5102562
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1582,5 +1583,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
+  webglMode: 0
   background: {fileID: 460226558172504696}
   bar: {fileID: 5176097539754944351}
