@@ -209,25 +209,23 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="helpSystem">The HelpSystemEntry which will display the given params.</param>
         /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
         /// <param name="videoPath">The path of the video which should be displayed.</param>
-        /// <param name="keywords">All keywords or headwords which should be displayed and spoken by the AudioSource.</param>
-        public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<LinkedListEntry> keywords, string videoPath)
+        /// <param name="instructions">All instructions which should be displayed and spoken aloud.</param>
+        public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<LinkedListEntry> instructions, string videoPath)
         {
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();
-            HelpSystemEntry entry = GetHelpMenuRootEntry();
 
-            if (!GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer))
-            {
-                throw new System.Exception("No video player found");
-            }
             Headline.GetComponent<TextMeshProUGUI>().text = entryTitle != null ? entryTitle : "Placeholder";
-            videoPlayer.url = Path.Combine(Application.streamingAssetsPath,videoPath);
-            Debug.Log(videoPlayer.url);
+
+            HelpSystemEntry entry = GetHelpMenuRootEntry();
+            VideoPlayer videoPlayer = entry.GetVideoPlayer();
+            videoPlayer.url = Path.Combine(Application.streamingAssetsPath, videoPath);
             videoPlayer.Play();
             videoPlayer.SetDirectAudioMute(0, true);
+
             entry.IsPlaying = true;
             GetHelpSystemMenu().ToggleMenu();
-            currentEntries = keywords;
+            currentEntries = instructions;
         }
     }
 }
