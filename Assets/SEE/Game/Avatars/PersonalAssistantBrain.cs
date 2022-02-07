@@ -83,17 +83,6 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// If the user asks for help, the <see cref="overviewText"/> is spoken.
-        /// </summary>
-        private void Update()
-        {
-            if (SEEInput.Help())
-            {
-                Interaction();
-            }
-        }
-
-        /// <summary>
         /// Speaks the <see cref="welcomeText"/>. It is called as a delayed
         /// function within <see cref="Start"/>.
         /// </summary>
