@@ -143,16 +143,20 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="keywords">The keywords which will be displayed at the bottom of the HelpSystemEntry.</param>
         /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
         /// <returns>A new HelpSystemMenu-Entry.</returns>
-        public static MenuEntry CreateNewHelpSystemEntry(string title, string description, Color entryColor, string videoPath, LinkedList<LinkedListEntry> keywords, HelpSystemEntry entry = null)
+        public static MenuEntry CreateNewHelpSystemEntry
+            (string title,
+            string description,
+            Color entryColor,
+            string videoPath,
+            LinkedList<LinkedListEntry> keywords,
+            HelpSystemEntry entry = null)
         {
-            MenuEntry helpSystemEntry = new MenuEntry(
+            return new MenuEntry(
                 action: () => { Execute(entry, title, keywords, videoPath); },
                 title: title,
                 description: description,
                 entryColor: entryColor,
                 icon: Resources.Load<Sprite>(EntryIcon));
-
-            return helpSystemEntry;
         }
 
         /// <summary>
@@ -167,14 +171,12 @@ namespace SEE.Game.UI.HelpSystem
         /// <returns>A new NestedMenuEntry.</returns>
         public static NestedMenuEntry CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor)
         {
-            NestedMenuEntry refEntry = new NestedMenuEntry(
+            return new NestedMenuEntry(
                 innerEntries: innerEntries,
                 title: title,
                 description: description,
                 entryColor: entryColor,
                 icon: Resources.Load<Sprite>(RefIcon));
-
-            return refEntry;
         }
 
         /// <summary>
@@ -197,7 +199,6 @@ namespace SEE.Game.UI.HelpSystem
             {
                 mainMenu.AddEntry(entry);
             }
-
             return mainMenu;
         }
 
@@ -213,31 +214,19 @@ namespace SEE.Game.UI.HelpSystem
         {
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();
-            GameObject go = GameObject.Find(HelpSystemName);
-            go.TryGetComponentOrLog(out NestedMenu menu);
             HelpSystemEntry entry = GetHelpMenuRootEntry();
 
             if (!GameObject.FindGameObjectWithTag("VideoPlayer").TryGetComponentOrLog(out VideoPlayer videoPlayer))
             {
                 throw new System.Exception("No video player found");
             }
-            if (entryTitle != null)
-            {
-                // FIXME: Is the following line useless? The out parameter text is not actually used.
-                EntrySpace.transform.Find("DynamicPanel/PanelHeader").gameObject.TryGetComponent<TextMeshProUGUI>(out TextMeshProUGUI text);
-                Headline.GetComponent<TextMeshProUGUI>().text = entryTitle;
-            }
-            else
-            {
-                Headline.GetComponent<TextMeshProUGUI>().text = "placeholder";
-            }
+            Headline.GetComponent<TextMeshProUGUI>().text = entryTitle != null ? entryTitle : "Placeholder";
             videoPlayer.url = Path.Combine(Application.streamingAssetsPath,videoPath);
             Debug.Log(videoPlayer.url);
             videoPlayer.Play();
             videoPlayer.SetDirectAudioMute(0, true);
             entry.IsPlaying = true;
-            menu.ToggleMenu();
-            HelpSystemMenu.IsEntryOpened = true;
+            GetHelpSystemMenu().ToggleMenu();
             currentEntries = keywords;
         }
     }

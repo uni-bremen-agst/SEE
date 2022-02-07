@@ -273,7 +273,6 @@ namespace SEE.Game.UI.HelpSystem
             HelpSystemBuilder.GetHelpSystemMenu().Reset();
             videoPlayer.Stop();
             IsPlaying = false;
-            HelpSystemMenu.IsEntryOpened = false;
             audioSource.Stop();
             Destroy(helpSystemSpace);
             EntryShown = false;
@@ -359,7 +358,6 @@ namespace SEE.Game.UI.HelpSystem
             }
             audioSource.Stop();
             videoPlayer.Stop();
-            HelpSystemMenu.IsEntryOpened = false;
             EntryShown = false;
             Destroy(helpSystemSpace);
         }
