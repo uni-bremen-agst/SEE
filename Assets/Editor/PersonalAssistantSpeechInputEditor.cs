@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if !UNITY_ANDROID
+using UnityEditor;
 using SEE.Game.Avatars;
 using SEE.Utils;
 
@@ -23,4 +24,5 @@ namespace SEEEditor
     }
 }
 
+#endif
 #endif

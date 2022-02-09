@@ -2,10 +2,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-#if UNITY_ANDROID
-#else
-using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Game.UI.Menu
 {

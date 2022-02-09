@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-#if UNITY_ANDROID
-#else
+﻿#if !UNITY_ANDROID
+using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Controls
 {
@@ -12,8 +10,6 @@ namespace SEE.Controls
     /// </summary>
     public class XRPlayerMovement : PlayerMovement
     {
-#if UNITY_ANDROID
-#else
         /// <summary>
         /// Gravity of the player. This is required to let a player jump down from platforms.
         /// </summary>
@@ -57,6 +53,6 @@ namespace SEE.Controls
                 characterController.Move(direction * speed * Time.deltaTime);
             }
         }
-#endif
     }
 }
+#endif

@@ -35,9 +35,11 @@ namespace SEE.Game.Avatars
                     case PlayerInputType.TouchGamepadPlayer:
                         PrepareForDesktop();
                         break;
+#if !UNITY_ANDROID
                     case PlayerInputType.VRPlayer:
                         PrepareForXR();
                         break;
+#endif
                     case PlayerInputType.MobilePlayer:
                         PrepareForMobile();
                         break;
@@ -151,6 +153,7 @@ namespace SEE.Game.Avatars
         /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
         /// as a child and an <see cref="XRPlayerMovement"/> component.
         /// </summary>
+#if !UNITY_ANDROID
         private void PrepareForXR()
         {
             GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
@@ -158,6 +161,7 @@ namespace SEE.Game.Avatars
             vrPlayer.transform.SetParent(gameObject.transform);
             gameObject.AddComponent<XRPlayerMovement>();
         }
+#endif
 
         /// <summary>
         /// Returns the height of a desktop avatar. Call this method only when running

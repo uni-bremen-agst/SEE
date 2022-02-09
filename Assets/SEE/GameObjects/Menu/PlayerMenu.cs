@@ -5,7 +5,9 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
+#if !UNITY_ANDROID
 using SEE.Game.UI.StateIndicator;
+#endif
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,8 +31,9 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
+#if !UNITY_ANDROID
         private ActionStateIndicator Indicator;
-
+#endif
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
         ///
@@ -64,7 +67,7 @@ namespace SEE.GO.Menu
 
             return modeMenu;
 
-            #region Local Functions
+#region Local Functions
 
             // Constructs a toggle menu entry for the mode menu from the given action state type.
             ToggleMenuEntry ToModeMenuEntry(ActionStateType type) =>
@@ -73,7 +76,7 @@ namespace SEE.GO.Menu
                                     title: type.Name, description: type.Description, entryColor: type.Color,
                                     icon: Resources.Load<Sprite>(type.IconPath));
 
-            #endregion
+#endregion
         }
         /// <summary>
         /// This creates and returns the mobile menu, with which you can select the active game mode.
@@ -122,6 +125,7 @@ namespace SEE.GO.Menu
         /// <param name="attachTo">The GameObject the indicator shall be attached to.
         /// If <c>null</c>, a new one will be created.</param>
         /// <returns>The newly created ActionStateIndicator.</returns>
+#if !UNITY_ANDROID
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
@@ -129,6 +133,7 @@ namespace SEE.GO.Menu
             ActionStateIndicator indicator = actionStateGO.AddComponent<ActionStateIndicator>();
             return indicator;
         }
+#endif
 
         private void Start()
         {
@@ -140,7 +145,9 @@ namespace SEE.GO.Menu
             else
             {
                 ModeMenu = CreateModeMenu(gameObject);
+#if !UNITY_ANDROID
                 Indicator = CreateActionStateIndicator(gameObject);
+
                 // Whenever the state is changed, the action state indicator should reflect that
                 ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
                 // Initialize action state indicator to current action state
@@ -150,6 +157,7 @@ namespace SEE.GO.Menu
                 {
                     Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
                 }
+#endif
             }
             
         }
@@ -190,14 +198,18 @@ namespace SEE.GO.Menu
                         }
                         ActionStateType currentAction = GlobalActionHistory.Current();
                         SetPlayerMenu(currentAction.Name);
+#if !UNITY_ANDROID
                         Indicator.ChangeActionState(currentAction);
+#endif
                     }
                     else if (SEEInput.Redo())
                     {
                         GlobalActionHistory.Redo();
                         ActionStateType currentAction = GlobalActionHistory.Current();
                         SetPlayerMenu(currentAction.Name);
+#if !UNITY_ANDROID
                         Indicator.ChangeActionState(currentAction);
+#endif
                     }
                     GlobalActionHistory.Update();
                 }

@@ -170,8 +170,7 @@ namespace SEE.Controls
         private void Start()
         {
             SetInstance();
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             // Turn off VR controller hints if requested in the user settings.
             if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
@@ -266,8 +265,7 @@ namespace SEE.Controls
                     Vector3 position = Ground.transform.position;
                     position.y += 0.01f;
                     GameObject clonedFloor = Instantiate(Ground, position, Ground.transform.rotation);
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
                     clonedFloor.AddComponent<TeleportArea>();
 #endif
                 }
@@ -313,8 +311,7 @@ namespace SEE.Controls
             // Add a city collection
             GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
             cityCollection.name = CityCollectionName;
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             // Hide all decoration to improve performance.
             GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
 #endif
@@ -396,8 +393,7 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-#if UNITY_ANDROID
-#else
+#if !UNITY_ANDROID
             if (playerInputType == PlayerInputType.VRPlayer)
             {
                 foreach (Hand hand in Player.instance.hands)

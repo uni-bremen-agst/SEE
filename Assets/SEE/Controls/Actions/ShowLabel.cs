@@ -6,9 +6,6 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-#if !UNITY_ANDROID
-using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Controls.Actions
 {
@@ -200,11 +197,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns true iff labels are enabled for this kind of node.
+        /// Returns true if labels are enabled for this kind of node.
         /// </summary>
         /// <param name="city">the code city holding the attributes for showing labels</param>
         /// <param name="node">This node</param>
-        /// <returns>true iff labels are enabled for this kind of node</returns>
+        /// <returns>true if labels are enabled for this kind of node</returns>
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
             // For leaves, we don't want to display labels if code is already shown for the node.

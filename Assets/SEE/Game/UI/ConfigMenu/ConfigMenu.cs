@@ -24,7 +24,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;

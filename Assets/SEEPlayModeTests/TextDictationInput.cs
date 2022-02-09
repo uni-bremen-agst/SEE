@@ -1,5 +1,4 @@
-﻿#if UNITY_ANDROID
-#else
+﻿#if !UNITY_ANDROID
 using System.Collections;
 using UnityEngine;
 using UnityEngine.TestTools;
