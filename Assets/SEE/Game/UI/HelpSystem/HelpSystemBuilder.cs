@@ -14,7 +14,7 @@
 // EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+#if !UNITY_ANDROID
 using System.Collections.Generic;
 using System.IO;
 using SEE.Game.UI.Menu;
@@ -188,6 +188,7 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="icon">The icon of the HelpSystem-MainMenu.</param>
         /// <param name="mainMenuEntries">The MenuEntries which are displayed inside of the MainMenu for more hierachy-layers.</param>
         /// <returns>The Main-Menu as a NestedMenu.</returns>
+#if !UNITY_ANDROID
         public static NestedMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
         {
             NestedMenu mainMenu = GameObject.Find(HelpSystemName).AddComponent<NestedMenu>();
@@ -200,6 +201,7 @@ namespace SEE.Game.UI.HelpSystem
             }
             return mainMenu;
         }
+#endif
 
         /// <summary>
         /// Starts the execution of the HelpSystemEntry. That means, it starts the video, displays a list of keywords and sets
@@ -228,3 +230,4 @@ namespace SEE.Game.UI.HelpSystem
         }
     }
 }
+#endif

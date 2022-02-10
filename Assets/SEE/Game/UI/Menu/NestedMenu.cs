@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !UNITY_ANDROID
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
@@ -284,3 +285,4 @@ namespace SEE.Game.UI.Menu
         }
     }
 }
+#endif

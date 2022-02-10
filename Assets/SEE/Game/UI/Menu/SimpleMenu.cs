@@ -276,6 +276,7 @@ namespace SEE.Game.UI.Menu
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
+#if !UNITY_ANDROID
         protected virtual void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
         {
             Debug.Log(args.text);
@@ -294,6 +295,7 @@ namespace SEE.Game.UI.Menu
                 i++;
             }
         }
+#endif
 
         /// <summary>
         /// Displays the menu when it is hidden, and vice versa.
