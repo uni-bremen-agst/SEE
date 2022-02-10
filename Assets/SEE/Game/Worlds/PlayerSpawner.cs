@@ -82,9 +82,9 @@ namespace SEE.Game.Worlds
         /// <param name="owner">the network ID of the owner</param>
         private void Spawn(ulong owner)
         {
-            numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(InitialRotation));
+            numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
