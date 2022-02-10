@@ -174,9 +174,10 @@ namespace SEE.GO.Menu
                 resultMenu.ShowMenu(false);
             }
 
-            // Returns a color between black and gray, the higher the given score the grayer it is.
-            static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
         }
+        
+        // Returns a color between black and gray, the higher the given score the grayer it is.
+        public static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
 
         /// <summary>
         /// Highlights the given <paramref name="result"/>> node with the name <paramref name="resultName"/>
@@ -240,7 +241,7 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <param name="input">The string which shall be filtered.</param>
         /// <returns>The filtered string.</returns>
-        private static string FilterString(string input)
+        public static string FilterString(string input)
         {
             const string zeroWidthSpace = "\u200B";
             return input.Trim().Replace(zeroWidthSpace, string.Empty);

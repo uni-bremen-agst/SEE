@@ -182,6 +182,12 @@ namespace SEE.Controls.Interactables
                     renderer.materials = materials;
                 }
             }
+            // The portal depends upon the code-city object. This object can be retrieved only
+            // if the gameObject is a descendant of it.
+            if (gameObject.transform.parent != null)
+            {
+                gameObject.UpdatePortal(true);
+            }
         }
 
         private void OnValidate()
