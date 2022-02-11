@@ -210,9 +210,9 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Constructor allowing to set <see cref="CreateReversible"/>.
-        /// 
+        ///
         /// This constructor is needed for the test cases which implement
-        /// their own variants of <see cref="ReversibleAction"/> and 
+        /// their own variants of <see cref="ReversibleAction"/> and
         /// which need to provide an <see cref="ActionStateType"/> of
         /// their own.
         /// </summary>

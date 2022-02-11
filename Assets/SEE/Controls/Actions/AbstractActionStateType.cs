@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
         /// Because this class replaces an enum, values of this class may only be created inside of it,
         /// hence the visibility modifier is set to protected.
         /// Children of this class must use this constructor if they provide their own.
-        /// 
+        ///
         /// </summary>
         /// <param name="value">The ID of this type. Must increase by one for each new instantiation.</param>
         /// <param name="name">The Name of this type. Must be unique.</param>
@@ -104,9 +104,9 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Constructor allowing to set <see cref="CreateReversible"/>.
-        /// 
+        ///
         /// This constructor is needed for the test cases which implement
-        /// their own variants of <see cref="ReversibleAction"/> and 
+        /// their own variants of <see cref="ReversibleAction"/> and
         /// which need to provide an <see cref="ActionStateType"/> of
         /// their own.
         /// </summary>
@@ -114,17 +114,6 @@ namespace SEE.Controls.Actions
         protected AbstractActionStateType(CreateReversibleAction createReversible)
         {
             CreateReversible = createReversible;
-        }
-
-        /// <summary>
-        /// Returns the type whose ID matches the given parameter.
-        /// </summary>
-        /// <param name="ID">The ID of the type which shall be returned</param>
-        /// <returns>the type whose ID matches the given parameter</returns>
-        /// <exception cref="InvalidOperationException">If no such type exists.</exception>
-        public static T FromID(int ID)
-        {
-            return AllTypes.Single(x => x.Value == ID);
         }
 
         #region Equality & Comparators
