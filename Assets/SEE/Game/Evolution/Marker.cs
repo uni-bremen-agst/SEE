@@ -158,12 +158,12 @@ namespace SEE.Game.Evolution
             {
                 // Offset from bottom against overlapping beams.
                 float offset = 0;
+                Node node = gameNode.GetNode();
 
-                // New game object as parent for multiple beams.
-                GameObject output = new GameObject();
+                // New game object as parent for multiple nested beams.
+                GameObject enclosingBeamMarker = new GameObject();
                 foreach (MarkerSection section in markerAttributes.MarkerSections)
                 {
-                    Node node = gameNode.GetNode();
                     node.TryGetNumeric(section.Metric, out float sectionMetric);
                     float sectionHeight = Transform(sectionMetric);
 
@@ -186,18 +186,18 @@ namespace SEE.Game.Evolution
 
                     // Makes beamMarker a child of block so that it moves along with it during the animation.
                     // In addition, it will also be destroyed along with its parent block.
-                    beamMarker.transform.SetParent(output.transform);
+                    beamMarker.transform.SetParent(enclosingBeamMarker.transform);
 
                     offset += sectionHeight;
                 }
 
-                output.transform.position = position;
-                output.transform.localScale = new Vector3(1, 0, 1);
-                output.transform.SetParent(gameNode.transform);
+                enclosingBeamMarker.transform.position = position;
+                enclosingBeamMarker.transform.localScale = new Vector3(1, 0, 1);
+                enclosingBeamMarker.transform.SetParent(gameNode.transform);
 
-                BeamRaiser raiser = output.AddComponent<BeamRaiser>();
+                BeamRaiser raiser = enclosingBeamMarker.AddComponent<BeamRaiser>();
                 raiser.SetTargetHeightAndDuration(new Vector3(1, 1, 1), duration: duration);
-                return output;
+                return enclosingBeamMarker;
             }
             else
             {
