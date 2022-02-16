@@ -876,7 +876,7 @@ namespace SEE.Game
             {
                 case Difference.Changed:
                     NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
-                    marker.MarkChanged(graphNode, currentGameNode);
+                    marker.MarkChanged(currentGameNode);
                     // There is a change. It may or may not be the metric determining the style.
                     // We will not further check that and just call the following method.
                     // If there is no change, this method does not to be called because then
@@ -885,7 +885,7 @@ namespace SEE.Game
                     graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
-                    marker.MarkBorn(graphNode, currentGameNode);
+                    marker.MarkBorn(currentGameNode);
                     break;
             }
             // we want the animator to move each node separately, which is why we
@@ -1034,7 +1034,7 @@ namespace SEE.Game
                 Assert.IsNotNull(block);
                 block.transform.SetParent(null);
                 /// if the node needs to be removed, mark it dead and let it raise to <see cref="SkyLevel"/>
-                marker.MarkDead(node, block);
+                marker.MarkDead(block);
                 Vector3 newPosition = block.transform.position;
                 newPosition.y = SkyLevel;
                 ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
