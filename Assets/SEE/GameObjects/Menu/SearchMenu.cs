@@ -21,7 +21,7 @@ namespace SEE.GO.Menu
     /// source name of a node.
     /// </summary>
     public class SearchMenu: MonoBehaviour
-    {        
+    {
         /// <summary>
         /// The time (in seconds) the found node will blink.
         /// </summary>
@@ -31,12 +31,12 @@ namespace SEE.GO.Menu
         /// The time (in seconds) between color inversions for found nodes.
         /// </summary>
         private const float BLINK_INTERVAL = 0.3f;
-        
+
         /// <summary>
         /// The height of the marker used to mark the found node.
         /// </summary>
         private const float MARKER_HEIGHT = 1f;
-        
+
         /// <summary>
         /// The width of the marker used to mark the found node.
         /// </summary>
@@ -46,12 +46,12 @@ namespace SEE.GO.Menu
         /// The dialog in which the search query can be entered.
         /// </summary>
         private PropertyDialog searchDialog;
-        
+
         /// <summary>
         /// The property which contains the searched query.
         /// </summary>
         private StringProperty searchString;
-        
+
         /// <summary>
         /// The menu in which the search results are listed.
         /// The user can select the desired node here.
@@ -69,7 +69,7 @@ namespace SEE.GO.Menu
         /// The color of the marker pointing to the found node.
         /// </summary>
         private static readonly Color MARKER_COLOR = Color.red;
-        
+
         /// <summary>
         /// A mapping from names to a list of nodes with that name.
         /// Is constructed in the <see cref="Start"/> method in order not to call expensive <c>Find</c> methods every
@@ -77,7 +77,7 @@ namespace SEE.GO.Menu
         /// will not be reflected in the search.
         /// </summary>
         private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
-        
+
         /// <summary>
         /// A list containing all entries in the <see cref="resultMenu"/>.
         /// </summary>
@@ -97,7 +97,7 @@ namespace SEE.GO.Menu
                        .Where(x => x.Score > 0) // results with score 0 are usually garbage
                        .SelectMany(x => cachedNodes[x.Value].Select(y => (x.Score, x.Value, y)))
                        .ToList();
-            
+
             // In cases there are duplicates in the result, we append the filename too
             HashSet<string> encounteredNames = new HashSet<string>();
             results = results.GroupBy(x => x.Item2)
@@ -125,8 +125,8 @@ namespace SEE.GO.Menu
                                      return (entry.score, newName, entry.gameObject);
                                  }
                              });
-                   
-            
+
+
             int found = results.Count();
             switch (found)
             {
@@ -143,7 +143,7 @@ namespace SEE.GO.Menu
             }
 
         }
-        
+
         /// <summary>
         /// This will show a menu with search results to the user in case more than one node was found.
         /// </summary>
@@ -163,7 +163,7 @@ namespace SEE.GO.Menu
             // Entries will be greyed out the further they go.
             resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
-            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), 
+            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2),
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
             resultMenu.ShowMenu(true);
@@ -187,7 +187,7 @@ namespace SEE.GO.Menu
         /// <param name="resultName">The name of the node which shall be highlighted.</param>
         private void HighlightNode(GameObject result, string resultName)
         {
-            ShowNotification.Info($"Highlighting '{resultName}'", 
+            ShowNotification.Info($"Highlighting '{resultName}'",
                                   $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
             GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
             if (result.TryGetComponentOrLog(out Renderer cityRenderer) &&
@@ -200,13 +200,13 @@ namespace SEE.GO.Menu
                 Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();
-                marker.MarkBorn(null, result);
+                marker.MarkBorn(result);
             }
 
             async UniTaskVoid RemoveMarkerWhenDone(Marker marker)
             {
                 // Remove marker either when a new search is started or when time is up
-                await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)), 
+                await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)),
                                       UniTask.WaitUntil(() => !stillHighlighting));
                 marker.Clear();
             }
@@ -223,7 +223,7 @@ namespace SEE.GO.Menu
             stillHighlighting = true;
             for (float i = BLINK_SECONDS; i > 0; i -= BLINK_INTERVAL)
             {
-                if (!stillHighlighting) 
+                if (!stillHighlighting)
                 {
                     // Another search has been started
                     break;
@@ -246,7 +246,7 @@ namespace SEE.GO.Menu
             const string zeroWidthSpace = "\u200B";
             return input.Trim().Replace(zeroWidthSpace, string.Empty);
         }
-        
+
         /// <summary>
         /// Constructs the <see cref="cachedNodes"/> and the <see cref="searchDialog"/>.
         /// </summary>
@@ -262,29 +262,29 @@ namespace SEE.GO.Menu
                 }
                 cachedNodes[sourceName].Add(node);
             }
-                
+
             searchString = gameObject.AddComponent<StringProperty>();
             searchString.Name = "Source name";
             searchString.Description = "The name of the source code component to search for.";
-            
+
             PropertyGroup group = gameObject.AddComponent<PropertyGroup>();
             group.Name = "Search parameters";
             group.AddProperty(searchString);
-            
+
             searchDialog = gameObject.AddComponent<PropertyDialog>();
             searchDialog.Title = "Search node";
             searchDialog.Description = "Enter the node name you wish to search for.";
             searchDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Search");
             searchDialog.AddGroup(group);
-            
+
             // Re-enable keyboard shortcuts on cancel
             searchDialog.OnCancel.AddListener(() => SEEInput.KeyboardShortcutsEnabled = true);
             searchDialog.OnConfirm.AddListener(ExecuteSearch);
-            
+
             //TODO: Bool properties (leaves, nodes)
             //TODO: Selection property (select city)
         }
-            
+
         /// <summary>
         /// Checks whether the <see cref="searchDialog"/> shall be opened.
         /// </summary>
