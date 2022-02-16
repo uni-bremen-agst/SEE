@@ -146,11 +146,10 @@ namespace SEE.Game.Evolution
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a beam marker on top
         /// of its roof.
         /// </summary>
-        /// <param name="node">node above which to add a beam marker</param>
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">node above which to add a beam marker</param>
         /// <returns>the resulting beam marker</returns>
-        private GameObject MarkByBeam(Node node, GameObject gameNode, NodeFactory factory)
+        private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
             Vector3 position = graphRenderer.GetRoof(gameNode);
             Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
@@ -164,6 +163,7 @@ namespace SEE.Game.Evolution
                 GameObject output = new GameObject();
                 foreach (MarkerSection section in markerAttributes.MarkerSections)
                 {
+                    Node node = gameNode.GetNode();
                     node.TryGetNumeric(section.Metric, out float sectionMetric);
                     float sectionHeight = Transform(sectionMetric);
 
@@ -267,12 +267,11 @@ namespace SEE.Game.Evolution
         /// Marks the given <paramref name="gameNode"/> as dying by putting a beam marker on top
         /// of its roof. The color of that beam was specified through the constructor call.
         /// </summary>
-        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkDead(Node node, GameObject gameNode)
+        public GameObject MarkDead(GameObject gameNode)
         {
-            GameObject beamMarker = MarkByBeam(node, gameNode, deletionMarkerFactory);
+            GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
             beamMarker.name = "dead " + gameNode.name;
             beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
@@ -283,13 +282,12 @@ namespace SEE.Game.Evolution
         /// of its roof. The color of that beam was specified through the constructor call.
         /// Adds the created beam marker to the cache.
         /// </summary>
-        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkBorn(Node node, GameObject gameNode)
+        public GameObject MarkBorn(GameObject gameNode)
         {
             NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(gameNode.gameObject.name);
-            GameObject beamMarker = MarkByBeam(node, gameNode, additionMarkerFactory);
+            GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
             beamMarker.name = "new " + gameNode.name;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
@@ -303,12 +301,11 @@ namespace SEE.Game.Evolution
         /// of its roof. The color of that beam was specified through the constructor call.
         /// Adds the created beam marker to the cache.
         /// </summary>
-        /// <param name="node">node to extract metric data from</param>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
-        public GameObject MarkChanged(Node node, GameObject gameNode)
+        public GameObject MarkChanged(GameObject gameNode)
         {
-            GameObject beamMarker = MarkByBeam(node, gameNode, changeMarkerFactory);
+            GameObject beamMarker = MarkByBeam(gameNode, changeMarkerFactory);
             beamMarker.name = "changed " + gameNode.name;
             // We need to add beam marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
