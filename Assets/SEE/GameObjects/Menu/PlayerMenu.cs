@@ -93,11 +93,6 @@ namespace SEE.GO.Menu
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
-
-            //foreach (ToggleMenuEntry entry in entries)
-            //{
-            //    modeMenu.AddEntry(entry);
-            //}
             modeMenu.AddEntries(entries);
 
             return modeMenu;
@@ -190,7 +185,7 @@ namespace SEE.GO.Menu
                     Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
                 }
             }
-            
+
         }
 
         /// <summary>
