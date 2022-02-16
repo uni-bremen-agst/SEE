@@ -54,7 +54,7 @@ namespace SEE.Game.Evolution
         private AnimationDataModel animationDataModel; // not serialized; will be set in Init()
 
         /// <summary>
-        /// The in-game canvas containing the menu for selecting the shown graph revision. 
+        /// The in-game canvas containing the menu for selecting the shown graph revision.
         /// It is shown when the user enters the ESC key. Beside the revision selection
         /// menu, it also contains a close button. If this button is pressed, the
         /// AnimationCanvas is shown again.
@@ -77,14 +77,14 @@ namespace SEE.Game.Evolution
         private EvolutionRenderer evolutionRenderer; // not serialized; will be set in property EvolutionRenderer
 
         /// <summary>
-        /// The container for the markers, needed for serialization 
+        /// The container for the markers, needed for serialization
         /// </summary>
         private SliderMarkerContainer sliderMarkerContainer; // not serialized; will be set in Init()
 
         /// <summary>
         /// The currently selected marker
         /// </summary>
-        private Button selectedMarker; 
+        private Button selectedMarker;
 
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
@@ -133,6 +133,26 @@ namespace SEE.Game.Evolution
         /// </summary>
         private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
 
+        /// <summary>
+        /// The name of the graph attribute providing the commit id.
+        /// </summary>
+        private const string CommitIdAttributeName = "CommitId";
+
+        /// <summary>
+        /// The name of the graph attribute providing the name of the author of a commit.
+        /// </summary>
+        private const string CommitAuthorAttributeName = "CommitAuthor";
+
+        /// <summary>
+        /// The name of the graph attribute providing the name of the timestamp of a commit.
+        /// </summary>
+        private const string CommitTimestampAttributeName = "CommitTimestamp";
+
+        /// <summary>
+        /// The name of the graph attribute providing the commit message.
+        /// </summary>
+        private const string CommitMessageAttributeName = "CommitMessage";
+
         private void Init()
         {
             AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
@@ -171,7 +191,7 @@ namespace SEE.Game.Evolution
             try
             {
                 sliderMarkerContainer = SliderMarkerContainer.Load(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
-                
+
             } catch(FileNotFoundException)
             {
                 sliderMarkerContainer = new SliderMarkerContainer();
@@ -193,7 +213,7 @@ namespace SEE.Game.Evolution
         /// If a child with <paramref name="canvasGameObjectName"/> exists in <see cref="gameObject"/>,
         /// this child will be returned. If no such child exists, a new child with that name will
         /// be created under <see cref="gameObject"/> as an instantiation of the given <paramref name="canvasPrefab"/>.
-        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception 
+        /// If <paramref name="canvasPrefab"/> cannot be loaded, the component will be disabled, and an exception
         /// be thrown.
         /// </summary>
         /// <param name="canvasGameObjectName">name of the child</param>
@@ -234,7 +254,7 @@ namespace SEE.Game.Evolution
                 SliderMarker sliderMarker = sliderMarkerContainer.getSliderMarkerForLocation(p.Key.transform.position);
                 sliderMarker.SetComment(p.Value.text);
             }
-          
+
             sliderMarkerContainer?.Save(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
         }
 
@@ -264,7 +284,7 @@ namespace SEE.Game.Evolution
                     evolutionRenderer.ToggleAutoPlay();
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -302,11 +322,11 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickFastForwardButton()
         {
-            if (evolutionRenderer.IsAutoPlayReverse) 
+            if (evolutionRenderer.IsAutoPlayReverse)
             {
                 return;
             }
-            if (isFastBackward) 
+            if (isFastBackward)
             {
                 animationTimeValue = 2;
                 evolutionRenderer.AnimationLag = animationTimeValue;
@@ -342,7 +362,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickFastBackwardButton()
         {
-            if (evolutionRenderer.IsAutoPlay) 
+            if (evolutionRenderer.IsAutoPlay)
             {
                 return;
             }
@@ -405,7 +425,7 @@ namespace SEE.Game.Evolution
             commentField.transform.localScale = new Vector3(16f, 1f, 1f);
             commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
-            if (comment != null) 
+            if (comment != null)
             {
                 commentField.text = comment;
             }
@@ -433,7 +453,7 @@ namespace SEE.Game.Evolution
                 sliderMarkerContainer.SliderMarkers.Add(newSliderMarker);
             }
             InputField commentField = AddCommentToMarker(newMarker, comment);
-            commentField.gameObject.SetActive(false);      
+            commentField.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -476,16 +496,16 @@ namespace SEE.Game.Evolution
                 else if (SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
-                } 
+                }
                 else if (SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
-                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null) 
+                    if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
                     {
                         AddMarker(markerPos, null);
-                    }                    
-                } 
+                    }
+                }
                 else if (SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
@@ -509,10 +529,10 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Toggles between the animation-interaction mode and the revision-selection
-        /// mode. 
+        /// mode.
         /// In the animation-interaction mode, the user can see and control
         /// the animations of the graph revisions through the AnimationCanvas
-        /// and freely move in the city. 
+        /// and freely move in the city.
         /// In the revision-selection mode, the user can select the revision to be shown
         /// through the RevisionSelectionCanvas. No movement is possible in that mode.
         /// </summary>
@@ -525,16 +545,16 @@ namespace SEE.Game.Evolution
         /// Toggles between the animation-interaction mode and the revision-selection
         /// mode. If <paramref name="enabled"/> is true, the revision-selection mode
         /// is activated; otherwise the animation-interaction mode is turned on.
-        /// 
+        ///
         /// In the revision-selection mode, the user can select the revision to be shown
         /// through the RevisionSelectionCanvas. No movement is possible in that mode.
-        /// 
+        ///
         /// In the animation-interaction mode, the user can see and control
         /// the animations of the graph revisions through the AnimationCanvas
-        /// and freely move in the city. 
-        /// 
+        /// and freely move in the city.
+        ///
         /// Both modes are mutually exclusive.
-        /// 
+        ///
         /// Auto-play animation is always turned off independent of <paramref name="enabled"/>.
         /// </summary>
         /// <param name="enabled">if true, revision-selection mode is turned on; otherwise
@@ -561,6 +581,53 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Returns the value of the string attribute named <paramref name="attributeName"/> of
+        /// the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <param name="attributeName">name of the string attribute</param>
+        /// <returns>attribute value</returns>
+        private string GetAttributeOfCurrentGraph(string attributeName)
+        {
+            return evolutionRenderer.GraphCurrent.GetString(attributeName);
+        }
+
+        /// <summary>
+        /// Returns commit id of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit id</returns>
+        private string CurrentCommitId()
+        {
+            return GetAttributeOfCurrentGraph(CommitIdAttributeName);
+        }
+
+        /// <summary>
+        /// Returns the author of the commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit author</returns>
+        private string CurrentAuthor()
+        {
+            return GetAttributeOfCurrentGraph(CommitAuthorAttributeName);
+        }
+
+        /// <summary>
+        /// Returns timestamp commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit timestamp</returns>
+        private string CurrentCommitTimestamp()
+        {
+            return GetAttributeOfCurrentGraph(CommitTimestampAttributeName);
+        }
+
+        /// <summary>
+        /// Returns commit message of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit message</returns>
+        private string CurrentCommitMessage()
+        {
+            return GetAttributeOfCurrentGraph(CommitMessageAttributeName);
+        }
+
+        /// <summary>
         /// Event function that updates all shown data for the user;
         /// e.g. the revision number shown in the animation canvas.
         /// This method is called as a callback of the evolution renderer
@@ -569,7 +636,10 @@ namespace SEE.Game.Evolution
         private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
-            animationDataModel.CommitInformationText.text = "Commit #" + evolutionRenderer.GraphCurrent.CommitId + "\nAuthor: " + evolutionRenderer.GraphCurrent.CommitAuthor + "\nTimestamp: " + evolutionRenderer.GraphCurrent.CommitTimestamp + "\nMessage:\n" + evolutionRenderer.GraphCurrent.CommitMessage;
+            animationDataModel.CommitInformationText.text = "Commit #" + CurrentCommitId()
+                + "\nAuthor: " + CurrentAuthor()
+                + "\nTimestamp: " + CurrentCommitTimestamp()
+                + "\nMessage:\n" + CurrentCommitMessage();
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
         }
 
