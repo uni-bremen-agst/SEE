@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions
     public class ActionStateType
     {
         /// <summary>
-        /// A list of all available ActionStateTypes.
+        /// A list of all available ActionStateTypes for the current platform.
         /// </summary>
         public static List<ActionStateType> AllTypes { get; } = new List<ActionStateType>();
         public static List<ActionStateType> DesktopMenuTypes { get; } = new List<ActionStateType>();
@@ -60,14 +60,16 @@ namespace SEE.Controls.Actions
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
             new ActionStateType(8, "Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+                                Color.black, "Materials/ModernUIPack/Document",
+                                ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
             new ActionStateType(10, "Hide Node", "Hides a node",
-                               Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
+                               Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                               HideAction.CreateReversibleAction);
 
         /// <summary>
         /// Marks the border to the desktop button group.
@@ -78,92 +80,113 @@ namespace SEE.Controls.Actions
         // Select Button group on the right side
         public static ActionStateType Select { get; } =
             new ActionStateType(11, "Select", "Select objects",
-                                      Color.white.Darker(), "Materials/Charts/MoveIcon", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/Charts/MoveIcon",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType Deselect { get; } =
-            new ActionStateType(12, "Deselect", "Deselect object",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
+            new ActionStateType(12, "Deselect", "Deselect objects",
+                                      Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold",
+                                      DeleteAction.CreateReversibleAction);
 
         // Delete button group on the right side
         public static ActionStateType DeleteMobile { get; } =
             new ActionStateType(13, "Delete Mobile", "Delete a node on touch",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Trash", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Trash",
+                                      DeleteAction.CreateReversibleAction);
 
         // Delete multi button group on the right side
         public static ActionStateType DeleteMulti { get; } =
             new ActionStateType(14, "Delete Multi", "Delete multiple nodes",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Minus", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Minus",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType CancelDeletion { get; } =
             new ActionStateType(15, "Cancel Deletion", "Cancel the deletion of the selected objects",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Cancel Bold",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType AcceptDeletion { get; } =
             new ActionStateType(16, "Accept Deletion", "Accept the deletion of the selected objects",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Check Bold", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Check Bold",
+                                      DeleteAction.CreateReversibleAction);
 
         // Rotate button group on the right side
         public static ActionStateType RotateMobile { get; } =
             new ActionStateType(17, "Rotate Mobile", "Rotation Mode",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Refresh", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Refresh",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType RotateCity { get; } =
             new ActionStateType(18, "Rotate City", "Rotate the City",
-                                      Color.white.Darker(), "Icons/n", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Icons/n",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType RotateObject { get; } =
             new ActionStateType(19, "Rotate Object", "Rotate an Object",
-                                      Color.white.Darker(), "Icons/1", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Icons/1",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType LockedRotate { get; } =
             new ActionStateType(20, "Locked Rotation Mode", "Locked Rotation Mode",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_rotate_90_degrees_ccw_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_rotate_90_degrees_ccw_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType LockedCenter { get; } =
             new ActionStateType(21, "Locked Around Center Mode", "Locked Around Center Mode",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_settings_backup_restore_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_settings_backup_restore_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         // Move button group on the right side
         public static ActionStateType MoveMobile { get; } =
             new ActionStateType(22, "Move Mobile", "Move Mode",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType MoveCity { get; } =
             new ActionStateType(23, "Move City", "Move the whole City",
-                                      Color.white.Darker(), "Icons/n", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Icons/n",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType MoveObject { get; } =
             new ActionStateType(24, "Move Object", "Move Object Mode",
-                                      Color.white.Darker(), "Icons/8", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Icons/8",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType EightDirections { get; } =
             new ActionStateType(25, "8-Directions Mode", "8-Directions Mode",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Plus", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Plus",
+                                      DeleteAction.CreateReversibleAction);
 
         // Quick Menu group on the left side
         public static ActionStateType Redo { get; } =
             new ActionStateType(26, "Redo Action", "Redo Action",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_redo_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_redo_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType Undo { get; } =
             new ActionStateType(27, "Undo", "Undo Action",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_undo_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_undo_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType CameraLock { get; } =
             new ActionStateType(28, "Camera Lock Mode", "Camera Lock Mode",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Lock Open", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Lock Open",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType Rerotate { get; } =
             new ActionStateType(29, "Rerotate", "Set rotation back to standard",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_history_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_history_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType Recenter { get; } =
             new ActionStateType(30, "Recenter", "Recenter the City",
-                                      Color.white.Darker(), "Materials/GoogleIcons/ic_open_with_white_48dp", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/GoogleIcons/ic_open_with_white_48dp",
+                                      DeleteAction.CreateReversibleAction);
 
         public static ActionStateType Collapse { get; } =
             new ActionStateType(31, "Collapse", "Collapse the Quick Menu",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Arrow Bold", DeleteAction.CreateReversibleAction);
+                                      Color.white.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                                      DeleteAction.CreateReversibleAction);
         /// <summary>
         /// Marks the border to the mobile button group.
         /// </summary>
@@ -272,7 +295,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the ActionStateType whose ID matches the given parameter.
+        /// Returns the ActionStateType in <see cref="AllTypes"/> whose ID matches the given parameter.
         /// </summary>
         /// <param name="ID">The ID of the ActionStateType which shall be returned</param>
         /// <returns>the ActionStateType whose ID matches the given parameter</returns>
