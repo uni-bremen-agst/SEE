@@ -133,9 +133,11 @@ namespace SEE.Game.Evolution
         private static readonly int Strength = Shader.PropertyToID("_EmissionStrength");
 
         /// <summary>
-        /// Transformation method to scale numbers.
+        /// Transformation method to scale numbers. Yields <paramref name="input"/> devided
+        /// by 100.
         /// </summary>
-        private float transform(float input)
+        /// <returns>input / 100</returns>
+        private float Transform(float input)
         {
             return input / 100;
         }
@@ -155,10 +157,6 @@ namespace SEE.Game.Evolution
 
             if (markerAttributes.Kind == MarkerKinds.Dynamic)
             {
-                float lengthMetric = 0; 
-                node.TryGetNumeric(markerAttributes.LengthMetric, out lengthMetric);
-                float totalHeight = transform(lengthMetric);
-
                 // Offset from bottom against overlapping beams.
                 float offset = 0;
 
@@ -166,9 +164,8 @@ namespace SEE.Game.Evolution
                 GameObject output = new GameObject();
                 foreach (MarkerSection section in markerAttributes.MarkerSections)
                 {
-                    float sectionMetric = 0;
-                    node.TryGetNumeric(section.Metric, out sectionMetric);
-                    float sectionHeight = transform(sectionMetric);
+                    node.TryGetNumeric(section.Metric, out float sectionMetric);
+                    float sectionHeight = Transform(sectionMetric);
 
                     CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
@@ -201,7 +198,7 @@ namespace SEE.Game.Evolution
                 BeamRaiser raiser = output.AddComponent<BeamRaiser>();
                 raiser.SetTargetHeightAndDuration(new Vector3(1, 1, 1), duration: duration);
                 return output;
-            } 
+            }
             else
             {
                 // The marker should be drawn in front of the block, hence, its render
