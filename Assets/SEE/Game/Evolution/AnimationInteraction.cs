@@ -605,9 +605,11 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Returns the value of the string attribute named <paramref name="attributeName"/> of
         /// the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// If the graph does not have the requested <paramref name="attributeName"/>,
+        /// the empty string is returned.
         /// </summary>
         /// <param name="attributeName">name of the string attribute</param>
-        /// <returns>attribute value</returns>
+        /// <returns>attribute value or the empty string</returns>
         private string GetAttributeOfCurrentGraph(string attributeName)
         {
             evolutionRenderer.GraphCurrent.TryGetString(attributeName, out string result);
