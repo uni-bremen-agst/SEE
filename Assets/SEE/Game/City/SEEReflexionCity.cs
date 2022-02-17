@@ -93,10 +93,6 @@ namespace SEE.Game.City
                     MappingGraph = LoadGraph(GxlMappingPath.Path, "");
                 }
 
-                // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
-                ArchitectureGraph.MarkGraphNodes(ArchitectureLabel);
-                ImplementationGraph.MarkGraphNodes(ImplementationLabel);
-
                 // We collect the tasks here so we can wait on them both at the same time instead of sequentially
                 IList<UniTask> tasks = new List<UniTask>();
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
