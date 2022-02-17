@@ -143,8 +143,11 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a beam marker on top
-        /// of its roof.
+        /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
+        /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
+        /// equals <see cref="MarkerKinds.Stacked"/> the marker will be a set of
+        /// stacked line segments, where the length of each segment is proportional
+        /// to <see cref="markerAttributes.MarkerSections"/>
         /// </summary>
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">node above which to add a beam marker</param>
@@ -154,7 +157,7 @@ namespace SEE.Game.Evolution
             Vector3 position = graphRenderer.GetRoof(gameNode);
             Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
 
-            if (markerAttributes.Kind == MarkerKinds.Dynamic)
+            if (markerAttributes.Kind == MarkerKinds.Stacked)
             {
                 // Offset from bottom against overlapping beams.
                 float offset = 0;
