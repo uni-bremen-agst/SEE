@@ -381,10 +381,16 @@ namespace SEE.Game
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
         /// a child of the given <paramref name="root"/>.
         /// </summary>
-        /// <param name="nodeMap">mapping of graph node IDs onto their representing game objects</param>
-        /// <param name="root">the parent of every game object not nested in any other game object</param>
+        /// <param name="nodeMap">mapping of graph nodes onto their representing game object</param>
+        /// <param name="root">the parent of every game object not nested in any other game object
+        /// (must not be null)</param>
+        /// <exception cref="Exception">thrown if <paramref name="root"/> is null</exception>
         public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
+            if (root == null)
+            {
+                throw new Exception("Root must not be null.");
+            }
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
                 Node node = entry.Key;
@@ -393,8 +399,7 @@ namespace SEE.Game
                 // If node is a root, it will be added to parent as a child.
                 // Otherwise, node is a child of another game node.
                 AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
-
-                entry.Value.UpdatePortal(includeDescendants: Portal.IncludeDescendants.DIRECT_DESCENDANTS);
+                Portal.SetPortal(root, entry.Value, Portal.IncludeDescendants.ONLY_SELF);
             }
         }
 
