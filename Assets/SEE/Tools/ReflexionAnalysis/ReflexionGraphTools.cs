@@ -24,7 +24,6 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public const string ImplementationLabel = "Implementation";
 
-
         /// <summary>
         /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
         /// the given <paramref name="graph"/>.  The root node will <b>not</b> get such a label!
@@ -57,6 +56,10 @@ namespace SEE.Tools.ReflexionAnalysis
                 throw new ArgumentException("All three sub-graphs must be loaded before generating "
                                             + "the full graph.");
             }
+
+            // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
+            ArchitectureGraph.MarkGraphNodes(ArchitectureLabel);
+            ImplementationGraph.MarkGraphNodes(ImplementationLabel);
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;
