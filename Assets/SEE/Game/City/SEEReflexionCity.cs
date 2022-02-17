@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -18,16 +19,6 @@ namespace SEE.Game.City
     /// </summary>
     public class SEEReflexionCity : SEECity
     {
-        /// <summary>
-        /// Label for the architecture toggle added to each graph element of the architecture city.
-        /// </summary>
-        public const string ArchitectureLabel = "Architecture";
-
-        /// <summary>
-        /// Label for the implementation toggle added to each graph element of the implementation city.
-        /// </summary>
-        public const string ImplementationLabel = "Implementation";
-
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
         /// </summary>
@@ -103,8 +94,8 @@ namespace SEE.Game.City
                 }
 
                 // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
-                MarkGraphNodes(ArchitectureGraph, ArchitectureLabel);
-                MarkGraphNodes(ImplementationGraph, ImplementationLabel);
+                ArchitectureGraph.MarkGraphNodes(ArchitectureLabel);
+                ImplementationGraph.MarkGraphNodes(ImplementationLabel);
 
                 // We collect the tasks here so we can wait on them both at the same time instead of sequentially
                 IList<UniTask> tasks = new List<UniTask>();
@@ -120,111 +111,11 @@ namespace SEE.Game.City
 
                 await UniTask.WhenAll(tasks);
 
-                LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
+                LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             }
 
             #endregion
-        }
-
-        /// <summary>
-        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
-        /// the given <paramref name="graph"/>.  The root node will <b>not</b> get such a label!
-        /// </summary>
-        /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
-        /// <param name="label">The value of the toggle attribute</param>
-        private static void MarkGraphNodes(Graph graph, string label)
-        {
-            IEnumerable<GraphElement> graphElements = graph.Nodes().Where(node => node.Type != GraphRenderer.RootType)
-                                                           .Concat<GraphElement>(graph.Edges());
-            foreach (GraphElement graphElement in graphElements)
-            {
-                graphElement.SetToggle(label);
-            }
-        }
-
-        /// <summary>
-        /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
-        /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
-        /// the result. Note that the name of the three graphs may be modified.
-        /// 
-        /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
-        /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
-        /// </summary>
-        /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        private static Graph GenerateFullGraph(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph,
-                                               string Name)
-        {
-            if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
-            {
-                throw new ArgumentException("All three sub-graphs must be loaded before generating "
-                                            + "the full graph.");
-            }
-
-            // We set the name for the implementation graph, because its name will be used for the merged graph.
-            ImplementationGraph.Name = Name;
-
-            // We merge architecture and implementation first.
-            // Duplicate node IDs between architecture and implementation are not allowed.
-            // Any duplicate nodes in the mapping graph are merged into the full graph.
-            // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
-            List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            string suffix = null;
-            if (nodesOverlap.Count > 0)
-            {
-                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
-            }
-
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-A";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-
-            Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
-
-            // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
-            edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
-            suffix = null;
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-M";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-
-            return mergedGraph.MergeWith(MappingGraph, suffix);
-
-            #region Local Functions
-
-            // Returns the intersection of the node IDs of the two graphs.
-            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
-
-            // Returns the intersection of the edge IDs of the two graphs.
-            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-
-            #endregion
-        }
-
-        /// <summary>
-        /// Disassembles the given <paramref name="FullGraph"/> into implementation, architecture, and mapping graphs,
-        /// and returns them in this order.
-        ///
-        /// Pre-condition: The given graph must have been assembled by <see cref="GenerateFullGraph"/>.
-        /// </summary>
-        /// <param name="FullGraph">Graph generated by <see cref="GenerateFullGraph"/></param>
-        /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
-        private static (Graph implementation, Graph architecture, Graph mapping) DisassembleFullGraph(Graph FullGraph)
-        {
-            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] { ImplementationLabel });
-            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] { ArchitectureLabel });
-            // Mapping graph's edges will have neither architecture nor implementation label and will only contain
-            // nodes connected to those edges.
-            Graph MappingGraph = FullGraph.SubgraphByEdges(x => !x.HasToggle(ImplementationLabel)
-                                                                && !x.HasToggle(ArchitectureLabel));
-            return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
 
         /// <summary>
@@ -302,7 +193,7 @@ namespace SEE.Game.City
             else
             {
                 string hierarchicalType = HierarchicalEdges.First();
-                (Graph implementation, Graph architecture, Graph mapping) = DisassembleFullGraph(LoadedGraph);
+                (Graph implementation, Graph architecture, Graph mapping) = LoadedGraph.Disassemble();
                 GraphWriter.Save(GxlArchitecturePath.Path, architecture, hierarchicalType);
                 Debug.Log($"Architecture graph saved at {GxlArchitecturePath.Path}.\n");
                 GraphWriter.Save(GxlImplementationPath.Path, implementation, hierarchicalType);

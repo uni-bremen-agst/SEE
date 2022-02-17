@@ -109,10 +109,10 @@ namespace SEE.Tools.ReflexionAnalysis
                          Graph mapping,
                          bool allowDependenciesToParents = true)
         {
-            this.Implementation = implementation;
-            this.Architecture = architecture;
-            this.Mapping = mapping;
-            this.allowDependenciesToParents = allowDependenciesToParents;
+            Implementation = implementation;
+            Architecture = architecture;
+            Mapping = mapping;
+            AllowDependenciesToParents = allowDependenciesToParents;
         }
 
         /// <summary>
@@ -126,6 +126,25 @@ namespace SEE.Tools.ReflexionAnalysis
             FromScratch();
             //DumpResults();
         }
+        
+        #region Graphs
+
+        /// The implementation graph for which the reflexion data is calculated.
+        public Graph Implementation { get; }
+
+        /// The architecture graph for which the reflexion data is calculated.
+        public Graph Architecture { get; }
+
+        /// <summary>
+        /// Returns the mapping graph for which the reflexion data are calculated.
+        /// </summary>
+        /// <returns>mapping graph</returns>
+        public Graph Mapping { get; }
+        
+        public Graph FullGraph { get; }
+
+        #endregion
+
 
         #region State Edge Attribute
         
@@ -163,7 +182,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">edge whose initial state is to be set</param>
         /// <param name="initialState">the initial state to be set</param>
-        // TODO(falko17): Do we really need this proxy method?
+        // TODO(falko17): Do we really need this proxy method? 
+        // Can be removed
         private static void SetInitial(Edge edge, State initialState) => SetState(edge, initialState);
 
         /// <summary>
@@ -210,6 +230,8 @@ namespace SEE.Tools.ReflexionAnalysis
 
         #region Edge counter attribute
 
+        // TODO(falko17): What does the counter of edges count?
+        // Counts number of propagations
         /// <summary>
         /// Name of the edge attribute for the counter of a dependency.
         /// </summary>
@@ -268,7 +290,7 @@ namespace SEE.Tools.ReflexionAnalysis
             int newValue = oldValue + value;
             if (newValue <= 0)
             {
-                // TODO(falko17): Why was this needed — do we still need this code fragment?
+                // TODO(koschke): Why was this needed — do we still need this code fragment?
                 /*
                 if (GetState(edge) == State.divergent)
                 {
@@ -301,27 +323,10 @@ namespace SEE.Tools.ReflexionAnalysis
             // returns the value of the counter attribute of edge
             // at present, dependencies extracted from the source
             // do not have an edge counter; therefore, we return just 1
-            // TODO(falko17): Should this get its own counter if none has been initialized yet?
             return 1;
         }
         
         #endregion 
-
-        #region Context Information
-
-        /// The implementation graph for which the reflexion data is calculated.
-        public Graph Implementation { get; }
-
-        /// The architecture graph for which the reflexion data is calculated.
-        public Graph Architecture { get; }
-
-        /// <summary>
-        /// Returns the mapping graph for which the reflexion data are calculated.
-        /// </summary>
-        /// <returns>mapping graph</returns>
-        public Graph Mapping { get; }
-
-        #endregion
 
         #region Modifiers
         // The following operations manipulate the relevant graphs of the
@@ -341,9 +346,14 @@ namespace SEE.Tools.ReflexionAnalysis
         // edges (hierarchical as well as dependencies) will be removed, too.
         // Note also that an addition of an edge will imply an implicit addition of
         // its source and target node if there are not yet contained in the target graph.
-        // NODE section
+
+        #region Node
 
         // TODO(falko17): Why are the Mapping modifier methods commented out?
+        // Are these the methods for incremental reflexion?
+        // Yes
+        
+        
         /// <summary>
         /// Adds given node to the mapping graph.
         /// Precondition: node must not be contained in the mapping graph.
@@ -418,7 +428,9 @@ namespace SEE.Tools.ReflexionAnalysis
             throw new NotImplementedException(); // FIXME
         }
 
-        // EDGE section
+        #endregion
+
+        #region Edge
 
         /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
@@ -441,8 +453,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // all nodes that should be mapped onto 'to', too, as a consequence of
                 // mapping 'from'
                 List<Node> subtree = MappedSubtree(from);
-                // was 'to' mapped implicitly at all?
-                // TODO(falko17): Documentation above: Isn't this checking 'from' rather than 'to'?
+                // was 'from' mapped implicitly at all?
                 if (implicitMapsToTable.TryGetValue(from.ID, out Node oldTarget))
                 {
                     // from was actually mapped implicitly onto oldTarget
@@ -534,6 +545,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to"></param>
         private delegate void HandleMappingChange(Edge edge, Node from, Node to);
 
+        // TODO(falko17): What exactly does it mean to "propagate" and "lift" an edge?
+        // (What does the method below do exactly?)
+        // propagate: copy edge from implementation to architecture
+        // lift: move upwards through hierarchy and check convergence
+
         /// <summary>
         /// Handles every dependency edge (incoming as well as outgoing) of every node in given
         /// <paramref name="subtree"/> as follows:
@@ -623,7 +639,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
         }
-
+        
         /// <summary>
         /// Reverts the effect of the mapping of every node in the given <paramref name="subtree"/> onto the
         /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
@@ -795,7 +811,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // is mapped at all (implicitly or explicitly).
                 if (implicitMapsToTable.TryGetValue(implSourceParent.ID, out Node newTarget))
                 {
-                    // new_target is the architecture node onto which the parent of implSource is mapped.
+                    // newTarget is the architecture node onto which the parent of implSource is mapped.
                     ChangeMap(subtree, newTarget);
                 }
                 if (newTarget != null)
@@ -830,7 +846,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// to be removed from the mapping graph </param>
         /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
-        public void Delete_From_Mapping(Node from, Node to)
+        public void DeleteFromMapping(Node from, Node to)
         {
             // The node corresponding to 'from' in the mapping.
             Node mapFrom = Mapping.GetNode(from.ID);
@@ -936,10 +952,10 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             throw new NotImplementedException(); // FIXME
         }
+        
+        #endregion
 
         #endregion
-        
-        // FIXME(falko17) --- Continue refactoring from here ---
         
         #region Summaries
 
@@ -992,17 +1008,19 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
-        private readonly bool allowDependenciesToParents;
+        private readonly bool AllowDependenciesToParents;
         
         #endregion
 
-        // TODO(falko17): What does the below mean?
         // *****************************************
         // involved graphs
         // *****************************************
 
         #region Node Mappings
 
+        // TODO(falko17): What are these mappings used for (i.e. which IDs are used here)?
+        // look for nodes across three graphs using ID
+        
         /// <summary>
         /// Mapping of IDs onto nodes in the implementation graph.
         /// </summary>
@@ -1021,6 +1039,9 @@ namespace SEE.Tools.ReflexionAnalysis
         #region Node and Edge predicates
 
         // TODO(falko17): Do "template instances" refer to C++ templates? What do they mean in this context?
+        // Also, what are artificial edges and nodes, are those implicitly mapped graph elements?
+        // Ignore for now
+        
         /// <summary>
         /// Returns false for given node if it should be ignored in the reflexion analysis.
         /// For instance, artificial nodes, template instances, and nodes with ambiguous definitions
@@ -1068,11 +1089,13 @@ namespace SEE.Tools.ReflexionAnalysis
             // source and target are relevant.
         }
 
-
         #endregion
 
         #region Mapping
 
+        // TODO(falko17): Why are we mapping from IDs (instead of nodes) onto nodes?
+        // Node can exist multiple times across different graphs
+        
         /// <summary>
         /// The implicit mapping as derived from explicitMapsToTable.
         /// Note 1: the mapping key is the ID of a node in implementation and the mapping value a node in architecture
@@ -1303,6 +1326,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Calculates absences non-incrementally.
+        /// Pre-condition: CalculateConvergencesAndDivergences has been called previously.
         /// </summary>
         private void CalculateAbsences()
         {
@@ -1392,6 +1416,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             // keep a trace of dependency propagation
             // TODO(falko17): Why is this commented out (and in C++), is this not required?
+            // mark e.g. divergent edges, not needed yet
             //causing.insert(std::pair<Edge*, Edge*>
             // (allowing_edge ? allowing_edge : architecture_dep, implementationDependency));
         }
@@ -1532,7 +1557,8 @@ namespace SEE.Tools.ReflexionAnalysis
                                                   out Edge allowingEdgeOut)
         {
             // TODO(falko17): This counter is never changed. Is that intentional?
-            int counter = 1;
+            // Same reasoning as for implementation edge counter
+            const int counter = 1;
             Edge propagatedArchitectureDep = Add(archSource, archTarget, edgeType, Architecture);
             // architecture_dep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
@@ -1559,7 +1585,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // dependency. Self dependencies are implicitly allowed.
                 allowingEdgeOut = null;
             }
-            else if (allowDependenciesToParents
+            else if (AllowDependenciesToParents
                      && IsDescendantOf(propagatedArchitectureDep.Source, propagatedArchitectureDep.Target))
             {
                 Transition(propagatedArchitectureDep, State.Undefined, State.ImplicitlyAllowed);
