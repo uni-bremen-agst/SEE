@@ -610,7 +610,8 @@ namespace SEE.Game.Evolution
         /// <returns>attribute value</returns>
         private string GetAttributeOfCurrentGraph(string attributeName)
         {
-            return evolutionRenderer.GraphCurrent.GetString(attributeName);
+            evolutionRenderer.GraphCurrent.TryGetString(attributeName, out string result);
+            return result;
         }
 
         /// <summary>
@@ -658,11 +659,23 @@ namespace SEE.Game.Evolution
         private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
-            animationDataModel.CommitInformationText.text = "Commit #" + CurrentCommitId()
-                + "\nAuthor: " + CurrentAuthor()
-                + "\nTimestamp: " + CurrentCommitTimestamp()
-                + "\nMessage:\n" + CurrentCommitMessage();
+            animationDataModel.CommitInformationText.text = AllOrNothing("Commit #", CurrentCommitId())
+                + AllOrNothing("\nAuthor: ", CurrentAuthor())
+                + AllOrNothing("\nTimestamp: ", CurrentCommitTimestamp())
+                + AllOrNothing("\nMessage:\n", CurrentCommitMessage());
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
+
+            string AllOrNothing(string prefix, string postfix)
+            {
+                if (string.IsNullOrWhiteSpace(postfix))
+                {
+                    return "";
+                }
+                else
+                {
+                    return prefix + postfix;
+                }
+            }
         }
 
         /// <summary>
