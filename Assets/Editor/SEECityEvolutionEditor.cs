@@ -16,15 +16,10 @@ namespace SEEEditor
     [CanEditMultipleObjects]
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
-        /// <summary>
-        /// the city to display
-        /// </summary>
-        private SEECityEvolution city;
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            city = target as SEECityEvolution;
+            SEECityEvolution cityEvolution = city as SEECityEvolution;
 
             EditorGUILayout.Separator();
 
@@ -32,16 +27,16 @@ namespace SEEEditor
 
             EditorGUILayout.Separator();
 
-            AnimationAttributes();
+            AnimationAttributes(cityEvolution);
 
             EditorGUILayout.Separator();
 
-            MarkerAttributes();
+            MarkerAttributes(cityEvolution);
 
             EditorGUILayout.Separator();
 
-            ShowNodeTypes(city);
-            Buttons();
+            ShowNodeTypes(cityEvolution);
+            Buttons(cityEvolution);
         }
 
         /// <summary>
@@ -62,10 +57,8 @@ namespace SEEEditor
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        private void Buttons()
+        private void Buttons(SEECityEvolution city)
         {
-            SEECityEvolution city = target as SEECityEvolution;
-
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
@@ -101,7 +94,7 @@ namespace SEEEditor
         /// <summary>
         /// Renders the GUI for attributes of animations.
         /// </summary>
-        private void AnimationAttributes()
+        private void AnimationAttributes(SEECityEvolution city)
         {
             showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
             if (showAnimationFoldOut)
@@ -118,7 +111,7 @@ namespace SEEEditor
         /// <summary>
         /// Renders the GUI for attributes of markers.
         /// </summary>
-        private void MarkerAttributes()
+        private void MarkerAttributes(SEECityEvolution city)
         {
             showMarkerAttributes = EditorGUILayout.Foldout(showMarkerAttributes, "Attributes of markers", true, EditorStyles.foldoutHeader);
             if (showMarkerAttributes)
