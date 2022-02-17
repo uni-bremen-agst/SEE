@@ -155,7 +155,6 @@ namespace SEE.Game.Evolution
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
             Vector3 position = graphRenderer.GetRoof(gameNode);
-            Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
 
             if (markerAttributes.Kind == MarkerKinds.Stacked)
             {
@@ -214,6 +213,7 @@ namespace SEE.Game.Evolution
 
                 beamMarker.tag = Tags.Decoration;
 
+                Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
                 position.y += beamScale.y / 2.0f;
                 beamMarker.transform.position = position;
                 beamMarker.transform.localScale = beamScale;
