@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
+  m_Name: o3n_female_tennis_dress_hide_asset_LOD1
+  m_EditorClassIdentifier: 
+  _asset: {fileID: 11400000, guid: 4f32e172f9f70a844a9c7dd88efc41e8, type: 2}
+  _assetSlotName: 
+  _serializedFlags:
+  - flags: ffffffffffffffffffff0f000000000000000000000000000000000000007080fffffffffffffffffffffffffffffffffffffffffffffffffff9ff0f00000083f1ffffffffbf1f00000000000000000000000000000000000000000000feffff5ff2ffffffffffffffffffffffffff030000f03f000000feffffffff03000000ffffffffffffffcfffffffffffffffffffffff01a001000000000000000000000080ffffffffffffffffffffffffffffffffffff1f0000000000000000000000000000000000000000000080feffffffffffffff0ddf87000470002000000000c0f3ffffffffffffff00f00340069c0ffe3f0000000000000000000000000000000000000000000000000000000000ffffff1f00f0ff0700fcfeff00
+    Count: 2265

@@ -202,11 +202,10 @@ namespace SEE.Controls.Actions
         {
             // This dialog will set the source name and type of memento.node.
             NodePropertyDialog dialog = new NodePropertyDialog(memento.node);
-            // If the OK button is pressed, we continue with ProgressState.ValuesAreGiven.
             dialog.OnConfirm.AddListener(OKButtonPressed);
-            // If the Cancel button is pressed, we continue with ProgressState.AddingIsCanceled.
-            dialog.OnCancel.AddListener(() => progress = ProgressState.EditIsCanceled);
+            dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open();
+            SEEInput.KeyboardShortcutsEnabled = false;
 
             void OKButtonPressed()
             {
@@ -214,6 +213,13 @@ namespace SEE.Controls.Actions
                 memento.newName = memento.node.SourceName;
                 memento.newType = memento.node.Type;
                 InteractableObject.UnselectAll(true);
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
+
+            void CancelButtonPressed()
+            {
+                progress = ProgressState.EditIsCanceled;
+                SEEInput.KeyboardShortcutsEnabled = true;
             }
         }
     }

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: UpperLipUp_R
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LipUpperAbove
+    hash: 213529522
+    position: {x: 0, y: 0, z: -0.00090944767}
+    rotation: {x: -2.816975e-16, y: -0.0000000018619252, z: -1.6652874e-14, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperCorner_R
+    hash: -983717372
+    position: {x: 0.000051487237, y: -0.00010130927, z: 0}
+    rotation: {x: 0.00000006031726, y: 0.00000034589584, z: 0.00000008826619, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperIn_R
+    hash: 749336865
+    position: {x: 0.000028327107, y: 0.000070900656, z: -0.00356853}
+    rotation: {x: -0.087155364, y: -0.00000024903918, z: 0.000000052765515, w: 0.9961948}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperMiddle
+    hash: -741693195
+    position: {x: 0, y: 0, z: -0.0009095669}
+    rotation: {x: -5.1559364e-13, y: 0.000000054581403, z: -5.4174384e-14, w: 1.0000001}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperOut_R
+    hash: -1832086400
+    position: {x: 0.00004631281, y: 0, z: -0.00356853}
+    rotation: {x: -0.087155685, y: 0.00000086997613, z: 0.00000011909525, w: 0.9961948}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

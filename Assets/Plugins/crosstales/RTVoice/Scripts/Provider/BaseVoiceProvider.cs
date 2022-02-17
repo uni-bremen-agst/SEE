@@ -297,6 +297,8 @@ namespace Crosstales.RTVoice.Provider
             outputFile = Util.Config.AUDIOFILE_PATH + filename;
          }
 
+         //Debug.Log("FILE: " + outputFile);
+
          /*
          if (createFile)
          {
@@ -318,6 +320,8 @@ namespace Crosstales.RTVoice.Provider
          AudioType type = AudioType.WAV, bool isNative = false, bool isLocalFile = true,
          System.Collections.Generic.Dictionary<string, string> headers = null)
       {
+         //Debug.Log("URL: " + url);
+
          if (wrapper != null && wrapper.Source != null)
          {
             if (!isLocalFile || isLocalFile && (System.IO.File.Exists(outputFile) && new System.IO.FileInfo(outputFile).Length > 1024))

@@ -281,7 +281,7 @@ namespace Crosstales.RTVoice.Provider
                      do
                      {
                         yield return null;
-                     } while (!silence && Util.Helper.hasActiveClip(wrapper.Source));
+                     } while (!silence && wrapper.Source.CTHasActiveClip());
 
                      if (Util.Config.DEBUG)
                         Debug.Log($"Text spoken: {wrapper.Text}");

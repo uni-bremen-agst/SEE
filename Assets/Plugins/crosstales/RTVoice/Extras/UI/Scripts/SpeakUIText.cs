@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 namespace Crosstales.RTVoice.UI
 {
    /// <summary>Speaks a Text.</summary>
-   [RequireComponent(typeof(Text))]
    [HelpURL("https://crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_r_t_voice_1_1_u_i_1_1_speak_u_i_text.html")]
    public class SpeakUIText : SpeakUIBase
    {
@@ -15,7 +14,8 @@ namespace Crosstales.RTVoice.UI
       public Color TextColor = Color.green;
       public bool ClearTags = true;
 
-      protected Text textComponent;
+      public Text TextComponent;
+
       private Color originalColor;
 
       #endregion
@@ -25,8 +25,10 @@ namespace Crosstales.RTVoice.UI
 
       private void Awake()
       {
-         textComponent = GetComponent<Text>();
-         originalColor = textComponent.color;
+         if (TextComponent == null)
+            TextComponent = GetComponent<Text>();
+
+         originalColor = TextComponent.color;
       }
 
       private void Update()
@@ -38,9 +40,9 @@ namespace Crosstales.RTVoice.UI
             if (elapsedTime > Delay && uid == null && (!SpeakOnlyOnce || !spoken))
             {
                if (ChangeColor)
-                  textComponent.color = TextColor;
+                  TextComponent.color = TextColor;
 
-               uid = speak(ClearTags ? textComponent.text.CTClearTags() : textComponent.text);
+               uid = speak(ClearTags ? TextComponent.text.CTClearTags() : TextComponent.text);
                elapsedTime = 0f;
             }
          }
@@ -59,7 +61,7 @@ namespace Crosstales.RTVoice.UI
       {
          base.OnPointerExit(eventData);
 
-         textComponent.color = originalColor;
+         TextComponent.color = originalColor;
       }
 
       protected override void onSpeakComplete(Model.Wrapper wrapper)
@@ -68,7 +70,7 @@ namespace Crosstales.RTVoice.UI
          {
             base.onSpeakComplete(wrapper);
 
-            textComponent.color = originalColor;
+            TextComponent.color = originalColor;
          }
       }
 

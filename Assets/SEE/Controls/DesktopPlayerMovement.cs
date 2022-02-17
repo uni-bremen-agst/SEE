@@ -1,66 +1,65 @@
-﻿using SEE.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Controls
 {
-
-    public class DesktopPlayerMovement : MonoBehaviour
+    /// <summary>
+    /// Moves a player in a desktop environment (keyboard and mouse input).
+    /// </summary>
+    public class DesktopPlayerMovement : PlayerMovement
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 0.5f;
+        public float Speed = 1f;
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
-        public float BoostFactor = 2.0f;
+        public float BoostFactor = 4f;
 
         private struct CameraState
         {
-            internal float distance;
-            internal float yaw;
-            internal float pitch;
-            internal bool freeMode;
+            internal float Distance;
+            internal float Yaw;
+            internal float Pitch;
+            internal bool FreeMode;
         }
 
-        private CameraState cameraState;        
+        private CameraState cameraState;
 
         [Tooltip("The code city which the player is focusing on.")]
-        public GO.Plane focusedObject;
+        public GO.Plane FocusedObject;
 
         private void Start()
         {
-            Camera mainCamera = MainCamera.Camera;
-            if (focusedObject != null)
+            if (FocusedObject != null)
             {
-                cameraState.distance = 2.0f;
-                cameraState.yaw = 0.0f;
-                cameraState.pitch = 45.0f;
-                mainCamera.transform.position = focusedObject.CenterTop;
-                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                cameraState.Distance = 2.0f;
+                cameraState.Yaw = 0.0f;
+                cameraState.Pitch = 45.0f;
+                transform.position = FocusedObject.CenterTop;
+                transform.position -= transform.forward * cameraState.Distance;
+                transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
             }
             else
             {
                 // Use the inital camera rotation.
-                Vector3 rotation = mainCamera.transform.rotation.eulerAngles;
-                cameraState.yaw = rotation.y;
-                cameraState.pitch = rotation.x;
-                cameraState.freeMode = true;
+                Vector3 rotation = transform.rotation.eulerAngles;
+                cameraState.Yaw = rotation.y;
+                cameraState.Pitch = rotation.x;
+                cameraState.FreeMode = true;
             }
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
         private void Update()
         {
-            Camera mainCamera = MainCamera.Camera;
-            if (SEEInput.ToggleCameraLock())
+            if (FocusedObject != null && SEEInput.ToggleCameraLock())
             {
-                cameraState.freeMode = !cameraState.freeMode;
-                if (!cameraState.freeMode)
+                cameraState.FreeMode = !cameraState.FreeMode;
+                if (!cameraState.FreeMode)
                 {
-                    Vector3 positionToFocusedObject = focusedObject.CenterTop - transform.position;
-                    cameraState.distance = positionToFocusedObject.magnitude;
+                    Vector3 positionToFocusedObject = FocusedObject.CenterTop - transform.position;
+                    cameraState.Distance = positionToFocusedObject.magnitude;
                     transform.forward = positionToFocusedObject;
                     Vector3 pitchYawRoll = transform.rotation.eulerAngles;
-                    cameraState.pitch = pitchYawRoll.x;
-                    cameraState.yaw = pitchYawRoll.y;
+                    cameraState.Pitch = pitchYawRoll.x;
+                    cameraState.Yaw = pitchYawRoll.y;
                 }
             }
 
@@ -70,7 +69,7 @@ namespace SEE.Controls
                 speed *= BoostFactor;
             }
 
-            if (!cameraState.freeMode)
+            if (!cameraState.FreeMode)
             {
                 float d = 0.0f;
                 if (SEEInput.MoveForward())
@@ -81,46 +80,46 @@ namespace SEE.Controls
                 {
                     d -= speed;
                 }
-                cameraState.distance -= d;
+                cameraState.Distance -= d;
 
                 HandleRotation();
-                mainCamera.transform.position = focusedObject.CenterTop;
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
-                mainCamera.transform.position -= mainCamera.transform.forward * cameraState.distance;
+                transform.position = FocusedObject.CenterTop;
+                transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+                transform.position -= transform.forward * cameraState.Distance;
             }
             else // cameraState.freeMode == true
             {
-                Vector3 v = Vector3.zero;
+                Vector3 velocity = Vector3.zero;
                 if (SEEInput.MoveForward())
                 {
-                    v += mainCamera.transform.forward;
+                    velocity += transform.forward;
                 }
                 if (SEEInput.MoveBackward())
                 {
-                    v -= mainCamera.transform.forward;
+                    velocity -= transform.forward;
                 }
                 if (SEEInput.MoveRight())
                 {
-                    v += mainCamera.transform.right;
+                    velocity += transform.right;
                 }
                 if (SEEInput.MoveLeft())
                 {
-                    v -= mainCamera.transform.right;
+                    velocity -= transform.right;
                 }
                 if (SEEInput.MoveUp())
                 {
-                    v += Vector3.up;
+                    velocity += Vector3.up;
                 }
                 if (SEEInput.MoveDown())
                 {
-                    v += Vector3.down;
+                    velocity += Vector3.down;
                 }
-                v.Normalize();
-                v *= speed;
-                mainCamera.transform.position += v;
+                velocity.Normalize();
+                velocity *= speed;
+                transform.position += velocity;
 
                 HandleRotation();
-                mainCamera.transform.rotation = Quaternion.Euler(cameraState.pitch, cameraState.yaw, 0.0f);
+                transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
             }
         }
 
@@ -130,9 +129,9 @@ namespace SEE.Controls
         private Vector2 lastAxis;
 
         /// <summary>
-        /// If the user wants us, we rotate the camera according to mouse input.
+        /// If the user wants us, we rotate the gameobject according to mouse input.
         /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
-        /// 
+        ///
         /// Note: This is a workaround of issues with the correct mouse position
         /// in a remote-desktop session.
         /// </summary>
@@ -148,8 +147,8 @@ namespace SEE.Controls
                 // float x = Input.GetAxis("Mouse X");
                 // float y = Input.GetAxis("Mouse Y");
 
-                cameraState.yaw += x;
-                cameraState.pitch -= y;
+                cameraState.Yaw += x;
+                cameraState.Pitch -= y;
             }
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;

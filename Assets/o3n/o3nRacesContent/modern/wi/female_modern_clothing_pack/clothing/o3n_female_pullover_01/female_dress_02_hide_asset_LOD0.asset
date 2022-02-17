@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
+  m_Name: female_dress_02_hide_asset_LOD0
+  m_EditorClassIdentifier: 
+  _asset: {fileID: 11400000, guid: 8c0138e2c61b1ae4cb8b4451b461da0c, type: 2}
+  _assetSlotName: o3n_female_dress_02_LOD0
+  _serializedFlags:
+  - flags: 00c00300000000f0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000ffffffffffffffffffffffffffff1f0000a0797a0000f767febfffffffffffff0f00000008000078000000000000000000000000000000000000f5ffbf7ffec3ff01f0ffffffffffffffffffffffffffffffffff03000000000000000000000000000000000000000000000000000000000000f8ffffff7f000000000000000000000000000000000000000000000000000000000000000000f8ffffffffffffffffffff02000000000000000000ffffffffffffff01000080239fffff7f000000
+    Count: 2646

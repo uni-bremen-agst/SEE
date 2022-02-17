@@ -10,15 +10,17 @@ namespace SEE.Game
     /// <summary>
     /// Adds components required for interacting with a game object.
     /// </summary>
-    public static class InteractionDecorator
+    internal static class InteractionDecorator
     {
         /// <summary>
         /// Adds the following components to given <paramref name="gameObject"/>:
-        /// Interactable, InteractableObject, ShowHovering, ShowSelection, ShowGrabbing.
-        /// If <paramref name="gameObject"/> represents a graph node, it will also
-        /// receive the following components additionally: GameNodeScaler, 
-        /// ShowLabel, EyeGazeHandler.
-        /// 
+        /// <see cref="Interactable"/>, <see cref="InteractableObject"/>,
+        /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
+        /// components are added in addition to the ones above:
+        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
+        /// <see cref="HighlightErosion"/>.
+        ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
         /// </summary>
@@ -26,7 +28,7 @@ namespace SEE.Game
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
-            Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();           
+            Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
             interactable.highlightOnHover = false;
             gameObject.AddComponentIfNecessary<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
@@ -64,16 +66,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds the following components to all given <paramref name="gameObjects"/>:
-        /// Interactable, InteractableObject, ShowHovering, ShowSelection, ShowGrabbing.
-        /// If <paramref name="gameNode"/> represents a graph node, it will also
-        /// receive the following components additionally: GameNodeScaler, 
-        /// ShowLabel, EyeGazeHandler.
-        /// 
-        /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
+        /// Adds the following components to all <paramref name="gameObjects"/>:
+        /// <see cref="Interactable"/>, <see cref="InteractableObject"/>,
+        /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// If a element in <paramref name="gameObjects"/> has a <see cref="NodeRef"/>, then the following
+        /// components are added in addition to the ones above:
+        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
+        /// <see cref="HighlightErosion"/>.
+        ///
+        /// Note: All <paramref name="gameObjects"/> are assumed to represent a graph node
         /// or edge.
         /// </summary>
-        /// <param name="gameObjects">game object where the components are to be added to</param>
+        /// <param name="gameObjects">game objects where the components are to be added to</param>
         public static void PrepareForInteraction(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)

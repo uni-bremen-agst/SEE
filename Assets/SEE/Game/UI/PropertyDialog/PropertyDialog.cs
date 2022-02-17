@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.GO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// The icon providing a visual clue on the dialog's purpose.
         /// </summary>
         public Sprite Icon;
-        
+
         /// <summary>
         /// The list of cohesive groups of properties of the dialog. The properties of
         /// a group should be shown together because they are semantically related.
@@ -55,7 +56,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// If true, the dialog is currently shown.
         /// This value may differ from <see cref="DialogShouldBeShown"/>. The latter is only the
-        /// request to show the dialog, where the actual occurence of the dialog can be delayed 
+        /// request to show the dialog, where the actual occurence of the dialog can be delayed
         /// somewhat.
         /// </summary>
         private bool dialogIsShown = false;
@@ -63,6 +64,58 @@ namespace SEE.Game.UI.PropertyDialog
         /// Whether the dialog should be shown.
         /// </summary>
         public bool DialogShouldBeShown { get; set; } = false;
+
+        /// <summary>
+        /// If <paramref name="allow"/> is true, the dialog is allowed to handle its
+        /// own closing. If <paramref name="allow"/> is false, the client must handle
+        /// the closing by calling <see cref="Close"/>.
+        /// </summary>
+        /// <param name="allow">whether the dialog may handle its own closing</param>
+        public void AllowClosing(bool allow)
+        {
+            switch (Platform)
+            {
+                case PlayerInputType.DesktopPlayer:
+                    AllowClosingDesktop(allow);
+                    break;
+                case PlayerInputType.TouchGamepadPlayer:
+                    break;
+                case PlayerInputType.VRPlayer:
+                    break;
+                case PlayerInputType.HoloLensPlayer:
+                    break;
+                case PlayerInputType.None: // no UI has to be rendered
+                    break;
+                default:
+                    PlatformUnsupported();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Closes this dialog. Should be called only if self-managed closing of
+        /// this dialog was disabled via <see cref="AllowClosing(bool)"/>.
+        /// </summary>
+        public void Close()
+        {
+            switch (Platform)
+            {
+                case PlayerInputType.DesktopPlayer:
+                    CloseDesktop();
+                    break;
+                case PlayerInputType.TouchGamepadPlayer:
+                    break;
+                case PlayerInputType.VRPlayer:
+                    break;
+                case PlayerInputType.HoloLensPlayer:
+                    break;
+                case PlayerInputType.None: // no UI has to be rendered
+                    break;
+                default:
+                    PlatformUnsupported();
+                    break;
+            }
+        }
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can

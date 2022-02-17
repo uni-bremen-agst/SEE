@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1459277796225044}
+  m_IsPrefabParent: 1
+--- !u!1 &1459277796225044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4061240312067400}
+  - 114: {fileID: 114416574945827136}
+  m_Layer: 0
+  m_Name: o3nPhysicsStandardSlotPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4061240312067400
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1459277796225044}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &114416574945827136
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1459277796225044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b79b22c90bc7dd441899ab6522cfd2b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ragdollLayer: 8
+  playerLayer: 9
+  simplePlayerCollider: 1
+  enableColliderTriggers: 0
+  UpdateTransformAfterRagdoll: 1
+  PhysicsElements:
+  - {fileID: 11400000, guid: e4f7fce43cac36247ac27e583cca2430, type: 2}
+  - {fileID: 11400000, guid: c9a10ede1523743448efcc94f9b8a536, type: 2}
+  - {fileID: 11400000, guid: 5e16938a16b774644936b14a6ac8029e, type: 2}
+  - {fileID: 11400000, guid: 75433963b2944b44e89f2113af912f11, type: 2}
+  - {fileID: 11400000, guid: c4323b11ca2f6f94cb06f09edfa7915b, type: 2}
+  - {fileID: 11400000, guid: 56506dec02a860a4c90032ff0a48c74b, type: 2}
+  - {fileID: 11400000, guid: a19496a08a251024eb70f0f68bdca025, type: 2}
+  - {fileID: 11400000, guid: 2ab537f3b7fc6264da3edb1f15f5d736, type: 2}
+  - {fileID: 11400000, guid: c03f06cbe8eb3af40afb67be51b43b72, type: 2}
+  - {fileID: 11400000, guid: 0a2062fca4930f844b9013b915777db7, type: 2}
+  - {fileID: 11400000, guid: c18a52da8c3541f4ab9e3307a971a3fe, type: 2}
