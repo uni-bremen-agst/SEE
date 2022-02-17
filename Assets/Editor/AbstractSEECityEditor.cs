@@ -17,9 +17,9 @@ namespace SEEEditor
     public class AbstractSEECityEditor : Editor
     {
         /// <summary>
-        /// the city to display
+        /// The city to be configured.
         /// </summary>
-        private AbstractSEECity city;
+        protected AbstractSEECity city;
 
         /// <summary>
         /// Whether the foldout for the general attributes of the city should be expanded.
