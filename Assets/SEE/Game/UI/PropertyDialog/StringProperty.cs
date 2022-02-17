@@ -18,8 +18,12 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// The text field in which the value will be entered by the user.
+        /// Note: The input field has a child Text Area/Text with a TextMeshProUGUI
+        /// component holding the text, too. Yet, one should never use the latter, because
+        /// the latter contains invisible characters. One must always use the attribute
+        /// text of the TMP_InputField.
         /// </summary>
-        private TextMeshProUGUI textField;
+        private TMP_InputField textField;
 
         /// <summary>
         /// Instantiation of the prefab <see cref="StringInputFieldPrefab"/>.
@@ -28,7 +32,7 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// The parent of <see cref="inputField"/>. Because <see cref="SetParent(GameObject)"/>
-        /// may be called before <see cref="StartDesktop"/>, the parameter passed to 
+        /// may be called before <see cref="StartDesktop"/>, the parameter passed to
         /// <see cref="SetParent(GameObject)"/> will be buffered in this attribute.
         /// </summary>
         private GameObject parentOfInputField;
@@ -53,7 +57,7 @@ namespace SEE.Game.UI.PropertyDialog
             inputField.gameObject.name = Name;
             SetLabel(inputField);
             SetInitialInput(inputField, savedValue);
-            textField = GetTextField(inputField);
+            textField = GetInputField(inputField);
             textField.text = savedValue;
             SetupTooltip(inputField);
 
@@ -70,7 +74,7 @@ namespace SEE.Game.UI.PropertyDialog
                     // FIXME scrolling doesn't work while hovering above the field, because
                     // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
                     // It is unclear how to resolve this without either abstaining from using the Modern UI Pack
-                    // in this instance or without modifying the Modern UI Pack, which would complicate 
+                    // in this instance or without modifying the Modern UI Pack, which would complicate
                     // updates greatly. Perhaps the author of the Modern UI Pack (or Unity developers?) should
                     // be contacted about this.
                 }
@@ -95,19 +99,18 @@ namespace SEE.Game.UI.PropertyDialog
                 }
             }
 
-            static TextMeshProUGUI GetTextField(GameObject field)
+            static TMP_InputField GetInputField(GameObject field)
             {
-                Transform result = field.transform.Find("Text Area/Text");                
-                if (result != null && result.gameObject.TryGetComponentOrLog(out TextMeshProUGUI text))
+                if (field.TryGetComponent(out TMP_InputField inputField))
                 {
-                    return text;
+                    return inputField;
                 }
                 else
                 {
-                    throw new Exception($"Prefab {StringInputFieldPrefab} does not have a TextMeshProUGUI component at child 'Text Area/Text'");
+                    throw new Exception($"Prefab {StringInputFieldPrefab} does not have a {typeof(TMP_InputField)}");
                 }
             }
-            
+
             #endregion
         }
 
@@ -130,7 +133,7 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// The buffered value of the <see cref="textField"/>. Because <see cref="Value"/>
-        /// may be set before <see cref="StartDesktop"/> is called, the parameter passed to 
+        /// may be set before <see cref="StartDesktop"/> is called, the parameter passed to
         /// <see cref="Value"/> will be buffered in this attribute if <see cref="StartDesktop"/>
         /// has not been called and, hence, <see cref="textField"/> does not exist yet.
         /// </summary>

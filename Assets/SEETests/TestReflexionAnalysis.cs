@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
 using System.Collections.Generic;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
 namespace SEE.Tools.Architecture
@@ -93,7 +94,7 @@ namespace SEE.Tools.Architecture
         {
             foreach (EdgeChange e in edgeChanges)
             {
-                if (e.edge.Source == source && e.edge.Target == target && e.edge.Type == edgeType && e.newState == state)
+                if (e.Edge.Source == source && e.Edge.Target == target && e.Edge.Type == edgeType && e.NewState == state)
                 {
                     return true;
                 }
@@ -112,7 +113,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsConvergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.convergent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Convergent);
         }
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.allowed);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Allowed);
         }
 
         /// <summary>
@@ -140,7 +141,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.absent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Absent);
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsImplicitlyAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed);
+            return HasNewState(edgeChanges, source, target, edgeType, State.ImplicitlyAllowed);
         }
 
         /// <summary>
@@ -168,7 +169,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowedAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.AllowedAbsent);
         }
 
         /// <summary>
@@ -182,7 +183,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge exists</returns>
         protected bool IsDivergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.divergent);
+            return HasNewState(edgeChanges, source, target, edgeType, State.Divergent);
         }
 
         /// <summary>
@@ -223,9 +224,9 @@ namespace SEE.Tools.Architecture
         {
             foreach (PropagatedEdge edge in propagatedEdges)
             {
-                if (from.ID == edge.propagatedEdge.Source.ID
-                    && to.ID == edge.propagatedEdge.Target.ID
-                    && edgeType == edge.propagatedEdge.Type)
+                if (from.ID == edge.ThePropagatedEdge.Source.ID
+                    && to.ID == edge.ThePropagatedEdge.Target.ID
+                    && edgeType == edge.ThePropagatedEdge.Type)
                 {
                     return true;
                 }
@@ -242,29 +243,29 @@ namespace SEE.Tools.Architecture
             Debug.Log("MAPS_TO EDGES ADDED TO MAPPING\n");
             foreach (MapsToEdge e in mapsToEdgesAdded)
             {
-                Debug.LogFormat("maps_to {0}\n", e.mapsToEdge.ToString());
+                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge.ToString());
             }
             Debug.Log("MAPS_TO EDGES REMOVED FROM MAPPING\n");
             foreach (MapsToEdge e in mapsToEdgesRemoved)
             {
-                Debug.LogFormat("maps_to {0}\n", e.mapsToEdge.ToString());
+                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge.ToString());
             }
 
             Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
             foreach (PropagatedEdgeAdded e in propagatedEdgesAdded)
             {
-                Debug.LogFormat("propagated {0}\n", e.propagatedEdge.ToString());
+                Debug.LogFormat("propagated {0}\n", e.ThePropagatedEdge.ToString());
             }
             Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
             foreach (PropagatedEdgeRemoved e in propagatedEdgesRemoved)
             {
-                Debug.LogFormat("removed {0}\n", e.propagatedEdge.ToString());
+                Debug.LogFormat("removed {0}\n", e.ThePropagatedEdge.ToString());
             }
 
             Debug.Log("DEPENDENCIES CHANGED IN ARCHITECTURE\n");
             foreach (EdgeChange e in edgeChanges)
             {
-                Debug.LogFormat("changed {0} from {1} to {2}\n", e.edge.ToString(), e.oldState, e.newState);
+                Debug.LogFormat("changed {0} from {1} to {2}\n", e.Edge.ToString(), e.OldState, e.NewState);
             }
         }
 
@@ -320,14 +321,8 @@ namespace SEE.Tools.Architecture
             return result;
         }
 
-        /// <summary>
-        /// Unique ID for edges.
-        /// </summary>
-        private static int edgeID = 1;
-
         protected static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            edgeID++;
             Edge result = new Edge(from, to, type);
             graph.AddEdge(result);
             return result;

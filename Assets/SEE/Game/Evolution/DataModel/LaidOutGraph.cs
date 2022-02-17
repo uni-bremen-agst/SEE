@@ -45,7 +45,7 @@ namespace SEE.Game.Evolution
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
         /// May be null if edges are not drawn.
         /// </summary>
-        private readonly Dictionary<string, LayoutEdge> edgeLayout;
+        private readonly Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout;
 
         /// <summary>
         /// The graph.
@@ -61,7 +61,7 @@ namespace SEE.Game.Evolution
         /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
         /// May be null if edges are not drawn.
         /// </summary>
-        public Dictionary<string, LayoutEdge> EdgeLayout => edgeLayout;
+        public Dictionary<string, ILayoutEdge<ILayoutNode>> EdgeLayout => edgeLayout;
 
         /// <summary>
         /// Constructor.
@@ -72,7 +72,8 @@ namespace SEE.Game.Evolution
         public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> nodeLayout, Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout)
         {
             this.graph = graph.AssertNotNull("graph");
-            this.nodeLayout = nodeLayout.AssertNotNull("layout");
+            this.nodeLayout = nodeLayout.AssertNotNull("node layout");
+            this.edgeLayout = edgeLayout.AssertNotNull("edge layout");
         }
     }
 }

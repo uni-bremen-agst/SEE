@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
@@ -13,21 +12,26 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class RotateAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// The number of degrees in a full circle.
+        /// </summary>
+        private const float FullCircleDegree = 360.0f;
+
         private struct Hit
         {
             /// <summary>
-            /// The root of the code city. This the top-most game object representing a node,
+            /// The root of the code city. This is the top-most game object representing a node,
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
-            internal Transform cityRootNode;
-            internal CityCursor cursor;
-            internal UnityEngine.Plane plane;
+            internal Transform CityRootNode;
+            internal CityCursor Cursor;
+            internal UnityEngine.Plane Plane;
         }
 
         private const float SnapStepCount = 8;
-        private const float SnapStepAngle = 360.0f / SnapStepCount;
-
-        private static readonly RotateGizmo gizmo = RotateGizmo.Create(1024);
+        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
+        private const int TextureResolution = 1024;
+        private static readonly RotateGizmo gizmo = RotateGizmo.Create(TextureResolution);
 
         private bool rotating;
         private Hit hit;
@@ -103,12 +107,12 @@ namespace SEE.Controls.Actions
             {
                 if (rotating)
                 {
-                    Positioner.Set(hit.cityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
-                    foreach (InteractableObject o in hit.cursor.E.GetFocusses())
+                    Positioner.Set(hit.CityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
+                    foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                     {
-                        if (o.IsGrabbed)
+                        if (interactable.IsGrabbed)
                         {
-                            o.SetGrab(false, true);
+                            interactable.SetGrab(false, true);
                         }
                     }
                     gizmo.gameObject.SetActive(false);
@@ -118,7 +122,8 @@ namespace SEE.Controls.Actions
                 }
                 else if (obj)
                 {
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true); // TODO(torben): Explanation in MoveAction.cs: @UnselectInWrongPlace
+                    // TODO(torben): Explanation in MoveAction.cs: @UnselectInWrongPlace
+                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true);
                 }
             }
             else if (SEEInput.Drag()) // start or continue rotation
@@ -130,16 +135,16 @@ namespace SEE.Controls.Actions
                     if (SEEInput.StartDrag() && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
                         rotating = true;
-                        hit.cityRootNode = cityRootNode;
-                        hit.cursor = cityCursor;
-                        hit.plane = plane;
+                        hit.CityRootNode = cityRootNode;
+                        hit.Cursor = cityCursor;
+                        hit.Plane = plane;
 
-                        foreach (InteractableObject o in hit.cursor.E.GetFocusses())
+                        foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                         {
-                            o.SetGrab(true, true);
+                            interactable.SetGrab(true, true);
                         }
                         gizmo.gameObject.SetActive(true);
-                        gizmo.Center = cityCursor.E.HasFocus() ? hit.cursor.E.ComputeCenter() : hit.cityRootNode.position;
+                        gizmo.Center = cityCursor.E.HasFocus() ? hit.Cursor.E.ComputeCenter() : hit.CityRootNode.position;
 
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
@@ -152,7 +157,7 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (rotating && Raycasting.RaycastPlane(hit.plane, out planeHitPoint)) // continue rotation
+                if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint)) // continue rotation
                 {
                     Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                     float toHitAngle = toHit.Angle360();
@@ -162,18 +167,18 @@ namespace SEE.Controls.Actions
                         angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                     }
 
-                    hit.cityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.cityRootNode.rotation.eulerAngles.y);
+                    hit.CityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.CityRootNode.rotation.eulerAngles.y);
 
                     float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
                     float currAngle = toHitAngle;
 
-                    while (Mathf.Abs(currAngle + 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                    while (Mathf.Abs(currAngle + FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
                     {
-                        currAngle += 360.0f;
+                        currAngle += FullCircleDegree;
                     }
-                    while (Mathf.Abs(currAngle - 360.0f - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                    while (Mathf.Abs(currAngle - FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
                     {
-                        currAngle -= 360.0f;
+                        currAngle -= FullCircleDegree;
                     }
                     if (SEEInput.Snap())
                     {
@@ -188,16 +193,18 @@ namespace SEE.Controls.Actions
             {
                 if (obj && !rotating)
                 {
-                    foreach (InteractableObject o in cityCursor.E.GetFocusses())
+                    foreach (InteractableObject interactable in cityCursor.E.GetFocusses())
                     {
-                        if (o.IsGrabbed)
+                        if (interactable.IsGrabbed)
                         {
-                            o.SetGrab(false, true);
+                            interactable.SetGrab(false, true);
                         }
                     }
                     gizmo.gameObject.SetActive(false);
 
-                    cityRootNode.RotateAround(cityCursor.E.HasFocus() ? cityCursor.E.ComputeCenter() : cityRootNode.position, Vector3.up, -cityRootNode.rotation.eulerAngles.y);
+                    cityRootNode.RotateAround(cityCursor.E.HasFocus() ?
+                          cityCursor.E.ComputeCenter()
+                        : cityRootNode.position, Vector3.up, -cityRootNode.rotation.eulerAngles.y);
                     synchronize = true;
                 }
             }
@@ -205,9 +212,9 @@ namespace SEE.Controls.Actions
             {
                 rotating = false;
 
-                foreach (InteractableObject o in hit.cursor.E.GetFocusses())
+                foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                 {
-                    o.SetGrab(false, true);
+                    interactable.SetGrab(false, true);
                 }
                 gizmo.gameObject.SetActive(false);
 
@@ -216,7 +223,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new Net.RotateNodeNetAction(hit.cityRootNode.name, hit.cityRootNode.position, hit.cityRootNode.eulerAngles.y).Execute();
+                new Net.RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
@@ -234,7 +241,7 @@ namespace SEE.Controls.Actions
         /// <returns>The angle in the range [0, 360) degrees.</returns>
         private static float AngleMod(float degrees)
         {
-            return ((degrees % 360.0f) + 360.0f) % 360.0f;
+            return ((degrees % FullCircleDegree) + FullCircleDegree) % FullCircleDegree;
         }
     }
 }

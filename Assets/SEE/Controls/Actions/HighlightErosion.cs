@@ -40,17 +40,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable == null)
+            if (Interactable == null)
             {
                 Debug.LogError($"HighlightErosion.OnEnable for {name} has no interactable.\n");
                 enabled = false;
             }
             else
             {
-                interactable.SelectIn += SelectionOn;
-                interactable.SelectOut += SelectionOff;
-                interactable.HoverIn += HoverOn;
-                interactable.HoverOut += HoverOff;
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
             }
         }
 
@@ -59,12 +59,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= SelectionOn;
-                interactable.SelectOut -= SelectionOff;
-                interactable.HoverIn -= HoverOn;
-                interactable.HoverOut -= HoverOff;
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
             }
             else
             {

@@ -38,6 +38,7 @@ namespace SEE.DataModel.DG
         public bool NodeHierarchyHasChanged = true;
 
         private int maxDepth = -1;
+
         /// <summary>
         /// The maximal depth of the node hierarchy. The maximal depth is the
         /// maximal length of all paths from any of the roots to their leaves
@@ -55,6 +56,7 @@ namespace SEE.DataModel.DG
                 {
                     FinalizeNodeHierarchy();
                 }
+
                 return maxDepth;
             }
         }
@@ -81,14 +83,17 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentNullException(nameof(node));
             }
+
             if (string.IsNullOrEmpty(node.ID))
             {
                 throw new ArgumentException("ID of a node must neither be null nor empty.");
             }
+
             if (nodes.ContainsKey(node.ID))
             {
                 throw new InvalidOperationException($"ID '{node.ID}' is not unique\n: {node}. \nDuplicate already in graph: {nodes[node.ID]}.");
             }
+
             if (node.ItsGraph != null)
             {
                 throw new InvalidOperationException($"Node {node.ID} is already in a graph {node.ItsGraph.Name}.");
@@ -125,6 +130,7 @@ namespace SEE.DataModel.DG
                 {
                     throw new Exception($"Node {node} is not contained in any graph.");
                 }
+
                 throw new Exception($"Node {node} is contained in a different graph {node.ItsGraph.Name}.");
             }
 
@@ -139,6 +145,7 @@ namespace SEE.DataModel.DG
                     edges.Remove(outgoing.ID);
                     outgoing.ItsGraph = null;
                 }
+
                 foreach (Edge incoming in node.Incomings)
                 {
                     Node predecessor = incoming.Source;
@@ -146,12 +153,14 @@ namespace SEE.DataModel.DG
                     edges.Remove(incoming.ID);
                     incoming.ItsGraph = null;
                 }
+
                 // Adjust the node hierarchy.
                 if (node.NumberOfChildren() > 0)
                 {
                     Reparent(node.Children().ToArray(),
                              orphansBecomeRoots ? null : node.Parent);
                 }
+
                 node.Reset();
                 NodeHierarchyHasChanged = true;
             }
@@ -181,17 +190,41 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node to be checked for containment</param>
         /// <returns>true iff there is a node contained in the graph with node.ID</returns>
-        public bool Contains(Node node)
+        public bool ContainsNode(Node node)
         {
             if (ReferenceEquals(node, null))
             {
                 throw new ArgumentNullException(nameof(node));
             }
+
             if (string.IsNullOrEmpty(node.ID))
             {
                 throw new ArgumentException("ID of a node must neither be null nor empty");
             }
+
             return nodes.ContainsKey(node.ID);
+        }
+
+        /// <summary>
+        /// Returns true if this graph contains an edge with the same unique ID
+        /// as the given edge.
+        /// Throws an exception if <paramref name="edge"/> is null or has no valid ID.
+        /// </summary>
+        /// <param name="edge">edge to be checked for containment</param>
+        /// <returns>true iff there is an edge contained in the graph with the same ID</returns>
+        public bool ContainsEdge(Edge edge)
+        {
+            if (ReferenceEquals(edge, null))
+            {
+                throw new ArgumentNullException(nameof(edge));
+            }
+
+            if (string.IsNullOrEmpty(edge.ID))
+            {
+                throw new ArgumentException("ID of an edge must neither be null nor empty");
+            }
+
+            return edges.ContainsKey(edge.ID);
         }
 
         /// <summary>
@@ -206,12 +239,13 @@ namespace SEE.DataModel.DG
             List<Node> roots = GetRoots();
             if (roots.Count > 0)
             {
-                Node newRoot = new Node {SourceName = name, ID = name, Type = type};
+                Node newRoot = new Node { SourceName = name, ID = name, Type = type };
                 AddNode(newRoot);
                 foreach (Node oldRoot in roots)
                 {
                     newRoot.AddChild(oldRoot);
                 }
+
                 NodeHierarchyHasChanged = true;
             }
         }
@@ -227,10 +261,12 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
+
             if (nodes.TryGetValue(ID, out Node node))
             {
                 return node;
             }
+
             return null;
         }
 
@@ -245,10 +281,12 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
+
             if (edges.TryGetValue(ID, out Edge edge))
             {
                 return edge;
             }
+
             return null;
         }
 
@@ -265,20 +303,24 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentNullException(nameof(edge));
             }
+
             if (ReferenceEquals(edge.Source, null) || ReferenceEquals(edge.Target, null))
             {
                 throw new ArgumentException("Source/target of this edge is null.");
             }
+
             if (ReferenceEquals(edge.ItsGraph, null))
             {
                 if (edge.Source.ItsGraph != this)
                 {
                     throw new InvalidOperationException($"Source node {edge.Source} is not in the graph.");
                 }
+
                 if (edge.Target.ItsGraph != this)
                 {
                     throw new InvalidOperationException($"Target node {edge.Target} is not in the graph.");
                 }
+
                 if (edges.ContainsKey(edge.ID))
                 {
                     throw new InvalidOperationException($"There is already an edge with the ID {edge.ID}.");
@@ -305,14 +347,17 @@ namespace SEE.DataModel.DG
             {
                 throw new ArgumentNullException(nameof(edge));
             }
+
             if (edge.ItsGraph != this)
             {
                 if (ReferenceEquals(edge.ItsGraph, null))
                 {
                     throw new ArgumentException($"Edge {edge} is not contained in any graph");
                 }
+
                 throw new ArgumentException($"Edge {edge} is contained in a different graph {edge.ItsGraph.Name}.");
             }
+
             if (!edges.ContainsKey(edge.ID))
             {
                 throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
@@ -368,7 +413,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="ID">unique ID of the node searched</param>
         /// <returns>true if a node with the given <paramref name="ID"/> is part of the graph</returns>
-        public bool ContainsNode(string ID)
+        public bool ContainsNodeID(string ID)
         {
             return nodes.ContainsKey(ID);
         }
@@ -402,6 +447,7 @@ namespace SEE.DataModel.DG
             {
                 FinalizeNodeHierarchy();
             }
+
             return roots;
 #if false
             // FIXME this method is called often, which is why it should be more performant.
@@ -473,6 +519,7 @@ namespace SEE.DataModel.DG
             {
                 indentation += "-";
             }
+
             Debug.Log(indentation + root.ID + "\n");
             foreach (Node child in root.Children())
             {
@@ -569,6 +616,7 @@ namespace SEE.DataModel.DG
                     mergedGraph.FloatAttributes[attribute.Key] = attribute.Value;
                 }
             }
+
             foreach (KeyValuePair<string, int> attribute in otherGraph.IntAttributes)
             {
                 if (!mergedGraph.IntAttributes.ContainsKey(attribute.Key))
@@ -576,6 +624,7 @@ namespace SEE.DataModel.DG
                     mergedGraph.IntAttributes[attribute.Key] = attribute.Value;
                 }
             }
+
             foreach (KeyValuePair<string, string> attribute in otherGraph.StringAttributes)
             {
                 if (!mergedGraph.StringAttributes.ContainsKey(attribute.Key))
@@ -620,7 +669,7 @@ namespace SEE.DataModel.DG
         private static int CalcMaxDepth(IEnumerable<Node> nodes, int currentDepth)
         {
             return nodes.Select(node => CalcMaxDepth(node.Children(), currentDepth + 1))
-                        .Prepend(currentDepth+1).Max();
+                        .Prepend(currentDepth + 1).Max();
         }
 
         /// <summary>
@@ -640,10 +689,12 @@ namespace SEE.DataModel.DG
             {
                 result += $"{node},\n";
             }
+
             foreach (Edge edge in edges.Values)
             {
                 result += $"{edge},\n";
             }
+
             result += "}\n";
             return result;
         }
@@ -844,6 +895,7 @@ namespace SEE.DataModel.DG
                 {
                     throw new InvalidOperationException($"Target graph does not have a node with ID {edge.Source.ID}");
                 }
+
                 // set corresponding target
                 if (target.TryGetNode(edge.Target.ID + (nodeIdSuffix ?? ""), out Node to))
                 {
@@ -858,6 +910,7 @@ namespace SEE.DataModel.DG
                 {
                     clone.ID += edgeIdSuffix;
                 }
+
                 target.AddEdge(clone);
             }
         }
@@ -910,6 +963,7 @@ namespace SEE.DataModel.DG
                 }
             }
         }
+
         /// <summary>
         /// Yields a subgraph of given graph that contains only nodes with one of the given
         /// <paramref name="nodeTypes"/>. The edges of this graph are "lifted" in the subgraph.
@@ -943,8 +997,29 @@ namespace SEE.DataModel.DG
         /// <returns>
         /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
         /// </returns>
+        /// <seealso cref="SubgraphBy"/>
         public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) =>
             SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
+
+        /// <summary>
+        /// Yields a subgraph of given graph that contains only edges for which <paramref name="includeEdge"/> returns
+        /// true and only nodes which are connected to those edges.
+        /// For more on how the subgraph is constructed, consult the documentation of <see cref="SubgraphBy"/>.
+        /// </summary>
+        /// <param name="includeEdge">function returning true if edge shall be added</param>
+        /// <returns>Subgraph containing only edges for which <paramref name="includeEdge"/> returns true
+        /// and nodes connected to those edges.</returns>
+        /// <seealso cref="SubgraphBy"/>
+        public Graph SubgraphByEdges(Func<Edge, bool> includeEdge)
+        {
+            ISet<Edge> keptEdges = new HashSet<Edge>(edges.Select(x => x.Value).Where(includeEdge));
+
+            // We need to identify all nodes we want to keep, so all nodes which are attached to a kept edge.
+            ISet<Node> keptNodes = new HashSet<Node>(nodes.Select(x => x.Value)
+                                                          .Where(x => keptEdges.Overlaps(x.Incomings.Concat(x.Outgoings))));
+
+            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x));
+        }
 
         /// <summary>
         /// Yields a subgraph of given graph that contains only nodes and edges for which
@@ -1023,8 +1098,10 @@ namespace SEE.DataModel.DG
                 {
                     mapsTo[root] = null;
                 }
+
                 AddToSubGraph(subgraph, includeElement, mapsTo, root);
             }
+
             return mapsTo;
         }
 
@@ -1037,8 +1114,8 @@ namespace SEE.DataModel.DG
         /// <param name="includeElement">function returning true if node shall be added</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="parent">root of a subtree to be mapped; is a node in this graph</param>
-        private static void AddToSubGraph (Graph subgraph, Func<GraphElement, bool> includeElement,
-                                           IDictionary<Node, Node> mapsTo, Node parent)
+        private static void AddToSubGraph(Graph subgraph, Func<GraphElement, bool> includeElement,
+                                          IDictionary<Node, Node> mapsTo, Node parent)
         {
             foreach (Node child in parent.Children())
             {
@@ -1093,7 +1170,7 @@ namespace SEE.DataModel.DG
                 Node targetInSubgraph = mapsTo[edge.Target];
 
                 if (sourceInSubgraph != null && targetInSubgraph != null
-                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                                             && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
                 {
                     Edge edgeInSubgraph = (Edge)edge.Clone();
                     edgeInSubgraph.Source = sourceInSubgraph;
@@ -1114,13 +1191,11 @@ namespace SEE.DataModel.DG
         /// <param name="leafAction">Function that is called when node is a leaf.</param>
         public void Traverse(Action<Node> rootAction, Action<Node> innerNodeAction, Action<Node> leafAction)
         {
-            GetRoots().ForEach(
-                rootNode =>
-                {
-                    rootAction?.Invoke(rootNode);
-                    rootNode.Children().ForEach(child => TraverseTree(child, innerNodeAction, leafAction));
-                }
-            );
+            GetRoots().ForEach(rootNode =>
+            {
+                rootAction?.Invoke(rootNode);
+                rootNode.Children().ForEach(child => TraverseTree(child, innerNodeAction, leafAction));
+            });
         }
 
         /// <summary>
@@ -1191,6 +1266,7 @@ namespace SEE.DataModel.DG
                 {
                     Report($"Graphs {Name} {otherNode?.Name} have differences");
                 }
+
                 return false;
             }
 
@@ -1234,6 +1310,7 @@ namespace SEE.DataModel.DG
             {
                 Report("Graph edges are different");
             }
+
             return true;
         }
 
@@ -1358,6 +1435,7 @@ namespace SEE.DataModel.DG
                     result.Add(name);
                 }
             }
+
             return result.ToList();
         }
 

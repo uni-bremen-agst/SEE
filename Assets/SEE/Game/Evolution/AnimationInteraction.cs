@@ -18,6 +18,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -158,8 +159,7 @@ namespace SEE.Game.Evolution
             AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
             RevisionSelectionCanvas = GetCanvas(RevisionSelectionCanvasGameObjectName, RevisionSelectionCanvasPrefab);
 
-            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
-            canvas.worldCamera = MainCamera.Camera;
+            StartCoroutine(SetAnimationCanvasCamera());
 
             revisionSelectionDataModel = RevisionSelectionCanvas.GetComponent<RevisionSelectionDataModel>();
             animationDataModel = AnimationCanvas.GetComponent<AnimationDataModel>();
@@ -171,7 +171,7 @@ namespace SEE.Game.Evolution
             revisionSelectionDataModel.RevisionDropdown.onValueChanged.AddListener(OnDropDownChanged);
 
             animationDataModel.Slider.minValue = 1;
-            animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount-1;
+            animationDataModel.Slider.maxValue = evolutionRenderer.GraphCount - 1;
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
             animationDataModel.PlayButton.onClick.AddListener(TaskOnClickPlayButton);
@@ -191,8 +191,8 @@ namespace SEE.Game.Evolution
             try
             {
                 sliderMarkerContainer = SliderMarkerContainer.Load(Path.Combine(Application.persistentDataPath, "sliderMarkers.xml"));
-
-            } catch(FileNotFoundException)
+            }
+            catch (FileNotFoundException)
             {
                 sliderMarkerContainer = new SliderMarkerContainer();
             }
@@ -207,6 +207,28 @@ namespace SEE.Game.Evolution
             SetMode(false);
             OnShownGraphHasChanged();
             evolutionRenderer.Register(OnShownGraphHasChanged);
+        }
+
+        /// <summary>
+        /// Waits until a camera becomes a available. When a camera is
+        /// available, the world camera of the <see cref="AnimationCanvas"/>
+        /// will be set to this camera.
+        ///
+        /// Intended to be run as a co-routine.
+        /// </summary>
+        /// <returns>whether to continue the co-routine</returns>
+        private IEnumerator SetAnimationCanvasCamera()
+        {
+            Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
+            Camera camera = Camera.main;
+
+            while (camera == null)
+            {
+                yield return new WaitForSeconds(0.5f);
+                camera = Camera.main;
+            }
+
+            canvas.worldCamera = camera;
         }
 
         /// <summary>
