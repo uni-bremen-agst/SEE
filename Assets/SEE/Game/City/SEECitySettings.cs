@@ -215,12 +215,22 @@ namespace SEE.Game.City
     /// </summary>
     public enum MarkerKinds : byte
     {
-        Static,
-        Dynamic
+        /// <summary>
+        /// The marker is a single line with one color.
+        /// </summary>
+        Single,
+        /// <summary>
+        /// The marker is a set of stacked lines where each line has a different
+        /// length and color. The length of each stacked line is proportional to a
+        /// metric. Which color and metric should be used is determined by <see cref="MarkerSection"/>.
+        /// </summary>
+        Stacked
     }
 
     /// <summary>
-    /// The settings of markers sections.
+    /// The settings of markers sections specifying the metric that
+    /// determines the length of a marker section and the color of
+    /// the marker section.
     /// </summary>
     [System.Serializable]
     public class MarkerSection : ConfigIO.PersistentConfigItem
@@ -234,7 +244,13 @@ namespace SEE.Game.City
         /// </summary>
         public Color Color;
 
+        /// <summary>
+        /// Label in the configuration file for the <see cref="Metric"/>.
+        /// </summary>
         private const string MetricLabel = "Metric";
+        /// <summary>
+        /// Label in the configuration file for the <see cref="Color"/>.
+        /// </summary>
         private const string ColorLabel = "Color";
 
         public bool Restore(Dictionary<string, object> attributes, string label = "")
@@ -247,7 +263,7 @@ namespace SEE.Game.City
             }
             else if (attributes.TryGetValue(label, out object dictionary))
             {
-                // label was given => attributes is a dictionary where we need to look up the data 
+                // label was given => attributes is a dictionary where we need to look up the data
                 // using the label
                 values = dictionary as Dictionary<string, object>;
             }
@@ -271,7 +287,7 @@ namespace SEE.Game.City
             writer.EndGroup();
         }
     }
-  
+
     /// <summary>
     /// The settings of markers of a specific kind.
     /// </summary>
@@ -281,7 +297,7 @@ namespace SEE.Game.City
         /// <summary>
         /// How a marker should be drawn.
         /// </summary>
-        public MarkerKinds Kind = MarkerKinds.Static;
+        public MarkerKinds Kind = MarkerKinds.Single;
         /// <summary>
         /// Name of the metric defining the length.
         /// </summary>
