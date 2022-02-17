@@ -14634,6 +14634,13 @@ MonoBehaviour:
     absolutePath: 
   MarkerHeight: 0.2
   MarkerWidth: 0.01
+  MarkerSettings:
+    HeightMetric: 
+    ColorMetric: 
+    Kind: 0
+    MinimalMarkerLength: 0.001
+    MaximalMarkerLength: 5
+    MarkerSections: []
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
