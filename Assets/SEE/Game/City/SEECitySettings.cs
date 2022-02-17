@@ -228,7 +228,7 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// The settings of markers sections specifying the metric that
+    /// The settings of marker sections specifying the metric that
     /// determines the length of a marker section and the color of
     /// the marker section.
     /// </summary>
@@ -236,7 +236,7 @@ namespace SEE.Game.City
     public class MarkerSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
-        /// By which metric the marker should be weighted.
+        /// Which metric should determine the relative length of the marker.
         /// </summary>
         public string Metric;
         /// <summary>
@@ -299,10 +299,6 @@ namespace SEE.Game.City
         /// </summary>
         public MarkerKinds Kind = MarkerKinds.Single;
         /// <summary>
-        /// Name of the metric defining the length.
-        /// </summary>
-        public string LengthMetric = "Metric.Vcs2See.Commit.Line_Changes";
-        /// <summary>
         /// This parameter determines the minimal length of each marker.
         /// Must not be greater than <see cref="MaximalMarkerLength"/>.
         /// </summary>
@@ -326,7 +322,6 @@ namespace SEE.Game.City
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeKindsLabel);
-            writer.Save(LengthMetric, LengthMetricLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
             writer.Save(MinimalMarkerLength, MinimalMarkerLengthLabel);
             writer.Save(MaximalMarkerLength, MaximalMarkerLengthLabel);
@@ -348,7 +343,6 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
-                ConfigIO.Restore(values, LengthMetricLabel, ref LengthMetric);
                 LabelSettings.Restore(values, LabelSettingsLabel);
                 ConfigIO.Restore(values, MinimalMarkerLengthLabel, ref MinimalMarkerLength);
                 ConfigIO.Restore(values, MaximalMarkerLengthLabel, ref MaximalMarkerLength);

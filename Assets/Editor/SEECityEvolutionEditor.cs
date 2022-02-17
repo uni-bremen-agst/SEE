@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SEEEditor
 {
     /// <summary>
-    /// A custom editor for instances of SEECityEvolution as an extension 
+    /// A custom editor for instances of SEECityEvolution as an extension
     /// of the AbstractSEECityEditor.
     /// </summary>
     [CustomEditor(typeof(SEECityEvolution))]
@@ -22,7 +22,7 @@ namespace SEEEditor
         private SEECityEvolution city;
 
         public override void OnInspectorGUI()
-        {            
+        {
             base.OnInspectorGUI();
             city = target as SEECityEvolution;
 
@@ -65,7 +65,7 @@ namespace SEEEditor
         private void Buttons()
         {
             SEECityEvolution city = target as SEECityEvolution;
-          
+
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
@@ -84,7 +84,7 @@ namespace SEEEditor
 
         /// <summary>
         /// Draws given <paramref name="graph"/> using the settings of <paramref name="city"/>.
-        /// 
+        ///
         /// Precondition: graph != null.
         /// </summary>
         /// <param name="city">the city settings for drawing the graph</param>
@@ -126,7 +126,6 @@ namespace SEEEditor
                 MarkerAttributes settings = city.MarkerSettings;
 
                 settings.Kind = (MarkerKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
-                settings.LengthMetric = EditorGUILayout.TextField("Length", settings.LengthMetric);
                 settings.MinimalMarkerLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalMarkerLength));
                 settings.MaximalMarkerLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalMarkerLength);
 
