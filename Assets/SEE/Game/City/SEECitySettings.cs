@@ -309,7 +309,8 @@ namespace SEE.Game.City
         /// </summary>
         public float MaximalMarkerLength= 5.0f; // serialized by Unity
         /// <summary>
-        /// This parameter determines the sections of each marker.
+        /// This parameter determines the sections of each marker. It is used
+        /// only if <see cref="Kind"/> equals <see cref="MarkerKinds.Stacked"/>.
         /// </summary>
         [SerializeField]
         public List<MarkerSection> MarkerSections = new List<MarkerSection>(1);
@@ -350,10 +351,6 @@ namespace SEE.Game.City
             }
         }
 
-        /// <summary>
-        /// Label in the configuration file for the length metric.
-        /// </summary>
-        private const string LengthMetricLabel = "LengthMetric";
         /// <summary>
         /// Label in the configuration file for the minimal block length of a node.
         /// </summary>
