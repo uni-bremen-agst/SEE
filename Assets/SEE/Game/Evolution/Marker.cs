@@ -93,7 +93,7 @@ namespace SEE.Game.Evolution
         /// The height of the beam markers used to mark new, changed, and deleted
         /// objects from one version to the next one.
         /// </summary>
-        private float markerHeight;
+        private readonly float markerHeight;
 
         /// <summary>
         /// The width (x and z lengths) of the beam markers used to mark new, changed,
@@ -163,34 +163,37 @@ namespace SEE.Game.Evolution
                 Node node = gameNode.GetNode();
 
                 // New game object as parent for multiple nested beams.
-                GameObject enclosingBeamMarker = new GameObject();
+                GameObject enclosingBeamMarker = new GameObject("Change Marker");
                 foreach (MarkerSection section in markerAttributes.MarkerSections)
                 {
-                    node.TryGetNumeric(section.Metric, out float sectionMetric);
-                    float sectionHeight = Transform(sectionMetric);
+                    if (node.TryGetNumeric(section.Metric, out float sectionMetric))
+                    {
+                        float sectionHeight = Transform(sectionMetric);
 
-                    CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
+                        CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
-                    // The marker should be drawn as part of the block, hence, its render
-                    // queue offset must be equal to that of the block.
-                    GameObject beamMarker = NewBeam(customFactory, gameNode.GetRenderQueue() - (int) RenderQueue.Transparent);
+                        // The marker should be drawn as part of the block, hence, its render
+                        // queue offset must be equal to that of the block.
+                        GameObject beamMarker = NewBeam(customFactory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
+                        beamMarker.name = section.Metric;
 
-                    // FIXME: These kinds of beam markers make sense only for leaf nodes.
-                    // Could we better use some kind of blinking now that the cities
-                    // are drawn in miniature?
+                        // FIXME: These kinds of beam markers make sense only for leaf nodes.
+                        // Could we better use some kind of blinking now that the cities
+                        // are drawn in miniature?
 
-                    beamMarker.tag = Tags.Decoration;
+                        beamMarker.tag = Tags.Decoration;
 
-                    Vector3 localBeamScale = new Vector3(markerWidth, sectionHeight, markerWidth);
+                        Vector3 localBeamScale = new Vector3(markerWidth, sectionHeight, markerWidth);
 
-                    beamMarker.transform.position = new Vector3(0, offset, 0);
-                    beamMarker.transform.localScale = localBeamScale;
+                        beamMarker.transform.position = new Vector3(0, offset, 0);
+                        beamMarker.transform.localScale = localBeamScale;
 
-                    // Makes beamMarker a child of block so that it moves along with it during the animation.
-                    // In addition, it will also be destroyed along with its parent block.
-                    beamMarker.transform.SetParent(enclosingBeamMarker.transform);
+                        // Makes beamMarker a child of block so that it moves along with it during the animation.
+                        // In addition, it will also be destroyed along with its parent block.
+                        beamMarker.transform.SetParent(enclosingBeamMarker.transform);
 
-                    offset += sectionHeight;
+                        offset += sectionHeight;
+                    }
                 }
 
                 enclosingBeamMarker.transform.position = position;
