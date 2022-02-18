@@ -170,6 +170,7 @@ namespace SEE.Game.Evolution
                     {
                         float sectionHeight = Transform(sectionMetric);
 
+                        // FIXME: Add a cache for these factories. They should not be created for each marker and loop iteration.
                         CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
 
                         // The marker should be drawn as part of the block, hence, its render
