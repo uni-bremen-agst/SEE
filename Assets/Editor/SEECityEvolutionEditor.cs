@@ -119,8 +119,6 @@ namespace SEEEditor
                 MarkerAttributes settings = city.MarkerSettings;
 
                 settings.Kind = (MarkerKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
-                settings.MinimalMarkerLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalMarkerLength));
-                settings.MaximalMarkerLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalMarkerLength);
 
                 EditorGUI.indentLevel++;
 
