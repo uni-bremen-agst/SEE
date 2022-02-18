@@ -39,12 +39,12 @@ namespace SEE.Tools.ReflexionAnalysis
                 graphElement.SetToggle(label);
             }
         }
-        
+
         /// <summary>
         /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
         /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
         /// the result. Note that the name of the three graphs may be modified.
-        /// 
+        ///
         /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
@@ -100,10 +100,12 @@ namespace SEE.Tools.ReflexionAnalysis
             #region Local Functions
 
             // Returns the intersection of the node IDs of the two graphs.
-            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
+            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph)
+                => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
 
             // Returns the intersection of the edge IDs of the two graphs.
-            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
+            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
+                => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
 
             #endregion
         }
@@ -126,6 +128,5 @@ namespace SEE.Tools.ReflexionAnalysis
                                                                 && !x.HasToggle(ArchitectureLabel));
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
-
     }
 }
