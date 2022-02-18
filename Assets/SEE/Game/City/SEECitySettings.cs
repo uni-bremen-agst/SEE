@@ -299,16 +299,6 @@ namespace SEE.Game.City
         /// </summary>
         public MarkerKinds Kind = MarkerKinds.Single;
         /// <summary>
-        /// This parameter determines the minimal length of each marker.
-        /// Must not be greater than <see cref="MaximalMarkerLength"/>.
-        /// </summary>
-        public float MinimalMarkerLength = 0.001f; // serialized by Unity
-        /// <summary>
-        /// This parameter determines the maximal length of each marker.
-        /// Must not be smaller than <see cref="MinimalMarkerLength"/>.
-        /// </summary>
-        public float MaximalMarkerLength= 5.0f; // serialized by Unity
-        /// <summary>
         /// This parameter determines the sections of each marker. It is used
         /// only if <see cref="Kind"/> equals <see cref="MarkerKinds.Stacked"/>.
         /// </summary>
@@ -324,8 +314,6 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeKindsLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
-            writer.Save(MinimalMarkerLength, MinimalMarkerLengthLabel);
-            writer.Save(MaximalMarkerLength, MaximalMarkerLengthLabel);
             writer.Save(MarkerSections, MarkerSectionsLabel);
             writer.EndGroup();
         }
@@ -345,8 +333,6 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 LabelSettings.Restore(values, LabelSettingsLabel);
-                ConfigIO.Restore(values, MinimalMarkerLengthLabel, ref MinimalMarkerLength);
-                ConfigIO.Restore(values, MaximalMarkerLengthLabel, ref MaximalMarkerLength);
                 ConfigIO.Restore(values, MarkerSectionsLabel, ref MarkerSections);
             }
         }
