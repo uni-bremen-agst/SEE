@@ -24,7 +24,7 @@ dependency graph describes the dependencies among the implementation entities
 - mapping graph describes the partial mapping of implementation entities onto
 architectural entities.
 
-Internally, the reflexion analysis operates on a single graph, distinguishing between 
+Internally, the reflexion analysis operates on a single graph, distinguishing between
 architecture and implementation by checking a corresponding attribute, whereas the
 mapping graph simply consists of all Maps_To edges and their connected nodes.
 
@@ -146,8 +146,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </param>
         /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
         /// <remarks>
-        /// This does not really run the reflexion analysis. Use
-        /// method Run() to start the analysis.
+        /// This does not really run the reflexion analysis. Use <see cref="Run"/> to start the analysis.
         /// </remarks>
         public Reflexion(Graph fullGraph, bool allowDependenciesToParents = true)
         {
@@ -165,9 +164,9 @@ namespace SEE.Tools.ReflexionAnalysis
             FromScratch();
             //DumpResults();
         }
-        
+
         #region Graphs
-        
+
         /// <summary>
         /// The reflexion graph for which the reflexion data is calculated.
         /// Implementation and architecture nodes and edges are distinguished by the toggle attributes
@@ -180,7 +179,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
 
         #region State Edge Attribute
-        
+
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
@@ -249,7 +248,7 @@ namespace SEE.Tools.ReflexionAnalysis
             State state = GetState(edge);
             return state == State.Specified || state == State.Convergent || state == State.Absent;
         }
-        
+
         #endregion
 
         #region Edge counter attribute
@@ -353,8 +352,8 @@ namespace SEE.Tools.ReflexionAnalysis
             // do not have an edge counter; therefore, we return just 1
             return 1;
         }
-        
-        #endregion 
+
+        #endregion
 
         #region Modifiers
         // The following operations manipulate the relevant graphs of the
@@ -376,8 +375,8 @@ namespace SEE.Tools.ReflexionAnalysis
         // its source and target node if there are not yet contained in the target graph.
 
         #region Node
-        
-        
+
+
         /// <summary>
         /// Adds given node to the mapping graph.
         /// Precondition: node must not be contained in the mapping graph.
@@ -646,7 +645,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
         }
-        
+
         /// <summary>
         /// Reverts the effect of the mapping of every node in the given <paramref name="subtree"/> onto the
         /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
@@ -802,7 +801,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 throw new ArgumentException($"Implementation node {mapsTo.Source} is not mapped explicitly.");
             }
-            
+
             // All nodes in the subtree rooted by mapsTo.Source and mapped onto the same target as mapsTo.Source.
             List<Node> subtree = MappedSubtree(mapsTo.Source);
             Unmap(subtree, mapsTo.Target);
@@ -857,14 +856,14 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 throw new ArgumentException($"Node {to} is not in the graph.");
             }
-            
+
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
             Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault();
             if (mapsToEdge == null)
             {
                 throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
             }
-            
+
             // Deletes the unique Maps_To edge.
             DeleteMapsTo(mapsToEdge);
         }
@@ -949,11 +948,11 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             throw new NotImplementedException(); // FIXME
         }
-        
+
         #endregion
 
         #endregion
-        
+
         #region Summaries
 
         /// <summary>
@@ -1006,7 +1005,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
         private readonly bool AllowDependenciesToParents;
-        
+
         #endregion
 
         #region Node and Edge predicates
@@ -1105,7 +1104,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             implicitMapsToTable = new Dictionary<string, Node>();
-            
+
             foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.HasSupertypeOf(MapsToType)))
             {
                 Node source = mapsTo.Source;
@@ -1242,7 +1241,7 @@ namespace SEE.Tools.ReflexionAnalysis
                         throw new InvalidOperationException($"Unknown state '{state}' encountered!");
                 }
             }
-            
+
             // Removal of edges from architecture must be done outside of the loop
             // because the loop iterates on architecture.Edges().
             foreach (Edge edge in toBeRemoved)
@@ -1285,7 +1284,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 State state = GetState(edge);
                 if (IsSpecified(edge) && state != State.Convergent)
                 {
-                    Transition(edge, state, 
+                    Transition(edge, state,
                                edge.HasToggle("Architecture.Is_Optional") ? State.AllowedAbsent : State.Absent);
                 }
             }
@@ -1350,7 +1349,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(architectureDependency == null || architectureDependency.HasToggle(ArchitectureLabel));
             Edge allowingEdge = null;
             if (architectureDependency == null)
-            {   
+            {
                 // a propagated dependency has not existed yet; we need to create one
                 architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, out allowingEdge);
                 Assert.IsTrue(architectureDependency.HasToggle(ArchitectureLabel));
@@ -1420,7 +1419,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(edge.HasToggle(ImplementationLabel));
             Node mappedSource = MapsTo(edge.Source);
             Node mappedTarget = MapsTo(edge.Target);
-            
+
             if (mappedSource != null && mappedTarget != null)
             {
                 Assert.IsTrue(mappedSource.HasToggle(ArchitectureLabel));
@@ -1574,7 +1573,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(parents.All(x => x.HasToggle(ArchitectureLabel)));
             Node cursor = from;
             Assert.IsTrue(cursor.HasToggle(ArchitectureLabel));
-            
+
             while (cursor != null)
             {
                 IEnumerable<Edge> outs = cursor.Outgoings.Where(x => x.HasToggle(ArchitectureLabel));
@@ -1601,7 +1600,7 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         #endregion
-        
+
         #region Helper methods for debugging
 
         /// <summary>
@@ -1624,18 +1623,6 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             int? result = graphElement.SourceLine();
             return result.HasValue ? result.ToString() : string.Empty;
-        }
-
-        /// <summary>
-        /// Returns a human-readable identifier for the given edge.
-        /// Note: this identifier is not necessarily unique.
-        /// </summary>
-        /// <param name="edge">edge whose identifier is required</param>
-        /// <param name="beVerbose">currently ignored</param>
-        /// <returns>an identifier for the given edge</returns>
-        private static string EdgeName(Edge edge, bool beVerbose = false)
-        {
-            return edge.ToString();
         }
 
         /// <summary>
@@ -1706,7 +1693,6 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Dumps given <paramref name="edgeSet"/> after given message was dumped.
         /// </summary>
         /// <param name="edgeSet">list of edges whose qualified name is to be dumped</param>
-        /// <param name="message">message to be emitted before the edges</param>
         private static void DumpEdgeSet(List<Edge> edgeSet)
         {
             foreach (Edge edge in edgeSet)
