@@ -4,6 +4,7 @@ using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
@@ -24,6 +25,7 @@ namespace SEE.Tools.Architecture
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
             reflexion = new Reflexion(impl, arch, mapping);
+            fullGraph = reflexion.FullGraph;
             reflexion.Register(this);
             reflexion.Run();
             p.End();
@@ -45,16 +47,19 @@ namespace SEE.Tools.Architecture
             Performance p = Performance.Begin("Running incremental reflexion analysis");
             // Passing the empty graph as mapping argument to reflexion.
             reflexion = new Reflexion(impl, arch, new Graph());
+            fullGraph = reflexion.FullGraph;
             reflexion.Register(this);
             reflexion.Run(); // from scratch
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
             {
-                Node source = impl.GetNode(map.Source.ID);
-                Node target = arch.GetNode(map.Target.ID);
+                Node source = fullGraph.GetNode(map.Source.ID);
+                Assert.IsTrue(source.IsInImplementation());
+                Node target = fullGraph.GetNode(map.Target.ID);
+                Assert.IsTrue(target.IsInArchitecture());
                 Assert.NotNull(source);
                 Assert.NotNull(target);
-                reflexion.Add_To_Mapping(source, target);
+                reflexion.AddToMapping(source, target);
             }
             p.End();
         }
@@ -65,14 +70,14 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestMinilaxComparison()
         {
-            string folderName = "minilax";
+            const string folderName = "minilax";
             NonIncrementally(folderName);
             int[] incrementally = reflexion.Summary();
             Teardown();
             Setup();
             Incrementally(folderName);
-            int[] nonincrementally = reflexion.Summary();
-            Assert.AreEqual(incrementally, nonincrementally);
+            int[] nonIncrementally = reflexion.Summary();
+            Assert.AreEqual(incrementally, nonIncrementally);
         }
 
         private Graph Load(string path)
