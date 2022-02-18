@@ -885,6 +885,7 @@ namespace SEE.Game
                     graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
+                    NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(currentGameNode.name);
                     marker.MarkBorn(currentGameNode);
                     break;
             }
