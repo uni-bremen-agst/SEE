@@ -27,7 +27,7 @@ namespace SEEEditor
 
             EditorGUILayout.Separator();
 
-            AnimationAttributes(cityEvolution);
+            EvolutionMarkerAttributes(cityEvolution);
 
             EditorGUILayout.Separator();
 
@@ -47,7 +47,7 @@ namespace SEEEditor
         /// <summary>
         /// Whether the animation foldout should be expanded.
         /// </summary>
-        private bool showAnimationFoldOut = false;
+        private bool evolutionMarkerFoldOut = false;
 
         /// <summary>
         /// Whether the marker attribute foldout should be expanded.
@@ -94,10 +94,10 @@ namespace SEEEditor
         /// <summary>
         /// Renders the GUI for attributes of animations.
         /// </summary>
-        private void AnimationAttributes(SEECityEvolution city)
+        private void EvolutionMarkerAttributes(SEECityEvolution city)
         {
-            showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
-            if (showAnimationFoldOut)
+            evolutionMarkerFoldOut = EditorGUILayout.Foldout(evolutionMarkerFoldOut, "Evolution Markers", true, EditorStyles.foldoutHeader);
+            if (evolutionMarkerFoldOut)
             {
                 city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
                 city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
