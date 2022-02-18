@@ -7,6 +7,7 @@ using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using Assert = UnityEngine.Assertions.Assert;
 
 namespace SEE.Tools.Architecture
 {
@@ -295,7 +296,7 @@ namespace SEE.Tools.Architecture
             propagatedEdgesRemoved = null;
         }
 
-        protected Node NewNode(string label, string linkname, string type = "Routine")
+        protected Node NewNode(bool inArchitecture, string linkname, string type = "Routine")
         {
             Node result = new Node
             {
@@ -303,19 +304,34 @@ namespace SEE.Tools.Architecture
                 SourceName = linkname,
                 Type = type
             };
-            if (label != null) {
-                result.SetToggle(label);
+            if (inArchitecture) {
+                result.SetInArchitecture();
+            }
+            else
+            {
+                result.SetInImplementation();
             }
             fullGraph.AddNode(result);
             return result;
         }
 
-        protected Edge NewEdge(string label, Node from, Node to, string type)
+        protected Edge NewEdge(Node from, Node to, string type)
         {
             Edge result = new Edge(from, to, type);
-            if (label != null)
+            if (type == ReflexionGraphTools.MapsToType)
             {
-                result.SetToggle(label);
+                Assert.IsTrue(from.IsInImplementation());
+                Assert.IsTrue(to.IsInArchitecture());
+            }
+            else if (from.IsInImplementation())
+            {
+                Assert.IsTrue(to.IsInImplementation());
+                result.SetInImplementation();
+            }
+            else if (from.IsInArchitecture())
+            {
+                Assert.IsTrue(to.IsInArchitecture());
+                result.SetInArchitecture();
             }
 
             fullGraph.AddEdge(result);

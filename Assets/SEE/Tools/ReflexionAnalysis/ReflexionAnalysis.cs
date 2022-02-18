@@ -186,11 +186,6 @@ namespace SEE.Tools.ReflexionAnalysis
         private const string StateAttribute = "Reflexion.State";
 
         /// <summary>
-        /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
-        /// </summary>
-        public const string MapsToType = "Maps_To";
-
-        /// <summary>
         /// Returns the state of an architecture dependency.
         /// Precondition: edge must be in the architecture graph.
         /// </summary>
@@ -244,7 +239,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if edge is a specified architecture dependency</returns>
         private static bool IsSpecified(Edge edge)
         {
-            Assert.IsTrue(edge.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(edge.IsInArchitecture());
             State state = GetState(edge);
             return state == State.Specified || state == State.Convergent || state == State.Absent;
         }
@@ -269,7 +264,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be set</param>
         private static void SetCounter(Edge edge, int value)
         {
-            Assert.IsTrue(edge.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(edge.IsInArchitecture());
             edge.SetInt(CounterAttribute, value);
         }
 
@@ -282,7 +277,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be added</param>
         private void AddToCounter(Edge edge, int value)
         {
-            Assert.IsTrue(edge.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(edge.IsInArchitecture());
             if (edge.TryGetInt(CounterAttribute, out int oldValue))
             {
                 edge.SetInt(CounterAttribute, oldValue + value);
@@ -312,7 +307,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be added</param>
         private void AddToImplRef(Edge edge, int value)
         {
-            Assert.IsTrue(edge.HasToggle(ArchitectureLabel) && !IsSpecified(edge));
+            Assert.IsTrue(edge.IsInArchitecture() && !IsSpecified(edge));
             int oldValue = GetCounter(edge);
             int newValue = oldValue + value;
             if (newValue <= 0)
@@ -467,8 +462,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
         public void AddToMapping(Node from, Node to)
         {
-            Assert.IsTrue(from.HasToggle(ImplementationLabel));
-            Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(from.IsInImplementation());
+            Assert.IsTrue(to.IsInArchitecture());
             if (IsExplicitlyMapped(from))
             {
                 throw new ArgumentException($"Node {from.ID} is already mapped explicitly.");
@@ -505,8 +500,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">target of the Maps_To edge</param>
         private void AddToMappingGraph(Node from, Node to)
         {
-            Assert.IsTrue(from.HasToggle(ImplementationLabel));
-            Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(from.IsInImplementation());
+            Assert.IsTrue(to.IsInArchitecture());
             // add Maps_To edge to Mapping
             Edge mapsTo = new Edge(from, to, MapsToType);
             FullGraph.AddEdge(mapsTo);
@@ -525,12 +520,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="target">architecture node onto which to map all nodes in <paramref name="subtree"/></param>
         private void ChangeMap(List<Node> subtree, Node target)
         {
-            Assert.IsTrue(target == null || target.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(target == null || target.IsInArchitecture());
             if (target == null)
             {
                 foreach (Node node in subtree)
                 {
-                    Assert.IsTrue(node.HasToggle(ImplementationLabel));
+                    Assert.IsTrue(node.IsInImplementation());
                     implicitMapsToTable.Remove(node.ID);
                 }
             }
@@ -538,7 +533,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 foreach (Node node in subtree)
                 {
-                    Assert.IsTrue(node.HasToggle(ImplementationLabel));
+                    Assert.IsTrue(node.IsInImplementation());
                     implicitMapsToTable[node.ID] = target;
                 }
             }
@@ -590,7 +585,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="handler">delegate handling the necessary adjustment</param>
         private void HandleMappedSubtree(List<Node> subtree, Node archNode, HandleMappingChange handler)
         {
-            Assert.IsTrue(archNode.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(archNode.IsInArchitecture());
             // An inner dependency may occur twice in the iteration below, once in the set
             // of outgoing edges and once in the set of incoming edges of any nodes in the subtree.
             // We may call the handler only once for these; that is why we need to keep a log of
@@ -598,8 +593,8 @@ namespace SEE.Tools.ReflexionAnalysis
             ISet<Edge> innerEdgesAlreadyHandled = new HashSet<Edge>();
             foreach (Node implNode in subtree)
             {
-                Assert.IsTrue(implNode.HasToggle(ImplementationLabel));
-                foreach (Edge outgoing in implNode.Outgoings.Where(x => x.HasToggle(ImplementationLabel)))
+                Assert.IsTrue(implNode.IsInImplementation());
+                foreach (Edge outgoing in implNode.Outgoings.Where(x => x.IsInImplementation()))
                 {
                     if (implicitMapsToTable.TryGetValue(outgoing.Target.ID, out Node oldTarget))
                     {
@@ -621,9 +616,9 @@ namespace SEE.Tools.ReflexionAnalysis
                         }
                     }
                 }
-                foreach (Edge incoming in implNode.Incomings.Where(x => x.HasToggle(ImplementationLabel)))
+                foreach (Edge incoming in implNode.Incomings.Where(x => x.IsInImplementation()))
                 {
-                    Assert.IsTrue(incoming.HasToggle(ImplementationLabel));
+                    Assert.IsTrue(incoming.IsInImplementation());
                     if (implicitMapsToTable.TryGetValue(incoming.Source.ID, out Node oldTarget))
                     {
                         // incoming is not dangling; it is either an incoming cross or inner dependency
@@ -659,7 +654,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// were mapped originally</param>
         private void Unmap(List<Node> subtree, Node oldTarget)
         {
-            Assert.IsTrue(oldTarget.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(oldTarget.IsInArchitecture());
             HandleMappedSubtree(subtree, oldTarget, DecreaseAndLift);
         }
 
@@ -674,7 +669,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
         private void Map(List<Node> subtree, Node newTarget)
         {
-            Assert.IsTrue(newTarget.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(newTarget.IsInArchitecture());
             HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
         }
 
@@ -697,9 +692,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             if (from != null && to != null)
             {
-                Assert.IsTrue(implementationDependency.HasToggle(ImplementationLabel));
-                Assert.IsTrue(from.HasToggle(ArchitectureLabel));
-                Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(implementationDependency.IsInImplementation());
+                Assert.IsTrue(from.IsInArchitecture());
+                Assert.IsTrue(to.IsInArchitecture());
                 Edge propagatedEdge = GetPropagatedDependency(from, to, implementationDependency.Type);
                 // It can happen that one of the edges end is not mapped, hence, no edge was propagated.
                 if (propagatedEdge != null)
@@ -730,9 +725,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </remarks>
         private void IncreaseAndLift(Edge implementationDependency, Node from, Node to)
         {
-            Assert.IsTrue(implementationDependency.HasToggle(ImplementationLabel));
-            Assert.IsTrue(from.HasToggle(ArchitectureLabel));
-            Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(implementationDependency.IsInImplementation());
+            Assert.IsTrue(from.IsInArchitecture());
+            Assert.IsTrue(to.IsInArchitecture());
             // safely ignore from and to
             PropagateAndLiftDependency(implementationDependency);
         }
@@ -749,7 +744,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">root node of the subtree</param>
         private List<Node> MappedSubtree(Node node)
         {
-            Assert.IsTrue(node.HasToggle(ImplementationLabel));
+            Assert.IsTrue(node.IsInImplementation());
             return node.Children().Where(x => !IsExplicitlyMapped(x))
                        .SelectMany(MappedSubtree).Prepend(node).ToList();
         }
@@ -763,14 +758,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">the Maps_To edge to be removed from the mapping graph</param>
         public void DeleteFromMapping(Edge edge)
         {
-            Assert.IsTrue(edge.HasSupertypeOf(MapsToType));
+            Assert.IsTrue(edge.IsInMapping());
             // The mapping target in the architecture graph.
-            if (!edge.Target.HasToggle(ArchitectureLabel))
+            if (!edge.Target.IsInArchitecture())
             {
                 throw new ArgumentException($"Mapping target node {edge.Target.ID} is not in the architecture.");
             }
             // The mapping source in the implementation graph.
-            if (!edge.Source.HasToggle(ImplementationLabel))
+            if (!edge.Source.IsInImplementation())
             {
                 throw new ArgumentException($"Mapping source node {edge.Source.ID} is not in the implementation.");
             }
@@ -846,8 +841,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// to be removed from the mapping graph </param>
         public void DeleteFromMapping(Node from, Node to)
         {
-            Assert.IsTrue(from.HasToggle(ImplementationLabel));
-            Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(from.IsInImplementation());
+            Assert.IsTrue(to.IsInArchitecture());
             if (!FullGraph.ContainsNode(from))
             {
                 throw new ArgumentException($"Node {from} is not in the graph.");
@@ -994,7 +989,7 @@ namespace SEE.Tools.ReflexionAnalysis
             string[] stateNames = Enum.GetNames(typeof(State));
             int[] summary = new int[stateNames.Length];
 
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.HasToggle(ArchitectureLabel)))
+            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
             {
                 summary[(int)GetState(edge)] += GetCounter(edge);
             }
@@ -1093,24 +1088,24 @@ namespace SEE.Tools.ReflexionAnalysis
             // to first create the explicit mapping and can only then map the otherwise
             // unmapped children
             explicitMapsToTable = new Dictionary<string, Node>();
-            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.HasSupertypeOf(MapsToType)))
+            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.IsInMapping()))
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
-                Assert.IsTrue(source.HasToggle(ImplementationLabel));
-                Assert.IsTrue(target.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(source.IsInImplementation());
+                Assert.IsTrue(target.IsInArchitecture());
                 explicitMapsToTable[source.ID] = target;
                 //explicitMapsToTable[InImplementation[source.ID]] = InArchitecture[target.ID];
             }
 
             implicitMapsToTable = new Dictionary<string, Node>();
 
-            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.HasSupertypeOf(MapsToType)))
+            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.IsInMapping()))
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
-                Assert.IsTrue(source.HasToggle(ImplementationLabel));
-                Assert.IsTrue(target.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(source.IsInImplementation());
+                Assert.IsTrue(target.IsInArchitecture());
                 AddSubtreeToImplicitMap(source, target);
             }
         }
@@ -1137,8 +1132,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="target">architecture node that is the target of the implicit mapping</param>
         private void AddSubtreeToImplicitMap(Node root, Node target)
         {
-            Assert.IsTrue(root.HasToggle(ImplementationLabel));
-            Assert.IsTrue(target.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(root.IsInImplementation());
+            Assert.IsTrue(target.IsInArchitecture());
             List<Node> children = root.Children();
             foreach (Node child in children)
             {
@@ -1165,7 +1160,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">the value to be added to the edge's counter</param>
         private void ChangeArchitectureDependency(Edge edge, int value)
         {
-            Assert.IsTrue(edge.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(edge.IsInArchitecture());
             int oldValue = GetCounter(edge);
             int newValue = oldValue + value;
             State state = GetState(edge);
@@ -1212,7 +1207,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             List<Edge> toBeRemoved = new List<Edge>();
 
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.HasToggle(ArchitectureLabel)))
+            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
             {
                 State state = GetState(edge);
                 switch (state)
@@ -1261,7 +1256,7 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (KeyValuePair<string, Node> mapsTo in implicitMapsToTable)
             {
                 Node sourceNode = FullGraph.GetNode(mapsTo.Key);
-                Assert.IsTrue(sourceNode.HasToggle(ImplementationLabel));
+                Assert.IsTrue(sourceNode.IsInImplementation());
                 if (IsRelevant(sourceNode))
                 {
                     // Node is contained in implementation graph and implicitMapsToTable
@@ -1279,7 +1274,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // after CalculateConvergesAndDivergences() all
             // architectural dependencies not marked as 'convergent'
             // are 'absent' (unless the architecture edge is marked 'optional')
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.HasToggle(ArchitectureLabel)))
+            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
             {
                 State state = GetState(edge);
                 if (IsSpecified(edge) && state != State.Convergent)
@@ -1310,8 +1305,8 @@ namespace SEE.Tools.ReflexionAnalysis
             Node target, // target of edge; must be in architecture
             string itsType) // the edge type that must match exactly
         {
-            Assert.IsTrue(source.HasToggle(ArchitectureLabel));
-            Assert.IsTrue(target.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(source.IsInArchitecture());
+            Assert.IsTrue(target.IsInArchitecture());
             // There may be multiple (more precisely, two or less) edges from source to target with itsType,
             // but at most one that was specified by the user in the architecture model (we assume that
             // the architecture graph does not have redundant specified dependencies).
@@ -1328,17 +1323,17 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="implementationDependency">the implementation edge to be propagated</param>
         private void PropagateAndLiftDependency(Edge implementationDependency)
         {
-            Assert.IsTrue(implementationDependency.HasToggle(ImplementationLabel));
+            Assert.IsTrue(implementationDependency.IsInImplementation());
             Node implSource = implementationDependency.Source;
             Node implTarget = implementationDependency.Target;
-            Assert.IsTrue(implSource.HasToggle(ImplementationLabel));
-            Assert.IsTrue(implTarget.HasToggle(ImplementationLabel));
+            Assert.IsTrue(implSource.IsInImplementation());
+            Assert.IsTrue(implTarget.IsInImplementation());
             string implType = implementationDependency.Type;
 
             Node archSource = MapsTo(implSource);
             Node archTarget = MapsTo(implTarget);
-            Assert.IsTrue(archSource == null || archSource.HasToggle(ArchitectureLabel));
-            Assert.IsTrue(archTarget == null || archTarget.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(archSource == null || archSource.IsInArchitecture());
+            Assert.IsTrue(archTarget == null || archTarget.IsInArchitecture());
 
             if (archSource == null || archTarget == null)
             {
@@ -1346,20 +1341,20 @@ namespace SEE.Tools.ReflexionAnalysis
                 return;
             }
             Edge architectureDependency = GetPropagatedDependency(archSource, archTarget, implType);
-            Assert.IsTrue(architectureDependency == null || architectureDependency.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(architectureDependency == null || architectureDependency.IsInArchitecture());
             Edge allowingEdge = null;
             if (architectureDependency == null)
             {
                 // a propagated dependency has not existed yet; we need to create one
                 architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, out allowingEdge);
-                Assert.IsTrue(architectureDependency.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(architectureDependency.IsInArchitecture());
             }
             else
             {
                 // a propagated dependency exists already
                 int implCounter = GetImplCounter(implementationDependency);
-                Assert.IsTrue(architectureDependency.Source.HasToggle(ArchitectureLabel));
-                Assert.IsTrue(architectureDependency.Target.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(architectureDependency.Source.IsInArchitecture());
+                Assert.IsTrue(architectureDependency.Target.IsInArchitecture());
                 // Assert: architectureDependency.Source and architectureDependency.Target are in architecture.
                 Lift(architectureDependency.Source, architectureDependency.Target,
                      implType, implCounter, out allowingEdge);
@@ -1380,8 +1375,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
         private void PropagateAndLiftOutgoingDependencies(Node node)
         {
-            Assert.IsTrue(node.HasToggle(ImplementationLabel));
-            foreach (Edge edge in node.Outgoings.Where(x => x.HasToggle(ImplementationLabel)))
+            Assert.IsTrue(node.IsInImplementation());
+            foreach (Edge edge in node.Outgoings.Where(x => x.IsInImplementation()))
             {
                 // edge is in implementation
                 // only relevant dependencies may be propagated and lifted
@@ -1402,7 +1397,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the architecture node upon which node is mapped or null</returns>
         private Node MapsTo(Node node)
         {
-            Assert.IsTrue(node.HasToggle(ImplementationLabel));
+            Assert.IsTrue(node.IsInImplementation());
             return implicitMapsToTable.TryGetValue(node.ID, out Node target) ? target : null;
         }
 
@@ -1416,14 +1411,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if this causing edge is a dependency from child to parent</returns>
         private bool IsDependencyToParent(Edge edge)
         {
-            Assert.IsTrue(edge.HasToggle(ImplementationLabel));
+            Assert.IsTrue(edge.IsInImplementation());
             Node mappedSource = MapsTo(edge.Source);
             Node mappedTarget = MapsTo(edge.Target);
 
             if (mappedSource != null && mappedTarget != null)
             {
-                Assert.IsTrue(mappedSource.HasToggle(ArchitectureLabel));
-                Assert.IsTrue(mappedTarget.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(mappedSource.IsInArchitecture());
+                Assert.IsTrue(mappedTarget.IsInArchitecture());
                 return IsDescendantOf(mappedSource, mappedTarget);
             }
             return false;
@@ -1461,9 +1456,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">the source of the edge</param>
         /// <param name="to">the target of the edge</param>
         /// <param name="itsType">the type of the edge</param>
-        /// <param name="label">Toggle attribute of the newly created edge</param>
         /// <returns>the new edge</returns>
-        private Edge Add(Node from, Node to, string itsType, string label)
+        private Edge Add(Node from, Node to, string itsType)
         {
             // Note: a propagated edge between the same two architectural entities may be specified as well;
             // hence, we may have multiple edges in between.
@@ -1474,7 +1468,16 @@ namespace SEE.Tools.ReflexionAnalysis
                 // The edge ID must be changed before the edge is added to the graph.
                 ID = Guid.NewGuid().ToString()
             };
-            result.SetToggle(label);
+            if (from.IsInImplementation())
+            {
+                Assert.IsTrue(to.IsInImplementation());
+                result.SetInImplementation();
+            } 
+            else if (from.IsInArchitecture())
+            {
+                Assert.IsTrue(to.IsInArchitecture());
+                result.SetInArchitecture();
+            }
             FullGraph.AddEdge(result);
             return result;
         }
@@ -1507,7 +1510,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private Edge NewImplDepInArchitecture(Node archSource, Node archTarget, string edgeType, out Edge allowingEdgeOut)
         {
             const int counter = 1;
-            Edge propagatedArchitectureDep = Add(archSource, archTarget, edgeType, ArchitectureLabel);
+            Edge propagatedArchitectureDep = Add(archSource, archTarget, edgeType);
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
 
@@ -1567,19 +1570,18 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>True if a matching architecture dependency is found</returns>
         private bool Lift(Node from, Node to, string edgeType, int counter, out Edge allowingEdgeOut)
         {
-            Assert.IsTrue(from.HasToggle(ArchitectureLabel));
-            Assert.IsTrue(to.HasToggle(ArchitectureLabel));
+            Assert.IsTrue(from.IsInArchitecture());
+            Assert.IsTrue(to.IsInArchitecture());
             List<Node> parents = to.Ascendants();
-            Assert.IsTrue(parents.All(x => x.HasToggle(ArchitectureLabel)));
+            Assert.IsTrue(parents.All(x => x.IsInArchitecture()));
             Node cursor = from;
-            Assert.IsTrue(cursor.HasToggle(ArchitectureLabel));
-
+            Assert.IsTrue(cursor.IsInArchitecture());
             while (cursor != null)
             {
-                IEnumerable<Edge> outs = cursor.Outgoings.Where(x => x.HasToggle(ArchitectureLabel));
+                IEnumerable<Edge> outs = cursor.Outgoings.Where(x => x.IsInArchitecture());
                 foreach (Edge edge in outs)
                 {
-                    Assert.IsTrue(edge.HasToggle(ArchitectureLabel));
+                    Assert.IsTrue(edge.IsInArchitecture());
                     // Assert: edge is in architecture; edgeType is the type of edge
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
