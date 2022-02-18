@@ -210,11 +210,6 @@ namespace SEE.Game.Evolution
                 // The marker should be drawn in front of the block, hence, its render
                 // queue offset must be greater than the one of the block.
                 GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int) RenderQueue.Transparent);
-
-                // FIXME: These kinds of beam markers make sense only for leaf nodes.
-                // Could we better use some kind of blinking now that the cities
-                // are drawn in miniature?
-
                 beamMarker.tag = Tags.Decoration;
 
                 Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
@@ -244,8 +239,6 @@ namespace SEE.Game.Evolution
             GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
             AddEmission(beamMarker);
             //Portal.SetPortal(beamMarker.transform.parent.gameObject);
-            // Add the added node id to the revision changes list
-            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(beamMarker.name);
             return beamMarker;
         }
 
@@ -293,7 +286,6 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting beam marker</returns>
         public GameObject MarkBorn(GameObject gameNode)
         {
-            NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(gameNode.gameObject.name);
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
             beamMarker.name = "new " + gameNode.name;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
