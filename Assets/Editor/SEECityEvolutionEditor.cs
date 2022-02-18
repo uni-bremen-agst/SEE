@@ -20,21 +20,11 @@ namespace SEEEditor
         {
             base.OnInspectorGUI();
             SEECityEvolution cityEvolution = city as SEECityEvolution;
-
             EditorGUILayout.Separator();
-
             Attributes();
-
             EditorGUILayout.Separator();
-
             EvolutionMarkerAttributes(cityEvolution);
-
             EditorGUILayout.Separator();
-
-            MarkerAttributes(cityEvolution);
-
-            EditorGUILayout.Separator();
-
             ShowNodeTypes(cityEvolution);
             Buttons(cityEvolution);
         }
@@ -48,11 +38,6 @@ namespace SEEEditor
         /// Whether the animation foldout should be expanded.
         /// </summary>
         private bool evolutionMarkerFoldOut = false;
-
-        /// <summary>
-        /// Whether the marker attribute foldout should be expanded.
-        /// </summary>
-        private bool showMarkerAttributes = false;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
@@ -102,36 +87,30 @@ namespace SEEEditor
                 city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
                 city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
                 city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
-                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
-                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
-            }
-        }
-
-        /// <summary>
-        /// Renders the GUI for attributes of markers.
-        /// </summary>
-        private void MarkerAttributes(SEECityEvolution city)
-        {
-            showMarkerAttributes = EditorGUILayout.Foldout(showMarkerAttributes, "Attributes of markers", true, EditorStyles.foldoutHeader);
-            if (showMarkerAttributes)
-            {
                 MarkerAttributes settings = city.MarkerSettings;
 
                 settings.Kind = (MarkerKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
-
-                EditorGUI.indentLevel++;
-
-                SerializedProperty sections = serializedObject.FindProperty("MarkerSettings.MarkerSections");
-                EditorGUILayout.PropertyField(sections, new GUIContent("Marker sections"), true);
-
-                EditorGUI.indentLevel--;
-
+                switch (settings.Kind)
+                {
+                    case MarkerKinds.Single:
+                        city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
+                        city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
+                        city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
+                        break;
+                    case MarkerKinds.Stacked:
+                        EditorGUI.indentLevel++;
+                        SerializedProperty sections = serializedObject.FindProperty("MarkerSettings.MarkerSections");
+                        EditorGUILayout.PropertyField(sections, new GUIContent("Marker sections"), true);
+                        EditorGUI.indentLevel--;
+                        break;
+                    default:
+                        throw new System.NotImplementedException($"Case {settings.Kind} is not expected.");
+                }
             }
         }
 
         /// <summary>
-        /// Shows and sets the attributes of the SEECity managed here.
+        /// Shows and sets the attributes of the <see cref="SEECityEvolution"/ managed here.
         /// This method should be overridden by subclasses if they have additional
         /// attributes to manage.
         /// </summary>
