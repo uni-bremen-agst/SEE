@@ -17,22 +17,69 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Label for the architecture toggle added to each graph element of the architecture city.
         /// </summary>
-        public const string ArchitectureLabel = "Architecture";
+        private const string ArchitectureLabel = "Architecture";
 
         /// <summary>
         /// Label for the implementation toggle added to each graph element of the implementation city.
         /// </summary>
-        public const string ImplementationLabel = "Implementation";
+        private const string ImplementationLabel = "Implementation";
+
+        /// <summary>
+        /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
+        /// </summary>
+        public const string MapsToType = "Maps_To";
+
+        /// <summary>
+        /// Returns true if <paramref name="element"/> is in the architecture graph.
+        /// </summary>
+        public static bool IsInArchitecture(this GraphElement element) => element.HasToggle(ArchitectureLabel);
+
+        /// <summary>
+        /// Returns true if <paramref name="element"/> is in the implementation graph.
+        /// </summary>
+        public static bool IsInImplementation(this GraphElement element) => element.HasToggle(ImplementationLabel);
+
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is in the mapping graph.
+        /// </summary>
+        public static bool IsInMapping(this Edge edge) => edge.HasSupertypeOf(MapsToType);
+
+        /// <summary>
+        /// Returns true if <paramref name="node"/> is in the mapping graph.
+        /// </summary>
+        public static bool IsInMapping(this Node node) => node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
+
+        /// <summary>
+        /// Marks the <paramref name="element"/> as being in the architecture graph.
+        /// This will also remove it from the implementation graph, if applicable.
+        /// </summary>
+        public static void SetInArchitecture(this GraphElement element)
+        {
+            element.UnsetToggle(ImplementationLabel);
+            element.SetToggle(ArchitectureLabel);
+        }
+
+        /// <summary>
+        /// Marks the <paramref name="element"/> as being in the implementation graph.
+        /// This will also remove it from the architecture graph, if applicable.
+        /// </summary>
+        public static void SetInImplementation(this GraphElement element)
+        {
+            element.UnsetToggle(ArchitectureLabel);
+            element.SetToggle(ImplementationLabel);
+        }
 
         /// <summary>
         /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
-        /// the given <paramref name="graph"/>.  The root node will <b>not</b> get such a label!
+        /// the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
         /// <param name="label">The value of the toggle attribute</param>
-        public static void MarkGraphNodes(this Graph graph, string label)
+        /// <param name="labelRootNode">Whether to label the root node of the <paramref name="graph"/>, too</param>
+        public static void MarkGraphNodes(this Graph graph, string label, bool labelRootNode = true)
         {
-            IEnumerable<GraphElement> graphElements = graph.Nodes().Where(node => node.Type != GraphRenderer.RootType)
+            IEnumerable<GraphElement> graphElements = graph.Nodes()
+                                                           .Where(node => labelRootNode || node.Type != GraphRenderer.RootType)
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {

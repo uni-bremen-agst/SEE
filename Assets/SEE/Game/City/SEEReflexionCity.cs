@@ -132,7 +132,7 @@ namespace SEE.Game.City
         {
             from.AssertNotNull(nameof(from));
             to.AssertNotNull(nameof(to));
-            if (!from.HasToggle(ImplementationLabel) || !to.HasToggle(ArchitectureLabel))
+            if (!from.IsInImplementation() || !to.IsInArchitecture())
             {
                 throw new ArgumentException($"{nameof(from)} must be an implementation node, and"
                                             + $"{nameof(to)} must be an architecture node!");
@@ -143,36 +143,7 @@ namespace SEE.Game.City
                 throw new ArgumentException("The two nodes must be in the same graph!");
             }
             
-            RemoveOutgoing();
-            
-            RemoveIncoming();
-
-            Edge mapEdge = new Edge(from, to, Reflexion.MapsToType);
-            from.ItsGraph.AddEdge(mapEdge);
-
-            #region Local Functions
-            
-            void RemoveOutgoing()
-            {
-                // Note: We use "Single" instead of "First" because it's an invariant that "Maps_To" is a function.
-                Edge outgoing = from.Outgoings.SingleOrDefault(x => x.Type == Reflexion.MapsToType);
-                if (outgoing != null && from.ItsGraph.ContainsEdge(outgoing))
-                {
-                    from.ItsGraph.RemoveEdge(outgoing);
-                }
-            }
-
-            void RemoveIncoming()
-            {
-                // Note: We use "Single" instead of "First" because it's an invariant that "Maps_To" is injective.
-                Edge incoming = to.Incomings.SingleOrDefault(x => x.Type == Reflexion.MapsToType);
-                if (incoming != null && to.ItsGraph.ContainsEdge(incoming))
-                {
-                    to.ItsGraph.RemoveEdge(incoming);
-                }
-            }
-            
-            #endregion
+            // TODO(falko17): Invoke reflexion analysis
         }
 
         public override void SaveData()

@@ -54,9 +54,9 @@ namespace SEE.Tools.Architecture
             foreach (Edge map in mapping.Edges())
             {
                 Node source = fullGraph.GetNode(map.Source.ID);
-                Assert.IsTrue(source.HasToggle(ImplementationLabel));
+                Assert.IsTrue(source.IsInImplementation());
                 Node target = fullGraph.GetNode(map.Target.ID);
-                Assert.IsTrue(target.HasToggle(ArchitectureLabel));
+                Assert.IsTrue(target.IsInArchitecture());
                 Assert.NotNull(source);
                 Assert.NotNull(target);
                 reflexion.AddToMapping(source, target);

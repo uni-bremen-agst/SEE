@@ -69,12 +69,9 @@ namespace SEE.Tools.Architecture
             Save(implementation, architecture, mapping);
         }
 
-        private Edge AddToGraph(string label, string edgeType, Node from, Node to)
+        private Edge AddToGraph(string edgeType, Node from, Node to)
         {
-            Edge edge = new Edge(from, to, edgeType);
-            edge.SetToggle(label);
-            fullGraph.AddEdge(edge);
-            return edge;
+            return NewEdge(from, to, edgeType);
         }
 
         /// <summary>
@@ -101,7 +98,7 @@ namespace SEE.Tools.Architecture
             a = new Dictionary<int, Node>();
             for (int j = 1; j <= 9; j++)
             {
-                a[j] = NewNode(ArchitectureLabel, "a" + j, "Component");
+                a[j] = NewNode(true, "a" + j, "Component");
             }
             a[7].AddChild(a[6]);
             a[7].AddChild(a[5]);
@@ -110,10 +107,10 @@ namespace SEE.Tools.Architecture
             a[8].AddChild(a[2]);
 
             Dictionary<int, Edge> s = new Dictionary<int, Edge>();
-            s[1] = AddToGraph(ArchitectureLabel, call, a[3], a[7]);
-            s[2] = AddToGraph(ArchitectureLabel, call, a[1], a[3]);
-            s[3] = AddToGraph(ArchitectureLabel, call, a[8], a[8]);
-            s[4] = AddToGraph(ArchitectureLabel, call, a[2], a[4]);
+            s[1] = AddToGraph(call, a[3], a[7]);
+            s[2] = AddToGraph(call, a[1], a[3]);
+            s[3] = AddToGraph(call, a[8], a[8]);
+            s[4] = AddToGraph(call, a[2], a[4]);
         }
 
         private void AddImplementation()
@@ -121,7 +118,7 @@ namespace SEE.Tools.Architecture
             i = new Dictionary<int, Node>();
             for (int j = 1; j <= 17; j++)
             {
-                i[j] = NewNode(ImplementationLabel, "i" + j);
+                i[j] = NewNode(false, "i" + j);
             }
             i[1].AddChild(i[2]);
             i[1].AddChild(i[11]);
@@ -142,15 +139,15 @@ namespace SEE.Tools.Architecture
 
             Dictionary<int, Edge> e = new Dictionary<int, Edge>
             {
-                [1] = AddToGraph(ImplementationLabel, call, i[3], i[15]),
-                [2] = AddToGraph(ImplementationLabel, call, i[4], i[16]),
-                [3] = AddToGraph(ImplementationLabel, call, i[5], i[17]),
-                [4] = AddToGraph(ImplementationLabel, call, i[8], i[6]),
-                [5] = AddToGraph(ImplementationLabel, call, i[9], i[8]),
-                [6] = AddToGraph(ImplementationLabel, call, i[9], i[10]),
-                [7] = AddToGraph(ImplementationLabel, call, i[12], i[10]),
-                [8] = AddToGraph(ImplementationLabel, call, i[12], i[9]),
-                [9] = AddToGraph(ImplementationLabel, call, i[14], i[13])
+                [1] = AddToGraph(call, i[3], i[15]),
+                [2] = AddToGraph(call, i[4], i[16]),
+                [3] = AddToGraph(call, i[5], i[17]),
+                [4] = AddToGraph(call, i[8], i[6]),
+                [5] = AddToGraph(call, i[9], i[8]),
+                [6] = AddToGraph(call, i[9], i[10]),
+                [7] = AddToGraph(call, i[12], i[10]),
+                [8] = AddToGraph(call, i[12], i[9]),
+                [9] = AddToGraph(call, i[14], i[13])
             };
         }
 
@@ -184,12 +181,12 @@ namespace SEE.Tools.Architecture
             SetupReflexion();
             ResetEvents();
 
-            Node a1 = NewNode(ArchitectureLabel, "a1", "Component");
-            Node a2 = NewNode(ArchitectureLabel, "a2", "Component");
+            Node a1 = NewNode(true, "a1", "Component");
+            Node a2 = NewNode(true, "a2", "Component");
 
-            Node i1 = NewNode(ImplementationLabel, "i1", "Routine");
-            Node i2 = NewNode(ImplementationLabel, "i2", "Routine");
-            Edge e = NewEdge(ImplementationLabel, i1, i2, call);
+            Node i1 = NewNode(false, "i1", "Routine");
+            Node i2 = NewNode(false, "i2", "Routine");
+            Edge e = NewEdge(i1, i2, call);
 
             // i1 -> a1
             reflexion.AddToMapping(i1, a1);
@@ -220,12 +217,12 @@ namespace SEE.Tools.Architecture
             SetupReflexion();
             ResetEvents();
 
-            Node a1 = NewNode(ArchitectureLabel, "a1", "Component");
-            Node a2 = NewNode(ArchitectureLabel, "a2", "Component");
+            Node a1 = NewNode(true, "a1", "Component");
+            Node a2 = NewNode(true, "a2", "Component");
 
-            Node i1 = NewNode(ImplementationLabel, "i1", "Routine");
-            Node i2 = NewNode(ImplementationLabel, "i2", "Routine");
-            Edge e = NewEdge(ImplementationLabel, i1, i2, call);
+            Node i1 = NewNode(false, "i1", "Routine");
+            Node i2 = NewNode(false, "i2", "Routine");
+            Edge e = NewEdge(i1, i2, call);
 
             // i2 -> a1
             reflexion.AddToMapping(i2, a1);
@@ -251,12 +248,12 @@ namespace SEE.Tools.Architecture
             SetupReflexion();
             ResetEvents();
 
-            Node a1 = NewNode(ArchitectureLabel, "a1", "Component");
-            Node a2 = NewNode(ArchitectureLabel, "a2", "Component");
+            Node a1 = NewNode(true, "a1", "Component");
+            Node a2 = NewNode(true, "a2", "Component");
 
-            Node i1 = NewNode(ImplementationLabel, "i1", "Routine");
-            Node i2 = NewNode(ImplementationLabel, "i2", "Routine");
-            Edge e = NewEdge(ImplementationLabel, i1, i2, call);
+            Node i1 = NewNode(false, "i1", "Routine");
+            Node i2 = NewNode(false, "i2", "Routine");
+            Edge e = NewEdge(i1, i2, call);
 
             // i1 -> a1
             reflexion.AddToMapping(i1, a1);
