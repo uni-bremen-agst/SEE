@@ -337,7 +337,7 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                AntennaAttributes(ref showInnerAntennaAttributes, "InnerNodeSettings.AntennaSettings.AntennnaSections");
+                AntennaAttributes(ref showInnerAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "InnerNodeSettings.AntennaSettings.AntennaSections");
                 LabelSettings(ref showInnerLabelAttributes, ref settings.LabelSettings);
 
                 EditorGUI.indentLevel--;
@@ -348,12 +348,14 @@ namespace SEEEditor
         ///  Renders the GUI for antenna attributes of leaf and inner nodes.
         /// </summary>
         /// <param name="antennaSettingsProperty">the path of the antenna settings to be set by this dialog part relative to the edited city</param>
-        private void AntennaAttributes(ref bool showAntennaAttributes, string antennaSettingsProperty)
+        private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, string antennaSettingsProperty)
         {
             showAntennaAttributes = EditorGUILayout.Foldout(showAntennaAttributes, "Antenna", true, EditorStyles.foldoutHeader);
             if (showAntennaAttributes)
             {
+
                 EditorGUI.indentLevel++;
+                antennaWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", antennaWidth));
                 SerializedProperty sections = serializedObject.FindProperty(antennaSettingsProperty);
                 if (sections != null)
                 {
@@ -390,7 +392,7 @@ namespace SEEEditor
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
                 settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
                 settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
-                AntennaAttributes(ref showLeafAntennaAttributes, "LeafNodeSettings.AntennaSettings.AntennnaSections");
+                AntennaAttributes(ref showLeafAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "LeafNodeSettings.AntennaSettings.AntennaSections");
                 LabelSettings(ref showLeafLabelAttributes, ref settings.LabelSettings);
 
                 EditorGUI.indentLevel--;

@@ -394,7 +394,13 @@ namespace SEE.Game.City
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
-        public List<AntennaSection> AntennnaSections = new List<AntennaSection>(1);
+        public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
+
+        /// <summary>
+        /// The width of an antenna.
+        /// </summary>
+        public float AntennaWidth = 0.1f;
+
         /// <summary>
         /// Saves the settings in the configuration file.
         ///
@@ -405,7 +411,8 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(AntennnaSections, AntennaSectionsLabel);
+            writer.Save(AntennaWidth, AntennaWidthLabel);
+            writer.Save(AntennaSections, AntennaSectionsLabel);
             writer.EndGroup();
         }
 
@@ -425,6 +432,7 @@ namespace SEE.Game.City
             {
                 bool result = false;
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                ConfigIO.Restore(values, AntennaWidthLabel, ref AntennaWidth);
                 if (values.TryGetValue(AntennaSectionsLabel, out object antennaSections))
                 {
                     if (!(antennaSections is IList<object> objects))
@@ -440,7 +448,7 @@ namespace SEE.Game.City
                         }
                         AntennaSection section = new AntennaSection();
                         result = section.Restore(antennaSection) || result;
-                        AntennnaSections.Add(section);
+                        AntennaSections.Add(section);
                     }
                 }
                 return result;
@@ -450,6 +458,11 @@ namespace SEE.Game.City
                 return false;
             }
         }
+
+        /// <summary>
+        /// Label in the configuration file for the antenna width.
+        /// </summary>
+        private const string AntennaWidthLabel = "Width";
 
         /// <summary>
         /// Label in the configuration file for the antenna sections.
