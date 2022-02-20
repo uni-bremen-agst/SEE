@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.DataModel;
-using SEE.Game.Charts;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
-using SEE.Game.City;
-using SEE.DataModel.DG;
 
 namespace SEE.Game.Evolution
 {
@@ -31,11 +28,10 @@ namespace SEE.Game.Evolution
         /// <param name="changeColor">the color for the markers for changed nodes</param>
         /// <param name="deletionColor">the color for the markers for deleted nodes</param>
         /// <param name="duration">the duration until the final height of the markers must be reached</param>
-        public Marker(GraphRenderer graphRenderer, MarkerAttributes markerAttributes, float markerWidth, float markerHeight,
+        public Marker(GraphRenderer graphRenderer, float markerWidth, float markerHeight,
                       Color additionColor, Color changeColor, Color deletionColor, float duration)
         {
             this.graphRenderer = graphRenderer;
-            this.markerAttributes = markerAttributes;
             this.duration = duration;
 
             // graphRenderer.ShaderType
@@ -69,6 +65,11 @@ namespace SEE.Game.Evolution
         private const int EmissionStrength = 3;
 
         /// <summary>
+        /// The gap between the decorated game node and its marker in Unity world-space units.
+        /// </summary>
+        private const float Gap = 0.001f;
+
+        /// <summary>
         /// The time in seconds until the markers must have reached their final height.
         /// </summary>
         private float duration;
@@ -82,12 +83,6 @@ namespace SEE.Game.Evolution
         {
             duration = value;
         }
-
-        /// <summary>
-        /// The height of the beam markers used to mark new, changed, and deleted
-        /// objects from one version to the next one.
-        /// </summary>
-        private readonly MarkerAttributes markerAttributes;
 
         /// <summary>
         /// The height of the beam markers used to mark new, changed, and deleted
@@ -133,16 +128,6 @@ namespace SEE.Game.Evolution
         private static readonly int Strength = Shader.PropertyToID("_EmissionStrength");
 
         /// <summary>
-        /// Transformation method to scale numbers. Yields <paramref name="input"/> devided
-        /// by 100.
-        /// </summary>
-        /// <returns>input / 100</returns>
-        private float Transform(float input)
-        {
-            return input / 100;
-        }
-
-        /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
         /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
         /// equals <see cref="MarkerKinds.Stacked"/> the marker will be a set of
@@ -154,76 +139,30 @@ namespace SEE.Game.Evolution
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
+            // The marker should be drawn in front of the block, hence, its render
+            // queue offset must be greater than the one of the block.
+            GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
+            beamMarker.tag = Tags.Decoration;
+
+            // The initial scale of the marker is Vector3.zero. Later its height will be adjusted to
+            // markerWidth and markerHeight through the animator.
+            beamMarker.transform.localScale = Vector3.zero;
+
+            // Lift beamerMarker according to the length of its nested marker segments
+            // above the roof of the gameNode.
             Vector3 position = graphRenderer.GetRoof(gameNode);
+            position.y += Gap - markerHeight / 2;
+            beamMarker.transform.position = position;
 
-            if (markerAttributes.Kind == MarkerKinds.Stacked)
-            {
-                // Offset from bottom against overlapping beams.
-                float offset = 0;
-                Node node = gameNode.GetNode();
+            // Makes beamMarker a child of block so that it moves along with it during the animation.
+            // In addition, it will also be destroyed along with its parent block.
+            beamMarker.transform.SetParent(gameNode.transform);
 
-                // New game object as parent for multiple nested beams.
-                GameObject enclosingBeamMarker = new GameObject("Change Marker");
-                foreach (MarkerSection section in markerAttributes.MarkerSections)
-                {
-                    if (node.TryGetNumeric(section.Metric, out float sectionMetric))
-                    {
-                        float sectionHeight = Transform(sectionMetric);
+            BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
+            Vector3 targetScale = new Vector3(markerWidth, markerHeight, markerWidth);
+            raiser.SetTargetHeightAndDuration(targetScale, duration: duration);
 
-                        // FIXME: Add a cache for these factories. They should not be created for each marker and loop iteration.
-                        CylinderFactory customFactory = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
-
-                        // The marker should be drawn as part of the block, hence, its render
-                        // queue offset must be equal to that of the block.
-                        GameObject beamMarker = NewBeam(customFactory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
-                        beamMarker.name = section.Metric;
-
-                        // FIXME: These kinds of beam markers make sense only for leaf nodes.
-                        // Could we better use some kind of blinking now that the cities
-                        // are drawn in miniature?
-
-                        beamMarker.tag = Tags.Decoration;
-
-                        Vector3 localBeamScale = new Vector3(markerWidth, sectionHeight, markerWidth);
-
-                        beamMarker.transform.position = new Vector3(0, offset, 0);
-                        beamMarker.transform.localScale = localBeamScale;
-
-                        // Makes beamMarker a child of block so that it moves along with it during the animation.
-                        // In addition, it will also be destroyed along with its parent block.
-                        beamMarker.transform.SetParent(enclosingBeamMarker.transform);
-
-                        offset += sectionHeight;
-                    }
-                }
-
-                enclosingBeamMarker.transform.position = position;
-                enclosingBeamMarker.transform.localScale = new Vector3(1, 0, 1);
-                enclosingBeamMarker.transform.SetParent(gameNode.transform);
-
-                BeamRaiser raiser = enclosingBeamMarker.AddComponent<BeamRaiser>();
-                raiser.SetTargetHeightAndDuration(new Vector3(1, 1, 1), duration: duration);
-                return enclosingBeamMarker;
-            }
-            else
-            {
-                // The marker should be drawn in front of the block, hence, its render
-                // queue offset must be greater than the one of the block.
-                GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int) RenderQueue.Transparent);
-                beamMarker.tag = Tags.Decoration;
-
-                Vector3 beamScale = new Vector3(markerWidth, 0, markerWidth);
-                position.y += beamScale.y / 2.0f;
-                beamMarker.transform.position = position;
-                beamMarker.transform.localScale = beamScale;
-
-                // Makes beamMarker a child of block so that it moves along with it during the animation.
-                // In addition, it will also be destroyed along with its parent block.
-                beamMarker.transform.SetParent(gameNode.transform);
-                BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
-                raiser.SetTargetHeightAndDuration(new Vector3(markerWidth, markerHeight, markerWidth), duration: duration);
-                return beamMarker;
-            }
+            return beamMarker;
         }
 
         /// <summary>

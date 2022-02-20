@@ -176,7 +176,7 @@ namespace SEE.GO.Menu
             }
 
         }
-        
+
         // Returns a color between black and gray, the higher the given score the grayer it is.
         public static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
 
@@ -196,7 +196,7 @@ namespace SEE.GO.Menu
             {
                 // Display marker above the node
                 GraphRenderer graphRenderer = new GraphRenderer(city, null);
-                Marker marker = new Marker(graphRenderer, null, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
+                Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
                 Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();

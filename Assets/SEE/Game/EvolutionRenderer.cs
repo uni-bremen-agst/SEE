@@ -68,7 +68,6 @@ namespace SEE.Game
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new Marker(graphRenderer,
-                                    markerAttributes: cityEvolution.MarkerSettings,
                                     markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
