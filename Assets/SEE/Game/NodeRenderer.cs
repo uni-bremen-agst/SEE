@@ -275,7 +275,7 @@ namespace SEE.Game
                                         : Settings.InnerNodeSettings.ColorMetric;
 
             float metricMaximum;
-            if (TryGetFloat(colorMetric, out float metricValue))
+            if (Utils.FloatUtils.TryGetFloat(colorMetric, out float metricValue))
             {
                 // The colorMetric name is actually a constant number.
                 metricMaximum = numberOfStyles;
@@ -294,29 +294,6 @@ namespace SEE.Game
                 Assert.IsTrue(metricValue <= metricMaximum);
             }
             return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, metricValue / metricMaximum));
-        }
-
-        /// <summary>
-        /// Tries to parse <paramref name="floatString"/> as a floating point number.
-        /// Upon success, its value is return in <paramref name="value"/> and true
-        /// is returned. Otherwise false is returned and <paramref name="value"/>
-        /// is undefined.
-        /// </summary>
-        /// <param name="floatString">string to be parsed for a floating point number</param>
-        /// <param name="value">parsed floating point value; defined only if this method returns true</param>
-        /// <returns>true if a floating point number could be parsed successfully</returns>
-        private static bool TryGetFloat(string floatString, out float value)
-        {
-            try
-            {
-                value = float.Parse(floatString, CultureInfo.InvariantCulture.NumberFormat);
-                return true;
-            }
-            catch (FormatException)
-            {
-                value = 0.0f;
-                return false;
-            }
         }
 
         /// <summary>
@@ -522,30 +499,12 @@ namespace SEE.Game
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
         private float GetMetricValueOfLeaf(Node node, string metricName)
         {
-            return Mathf.Clamp(GetMetricValue(node, metricName),
+            return Mathf.Clamp(scaler.GetMetricValue(node, metricName),
                         Settings.LeafNodeSettings.MinimalBlockLength,
                         Settings.LeafNodeSettings.MaximalBlockLength);
         }
 
-        /// <summary>
-        /// If <paramref name="metricName"/> is the name of a metric, the corresponding
-        /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
-        /// can be parsed as a number instead, the parsed number is returned.
-        /// </summary>
-        /// <param name="node">node whose metric is to be returned</param>
-        /// <param name="metricName">the name of a node metric or a number</param>
-        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
-        private float GetMetricValue(Node node, string metricName)
-        {
-            if (TryGetFloat(metricName, out float value))
-            {
-                return value;
-            }
-            else
-            {
-                return scaler.GetNormalizedValue(metricName, node);
-            }
-        }
+
 
         /// <summary>
         /// Adds decoration for the given <paramref name="gameNode"/> with the global settings
