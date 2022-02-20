@@ -241,8 +241,9 @@ namespace SEE.Utils
         public void TestAntennaAttributes()
         {
             AntennaAttributes saved = new AntennaAttributes();
-            saved.AntennnaSections.Add(new AntennaSection("metricA", Color.white));
-            saved.AntennnaSections.Add(new AntennaSection("metricB", Color.black));
+            saved.AntennaSections.Add(new AntennaSection("metricA", Color.white));
+            saved.AntennaSections.Add(new AntennaSection("metricB", Color.black));
+            saved.AntennaWidth = 2.0f;
 
             const string filename = "antenna.cfg";
             const string label = "Antenna";
@@ -267,8 +268,8 @@ namespace SEE.Utils
             string filename = "seecity.cfg";
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
-            savedCity.LeafNodeSettings.AntennaSettings.AntennnaSections.Add(new AntennaSection("leafmetric", Color.white));
-            savedCity.InnerNodeSettings.AntennaSettings.AntennnaSections.Add(new AntennaSection("innermetric", Color.black));
+            savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
+            savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
             savedCity.Save(filename);
 
             // Create a new city with all its default values and then
@@ -833,16 +834,18 @@ namespace SEE.Utils
 
         private static void WipeOutAntennaSettings(ref AntennaAttributes antennaAttributes)
         {
-            antennaAttributes.AntennnaSections.Clear();
+            antennaAttributes.AntennaWidth = 999;
+            antennaAttributes.AntennaSections.Clear();
         }
 
         private static void AreEqualAntennaSettings(AntennaAttributes expected, AntennaAttributes actual)
         {
-            Assert.AreEqual(expected.AntennnaSections.Count, actual.AntennnaSections.Count);
-            for (int i = 0; i < expected.AntennnaSections.Count; i++)
+            Assert.AreEqual(expected.AntennaWidth, actual.AntennaWidth);
+            Assert.AreEqual(expected.AntennaSections.Count, actual.AntennaSections.Count);
+            for (int i = 0; i < expected.AntennaSections.Count; i++)
             {
-                Assert.AreEqual(expected.AntennnaSections[i].Metric, actual.AntennnaSections[i].Metric);
-                Assert.AreEqual(expected.AntennnaSections[i].Color, actual.AntennnaSections[i].Color);
+                Assert.AreEqual(expected.AntennaSections[i].Metric, actual.AntennaSections[i].Metric);
+                Assert.AreEqual(expected.AntennaSections[i].Color, actual.AntennaSections[i].Color);
             }
         }
 
