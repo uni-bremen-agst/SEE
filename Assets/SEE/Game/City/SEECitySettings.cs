@@ -58,6 +58,7 @@ namespace SEE.Game.City
     /// Abstract common super class for all settings influencing the visual
     /// appearance of game objects drawn in the scene.
     /// </summary>
+    [Serializable]
     public abstract class VisualAttributes
     {
         /// <summary>
@@ -80,6 +81,7 @@ namespace SEE.Game.City
     /// Abstract common super class for all settings influencing the visual
     /// appearance of leaf or inner nodes.
     /// </summary>
+    [Serializable]
     public abstract class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
@@ -180,6 +182,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The settings of leaf nodes of a specific kind.
     /// </summary>
+    [Serializable]
     public class LeafNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
@@ -261,6 +264,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
+    [Serializable]
     public class InnerNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
@@ -302,7 +306,7 @@ namespace SEE.Game.City
     /// The settings of one antenna section specifying the metric that
     /// determines the length and color of the section.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class AntennaSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
@@ -383,14 +387,14 @@ namespace SEE.Game.City
     /// <summary>
     /// Specifies how metrics are to be rendered as an antenna above the blocks.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class AntennaAttributes : ConfigIO.PersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
-        public IList<AntennaSection> AntennnaSections = new List<AntennaSection>(1);
+        public List<AntennaSection> AntennnaSections = new List<AntennaSection>(1);
         /// <summary>
         /// Saves the settings in the configuration file.
         ///
@@ -456,6 +460,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Common super class for settings of node and edge layouts.
     /// </summary>
+    [Serializable]
     public abstract class LayoutSettings : VisualAttributes
     {
     }
@@ -463,6 +468,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The settings for the layout of the nodes.
     /// </summary>
+    [Serializable]
     public class NodeLayoutAttributes : LayoutSettings
     {
         /// <summary>
@@ -507,6 +513,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The settings for the layout of the edges.
     /// </summary>
+    [Serializable]
     public class EdgeLayoutAttributes : LayoutSettings
     {
         /// <summary>
@@ -575,6 +582,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Attributes regarding the selection of edges.
     /// </summary>
+    [Serializable]
     public class EdgeSelectionAttributes : VisualAttributes
     {
         /// <summary>
@@ -626,6 +634,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Axivion's software erosion issues shown as icons above nodes.
     /// </summary>
+    [Serializable]
     public class ErosionAttributes : VisualAttributes
     {
         /// <summary>
