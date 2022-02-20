@@ -423,8 +423,7 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 if (values.TryGetValue(AntennaSectionsLabel, out object antennaSections))
                 {
-                    IList<object> objects = antennaSections as IList<object>;
-                    if (objects == null)
+                    if (!(antennaSections is IList<object> objects))
                     {
                         throw new InvalidCastException($"Value to be cast {antennaSections} is expected to be a list. Actual type is {antennaSections.GetType().Name}");
                     }
