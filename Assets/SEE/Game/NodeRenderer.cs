@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using SEE.Controls.Actions;
 using SEE.Controls.Interactables;
@@ -51,9 +50,11 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
-            GameObject result = leafNodeFactory.NewBlock(SelectStyle(node), node.ItsGraph.MaxDepth);
+            int renderQueueOffset = node.ItsGraph.MaxDepth;
+            GameObject result = leafNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustScaleOfLeaf(result);
+            leafAntennaDecorator.AddAntenna(result, renderQueueOffset);
             return result;
         }
 
@@ -76,9 +77,11 @@ namespace SEE.Game
             // later it should be drawn, or in other words, the higher its offset in the
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
-            GameObject result = innerNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset: node.Level);
+            int renderQueueOffset = node.Level;
+            GameObject result = innerNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
+            innerAntennaDecorator.AddAntenna(result, renderQueueOffset);
             return result;
         }
 

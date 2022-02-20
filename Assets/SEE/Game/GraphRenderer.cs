@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GameObjects.Decorators;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
@@ -65,6 +66,8 @@ namespace SEE.Game
                 SetScaler(graph);
                 graph.SortHierarchyByName();
             }
+            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
+            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
         }
 
         /// <summary>
@@ -116,6 +119,16 @@ namespace SEE.Game
         /// A mapping from Node to ILayoutNode.
         /// </summary>
         private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+
+        /// <summary>
+        /// To create antennas for leaf nodes.
+        /// </summary>
+        private readonly AntennaDecorator leafAntennaDecorator;
+
+        /// <summary>
+        /// To create antennas for inner nodes.
+        /// </summary>
+        private readonly AntennaDecorator innerAntennaDecorator;
 
         /// <summary>
         /// True if edges are actually drawn, that is, if the user has selected an
