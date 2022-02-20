@@ -3,6 +3,7 @@
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -317,11 +318,24 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                EditorGUI.EndDisabledGroup();
+                //EditorGUI.EndDisabledGroup();
+                AntennaAttributes(ref settings.AntennaSettings);
                 LabelSettings(ref settings.LabelSettings);
 
                 EditorGUI.indentLevel--;
             }
+        }
+
+        /// <summary>
+        ///  Renders the GUI for antenna attributes of leaf and inner nodes.
+        /// </summary>
+        /// <param name="settings">the antenna settings to be set by this dialog part</param>
+        private void AntennaAttributes(ref AntennaAttributes settings)
+        {
+            EditorGUI.indentLevel++;
+            SerializedProperty sections = serializedObject.FindProperty("AntennaSettings.AntennnaSections");
+            EditorGUILayout.PropertyField(sections, new GUIContent("Antenna sections"), true);
+            EditorGUI.indentLevel--;
         }
 
         /// <summary>
@@ -347,7 +361,8 @@ namespace SEEEditor
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
                 settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
                 settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
-                EditorGUI.EndDisabledGroup();
+                //EditorGUI.EndDisabledGroup();
+                AntennaAttributes(ref settings.AntennaSettings);
                 LabelSettings(ref settings.LabelSettings);
 
                 EditorGUI.indentLevel--;

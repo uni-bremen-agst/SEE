@@ -77,7 +77,7 @@ namespace SEE.Game.City
         /// Settings of markers.
         /// </summary>
         [SerializeField]
-        public MarkerAttributes MarkerSettings = new MarkerAttributes();
+        public AntennaAttributes MarkerSettings = new AntennaAttributes();
 
         /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector

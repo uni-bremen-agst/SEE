@@ -87,25 +87,9 @@ namespace SEEEditor
                 city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
                 city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
                 city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-                MarkerAttributes settings = city.MarkerSettings;
-
-                settings.Kind = (MarkerKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
-                switch (settings.Kind)
-                {
-                    case MarkerKinds.Single:
-                        city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
-                        city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
-                        city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
-                        break;
-                    case MarkerKinds.Stacked:
-                        EditorGUI.indentLevel++;
-                        SerializedProperty sections = serializedObject.FindProperty("MarkerSettings.MarkerSections");
-                        EditorGUILayout.PropertyField(sections, new GUIContent("Marker sections"), true);
-                        EditorGUI.indentLevel--;
-                        break;
-                    default:
-                        throw new System.NotImplementedException($"Case {settings.Kind} is not expected.");
-                }
+                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
+                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
+                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
             }
         }
 
