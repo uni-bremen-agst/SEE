@@ -50,7 +50,7 @@ namespace SEE.GameObjects.Decorators
             // we can place them below their parent.
             foreach (AntennaSection section in antennaAttributes.AntennaSections)
             {
-                if (node.TryGetNumeric(section.Metric, out float sectionMetric))
+                if (node.TryGetNumeric(section.Metric, out float sectionMetric) && sectionMetric > 0)
                 {
                     NodeFactory sectionFactory = GetSegmentFactory(section);
 
