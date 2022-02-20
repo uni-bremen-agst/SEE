@@ -631,7 +631,7 @@ namespace SEE.Game
                     break;
                 case InnerNodeKinds.Donuts:
                     {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, Settings.InnerNodeSettings.InnerDonutMetric,
+                        DonutDecorator decorator = new DonutDecorator(scaler, Settings.InnerNodeSettings.InnerDonutMetric,
                                                                       Settings.AllInnerNodeIssues().ToArray());
                         // the circle segments and the inner circle for the donut are added as children by Add();
                         // that is why we do not add the result to decorations.
