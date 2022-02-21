@@ -335,19 +335,22 @@ namespace SEE.Controls
             }
             catch (Exception)
             {
-                if (MaxNumberOfIdes == cachedConnections.Count && MaxNumberOfIdes != 0)
+                if (MaxNumberOfIdes == cachedConnections.Count && MaxNumberOfIdes != 0 
+                                                               && solutionPath != "")
                 {
                     await semaphore.WaitAsync();
                     connection = cachedConnections.First().Value;
                     semaphore.Release();
                     await ideCalls.ChangeSolution(connection, solutionPath);
                 }
-                else if (MaxNumberOfIdes != 0)
+                else if (MaxNumberOfIdes != 0 && solutionPath != "")
                 {
                     connection = await OpenNewIDEInstanceAsync(solutionPath);
                 }
                 else
                 {
+                    ShowNotification.Error("Solution file not defined",
+                        "SEE City is missing the solution file.");
                     return connection;
                 }
             }

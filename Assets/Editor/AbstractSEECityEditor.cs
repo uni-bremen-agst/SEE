@@ -135,7 +135,7 @@ namespace SEEEditor
                 city.ZScoreScale = EditorGUILayout.Toggle("Z-score scaling", city.ZScoreScale);
                 city.ScaleOnlyLeafMetrics = EditorGUILayout.Toggle("Scale only leaf metrics", city.ScaleOnlyLeafMetrics);
 
-                city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath);
+                city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath, Filenames.ExtensionWithoutPeriod(Filenames.SolutionExtension));
             }
 
             // TODO: We may want to allow a user to define all edge types to be considered hierarchical.
