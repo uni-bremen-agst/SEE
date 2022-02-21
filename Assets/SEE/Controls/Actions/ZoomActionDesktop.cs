@@ -34,7 +34,13 @@ namespace SEE.Controls.Actions
                     enabled = false;
                     return;
                 }
-                GO.Plane clippingPlane = rootTransform.parent.GetComponent<GO.Plane>();
+                if (!rootTransform.parent.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+                {
+                    Debug.LogError($"ZoomActionDesktop.Update: parent for hovered {obj.name} has no GO.Plane. Zooming turned off.\n");
+                    enabled = false;
+                    return;
+                }
+
                 Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane);
 
                 // We need to hit something inside of its clipping area

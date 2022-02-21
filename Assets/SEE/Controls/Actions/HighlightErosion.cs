@@ -31,11 +31,6 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The node reference this component is attached to.
-        /// </summary>
-        private NodeRef nodeRef;
-
-        /// <summary>
         /// All currently active tweens, collected in a sequence.
         /// </summary>
         private Sequence sequence;
@@ -45,22 +40,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable == null)
+            if (Interactable == null)
             {
                 Debug.LogError($"HighlightErosion.OnEnable for {name} has no interactable.\n");
                 enabled = false;
             }
-            else if ((nodeRef != null || gameObject.TryGetComponent(out nodeRef)) && nodeRef.Value != null)
-            {
-                interactable.SelectIn += SelectionOn;
-                interactable.SelectOut += SelectionOff;
-                interactable.HoverIn += HoverOn;
-                interactable.HoverOut += HoverOff;
-            }
             else
             {
-                Debug.LogError($"HighlightErosion.OnEnable for {name} has no valid node reference.\n");
-                enabled = false;
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
             }
         }
 
@@ -69,16 +59,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= SelectionOn;
-                interactable.SelectOut -= SelectionOff;
-                interactable.HoverIn -= HoverOn;
-                interactable.HoverOut -= HoverOff;
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
             }
             else
             {
-                Debug.LogError($"HighlightErosion.OnDisable for {name} has NO interactable.\n");
+                Debug.LogError($"HighlightErosion.OnDisable for {name} has no interactable.\n");
                 enabled = false;
             }
         }
@@ -200,24 +190,28 @@ namespace SEE.Controls.Actions
                 sequence = DOTween.Sequence();
                 sequence.SetAutoKill(false);
                 sequence.SetRecyclable(true);
-                float duration = AnimationDuration(nodeRef.Value);
-                const float SCALING_FACTOR = 1.3f;
-                ForEachErosion((sprite, textMesh, layoutGroup) =>
+
+                if (gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null)
                 {
-                    // We have to delete the text first to animate it more nicely, so we save it here before that
-                    string metricText = textMesh.text;
-                    // This will enlarge the sprite, make it more opaque, and fade in the text
-                    sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
-                            .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
-                                               .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
-                                                                     s => sprite.transform.localScale = s,
-                                                                     sprite.transform.localScale * SCALING_FACTOR, duration))
-                                               .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
-                                                                          1f, duration))
-                                               .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
-                                                                     metricText, duration));
-                });
-                sequence.PlayForward();
+                    float duration = AnimationDuration(nodeRef.Value);
+                    const float SCALING_FACTOR = 1.3f;
+                    ForEachErosion((sprite, textMesh, layoutGroup) =>
+                    {
+                        // We have to delete the text first to animate it more nicely, so we save it here before that.
+                        string metricText = textMesh.text;
+                        // This will enlarge the sprite, make it more opaque, and fade in the text.
+                        sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
+                                    .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                                       .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                                             s => sprite.transform.localScale = s,
+                                                                             sprite.transform.localScale * SCALING_FACTOR, duration))
+                                                       .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                                                  1f, duration))
+                                                       .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                                             metricText, duration));
+                    });
+                    sequence.PlayForward();
+                }
             }
         }
 
@@ -238,7 +232,7 @@ namespace SEE.Controls.Actions
                 throw new ArgumentNullException(nameof(spriteAction));
             }
 
-            foreach (Transform childTransform in nodeRef.transform)
+            foreach (Transform childTransform in gameObject.transform)
             {
                 if (childTransform.name.StartsWith(ErosionIssues.EROSION_SPRITE_PREFIX))
                 {

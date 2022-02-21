@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
+  m_Name: M_Shirt_ForCoat_Hider
+  m_EditorClassIdentifier: 
+  _asset: {fileID: 11400000, guid: caf6f7ecc63c8544baa74a99b0a7de7d, type: 2}
+  _serializedFlags:
+  - flags: 78fcfdffff7f84030000fcfffffbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0f0cf000ccc0ccf0ffffffff1f000000001878ff7f60f8ffffffffc1f0ffe1ffffff1f0000000e66863f00e0ffff010087ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0160800fffaf3f0660cc38f3c0c3ffffffffffffffffffffffffffffffff3f00fef90780ffffffffffffffffffffffffffffff03000000000c0080870000000000000000f0303300f0ffffff7706c0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff03feffffff010000000003000078808fffffbf3300fcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff1fff3f0018f0197e78e0ffffffffffffffffffffffff1ffcfffff93fff
+    Count: 3228

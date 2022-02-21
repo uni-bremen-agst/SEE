@@ -540,19 +540,13 @@ namespace Crosstales.RTVoice.Util
          string result = text;
 
          if (removeTags)
-         {
             result = result.CTClearTags();
-         }
 
          if (clearSpaces)
-         {
             result = result.CTClearSpaces();
-         }
 
          if (clearLineEndings)
-         {
             result = result.CTClearLineEndings();
-         }
 
          return result;
       }

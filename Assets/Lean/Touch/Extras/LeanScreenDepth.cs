@@ -1,6 +1,5 @@
-using Lean.Common;
-using UnityEditor;
 using UnityEngine;
+using Lean.Common;
 
 namespace Lean.Touch
 {
@@ -287,6 +286,8 @@ namespace Lean.Touch
 #if UNITY_EDITOR
 namespace Lean.Touch.Editor
 {
+	using UnityEditor;
+
 	[CustomPropertyDrawer(typeof(LeanScreenDepth))]
 	public class LeanScreenDepth_Drawer : PropertyDrawer
 	{

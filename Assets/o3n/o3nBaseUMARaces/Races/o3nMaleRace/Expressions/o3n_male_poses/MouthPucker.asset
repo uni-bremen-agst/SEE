@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
+  m_Name: MouthPucker
+  m_EditorClassIdentifier: 
+  poses:
+  - bone: LipLowerCorner_L
+    hash: 1534549083
+    position: {x: 0, y: 0.005000001, z: 0}
+    rotation: {x: 0.00000013329662, y: -0.00000036008825, z: -0.00000025461276, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerCorner_R
+    hash: -1585946312
+    position: {x: 0.000998415, y: -0.0050000027, z: 0}
+    rotation: {x: 0.00000018340738, y: 0.00000015743026, z: -0.00000007713675, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerIn_L
+    hash: -1225183903
+    position: {x: -0.003959868, y: 0.001000003, z: -0.00005064765}
+    rotation: {x: -0.07566267, y: -0.04266874, z: 0.0071150246, w: 0.9961948}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerIn_R
+    hash: 1291194370
+    position: {x: -0.0029863827, y: -0.0009999992, z: -0.00035351468}
+    rotation: {x: 0.07566282, y: -0.04266857, z: -0.00711515, w: 0.9961947}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerMiddle
+    hash: -1263147753
+    position: {x: -0.0030379295, y: 0, z: 0.0007713563}
+    rotation: {x: -0.000000010067121, y: 0.087155506, z: 0.000000045279187, w: 0.9961947}
+    scale: {x: 1, y: 0.9698154, z: 1}
+  - bone: LipLowerOut_L
+    hash: -893089928
+    position: {x: -0.00014897808, y: 0.0040000007, z: 0}
+    rotation: {x: 0.0000014256609, y: -0.000002803848, z: -0.00000051667035, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipLowerOut_R
+    hash: 818657819
+    position: {x: 0.0009984188, y: -0.0040000007, z: 0}
+    rotation: {x: 0.00000006865051, y: 0.00000052774817, z: 0.000000009748374, w: 1.0000001}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperAbove
+    hash: 213529522
+    position: {x: -0.0018331334, y: 0, z: 0.0010235962}
+    rotation: {x: 0.0000057539805, y: 0.0043084924, z: 0.0000009858786, w: 1.0000083}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperCorner_L
+    hash: 1062377319
+    position: {x: 0, y: 0.004999999, z: 0}
+    rotation: {x: 0.00000026120475, y: 0.000000640182, z: 0.000000048159094, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperCorner_R
+    hash: -983717372
+    position: {x: 0.0009982213, y: -0.005000001, z: 0}
+    rotation: {x: 0.00000006031726, y: 0.00000034589584, z: 0.00000008826619, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperIn_L
+    hash: -693713854
+    position: {x: -0.0057919733, y: 0.00022736471, z: 0.0017936842}
+    rotation: {x: 0.036934987, y: 0.020171478, z: 0.0014915608, w: 0.9990992}
+    scale: {x: 1.0431026, y: 1.0672579, z: 1}
+  - bone: LipUpperIn_R
+    hash: 749336865
+    position: {x: -0.0047294833, y: -0.00023455452, z: 0.0018262512}
+    rotation: {x: -0.036878742, y: 0.02026787, z: -0.0015263765, w: 0.9990993}
+    scale: {x: 1.0431025, y: 1.0672575, z: 1}
+  - bone: LipUpperMiddle
+    hash: -741693195
+    position: {x: -0.004901685, y: 0, z: 0.0011623865}
+    rotation: {x: 0.000048820395, y: -0.04210931, z: -0.000032469914, w: 0.9990994}
+    scale: {x: 1.0431024, y: 1.0335459, z: 1}
+  - bone: LipUpperOut_L
+    hash: 1757653475
+    position: {x: 0, y: 0.003999999, z: 0.00008020736}
+    rotation: {x: -0.0000003509218, y: -0.00000010243204, z: -0.00000008346779, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  - bone: LipUpperOut_R
+    hash: -1832086400
+    position: {x: 0.0009982251, y: -0.003999999, z: 0.00008270261}
+    rotation: {x: 0.000000068404944, y: 0.00000087521084, z: 0.00000006092121, w: 1}
+    scale: {x: 1, y: 1, z: 1}
+  tweenPoses: []
+  tweenWeights: []

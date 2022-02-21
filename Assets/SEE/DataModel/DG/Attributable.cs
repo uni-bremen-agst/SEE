@@ -168,6 +168,32 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Returns the value of a numeric (integer or float) attribute for the
+        /// attributed named <paramref name="attributeName"/> if it exists.
+        /// Otherwise an exception is thrown.
+        ///
+        /// Note: It could happen that the same name is given to a float and
+        /// integer attribute, in which case the float attribute will be
+        /// preferred.
+        /// </summary>
+        /// <param name="attributeName">name of an integer or float attribute</param>
+        /// <returns>value of numeric attribute <paramref name="attributeName"/></returns>
+        public float GetNumeric(string attributeName)
+        {
+            if (FloatAttributes.TryGetValue(attributeName, out float floatValue))
+            {
+                return floatValue;
+            }
+            else if (IntAttributes.TryGetValue(attributeName, out int intValue))
+            {
+                return intValue;
+            }
+            {
+                throw new UnknownAttribute(attributeName);
+            }
+        }
+
         //----------------------------------
         // General
         //----------------------------------

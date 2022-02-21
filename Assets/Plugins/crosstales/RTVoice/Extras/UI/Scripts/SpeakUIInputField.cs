@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 namespace Crosstales.RTVoice.UI
 {
    /// <summary>Speaks an InputField.</summary>
-   [RequireComponent(typeof(InputField))]
    [HelpURL("https://crosstales.com/media/data/assets/rtvoice/api/class_crosstales_1_1_r_t_voice_1_1_u_i_1_1_speak_u_i_input_field.html")]
    public class SpeakUIInputField : SpeakUIBase
    {
@@ -15,7 +14,8 @@ namespace Crosstales.RTVoice.UI
       public Color TextColor = Color.green;
       public bool ClearTags = true;
 
-      protected InputField inputComponent;
+      public InputField InputComponent;
+
       private Color originalColor;
       private Color originalPHColor;
 
@@ -26,9 +26,9 @@ namespace Crosstales.RTVoice.UI
 
       private void Awake()
       {
-         inputComponent = GetComponent<InputField>();
-         originalColor = inputComponent.textComponent.color;
-         originalPHColor = inputComponent.placeholder.color;
+         InputComponent = GetComponent<InputField>();
+         originalColor = InputComponent.textComponent.color;
+         originalPHColor = InputComponent.placeholder.color;
       }
 
       private void Update()
@@ -40,17 +40,17 @@ namespace Crosstales.RTVoice.UI
             if (elapsedTime > Delay && uid == null && (!SpeakOnlyOnce || !spoken))
             {
                string text;
-               if (!string.IsNullOrEmpty(inputComponent.textComponent.text))
+               if (!string.IsNullOrEmpty(InputComponent.textComponent.text))
                {
                   if (ChangeColor)
-                     inputComponent.textComponent.color = TextColor;
-                  text = inputComponent.textComponent.text;
+                     InputComponent.textComponent.color = TextColor;
+                  text = InputComponent.textComponent.text;
                }
                else
                {
                   if (ChangeColor)
-                     inputComponent.placeholder.color = TextColor;
-                  text = inputComponent.placeholder.GetComponent<Text>().text;
+                     InputComponent.placeholder.color = TextColor;
+                  text = InputComponent.placeholder.GetComponent<Text>().text;
                }
 
                uid = speak(ClearTags ? text.CTClearTags() : text);
@@ -72,8 +72,8 @@ namespace Crosstales.RTVoice.UI
       {
          base.OnPointerExit(eventData);
 
-         inputComponent.textComponent.color = originalColor;
-         inputComponent.placeholder.color = originalPHColor;
+         InputComponent.textComponent.color = originalColor;
+         InputComponent.placeholder.color = originalPHColor;
       }
 
       protected override void onSpeakComplete(Model.Wrapper wrapper)
@@ -82,8 +82,8 @@ namespace Crosstales.RTVoice.UI
          {
             base.onSpeakComplete(wrapper);
 
-            inputComponent.textComponent.color = originalColor;
-            inputComponent.placeholder.color = originalPHColor;
+            InputComponent.textComponent.color = originalColor;
+            InputComponent.placeholder.color = originalPHColor;
          }
       }
 

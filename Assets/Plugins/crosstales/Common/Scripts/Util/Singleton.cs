@@ -30,8 +30,9 @@ namespace Crosstales.Common.Util
       {
          get
          {
-            //if (!BaseHelper.isEditorMode && SingletonHelper.isQuitting)
-            if (SingletonHelper.isQuitting)
+            //Debug.Log("Instance: " + SingletonHelper.isQuitting + " - " + BaseHelper.isEditorMode + " - " + BaseHelper.ApplicationIsPlaying);
+
+            if (SingletonHelper.isQuitting && BaseHelper.isEditorMode)
             {
                //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
                return instance;
@@ -69,8 +70,9 @@ namespace Crosstales.Common.Util
       protected virtual void Awake()
       {
          //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' AWAKE: {activeInstance.GetInstanceID()}");
-
+//#if !UNITY_2020_1_OR_NEWER
          Util.BaseHelper.ApplicationIsPlaying = Application.isPlaying; //needed to enforce the right mode
+//#endif
          //isQuitting = false;
 
          if (instance == null)
@@ -109,6 +111,7 @@ namespace Crosstales.Common.Util
       {
          SingletonHelper.isQuitting = true;
 
+         //Debug.Log("OnApplicationQuit", this);
          Util.BaseHelper.ApplicationIsPlaying = false;
       }
 
@@ -120,6 +123,8 @@ namespace Crosstales.Common.Util
       /// <param name="deleteExistingInstance">Delete existing instance of this object (default: false, optional)</param>
       public static void CreateInstance(bool searchExistingGameObject = true, bool deleteExistingInstance = false)
       {
+         //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' will be newly created.");
+
          if (deleteExistingInstance)
             DeleteInstance();
 
@@ -190,7 +195,7 @@ namespace Crosstales.Common.Util
 #endif
    public class SingletonHelper
    {
-#if UNITY_EDITOR
+#if UNITY_EDITOR //&& !UNITY_2020_1_OR_NEWER
       private const string key = "CT_SINGLETON_ISQUITTING";
 
       private static bool quitting;
@@ -277,11 +282,13 @@ namespace Crosstales.Common.Util
          //Debug.Log($"{Time.realtimeSinceStartup} - onSceneLoaded");
 
          isQuitting = false;
+         //Debug.Log("onSceneLoaded");
          Util.BaseHelper.ApplicationIsPlaying = true;
       }
 
       private static void onSceneUnloaded(UnityEngine.SceneManagement.Scene scene)
       {
+         //Debug.Log("onSceneUnloaded");
          //if (Util.BaseHelper.ApplicationIsPlaying)
          //{
          //Debug.Log($"{Time.realtimeSinceStartup} - onSceneUnloaded");

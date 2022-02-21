@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
@@ -13,7 +12,7 @@ namespace SEE.GO
     /// reduce the number of drawing calls. The material does not have
     /// any reflexions to save computation run-time.
     /// </summary>
-    public class Materials
+    internal class Materials
     {
         /// <summary>
         /// Different types of shaders used to draw the materials.
@@ -67,7 +66,7 @@ namespace SEE.GO
         /// The different materials. They depend upon two aspects:
         /// the offset in the rendering queue and the number of colors requested.
         /// The first index in the list of <see cref="materials"/> is the offset
-        /// in the rendering queue, the second index in the materials array,
+        /// in the rendering queue. The second index in a materials array,
         /// which is an element of that list, is the color index.
         /// The entries of the inner material array are all alike except for the color.
         /// We will use a color gradient and one material for each color.
@@ -119,7 +118,7 @@ namespace SEE.GO
                 // Assumption: numberOfColors > 1; if numberOfColors == 0, we would divide by zero.
                 for (int i = 0; i < result.Length; i++)
                 {
-                    Color color = Color.Lerp(lower, higher, i / (float)(numberOfColors - 1));
+                    Color color = Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1));
                     result[i] = New(shaderType, color, renderQueueOffset);
                 }
             }
@@ -133,10 +132,10 @@ namespace SEE.GO
         /// <paramref name="renderQueueOffset"/> specifies the offset of the render queue for rendering.
         /// The larger the offset, the later the object will be rendered. An object drawn later
         /// will cover objects drawn earlier.
-        /// Precondition: 0 <= index <= numberOfColors-1 and renderQueueOffset >= 0; otherwise an exception is thrown
+        /// Precondition: 0 <= index <= NumberOfMaterials-1 and renderQueueOffset >= 0; otherwise an exception is thrown
         /// </summary>
         /// <param name="renderQueueOffset">offset for the render queue</param>
-        /// <param name="index">index of the material (color) in the range [0, numberOfColors-1]</param>
+        /// <param name="index">index of the material (color) in the range [0, NumberOfMaterials-1]</param>
         /// <returns>default material</returns>
         public Material Get(int renderQueueOffset, int index)
         {
@@ -185,11 +184,7 @@ namespace SEE.GO
             Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
             Material material = new Material(prefab)
             {
-                // FIXME this is not a good solution. we may want to add an enum or something for
-                // possible materials, such that we can ensure the correct renderQueue. That would make
-                // adding new materials make easier as well.
-                renderQueue = (int) (name.Contains("Transparent") ? UnityEngine.Rendering.RenderQueue.Transparent
-                                                                  : UnityEngine.Rendering.RenderQueue.Geometry) + renderQueueOffset,
+                renderQueue = prefab.renderQueue + renderQueueOffset,
                 color = color
             };
             return material;
@@ -204,20 +199,21 @@ namespace SEE.GO
         /// material</param>
         /// <param name="color">requested color of the new material</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
+        /// <param name="forHoloLens">whether materials suitable for the HoloLens should be used</param>
         /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0)
+        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0, bool forHoloLens = false)
         {
             string name = null;
 
             // When the user is on a HoloLens, the special MRTK shader variants should be used
-            if (PlayerSettings.GetInputType() != PlayerInputType.HoloLensPlayer)
+            if (forHoloLens)
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque:             name = OpaqueMaterialName; break;
-                    case ShaderType.Transparent:        name = TransparentMaterialName; break;
-                    case ShaderType.TransparentLine:    name = TransparentLineMaterialName; break;
-                    case ShaderType.Invisible:          name = InvisibleMaterialName; break;
+                    case ShaderType.Opaque: name = MRTKOpaqueMaterialName; break;
+                    case ShaderType.Transparent: name = MRTKTransparentMaterialName; break;
+                    case ShaderType.TransparentLine: name = MRTKTransparentLineMaterialName; break;
+                    case ShaderType.Invisible: name = MRTKInvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }
@@ -225,10 +221,10 @@ namespace SEE.GO
             {
                 switch (shaderType)
                 {
-                    case ShaderType.Opaque:             name = MRTKOpaqueMaterialName; break;
-                    case ShaderType.Transparent:        name = MRTKTransparentMaterialName; break;
-                    case ShaderType.TransparentLine:    name = MRTKTransparentLineMaterialName; break;
-                    case ShaderType.Invisible:          name = MRTKInvisibleMaterialName; break;
+                    case ShaderType.Opaque: name = OpaqueMaterialName; break;
+                    case ShaderType.Transparent: name = TransparentMaterialName; break;
+                    case ShaderType.TransparentLine: name = TransparentLineMaterialName; break;
+                    case ShaderType.Invisible: name = InvisibleMaterialName; break;
                     default: Assertions.InvalidCodePath(); break;
                 }
             }

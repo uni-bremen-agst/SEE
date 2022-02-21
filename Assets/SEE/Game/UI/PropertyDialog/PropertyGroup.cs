@@ -101,5 +101,18 @@ namespace SEE.Game.UI.PropertyDialog
             result.name = name;
             return result;
         }
+
+        /// <summary>
+        /// Calls <see cref="Property.GetReady()"/> for each property in this group.
+        /// Will be called just before the dialog containing this property group
+        /// is shown to the user.
+        /// </summary>
+        internal void GetReady()
+        {
+            foreach (Property property in Properties)
+            {
+                property.GetReady();
+            }
+        }
     }
 }

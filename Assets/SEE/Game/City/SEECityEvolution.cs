@@ -155,12 +155,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Called by Unity when this SEECityEvolution instances comes into existence
-        /// and can enter the game for the first time. Loads all graphs, calculates their
-        /// layouts, and displays the first graph in the graph series.
+        /// Loads all graphs, calculates their layouts, and displays the first graph in the
+        /// graph series.
         /// </summary>
-        private void Awake()
+        override internal void Start()
         {
+            base.Start();
+
             evolutionRenderer = CreateEvolutionRenderer();
             List<Graph> graphs = LoadData();
             DrawGraphs(graphs);
@@ -171,10 +172,7 @@ namespace SEE.Game.City
                 animationInteraction = gameObject.AddComponent<AnimationInteraction>();
             }
             animationInteraction.EvolutionRenderer = evolutionRenderer;
-        }
 
-        private void Start()
-        {
             evolutionRenderer.ShowGraphEvolution();
         }
 

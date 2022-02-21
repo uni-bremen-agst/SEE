@@ -2,35 +2,80 @@
 
 namespace SEE.Controls.Actions
 {
-    public class ShowGrabbing : InteractableObjectGrabAction
+    /// <summary>
+    /// Draws or modifies, respectively, an outline around a game object being grabbed and
+    /// makes it opaque.
+    /// </summary>
+    internal class ShowGrabbing : HighlightedInteractableObjectAction
     {
         /// <summary>
-        /// The local grabbing color of the outline.
+        /// Initializes the local and remote outline color.
         /// </summary>
-        private readonly static Color LocalGrabColor = Utils.ColorPalette.Viridis(0.8f);
+        static ShowGrabbing()
+        {
+            LocalOutlineColor = Utils.ColorPalette.Viridis(1.0f);
+            RemoteOutlineColor = Utils.ColorPalette.Viridis(0.0f);
+        }
 
         /// <summary>
-        /// The remote grabbing color of the outline.
+        /// Called when the object is grabbed. Remembers the current color
+        /// of the outline in <see cref="initialColor"/> and sets the outline's
+        /// color to <see cref="LocalOutlineColor"/> or <see cref="RemoteOutlineColor"/>,
+        /// respectively, depending upon <paramref name="isInitiator"/>.
+        /// If <paramref name="isInitiator"/>, the <see cref="enforcer"/>'s
+        /// current <see cref="TargetAlpha"/> is saved and then set to 1.
         /// </summary>
-        private readonly static Color RemoteGrabColor = Utils.ColorPalette.Viridis(0.0f);
-
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            if (TryGetComponent(out Outline outline))
+            SetOutlineColorAndAlpha(isInitiator);
+        }
+
+        /// <summary>
+        /// Called when the object is no longer grabbed. Resets the outline's
+        /// color and the <see cref="enforcer"/>'s <see cref="TargetAlpha"/>
+        /// to their original values before the object was grabbed.
+        /// </summary>
+        /// <param name="interactableObject">the object being grabbed</param>
+        /// <param name="isInitiator">true if a local user initiated this call</param>
+        protected override void Off(InteractableObject interactableObject, bool isInitiator)
+        {
+            if (!Interactable.IsHovered && !Interactable.IsSelected)
             {
-                outline.SetColor(isInitiator ? LocalGrabColor : RemoteGrabColor);
-            }
-            else
-            {
-                Outline.Create(gameObject, isInitiator ? LocalGrabColor : RemoteGrabColor);
+                ResetOutlineColorAndAlpha(isInitiator);
             }
         }
 
-        protected override void Off(InteractableObject interactableObject, bool isInitiator)
+        /// <summary>
+        /// Registers On() and Off() for the respective grabbing events.
+        /// </summary>
+        protected virtual void OnEnable()
         {
-            if (!interactable.IsHovered && !interactable.IsSelected && TryGetComponent(out Outline outline))
+            if (Interactable != null)
             {
-                DestroyImmediate(outline);
+                Interactable.GrabIn += On;
+                Interactable.GrabOut += Off;
+            }
+            else
+            {
+                Debug.LogError($"ShowGrabbing.OnEnable for {name} has NO interactable.\n");
+            }
+        }
+
+        /// <summary>
+        /// Unregisters On() and Off() from the respective grabbing events.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.GrabIn -= On;
+                Interactable.GrabOut -= Off;
+            }
+            else
+            {
+                Debug.LogError($"ShowGrabbing.OnDisable for {name} has NO interactable.\n");
             }
         }
     }

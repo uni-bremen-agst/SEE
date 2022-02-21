@@ -244,8 +244,8 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The outgoing edges are different.");
                     return false;
                 }
-                else if (incomings.Count != otherNode.incomings.Count
-                         || !GetIDs(incomings).SetEquals(GetIDs(otherNode.incomings)))
+                else if (Incomings.Count != otherNode.Incomings.Count
+                         || !GetIDs(Incomings).SetEquals(GetIDs(otherNode.Incomings)))
                 {
                     Report(ID + ": The incoming edges are different.");
                     return false;
@@ -295,12 +295,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        private List<Edge> incomings = new List<Edge>();
-
-        /// <summary>
-        /// The incoming edges of this node.
-        /// </summary>
-        public List<Edge> Incomings => incomings;
+        public ISet<Edge> Incomings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
@@ -323,7 +318,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                incomings.Add(edge);
+                Incomings.Add(edge);
             }
         }
 
@@ -348,7 +343,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                if (!incomings.Remove(edge))
+                if (!Incomings.Remove(edge))
                 {
                     throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
                 }
@@ -358,7 +353,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        public List<Edge> Outgoings { get; private set; } = new List<Edge>();
+        public ISet<Edge> Outgoings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
         /// Resets this node, i.e., removes all incoming and outgoing edges
@@ -370,7 +365,7 @@ namespace SEE.DataModel.DG
         public void Reset()
         {
             Outgoings.Clear();
-            incomings.Clear();
+            Incomings.Clear();
             children.Clear();
             Reparent(null);
             ItsGraph = null;
@@ -614,8 +609,8 @@ namespace SEE.DataModel.DG
             target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
-            target.Outgoings = new List<Edge>();
-            target.incomings = new List<Edge>();
+            target.Outgoings = new HashSet<Edge>();
+            target.Incomings = new HashSet<Edge>();
         }
 
         /// <summary>
@@ -627,7 +622,7 @@ namespace SEE.DataModel.DG
         /// <param name="target">target node</param>
         /// <param name="its_type">requested edge type</param>
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
-        public List<Edge> From_To(Node target, string its_type)
+        public List<Edge> FromTo(Node target, string its_type)
         {
             if (ReferenceEquals(target, null))
             {

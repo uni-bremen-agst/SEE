@@ -98,12 +98,32 @@ namespace SEE.GO.Menu
                        .ToList();
             
             // In cases there are duplicates in the result, we append the filename too
+            HashSet<string> encounteredNames = new HashSet<string>();
             results = results.GroupBy(x => x.Item2)
                              .SelectMany(x => x.Select((entry, i) => (entry, index: i)))
-                             .Select(x => x.index <= 0 ? x.entry : 
-                                         (x.entry.Item1, 
-                                          $"{x.entry.Item2} ({x.entry.Item3.GetNode().SourceFile ?? x.index.ToString()})", 
-                                          x.entry.Item3));
+                             .Select(x =>
+                             {
+                                 ((int score, string name, GameObject gameObject) entry, int index) = x;
+                                 if (index <= 0)
+                                 {
+                                     return entry;
+                                 }
+                                 else
+                                 {
+                                     string newName = $"{entry.name} ({entry.gameObject.GetNode().SourceFile ?? index.ToString()})";
+                                     if (!encounteredNames.Contains(newName))
+                                     {
+                                         encounteredNames.Add(newName);
+                                     }
+                                     else
+                                     {
+                                         // If this node exists multiple times within this filename,
+                                         // we append the index to it.
+                                         newName += $" ({index.ToString()})";
+                                     }
+                                     return (entry.score, newName, entry.gameObject);
+                                 }
+                             });
                    
             
             int found = results.Count();
@@ -154,9 +174,10 @@ namespace SEE.GO.Menu
                 resultMenu.ShowMenu(false);
             }
 
-            // Returns a color between black and gray, the higher the given score the grayer it is.
-            static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
         }
+        
+        // Returns a color between black and gray, the higher the given score the grayer it is.
+        public static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
 
         /// <summary>
         /// Highlights the given <paramref name="result"/>> node with the name <paramref name="resultName"/>
@@ -176,7 +197,7 @@ namespace SEE.GO.Menu
                 GraphRenderer graphRenderer = new GraphRenderer(city, null);
                 Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
-                Material material = cityRenderer.sharedMaterials.Last();
+                Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();
                 marker.MarkBorn(result);
@@ -220,7 +241,7 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <param name="input">The string which shall be filtered.</param>
         /// <returns>The filtered string.</returns>
-        private static string FilterString(string input)
+        public static string FilterString(string input)
         {
             const string zeroWidthSpace = "\u200B";
             return input.Trim().Replace(zeroWidthSpace, string.Empty);
