@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    public static class SEEInput
+    internal static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
@@ -17,7 +17,7 @@ namespace SEE.Controls
         /// For instance, pressing W would enter the text "W" and move the player
         /// forward.
         /// </summary>
-        public static bool KeyboardShortcutsEnabled = true;
+        public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
         //-----------------------------------------------------
         // General key bindings
@@ -273,7 +273,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to drag the city in it's entirety or parts of it.
+        /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()

@@ -30,13 +30,14 @@ namespace SEE.Game.City
     /// <summary>
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
-    /// </summary>
+    /// Declared public because it will be used by editor code.
+    /// /// </summary>
     public partial class SEEJlgCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEEJlgCity.Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEEJlgCity.Save(ConfigWriter)"/> and
+        /// <see cref="SEEJlgCity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -45,6 +46,10 @@ namespace SEE.Game.City
         /// <returns>path of JLG file</returns>
         public DataPath JLGPath = new DataPath();
 
+        /// <summary>
+        /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the
+        /// JLG tracing data.
+        /// </summary>
         public override void LoadData()
         {
             base.LoadData();
@@ -52,7 +57,8 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the data from the given jlg file into a parsedJLG object and gives the object to a GameObject, that has a component to visualize it in the running game.
+        /// Loads the data from the given jlg file into a parsedJLG object and gives the object
+        /// to a GameObject, that has a component to visualize it in the running game.
         /// </summary>
         private void LoadJLG()
         {

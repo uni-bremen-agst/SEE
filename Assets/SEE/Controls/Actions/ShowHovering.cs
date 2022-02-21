@@ -1,21 +1,43 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline around a game object being hovered over.
+    /// Draws or modifies, respectively, an outline around a game object being hovered over and makes it opaque.
     /// </summary>
-    public class ShowHovering : InteractableObjectHoveringAction
+    internal class ShowHovering : HighlightedInteractableObjectAction
     {
         /// <summary>
-        /// The local hovering color of the outline.
+        /// Initializes the local and remote outline color.
         /// </summary>
-        private readonly static Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+        static ShowHovering()
+        {
+            LocalOutlineColor = ColorPalette.Viridis(0.4f);
+            RemoteOutlineColor = ColorPalette.Viridis(0.2f);
+        }
 
         /// <summary>
-        /// The remote hovering color of the outline.
+        /// The animation sequence to be played while the gameObject is being hovered over.
         /// </summary>
-        private readonly static Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+        private Sequence hoverAnimation;
+
+        /// <summary>
+        /// Initializes this component by creating an outline and AlphaEnforcer as
+        /// well as a <see cref="hoverAnimation"/>.
+        /// </summary>
+        protected override void Start()
+        {
+            base.Start();
+            hoverAnimation = DOTween.Sequence();
+            // The following animation is equivalent to SetAlpha() when played forward and equivalent to
+            // ResetAlpha() when played backward.
+            hoverAnimation.Append(DOTween.To(() => enforcer.TargetAlpha, x => enforcer.TargetAlpha = x, 1f, 0.5f));
+            hoverAnimation.SetAutoKill(false);
+            hoverAnimation.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
+            hoverAnimation.Pause();
+        }
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
@@ -27,15 +49,13 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
-                if (TryGetComponent(out Outline outline))
+                SetInitialAndNewOutlineColor(isInitiator);
+                if (isInitiator)
                 {
-                    outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isInitiator ? LocalHoverColor : RemoteHoverColor);
+                    // Replaces SetAlpha().
+                    hoverAnimation.PlayForward();
                 }
             }
         }
@@ -49,25 +69,77 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
+            //FIXME: Outline color is not correctly set if we hover off while a node is selected
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
-                DestroyImmediate(outline);
+                ResetOutlineColor();
+                if (isInitiator)
+                {
+                    // Replaces ResetAlpha().
+                    hoverAnimation.PlayBackwards();
+                }
             }
         }
 
-        protected override void SelectOff(InteractableObject interactableObject, bool isInitiator)
+        protected void SelectOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsGrabbed)
+            if (Interactable.IsHovered && !Interactable.IsGrabbed)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                SetOutlineColor(isInitiator);
+                if (isInitiator)
+                {
+                    // Replaces SetAlpha().
+                    hoverAnimation.PlayForward();
+                }
             }
         }
 
-        protected override void GrabOff(InteractableObject interactableObject, bool isInitiator)
+        protected void GrabOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsSelected)
+            if (Interactable.IsHovered && !Interactable.IsSelected)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                SetOutlineColor(isInitiator);
+                if (isInitiator)
+                {
+                    // Replaces SetAlpha().
+                    hoverAnimation.PlayForward();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Registers On() and Off() for the respective hovering events.
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.HoverIn += On;
+                Interactable.HoverOut += Off;
+                Interactable.SelectOut += SelectOff;
+                Interactable.GrabOut += GrabOff;
+            }
+            else
+            {
+                Debug.LogErrorFormat("ShowHovering.OnEnable for {0} has NO interactable.\n", name);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters On() and Off() from the respective hovering events.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.HoverIn -= On;
+                Interactable.HoverOut -= Off;
+                Interactable.SelectOut -= SelectOff;
+                Interactable.GrabOut -= GrabOff;
+            }
+            else
+            {
+                Debug.LogErrorFormat("ShowHovering.OnDisable for {0} has NO interactable.\n", name);
             }
         }
     }

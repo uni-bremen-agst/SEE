@@ -184,43 +184,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the root game object that represents a code city as a whole
-        /// along with the settings (layout information etc.). In other words,
-        /// we simply return the top-most transform in the game-object hierarchy.
-        /// That top-most object must be tagged by Tags.CodeCity. If it is,
-        /// it will be returned. If not, null will be returned.
+        /// Returns the closest ancestor of <paramref name="transform"/> that
+        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
+        /// This ancestor is assumed to carry the settings (layout information etc.).
+        /// If none can be found, null will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>top-most transform in the game-object hierarchy tagged by
+        /// <returns>closest ancestor transform in the game-object hierarchy tagged by
         /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;
-            if (PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer)
+            while (result != null)
             {
-                // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
-                // In this case, we actually have to traverse the tree up until the Tags match.
-
-                while (result != null)
+                if (result.CompareTag(Tags.CodeCity))
                 {
-                    if (result.CompareTag(Tags.CodeCity))
-                    {
-                        return result;
-                    }
-                    result = result.parent;
+                    return result;
                 }
-                return result;
+                result = result.parent;
             }
-            result = transform.root;
-
-            if (result.CompareTag(Tags.CodeCity))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
+            return result;
         }
 
         /// <summary>

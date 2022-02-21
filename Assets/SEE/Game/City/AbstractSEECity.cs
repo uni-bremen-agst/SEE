@@ -109,6 +109,18 @@ namespace SEE.Game.City
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
+        /// Called at game start. Sets up additional components.
+        /// </summary>
+        internal virtual void Start()
+        {
+            if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
+            {
+                gameObject.AddComponent<EdgeMeshScheduler>()
+                    .Init(EdgeLayoutSettings, EdgeSelectionSettings);
+            }
+        }
+
+        /// <summary>
         /// Saves the settings of this code city to <see cref="CityPath"/>.
         /// </summary>
         public void Save()
@@ -127,7 +139,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the settings of this code city to <paramref name="filename"/>
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename">name of the file in which the settings are stored</param>
         public void Save(string filename)
         {
             using ConfigWriter writer = new ConfigWriter(filename);
@@ -137,7 +149,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Reads the settings of this city from <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename"></param>
+        /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
             using ConfigReader stream = new ConfigReader(filename);

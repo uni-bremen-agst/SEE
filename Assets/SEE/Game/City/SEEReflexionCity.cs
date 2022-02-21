@@ -5,6 +5,8 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
+using SEE.Tools.ReflexionAnalysis;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -17,16 +19,6 @@ namespace SEE.Game.City
     /// </summary>
     public class SEEReflexionCity : SEECity
     {
-        /// <summary>
-        /// Label for the architecture toggle added to each graph element of the architecture city.
-        /// </summary>
-        private const string ArchitectureLabel = "Architecture";
-        
-        /// <summary>
-        /// Label for the implementation toggle added to each graph element of the implementation city.
-        /// </summary>
-        private const string ImplementationLabel = "Implementation";
-
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
         /// </summary>
@@ -41,7 +33,7 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
         public DataPath GxlMappingPath = new DataPath();
-        
+
         /// <summary>
         /// The path to the CSV file containing the implementation metric data.
         /// </summary>
@@ -85,7 +77,7 @@ namespace SEE.Game.City
             }
 
             #region Local Functions
-            
+
             async UniTaskVoid LoadAllGraphs()
             {
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
@@ -101,124 +93,57 @@ namespace SEE.Game.City
                     MappingGraph = LoadGraph(GxlMappingPath.Path, "");
                 }
 
-                // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
-                MarkGraphNodes(ArchitectureGraph, ArchitectureLabel);
-                MarkGraphNodes(ImplementationGraph, ImplementationLabel);
-
                 // We collect the tasks here so we can wait on them both at the same time instead of sequentially
                 IList<UniTask> tasks = new List<UniTask>();
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
                     tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
+
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
                     tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
+
                 await UniTask.WhenAll(tasks);
-                
-                LoadedGraph = GenerateFullGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
+
+                LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
             }
 
             #endregion
         }
-        
-        /// <summary>
-        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of the given <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
-        /// <param name="label">The value of the toggle attribute</param>
-        private static void MarkGraphNodes(Graph graph, string label)
-        {
-            IEnumerable<GraphElement> graphElements = graph.Nodes().Concat<GraphElement>(graph.Edges());
-            foreach (GraphElement graphElement in graphElements)
-            {
-                graphElement.SetToggle(label);
-            }
-        }
 
         /// <summary>
-        /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
-        /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
-        /// the result. Note that the name of the three graphs may be modified.
-        /// 
-        /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
-        /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
+        /// Maps the node <paramref name="from"/> to the node <paramref name="to"/>.
+        /// This will result in a "Maps_To" edge being created between the two, and will cause
+        /// the <paramref name="from"/> node to be moved to the <paramref name="to"/> node.
+        /// Because "Maps_To" should be a mapping corresponding to an injective function,
+        /// existing outgoing "Maps_To" edges from the <paramref name="from"/> node and incoming "Maps_To" edges to the
+        /// <paramref name="to"/> node will be replaced.
         /// </summary>
-        /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        private static Graph GenerateFullGraph(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, 
-                                               string Name)
+        /// <param name="from">The node to map from.</param>
+        /// <param name="to">The node to map to.</param>
+        /// <exception cref="ArgumentException">
+        /// If <paramref name="from"/> and <paramref name="to"/> are not in the same graph, or if
+        /// the mapping isn't from an implementation node to an architecture node.
+        /// </exception>
+        public static void Map(Node from, Node to)
         {
-            if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
+            from.AssertNotNull(nameof(from));
+            to.AssertNotNull(nameof(to));
+            if (!from.IsInImplementation() || !to.IsInArchitecture())
             {
-                throw new ArgumentException("All three sub-graphs must be loaded before generating "
-                                            + "the full graph.");
+                throw new ArgumentException($"{nameof(from)} must be an implementation node, and"
+                                            + $"{nameof(to)} must be an architecture node!");
             }
 
-            // We set the name for the implementation graph, because its name will be used for the merged graph.
-            ImplementationGraph.Name = Name;
-
-            // We merge architecture and implementation first.
-            // Duplicate node IDs between architecture and implementation are not allowed.
-            // Any duplicate nodes in the mapping graph are merged into the full graph.
-            // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
-            List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            string suffix = null;
-            if (nodesOverlap.Count > 0)
+            if (!ReferenceEquals(from.ItsGraph, to.ItsGraph))
             {
-                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
+                throw new ArgumentException("The two nodes must be in the same graph!");
             }
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-A";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-            Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
             
-            // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
-            edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
-            suffix = null;
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-M";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-            return mergedGraph.MergeWith(MappingGraph, suffix);
-
-            
-            #region Local Functions
-
-            // Returns the intersection of the node IDs of the two graphs.
-            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
-
-            // Returns the intersection of the edge IDs of the two graphs.
-            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph) => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-            
-            #endregion
-        }
-
-        /// <summary>
-        /// Disassembles the given <paramref name="FullGraph"/> into implementation, architecture, and mapping graphs,
-        /// and returns them in this order.
-        ///
-        /// Pre-condition: The given graph must have been assembled by <see cref="GenerateFullGraph"/>.
-        /// </summary>
-        /// <param name="FullGraph">Graph generated by <see cref="GenerateFullGraph"/></param>
-        /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
-        private static (Graph implementation, Graph architecture, Graph mapping) DisassembleFullGraph(Graph FullGraph)
-        {
-            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] {ImplementationLabel});
-            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] {ArchitectureLabel});
-            // Mapping graph elements will have neither architecture nor implementation label.
-            // However, we must not include the artificial root node, if one was generated for this graph.
-            Graph MappingGraph = FullGraph.SubgraphBy(x => !x.HasToggle(ImplementationLabel) 
-                                                           && !x.HasToggle(ArchitectureLabel) 
-                                                           && x.Type != GraphRenderer.RootType);
-            return (ImplementationGraph, ArchitectureGraph, MappingGraph);
+            // TODO(falko17): Invoke reflexion analysis
         }
 
         public override void SaveData()
@@ -230,12 +155,12 @@ namespace SEE.Game.City
             if (NoPathGraphs.Count > 0)
             {
                 Debug.LogError($"Couldn't find any graph at path{(NoPathGraphs.Count > 1 ? "s" : "")} " +
-                    string.Join(", ", NoPathGraphs) + ".\n");
+                               string.Join(", ", NoPathGraphs) + ".\n");
             }
             else
             {
                 string hierarchicalType = HierarchicalEdges.First();
-                (Graph implementation, Graph architecture, Graph mapping) = DisassembleFullGraph(LoadedGraph);
+                (Graph implementation, Graph architecture, Graph mapping) = LoadedGraph.Disassemble();
                 GraphWriter.Save(GxlArchitecturePath.Path, architecture, hierarchicalType);
                 Debug.Log($"Architecture graph saved at {GxlArchitecturePath.Path}.\n");
                 GraphWriter.Save(GxlImplementationPath.Path, implementation, hierarchicalType);
@@ -253,12 +178,12 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GxlArchitecturePath"/> in the configuration file.
         /// </summary>
         private const string GxlArchitectureLabel = "ArchitectureGXL";
-        
+
         /// <summary>
         /// Label of attribute <see cref="GxlImplementationPath"/> in the configuration file.
         /// </summary>
         private const string GxlImplementationLabel = "ImplementationGXL";
-        
+
         /// <summary>
         /// Label of attribute <see cref="GxlMappingPath"/> in the configuration file.
         /// </summary>
@@ -268,7 +193,7 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="CsvArchitecturePath"/> in the configuration file.
         /// </summary>
         private const string CsvArchitectureLabel = "ArchitectureCSV";
-        
+
         /// <summary>
         /// Label of attribute <see cref="CsvImplementationPath"/> in the configuration file.
         /// </summary>

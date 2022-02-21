@@ -25,8 +25,9 @@ using System.Collections.Generic;
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// Data model containing a graph and its node layout. The node layout is indexed by the
-    /// node's ID.
+    /// Data model containing a <see cref="Graph"/> with its node and edge
+    /// layout. The layouts are indexed by the node's or edge's ID,
+    /// respectively.
     /// </summary>
     public class LaidOutGraph
     {
@@ -34,10 +35,17 @@ namespace SEE.Game.Evolution
         /// The graph.
         /// </summary>
         private readonly Graph graph;
+
         /// <summary>
-        /// The layout for the graph as a mapping of the nodes' IDs onto their ILayoutNode.
+        /// The layout of the nodes as a mapping of the nodes' IDs onto their ILayoutNode.
         /// </summary>
-        private readonly Dictionary<string, ILayoutNode> layout;
+        private readonly Dictionary<string, ILayoutNode> nodeLayout;
+
+        /// <summary>
+        /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
+        /// May be null if edges are not drawn.
+        /// </summary>
+        private readonly Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout;
 
         /// <summary>
         /// The graph.
@@ -45,19 +53,27 @@ namespace SEE.Game.Evolution
         public Graph Graph => graph;
 
         /// <summary>
-        /// The layout of the graph as a mapping of the nodes' IDs onto their ILayoutNode.
+        /// The layout of the nodes as a mapping of the nodes' IDs onto their ILayoutNode.
         /// </summary>
-        public Dictionary<string, ILayoutNode> Layout => layout;
+        public Dictionary<string, ILayoutNode> Layout => nodeLayout;
+
+        /// <summary>
+        /// The layout of the edges as a mapping of the edges' IDs onto their ILayoutEdge.
+        /// May be null if edges are not drawn.
+        /// </summary>
+        public Dictionary<string, ILayoutEdge<ILayoutNode>> EdgeLayout => edgeLayout;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="graph">the graph</param>
-        /// <param name="layout">its layout as a mapping of the nodes' IDs onto their ILayoutNode</param>
-        public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> layout)
+        /// <param name="nodeLayout">its node layout as a mapping of the nodes' IDs onto their ILayoutNode</param>
+        /// <param name="edgeLayout">its edge layout as a mapping of the edges' IDs onto their ILayoutEdge</param>
+        public LaidOutGraph(Graph graph, Dictionary<string, ILayoutNode> nodeLayout, Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout)
         {
             this.graph = graph.AssertNotNull("graph");
-            this.layout = layout.AssertNotNull("layout");
+            this.nodeLayout = nodeLayout.AssertNotNull("node layout");
+            this.edgeLayout = edgeLayout.AssertNotNull("edge layout");
         }
     }
 }

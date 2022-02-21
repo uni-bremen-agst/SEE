@@ -1,4 +1,5 @@
 ﻿using SEE.Layout.Utils;
+using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -48,9 +49,9 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="nodes">nodes whose edges are to be drawn or which are 
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
-        public override void Create(ICollection<ILayoutNode> nodes, ICollection<ILayoutEdge> edges)
+        public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
-            MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
+            MinMaxBlockY(nodes, out _, out _, out float maxHeight);
 
             // The offset of the edges above or below the ground chosen relative 
             // to the height of the largest block.
@@ -62,10 +63,10 @@ namespace SEE.Layout.EdgeLayouts
             // or above the house (depending on the orientation).
             float offset = Mathf.Max(minLevelDistance, 0.2f * maxHeight); // must be positive
 
-            foreach (ILayoutEdge edge in edges)
+            foreach (ILayoutEdge<T> edge in edges)
             {
-                ILayoutNode source = edge.Source;
-                ILayoutNode target = edge.Target;
+                T source = edge.Source;
+                T target = edge.Target;
                 // define the points along the line
                 Vector3 start;
                 Vector3 end;
@@ -79,9 +80,44 @@ namespace SEE.Layout.EdgeLayouts
                     start = source.Ground;
                     end = target.Ground;
                 }
-                edge.ControlPoints = LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, offset);
-                edge.Points = Simplify(LinePoints.SplineLinePoints(start, end, edgesAboveBlocks, offset), rdp);
+                edge.Spline = CreateSpline(start, end, edgesAboveBlocks, offset);
             }
+        }
+
+        /// <summary>
+        /// Returns a direct spline from <paramref name="start"/> to <paramref name="end"/>.
+        /// The y co-ordinate of the middle point of the spline is X above (if <paramref name="above"/>
+        /// is true) or below (if <paramref name="above"/> is false), respectively, the higher
+        /// (or lower if <paramref name="above"/> is false) of the two (<paramref name="start"/>
+        /// and <paramref name="end"/>), where X is half the distance between <paramref name="start"/>
+        /// and <paramref name="end"/>.
+        ///
+        /// The y offset of the middle point is chosen relative to the distance between the two points.
+        /// We are using a value relative to the distance so that splines connecting close points do
+        /// not shoot into the sky. Otherwise they would be difficult to read. Likewise, splines
+        /// connecting two points farther away should go higher (or deeper, respectively) so that we
+        /// avoid crossings with things that may be in between. This heuristic may help to better read
+        /// the splines.
+        /// </summary>
+        /// <param name="start">starting point</param>
+        /// <param name="end">ending point</param>
+        /// <param name="above">whether middle point of the spline should be above <paramref name="start"/>
+        /// <param name="minOffset">the minimal y offset for the point in between <paramref name="start"/>
+        /// and <paramref name="end"/> through which the spline should pass</param>
+        /// <returns>points of the spline</returns>
+        private TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, bool above, float minOffset)
+        {
+            // This offset is used to draw the line somewhat below
+            // or above the house (depending on the orientation).
+            float offset = Mathf.Max(minOffset, 0.5f * Vector3.Distance(start, end)); // must be positive
+            // The level at which edges are drawn.
+            float edgeLevel = above ? Mathf.Max(start.y, end.y) + offset
+                                    : Mathf.Min(start.y, end.y) - offset;
+
+            Vector3 middle = Vector3.Lerp(start, end, 0.5f);
+            middle.y = edgeLevel;
+            return TinySpline.BSpline.InterpolateCubicNatural(
+                TinySplineInterop.VectorsToList(start, middle, end), 3);
         }
     }
 }

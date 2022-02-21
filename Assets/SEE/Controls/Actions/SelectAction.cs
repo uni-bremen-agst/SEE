@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Provides the ability to select graph elements (nodes or edges). 
+    /// Provides the ability to select graph elements (nodes or edges).
     /// This components is intended to be added to instances of a player
     /// object. Generally, it will be added to prefabs for such player
     /// objects.
@@ -37,7 +37,6 @@ namespace SEE.Controls.Actions
                 {
                     obj = o;
                 }
-
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
                     if (obj != null)
