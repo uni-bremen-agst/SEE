@@ -112,7 +112,11 @@ namespace SEE.Controls.Actions
                 GameObject cityObject = SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
                 if (cityObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
-                    codeWindow.SolutionPath = city.SolutionPath.Path;
+                    codeWindow.SolutionPath = "";
+                    if (city.SolutionPath.RelativePath != "")
+                    {
+                        codeWindow.SolutionPath = city.SolutionPath.Path;
+                    }
                 }
 
                 // Add code window to our space of code window, if it isn't in there yet
