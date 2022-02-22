@@ -71,8 +71,7 @@ namespace SEE.Game
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,
-                                    deletionColor: cityEvolution.DeletionBeamColor,
-                                    duration: AnimationLag);
+                                    deletionColor: cityEvolution.DeletionBeamColor);
                 RegisterAllAnimators(animators);
                 phase1AnimationWatchDog = new Phase1AnimationWatchDog(this);
                 phase2AnimationWatchDog = new Phase2AnimationWatchDog(this);
@@ -201,7 +200,6 @@ namespace SEE.Game
                         animator.AnimationsDisabled = value == 0;
                     });
 
-                    marker?.SetDuration(value);
                     shownGraphHasChangedEvent.Invoke();
                 }
             }
