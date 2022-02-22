@@ -86,10 +86,10 @@ namespace SEE.GameObjects.Decorators
                     segmentScale.y = height;
                     segment.transform.localScale = segmentScale;
 
-                    // Note: The position attribute of our cylinders is actually the bottom and
-                    // not the center of the y axis.
+                    float extent = height / 2;
+                    segmentPosition.y += extent;
                     segment.transform.position = segmentPosition;
-                    segmentPosition.y += height;
+                    segmentPosition.y += extent;
 
                     segment.transform.SetParent(gameNode.transform);
                 }
