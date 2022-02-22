@@ -181,12 +181,13 @@ namespace SEE.Game
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
+        [SerializeField]
+        private float animationDuration = AbstractAnimator.DefaultAnimationTime;
 
         /// <summary>
-        /// The duration of an animation.
+        /// The time in seconds for showing a single graph revision during auto-play animation.
         /// </summary>
-        public float AnimationDuration
+        public float AnimationLag
         {
             get => animationDuration;
             set
@@ -199,6 +200,9 @@ namespace SEE.Game
                         animator.MaxAnimationTime = value;
                         animator.AnimationsDisabled = value == 0;
                     });
+
+                    marker?.SetDuration(value);
+                    shownGraphHasChangedEvent.Invoke();
                 }
             }
         }
@@ -1084,20 +1088,6 @@ namespace SEE.Game
         /// Current graph of the graph series to be rendered.
         /// </summary>
         public Graph GraphCurrent => graphs[currentGraphIndex];
-
-        /// <summary>
-        /// The time in seconds for showing a single graph revision during auto-play animation.
-        /// </summary>
-        public float AnimationLag
-        {
-            get => AnimationDuration;
-            set
-            {
-                AnimationDuration = value;
-                marker?.SetDuration(value);
-                shownGraphHasChangedEvent.Invoke();
-            }
-        }
 
         /// <summary>
         /// The index of the currently visualized graph.
