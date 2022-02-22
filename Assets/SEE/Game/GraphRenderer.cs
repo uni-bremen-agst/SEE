@@ -156,6 +156,8 @@ namespace SEE.Game
             {
                 scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
+            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
+            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
         }
 
         /// <summary>
@@ -167,8 +169,6 @@ namespace SEE.Game
         public void SetScaler(Graph graph)
         {
             SetScaler(new List<Graph> { graph });
-            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
-            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
         }
 
         /// <summary>

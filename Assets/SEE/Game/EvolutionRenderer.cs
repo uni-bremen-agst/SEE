@@ -1168,6 +1168,7 @@ namespace SEE.Game
         public void SetGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -1181,7 +1182,6 @@ namespace SEE.Game
             currentCity = null;
             nextCity = null;
 
-            graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
 
             shownGraphHasChangedEvent.Invoke();
