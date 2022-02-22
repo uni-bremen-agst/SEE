@@ -177,7 +177,6 @@ namespace SEE.Game.Evolution
         {
             GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
             AddEmission(beamMarker);
-            //Portal.SetPortal(beamMarker.transform.parent.gameObject);
             return beamMarker;
         }
 
