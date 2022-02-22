@@ -21,17 +21,16 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="graphRenderer">renderer used to retrieve the roof position of the game objects to be marked</param>
         /// <param name="markerWidth">the width (x and z lengths) of the markers</param>
         /// <param name="markerHeight">the height (y length) of the markers</param>
         /// <param name="additionColor">the color for the markers for added nodes</param>
         /// <param name="changeColor">the color for the markers for changed nodes</param>
         /// <param name="deletionColor">the color for the markers for deleted nodes</param>
         /// <param name="duration">the duration until the final height of the markers must be reached</param>
-        public Marker(GraphRenderer graphRenderer, float markerWidth, float markerHeight,
-                      Color additionColor, Color changeColor, Color deletionColor, float duration)
+        public Marker(float markerWidth, float markerHeight,
+                      Color additionColor, Color changeColor, Color deletionColor,
+                      float duration)
         {
-            this.graphRenderer = graphRenderer;
             this.duration = duration;
 
             // graphRenderer.ShaderType
@@ -98,11 +97,6 @@ namespace SEE.Game.Evolution
         private readonly float markerWidth;
 
         /// <summary>
-        /// The renderer used to retrieve the roof position of the game objects to be marked.
-        /// </summary>
-        private readonly GraphRenderer graphRenderer;
-
-        /// <summary>
         /// The list of beam markers added for the new game objects since the last call to Clear().
         /// </summary>
         private readonly List<GameObject> beamMarkers = new List<GameObject>();
@@ -148,10 +142,13 @@ namespace SEE.Game.Evolution
             // markerWidth and markerHeight through the animator.
             beamMarker.transform.localScale = Vector3.zero;
 
+            // FIXME: We need to consider the antenna: GetRoof() is not enough.
+
             // Lift beamerMarker according to the length of its nested marker segments
             // above the roof of the gameNode.
-            Vector3 position = graphRenderer.GetRoof(gameNode);
-            position.y += Gap - markerHeight / 2;
+            Vector3 position = gameNode.transform.position;
+            position.y = gameNode.GetRoof();
+            position.y += Gap + markerHeight / 2;
             beamMarker.transform.position = position;
 
             // Makes beamMarker a child of block so that it moves along with it during the animation.
