@@ -170,8 +170,8 @@ namespace SEE.Game.City
 
             evolutionRenderer = CreateEvolutionRenderer();
             List<Graph> graphs = LoadData();
-            DrawGraphs(graphs);
             evolutionRenderer.SetGraphEvolution(graphs);
+            DrawGraphs(graphs);
 
             if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))
             {
