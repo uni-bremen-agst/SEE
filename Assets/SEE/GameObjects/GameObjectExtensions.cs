@@ -290,13 +290,48 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the world-space position of the roof of this <paramref name="node"/>.
+        /// Returns the world-space position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="node">node whose height has to be determined</param>
-        /// <returns>world-space position of the roof of this <paramref name="node"/></returns>
-        public static float GetRoof(this GameObject node)
+        /// <param name="gameObject">game object whose roof has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/></returns>
+        public static float GetRoof(this GameObject gameObject)
         {
-            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+            return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the maximal world-space position (y co-ordinate) of the roof of
+        /// this <paramref name="gameObject"/> or any of its active descendants.
+        /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
+        /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Note: only descendants that are currently active in the scene are
+        /// considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
+        /// or any of its active descendants</returns>
+        public static float GetMaxY(this GameObject gameObject)
+        {
+            float result = float.NegativeInfinity;
+            Recurse(gameObject, ref result);
+            return result;
+
+            void Recurse(GameObject root, ref float max)
+            {
+                float roof = root.GetRoof();
+                if (max < roof)
+                {
+                    max = roof;
+                }
+                foreach (Transform child in root.transform)
+                {
+                    if (child.gameObject.activeInHierarchy)
+                    {
+                        Recurse(child.gameObject, ref max);
+                    }
+                }
+            }
         }
 
         /// <summary>
