@@ -6,6 +6,7 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SEE.GameObjects.Decorators
 {
@@ -51,11 +52,9 @@ namespace SEE.GameObjects.Decorators
         /// </summary>
         /// <param name="gameNode">the game node to be decorated (must have a graph
         /// node attached)</param>
-        /// <param name="renderQueueOffset">the render queue offset of the game objects
-        /// created for the antenna segments</param>
         /// <exception cref="Exception">thrown if <paramref name="gameNode"/> does
         /// not have a graph node attached</exception>
-        public void AddAntenna(GameObject gameNode, int renderQueueOffset = 0)
+        public void AddAntenna(GameObject gameNode)
         {
             Node node = gameNode.GetNode();
 
@@ -76,9 +75,7 @@ namespace SEE.GameObjects.Decorators
                 {
                     NodeFactory segmentFactory = metricToFactory[section.Metric];
 
-                    // The segment should be drawn as part of the parent, hence, its render
-                    // queue offset must be equal to that of the parent.
-                    GameObject segment = NewSegment(segmentFactory, renderQueueOffset);
+                    GameObject segment = NewSegment(segmentFactory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
                     segment.name = section.Metric + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 

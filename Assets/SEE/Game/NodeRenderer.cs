@@ -54,7 +54,7 @@ namespace SEE.Game
             GameObject result = leafNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustScaleOfLeaf(result);
-            leafAntennaDecorator.AddAntenna(result, renderQueueOffset);
+            leafAntennaDecorator.AddAntenna(result);
             return result;
         }
 
@@ -81,7 +81,7 @@ namespace SEE.Game
             GameObject result = innerNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
-            innerAntennaDecorator.AddAntenna(result, renderQueueOffset);
+            innerAntennaDecorator.AddAntenna(result);
             return result;
         }
 
