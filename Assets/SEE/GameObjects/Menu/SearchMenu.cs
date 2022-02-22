@@ -170,10 +170,13 @@ namespace SEE.GO.Menu
                 HighlightNode(chosen, chosenName);
                 resultMenu.ShowMenu(false);
             }
-
         }
 
-        // Returns a color between black and gray, the higher the given score the grayer it is.
+        /// <summary>
+        /// Returns a color between black and gray, the higher the given score the grayer it is.
+        /// </summary>
+        /// <param name="score">score for the shade of gray</param>
+        /// <returns>shade of gray</returns>
         public static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
 
         /// <summary>
@@ -190,8 +193,7 @@ namespace SEE.GO.Menu
             if (result.TryGetComponentOrLog(out Renderer cityRenderer))
             {
                 // Display marker above the node
-                Marker marker = new Marker(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
-                                           default, default, AbstractAnimator.DefaultAnimationTime);
+                Marker marker = new Marker(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
                 Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();

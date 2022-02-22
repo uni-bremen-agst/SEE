@@ -26,14 +26,9 @@ namespace SEE.Game.Evolution
         /// <param name="additionColor">the color for the markers for added nodes</param>
         /// <param name="changeColor">the color for the markers for changed nodes</param>
         /// <param name="deletionColor">the color for the markers for deleted nodes</param>
-        /// <param name="duration">the duration until the final height of the markers must be reached</param>
         public Marker(float markerWidth, float markerHeight,
-                      Color additionColor, Color changeColor, Color deletionColor,
-                      float duration)
+                      Color additionColor, Color changeColor, Color deletionColor)
         {
-            this.duration = duration;
-
-            // graphRenderer.ShaderType
             additionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(additionColor, additionColor, 1));
             changeMarkerFactory = new CylinderFactory(Transparent, new ColorRange(changeColor, changeColor, 1));
             deletionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(deletionColor, deletionColor, 1));
@@ -67,21 +62,6 @@ namespace SEE.Game.Evolution
         /// The gap between the decorated game node and its marker in Unity world-space units.
         /// </summary>
         private const float Gap = 0.001f;
-
-        /// <summary>
-        /// The time in seconds until the markers must have reached their final height.
-        /// </summary>
-        private float duration;
-
-        /// <summary>
-        /// Set the time in seconds until the markers must have reached their final height
-        /// to given <paramref name="value"/>.
-        /// </summary>
-        /// <param name="value">duration of animation</param>
-        public void SetDuration(float value)
-        {
-            duration = value;
-        }
 
         /// <summary>
         /// The height of the beam markers used to mark new, changed, and deleted
@@ -140,24 +120,15 @@ namespace SEE.Game.Evolution
 
             // The initial scale of the marker is Vector3.zero. Later its height will be adjusted to
             // markerWidth and markerHeight through the animator.
-            beamMarker.transform.localScale = Vector3.zero;
+            beamMarker.transform.localScale = new Vector3(markerWidth, markerHeight, markerWidth);
 
-            // FIXME: We need to consider the antenna: GetRoof() is not enough.
-
-            // Lift beamerMarker according to the length of its nested marker segments
+            // Lift beamerMarker according to the length of its nested antenna
             // above the roof of the gameNode.
             Vector3 position = gameNode.transform.position;
-            position.y = gameNode.GetRoof();
+            position.y = gameNode.GetMaxY();
             position.y += Gap + markerHeight / 2;
             beamMarker.transform.position = position;
-
-            // Makes beamMarker a child of block so that it moves along with it during the animation.
-            // In addition, it will also be destroyed along with its parent block.
             beamMarker.transform.SetParent(gameNode.transform);
-
-            BeamRaiser raiser = beamMarker.AddComponent<BeamRaiser>();
-            Vector3 targetScale = new Vector3(markerWidth, markerHeight, markerWidth);
-            raiser.SetTargetHeightAndDuration(targetScale, duration: duration);
 
             return beamMarker;
         }
@@ -208,7 +179,6 @@ namespace SEE.Game.Evolution
         {
             GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
             beamMarker.name = "dead " + gameNode.name;
-            beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
         }
 
@@ -226,7 +196,6 @@ namespace SEE.Game.Evolution
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);
-            beamMarker.transform.SetParent(gameNode.transform);
             return beamMarker;
         }
 
@@ -255,87 +224,10 @@ namespace SEE.Game.Evolution
         {
             foreach (GameObject gameObject in beamMarkers)
             {
+                gameObject.transform.SetParent(null);
                 Object.Destroy(gameObject);
             }
             beamMarkers.Clear();
-        }
-
-        /// <summary>
-        /// The behaviour to grow a beam until it reaches its target height over
-        /// multiple frames. This component is assumed to be attached to a
-        /// marker. The width and depth of all markers will be maintained to WidthDepth.
-        /// </summary>
-        private class BeamRaiser : MonoBehaviour
-        {
-            /// <summary>
-            /// The uniform width (x) and depth (z) of all markers. The height should
-            /// always be zero as this is the parameter we want to grow during the animation.
-            /// </summary>
-            private Vector3 targetScale = Vector3.zero;
-
-            /// <summary>
-            /// The initial height of the beam marker. Will be set in Start() as
-            /// the initial height of the game object.
-            /// </summary>
-            private float initialHeight = 0;
-
-            /// <summary>
-            /// Sets the target scale of the beam marker that should be reached eventually
-            /// and the time in seconds until this scale is reached.
-            /// </summary>
-            /// <param name="targetScale">the final scale to be reached</param>
-            /// <param name="duration">the duration in seconds until the requested scale is reached</param>
-            public void SetTargetHeightAndDuration(Vector3 targetScale, float duration)
-            {
-                this.targetScale = targetScale;
-                this.duration = duration;
-            }
-
-            /// <summary>
-            /// The time in seconds since this BeamRaiser was started.
-            /// </summary>
-            private float timeSinceStart;
-
-            /// <summary>
-            /// The duration in seconds until the requested scale must be reached.
-            /// </summary>
-            private float duration;
-
-            /// <summary>
-            /// Sets <see cref="initialHeight"/> to the initial height of the game object
-            /// that we are to grow.
-            /// </summary>
-            private void Start()
-            {
-                initialHeight = transform.lossyScale.y;
-            }
-
-            /// <summary>
-            /// At ever frame cycle, gameObject's height will be increased continuously
-            /// until it reaches its desired height. After that nothing is done anymore.
-            /// </summary>
-            private void Update()
-            {
-                if (transform.lossyScale != targetScale)
-                {
-                    // Resize gameObject independent of parent so that the scale relates to
-                    // world space. This can be done by first unparenting the gameObject.
-                    Transform parent = transform.parent;
-                    transform.parent = null;
-
-                    timeSinceStart += Time.deltaTime;
-                    // The relative time spent so far in relation to the requested duration.
-                    float relativeTime = Mathf.Min(timeSinceStart / duration, 1.0f);
-
-                    // The height is further increased as a linear interpolation
-                    // between the initial and final height relative to the time so far.
-                    Vector3 newScale = targetScale;
-                    newScale.y = Mathf.Lerp(initialHeight, targetScale.y, relativeTime);
-                    transform.localScale = newScale;
-
-                    transform.SetParent(parent);
-                }
-            }
         }
     }
 }
