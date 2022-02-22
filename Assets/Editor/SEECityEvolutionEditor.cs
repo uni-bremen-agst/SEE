@@ -85,11 +85,11 @@ namespace SEEEditor
             if (evolutionMarkerFoldOut)
             {
                 city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
-                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
-                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
-                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
-                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
+                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", city.MarkerWidth));
+                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height", city.MarkerHeight));
+                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of additions", city.AdditionBeamColor);
+                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of changes", city.ChangeBeamColor);
+                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletions", city.DeletionBeamColor);
             }
         }
 
