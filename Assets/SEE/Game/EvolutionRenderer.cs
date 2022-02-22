@@ -67,8 +67,7 @@ namespace SEE.Game
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new Marker(graphRenderer,
-                                    markerWidth: cityEvolution.MarkerWidth,
+                marker = new Marker(markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,

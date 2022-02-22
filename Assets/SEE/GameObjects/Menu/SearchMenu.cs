@@ -4,9 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
-using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.City;
 using SEE.Game.Evolution;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
@@ -127,8 +125,7 @@ namespace SEE.GO.Menu
                              });
 
 
-            int found = results.Count();
-            switch (found)
+            switch (results.Count())
             {
                 case 0:
                     ShowNotification.Warn("No nodes found", "No nodes found for the search term "
@@ -141,7 +138,6 @@ namespace SEE.GO.Menu
                     ShowResultsMenu(results);
                     break;
             }
-
         }
 
         /// <summary>
@@ -191,12 +187,10 @@ namespace SEE.GO.Menu
             ShowNotification.Info($"Highlighting '{resultName}'",
                                   $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
             GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
-            if (result.TryGetComponentOrLog(out Renderer cityRenderer) &&
-                cityObject.TryGetComponentOrLog(out AbstractSEECity city))
+            if (result.TryGetComponentOrLog(out Renderer cityRenderer))
             {
                 // Display marker above the node
-                GraphRenderer graphRenderer = new GraphRenderer(city, null);
-                Marker marker = new Marker(graphRenderer, MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
+                Marker marker = new Marker(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR,
                                            default, default, AbstractAnimator.DefaultAnimationTime);
                 Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
