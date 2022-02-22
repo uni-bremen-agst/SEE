@@ -343,7 +343,7 @@ namespace SEE.Game.UI.Menu
             }
             else
             {
-                Debug.LogError($"{menuGameObject.GetFullName()} does not have a child '{buttonsPath}'.\n");
+                Debug.LogError($"{menuGameObject.FullName()} does not have a child '{buttonsPath}'.\n");
             }
         }
     }

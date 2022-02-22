@@ -227,7 +227,7 @@ namespace SEE.Net
                 if (Instance != this)
                 {
                     Util.Logger.LogError("There must not be more than one Network component! "
-                        + $"This component in {gameObject.GetFullName()} will be destroyed!\n");
+                        + $"This component in {gameObject.FullName()} will be destroyed!\n");
                     Destroy(this);
                     return;
                 }
