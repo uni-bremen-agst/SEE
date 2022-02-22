@@ -66,8 +66,6 @@ namespace SEE.Game
                 SetScaler(graph);
                 graph.SortHierarchyByName();
             }
-            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
-            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
         }
 
         /// <summary>
@@ -123,12 +121,12 @@ namespace SEE.Game
         /// <summary>
         /// To create antennas for leaf nodes.
         /// </summary>
-        private readonly AntennaDecorator leafAntennaDecorator;
+        private AntennaDecorator leafAntennaDecorator;
 
         /// <summary>
         /// To create antennas for inner nodes.
         /// </summary>
-        private readonly AntennaDecorator innerAntennaDecorator;
+        private AntennaDecorator innerAntennaDecorator;
 
         /// <summary>
         /// True if edges are actually drawn, that is, if the user has selected an
@@ -169,6 +167,8 @@ namespace SEE.Game
         public void SetScaler(Graph graph)
         {
             SetScaler(new List<Graph> { graph });
+            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
+            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
         }
 
         /// <summary>
