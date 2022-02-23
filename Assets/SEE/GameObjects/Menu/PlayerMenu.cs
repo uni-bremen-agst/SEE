@@ -85,7 +85,7 @@ namespace SEE.GO.Menu
             //}
 
             ActionStateType firstType = ActionStateType.AllTypes.First();
-            List<ToggleMenuEntry> entries = ActionStateType.AllTypes.Select(ToModeMenuEntry).ToList();
+            List<ToggleMenuEntry> entries = ActionStateType.DesktopMenuTypes.Select(ToModeMenuEntry).ToList();
 
             // Initial state will be the first action state type
             GlobalActionHistory.Execute(firstType);
