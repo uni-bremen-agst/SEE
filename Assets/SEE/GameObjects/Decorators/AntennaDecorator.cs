@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,10 +46,20 @@ namespace SEE.GameObjects.Decorators
         private readonly AntennaAttributes antennaAttributes;
 
         /// <summary>
+        /// The name of the game object representing the antenna as a whole. It
+        /// will be an immediate child of the node to be decorated. The antenna
+        /// segments are the immediate children of this antenna game object.
+        /// </summary>
+        private const string AntennaGameObjectName = "Antenna";
+
+        /// <summary>
         /// Adds an antenna above <paramref name="gameNode"/>. The antenna consists of
         /// antenna segments as specified by the <see cref="AntennaAttributes"/> passed
-        /// to the constructor. All created antenna segments will be children of
-        /// <paramref name="gameNode"/>.
+        /// to the constructor. All created antenna segments will be children of a new
+        /// empty game object named <see cref="AntennaGameObjectName"/>, which in turn
+        /// will be an immediate child of <paramref name="gameNode"/>. If <paramref name="gameNode"/>
+        /// does not have any of the metrics specified in <see cref="antennaAttributes"/>,
+        /// nothing happens.
         /// </summary>
         /// <param name="gameNode">the game node to be decorated (must have a graph
         /// node attached)</param>
@@ -56,6 +67,12 @@ namespace SEE.GameObjects.Decorators
         /// not have a graph node attached</exception>
         public void AddAntenna(GameObject gameNode)
         {
+            RemoveAntenna(gameNode);
+
+            // The empty antenna object that will be the parent of all
+            // antenna segments. It will be created on demand, that is,
+            // if we have at least on antenna segment.
+            GameObject antenna = null;
             Node node = gameNode.GetNode();
 
             // The world-space position of the segment to be added in the current iteration.
@@ -88,7 +105,39 @@ namespace SEE.GameObjects.Decorators
                     segment.transform.position = segmentPosition;
                     segmentPosition.y += extent;
 
-                    segment.transform.SetParent(gameNode.transform);
+                    AddToAntenna(segment);
+                }
+            }
+
+            antenna?.transform.SetParent(gameNode.transform);
+
+            void AddToAntenna(GameObject segment)
+            {
+                if (antenna == null)
+                {
+                    antenna = new GameObject(AntennaGameObjectName);
+                    antenna.tag = Tags.Decoration;
+                    antenna.transform.localScale = Vector3.one;
+                }
+                segment.transform.SetParent(antenna.transform);
+            }
+        }
+
+        /// <summary>
+        /// Removes the antenna from <paramref name="gameNode"/> if it has one.
+        /// </summary>
+        /// <param name="gameNode">the game node to be decorated (must have a graph
+        /// node attached)</param>
+        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> does
+        /// not have a graph node attached</exception>
+        public void RemoveAntenna(GameObject gameNode)
+        {
+            foreach (Transform child in gameNode.transform)
+            {
+                if (child.name == AntennaGameObjectName && child.CompareTag(Tags.Decoration))
+                {
+                    child.transform.SetParent(null);
+                    Destroyer.DestroyGameObject(child.gameObject);
                 }
             }
         }
