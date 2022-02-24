@@ -102,6 +102,21 @@ namespace SEE.Game.Evolution
         private static readonly int Strength = Shader.PropertyToID("_EmissionStrength");
 
         /// <summary>
+        /// The name of game objects representing a marker for dead nodes.
+        /// </summary>
+        private const string DeadMarkerName = "DEAD_NODE";
+
+        /// <summary>
+        /// The name of game objects representing a marker for born nodes.
+        /// </summary>
+        private const string BornMarkerName = "BORN_NODE";
+
+        /// <summary>
+        /// The name of game objects representing a marker for changed nodes.
+        /// </summary>
+        private const string ChangeMarkerName = "CHANGED_NODE";
+
+        /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
         /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
         /// equals <see cref="MarkerKinds.Stacked"/> the marker will be a set of
@@ -124,12 +139,8 @@ namespace SEE.Game.Evolution
 
             // Lift beamerMarker according to the length of its nested antenna
             // above the roof of the gameNode.
-            Vector3 position = gameNode.transform.position;
-            position.y = gameNode.GetMaxY();
-            position.y += Gap + markerHeight / 2;
-            beamMarker.transform.position = position;
+            PutAbove(gameNode, beamMarker);
             beamMarker.transform.SetParent(gameNode.transform);
-
             return beamMarker;
         }
 
@@ -170,6 +181,43 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Puts <paramref name="beamMarker"/> above <paramref name="gameNode"/> and all
+        /// its active children (with a little <see cref="Gap"/>).
+        /// </summary>
+        /// <param name="gameNode">game node holding the <paramref name="beamMarker"/></param>
+        /// <param name="beamMarker">marker for <paramref name="gameNode"/></param>
+        private static void PutAbove(GameObject gameNode, GameObject beamMarker)
+        {
+            Vector3 position = gameNode.transform.position;
+            position.y = gameNode.GetMaxY();
+            position.y += Gap + beamMarker.transform.lossyScale.y / 2;
+            beamMarker.transform.position = position;
+        }
+
+        /// <summary>
+        /// Adjusts the y position of the marker in <paramref name="gameNode"/>
+        /// such that it is above <paramref name="gameNode"/> and all its children.
+        /// </summary>
+        /// <param name="gameNode">game node whose marker is to be adjusted</param>
+        public static void AdjustMarkerY(GameObject gameNode)
+        {
+            foreach (Transform child in gameNode.transform)
+            {
+                if (child.CompareTag(Tags.Decoration)
+                    && (child.name == ChangeMarkerName || child.name == BornMarkerName || child.name == DeadMarkerName))
+                {
+                    /// We need to set the child inactive so that it will be ignored by
+                    /// <see cref="GameObjectExtensions.GetMaxY(GameObject)"/>, called in
+                    /// <see cref="PutAbove(GameObject, GameObject)"/>.
+                    child.gameObject.SetActive(false);
+                    PutAbove(gameNode, child.gameObject);
+                    child.gameObject.SetActive(true);
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying by putting a beam marker on top
         /// of its roof. The color of that beam was specified through the constructor call.
         /// </summary>
@@ -178,7 +226,7 @@ namespace SEE.Game.Evolution
         public GameObject MarkDead(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, deletionMarkerFactory);
-            beamMarker.name = "dead " + gameNode.name;
+            beamMarker.name = DeadMarkerName;
             return beamMarker;
         }
 
@@ -192,7 +240,7 @@ namespace SEE.Game.Evolution
         public GameObject MarkBorn(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, additionMarkerFactory);
-            beamMarker.name = "new " + gameNode.name;
+            beamMarker.name = BornMarkerName;
             // We need to add the marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);
@@ -209,7 +257,7 @@ namespace SEE.Game.Evolution
         public GameObject MarkChanged(GameObject gameNode)
         {
             GameObject beamMarker = MarkByBeam(gameNode, changeMarkerFactory);
-            beamMarker.name = "changed " + gameNode.name;
+            beamMarker.name = ChangeMarkerName;
             // We need to add beam marker to beamMarkers so that it can be destroyed at the beginning of the
             // next animation cycle.
             beamMarkers.Add(beamMarker);
