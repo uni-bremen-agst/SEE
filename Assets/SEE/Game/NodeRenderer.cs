@@ -407,6 +407,32 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Adjusts the antenna of the given <paramref name="gameNode"/> according
+        /// to the metric value of the graph node attached to <paramref name="gameNode"/>
+        /// chosen to determine antenna segments.
+        /// </summary>
+        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
+        public void AdjustAntenna(GameObject gameNode)
+        {
+            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            {
+                Node node = nodeRef.Value;
+                if (node.IsLeaf())
+                {
+                    leafAntennaDecorator.AddAntenna(gameNode);
+                }
+                else
+                {
+                    innerAntennaDecorator.AddAntenna(gameNode);
+                }
+            }
+            else
+            {
+                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
+            }
+        }
+
+        /// <summary>
         /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
         /// to the metric values of the <paramref name="node"/> attached to
         /// <paramref name="gameNode"/>.
