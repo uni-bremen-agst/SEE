@@ -449,7 +449,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
+        /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
         /// </summary>
         /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
@@ -879,9 +879,9 @@ namespace SEE.Game
                     marker.MarkChanged(currentGameNode);
                     // There is a change. It may or may not be the metric determining the style.
                     // We will not further check that and just call the following method.
-                    // If there is no change, this method does not to be called because then
-                    // we know that the metric values determining the style of the former and
-                    // the new graph node are the same.
+                    // If there is no change, this method does not need to be called because then
+                    // we know that the metric values determining the style and antenna of the former
+                    // and the new graph node are the same.
                     graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
@@ -976,14 +976,20 @@ namespace SEE.Game
         /// <param name="gameNode">new or existing game object representing a graph node</param>
         private void OnAnimationNodeAnimationFinished(object gameNode)
         {
-            if (gameNode is GameObject go && go.transform.parent == null)
+            if (gameNode is GameObject go)
             {
-                /// We will just put this game object under <see cref="gameObject"/>
-                /// (the game object representing the city as a whole) as a child. When
-                /// the animation is over and all nodes have reached their destination,
-                /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
-                /// actual logical game-node parent.
-                go.transform.SetParent(gameObject.transform);
+                graphRenderer.AdjustAntenna(go);
+                Marker.AdjustMarkerY(go);
+
+                if (go.transform.parent == null)
+                {
+                    /// We will just put this game object under <see cref="gameObject"/>
+                    /// (the game object representing the city as a whole) as a child. When
+                    /// the animation is over and all nodes have reached their destination,
+                    /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
+                    /// actual logical game-node parent.
+                    go.transform.SetParent(gameObject.transform);
+                }
             }
             phase2AnimationWatchDog.Finished();
         }
