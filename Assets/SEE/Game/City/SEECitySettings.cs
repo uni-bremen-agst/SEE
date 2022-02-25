@@ -448,7 +448,7 @@ namespace SEE.Game.City
                         }
                         AntennaSection section = new AntennaSection();
                         result = section.Restore(antennaSection) || result;
-                        AntennaSections.Add(section);
+                        AddAntennaSection(section);
                     }
                 }
                 return result;
@@ -456,6 +456,14 @@ namespace SEE.Game.City
             else
             {
                 return false;
+            }
+
+            // If AntennaSections has already an antenna section for the metric in newSection,
+            // it will be removed. Then the newSection is added to it.
+            void AddAntennaSection(AntennaSection newSection)
+            {
+                AntennaSections.RemoveAll(section => section.Metric == newSection.Metric);
+                AntennaSections.Add(newSection);
             }
         }
 
