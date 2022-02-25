@@ -193,14 +193,14 @@ namespace SEE.GO.Menu
             if (result.TryGetComponentOrLog(out Renderer cityRenderer))
             {
                 // Display marker above the node
-                Marker marker = new Marker(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
+                MarkerFactory marker = new MarkerFactory(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
                 Material material = cityRenderer.sharedMaterial;
                 BlinkFor(material).Forget();
                 RemoveMarkerWhenDone(marker).Forget();
                 marker.MarkBorn(result);
             }
 
-            async UniTaskVoid RemoveMarkerWhenDone(Marker marker)
+            async UniTaskVoid RemoveMarkerWhenDone(MarkerFactory marker)
             {
                 // Remove marker either when a new search is started or when time is up
                 await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)),

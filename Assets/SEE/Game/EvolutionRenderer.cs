@@ -67,7 +67,7 @@ namespace SEE.Game
                 Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new Marker(markerWidth: cityEvolution.MarkerWidth,
+                marker = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,
@@ -113,7 +113,7 @@ namespace SEE.Game
         /// <summary>
         /// The marker used to mark the new and removed game objects.
         /// </summary>
-        private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
+        private MarkerFactory marker;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The kind of comparison to determine whether there are any differences between
@@ -979,7 +979,7 @@ namespace SEE.Game
             if (gameNode is GameObject go)
             {
                 graphRenderer.AdjustAntenna(go);
-                Marker.AdjustMarkerY(go);
+                MarkerFactory.AdjustMarkerY(go);
 
                 if (go.transform.parent == null)
                 {
