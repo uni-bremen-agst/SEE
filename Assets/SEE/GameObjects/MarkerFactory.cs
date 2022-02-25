@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.DataModel;
-using SEE.GO;
+using SEE.Game;
 using UnityEngine;
 using UnityEngine.Rendering;
 using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
 
-namespace SEE.Game.Evolution
+namespace SEE.GO
 {
     /// <summary>
     /// A factory for markers to highlight added, changed, and deleted nodes.
@@ -16,7 +16,7 @@ namespace SEE.Game.Evolution
     /// The markers appear as beams with emissive light growing from 0 to the
     /// requested maximal marker height in a requested time.
     /// </summary>
-    public class Marker
+    public class MarkerFactory
     {
         /// <summary>
         /// Constructor.
@@ -26,8 +26,8 @@ namespace SEE.Game.Evolution
         /// <param name="additionColor">the color for the markers for added nodes</param>
         /// <param name="changeColor">the color for the markers for changed nodes</param>
         /// <param name="deletionColor">the color for the markers for deleted nodes</param>
-        public Marker(float markerWidth, float markerHeight,
-                      Color additionColor, Color changeColor, Color deletionColor)
+        public MarkerFactory(float markerWidth, float markerHeight,
+                             Color additionColor, Color changeColor, Color deletionColor)
         {
             additionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(additionColor, additionColor, 1));
             changeMarkerFactory = new CylinderFactory(Transparent, new ColorRange(changeColor, changeColor, 1));
@@ -56,7 +56,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The strength factor of the emitted light for beam markers. It should be in the range [0,5].
         /// </summary>
-        private const int EmissionStrength = 3;
+        private const int EmissionStrength = 1;
 
         /// <summary>
         /// The gap between the decorated game node and its marker in Unity world-space units.
@@ -116,6 +116,9 @@ namespace SEE.Game.Evolution
         /// </summary>
         private const string ChangeMarkerName = "CHANGED_NODE";
 
+
+        private GameObjectFlasher flasher;
+
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
         /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
@@ -137,10 +140,14 @@ namespace SEE.Game.Evolution
             // markerWidth and markerHeight through the animator.
             beamMarker.transform.localScale = new Vector3(markerWidth, markerHeight, markerWidth);
 
+            beamMarker.transform.SetParent(gameNode.transform);
+
             // Lift beamerMarker according to the length of its nested antenna
             // above the roof of the gameNode.
             PutAbove(gameNode, beamMarker);
-            beamMarker.transform.SetParent(gameNode.transform);
+            flasher = new GameObjectFlasher(beamMarker, 1);
+            flasher.StartFlashing();
+
             return beamMarker;
         }
 
@@ -276,6 +283,15 @@ namespace SEE.Game.Evolution
                 Object.Destroy(gameObject);
             }
             beamMarkers.Clear();
+        }
+
+        private void Destroy()
+        {
+            if (flasher != null)
+            {
+                flasher.StopFlashing();
+                flasher = null;
+            }
         }
     }
 }
