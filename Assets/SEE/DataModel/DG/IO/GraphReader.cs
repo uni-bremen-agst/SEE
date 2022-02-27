@@ -446,7 +446,7 @@ namespace SEE.DataModel.DG.IO
         {
             if (currentAttributeName == "")
             {
-                LogError("There is not attribute name for this enum.");
+                LogError("There is no attribute name for this enum.");
             }
             else if (ReferenceEquals(current, null))
             {
