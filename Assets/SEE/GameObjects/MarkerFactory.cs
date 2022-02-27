@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using SEE.DataModel;
 using SEE.Game;
 using UnityEngine;
@@ -51,6 +52,13 @@ namespace SEE.GO
             {
                 this.markerWidth = markerWidth;
             }
+        }
+
+        private enum MarkerKind
+        {
+            Born,
+            Changed,
+            Dead
         }
 
         /// <summary>
@@ -116,9 +124,6 @@ namespace SEE.GO
         /// </summary>
         private const string ChangeMarkerName = "CHANGED_NODE";
 
-
-        private GameObjectFlasher flasher;
-
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
         /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
@@ -136,19 +141,25 @@ namespace SEE.GO
             GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
             beamMarker.tag = Tags.Decoration;
 
-            // The initial scale of the marker is Vector3.zero. Later its height will be adjusted to
-            // markerWidth and markerHeight through the animator.
-            beamMarker.transform.localScale = new Vector3(markerWidth, markerHeight, markerWidth);
-
+            SetScale(beamMarker);
             beamMarker.transform.SetParent(gameNode.transform);
 
             // Lift beamerMarker according to the length of its nested antenna
             // above the roof of the gameNode.
             PutAbove(gameNode, beamMarker);
-            flasher = new GameObjectFlasher(beamMarker, 1);
-            flasher.StartFlashing();
+
+            //flasher = new GameObjectFlasher(1);
+            //flasher.StartFlashing(beamMarker);
 
             return beamMarker;
+        }
+
+        private void SetScale(GameObject beamMarker)
+        {
+            Transform parent = beamMarker.transform.parent;
+            beamMarker.transform.SetParent(null);
+            beamMarker.transform.localScale = new Vector3(markerWidth, markerHeight, markerWidth);
+            beamMarker.transform.SetParent(parent);
         }
 
         /// <summary>
@@ -159,12 +170,14 @@ namespace SEE.GO
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new beam marker</returns>
-        private static GameObject NewBeam(NodeFactory factory, int renderQueueOffset)
+        private GameObject NewBeam(NodeFactory factory, int renderQueueOffset)
         {
             GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
             AddEmission(beamMarker);
             return beamMarker;
         }
+
+        private HashSet<Material> materials = new HashSet<Material>();
 
         /// <summary>
         /// Adds emission strength to the given <paramref name="gameObject"/>.
@@ -178,12 +191,21 @@ namespace SEE.GO
         /// material has a property _EmissionStrength.
         /// </summary>
         /// <param name="gameObject">the object receiving the emission strength</param>
-        private static void AddEmission(GameObject gameObject)
+        private void AddEmission(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                // Set power beam material to emissive
-                renderer.sharedMaterial.SetFloat(Strength, EmissionStrength);
+                // FIXME: Here we can use MarkerKind and animate the material.
+                // If the emission of renderer.sharedMaterial has been set
+                // before, we do call SetFloat again.
+
+                if (!materials.Add(renderer.sharedMaterial))
+                {
+                    // Set power beam material to emissive
+                    renderer.sharedMaterial.SetFloat(Strength, EmissionStrength);
+                    float animationDuration = 1.0f;
+                    renderer.sharedMaterial.DOFade(0.0f, animationDuration).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
+                }
             }
         }
 
@@ -206,13 +228,14 @@ namespace SEE.GO
         /// such that it is above <paramref name="gameNode"/> and all its children.
         /// </summary>
         /// <param name="gameNode">game node whose marker is to be adjusted</param>
-        public static void AdjustMarkerY(GameObject gameNode)
+        public void AdjustMarkerY(GameObject gameNode)
         {
             foreach (Transform child in gameNode.transform)
             {
                 if (child.CompareTag(Tags.Decoration)
                     && (child.name == ChangeMarkerName || child.name == BornMarkerName || child.name == DeadMarkerName))
                 {
+                    SetScale(child.gameObject);
                     /// We need to set the child inactive so that it will be ignored by
                     /// <see cref="GameObjectExtensions.GetMaxY(GameObject)"/>, called in
                     /// <see cref="PutAbove(GameObject, GameObject)"/>.
@@ -283,15 +306,6 @@ namespace SEE.GO
                 Object.Destroy(gameObject);
             }
             beamMarkers.Clear();
-        }
-
-        private void Destroy()
-        {
-            if (flasher != null)
-            {
-                flasher.StopFlashing();
-                flasher = null;
-            }
         }
     }
 }
