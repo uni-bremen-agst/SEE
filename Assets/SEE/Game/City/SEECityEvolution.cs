@@ -74,12 +74,6 @@ namespace SEE.Game.City
         public float MarkerWidth = 0.01f;
 
         /// <summary>
-        /// Settings of markers.
-        /// </summary>
-        [SerializeField]
-        public AntennaAttributes MarkerSettings = new AntennaAttributes();
-
-        /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector
         /// </summary>
         [Tooltip("The color of the beam for newly created nodes.")]
