@@ -156,7 +156,7 @@ namespace SEE.GameObjects.Decorators
             Dictionary<string, CylinderFactory> result = new Dictionary<string, CylinderFactory>(antennaAttributes.AntennaSections.Count);
             foreach (AntennaSection section in antennaAttributes.AntennaSections)
             {
-                result[section.Metric] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
+                result[section.Metric] = new CylinderFactory(Materials.ShaderType.Transparent, new ColorRange(section.Color, section.Color, 1));
             }
             return result;
         }
