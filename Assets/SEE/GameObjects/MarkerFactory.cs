@@ -36,29 +36,13 @@ namespace SEE.GO
 
             if (markerHeight < 0)
             {
-                this.markerHeight = 0;
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker height.\n");
-            }
-            else
-            {
-                this.markerHeight = markerHeight;
             }
             if (markerWidth < 0)
             {
-                this.markerWidth = 0;
                 throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker width.\n");
             }
-            else
-            {
-                this.markerWidth = markerWidth;
-            }
-        }
-
-        private enum MarkerKind
-        {
-            Born,
-            Changed,
-            Dead
+            markerScale = new Vector3(markerWidth, markerHeight, markerWidth);
         }
 
         /// <summary>
@@ -72,17 +56,10 @@ namespace SEE.GO
         private const float Gap = 0.001f;
 
         /// <summary>
-        /// The height of the beam markers used to mark new, changed, and deleted
+        /// The world-space scale of the markers used to mark new, changed, and deleted
         /// objects from one version to the next one.
         /// </summary>
-        private readonly float markerHeight;
-
-        /// <summary>
-        /// The width (x and z lengths) of the beam markers used to mark new, changed,
-        /// and deleted objects from one version
-        /// to the next one.
-        /// </summary>
-        private readonly float markerWidth;
+        private readonly Vector3 markerScale;
 
         /// <summary>
         /// The list of beam markers added for the new game objects since the last call to Clear().
@@ -107,7 +84,19 @@ namespace SEE.GO
         /// <summary>
         /// Cached shader property for emission strength.
         /// </summary>
-        private static readonly int Strength = Shader.PropertyToID("_EmissionStrength");
+        private static readonly int EmissionStrengthProperty = Shader.PropertyToID("_EmissionStrength");
+
+        /// <summary>
+        /// A mapping of the materials used by the three factories onto their original color.
+        /// This will be used to remember which materials have already been animated
+        /// along with their original color, so that we can restore it.
+        /// </summary>
+        private readonly Dictionary<Material, Color> materials = new Dictionary<Material, Color>();
+
+        /// <summary>
+        /// The duration of an animation cycle in seconds.
+        /// </summary>
+        private const float animationDuration = 1.0f;
 
         /// <summary>
         /// The name of game objects representing a marker for dead nodes.
@@ -125,11 +114,8 @@ namespace SEE.GO
         private const string ChangeMarkerName = "CHANGED_NODE";
 
         /// <summary>
-        /// Marks the given <paramref name="gameNode"/> as dying/getting alive by putting a
-        /// beam marker on top of its roof. If <see cref="markerAttributes.Kind"/>
-        /// equals <see cref="MarkerKinds.Stacked"/> the marker will be a set of
-        /// stacked line segments, where the length of each segment is proportional
-        /// to <see cref="markerAttributes.MarkerSections"/>
+        /// Marks the given <paramref name="gameNode"/> as by putting a beam marker
+        /// on top of its roof (including any of its children).
         /// </summary>
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">node above which to add a beam marker</param>
@@ -140,72 +126,49 @@ namespace SEE.GO
             // queue offset must be greater than the one of the block.
             GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
             beamMarker.tag = Tags.Decoration;
-
-            SetScale(beamMarker);
+            beamMarker.SetScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);
-
-            // Lift beamerMarker according to the length of its nested antenna
-            // above the roof of the gameNode.
             PutAbove(gameNode, beamMarker);
-
-            //flasher = new GameObjectFlasher(1);
-            //flasher.StartFlashing(beamMarker);
-
             return beamMarker;
-        }
-
-        private void SetScale(GameObject beamMarker)
-        {
-            Transform parent = beamMarker.transform.parent;
-            beamMarker.transform.SetParent(null);
-            beamMarker.transform.localScale = new Vector3(markerWidth, markerHeight, markerWidth);
-            beamMarker.transform.SetParent(parent);
         }
 
         /// <summary>
         /// Creates a new beam marker using the given <paramref name="factory"/>.
         /// This new game object will have the given <paramref name="renderQueueOffset"/>.
-        /// Emissive light is added to it. Its strength is defined by <see cref="EmissionStrength"/>.
+        /// Emissive light is added to it, where the emission strength is defined by
+        /// <see cref="EmissionStrength"/>.
         /// </summary>
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new beam marker</returns>
         private GameObject NewBeam(NodeFactory factory, int renderQueueOffset)
         {
-            GameObject beamMarker = factory.NewBlock(0, renderQueueOffset);
-            AddEmission(beamMarker);
-            return beamMarker;
+            GameObject result = factory.NewBlock(0, renderQueueOffset);
+            AddEmissionAndAnimation(result);
+            return result;
         }
 
-        private HashSet<Material> materials = new HashSet<Material>();
-
         /// <summary>
-        /// Adds emission strength to the given <paramref name="gameObject"/>.
-        /// This strength defines the intensity of the emitted light. The
-        /// strength is defined by <see cref="EmissionStrength"/>.
+        /// If the sharedMaterial of the <paramref name="gameObject"/> has been adjusted already
+        /// (i.e., is contained in <see cref="materials"/>), nothing happens. Otherwise
+        /// <see cref="EmissionStrength"/> and an animation is added to the shared material of
+        /// <paramref name="gameObject"/> and the shared material is added to <see cref="materials"/>.
         ///
         /// Note: The sharedMaterial will be changed. That means all other objects
         /// having the same material will be affected, too.
         ///
-        /// Precondition: <paramref name="gameObject"/> must have a render whose
-        /// material has a property _EmissionStrength.
+        /// Precondition: <paramref name="gameObject"/> must have a renderer whose
+        /// material has a property <see cref="EmissionStrengthProperty"/>.
         /// </summary>
-        /// <param name="gameObject">the object receiving the emission strength</param>
-        private void AddEmission(GameObject gameObject)
+        /// <param name="gameObject">the object whose shared material is receiving the emission
+        /// strength and animation</param>
+        private void AddEmissionAndAnimation(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent(out Renderer renderer))
+            if (gameObject.TryGetComponent(out Renderer renderer) && !materials.ContainsKey(renderer.sharedMaterial))
             {
-                // FIXME: Here we can use MarkerKind and animate the material.
-                // If the emission of renderer.sharedMaterial has been set
-                // before, we do call SetFloat again.
-
-                if (!materials.Add(renderer.sharedMaterial))
-                {
-                    // Set power beam material to emissive
-                    renderer.sharedMaterial.SetFloat(Strength, EmissionStrength);
-                    float animationDuration = 1.0f;
-                    renderer.sharedMaterial.DOFade(0.0f, animationDuration).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
-                }
+                materials[renderer.sharedMaterial] = renderer.sharedMaterial.color;
+                renderer.sharedMaterial.SetFloat(EmissionStrengthProperty, EmissionStrength);
+                renderer.sharedMaterial.DOFade(0.0f, animationDuration).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
             }
         }
 
@@ -213,7 +176,7 @@ namespace SEE.GO
         /// Puts <paramref name="beamMarker"/> above <paramref name="gameNode"/> and all
         /// its active children (with a little <see cref="Gap"/>).
         /// </summary>
-        /// <param name="gameNode">game node holding the <paramref name="beamMarker"/></param>
+        /// <param name="gameNode">game node above which <paramref name="beamMarker"/> is to be put</param>
         /// <param name="beamMarker">marker for <paramref name="gameNode"/></param>
         private static void PutAbove(GameObject gameNode, GameObject beamMarker)
         {
@@ -235,7 +198,7 @@ namespace SEE.GO
                 if (child.CompareTag(Tags.Decoration)
                     && (child.name == ChangeMarkerName || child.name == BornMarkerName || child.name == DeadMarkerName))
                 {
-                    SetScale(child.gameObject);
+                    child.gameObject.SetScale(markerScale);
                     /// We need to set the child inactive so that it will be ignored by
                     /// <see cref="GameObjectExtensions.GetMaxY(GameObject)"/>, called in
                     /// <see cref="PutAbove(GameObject, GameObject)"/>.
@@ -250,6 +213,7 @@ namespace SEE.GO
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as dying by putting a beam marker on top
         /// of its roof. The color of that beam was specified through the constructor call.
+        /// Its material will be animated, fading in and out.
         /// </summary>
         /// <param name="gameNode">game node to be marked</param>
         /// <returns>the resulting beam marker</returns>
@@ -262,7 +226,8 @@ namespace SEE.GO
 
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as coming into existence by putting a beam marker on top
-        /// of its roof. The color of that beam was specified through the constructor call.
+        /// of its roof. The color of that beam was specified through the constructor call. Its material will
+        /// be animated, fading in and out.
         /// Adds the created beam marker to the cache.
         /// </summary>
         /// <param name="gameNode">game node to be marked</param>
@@ -279,7 +244,8 @@ namespace SEE.GO
 
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as being changed by putting a beam marker on top
-        /// of its roof. The color of that beam was specified through the constructor call.
+        /// of its roof. The color of that beam was specified through the constructor call.  Its material will
+        /// be animated, fading in and out.
         /// Adds the created beam marker to the cache.
         /// </summary>
         /// <param name="gameNode">game node to be marked</param>
@@ -295,7 +261,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Destroys all marking created since the last call to Clear(). Clears the
+        /// Destroys all cached markers created since the last call to Clear(). Clears the
         /// cache of markers.
         /// </summary>
         public void Clear()
@@ -306,6 +272,18 @@ namespace SEE.GO
                 Object.Destroy(gameObject);
             }
             beamMarkers.Clear();
+            // We reset all marker materials to their original value.
+            // They need to be reset because the animation is still running and thus
+            // modifying the color of the materials while new blocks are being created
+            // receiving these materials interfere. I don't know the exact implementation details
+            // of the animation and, hence, have not clear explanation, but I observed
+            // that the materials tended to fade more and more, never reaching their
+            // original value again.
+            foreach (var entry in materials)
+            {
+                Material material = entry.Key;
+                material.color = entry.Value;
+            }
         }
     }
 }
