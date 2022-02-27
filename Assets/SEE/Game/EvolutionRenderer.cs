@@ -979,7 +979,7 @@ namespace SEE.Game
             if (gameNode is GameObject go)
             {
                 graphRenderer.AdjustAntenna(go);
-                MarkerFactory.AdjustMarkerY(go);
+                marker.AdjustMarkerY(go);
 
                 if (go.transform.parent == null)
                 {
