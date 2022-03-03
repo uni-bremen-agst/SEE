@@ -184,8 +184,19 @@ namespace SEE.Game.UI.Menu
             int quickButtonCnt = 0;
             foreach (T entry in buttonEntries)
             {
+                // The count 0 represents the select mode button
+                if (cnt == 0)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    selectButtons[selectCnt] = iconButton;
+                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    cnt++;
+                    selectCnt++;
+                }
                 // The count smaller than 2 marks the select button group.
-                if (cnt < 2)
+                else if (cnt < 2)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
                     selectButtons[selectCnt] = iconButton;
@@ -195,12 +206,13 @@ namespace SEE.Game.UI.Menu
                     selectCnt++;
                 }
                 // The count 3 marks the delete Button.
-                else if (cnt == 3)
+                else if (cnt == 2)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelVertical, false);
                     deleteButton[0] = iconButton;
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    deleteButton[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
                     cnt++;
                 }
                 // The count smaller 6 marks the delete multi button group.
@@ -213,6 +225,17 @@ namespace SEE.Game.UI.Menu
                     deleteCnt++;
                     cnt++;
                 }
+                // The count 6 represents the rotate mode button
+                else if(cnt == 6)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    rotateButtons[rotateCnt] = iconButton;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    rotateCnt++;
+                    cnt++;
+                }
                 // The count smaller 11 marks the rotate button group.
                 else if (cnt < 11)
                 {
@@ -221,6 +244,17 @@ namespace SEE.Game.UI.Menu
                     rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
                     rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
                     rotateCnt++;
+                    cnt++;
+                }
+                // The count 11 represents the move mode button
+                else if (cnt == 11)
+                {
+                    GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
+                    moveButtons[moveCnt] = iconButton;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    moveCnt++;
                     cnt++;
                 }
                 // The count smaller 15 marks the move button group.
