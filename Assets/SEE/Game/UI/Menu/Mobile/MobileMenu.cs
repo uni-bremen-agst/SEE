@@ -4,6 +4,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Utils;
 using UnityEngine.Assertions;
 using SEE.Controls.Actions;
+using System.Linq;
 
 namespace SEE.Game.UI.Menu
 {
@@ -154,7 +155,10 @@ namespace SEE.Game.UI.Menu
                 {
                     btn.SetActive(false);
                 }
-
+                quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => TriggerRedo()); 
+                quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                     => TriggerUndo());
                 quickButtons[5].SetActive(true);
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() 
                     => ExpandButton(arrowLeftSprite, arrowRightSprite));
@@ -359,6 +363,29 @@ namespace SEE.Game.UI.Menu
             {
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = left;
                 QuickMenuShown = true;
+            }
+        }
+
+        /// <summary>
+        /// Triggers the Redo Action
+        /// </summary>
+        private void TriggerRedo()
+        {
+            GlobalActionHistory.Redo();
+        }
+
+        /// <summary>
+        /// Triggers the Undo Action
+        /// </summary>
+        private void TriggerUndo()
+        {
+            GlobalActionHistory.Undo();
+
+            if (GlobalActionHistory.IsEmpty())
+            {
+                // We always want to have an action running.
+                // The default action will be the first action state type.
+                GlobalActionHistory.Execute(ActionStateType.MobileMenuTypes.First());
             }
         }
 
