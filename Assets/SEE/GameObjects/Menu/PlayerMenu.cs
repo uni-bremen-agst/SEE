@@ -233,9 +233,8 @@ namespace SEE.GO.Menu
                 SetPlayerMenu(currentAction.Name);
                 Indicator.ChangeActionState(currentAction);
             }
-
-            GlobalActionHistory.Update();
             }
+            GlobalActionHistory.Update();
         }
 
         /// <summary>
