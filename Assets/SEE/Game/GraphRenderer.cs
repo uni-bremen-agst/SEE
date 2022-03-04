@@ -397,12 +397,12 @@ namespace SEE.Game
         /// <param name="nodeMap">mapping of graph nodes onto their representing game object</param>
         /// <param name="root">the parent of every game object not nested in any other game object
         /// (must not be null)</param>
-        /// <exception cref="Exception">thrown if <paramref name="root"/> is null</exception>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="root"/> is null</exception>
         public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
             if (root == null)
             {
-                throw new Exception("Root must not be null.");
+                throw new ArgumentNullException(nameof(root));
             }
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
