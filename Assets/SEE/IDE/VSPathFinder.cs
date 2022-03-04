@@ -27,7 +27,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace SEE.Utils
+namespace SEE.IDE
 {
     /// <summary>
     /// Visual Studio pathfinder class. Uses Microsoft's "vswhere" project to receive
