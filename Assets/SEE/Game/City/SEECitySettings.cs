@@ -440,10 +440,9 @@ namespace SEE.Game.City
                     }
                     foreach (object anObject in objects)
                     {
-                        Dictionary<string, object> antennaSection = anObject as Dictionary<string, object>;
-                        if (antennaSection == null)
+                        if (!(anObject is Dictionary<string, object> antennaSection))
                         {
-                            throw new InvalidCastException($"Value to be cast {antennaSection} is expected to be a dictionary. Actual type is {antennaSection.GetType().Name}");
+                            throw new InvalidCastException($"Value to be cast {anObject} is expected to be a dictionary. Actual type is {anObject.GetType().Name}");
                         }
                         AntennaSection section = new AntennaSection();
                         result = section.Restore(antennaSection) || result;

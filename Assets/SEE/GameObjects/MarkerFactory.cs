@@ -118,7 +118,7 @@ namespace SEE.GO
         /// on top of its roof (including any of its children).
         /// </summary>
         /// <param name="gameNode">node above which to add a beam marker</param>
-        /// <param name="factory">node above which to add a beam marker</param>
+        /// <param name="factory">factory to create the beam marker</param>
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {

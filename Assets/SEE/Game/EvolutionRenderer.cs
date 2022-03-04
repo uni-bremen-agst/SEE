@@ -1,4 +1,5 @@
 //Copyright 2020 Florian Garbade
+//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -64,7 +65,6 @@ namespace SEE.Game
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
                 edgesAreDrawn = graphRenderer.AreEdgesDrawn();
-                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
                 marker = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
