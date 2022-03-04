@@ -225,7 +225,7 @@ namespace SEE.Game.UI.HelpSystem
             Transform videoPlayer = helpSystemEntry.transform.Find(VideoPlayerPath);
             if (videoPlayer == null)
             {
-                throw new Exception($"Help-system entry {helpSystemEntry.GetFullName()} has no video player {VideoPlayerPath}.");
+                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has no video player {VideoPlayerPath}.");
             }
             if (videoPlayer.gameObject.TryGetComponent(out VideoPlayer result))
             {
@@ -233,7 +233,7 @@ namespace SEE.Game.UI.HelpSystem
             }
             else
             {
-                throw new Exception($"Help-system entry {helpSystemEntry.GetFullName()} has a video player {VideoPlayerPath} without {typeof(VideoPlayer)} component.");
+                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has a video player {VideoPlayerPath} without {typeof(VideoPlayer)} component.");
             }
         }
 
