@@ -141,16 +141,15 @@ namespace SEE.IDE
             /// <param name="path">path of the solution</param>
             public void SolutionChanged(string path)
             {
-                ideIntegration.semaphore.Wait();
                 if (ideIntegration.cachedConnections.ContainsKey(solutionPath))
                 {
                     JsonRpcConnection connection = ideIntegration.cachedConnections[solutionPath];
 
                     if (ideIntegration.cachedSolutionPaths.Contains(path) || ideIntegration.ConnectToAny)
                     {
-                        if (ideIntegration.cachedConnections.Remove(solutionPath))
+                        if (ideIntegration.cachedConnections.TryRemove(solutionPath, out _))
                         {
-                            ideIntegration.cachedConnections.Add(path, connection);
+                            ideIntegration.cachedConnections.GetOrAdd(path, connection);
                             solutionPath = path;
                         }
                     }
@@ -159,8 +158,6 @@ namespace SEE.IDE
                         ideIntegration.ideCalls.Decline(connection).Forget();
                     }
                 }
-
-                ideIntegration.semaphore.Release();
             }
 
             /// <summary>
