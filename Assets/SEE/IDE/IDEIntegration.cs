@@ -458,11 +458,25 @@ namespace SEE.IDE
             JsonRpcConnection connection = null;
 
             // Time out after 3 minutes without connecting.
-            await UniTask.WhenAny(LookUpConnection(), UniTask.Delay(180000));
+            CancellationTokenSource cts = new CancellationTokenSource(180000);
+
+            try
+            {
+                await LookUpConnection(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification.Error("Connection timed out",
+                    "Couldn't establish connection to IDE.");
+            }
+            finally
+            {
+                cts.Dispose();
+            }
 
             return connection;
 
-            async UniTask LookUpConnection()
+            async UniTask LookUpConnection(CancellationToken token)
             {
                 while (true)
                 {
@@ -473,7 +487,7 @@ namespace SEE.IDE
                     }
                     catch (Exception)
                     {
-                        await UniTask.Delay(200);
+                        await UniTask.Delay(200, cancellationToken: token);
                     }
                 }
             }
