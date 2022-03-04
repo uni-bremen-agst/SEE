@@ -94,7 +94,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Shows and sets the attributes of the <see cref="SEECityEvolution"/ managed here.
+        /// Shows and sets the attributes of the <see cref="SEECityEvolution"/> managed here.
         /// This method should be overridden by subclasses if they have additional
         /// attributes to manage.
         /// </summary>
