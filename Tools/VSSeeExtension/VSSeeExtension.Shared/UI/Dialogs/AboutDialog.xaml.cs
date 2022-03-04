@@ -25,7 +25,7 @@ using System;
 namespace VSSeeExtension.UI.Dialogs
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for AboutDialog.xaml
     /// </summary>
     public partial class AboutDialog
     {
@@ -40,9 +40,9 @@ namespace VSSeeExtension.UI.Dialogs
         /// <summary>
         /// Closes the current window when called.
         /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">EventArgs <see cref="EventArgs"/></param>
-        public void OnClose(object sender, EventArgs e)
+        /// <param name="sender">The sender object (ignored)</param>
+        /// <param name="eventArgs">EventArgs <see cref="EventArgs"/> (ignored)</param>
+        public void OnClose(object sender, EventArgs eventArgs)
         {
             Close();
         }

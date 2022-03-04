@@ -37,7 +37,7 @@ namespace VSSeeExtension.Commands
         /// Package that owns this command.
         /// </summary>
         protected VSSeeExtensionPackage Package;
-        
+
         /// <summary>
         /// Adds the command instance to MenuCommandService.
         /// </summary>
@@ -54,9 +54,9 @@ namespace VSSeeExtension.Commands
 
             if (await Package.GetServiceAsync(typeof(IMenuCommandService)) is not OleMenuCommandService commandService)
                 throw new Exception(nameof(commandService));
-            
+
             CommandID menuCommandId = new CommandID(commandSet, commandId);
-            
+
             if (commandService.FindCommand(menuCommandId) == null)
             {
                 OleMenuCommand command = new OleMenuCommand(Execute, null, BeforeQueryStatus, menuCommandId);
@@ -69,8 +69,8 @@ namespace VSSeeExtension.Commands
         /// Functionality of this Button for the EventHandler.
         /// </summary>
         /// <param name="sender">Sender object.</param>
-        /// <param name="e">EventArgs <see cref="EventArgs"/></param>
-        private void Execute(object sender, EventArgs e)
+        /// <param name="eventArgs">EventArgs <see cref="EventArgs"/> (ignored)</param>
+        private void Execute(object sender, EventArgs eventArgs)
         {
             _ = ExecuteAsync();
         }
@@ -79,8 +79,8 @@ namespace VSSeeExtension.Commands
         /// Update the status of this command.
         /// </summary>
         /// <param name="sender">Sender object.</param>
-        /// <param name="e">EventArgs <see cref="EventArgs"/></param>
-        private void BeforeQueryStatus(object sender, EventArgs e)
+        /// <param name="eventArgs">EventArgs <see cref="EventArgs"/> (ignored)</param>
+        private void BeforeQueryStatus(object sender, EventArgs eventArgs)
         {
             OleMenuCommand command = (OleMenuCommand) sender;
             command.Enabled = IsEnabled();

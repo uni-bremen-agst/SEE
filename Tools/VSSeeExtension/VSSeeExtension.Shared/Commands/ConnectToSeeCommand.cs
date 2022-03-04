@@ -53,8 +53,8 @@ namespace VSSeeExtension.Commands
         /// <summary>
         /// Initialize the ConnectToSeeCommand class.
         /// </summary>
-        /// <param name="package">The Package which is calling initializing the button.</param>
-        /// <returns></returns>
+        /// <param name="package">The package that is calling the initialization of the button.</param>
+        /// <returns>task executing this command</returns>
         public static async Task InitializeAsync(VSSeeExtensionPackage package)
         {
             Instance = new ConnectToSeeCommand();
@@ -63,7 +63,7 @@ namespace VSSeeExtension.Commands
         }
 
         /// <summary>
-        /// Functionality of this Button.
+        /// Functionality of this command.
         /// </summary>
         protected override async Task ExecuteAsync()
         {

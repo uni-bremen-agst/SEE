@@ -62,7 +62,7 @@ namespace VSSeeExtension
     public sealed class VSSeeExtensionPackage : AsyncPackage
     {
         /// <summary>
-        /// The package options that can be changed in Visual Studios options page.
+        /// The package options that can be changed in Visual Studio's options page.
         /// </summary>
         internal VSSeeExtensionOptions Options { get; private set; }
 
@@ -74,7 +74,6 @@ namespace VSSeeExtension
         /// <summary>
         /// Initializes all commands (buttons).
         /// </summary>
-        /// <returns>Async Task.</returns>
         private async Task InitializeCommandsAsync()
         {
             await AboutCommand.InitializeAsync(this);
@@ -96,21 +95,23 @@ namespace VSSeeExtension
             await JoinableTaskFactory.SwitchToMainThreadAsync(DisposalToken);
             // If command line switch was set, start integration.
             if (await GetServiceAsync(typeof(SVsAppCommandLine)) is not IVsAppCommandLine cmdService)
+            {
                 throw new Exception(nameof(cmdService));
+            }
             if (cmdService.GetOption("VSSeeExtension", out int isPresent, out _) == VSConstants.S_OK)
             {
                 if (isPresent == 1)
                 {
                     // RPC can't be used during initialization and thus needs to be started separately, see also:
                     // https://docs.microsoft.com/en-us/visualstudio/extensibility/how-to-use-asyncpackage-to-load-vspackages-in-the-background
-                    _ = Task.Run(async () => await Integration.StartAsync(true));
+                    Task.Run(async () => await Integration.StartAsync(true));
                 }
             }
         }
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// where you can put all the initialization code that relies on services provided by Visual Studio.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
         /// <param name="progress">A provider for progress updates.</param>

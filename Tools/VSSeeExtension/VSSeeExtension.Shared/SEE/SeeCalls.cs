@@ -87,7 +87,7 @@ namespace VSSeeExtension.SEE
             }
 
             /// <summary>
-            /// Notify SEE that the loaded project has changed.
+            /// Notifies SEE that the loaded project has changed.
             /// </summary>
             /// <param name="path">New solution path.</param>
             /// <returns>Async Task.</returns>
