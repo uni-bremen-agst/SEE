@@ -24,6 +24,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using StreamRpc;
+using UnityEngine;
 
 namespace SEE.Utils.RPC
 {
@@ -118,9 +119,12 @@ namespace SEE.Utils.RPC
                 Disconnected?.Invoke(this);
                 throw;
             }
-            catch (Exception)
+            catch (InvalidOperationException e)
             {
-                // Connection was unexpectedly interrupted.
+                // listening hasn't been started
+#if UNITY_EDITOR
+                Debug.LogError($"{e.Message}\n");
+#endif
             }
 
             Disconnected?.Invoke(this);

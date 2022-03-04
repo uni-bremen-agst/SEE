@@ -222,9 +222,11 @@ namespace SEE.Utils.RPC
                     if (connection.Rpc == null) return default;
                     return await connection.Rpc.InvokeAsync<T>(targetName, arguments);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // Lost connection to client.
+#if UNITY_EDITOR
+                    Debug.LogWarning($"{e.Message}\n");
+#endif
                 }
             }
             else
