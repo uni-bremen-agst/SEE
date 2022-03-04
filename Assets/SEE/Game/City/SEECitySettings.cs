@@ -310,11 +310,11 @@ namespace SEE.Game.City
     public class AntennaSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
-        /// Which metric should determine the length of the section.
+        /// The metric which should determine the length of the section.
         /// </summary>
         public string Metric;
         /// <summary>
-        /// In which color the section should be drawn.
+        /// The color in which the section should be drawn.
         /// </summary>
         public Color Color;
 
