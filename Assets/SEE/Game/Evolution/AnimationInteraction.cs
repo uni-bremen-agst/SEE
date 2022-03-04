@@ -617,9 +617,9 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns commit id of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// Returns commit ID of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit id</returns>
+        /// <returns>commit ID</returns>
         private string CurrentCommitId()
         {
             return GetAttributeOfCurrentGraph(CommitIdAttributeName);
