@@ -622,7 +622,7 @@ namespace SEE.DataModel.DG
         /// <param name="target">target node</param>
         /// <param name="its_type">requested edge type</param>
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
-        public List<Edge> From_To(Node target, string its_type)
+        public List<Edge> FromTo(Node target, string its_type)
         {
             if (ReferenceEquals(target, null))
             {

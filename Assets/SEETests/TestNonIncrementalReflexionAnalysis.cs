@@ -2,13 +2,14 @@
 
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
     /// <summary>
     /// Test cases for the non-incremental reflexion analysis.
     /// </summary>
-    internal class TestNonincrementalReflexionAnalysis : TestReflexionAnalysis
+    internal class TestNonIncrementalReflexionAnalysis : TestReflexionAnalysis
     {
         //----------------------------
         // implementation nodes
@@ -81,21 +82,21 @@ namespace SEE.Tools.Architecture
         private void SetNodes()
         {
             // implementation nodes
-            n1 = impl.GetNode("n1");
-            n1_c1 = impl.GetNode("n1_c1");
-            n1_c2 = impl.GetNode("n1_c2");
-            n1_c1_c1 = impl.GetNode("n1_c1_c1");
-            n1_c1_c2 = impl.GetNode("n1_c1_c2");
-            n2 = impl.GetNode("n2");
-            n2_c1 = impl.GetNode("n2_c1");
-            n3 = impl.GetNode("n3");
+            n1 = fullGraph.GetNode("n1");
+            n1_c1 = fullGraph.GetNode("n1_c1");
+            n1_c2 = fullGraph.GetNode("n1_c2");
+            n1_c1_c1 = fullGraph.GetNode("n1_c1_c1");
+            n1_c1_c2 = fullGraph.GetNode("n1_c1_c2");
+            n2 = fullGraph.GetNode("n2");
+            n2_c1 = fullGraph.GetNode("n2_c1");
+            n3 = fullGraph.GetNode("n3");
             // architecture nodes
-            N1 = arch.GetNode("N1");
-            N1_C1 = arch.GetNode("N1_C1");
-            N1_C2 = arch.GetNode("N1_C2");
-            N2 = arch.GetNode("N2");
-            N2_C1 = arch.GetNode("N2_C1");
-            N3 = arch.GetNode("N3");
+            N1 = fullGraph.GetNode("N1");
+            N1_C1 = fullGraph.GetNode("N1_C1");
+            N1_C2 = fullGraph.GetNode("N1_C2");
+            N2 = fullGraph.GetNode("N2");
+            N2_C1 = fullGraph.GetNode("N2_C1");
+            N3 = fullGraph.GetNode("N3");
         }
 
         /// <summary>
@@ -132,10 +133,10 @@ namespace SEE.Tools.Architecture
         protected override void Setup()
         {
             base.Setup();
-            impl = NewImplementationNodeHierarchy();
-            arch = NewArchitecture();
-            mapping = NewMapping();
-            reflexion = new Reflexion(impl, arch, mapping);
+            AddImplementationNodeHierarchy();
+            AddArchitecture();
+            AddMapping();
+            reflexion = new Reflexion(fullGraph);
             reflexion.Register(this);
             SetNodes();
         }
@@ -165,32 +166,26 @@ namespace SEE.Tools.Architecture
         /// call(N3, N2_C1) marked as Architecture.Is_Optional
         /// </summary>
         /// <returns>new architecture graph</returns>
-        private Graph NewArchitecture()
+        private void AddArchitecture()
         {
-            Graph graph = new Graph();
-            graph.Path = "none";
-            graph.Name = "architecture";
-
             // Root nodes
-            Node N1 = NewNode(graph, "N1", "Component");
-            Node N2 = NewNode(graph, "N2", "Component");
-            Node N3 = NewNode(graph, "N3", "Component");
+            N1 = NewNode(true, "N1", "Component");
+            N2 = NewNode(true, "N2", "Component");
+            N3 = NewNode(true, "N3", "Component");
 
             // Second level
-            Node N1_C1 = NewNode(graph, "N1_C1", "Component");
-            Node N1_C2 = NewNode(graph, "N1_C2", "Component");
+            N1_C1 = NewNode(true, "N1_C1", "Component");
+            N1_C2 = NewNode(true, "N1_C2", "Component");
             N1.AddChild(N1_C1);
             N1.AddChild(N1_C2);
-            Node N2_C1 = NewNode(graph, "N2_C1", "Component");
+            N2_C1 = NewNode(true, "N2_C1", "Component");
             N2.AddChild(N2_C1);
 
-            NewEdge(graph, N1_C1, N2_C1, call);
-            NewEdge(graph, N2, N1, call);
-            Edge edge = NewEdge(graph, N3, N2_C1, call);
+            NewEdge(N1_C1, N2_C1, call);
+            NewEdge(N2, N1, call);
+            Edge edge = NewEdge(N3, N2_C1, call);
             edge.SetToggle("Architecture.Is_Optional");
-            NewEdge(graph, N3, N1_C2, call);
-
-            return graph;
+            NewEdge(N3, N1_C2, call);
         }
 
         /// <summary>
@@ -206,33 +201,27 @@ namespace SEE.Tools.Architecture
         ///
         /// </summary>
         /// <returns>new implementation graph with a hierarchy of nodes</returns>
-        private Graph NewImplementationNodeHierarchy()
+        private void AddImplementationNodeHierarchy()
         {
-            Graph graph = new Graph();
-            graph.Path = "path";
-            graph.Name = "implementation";
-
             // Root nodes
-            Node n1 = NewNode(graph, "n1");
-            Node n2 = NewNode(graph, "n2");
-            Node n3 = NewNode(graph, "n3");
+            n1 = NewNode(false, "n1");
+            n2 = NewNode(false, "n2");
+            n3 = NewNode(false, "n3");
 
             // Second level
-            Node n1_c1 = NewNode(graph, "n1_c1");
-            Node n1_c2 = NewNode(graph, "n1_c2");
+            n1_c1 = NewNode(false, "n1_c1");
+            n1_c2 = NewNode(false, "n1_c2");
             n1.AddChild(n1_c1);
             n1.AddChild(n1_c2);
 
-            Node n2_c1 = NewNode(graph, "n2_c1");
+            n2_c1 = NewNode(false, "n2_c1");
             n2.AddChild(n2_c1);
 
             // Third level
-            Node n1_c1_c1 = NewNode(graph, "n1_c1_c1");
-            Node n1_c1_c2 = NewNode(graph, "n1_c1_c2");
+            n1_c1_c1 = NewNode(false, "n1_c1_c1");
+            n1_c1_c2 = NewNode(false, "n1_c1_c2");
             n1_c1.AddChild(n1_c1_c1);
             n1_c1.AddChild(n1_c1_c2);
-
-            return graph;
         }
 
         /// <summary>
@@ -246,58 +235,33 @@ namespace SEE.Tools.Architecture
         /// n2_c1 -Maps_To-> N2_C1
         /// </summary>
         /// <returns>mapping from implementation onto architecture</returns>
-        private Graph NewMapping()
+        private void AddMapping()
         {
-            Graph graph = new Graph();
-            graph.Path = "whatever";
-            graph.Name = "mapping";
-
-            // architecture
-            Node N1 = NewNode(graph, "N1", "Component");
-            Node N2 = NewNode(graph, "N2", "Component");
-            Node N3 = NewNode(graph, "N3", "Component");
-            Node N1_C1 = NewNode(graph, "N1_C1", "Component");
-            Node N1_C2 = NewNode(graph, "N1_C2", "Component");
-            Node N2_C1 = NewNode(graph, "N2_C1", "Component");
-
-            // implementation
-            Node n1 = NewNode(graph, "n1");
-            Node n2 = NewNode(graph, "n2");
-            Node n3 = NewNode(graph, "n3");
-            Node n1_c1 = NewNode(graph, "n1_c1");
-            Node n1_c2 = NewNode(graph, "n1_c2");
-            Node n2_c1 = NewNode(graph, "n2_c1");
-
-            // n1_c1_c1 and n1_c1_c2 are implicitly mapped
-
-            NewEdge(graph, n1, N1, "Maps_To");
-            NewEdge(graph, n2, N2, "Maps_To");
-            NewEdge(graph, n3, N3, "Maps_To");
-            NewEdge(graph, n1_c1, N1_C1, "Maps_To");
-            NewEdge(graph, n1_c2, N1_C2, "Maps_To");
-            NewEdge(graph, n2_c1, N2_C1, "Maps_To");
-
-            return graph;
+            NewEdge(n1, N1, MapsToType);
+            NewEdge(n2, N2, MapsToType);
+            NewEdge(n3, N3, MapsToType);
+            NewEdge(n1_c1, N1_C1, MapsToType);
+            NewEdge(n1_c2, N1_C2, MapsToType);
+            NewEdge(n2_c1, N2_C1, MapsToType);
         }
 
         /// <summary>
-        /// Returns the implementation graph created by NewImplementationNodeHierarchy()
+        /// Returns the implementation graph created by AddImplementationNodeHierarchy()
         /// with the following additional edges:
         ///   call(n1, n2)
         ///   call(n2, n3)
         ///   call(n2, n3)
         /// </summary>
         /// <returns>implementation graph</returns>
-        private Graph CallGraph()
+        private void AddCallGraph()
         {
-            Graph graph = NewImplementationNodeHierarchy();
-            Node n1 = graph.GetNode("n1");
-            Node n2 = graph.GetNode("n2");
-            Node n3 = graph.GetNode("n3");
-            NewEdge(graph, n1, n2, call);
-            NewEdge(graph, n2, n3, call);
-            NewEdge(graph, n2, n3, call);
-            return graph;
+            AddImplementationNodeHierarchy();
+            n1 = fullGraph.GetNode("n1");
+            n2 = fullGraph.GetNode("n2");
+            n3 = fullGraph.GetNode("n3");
+            NewEdge(n1, n2, call);
+            NewEdge(n2, n3, call);
+            NewEdge(n2, n3, call);
         }
 
         //-------------------
@@ -327,7 +291,7 @@ namespace SEE.Tools.Architecture
         public void TestImplicitlyAllowed1()
         {
             // dependency between siblings not mapped
-            NewEdge(impl, n1_c1_c1, n1_c1_c2, call);
+            NewEdge(n1_c1_c1, n1_c1_c2, call);
             reflexion.Run();
 
             CommonImplicitlyAllowed();
@@ -337,7 +301,7 @@ namespace SEE.Tools.Architecture
         public void TestImplicitlyAllowed2()
         {
             // self dependency for node not mapped
-            NewEdge(impl, n1_c1_c1, n1_c1_c1, call);
+            NewEdge(n1_c1_c1, n1_c1_c1, call);
             reflexion.Run();
 
             CommonImplicitlyAllowed();
@@ -347,7 +311,7 @@ namespace SEE.Tools.Architecture
         public void TestImplicitlyAllowed3()
         {
             // self dependency for node mapped
-            NewEdge(impl, n1_c1, n1_c1, call);
+            NewEdge(n1_c1, n1_c1, call);
             reflexion.Run();
 
             CommonImplicitlyAllowed();
@@ -357,7 +321,7 @@ namespace SEE.Tools.Architecture
         public void TestImplicitlyAllowed4()
         {
             // dependency to parent where source is not mapped and target is mapped
-            NewEdge(impl, n1_c1_c1, n1_c1, call);
+            NewEdge(n1_c1_c1, n1_c1, call);
             reflexion.Run();
 
             CommonImplicitlyAllowed();
@@ -388,7 +352,7 @@ namespace SEE.Tools.Architecture
         public void TestAllowedParentAccess1()
         {
             // dependency to parent where source and target are mapped explicitly
-            NewEdge(impl, n1_c1, n1, call);
+            NewEdge(n1_c1, n1, call);
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
@@ -401,7 +365,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency to parent where source is not mapped explicitly but
             // target is mapped explicitly
-            NewEdge(impl, n1_c1_c1, n1, call);
+            NewEdge(n1_c1_c1, n1, call);
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
@@ -413,7 +377,7 @@ namespace SEE.Tools.Architecture
         public void TestAllowedChildAccess1()
         {
             // dependency from parent to child where both are mapped explicitly
-            NewEdge(impl, n1_c1, n1_c1_c1, call);
+            NewEdge(n1_c1, n1_c1_c1, call);
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
@@ -425,7 +389,7 @@ namespace SEE.Tools.Architecture
         public void TestDisallowedChildAccess()
         {
             // dependency from parent to child where both are mapped explicitly
-            NewEdge(impl, n1, n1_c1, call);
+            NewEdge(n1, n1_c1, call);
             reflexion.Run();
 
             // 1 disallowed propagated dependencies
@@ -442,11 +406,11 @@ namespace SEE.Tools.Architecture
         {
             // Note: only one propagated edge for the following two implementation dependencies
             // will be created that covers both.
-            NewEdge(impl, n1_c1_c1, n2_c1, call);
-            NewEdge(impl, n1_c1_c2, n2_c1, call);
-            NewEdge(impl, n2, n1_c2, call);
-            NewEdge(impl, n3, n2_c1, call);
-            NewEdge(impl, n3, n1_c2, call);
+            NewEdge(n1_c1_c1, n2_c1, call);
+            NewEdge(n1_c1_c2, n2_c1, call);
+            NewEdge(n2, n1_c2, call);
+            NewEdge(n3, n2_c1, call);
+            NewEdge(n3, n1_c2, call);
             reflexion.Run();
 
             // 4 propagated edges
@@ -474,7 +438,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestConvergences2()
         {
-            NewEdge(impl, n2, n1, call);
+            NewEdge(n2, n1, call);
             reflexion.Run();
 
             // 1 propagated edges
@@ -514,7 +478,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestConvergences3()
         {
-            NewEdge(impl, n2_c1, n1_c2, call);
+            NewEdge(n2_c1, n1_c2, call);
             reflexion.Run();
 
             // 1 allowed propagated dependencies
@@ -526,7 +490,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestConvergences4()
         {
-            NewEdge(impl, n2_c1, n1_c1_c2, call);
+            NewEdge(n2_c1, n1_c1_c2, call);
             reflexion.Run();
 
             // 1 allowed propagated dependencies
@@ -538,7 +502,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestConvergences5()
         {
-            NewEdge(impl, n2_c1, n1, call);
+            NewEdge(n2_c1, n1, call);
             reflexion.Run();
 
             // 1 allowed propagated dependencies
@@ -571,7 +535,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences1()
         {
-            NewEdge(impl, n1, n2, call);
+            NewEdge(n1, n2, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
@@ -583,7 +547,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences2()
         {
-            NewEdge(impl, n1_c1, n2, call);
+            NewEdge(n1_c1, n2, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
@@ -595,8 +559,8 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences3()
         {
-            NewEdge(impl, n1_c1_c1, n2, call);
-            NewEdge(impl, n1_c1_c2, n2, call);
+            NewEdge(n1_c1_c1, n2, call);
+            NewEdge(n1_c1_c2, n2, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
@@ -608,7 +572,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences4()
         {
-            NewEdge(impl, n1, n2_c1, call);
+            NewEdge(n1, n2_c1, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
@@ -620,7 +584,7 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences5()
         {
-            NewEdge(impl, n1_c2, n2_c1, call);
+            NewEdge(n1_c2, n2_c1, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
@@ -632,8 +596,8 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestDivergences6()
         {
-            NewEdge(impl, n1_c1_c1, n1_c2, call);
-            NewEdge(impl, n1_c1_c2, n1_c2, call);
+            NewEdge(n1_c1_c1, n1_c2, call);
+            NewEdge(n1_c1_c2, n1_c2, call);
             reflexion.Run();
 
             // 1 divergent propagated dependency
