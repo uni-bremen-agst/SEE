@@ -88,7 +88,7 @@ namespace SEE.Utils.RPC
         #endregion
 
         /// <summary>
-        /// The port used for the inter-process communication.
+        /// The TCP port used for the inter-process communication.
         /// </summary>
         private readonly int port;
 
@@ -100,9 +100,9 @@ namespace SEE.Utils.RPC
         /// <summary>
         /// Creates a new JsonRpcNamedPipeServer instance.
         /// </summary>
-        /// <param name="target">An object that contains function that can be called
-        /// remotely. If null no target will be added by default.</param>
-        /// <param name="port">The port, that will be used for communication.</param>
+        /// <param name="target">An object that contains the function that can be called
+        /// remotely. If null, no target will be added by default.</param>
+        /// <param name="port">The TCP port, that will be used for communication.</param>
         public JsonRpcSocketServer(object target, int port) : base(target)
         {
             this.port = port;
