@@ -345,7 +345,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        ///  Renders the GUI for antenna attributes of leaf and inner nodes.
+        /// Renders the GUI for antenna attributes of leaf and inner nodes.
         /// </summary>
         /// <param name="antennaSettingsProperty">the path of the antenna settings to be set by this dialog part relative to the edited city</param>
         private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, string antennaSettingsProperty)
