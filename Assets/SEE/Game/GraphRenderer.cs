@@ -119,7 +119,7 @@ namespace SEE.Game
         private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
-        /// To create antennas for leaf nodes.
+        /// Used to create antennas for leaf nodes.
         /// </summary>
         private AntennaDecorator leafAntennaDecorator;
 
