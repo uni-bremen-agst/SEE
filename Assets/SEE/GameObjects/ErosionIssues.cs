@@ -152,7 +152,7 @@ namespace SEE.GO
         /// considering all descendants of <paramref name="gameNode"/>. More precisely, the
         /// x and z co-ordinates are those of the game object referred to by <paramref name="gameNode"/>
         /// and the y co-ordinate is the maximum y co-ordinate of that game object and all its
-        /// descendants in the game-objet hierarchy.
+        /// descendants in the game-object hierarchy.
         /// </summary>
         /// <param name="gameNode">game node whose roof is to be determined</param>
         /// <returns>world-space position of the roof of <paramref name="gameNode"/></returns>
