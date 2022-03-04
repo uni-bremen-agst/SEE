@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
                 if (cityObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
                     codeWindow.SolutionPath = "";
-                    if (city.SolutionPath.RelativePath != "")
+                    if (!string.IsNullOrWhiteSpace(city.SolutionPath.RelativePath))
                     {
                         codeWindow.SolutionPath = city.SolutionPath.Path;
                     }

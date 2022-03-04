@@ -137,7 +137,7 @@ namespace SEE.Controls
             /// <summary>
             /// Solution path changed.
             /// </summary>
-            /// <returns>Async Task.</returns>
+            /// <param name="path">path of the solution</param>
             public void SolutionChanged(string path)
             {
                 ideIntegration.semaphore.Wait();
