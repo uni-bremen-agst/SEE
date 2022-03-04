@@ -124,7 +124,7 @@ namespace SEE.Game
         private AntennaDecorator leafAntennaDecorator;
 
         /// <summary>
-        /// To create antennas for inner nodes.
+        /// Used to create antennas for inner nodes.
         /// </summary>
         private AntennaDecorator innerAntennaDecorator;
 
