@@ -39,10 +39,7 @@ namespace SEE.Controls.Actions
                 }
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    if (obj != null)
-                    {
-                        obj.SetSelect(!obj.IsSelected, true);
-                    }
+                    obj?.SetSelect(!obj.IsSelected, true);
                 }
                 else
                 {
@@ -53,12 +50,9 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(false);
 
-                foreach (var elem in IDEIntegration.Instance?.PopPendingSelections())
+                foreach (InteractableObject elem in IDEIntegration.Instance?.PopPendingSelections())
                 {
-                    if (elem != null)
-                    {
-                        elem.SetSelect(true, false);
-                    }
+                    elem?.SetSelect(true, false);
                 }
             }
         }
