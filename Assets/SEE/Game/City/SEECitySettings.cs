@@ -457,7 +457,7 @@ namespace SEE.Game.City
                 return false;
             }
 
-            // If AntennaSections has already an antenna section for the metric in newSection,
+            // If AntennaSections already has an antenna section for the metric in newSection,
             // it will be removed. Then the newSection is added to it.
             void AddAntennaSection(AntennaSection newSection)
             {
