@@ -378,9 +378,8 @@ namespace SEE.Game.City
                 return false;
             }
 
-            bool result = ConfigIO.Restore(values, MetricLabel, ref Metric);
-            result = ConfigIO.Restore(values, ColorLabel, ref Color) || result;
-            return result;
+            bool metricRestored = ConfigIO.Restore(values, MetricLabel, ref Metric);
+            return ConfigIO.Restore(values, ColorLabel, ref Color) || metricRestored;
         }
     }
 
