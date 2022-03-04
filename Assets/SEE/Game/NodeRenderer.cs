@@ -414,7 +414,7 @@ namespace SEE.Game
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
         public void AdjustAntenna(GameObject gameNode)
         {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
                 if (node.IsLeaf())
