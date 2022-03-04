@@ -28,6 +28,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -38,7 +39,7 @@ using SEE.Utils;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace SEE.Controls
+namespace SEE.IDE
 {
     /// <summary>
     /// This class establishes the connection to an IDE of choice. There is the
