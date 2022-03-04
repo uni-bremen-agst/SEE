@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.IDE;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

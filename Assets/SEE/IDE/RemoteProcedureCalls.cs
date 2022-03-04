@@ -24,12 +24,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.IDE
 {
     /// <summary>
     /// This script establishes the connection to an IDE of choice. There is the

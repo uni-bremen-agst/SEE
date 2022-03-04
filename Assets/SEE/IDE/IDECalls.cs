@@ -24,7 +24,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Controls
+namespace SEE.IDE
 {
     /// <summary>
     /// This script establishes the connection to an IDE of choice. There is the
@@ -66,7 +66,7 @@ namespace SEE.Controls
             }
 
             /// <summary>
-            /// Gets the absolute project path (e.g. .sln). 
+            /// Gets the absolute project path (e.g. .sln).
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
@@ -76,7 +76,7 @@ namespace SEE.Controls
             }
 
             /// <summary>
-            /// Gets the absolute project path (e.g. .sln). 
+            /// Gets the absolute project path (e.g. .sln).
             /// </summary>
             /// <param name="connection">A connection to an IDE.</param>
             /// <returns>Returns the absolute project path. Can be null.</returns>
