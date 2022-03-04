@@ -276,7 +276,7 @@ namespace SEE.GO
             // They need to be reset because the animation is still running and thus
             // modifying the color of the materials while new blocks are being created
             // receiving these materials interfere. I don't know the exact implementation details
-            // of the animation and, hence, have not clear explanation, but I observed
+            // of the animation and, hence, have no clear explanation, but I observed
             // that the materials tended to fade more and more, never reaching their
             // original value again.
             foreach (var entry in materials)
