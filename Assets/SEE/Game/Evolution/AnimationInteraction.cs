@@ -135,7 +135,7 @@ namespace SEE.Game.Evolution
         private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
 
         /// <summary>
-        /// The name of the graph attribute providing the commit id.
+        /// The name of the graph attribute providing the commit ID.
         /// </summary>
         private const string CommitIdAttributeName = "CommitId";
 
