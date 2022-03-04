@@ -45,7 +45,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Defines the default time an animation takes in seconds.
         /// </summary>
-        public const float DefaultAnimationTime = 2.0f;
+        public const float DefaultAnimationTime = 5.0f;
 
         /// <summary>
         /// Defines the maximum time an animation is allowed to take in seconds.

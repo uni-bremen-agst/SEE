@@ -134,6 +134,26 @@ namespace SEE.Game.Evolution
         /// </summary>
         private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
 
+        /// <summary>
+        /// The name of the graph attribute providing the commit ID.
+        /// </summary>
+        private const string CommitIdAttributeName = "CommitId";
+
+        /// <summary>
+        /// The name of the graph attribute providing the name of the author of a commit.
+        /// </summary>
+        private const string CommitAuthorAttributeName = "CommitAuthor";
+
+        /// <summary>
+        /// The name of the graph attribute providing the name of the timestamp of a commit.
+        /// </summary>
+        private const string CommitTimestampAttributeName = "CommitTimestamp";
+
+        /// <summary>
+        /// The name of the graph attribute providing the commit message.
+        /// </summary>
+        private const string CommitMessageAttributeName = "CommitMessage";
+
         private void Init()
         {
             AnimationCanvas = GetCanvas(AnimationCanvasGameObjectName, AnimationCanvasPrefab);
@@ -583,6 +603,56 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Returns the value of the string attribute named <paramref name="attributeName"/> of
+        /// the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// If the graph does not have the requested <paramref name="attributeName"/>,
+        /// the empty string is returned.
+        /// </summary>
+        /// <param name="attributeName">name of the string attribute</param>
+        /// <returns>attribute value or the empty string</returns>
+        private string GetAttributeOfCurrentGraph(string attributeName)
+        {
+            evolutionRenderer.GraphCurrent.TryGetString(attributeName, out string result);
+            return result;
+        }
+
+        /// <summary>
+        /// Returns commit ID of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit ID</returns>
+        private string CurrentCommitId()
+        {
+            return GetAttributeOfCurrentGraph(CommitIdAttributeName);
+        }
+
+        /// <summary>
+        /// Returns the author of the commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit author</returns>
+        private string CurrentAuthor()
+        {
+            return GetAttributeOfCurrentGraph(CommitAuthorAttributeName);
+        }
+
+        /// <summary>
+        /// Returns timestamp commit of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit timestamp</returns>
+        private string CurrentCommitTimestamp()
+        {
+            return GetAttributeOfCurrentGraph(CommitTimestampAttributeName);
+        }
+
+        /// <summary>
+        /// Returns commit message of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// </summary>
+        /// <returns>commit message</returns>
+        private string CurrentCommitMessage()
+        {
+            return GetAttributeOfCurrentGraph(CommitMessageAttributeName);
+        }
+
+        /// <summary>
         /// Event function that updates all shown data for the user;
         /// e.g. the revision number shown in the animation canvas.
         /// This method is called as a callback of the evolution renderer
@@ -591,7 +661,23 @@ namespace SEE.Game.Evolution
         private void OnShownGraphHasChanged()
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
+            animationDataModel.CommitInformationText.text = AllOrNothing("Commit #", CurrentCommitId())
+                + AllOrNothing("Author: ", CurrentAuthor())
+                + AllOrNothing("Timestamp: ", CurrentCommitTimestamp())
+                + AllOrNothing("Message:\n", CurrentCommitMessage());
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
+
+            string AllOrNothing(string prefix, string postfix)
+            {
+                if (string.IsNullOrWhiteSpace(postfix))
+                {
+                    return "";
+                }
+                else
+                {
+                    return prefix + postfix + "\n";
+                }
+            }
         }
 
         /// <summary>

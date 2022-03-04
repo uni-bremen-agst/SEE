@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OdinSerializer;
 using SEE.DataModel.DG;
@@ -57,6 +58,7 @@ namespace SEE.Game.City
     /// Abstract common super class for all settings influencing the visual
     /// appearance of game objects drawn in the scene.
     /// </summary>
+    [Serializable]
     public abstract class VisualAttributes
     {
         /// <summary>
@@ -79,6 +81,7 @@ namespace SEE.Game.City
     /// Abstract common super class for all settings influencing the visual
     /// appearance of leaf or inner nodes.
     /// </summary>
+    [Serializable]
     public abstract class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
@@ -94,10 +97,62 @@ namespace SEE.Game.City
         /// </summary>
         public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
         /// <summary>
+        /// Describes how metrics are mapped onto the antenna above the blocks.
+        /// </summary>
+        [OdinSerialize]
+        public AntennaAttributes AntennaSettings = new AntennaAttributes();
+        /// <summary>
         /// The settings for the labels appearing when a node is hovered over.
         /// </summary>
         [OdinSerialize]
         public LabelAttributes LabelSettings = new LabelAttributes();
+
+        /// <summary>
+        /// Saves the settings in the configuration file.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings</param>
+        public override void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(HeightMetric, HeightMetricLabel);
+            writer.Save(ColorMetric, StyleMetricLabel);
+            ColorRange.Save(writer, ColorRangeLabel);
+            LabelSettings.Save(writer, LabelSettingsLabel);
+            AntennaSettings.Save(writer, AntennaSettingsLabel);
+            SaveAdditionalAttributes(writer);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        public override void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
+                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
+                ColorRange.Restore(values, ColorRangeLabel);
+                LabelSettings.Restore(values, LabelSettingsLabel);
+                AntennaSettings.Restore(values, AntennaSettingsLabel);
+            }
+        }
+
+        /// <summary>
+        /// Saves the additional attributes of subclasses. The enclosing group
+        /// is already opened. Implementations must not call writer.BeginGroup(label)
+        /// and writer.EndGroup().
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        protected abstract void SaveAdditionalAttributes(ConfigWriter writer);
+
         /// <summary>
         /// Label in the configuration file for the kind of object drawn for a node.
         /// </summary>
@@ -105,24 +160,29 @@ namespace SEE.Game.City
         /// <summary>
         /// Label in the configuration file for a color range.
         /// </summary>
-        protected const string ColorRangeLabel = "ColorRange";
+        private const string ColorRangeLabel = "ColorRange";
         /// <summary>
         /// Label in the configuration file for a node style (color actually).
         /// </summary>
-        protected const string StyleMetricLabel = "StyleMetric";
+        private const string StyleMetricLabel = "StyleMetric";
         /// <summary>
         /// Label in the configuration file for a height metric.
         /// </summary>
-        protected const string HeightMetricLabel = "HeightMetric";
+        private const string HeightMetricLabel = "HeightMetric";
         /// <summary>
         /// Label in the configuration file for the label settings for leaf and inner nodes.
         /// </summary>
-        protected const string LabelSettingsLabel = "LabelSettings";
+        private const string LabelSettingsLabel = "LabelSettings";
+        /// <summary>
+        /// Label in the configuration file for the antenna settings for leaf and inner nodes.
+        /// </summary>
+        private const string AntennaSettingsLabel = "AntennnaSettings";
     }
 
     /// <summary>
     /// The settings of leaf nodes of a specific kind.
     /// </summary>
+    [Serializable]
     public class LeafNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
@@ -146,25 +206,18 @@ namespace SEE.Game.City
         /// This parameter determines the maximal width, breadth, and height of each block
         /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
         /// </summary>
-        public float MaximalBlockLength = 5.0f; // serialized by Unity
+        public float MaximalBlockLength = 1.0f; // serialized by Unity
         /// <summary>
-        /// Saves the settings in the configuration file.
+        /// Saves the settings specific to this class in the configuration file.
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
-        /// <param name="label">the outer label grouping the settings</param>
-        public override void Save(ConfigWriter writer, string label)
+        protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeKindsLabel);
             writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
             writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
-            LabelSettings.Save(writer, LabelSettingsLabel);
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
-            writer.EndGroup();
         }
 
         /// <summary>
@@ -176,17 +229,15 @@ namespace SEE.Game.City
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
+            base.Restore(attributes, label);
+
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
                 ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
-                LabelSettings.Restore(values, LabelSettingsLabel);
                 ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
                 ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
             }
@@ -213,6 +264,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
     /// </summary>
+    [Serializable]
     public class InnerNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
@@ -225,30 +277,25 @@ namespace SEE.Game.City
         /// </summary>
         public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
-        public override void Save(ConfigWriter writer, string label)
+        /// <summary>
+        /// Saves the settings specific to this class in the configuration file.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
-            writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeKindsLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
-            LabelSettings.Save(writer, LabelSettingsLabel);
-            writer.EndGroup();
         }
 
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
+            base.Restore(attributes, label);
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
                 ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
-                LabelSettings.Restore(values, LabelSettingsLabel);
             }
         }
 
@@ -256,8 +303,183 @@ namespace SEE.Game.City
     }
 
     /// <summary>
+    /// The settings of one antenna section specifying the metric that
+    /// determines the length and color of the section.
+    /// </summary>
+    [Serializable]
+    public class AntennaSection : ConfigIO.PersistentConfigItem
+    {
+        /// <summary>
+        /// The metric which should determine the length of the section.
+        /// </summary>
+        public string Metric;
+        /// <summary>
+        /// The color in which the section should be drawn.
+        /// </summary>
+        public Color Color;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="metric">the metric that should determine the length of the section</param>
+        /// <param name="color">color in the section should be drawn</param>
+        public AntennaSection(string metric, Color color)
+        {
+            Metric = metric;
+            Color = color;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public AntennaSection() : this(string.Empty, Color.white) { }
+
+        /// <summary>
+        /// Label in the configuration file for the <see cref="Metric"/>.
+        /// </summary>
+        private const string MetricLabel = "Metric";
+        /// <summary>
+        /// Label in the configuration file for the <see cref="Color"/>.
+        /// </summary>
+        private const string ColorLabel = "Color";
+
+        /// <summary>
+        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// </summary>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(Metric, MetricLabel);
+            writer.Save(Color, ColorLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Implements <see cref="ConfigIO.PersistentConfigItem.Restore(Dictionary{string, object}, string)"/>.
+        /// </summary>
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
+        {
+            Dictionary<string, object> values;
+            if (string.IsNullOrEmpty(label))
+            {
+                // no label given => attributes contains already the data to be restored
+                values = attributes;
+            }
+            else if (attributes.TryGetValue(label, out object dictionary))
+            {
+                // label was given => attributes is a dictionary where we need to look up the data
+                // using the label
+                values = dictionary as Dictionary<string, object>;
+            }
+            else
+            {
+                // label was given, but attributes does not know it
+                // => no data; we cannot restore the object
+                return false;
+            }
+
+            bool metricRestored = ConfigIO.Restore(values, MetricLabel, ref Metric);
+            return ConfigIO.Restore(values, ColorLabel, ref Color) || metricRestored;
+        }
+    }
+
+    /// <summary>
+    /// Specifies how metrics are to be rendered as an antenna above the blocks.
+    /// </summary>
+    [Serializable]
+    public class AntennaAttributes : ConfigIO.PersistentConfigItem
+    {
+        /// <summary>
+        /// This parameter determines the sections of the antenna.
+        /// </summary>
+        [SerializeField]
+        public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
+
+        /// <summary>
+        /// The width of an antenna.
+        /// </summary>
+        public float AntennaWidth = 0.1f;
+
+        /// <summary>
+        /// Saves the settings in the configuration file.
+        ///
+        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings</param>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(AntennaWidth, AntennaWidthLabel);
+            writer.Save(AntennaSections, AntennaSectionsLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        ///
+        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        /// <returns>true if at least one attribute was successfully restored</returns>
+        public bool Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                bool result = false;
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                ConfigIO.Restore(values, AntennaWidthLabel, ref AntennaWidth);
+                if (values.TryGetValue(AntennaSectionsLabel, out object antennaSections))
+                {
+                    if (!(antennaSections is IList<object> objects))
+                    {
+                        throw new InvalidCastException($"Value to be cast {antennaSections} is expected to be a list. Actual type is {antennaSections.GetType().Name}");
+                    }
+                    foreach (object anObject in objects)
+                    {
+                        if (!(anObject is Dictionary<string, object> antennaSection))
+                        {
+                            throw new InvalidCastException($"Value to be cast {anObject} is expected to be a dictionary. Actual type is {anObject.GetType().Name}");
+                        }
+                        AntennaSection section = new AntennaSection();
+                        result = section.Restore(antennaSection) || result;
+                        AddAntennaSection(section);
+                    }
+                }
+                return result;
+            }
+            else
+            {
+                return false;
+            }
+
+            // If AntennaSections already has an antenna section for the metric in newSection,
+            // it will be removed. Then the newSection is added to it.
+            void AddAntennaSection(AntennaSection newSection)
+            {
+                AntennaSections.RemoveAll(section => section.Metric == newSection.Metric);
+                AntennaSections.Add(newSection);
+            }
+        }
+
+        /// <summary>
+        /// Label in the configuration file for the antenna width.
+        /// </summary>
+        private const string AntennaWidthLabel = "Width";
+
+        /// <summary>
+        /// Label in the configuration file for the antenna sections.
+        /// </summary>
+        private const string AntennaSectionsLabel = "AntennaSections";
+    }
+
+    /// <summary>
     /// Common super class for settings of node and edge layouts.
     /// </summary>
+    [Serializable]
     public abstract class LayoutSettings : VisualAttributes
     {
     }
@@ -265,6 +487,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The settings for the layout of the nodes.
     /// </summary>
+    [Serializable]
     public class NodeLayoutAttributes : LayoutSettings
     {
         /// <summary>
@@ -309,6 +532,7 @@ namespace SEE.Game.City
     /// <summary>
     /// The settings for the layout of the edges.
     /// </summary>
+    [Serializable]
     public class EdgeLayoutAttributes : LayoutSettings
     {
         /// <summary>
@@ -377,6 +601,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Attributes regarding the selection of edges.
     /// </summary>
+    [Serializable]
     public class EdgeSelectionAttributes : VisualAttributes
     {
         /// <summary>
@@ -428,6 +653,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Axivion's software erosion issues shown as icons above nodes.
     /// </summary>
+    [Serializable]
     public class ErosionAttributes : VisualAttributes
     {
         /// <summary>

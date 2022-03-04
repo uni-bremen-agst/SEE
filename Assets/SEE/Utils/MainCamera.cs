@@ -45,7 +45,7 @@ namespace SEE.Utils
                                 {
                                     camera = cam;
                                 }
-                                Debug.LogWarning($"Camera: {cam.gameObject.GetFullName()}\n");
+                                Debug.LogWarning($"Camera: {cam.gameObject.FullName()}\n");
                             }
                             camera = Camera.main;
                             NotifyAll();

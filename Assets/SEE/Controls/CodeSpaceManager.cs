@@ -140,7 +140,7 @@ namespace SEE.Controls
                                + "code windows across the network! No new indicator will be created.\n");
                 foreach (CodeSpaceManager manager in FindObjectsOfType<CodeSpaceManager>())
                 {
-                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.GetFullName()}.\n");
+                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.FullName()}.\n");
                 }
             }
             else
