@@ -80,11 +80,6 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
-      Standalone: Linux64
-    second:
-      enabled: 1
-      settings: {}
-  - first:
       Standalone: Win64
     second:
       enabled: 1

@@ -319,18 +319,22 @@ namespace SEE.Game.City
 
         /// <summary>
         /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
-        /// DepthMetric, and LeafStyleMetric).
+        /// DepthMetric, and LeafStyleMetric plus the antenna metrics).
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of a leaf node</returns>
-        public ICollection<string> AllLeafMetrics() =>
-            new List<string>(4)
+        public ICollection<string> AllLeafMetrics()
+        {
+            List<string> result = new List<string>(4)
             {
                 LeafNodeSettings.WidthMetric,
                 LeafNodeSettings.HeightMetric,
                 LeafNodeSettings.DepthMetric,
                 LeafNodeSettings.ColorMetric
             };
+            result.AddRange(LeafNodeSettings.AntennaSettings.AntennaSections.Select(section => section.Metric));
+            return new HashSet<string>(result);
+        }
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions.
@@ -371,6 +375,7 @@ namespace SEE.Game.City
         /// More precisely, the resulting list consists of the following metrics:
         /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
         /// AllInnerNodeIssues(), and InnerDonutMetric.
+        /// A metric name occurs only once.
         /// </summary>
         /// <returns>all node metric names</returns>
         public List<string> AllDefaultMetrics()
@@ -380,7 +385,7 @@ namespace SEE.Game.City
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
             nodeMetrics.Add(InnerNodeSettings.InnerDonutMetric);
-            return nodeMetrics;
+            return new HashSet<string>(nodeMetrics).ToList();
         }
 
         /// <summary>
@@ -421,12 +426,20 @@ namespace SEE.Game.City
 
         /// <summary>
         /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric).
+        /// and InnerNodeHeightMetric plus the antenna metrics).
         /// Note: A metric name occurs only once (i.e., duplicate names are removed).
         /// </summary>
         /// <returns>all metrics used for visual attributes of an inner node</returns>
-        public ICollection<string> AllInnerNodeMetrics() =>
-            new List<string> { InnerNodeSettings.ColorMetric, InnerNodeSettings.HeightMetric };
+        public ICollection<string> AllInnerNodeMetrics()
+        {
+            List<string> result = new List<string>
+            {
+                InnerNodeSettings.ColorMetric,
+                InnerNodeSettings.HeightMetric
+            };
+            result.AddRange(InnerNodeSettings.AntennaSettings.AntennaSections.Select(section => section.Metric));
+            return new HashSet<string>(result);
+        }
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.

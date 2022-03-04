@@ -22,6 +22,15 @@
       <attr name="Linkage.Name">
         <string>p1.c1.m1</string>
       </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>1</int>
+	  </attr>
     </node>
     <node id="N3">
       <type xlink:href="Class"/>
@@ -43,6 +52,15 @@
       <attr name="Linkage.Name">
         <string>p1.c1</string>
       </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+      </attr>	  
     </node>
     <node id="N5">
       <type xlink:href="Class"/>
@@ -85,6 +103,15 @@
       <attr name="Linkage.Name">
         <string>p1.c4</string>
       </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
     </node>
     <node id="N7">
       <type xlink:href="Package"/>

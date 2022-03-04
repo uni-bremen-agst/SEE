@@ -421,43 +421,45 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartAttr()
         {
-            if (ReferenceEquals(current, null))
+            if (reader.HasAttributes)
             {
-                LogError("Found attribute declaration outside of a node/edge declaration");
+                while (reader.MoveToNextAttribute())
+                {
+                    if (reader.Name == "name")
+                    {
+                        // save for later when we know the attribute type
+                        currentAttributeName = reader.Value;
+                        break;
+                    }
+                }
             }
             else
             {
-                if (reader.HasAttributes)
-                {
-                    while (reader.MoveToNextAttribute())
-                    {
-                        if (reader.Name == "name")
-                        {
-                            // save for later when we know the attribute type
-                            currentAttributeName = reader.Value;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    LogError("Attribute declaration without name.");
-                }
+                LogError("Attribute declaration without name.");
             }
         }
 
         /// <summary>
-        /// Sets toggle attribute value of attribute currentAttributeName of current graph element.
+        /// Sets toggle attribute of attribute currentAttributeName of current graph element.
         /// </summary>
         protected override void StartEnum()
         {
-            if (ReferenceEquals(current, null))
+            if (currentAttributeName == "")
             {
-                LogError("Found toggle attribute (enum) outside of a node/edge declaration.");
+                LogError("There is no attribute name for this enum.");
             }
-            else if (currentAttributeName == "")
+            else if (ReferenceEquals(current, null))
             {
-                LogError("There is not attribute name for this enum.");
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetToggle(currentAttributeName);
+                }
+                else
+                {
+                    LogError("Found toggle attribute (enum) outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -471,13 +473,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndString(string value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found string attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this string.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetString(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found string attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -490,13 +501,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndFloat(float value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found float attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this float.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetFloat(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found float attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -509,13 +529,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndInt(int value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found int attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this int.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetInt(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found int attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
