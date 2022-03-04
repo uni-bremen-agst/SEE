@@ -249,7 +249,7 @@
       }
     },
     "com.unity.xr.arsubsystems": {
-      "version": "4.1.7",
+      "version": "4.1.9",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -262,7 +262,7 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.subsystemregistration": "1.0.6"
+        "com.unity.subsystemregistration": "1.0.5"
       },
       "url": "https://packages.unity.com"
     },
