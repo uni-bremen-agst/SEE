@@ -30,9 +30,9 @@ using Debug = UnityEngine.Debug;
 namespace SEE.IDE
 {
     /// <summary>
-    /// Visual Studio pathfinder class. Uses Microsoft's "vswhere" project to receive
-    /// information about a Visual Studio Instance. You can find the project
-    /// here: https://github.com/microsoft/vswhere.
+    /// Visual Studio pathfinder class. Uses Microsoft's "vswhere" tool to retrieve
+    /// information about a Visual Studio instance. You can find the project
+    /// of vswhere here: https://github.com/microsoft/vswhere.
     ///
     /// Note: This only works on Windows.
     /// </summary>
@@ -71,7 +71,9 @@ namespace SEE.IDE
         public static async UniTask<string> GetVisualStudioExecutableAsync(Version version)
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
                 throw new InvalidOperationException("This method is only supported on Windows!");
+            }
             string requestedInstance = version switch
             {
                 Version.VS2019 => VS2019,
