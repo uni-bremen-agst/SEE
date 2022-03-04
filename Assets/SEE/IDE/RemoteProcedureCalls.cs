@@ -27,7 +27,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.RPC;
 using UnityEngine;
 
 namespace SEE.IDE

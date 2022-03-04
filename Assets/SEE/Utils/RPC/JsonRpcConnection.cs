@@ -25,7 +25,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using StreamRpc;
 
-namespace SEE.Utils
+namespace SEE.Utils.RPC
 {
     /// <summary>
     /// Represents a unique client connection. Contains the underlying <see cref="JsonRpc"/>
@@ -92,14 +92,17 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// The Task that will handle the connection. When successfully connected, this method
+        /// Returns the task that will handle the connection. When successfully connected, this method
         /// will invoke <see cref="Connected"/>. After disconnecting will invoke
         /// <see cref="Disconnected"/>.
         /// </summary>
         /// <returns>UniTask.</returns>
         private async UniTask RunTask(CancellationToken token)
         {
-            if (!InitiateJsonRpc()) return;
+            if (!InitiateJsonRpc())
+            {
+                return;
+            }
 
             // To allow adding targets after starting
             Rpc.AllowModificationWhileListening = true;

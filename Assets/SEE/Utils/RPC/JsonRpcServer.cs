@@ -26,10 +26,10 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.RPC
 {
     /// <summary>
-    /// The Base class of the inter-process communication implementation for
+    /// The base class of the inter-process communication implementation for
     /// communication between an IDE and SEE.
     /// </summary>
     public abstract class JsonRpcServer : IDisposable
@@ -112,7 +112,10 @@ namespace SEE.Utils
         /// <returns>Async UniTask.</returns>
         public async UniTask Start(uint maxClients)
         {
-            if (Server.Status == UniTaskStatus.Pending) return;
+            if (Server.Status == UniTaskStatus.Pending)
+            {
+                return;
+            }
             Dispose();
             Server = StartServerAsync(maxClients, sourceToken.Token);
             await Server;
@@ -157,7 +160,10 @@ namespace SEE.Utils
             connection.Connected += AddConnection;
             connection.Disconnected += RemoveConnection;
             connection.Run();
-            if (Target != null) connection.AddTarget(Target);
+            if (Target != null)
+            {
+                connection.AddTarget(Target);
+            }
         }
 
         /// <summary>
@@ -252,7 +258,7 @@ namespace SEE.Utils
         protected abstract UniTask StartServerAsync(uint maxClients, CancellationToken token);
 
         /// <summary>
-        /// Dispose all open streams and stops the server.
+        /// Disposes all open streams and stops the server.
         /// </summary>
         public virtual void Dispose()
         {
@@ -267,7 +273,7 @@ namespace SEE.Utils
 
                 Semaphore.Release();
             }
-            
+
             sourceToken = new CancellationTokenSource();
         }
     }

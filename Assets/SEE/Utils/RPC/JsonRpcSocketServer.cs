@@ -29,7 +29,7 @@ using Cysharp.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.RPC
 {
     /// <summary>
     /// The implementation of JsonRpcServer that will use <see cref="TcpListener"/>.
@@ -117,7 +117,7 @@ namespace SEE.Utils
         protected override async UniTask StartServerAsync(uint maxClients, CancellationToken token)
         {
             try
-            {	
+            {
                 socket = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
                 socket.Start();
 
