@@ -81,7 +81,7 @@ namespace SEE.Utils
         /// A <see cref="GameObject"/> to be the target of the animation.
         /// </param>
         /// <param name="localScale">
-        /// The final locale scale to be reached.
+        /// The final local scale to be reached.
         /// </param>
         /// <param name="duration">
         /// The time in seconds the animation should take to complete.
