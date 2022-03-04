@@ -33,7 +33,7 @@ using Task = System.Threading.Tasks.Task;
 namespace VSSeeExtension.SEE
 {
     /// <summary>
-    /// Provides all useful functions to interact with the server(SEE).
+    /// Provides necessary functions to interact with the server (SEE).
     /// </summary>
     public partial class SeeIntegration : IDisposable
     {
@@ -48,7 +48,7 @@ namespace VSSeeExtension.SEE
         private JsonRpcClient rpc;
 
         /// <summary>
-        /// See methods that can be called by the client.
+        /// SEE methods that can be called by the client.
         /// </summary>
         public SeeCalls See { get; private set; }
 
@@ -58,12 +58,12 @@ namespace VSSeeExtension.SEE
         private static SeeIntegration instance;
 
         /// <summary>
-        /// Private property.
+        /// Private property indicating whether Visual Studio was started by SEE.
         /// </summary>
         private bool startedBySee;
 
         /// <summary>
-        /// Indicates if Visual Studio was started by SEE.
+        /// Indicates whether Visual Studio was started by SEE.
         /// </summary>
         public bool StartedBySee
         {
@@ -77,7 +77,7 @@ namespace VSSeeExtension.SEE
         }
 
         /// <summary>
-        /// The integration that will communicate with SEE
+        /// The integration that will communicate with SEE.
         /// </summary>
         /// <param name="package">Package that owns this class</param>
         public SeeIntegration(VSSeeExtensionPackage package)
@@ -111,17 +111,16 @@ namespace VSSeeExtension.SEE
         ///
         /// Note: Will always return false if auto connect is enabled.
         /// </summary>
-        /// <param name="startedBySee">Was this action directly taken by SEE.</param>
+        /// <param name="startedBySee">Whether this action was directly taken by SEE.</param>
         /// <returns>True if this started and connected the client, false otherwise.</returns>
         public async Task<bool> StartAsync(bool startedBySee = false)
         {
             StartedBySee = startedBySee;
-            if (rpc == null || !await rpc.StartAsync()) return false;
-            return true;
+            return rpc != null && await rpc.StartAsync());
         }
 
         /// <summary>
-        /// Special stop method, that will retry a connection attempt while in automatic mode.
+        /// Special stop method that will retry a connection attempt while in automatic mode.
         /// </summary>
         public void StopByServer()
         {
@@ -147,17 +146,20 @@ namespace VSSeeExtension.SEE
 
             // Due to limitations with Mono only Socket implementation works with Unity.
             rpc = new JsonRpcSocketClient(
-                package.Options.AutoConnect, 
+                package.Options.AutoConnect,
                 new RemoteProcedureCalls(this),
                 package.Options.TcpPort);
 
-            if (package.Options.AutoConnect) _ = rpc.StartAsync();
+            if (package.Options.AutoConnect)
+            {
+                rpc.StartAsync();
+            }
 
             See = new SeeCalls(this);
         }
 
         /// <summary>
-        /// Subscribe to all necessary events. 
+        /// Subscribes to all necessary events.
         /// </summary>
         private void InitializeEventHandler()
         {
@@ -168,7 +170,7 @@ namespace VSSeeExtension.SEE
             {
                 if (IsConnected())
                 {
-                    _ = ThreadHelper.JoinableTaskFactory.Run(async () => See.SolutionChangedAsync(
+                    ThreadHelper.JoinableTaskFactory.Run(async () => See.SolutionChangedAsync(
                         await SolutionHelper.GetSolutionAsync(package.DisposalToken)));
                 }
             };

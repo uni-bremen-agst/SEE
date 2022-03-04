@@ -40,7 +40,7 @@ namespace VSSeeExtension.SEE
             private readonly SeeIntegration integration;
 
             /// <summary>
-            /// Initializes this class. Brings functionality for See.
+            /// Initializes this class. Brings functionality for SEE.
             /// </summary>
             /// <param name="integration">Parent class.</param>
             public RemoteProcedureCalls(SeeIntegration integration)
@@ -49,10 +49,10 @@ namespace VSSeeExtension.SEE
             }
 
             /// <summary>
-            /// Opens a File and jumps to the given line.
+            /// Opens a file and jumps to the given line.
             /// </summary>
             /// <param name="path">The absolute path of the file</param>
-            /// <param name="line">The line number. If 0 it will go to the previous spot.</param>
+            /// <param name="line">The line number. If 0, it will go to the previous spot.</param>
             /// <returns>Was successful.</returns>
             public void OpenFile(string path, int? line = null)
             {
@@ -70,7 +70,7 @@ namespace VSSeeExtension.SEE
             /// </summary>
             /// <returns>The solution path.</returns>
             public string GetProject()
-            { 
+            {
                 return ThreadHelper.JoinableTaskFactory.Run(async () =>
                     await SolutionHelper.GetSolutionAsync(integration.package.DisposalToken));
             }
@@ -85,7 +85,7 @@ namespace VSSeeExtension.SEE
             }
 
             /// <summary>
-            /// Was this client instance started by SEE directly through a command switch.
+            /// True if this client instance was started by SEE directly through a command switch.
             /// </summary>
             /// <returns>True if SEE started this client.</returns>
             public bool WasStartedBySee()
@@ -111,8 +111,8 @@ namespace VSSeeExtension.SEE
             }
 
             /// <summary>
-            /// Declines this instance of Visual Studio and stops auto connecting attempts. Should be
-            /// called by the server when solution doesn't match the current solution.
+            /// Declines this instance of Visual Studio and stops auto-connecting attempts. Should be
+            /// called by the server when a solution doesn't match the current solution.
             /// </summary>
             public void Decline()
             {

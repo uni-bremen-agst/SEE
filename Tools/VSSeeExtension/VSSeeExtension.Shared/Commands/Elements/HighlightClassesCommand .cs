@@ -27,7 +27,7 @@ using Task = System.Threading.Tasks.Task;
 namespace VSSeeExtension.Commands
 {
     /// <summary>
-    /// The button in Visual Studio to highlight a method in SEE.
+    /// The button in Visual Studio to highlight a class in SEE.
     /// </summary>
     public sealed class HighlightClassesCommand : HighlightElementsCommand
     {
@@ -46,8 +46,8 @@ namespace VSSeeExtension.Commands
         /// <summary>
         /// Initialize the <see cref="HighlightClassesCommand"/> class.
         /// </summary>
-        /// <param name="package">The Package which is calling initializing the button.</param>
-        /// <returns></returns>
+        /// <param name="package">The package that is calling the initialization of the button.</param>
+        /// <returns>task executing this command</returns>
         public static async Task InitializeAsync(VSSeeExtensionPackage package)
         {
             Instance = new HighlightClassesCommand();

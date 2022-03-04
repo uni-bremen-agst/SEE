@@ -45,8 +45,8 @@ namespace VSSeeExtension.Commands
         /// <summary>
         /// Initialize the <see cref="DisconnectFromSeeCommand"/> class.
         /// </summary>
-        /// <param name="package">The Package which is calling initializing the button.</param>
-        /// <returns></returns>
+        /// <param name="package">The package that is calling the initialization of the button.</param>
+        /// <returns>task executing this command</returns>
         public static async Task InitializeAsync(VSSeeExtensionPackage package)
         {
             Instance = new DisconnectFromSeeCommand();
@@ -55,7 +55,7 @@ namespace VSSeeExtension.Commands
         }
 
         /// <summary>
-        /// Functionality of this Button.
+        /// Functionality of this command.
         /// </summary>
         protected override async Task ExecuteAsync()
         {

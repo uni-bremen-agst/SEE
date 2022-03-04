@@ -44,10 +44,10 @@ namespace VSSeeExtension.Commands
         public static HighlightMethodCommand Instance { get; private set; }
 
         /// <summary>
-        /// Initialize the <see cref="HighlightMethodCommand"/> class.
+        /// Initializes the <see cref="HighlightMethodCommand"/> class.
         /// </summary>
-        /// <param name="package">The Package which is calling initializing the button.</param>
-        /// <returns></returns>
+        /// <param name="package">The package that is calling the initialization of the button.</param>
+        /// <returns>task executing this command</returns>
         public static async Task InitializeAsync(VSSeeExtensionPackage package)
         {
             Instance = new HighlightMethodCommand();

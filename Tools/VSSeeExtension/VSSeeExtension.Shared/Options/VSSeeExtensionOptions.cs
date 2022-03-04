@@ -27,7 +27,7 @@ using Microsoft.VisualStudio.Shell;
 namespace VSSeeExtension.Options
 {
     /// <summary>
-    /// Here are all settings from Visual Studios options Page.
+    /// All settings of the Visual Studios options page for this extension.
     /// </summary>
     public sealed class VSSeeExtensionOptions : DialogPage
     {
@@ -42,16 +42,16 @@ namespace VSSeeExtension.Options
         private const string CommonCategory = "Common";
 
         /// <summary>
-        /// EventHandler when Settings changes.
+        /// EventHandler when settings change.
         /// </summary>
         public event EventHandler SettingsChanged;
 
         /// <summary>
-        /// TCP Port for the See.
+        /// TCP Port for SEE.
         /// </summary>
         [Category(TcpCategory)]
         [DisplayName("TCP Port")]
-        [Description("Determines the port of Socket TCP connection.")]
+        [Description("Determines the port of Socket TCP connection of SEE.")]
         [DefaultValue(26100)]
         public int TcpPort { get; set; } = 26100;
 

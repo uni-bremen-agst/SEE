@@ -41,13 +41,13 @@ namespace VSSeeExtension.Commands
         /// <summary>
         /// Initializes <see cref="HighlightElementCommand"/>.
         /// </summary>
-        /// <param name="elementType">The element type, that is wanted.</param>
+        /// <param name="elementType">The element type that is wanted.</param>
         protected HighlightElementCommand(vsCMElement elementType)
         {
             this.elementType = elementType;
         }
         /// <summary>
-        /// Functionality of this Button.
+        /// Functionality of this command.
         /// </summary>
         protected override async Task ExecuteAsync()
         {
