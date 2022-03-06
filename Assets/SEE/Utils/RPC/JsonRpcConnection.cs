@@ -123,7 +123,7 @@ namespace SEE.Utils.RPC
             {
                 // listening hasn't been started
 #if UNITY_EDITOR
-                Debug.LogError($"{e.Message}\n");
+                Debug.LogError($"{e.Message}.\n");
 #endif
             }
 
