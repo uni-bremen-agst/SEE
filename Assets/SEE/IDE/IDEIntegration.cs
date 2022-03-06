@@ -334,8 +334,7 @@ namespace SEE.IDE
                 }
                 catch (Exception)
                 {
-                    ShowNotification.Error("File not found",
-                        "File path of node doesn't exist.");
+                    ShowNotification.Error("File not found", "File path of node doesn't exist.");
                 }
             }
         }
