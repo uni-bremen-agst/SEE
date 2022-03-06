@@ -186,8 +186,7 @@ namespace SEE.Utils.RPC
             else
             {
 #if UNITY_EDITOR
-                Debug.LogWarning("JsonRpcServer not connected to client!" +
-                                 $" Couldn't call '{targetName}'.");
+                Debug.LogWarning($"JsonRpcServer not connected to client! Couldn't call '{targetName}'.\n");
 #endif
             }
         }
@@ -232,8 +231,7 @@ namespace SEE.Utils.RPC
             else
             {
 #if UNITY_EDITOR
-                Debug.LogWarning("Connection is null!" +
-                                 $" Couldn't call '{targetName}'.");
+                Debug.LogWarning($"Connection is null! Couldn't call '{targetName}'.\n");
 #endif
             }
             return default;
