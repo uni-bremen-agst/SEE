@@ -6,7 +6,10 @@ Visual Studio Extension for SEE (Software Engineering Experience).
 * Visual Studio 2022: experimental
 
 ## Install instructions
+1. You must have installed the Visual Studio extension for VS extension development (Visual Studio SDK).
 1. Build the solution (release configuration).
+   Open Tools/VSSeeExtension/VSSeeExtension.Shared/VSSeeExtension.Shared.sln
+   
 2. Close all open instances of Visual Studio.
 3. Execute the generated .vsix file and follow the instructions. Files are located at:
     * Visual Studio 2019: ./VSSeeExtension.VS2019/bin/Release/VSSeeExtension.VS2019.vsix
