@@ -116,7 +116,7 @@ namespace VSSeeExtension.SEE
         public async Task<bool> StartAsync(bool startedBySee = false)
         {
             StartedBySee = startedBySee;
-            return rpc != null && await rpc.StartAsync());
+            return rpc != null && await rpc.StartAsync();
         }
 
         /// <summary>
