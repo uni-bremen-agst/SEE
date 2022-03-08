@@ -35,6 +35,12 @@ namespace SEE.Controls.Actions
                 {
                     obj = o;
                 }
+#if UNITY_ANDROID
+                if (obj != null)
+                {
+                    obj.SetSelect(!obj.IsSelected, true);
+                }
+#else
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
                     if (obj != null)
@@ -46,6 +52,7 @@ namespace SEE.Controls.Actions
                 {
                     InteractableObject.ReplaceSelection(obj, true);
                 }
+#endif
             }
         }
     }

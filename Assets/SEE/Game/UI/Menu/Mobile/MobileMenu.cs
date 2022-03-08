@@ -5,6 +5,7 @@ using SEE.Utils;
 using UnityEngine.Assertions;
 using SEE.Controls.Actions;
 using System.Linq;
+using SEE.Controls;
 
 namespace SEE.Game.UI.Menu
 {
@@ -155,6 +156,8 @@ namespace SEE.Game.UI.Menu
                 {
                     btn.SetActive(false);
                 }
+                buttons[0][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => Deselect());
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => TriggerRedo()); 
                 quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
@@ -387,6 +390,14 @@ namespace SEE.Game.UI.Menu
                 // The default action will be the first action state type.
                 GlobalActionHistory.Execute(ActionStateType.MobileMenuTypes.First());
             }
+        }
+
+        /// <summary>
+        /// Unselects all objects
+        /// </summary>
+        private void Deselect()
+        {
+            InteractableObject.UnselectAll(true);
         }
 
     }
