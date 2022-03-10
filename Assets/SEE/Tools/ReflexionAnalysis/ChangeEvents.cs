@@ -12,10 +12,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// The edge being changed.
         /// </summary>
         public readonly Edge Edge;
+
         /// <summary>
         /// The previous state of the edge before the change.
         /// </summary>
         public readonly State OldState;
+
         /// <summary>
         /// The new state of the edge after the change.
         /// </summary>
@@ -29,9 +31,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="new_state">the new state of the edge after the change</param>
         public EdgeChange(Edge edge, State oldState, State newState)
         {
-            this.Edge = edge;
-            this.OldState = oldState;
-            this.NewState = newState;
+            Edge = edge;
+            OldState = oldState;
+            NewState = newState;
         }
 
         public override string ToString()
@@ -49,7 +51,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// The implementation dependency propagated from the implementation to the architecture.
         /// </summary>
-        public Edge ThePropagatedEdge;
+        public readonly Edge ThePropagatedEdge;
 
         /// <summary>
         /// Constructor preserving the implementation dependency that is or was
@@ -58,7 +60,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="propagatedEdge">the propagated edge</param>
         public PropagatedEdge(Edge propagatedEdge)
         {
-            this.ThePropagatedEdge = propagatedEdge;
+            ThePropagatedEdge = propagatedEdge;
         }
     }
 
@@ -84,7 +86,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public override string ToString()
         {
-            return base.ToString() + ": new propagated edge " + ThePropagatedEdge.ToString();
+            return base.ToString() + ": new propagated edge " + ThePropagatedEdge;
         }
     }
 
@@ -103,7 +105,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public override string ToString()
         {
-            return base.ToString() + ": unpropagated edge " + ThePropagatedEdge.ToString();
+            return base.ToString() + ": unpropagated edge " + ThePropagatedEdge;
         }
     }
 
@@ -115,7 +117,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// The Maps_To edge added to the mapping or removed from it.
         /// </summary>
-        public Edge TheMapsToEdge;
+        public readonly Edge TheMapsToEdge;
 
         /// <summary>
         /// Constructor preserving the Maps_To edge added to the mapping or removed from it.
@@ -123,7 +125,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="mapsToEdge">the Maps_To edge being added or removed</param>
         public MapsToEdge(Edge mapsToEdge)
         {
-            this.TheMapsToEdge = mapsToEdge;
+            TheMapsToEdge = mapsToEdge;
         }
     }
 
@@ -142,7 +144,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public override string ToString()
         {
-            return base.ToString() + ": new Maps_To edge " + TheMapsToEdge.ToString();
+            return base.ToString() + ": new Maps_To edge " + TheMapsToEdge;
         }
     }
 
@@ -161,8 +163,32 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public override string ToString()
         {
-            return base.ToString() + ": removed Maps_To edge " + TheMapsToEdge.ToString();
+            return base.ToString() + ": removed Maps_To edge " + TheMapsToEdge;
         }
     }
 
+    /// <summary>
+    /// A change event fired when an edge has been removed from the implementation.
+    /// </summary>
+    public class ImplementationEdgeRemoved : ChangeEvent
+    {
+        /// <summary>
+        /// The edge removed from the Implementation.
+        /// </summary>
+        public readonly Edge RemovedEdge;
+
+        /// <summary>
+        /// Constructor preserving the edge removed from the implementation.
+        /// </summary>
+        /// <param name="removedEdge">the implementation edge being removed</param>
+        public ImplementationEdgeRemoved(Edge removedEdge)
+        {
+            RemovedEdge = removedEdge;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $": implementation edge '{RemovedEdge}' has been removed from the graph.";
+        }
+    }
 }

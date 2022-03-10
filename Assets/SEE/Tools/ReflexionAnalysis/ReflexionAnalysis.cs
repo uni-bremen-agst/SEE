@@ -112,7 +112,7 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </li>
     /// </ul>
     /// </remarks>
-    public class Reflexion : Observable
+    public partial class Reflexion : Observable
     {
         /// <summary>
         /// Constructor for setting up the reflexion analysis.
@@ -305,11 +305,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">propagated dependency in architecture graph</param>
         /// <param name="value">value to be added</param>
-        private void AddToImplRef(Edge edge, int value)
+        private void ChangePropagatedDependency(Edge edge, int value)
         {
             Assert.IsTrue(edge.IsInArchitecture() && !IsSpecified(edge));
             int oldValue = GetCounter(edge);
             int newValue = oldValue + value;
+            // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
             if (newValue <= 0)
             {
                 // TODO(koschke): Why was this needed — do we still need this code fragment?
@@ -449,44 +450,6 @@ namespace SEE.Tools.ReflexionAnalysis
         #endregion
 
         #region Edge
-
-        /// <summary>
-        /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
-        /// re-runs the reflexion analysis incrementally.
-        /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
-        /// explicitly and <paramref name="to"/> is contained in the architecture graph.
-        /// Postcondition: Created edge is contained in the mapping graph and the reflexion
-        ///   graph is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="from">the source of the Maps_To edge to be added to the mapping graph</param>
-        /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
-        public void AddToMapping(Node from, Node to)
-        {
-            Assert.IsTrue(from.IsInImplementation());
-            Assert.IsTrue(to.IsInArchitecture());
-            if (IsExplicitlyMapped(from))
-            {
-                throw new ArgumentException($"Node {from.ID} is already mapped explicitly.");
-            }
-            else
-            {
-                // all nodes that should be mapped onto 'to', too, as a consequence of
-                // mapping 'from'
-                List<Node> subtree = MappedSubtree(from);
-                // was 'from' mapped implicitly at all?
-                if (implicitMapsToTable.TryGetValue(from.ID, out Node oldTarget))
-                {
-                    // from was actually mapped implicitly onto oldTarget
-                    Unmap(subtree, oldTarget);
-                }
-                AddToMappingGraph(from, to);
-                // adjust explicit mapping
-                explicitMapsToTable[from.ID] = to;
-                // adjust implicit mapping
-                ChangeMap(subtree, to);
-                Map(subtree, to);
-            }
-        }
 
         /// <summary>
         /// Adds an edge of type <see cref="MapsToType"/> between <paramref name="from"/> and <paramref name="to"/>.
@@ -704,7 +667,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     {
                         // matching specified architecture dependency found; no state change
                     }
-                    AddToImplRef(propagatedEdge, counter);
+                    ChangePropagatedDependency(propagatedEdge, counter);
                 }
             }
         }
@@ -824,43 +787,6 @@ namespace SEE.Tools.ReflexionAnalysis
             // First notify before we delete the mapsTo edge for good.
             Notify(new MapsToEdgeRemoved(mapsTo));
             FullGraph.RemoveEdge(mapsTo);
-        }
-
-        /// <summary>
-        /// Removes the Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
-        /// from the mapping graph.
-        /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
-        /// must be contained in the mapping graph, <paramref name="from"/> is contained in implementation graph
-        /// and <paramref name="to"/> is contained in the architecture graph.
-        /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
-        /// to be removed from the mapping graph </param>
-        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
-        /// to be removed from the mapping graph </param>
-        public void DeleteFromMapping(Node from, Node to)
-        {
-            Assert.IsTrue(from.IsInImplementation());
-            Assert.IsTrue(to.IsInArchitecture());
-            if (!FullGraph.ContainsNode(from))
-            {
-                throw new ArgumentException($"Node {from} is not in the graph.");
-            }
-            if (!FullGraph.ContainsNode(to))
-            {
-                throw new ArgumentException($"Node {to} is not in the graph.");
-            }
-
-            // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
-            Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault();
-            if (mapsToEdge == null)
-            {
-                throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
-            }
-
-            // Deletes the unique Maps_To edge.
-            DeleteMapsTo(mapsToEdge);
         }
 
         /// <summary>
@@ -1052,6 +978,19 @@ namespace SEE.Tools.ReflexionAnalysis
             // source and target are relevant.
         }
 
+        /// <summary>
+        /// Returns true if the given <paramref name="edge"/> has been propagated.
+        ///
+        /// Pre-condition: <paramref name="edge"/> is contained in the implementation.
+        /// </summary>
+        /// <param name="edge">The edge which should be checked</param>
+        /// <returns>True iff <paramref name="edge"/> has been propagated</returns>
+        private bool IsPropagated(Edge edge)
+        {
+            Assert.IsTrue(edge.IsInImplementation());
+            return MapsTo(edge.Source) != null && MapsTo(edge.Target) != null;
+        }
+
         #endregion
 
         #region Mapping
@@ -1154,13 +1093,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Adds value to counter of <paramref name="edge"/> and transforms its state.
         /// Notifies if edge state changes.
-        /// Precondition: <paramref name="edge"/> is in architecture graph.
+        /// Precondition: <paramref name="edge"/> is in architecture graph and specified.
         /// </summary>
         /// <param name="edge">architecture dependency to be changed</param>
         /// <param name="value">the value to be added to the edge's counter</param>
-        private void ChangeArchitectureDependency(Edge edge, int value)
+        private void ChangeSpecifiedDependency(Edge edge, int value)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
+            Assert.IsTrue(edge.IsInArchitecture() && IsSpecified(edge));
             int oldValue = GetCounter(edge);
             int newValue = oldValue + value;
             State state = GetState(edge);
@@ -1332,14 +1271,15 @@ namespace SEE.Tools.ReflexionAnalysis
 
             Node archSource = MapsTo(implSource);
             Node archTarget = MapsTo(implTarget);
-            Assert.IsTrue(archSource == null || archSource.IsInArchitecture());
-            Assert.IsTrue(archTarget == null || archTarget.IsInArchitecture());
 
             if (archSource == null || archTarget == null)
             {
                 // source or target are not mapped; so we cannot do anything
                 return;
             }
+            
+            Assert.IsTrue(archSource.IsInArchitecture());
+            Assert.IsTrue(archTarget.IsInArchitecture());
             Edge architectureDependency = GetPropagatedDependency(archSource, archTarget, implType);
             Assert.IsTrue(architectureDependency == null || architectureDependency.IsInArchitecture());
             Edge allowingEdge = null;
@@ -1358,7 +1298,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // Assert: architectureDependency.Source and architectureDependency.Target are in architecture.
                 Lift(architectureDependency.Source, architectureDependency.Target,
                      implType, implCounter, out allowingEdge);
-                AddToImplRef(architectureDependency, implCounter);
+                ChangePropagatedDependency(architectureDependency, implCounter);
             }
             // TODO: keep a trace of dependency propagation
             //causing.insert(std::pair<Edge*, Edge*>
@@ -1589,7 +1529,7 @@ namespace SEE.Tools.ReflexionAnalysis
                         // && edge.HasSupertypeOf(edgeType) FIXME: We consider that edges match independent of their types
                         && parents.Contains(edge.Target))
                     {   // matching architecture dependency found
-                        ChangeArchitectureDependency(edge, counter);
+                        ChangeSpecifiedDependency(edge, counter);
                         allowingEdgeOut = edge;
                         return true;
                     }
