@@ -44,6 +44,13 @@ namespace SEE.Game.City
         public DataPath CityPath = new DataPath();
 
         /// <summary>
+        /// The path to project where the source code can be found. This attribute
+        /// is needed to show the source code of nodes and edges.
+        /// </summary>
+        [OdinSerialize]
+        public DataPath ProjectPath = new DataPath();
+
+        /// <summary>
         /// The solution path for our project. Abstractly, this is a configuration file
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
