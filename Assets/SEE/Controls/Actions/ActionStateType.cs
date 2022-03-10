@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions
         public static ActionStateType Select { get; } =
             new ActionStateType(11, "Select", "Select objects",
                                       Color.white.Darker(), "Materials/Charts/MoveIcon",
-                                      MoveAction.CreateReversibleAction);
+                                      SelectActionMobile.CreateReversibleAction);
 
         public static ActionStateType Deselect { get; } =
             new ActionStateType(12, "Deselect", "Deselect objects",
