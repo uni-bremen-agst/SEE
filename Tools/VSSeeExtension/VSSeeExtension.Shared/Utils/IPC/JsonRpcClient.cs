@@ -156,11 +156,11 @@ namespace VSSeeExtension.Utils.IPC
         }
 
         /// <summary>
-        /// Call a Process remotely.
+        /// Call a process remotely.
         /// </summary>
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Arguments for remotely called process.</param>
-        /// <returns></returns>
+        /// <returns>Async Task.</returns>
         public async Task CallRemoteProcessAsync(string targetName, params object[] arguments)
         {
             if (IsConnected())
