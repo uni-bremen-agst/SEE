@@ -154,7 +154,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the absolute path of the file declaring this graph element
         /// by concatenating the <see cref="Graph.BasePath"/> of the graph containing
-        /// this graph element and path and filename attributes of this graph
+        /// this graph element and the path and filename attributes of this graph
         /// element.
         ///
         /// The result will be in the platform-specific syntax for filenames.
