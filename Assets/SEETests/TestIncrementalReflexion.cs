@@ -137,7 +137,7 @@ namespace SEE.Tools.Architecture
             i[11].AddChild(i[12]);
             i[11].AddChild(i[13]);
 
-            Dictionary<int, Edge> e = new Dictionary<int, Edge>
+            Dictionary<int, Edge> _ = new Dictionary<int, Edge>
             {
                 [1] = AddToGraph(call, i[3], i[15]),
                 [2] = AddToGraph(call, i[4], i[16]),
@@ -302,6 +302,8 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(0, mapsToEdgesAdded.Count);
             Assert.AreEqual(0, propagatedEdgesAdded.Count);
             Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            Assert.AreEqual(0, implementationEdgesAdded.Count);
+            Assert.AreEqual(0, implementationEdgesRemoved.Count);
 
             //--------------------
             // incremental mapping
@@ -469,6 +471,23 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(0, propagatedEdgesAdded.Count);
             Assert.AreEqual(0, propagatedEdgesRemoved.Count);
             Assert.AreEqual(0, edgeChanges.Count);
+        }
+
+        [Test]
+        public void TestIncrementalRefChange()
+        {
+            //--------------------
+            // initial state
+            //--------------------
+            Assert.That(IsAbsent(edgeChanges, a[3], a[7], call));
+            Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
+            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
+            Assert.That(IsAbsent(edgeChanges, a[2], a[4], call));
+            Assert.AreEqual(0, mapsToEdgesAdded.Count);
+            Assert.AreEqual(0, propagatedEdgesAdded.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            Assert.AreEqual(0, implementationEdgesAdded.Count);
+            Assert.AreEqual(0, implementationEdgesRemoved.Count);
         }
     }
 }
