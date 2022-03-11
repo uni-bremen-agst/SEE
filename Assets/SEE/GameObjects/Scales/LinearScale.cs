@@ -32,7 +32,7 @@ namespace SEE.GO
         /// <returns>normalized value of node metric</returns>
         public override float GetNormalizedValue(string metric, float value)
         {
-            float max = metricMaxima[metric];
+            metricMaxima.TryGetValue(metric, out float max);
             if (max <= 0.0f || value <= 0.0f)
             {
                 return 0.0f;

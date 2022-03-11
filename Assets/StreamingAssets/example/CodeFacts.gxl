@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CopyClones" edgeids="true">
+    <node id="N1">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_A</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_A</string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_B</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_B</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_C</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_C</string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_A_1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_A_1</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_A_2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_A_2</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_B_1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_B_1</string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_B_2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_B_2</string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_C_1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_C_1</string>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_C_2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_C_2</string>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1496</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>273</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>80</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a1_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a1_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>800</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>55</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.3</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>23</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a1_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a1_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N12">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1200</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>400</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.8</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>90</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a2_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a2_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N13">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>3000</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>300</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>10</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.91</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>180</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>a2_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>a2_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N14">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>b1_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b1_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N15">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>16</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>0</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.2</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>1</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>b1_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b1_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1110</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>260</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>15</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.2</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>8</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>b2_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b2_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N17">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>500</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>111</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>45</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>b2_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b2_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N18">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>3000</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>400</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>1</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>150</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>c1_MAX.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>c1_MAX.cpp</string>
+      </attr>
+    </node>
+    <node id="N19">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1492</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>279</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.6</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>85</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>c1_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>c1_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N20">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>257</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>101</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>9</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.4</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>25</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>c2_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>c2_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N21">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>780</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>367</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.8</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>25</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>c2_b.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>c2_b.cpp</string>
+      </attr>
+    </node>
+    <node id="N22">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>490</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>211</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>1</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>25</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>c_a.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>c_a.cpp</string>
+      </attr>
+    </node>
+    <node id="N23">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>dir_root</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_root</string>
+      </attr>
+    </node>
+	<node id="N24">
+      <type xlink:href="Directory"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Source.Name">
+        <string>dir_D</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>dir_D</string>
+      </attr>
+    </node>
+	    <node id="N25">
+      <type xlink:href="File"/>
+      <attr name="Linkage.Is_Definition">
+        <enum/>
+      </attr>
+      <attr name="Metric.Number_of_Tokens">
+        <int>490</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>211</int>
+      </attr>
+      <attr name="Metric.Authors">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Changes">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.25</float>
+      </attr>
+      <attr name="Metric.Complexity">
+        <float>25</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>d.cpp</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>d.cpp</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N4" to="N1">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E2" from="N5" to="N1">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E3" from="N6" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E4" from="N7" to="N2">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E5" from="N8" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E6" from="N9" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E7" from="N10" to="N4">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E8" from="N11" to="N4">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E9" from="N12" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E10" from="N13" to="N5">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E11" from="N14" to="N6">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E12" from="N15" to="N6">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E13" from="N16" to="N7">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E14" from="N17" to="N7">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E15" from="N18" to="N8">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E16" from="N19" to="N8">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E17" from="N20" to="N9">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E18" from="N21" to="N9">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E19" from="N22" to="N3">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E20" from="N13" to="N11">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E21" from="N12" to="N10">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E22" from="N16" to="N14">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E23" from="N17" to="N15">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E24" from="N18" to="N20">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E25" from="N22" to="N20">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E26" from="N22" to="N18">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E27" from="N19" to="N21">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E28" from="N17" to="N19">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E29" from="N15" to="N21">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E30" from="N15" to="N13">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E31" from="N15" to="N11">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E32" from="N10" to="N14">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E33" from="N10" to="N22">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E34" from="N10" to="N20">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E35" from="N1" to="N23">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E36" from="N2" to="N23">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E37" from="N3" to="N23">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E38" from="N18" to="N18">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E39" from="N11" to="N11">
+      <type xlink:href="Clone"/>
+    </edge>	
+	<edge id="E40" from="N16" to="N17">
+      <type xlink:href="Clone"/>
+    </edge>
+    <edge id="E41" from="N24" to="N23">
+      <type xlink:href="Enclosing"/>
+    </edge>
+	 <edge id="E19" from="N25" to="N24">
+      <type xlink:href="Enclosing"/>
+    </edge>
+  </graph>
+</gxl>

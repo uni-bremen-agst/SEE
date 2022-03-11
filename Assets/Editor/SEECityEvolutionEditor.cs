@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SEEEditor
 {
     /// <summary>
-    /// A custom editor for instances of SEECityEvolution as an extension 
+    /// A custom editor for instances of SEECityEvolution as an extension
     /// of the AbstractSEECityEditor.
     /// </summary>
     [CustomEditor(typeof(SEECityEvolution))]
@@ -17,22 +17,16 @@ namespace SEEEditor
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {
         public override void OnInspectorGUI()
-        {            
+        {
             base.OnInspectorGUI();
-            SEECityEvolution city = target as SEECityEvolution;
+            SEECityEvolution cityEvolution = city as SEECityEvolution;
+            EditorGUILayout.Separator();
             Attributes();
-            showAnimationFoldOut = EditorGUILayout.Foldout(showAnimationFoldOut, "Animation", true, EditorStyles.foldoutHeader);
-            if (showAnimationFoldOut)
-            {
-                city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
-                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width of markers", city.MarkerWidth));
-                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height of markers", city.MarkerHeight));
-                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of addition markers", city.AdditionBeamColor);
-                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of change markers", city.ChangeBeamColor);
-                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletion markers", city.DeletionBeamColor);
-            }
-            ShowNodeTypes(city);
-            Buttons();
+            EditorGUILayout.Separator();
+            EvolutionMarkerAttributes(cityEvolution);
+            EditorGUILayout.Separator();
+            ShowNodeTypes(cityEvolution);
+            Buttons(cityEvolution);
         }
 
         /// <summary>
@@ -43,15 +37,13 @@ namespace SEEEditor
         /// <summary>
         /// Whether the animation foldout should be expanded.
         /// </summary>
-        private bool showAnimationFoldOut = false;
+        private bool evolutionMarkerFoldOut = false;
 
         /// <summary>
         /// Creates the buttons for loading the first graph of the evolution series.
         /// </summary>
-        private void Buttons()
+        private void Buttons(SEECityEvolution city)
         {
-            SEECityEvolution city = target as SEECityEvolution;
-          
             if (firstGraph == null && GUILayout.Button("Load First Graph"))
             {
                 firstGraph = city.LoadFirstGraph();
@@ -70,7 +62,7 @@ namespace SEEEditor
 
         /// <summary>
         /// Draws given <paramref name="graph"/> using the settings of <paramref name="city"/>.
-        /// 
+        ///
         /// Precondition: graph != null.
         /// </summary>
         /// <param name="city">the city settings for drawing the graph</param>
@@ -85,7 +77,24 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// Shows and sets the attributes of the SEECity managed here.
+        /// Renders the GUI for attributes of animations.
+        /// </summary>
+        private void EvolutionMarkerAttributes(SEECityEvolution city)
+        {
+            evolutionMarkerFoldOut = EditorGUILayout.Foldout(evolutionMarkerFoldOut, "Evolution Markers", true, EditorStyles.foldoutHeader);
+            if (evolutionMarkerFoldOut)
+            {
+                city.MaxRevisionsToLoad = EditorGUILayout.IntField("Maximal revisions", city.MaxRevisionsToLoad);
+                city.MarkerWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", city.MarkerWidth));
+                city.MarkerHeight = Mathf.Max(0, EditorGUILayout.FloatField("Height", city.MarkerHeight));
+                city.AdditionBeamColor = EditorGUILayout.ColorField("Color of additions", city.AdditionBeamColor);
+                city.ChangeBeamColor = EditorGUILayout.ColorField("Color of changes", city.ChangeBeamColor);
+                city.DeletionBeamColor = EditorGUILayout.ColorField("Color of deletions", city.DeletionBeamColor);
+            }
+        }
+
+        /// <summary>
+        /// Shows and sets the attributes of the <see cref="SEECityEvolution"/> managed here.
         /// This method should be overridden by subclasses if they have additional
         /// attributes to manage.
         /// </summary>

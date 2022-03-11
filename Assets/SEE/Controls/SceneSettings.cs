@@ -438,10 +438,6 @@ namespace SEE.Controls
                     }
                 }
             }
-            if (SEEInput.Help())
-            {
-                KeyBindings.PrintBindings();
-            }
         }
     }
 }

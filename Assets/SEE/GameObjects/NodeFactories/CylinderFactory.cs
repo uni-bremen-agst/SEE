@@ -68,7 +68,7 @@ namespace SEE.GO
         /// <param name="heightSegments">the number of height segments</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
         public static Mesh GetCylinderMesh(int radialSegments = DEFAULT_RADIAL_SEGMENTS,
-                                            int heightSegments = DEFAULT_HEIGHT_SEGMENTS)
+                                           int heightSegments = DEFAULT_HEIGHT_SEGMENTS)
         {
             if (modelMesh != null)
             {
@@ -109,9 +109,9 @@ namespace SEE.GO
             // Debug.Log ("CustomCylinder has " + trisArrayLength/3 + " tris");
 
             // initialize arrays
-            Vector3[] Vertices = new Vector3[numVertices];
+            Vector3[] vertices = new Vector3[numVertices];
             Vector2[] UVs = new Vector2[numUVs];
-            int[] Tris = new int[trisArrayLength];
+            int[] tris = new int[trisArrayLength];
 
             // precalculate increments to improve performance
             float heightStep = length / heightSegments;
@@ -134,8 +134,8 @@ namespace SEE.GO
                     }
 
                     // position current vertex
-                    Vertices[j * numVertexColumns + i] = new Vector3(radius * Mathf.Cos(angle),
-                                                                     j * heightStep,
+                    vertices[j * numVertexColumns + i] = new Vector3(radius * Mathf.Cos(angle),
+                                                                     j * heightStep - length / 2,
                                                                      radius * Mathf.Sin(angle));
 
                     // calculate UVs
@@ -157,14 +157,14 @@ namespace SEE.GO
                         int baseIndex = numCapTris * 3 + (j - 1) * radialSegments * 6 + i * 6;
 
                         // 1st tri - below and in front
-                        Tris[baseIndex + 0] = j * numVertexColumns + i;
-                        Tris[baseIndex + 1] = j * numVertexColumns + i + 1;
-                        Tris[baseIndex + 2] = (j - 1) * numVertexColumns + i;
+                        tris[baseIndex + 0] = j * numVertexColumns + i;
+                        tris[baseIndex + 1] = j * numVertexColumns + i + 1;
+                        tris[baseIndex + 2] = (j - 1) * numVertexColumns + i;
 
                         // 2nd tri - the one it doesn't touch
-                        Tris[baseIndex + 3] = (j - 1) * numVertexColumns + i;
-                        Tris[baseIndex + 4] = j * numVertexColumns + i + 1;
-                        Tris[baseIndex + 5] = (j - 1) * numVertexColumns + i + 1;
+                        tris[baseIndex + 3] = (j - 1) * numVertexColumns + i;
+                        tris[baseIndex + 4] = j * numVertexColumns + i + 1;
+                        tris[baseIndex + 5] = (j - 1) * numVertexColumns + i + 1;
                     }
                 }
             }
@@ -200,20 +200,20 @@ namespace SEE.GO
                 leftSided = !leftSided;
 
                 // assign bottom tris
-                Tris[bottomCapBaseIndex + 0] = rightIndex;
-                Tris[bottomCapBaseIndex + 1] = middleIndex;
-                Tris[bottomCapBaseIndex + 2] = leftIndex;
+                tris[bottomCapBaseIndex + 0] = rightIndex;
+                tris[bottomCapBaseIndex + 1] = middleIndex;
+                tris[bottomCapBaseIndex + 2] = leftIndex;
 
                 // assign top tris
-                Tris[topCapBaseIndex + 0] = topCapVertexOffset + leftIndex;
-                Tris[topCapBaseIndex + 1] = topCapVertexOffset + middleIndex;
-                Tris[topCapBaseIndex + 2] = topCapVertexOffset + rightIndex;
+                tris[topCapBaseIndex + 0] = topCapVertexOffset + leftIndex;
+                tris[topCapBaseIndex + 1] = topCapVertexOffset + middleIndex;
+                tris[topCapBaseIndex + 2] = topCapVertexOffset + rightIndex;
             }
 
             // assign vertices, uvs and tris
-            modelMesh.vertices = Vertices;
+            modelMesh.vertices = vertices;
             modelMesh.uv = UVs;
-            modelMesh.triangles = Tris;
+            modelMesh.triangles = tris;
 
             modelMesh.RecalculateNormals();
             modelMesh.RecalculateBounds();

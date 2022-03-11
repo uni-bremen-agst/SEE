@@ -65,6 +65,11 @@ namespace SEE.Utils
         public const string GrammarExtension = ".grxml";
 
         /// <summary>
+        /// File extension for projects in Visual Studio.
+        /// </summary>
+        public const string SolutionExtension = ".sln";
+
+        /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
         /// 

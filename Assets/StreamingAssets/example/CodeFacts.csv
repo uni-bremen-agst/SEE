@@ -1,0 +1,15 @@
+ID;Metric.Architecture_Violations;Metric.Clone;Metric.Dead_Code;Metric.Cycle;Metric.Metric;Metric.Style;Metric.Universal
+a1_a.cpp;3;1;0;0;5;23123;0.1
+a1_b.cpp;3;3;1;0;8;34234;0.1
+a2_a.cpp;1;6;3;0;2;34;0.1
+a2_b.cpp;9;7;0;0;5;2135;0.1
+b1_a.cpp;6;4;2;0;2;34;0.1
+b1_b.cpp;3;2;1;0;12;5342;0.1
+b2_a.cpp;7;9;0;0;5;32;0.1
+b2_b.cpp;1;11;0;0;7;13;0.1
+c1_MAX.cpp;0;45;0;0;89;233345;0.1
+c1_b.cpp;4;76;0;0;2;56;0.1
+c2_a.cpp;1;34;2;0;5;22;0.1
+c2_b.cpp;6;1;1;0;23;455;0.1
+c_a.cpp;8;5;1;1;74;0;0.1
+d.cpp;8;5;1;1;74;0;0.1
