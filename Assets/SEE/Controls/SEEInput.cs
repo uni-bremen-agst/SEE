@@ -366,7 +366,7 @@ namespace SEE.Controls
         /// True if the user wishes to point.
         /// </summary>
         /// <returns>true if the user wishes to point</returns>
-        public static bool IsPointing()
+        public static bool TogglePointing()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Pointing);
         }
