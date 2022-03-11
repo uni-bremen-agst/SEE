@@ -31,6 +31,12 @@ namespace SEE.Game.UI.CodeWindow
         public string FilePath;
 
         /// <summary>
+        /// The line that was marked (1-indexed). Unlike <see cref="VisibleLine"/>,
+        /// this line is independent of scrolling.
+        /// </summary>
+        private int markedLine = 1;
+
+        /// <summary>
         /// The solution path used for the IDE integration.
         /// </summary>
         public string SolutionPath;
@@ -73,11 +79,13 @@ namespace SEE.Game.UI.CodeWindow
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
-        /// Will also unmark any other line.
+        /// Will also unmark any other line. Sets <see cref="markedLine"/> to
+        /// <paramref name="lineNumber"/>.
         /// </summary>
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
         private void MarkLine(int lineNumber)
         {
+            this.markedLine = lineNumber;
             string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
             string markedLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
             TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markedLine)
