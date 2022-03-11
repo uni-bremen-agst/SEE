@@ -1295,7 +1295,6 @@ namespace SEE.Tools.ReflexionAnalysis
                 int implCounter = GetImplCounter(implementationDependency);
                 Assert.IsTrue(architectureDependency.Source.IsInArchitecture());
                 Assert.IsTrue(architectureDependency.Target.IsInArchitecture());
-                // Assert: architectureDependency.Source and architectureDependency.Target are in architecture.
                 Lift(architectureDependency.Source, architectureDependency.Target,
                      implType, implCounter, out allowingEdge);
                 ChangePropagatedDependency(architectureDependency, implCounter);
@@ -1454,11 +1453,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
 
-            // TODO: Mark propagatedArchitecturDep as propagated. Or maybe that is not necessary at all
-            // because we have the edge state from which we can derive whether an edge is specified
-            // or propagated.
-
-            // propagatedArchitecturDep is a dependency propagated from the implementation onto the architecture;
+            // propagatedArchitectureDep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
             // because it has just come into existence, we need to let our observers know about it
             Notify(new PropagatedEdgeAdded(propagatedArchitectureDep));
