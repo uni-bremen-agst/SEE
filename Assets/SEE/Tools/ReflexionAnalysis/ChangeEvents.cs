@@ -191,4 +191,29 @@ namespace SEE.Tools.ReflexionAnalysis
             return base.ToString() + $": implementation edge '{RemovedEdge}' has been removed from the graph.";
         }
     }
+    
+    /// <summary>
+    /// A change event fired when an edge has been added to the implementation.
+    /// </summary>
+    public class ImplementationEdgeAdded : ChangeEvent
+    {
+        /// <summary>
+        /// The edge added to the Implementation.
+        /// </summary>
+        public readonly Edge AddedEdge;
+
+        /// <summary>
+        /// Constructor receiving the edge added to the implementation.
+        /// </summary>
+        /// <param name="addedEdge">the implementation edge being added</param>
+        public ImplementationEdgeAdded(Edge addedEdge)
+        {
+            AddedEdge = addedEdge;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $": implementation edge '{AddedEdge}' has been added to the graph.";
+        }
+    }
 }

@@ -42,6 +42,26 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Adds an edge from <paramref name="from"/> to <paramref name="to"/> of type <paramref name="type"/>
+        /// to the implementation graph, returning the new edge and adjusting the reflexion analysis incrementally.
+        /// This will propagate and lift the new edge, thereby increasing the counter of the matching specified edge
+        /// if it exists.
+        /// 
+        /// Pre-condition: <paramref name="from"/> and <paramref name="to"/> are contained in the implementation graph.
+        /// </summary>
+        /// <param name="from">Source of the new edge</param>
+        /// <param name="to">Target of the new edge</param>
+        /// <param name="type">Type of the new edge</param>
+        public void AddImplementationEdge(Node from, Node to, string type)  // TODO: Support counter in the future
+        {
+            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
+            Edge edge = new Edge(from, to, type);
+            FullGraph.AddEdge(edge);
+            Notify(new ImplementationEdgeAdded(edge));
+            PropagateAndLiftDependency(edge);
+        }
+
+        /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
         /// re-runs the reflexion analysis incrementally.
         /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
