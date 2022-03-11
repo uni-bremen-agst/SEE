@@ -1226,9 +1226,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -1252,11 +1282,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1344,7 +1374,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1374,11 +1404,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1394,11 +1424,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -1410,11 +1440,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -1426,11 +1456,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -1451,6 +1481,10 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -1716,6 +1750,7 @@ GameObject:
   - component: {fileID: 338787055}
   - component: {fileID: 338787053}
   - component: {fileID: 338787052}
+  - component: {fileID: 338787054}
   m_Layer: 0
   m_Name: Scene Settings
   m_TagString: Untagged
@@ -1774,6 +1809,24 @@ MonoBehaviour:
   CityScalingFactor: 1
   EyeGazeHover: 1
   EyeStareDelay: 1
+--- !u!114 &338787054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338787051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1fecd2eb5326484b87b82e085f61a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 0
+  MaxNumberOfIdes: 1
+  Port: 26100
+  ConnectToAny: 0
+  UseElementPosition: 0
+  UseElementRange: 1
 --- !u!4 &338787055
 Transform:
   m_ObjectHideFlags: 0
@@ -8555,9 +8608,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -8581,11 +8664,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -8649,7 +8732,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -8679,11 +8762,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -8699,11 +8782,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -8715,11 +8798,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -8731,11 +8814,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -8756,6 +8839,10 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -9805,9 +9892,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -9831,11 +9948,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -9923,7 +10040,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -9953,11 +10070,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -9973,11 +10090,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -9989,11 +10106,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -10005,11 +10122,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -10030,6 +10147,10 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -10840,9 +10961,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -10866,11 +11017,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -10910,7 +11061,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -10940,11 +11091,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -10960,11 +11111,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -10976,11 +11127,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -10992,11 +11143,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -11017,6 +11168,10 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   CityPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -11706,9 +11861,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /mini
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: relativePath
+      Entry: 1
+      Data: /mini/src/mini.sln
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -11732,11 +11917,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -11744,30 +11929,6 @@ MonoBehaviour:
     - Name: 
       Entry: 12
       Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Method
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Field
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 7
       Data: 
@@ -11785,7 +11946,31 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Package
+      Data: Method
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Member
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Namespace
     - Name: $v
       Entry: 5
       Data: true
@@ -11800,7 +11985,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -11830,11 +12015,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -11850,11 +12035,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -11866,11 +12051,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -11882,11 +12067,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 8
     - Name: 
       Entry: 12
       Data: 0
@@ -11910,6 +12095,10 @@ MonoBehaviour:
     Root: 3
     relativePath: /mini/CodeFacts.cfg
     absolutePath: 
+  SolutionPath:
+    Root: 3
+    relativePath: /mini/src/mini.sln
+    absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   LeafNodeSettings:
@@ -11917,14 +12106,12 @@ MonoBehaviour:
     ColorMetric: Metric.McCabe_Complexity
     AntennaSettings:
       AntennaSections:
-      - Metric: Metric.Number_Of_Calling_Routines
+      - Metric: Metric.Lines.Comment
         Color: {r: 0, g: 0, b: 0, a: 1}
-      - Metric: Metric.Lines.LOC
-        Color: {r: 0.2352941, g: 0.2352941, b: 0.2352941, a: 1}
-      - Metric: Metric.Number_Of_Called_Routines
-        Color: {r: 0.4313726, g: 0.4313726, b: 0.4313726, a: 1}
-      - Metric: Metric.McCabe_Complexity
-        Color: {r: 1, g: 1, b: 1, a: 1}
+      - Metric: Metric.Lines.Fixme
+        Color: {r: 0.9254902, g: 0.49019608, b: 0.3254902, a: 1}
+      - Metric: Metric.Halstead.Volume
+        Color: {r: 0.3254902, g: 0.8627451, b: 0.9254902, a: 1}
       AntennaWidth: 0.1
     Kind: 0
     WidthMetric: Metric.Number_Of_Calling_Routines
@@ -11983,7 +12170,7 @@ MonoBehaviour:
     absolutePath: 
   CSVPath:
     Root: 3
-    relativePath: /mini/CodeFacts.csv
+    relativePath: 
     absolutePath: 
 --- !u!114 &1535691040
 MonoBehaviour:
@@ -11998,7 +12185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.004724443
+  HeightOffset: 0.0048571825
 --- !u!65 &1535691041
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12926,9 +13113,39 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: projectPath
+      Entry: 7
+      Data: 1|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SolutionPath
+      Entry: 7
+      Data: 2|SEE.Game.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -12952,11 +13169,11 @@ MonoBehaviour:
       Data: 
     - Name: SelectedNodeTypes
       Entry: 7
-      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -13008,7 +13225,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -13038,11 +13255,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -13054,11 +13271,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 6|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -13070,11 +13287,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -13086,11 +13303,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 5
     - Name: 
       Entry: 12
       Data: 0
@@ -13113,6 +13330,10 @@ MonoBehaviour:
   CityPath:
     Root: 3
     relativePath: mini-evolution/mini-evolution.cfg
+    absolutePath: 
+  SolutionPath:
+    Root: 2
+    relativePath: 
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 0
@@ -13192,9 +13413,6 @@ MonoBehaviour:
     absolutePath: 
   MarkerHeight: 0.2
   MarkerWidth: 0.01
-  MarkerSettings:
-    AntennaSections: []
-    AntennaWidth: 0.1
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.9215686, b: 0.01568628, a: 1}
   DeletionBeamColor: {r: 0, g: 0, b: 0, a: 1}
