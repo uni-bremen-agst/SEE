@@ -24,7 +24,7 @@ namespace SEE.DataModel.DG
         public void TestCloneNode()
         {
             Node original = NewNode("node1");
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             graph.AddNode(original);
 
             Node clone = (Node)original.Clone();
@@ -63,7 +63,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestCloneEdge()
         {
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             Node source = NewNode("source");
             graph.AddNode(source);
             Node target = NewNode("target");
@@ -87,7 +87,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestCloneGraph()
         {
-            Graph original = new Graph();
+            Graph original = new Graph("DUMMYBASEPATH");
             original.Path = "path";
             original.Name = "name";
 
