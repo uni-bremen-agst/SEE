@@ -66,9 +66,18 @@ namespace SEE.Tools.Architecture
         /// List of Maps_To edges removed from the mapping.
         /// </summary>
         protected List<MapsToEdgeRemoved> mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
+        
+        /// <summary>
+        /// List of Implementation edges added to the mapping.
+        /// </summary>
+        protected List<ImplementationEdgeAdded> implementationEdgesAdded = new List<ImplementationEdgeAdded>();
+        /// <summary>
+        /// List of Implementation edges removed from the mapping.
+        /// </summary>
+        protected List<ImplementationEdgeRemoved> implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
 
         /// <summary>
-        /// Re-sets the event chaches edgeChanges, propagatedEdges, and removedEdges to
+        /// Re-sets the event caches edgeChanges, propagatedEdges, and removedEdges to
         /// to their initial value (empty).
         /// </summary>
         protected void ResetEvents()
