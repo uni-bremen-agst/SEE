@@ -10,7 +10,7 @@ namespace SEE.GO
 {
     /// <summary>
     /// Decorates each block with an assigned texture.
-    /// 
+    ///
     /// The component is assumed to be attached to every node
     /// to be decorated.
     /// </summary>
@@ -18,13 +18,13 @@ namespace SEE.GO
     public class NodeDecorationController : MonoBehaviour
     {
         /// Although the component is assumed to be attached to every node
-        /// to be decorated, in order to prevent errors, the 
-        /// component needs to get the gameObject it is attached to 
-        /// manually (rather than using parent). The <see cref="ChildNodes"/> 
+        /// to be decorated, in order to prevent errors, the
+        /// component needs to get the gameObject it is attached to
+        /// manually (rather than using parent). The <see cref="ChildNodes"/>
         /// need to be set manually because:
         /// <ul>
         /// <li> If using normal decoration mode: you only want to decorate
-        /// the block using the upmost children (not recursively all 
+        /// the block using the upmost children (not recursively all
         /// transitive ancestors) and furthermore we need the gameObjects
         /// of the children, as using this.children might error out of there
         /// are empty objects between the node and its children.
@@ -38,7 +38,7 @@ namespace SEE.GO
         /// Child nodes of this block.
         /// </summary>
         public IList<GameObject> ChildNodes = new List<GameObject>();
-        
+
         /// <summary>
         /// The height the treemap decorators should have, is set
         /// to 0.1f so they are basically flush with the surface of the
@@ -431,17 +431,17 @@ namespace SEE.GO
             Vector3 packedBlockLocation = packedBlock.transform.position;
 
             // Corners of the block computed with simple geometry
-            Vector3 northWestTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, 
-                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+            Vector3 northWestTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x,
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y,
                                                      packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-            Vector3 northEastTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x, 
-                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+            Vector3 northEastTopCorner = new Vector3(packedBlockLocation.x + 0.5f * packedBlockDimensions.x,
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y,
                                                      packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
-            Vector3 southWestTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, 
-                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+            Vector3 southWestTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x,
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y,
                                                      packedBlockLocation.z + 0.5f * packedBlockDimensions.z);
-            Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x, 
-                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y, 
+            Vector3 southEastTopCorner = new Vector3(packedBlockLocation.x - 0.5f * packedBlockDimensions.x,
+                                                     packedBlockLocation.y + 0.5f * packedBlockDimensions.y,
                                                      packedBlockLocation.z - 0.5f * packedBlockDimensions.z);
 
             // Compute sum of block heights
@@ -670,15 +670,15 @@ namespace SEE.GO
         [Obsolete("This test method can be removed when everything works.")]
         private void TestTreemapDecoration(int columns, int rows)
         {
-            Graph graph = new Graph("test");
+            Graph graph = new Graph("DUMMY", name: "test");
             int counter = 0;
             for (int i = 0; i < columns; i++)
             {
                 for (int j = 0; j < rows; j++)
                 {
-                    Node n = new Node();
-                    n.ID = counter + "-DummyNode";
-                    graph.AddNode(n);
+                    Node node = new Node();
+                    node.ID = counter + "-DummyNode";
+                    graph.AddNode(node);
                     counter++;
                 }
             }
