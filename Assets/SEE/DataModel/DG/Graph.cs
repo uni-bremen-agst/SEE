@@ -66,7 +66,9 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="basePath">the base path of this graph; it will be </param>
+        /// <param name="basePath">the base path of this graph; it will be prepended to
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of
+        /// this graph</param>
         /// <param name="name">name of the graph</param>
         public Graph(string basePath, string name = "")
         {
