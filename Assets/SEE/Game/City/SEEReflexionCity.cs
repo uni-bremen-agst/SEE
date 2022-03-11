@@ -86,7 +86,10 @@ namespace SEE.Game.City
                 if (string.IsNullOrEmpty(GxlMappingPath.Path))
                 {
                     Debug.LogWarning("Mapping graph path is empty. Will create new mapping from scratch.\n");
-                    MappingGraph = new Graph();
+                    /// The mapping graph may contain nodes and edges from the implementation. Possibly, their
+                    /// <see cref="GraphElement.AbsolutePlatformPath()"/> will be retrieved. That is why we
+                    /// will set the base path to <see cref="ProjectPath.Path"/>.
+                    MappingGraph = new Graph(ProjectPath.Path);
                 }
                 else
                 {
@@ -142,7 +145,7 @@ namespace SEE.Game.City
             {
                 throw new ArgumentException("The two nodes must be in the same graph!");
             }
-            
+
             // TODO(falko17): Invoke reflexion analysis
         }
 
