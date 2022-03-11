@@ -17,10 +17,6 @@ namespace SEE.Game.Avatars
     /// </summary>
     public class AvatarAimingSystem : MonoBehaviour
     {
-        [Tooltip("AimPoser is a tool that returns an animation name based on direction.")]
-        // TODO: Make it private and search this in the scene.
-        public AimPoser AimPoser;
-
         [Tooltip("Reference to the AimIK component.")]
         public AimIK Aim;
 
@@ -37,50 +33,26 @@ namespace SEE.Game.Avatars
         public float MinimalAimDistance = 0.1f;
 
         /// <summary>
-        /// Whether the avatar is right-handed. The value of it decides whether
-        /// the aiming object becomes a part of the right or left hand.
-        /// NOTE: Although this code allows to make this distinction, there is
-        /// more to support left-handedness. The whole chain of bones controlled
-        /// by Final IK as well as the animations must be adjusted, too.
-        /// Until then, this parameter remains a constant.
-        /// </summary>
-        [Tooltip("Whether the avatar is right-handed.")]
-        private const bool RightHanded = true;
-
-        [Tooltip("The world-space scale of the laser beam for pointing.")]
-        public Vector3 LaserScale = new Vector3(0.01f, 0.01f, 1.5f);
-
-        [Tooltip("The color of the laser beam for pointing.")]
-        public Color LaserColor = Color.red;
-
-        /// <summary>
         /// Whether the avatar is currently pointing, i.e., whether it has an aiming or looking target.
         /// </summary>
         [Tooltip("If true, the avatar is currently pointing. Its pose will be adjusted according to the aimed target.")]
         public bool IsPointing = false;
 
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
-        public bool LocallyControlled = true;
+        public bool IsLocallyControlled = true;
 
         /// <summary>
-        /// The transform that represents the search point, i.e., the
-        /// object becoming the aiming target when the avatar is scanning for
-        /// anything relevant. This is not to be confused with the aiming
-        /// transform. The latter will be the object that will be moved
-        /// and rotated so that it aims at <see cref="AimedTarget"/>.
-        /// So, we have an aim, i.e., <see cref="AimedTarget"/>, and another
-        /// transform aiming at it.
-        ///
-        /// This attribute is made public so that clients can modify the
-        /// search point's position. This way local aiming changes can
-        /// be propagated through the network.
-        ///
-        /// Note: If clients set this <see cref="AimedTarget"/>, <see cref="LocallyControlled"/>
-        /// should be <code>false</code>; otherwise their changes will be overridden
-        /// by local user interactions.
+        /// AimPoser is a tool that returns an animation name based on direction.
+        /// It will be searched in the scene by the name <see cref="AimPoserName"/>.
+        /// There is only one <see cref="AimPoser"/> in the scene. That is why this
+        /// field can be static.
         /// </summary>
-        [Tooltip("The avatar's aimed target.")]
-        public Transform AimedTarget;
+        private static AimPoser AimPoser;
+
+        /// <summary>
+        /// The name of the <see cref="AimPoser"/> game object. Must be present in the scene.
+        /// </summary>
+        private const string AimPoserName = "Aim Poser";
 
         /// <summary>
         /// The pose of the <see cref="AimPoser"/> while aiming at the target.
@@ -99,12 +71,6 @@ namespace SEE.Game.Avatars
         private AimIK aimIK;
 
         /// <summary>
-        /// The <see cref="LookAtIK"/> component attached to this avatar. It is used for looking
-        /// at a particular target (specified by <see cref="lookAtIK.solver.target"/>).
-        /// </summary>
-        private LookAtIK lookAtIK;
-
-        /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
         public void TogglePointing()
@@ -115,171 +81,99 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// The laser beam for aiming.
+        /// The laser beam for aiming. The laser starts at the aim transform and ends at the
+        /// aim target.
+        /// This reference will be used to turn the laser on and off depending upon <see cref="IsPointing"/>.
+        /// It is a child of the aim transform object <see cref="aimIK.solver.transform"/>, which was
+        /// set in the inspector for the avatar (component <see cref="AimIK"/>). Its name is defined
+        /// by <see cref="LaserName"/>.
         /// </summary>
         private GameObject laser;
 
         /// <summary>
+        /// The name of the object representing the laser beam which starts at the object
+        /// <see cref="aimIK.solver.transform"/> and aims towards the object <see cref="aimIK.solver.target"/>
+        /// while the avatar is pointing.
+        /// Note: The laser is assumed to be a descendant of <see cref="aimIK.solver.transform"/>.
+        /// </summary>
+        private const string LaserName = "Laser";
+
+        /// <summary>
+        /// Retrieves the <see cref="AimPoser"/> from the scene when not already set.
         /// Disables the IK components <see cref="Aim"/> and <see cref="LookAt"/>
-        /// so that we can manage their updating order by ourselves. Sets
-        /// <see cref="aimIK"/>, <see cref="originalAimTarget"/>, <see cref="lookAtIK"/>,
-        /// <see cref="originalLookTarget"/>, and <see cref="IsPointing"/>.
+        /// so that we can manage their updating order by ourselves. Retrieves
+        /// the <see cref="laser"/> from the aiming transform <see cref="aimIK.solver.transform"/>.
         /// </summary>
         private void Start()
         {
+            // Retrieve the aim poser.
+            if (AimPoser == null)
+            {
+                GameObject aimPoser = GameObject.Find(AimPoserName);
+                if (aimPoser == null || !aimPoser.TryGetComponentOrLog(out AimPoser))
+                {
+                    Debug.LogError($"There is no game object named {AimPoserName} with a {typeof(AimPoser)} component in the scene.\n");
+                    enabled = false;
+                    return;
+                }
+            }
+
             /// We are disabling <see cref="Aim"/> and <see cref="LookAt"/> so that
             /// we can control their update cycle ourselves.
             Aim.enabled = false;
             LookAt.enabled = false;
             gameObject.TryGetComponentOrLog(out aimIK);
-            gameObject.TryGetComponentOrLog(out lookAtIK);
-
-            /// The object that is used for the aiming. It will be moved and
-            /// rotated by <see cref="aimIK"/> so that it aims at <see cref="AimedTarget"/>.
-            (aimIK.solver.transform, laser) = CreateAimTransform();
-
-            // The aim itself.
-            AimedTarget = CreateSearchPoint();
-            AimedTarget.SetParent(gameObject.transform);
-            MoveSearchPoint();
-
-            if (aimIK.solver.target == null)
-            {
-                aimIK.solver.target = AimedTarget;
-            }
-            if (lookAtIK.solver.target == null)
-            {
-                lookAtIK.solver.target = AimedTarget;
-            }
-
-            // Returns a game object that represents the search point, i.e., the
-            // object becoming the aiming target when the avatar is scanning for
-            // anything relevant.
-            Transform CreateSearchPoint()
-            {
-                if (true)
-                {
-                    return new GameObject("Search Point").transform;
-                }
-                else
-                {
-                    // for debugging: the search point is a visible object.
-                    GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    result.name = "Search Point";
-                    result.transform.localScale = Vector3.one / 10;
-                    return result.transform;
-                }
-            }
+            laser = GetLaser(aimIK.solver.transform);
+            MoveTarget();
         }
 
         /// <summary>
-        /// The name of the game object (child of avatar) representing the right hand.
+        /// Returns the descendant of <paramref name="aimTransform"/> named <see cref="LaserName"/>.
         /// </summary>
-        private const string RightHandName = "RightHand";
-        /// <summary>
-        /// The name of the game object (child of avatar) representing the left hand.
-        /// </summary>
-        private const string LeftHandName = "LeftHand";
-
-        /// <summary>
-        /// Creates and returns the IK aiming transform and a nested laser pointer. The IK
-        /// aiming object is the object that will be moved and rotated by <see cref="aimIK"/>
-        /// to aim towards <see cref="AimedTarget"/>.
-        /// It consists of an invisible game objects with a visible laser pointer as a child.
-        /// The IK aiming transform itself will be created as a child of either
-        /// the avatar's hand named either <see cref="RightHandName"/> or <see cref="LeftHandName"/>
-        /// depending upon <see cref="RightHanded"/>,
-        /// </summary>
-        /// <returns>the new IK aiming transform and laser beam</returns>
-        /// <exception cref="Exception">thrown if the avatar does not have a hand named
-        /// <see cref="RightHandName"/> or <see cref="LeftHandName"/>, respectively</exception>
-        private (Transform, GameObject) CreateAimTransform()
+        /// <param name="aimTransform">the game object in which to look up the laser</param>
+        /// <returns>the laser</returns>
+        /// <exception cref="Exception">thrown if there is no such laser, in which case this
+        /// component is also disabled</exception>
+        private GameObject GetLaser(Transform aimTransform)
         {
-            string handName = RightHanded ? RightHandName : LeftHandName;
-            Transform hand = gameObject.Ancestor(handName).transform;
-            if (hand == null)
+            Transform laser = aimTransform.transform.Find(LaserName);
+            if (laser == null)
             {
-                throw new Exception($"Avatar {name} does not have a {handName}.");
+                enabled = false;
+                throw new Exception($"The aim transform {aimTransform.gameObject.FullName()} of avatar {name} has no child named {LaserName}.");
             }
-            GameObject aimingObject = CreateAimingObject(hand);
-            return (aimingObject.transform, CreateLaserBeam(aimingObject));
+            return laser.gameObject;
         }
 
         /// <summary>
-        /// Creates and returns the aiming object (the object used by <see cref="aimIK"/>
-        /// to aim towards <see cref="AimedTarget"/>. This object will become a child
-        /// of the given <paramref name="hand"/>. It is positioned just before the
-        /// hand. The object is invisible, that is, its renderer is turned off,
-        /// and has no collider. Its whole purpose is to have a transform that can
-        /// used for aiming very close to the <paramref name="hand"/>.
-        ///
-        /// </summary>
-        /// <param name="hand">hand in which to create the aiming object</param>
-        /// <returns>the aiming object</returns>
-        private static GameObject CreateAimingObject(Transform hand)
-        {
-            // The aiming transform.
-            GameObject aimingObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            aimingObject.name = "AimTransform";
-            aimingObject.transform.SetParent(hand.transform);
-            // The following values of the rotation, position, and scale have been determined
-            // by trial and error.
-            aimingObject.transform.localEulerAngles = new Vector3(180, 80, 80);
-            aimingObject.transform.localPosition = new Vector3(-0.2506f, 0.0538f, -0.0412f);
-            aimingObject.transform.localScale = new Vector3(0.1f, 0.05f, 0.01f);
-            // The aiming object should be invisible. We have the laser pointer instead.
-            aimingObject.GetComponent<Renderer>().enabled = false;
-            Destroy(aimingObject.GetComponent<Collider>());
-            return aimingObject;
-        }
-
-        /// <summary>
-        /// Creates and returns a laser beam as a child of <paramref name="aimingObject"/>.
-        /// Its scale will be determined by <see cref="LaserScale"/> and its color by
-        /// <see cref="LaserColor"/>. Whether the laser beam is active initially is
-        /// determined by <see cref="IsPointing"/>.
-        /// </summary>
-        /// <param name="aimingObject">the IK aiming object</param>
-        private GameObject CreateLaserBeam(GameObject aimingObject)
-        {
-            // The laser beam.
-            GameObject laser = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            laser.name = "Laser";
-            // We set the scale before laser is turned into a child so that we
-            // have a world-space scale.
-            laser.transform.localScale = LaserScale;
-            laser.transform.SetParent(aimingObject.transform);
-            laser.transform.localEulerAngles = Vector3.zero;
-            laser.transform.localPosition = new Vector3(0, 0, laser.transform.localScale.z / 2);
-            laser.GetComponent<Renderer>().material.color = LaserColor;
-            laser.SetActive(IsPointing);
-            return laser;
-        }
-
-        /// <summary>
-        /// If <see cref="KeyCode.P"/> is entered, toggles pointing.
+        /// If <see cref="IsLocallyControlled"/>, moves the aimIK target
+        /// and toggles pointing if <see cref="SEEInput.TogglePointing()"/>.
         /// </summary>
         private void Update()
         {
-            if (SEEInput.IsPointing())
+            if (IsLocallyControlled)
             {
-                TogglePointing();
-            }
-            if (LocallyControlled)
-            {
-                MoveSearchPoint();
+                if (SEEInput.TogglePointing())
+                {
+                    TogglePointing();
+                }
+                MoveTarget();
             }
         }
 
+        public float LookAhead = 1.25f;
+
         /// <summary>
-        /// Moves <see cref="AimedTarget"/> to the end point of the laser beam,
+        /// Moves <see cref="aimIK.solver.target"/> to the end point of the laser beam,
         /// i.e., the point where the user is currently pointing to.
         /// </summary>
-        private void MoveSearchPoint()
+        private void MoveTarget()
         {
             // TODO: We need a solution for VR and other environments, too.
             Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-            AimedTarget.position = ray.origin + ray.direction * LaserScale.z;
+            aimIK.solver.target.position = ray.origin + ray.direction * LookAhead; // 2 * laser.transform.lossyScale.y;
+            Debug.DrawRay(ray.origin, ray.direction);
+            Debug.DrawLine(aimIK.solver.transform.position, aimIK.solver.target.position, Color.green);
         }
 
         /// <summary>
@@ -308,7 +202,7 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Updates the pose of the avatar so that the avatar is pointing towards <see cref="AimedTarget"/>.
+        /// Updates the pose of the avatar so that the avatar is pointing towards <see cref="Target"/>.
         /// </summary>
         private void Pose()
         {
