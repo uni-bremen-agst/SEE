@@ -304,9 +304,6 @@ namespace SEE.Game
         /// <summary>
         /// Returns the first game object in the current scene with the given <paramref name="id"/>.
         /// Will also return inactive game objects. If no such object exists, null will be returned.
-        ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be considered.
         /// </summary>
         /// <param name="id">id of the game object to be found</param>
         /// <returns>found game object or null</returns>
@@ -317,13 +314,10 @@ namespace SEE.Game
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
+                GameObject ancestor = root.Descendant(id);
+                if (ancestor != null)
                 {
-                    GameObject ancestor = root.Descendant(id);
-                    if (ancestor != null)
-                    {
-                        return ancestor;
-                    }
+                    return ancestor;
                 }
             }
             return null;
@@ -332,9 +326,6 @@ namespace SEE.Game
         /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectIDs"/>.
         /// Will also return inactive game objects.
-        ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be included.
         /// </summary>
         /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
         /// <returns>found game objects</returns>
@@ -346,10 +337,7 @@ namespace SEE.Game
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
-                {
-                    result.UnionWith(root.Descendants(gameObjectIDs));
-                }
+                result.UnionWith(root.Descendants(gameObjectIDs));
             }
             return result;
         }
