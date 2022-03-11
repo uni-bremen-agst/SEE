@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -320,7 +319,7 @@ namespace SEE.Game
             {
                 if (root.CompareTag(Tags.CodeCity))
                 {
-                    GameObject ancestor = root.Ancestor(id);
+                    GameObject ancestor = root.Descendant(id);
                     if (ancestor != null)
                     {
                         return ancestor;
@@ -349,7 +348,7 @@ namespace SEE.Game
             {
                 if (root.CompareTag(Tags.CodeCity))
                 {
-                    result.UnionWith(root.Ancestors(gameObjectIDs));
+                    result.UnionWith(root.Descendants(gameObjectIDs));
                 }
             }
             return result;
