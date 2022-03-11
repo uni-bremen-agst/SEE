@@ -167,6 +167,12 @@ namespace SEE.Controls.Actions
             return city;
         }
 
+        /// <summary>
+        /// The default animation duration in case we cannot derive a city for the
+        /// interactable object.
+        /// </summary>
+        private const float DefaultAnimationDuration = 1.0f;
+
         /**
          * Returns the animation duration using values defined in AbstractSEECity.
          * <param name="node">The node.</param>
@@ -176,7 +182,8 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
+            return city == null ? DefaultAnimationDuration
+                : (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
         }
 
         private void On()

@@ -16,6 +16,15 @@
       <attr name="Metric.McCabe_Complexity">
         <int>1</int>
       </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
       <attr name="Source.Name">
         <string>m1</string>
       </attr>
@@ -43,6 +52,15 @@
       <attr name="Linkage.Name">
         <string>p1.c1</string>
       </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>5</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>5</int>
+      </attr>	  
     </node>
     <node id="N5">
       <type xlink:href="Class"/>
@@ -84,6 +102,15 @@
       </attr>
       <attr name="Linkage.Name">
         <string>p1.c4</string>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
       </attr>
     </node>
     <node id="N7">

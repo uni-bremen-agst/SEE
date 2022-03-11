@@ -291,13 +291,48 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Gets the Height (Roof) of this <paramref name="node"/>
+        /// Returns the world-space position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="node">node whose height has to be determined</param>
-        /// <returns>The height of the Roof from this <paramref name="node"/></returns>
-        public static float GetRoof(this GameObject node)
+        /// <param name="gameObject">game object whose roof has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/></returns>
+        public static float GetRoof(this GameObject gameObject)
         {
-            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+            return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the maximal world-space position (y co-ordinate) of the roof of
+        /// this <paramref name="gameObject"/> or any of its active descendants.
+        /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
+        /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Note: only descendants that are currently active in the scene are
+        /// considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
+        /// or any of its active descendants</returns>
+        public static float GetMaxY(this GameObject gameObject)
+        {
+            float result = float.NegativeInfinity;
+            Recurse(gameObject, ref result);
+            return result;
+
+            void Recurse(GameObject root, ref float max)
+            {
+                float roof = root.GetRoof();
+                if (max < roof)
+                {
+                    max = roof;
+                }
+                foreach (Transform child in root.transform)
+                {
+                    if (child.gameObject.activeInHierarchy)
+                    {
+                        Recurse(child.gameObject, ref max);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -502,31 +537,19 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the full name of given <paramref name="gameObject"/>.
-        /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
-        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
-        /// has name B and the parent's parent has name A, then the result will be A.B.C.
+        /// Returns the full name of the game object, that is, its name and the
+        /// names of its ancestors in the game-object hierarchy separated by /.
         /// </summary>
-        /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
-        /// <returns>full name</returns>
+        /// <param name="gameObject">game object for which to retrieve the full name</param>
         public static string FullName(this GameObject gameObject)
         {
-            if (gameObject == null)
+            string result = gameObject.name;
+            while (gameObject.transform.parent != null)
             {
-                return "";
+                gameObject = gameObject.transform.parent.gameObject;
+                result = gameObject.name + "/" + result;
             }
-            else
-            {
-                Transform parent = gameObject.transform.parent;
-                if (parent != null)
-                {
-                    return FullName(parent.gameObject) + "." + gameObject.name;
-                }
-                else
-                {
-                    return gameObject.name;
-                }
-            }
+            return result;
         }
 
         /// <summary>
@@ -606,22 +629,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the full name of the game object, that is, its name and the
-        /// names of its ancestors in the game-object hierarchy separated by /.
-        /// </summary>
-        /// <param name="gameObject">game object for which to retrieve the full name</param>
-        public static string GetFullName(this GameObject gameObject)
-        {
-            string result = gameObject.name;
-            while (gameObject.transform.parent != null)
-            {
-                gameObject = gameObject.transform.parent.gameObject;
-                result = gameObject.name + "/" + result;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Updates the portal of this game object by setting the boundaries of itself
         /// (and its descendants, depending on <paramref name="includeDescendants"/>)
         /// to the code city they're contained in.
@@ -647,7 +654,7 @@ namespace SEE.GO
             else if (warnOnFailure)
             {
                 Debug.LogWarning("Couldn't update portal: No code city has been found"
-                                 + $" attached to game object {gameObject.GetFullName()}.\n");
+                                 + $" attached to game object {gameObject.FullName()}.\n");
             }
         }
     }

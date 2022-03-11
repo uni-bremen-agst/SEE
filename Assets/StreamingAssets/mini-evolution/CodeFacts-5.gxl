@@ -22,6 +22,15 @@
       <attr name="Metric.McCabe_Complexity">
         <int>0</int>
       </attr>	  
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
     </node>
 	  <node id="N2">
       <type xlink:href="Field"/>
@@ -60,6 +69,15 @@
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
       </attr>	  
     </node>
     <node id="N4">
@@ -123,7 +141,16 @@
       </attr>
       <attr name="Metric.McCabe_Complexity">
         <int>3</int>
-      </attr>		  
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
     </node>
     <node id="N7">
       <type xlink:href="Package"/>

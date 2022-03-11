@@ -56,7 +56,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="type"></param>
         /// <returns>true iff type --extends*--> this.Type</returns>
-        public bool Has_Supertype_Of(string type)
+        public bool HasSupertypeOf(string type)
         {
             // FIXME: We currently do not have the type hierarchy, so we cannot know
             // which type subsumes which other type. For the time being, we insist that
