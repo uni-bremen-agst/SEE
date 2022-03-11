@@ -98,7 +98,6 @@ namespace SEE.Utils.RPC
         protected JsonRpcServer(object target)
         {
             Target = target;
-
             sourceToken = new CancellationTokenSource();
             Semaphore = new SemaphoreSlim(1, 1);
             RpcConnections = new HashSet<JsonRpcConnection>();
@@ -111,13 +110,12 @@ namespace SEE.Utils.RPC
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
         public async UniTask Start(uint maxClients)
         {
-            if (Server.Status == UniTaskStatus.Pending)
+            if (Server.Status != UniTaskStatus.Pending)
             {
-                return;
+                Dispose();
+                Server = StartServerAsync(maxClients, sourceToken.Token);
+                await Server;
             }
-            Dispose();
-            Server = StartServerAsync(maxClients, sourceToken.Token);
-            await Server;
         }
 
         /// <summary>
