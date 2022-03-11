@@ -14,19 +14,19 @@
       <Menu guid="VSSeePackageCommandString" id="ExtensionSubMenu" priority="0x0100" type="Menu">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_MACROS"/>
         <Strings>
-          <ButtonText>SEE Integration</ButtonText>
+          <ButtonText>SEE</ButtonText>
         </Strings>
       </Menu>
       <Menu guid="VSSeePackageCommandString" id="DocumentSubMenu" priority="0x0100" type="Menu">
         <Parent guid="VSSeePackageCommandString" id="DocumentCommandGroup"/>
         <Strings>
-          <ButtonText>SEE Actions</ButtonText>
+          <ButtonText>SEE</ButtonText>
         </Strings>
       </Menu>
       <Menu guid="VSSeePackageCommandString" id="SolutionExplorerSubMenu" priority="0x0100" type="Menu">
         <Parent guid="VSSeePackageCommandString" id="SolutionExplorerCommandGroup"/>
         <Strings>
-          <ButtonText>SEE Actions</ButtonText>
+          <ButtonText>SEE</ButtonText>
         </Strings>
       </Menu>
     </Menus>
@@ -113,7 +113,7 @@
         <Parent guid="VSSeePackageCommandString" id="InformationCommandGroup" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>About See Integration</ButtonText>
+          <ButtonText>About SEE</ButtonText>
         </Strings>
       </Button>
     </Buttons>
