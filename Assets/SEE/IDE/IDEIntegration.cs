@@ -274,7 +274,7 @@ namespace SEE.IDE
         /// <param name="name">The name of the element.</param>
         /// <param name="line">The line number of the element.</param>
         /// <param name="column">The column number of the element.</param>
-        /// <param name="length">The length of the code range.</param>
+        /// <param name="length">The length of the code range (the number of lines from the start of its declaration until its end).</param>
         /// <returns>A key for <see cref="cachedObjects"/>.</returns>
         private string GenerateKey(string name, int line, int column, int length)
         {
