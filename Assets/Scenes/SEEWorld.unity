@@ -13084,8 +13084,12 @@ MonoBehaviour:
       Data: 13|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 14|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -13097,11 +13101,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 14|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13113,11 +13117,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 15|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13129,11 +13133,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 16|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 3
+      Data: 14
     - Name: 
       Entry: 12
       Data: 0
@@ -13154,7 +13158,7 @@ MonoBehaviour:
       Data: 
     - Name: ErosionSettings
       Entry: 7
-      Data: 17|SEE.Game.City.ErosionAttributes, SEE
+      Data: 18|SEE.Game.City.ErosionAttributes, SEE
     - Name: ShowInnerErosions
       Entry: 5
       Data: false
@@ -13651,6 +13655,96 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1582494076}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1623224194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1623224197}
+  - component: {fileID: 1623224196}
+  - component: {fileID: 1623224195}
+  m_Layer: 0
+  m_Name: Aim Poser
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1623224195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623224194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4267160fb35f54254be87414e585c1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  angleBuffer: 10
+  poses:
+  - visualize: 1
+    name: Aim Up
+    direction: {x: 0, y: 1, z: 0}
+    yaw: 180
+    pitch: 40
+  - visualize: 1
+    name: Aim Down
+    direction: {x: 0, y: -1, z: 0}
+    yaw: 180
+    pitch: 50
+  - visualize: 1
+    name: Aim Back
+    direction: {x: 0, y: 0, z: -1}
+    yaw: 40
+    pitch: 180
+  - visualize: 1
+    name: Aim Left
+    direction: {x: -1, y: 0, z: -0.1}
+    yaw: 45
+    pitch: 180
+  - visualize: 1
+    name: Aim Right
+    direction: {x: 1, y: 0, z: -0.1}
+    yaw: 45
+    pitch: 180
+  - visualize: 1
+    name: Aim Forward
+    direction: {x: 0, y: 0, z: 1}
+    yaw: 180
+    pitch: 180
+--- !u!114 &1623224196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623224194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92471cc1733c49042be56cd39b4b6e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: The names of the Poses must match exactly with the parameters of the Direct
+    blend tree in the Animator Controller's "Upperbody Aiming" layer.
+--- !u!4 &1623224197
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1623224194}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9943428, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1623245154
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15727,14 +15821,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab:
-  - {fileID: 721120223912629427, guid: bdc327a459a327942924a0bff5220ed4, type: 3}
-  - {fileID: 223132874815050282, guid: 4ae18712e3e90e54783307947de7ff71, type: 3}
-  - {fileID: 2148359632239371273, guid: d29c2b8a1bf586a49aa969b83210166c, type: 3}
-  - {fileID: 3413141361298906494, guid: c78211f36da6bc74093166055fbe27a5, type: 3}
-  - {fileID: 1119361092242382542, guid: e18558cd1cec9cf44a76097b7e541483, type: 3}
-  - {fileID: 7704617729666261720, guid: cc8fbe2ffa34728439843fa0953c8d1c, type: 3}
-  - {fileID: 3430662996609522360, guid: c062a229b1fe2eb46957d8e26b52c47d, type: 3}
-  - {fileID: 6417270086092738961, guid: e1e6a1e44a01a0d4bb0bb38d1c7df536, type: 3}
+  - {fileID: 8472076032805106264, guid: bdda49f80f6613c449c8cce2b20a1fad, type: 3}
+  - {fileID: 9120874007386958043, guid: 36fdfb07852307242bb82fae926f9481, type: 3}
+  - {fileID: 1804956525793131985, guid: eafa6f6901b9ba642bf7248a2e9dd2fb, type: 3}
+  - {fileID: 8943308232862852552, guid: 2e9cce630199ddc449105e1e3c8ecd51, type: 3}
+  - {fileID: 3641900252142699603, guid: 50420223034f4324d814cba9283fdb5b, type: 3}
+  - {fileID: 6256921579645108082, guid: f21a0a1f10edee54a8b42a422cbd646b, type: 3}
   InitialPosition: {x: 0, y: 0, z: -1}
   InitialRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &1989357559
