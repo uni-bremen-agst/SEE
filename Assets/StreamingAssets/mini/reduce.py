@@ -1,5 +1,9 @@
 #!/usr/bin/env rfgscript
 
+# This script allows to reduce a view to all nodes in a subtree rooted by a given 
+# node and all the edges between nodes of this subtree. Artifical nodes are 
+# removed, too.
+
 from bauhaus.shared import bauhaustool
 from bauhaus.rfg import Graph, View, Node, EdgeType, NodeSet, EdgeSet, misc, rfgtool
 
@@ -23,48 +27,56 @@ OUTPUT = 'rfg'
 BELONGS_TO = "Belongs_To"
 
 def reduce(graph: Graph, view_name: str, linkname: str):
-    """ graph: the rfg to be reduced;
-    view_name: the name of the view within graph that should be reduced;
-    linkname: the Linkage.Name of the root node of the node tree to be kept.
-    Returns the resulting modified graph.
+    """ 
+      graph: the rfg to be reduced;
+      view_name: the name of the view within graph that should be reduced;
+      linkname: the Linkage.Name of the root node of the node tree to be kept.
+      Returns the resulting modified graph.
     """
     if graph.is_edge_type_name(BELONGS_TO):
         belongs_to = graph.edge_type(BELONGS_TO)
         if graph.is_view_name(view_name):
-            v = graph.view(view_name)
-            reduce_view(v, linkname, belongs_to)
+            view = graph.view(view_name)
+            reduce_view(view, linkname, belongs_to)
         else:
-            print("View %s not found in RFG" % view_name)
+            print("View %s not found in RFG." % view_name)
     else:
-        print("Edge type %s does not exist in RFG" % BELONGS_TO)
+        print("Edge type %s does not exist in RFG." % BELONGS_TO)
     return graph
 
-def reduce_view(v: View, linkname: str, belongs_to: EdgeType):
+def reduce_view(view: View, linkname: str, belongs_to: EdgeType):
     """
+       view: the view to be reduced
+       linkname: the unique Linkage.Name of the root node of the subtree to be kept
+       belongs_to: the hierarchical edge type determining the nesting of the subtree
     """
-    # gather nodes to keep
-    for n in v.xnodes():
-        if n["Linkage.Name"] == linkname:
-            print("Found relevant node %s." % n["Source.Name"])
-            descendants = gather_descendants(v, n, belongs_to)
-            keep_only(v, descendants)
+    for node in view.xnodes():
+        if node["Linkage.Name"] == linkname:
+            descendants = gather_descendants(view, node, belongs_to)
+            keep_only(view, descendants)
             break
 
-def keep_only(v: View, nodes: NodeSet):
-    deleted = 0
-    for n in v.xnodes():
-        if "Element.Is_Artificial" in n or n not in nodes:
-            v.remove(n)
-            deleted = deleted + 1
-    print("Deleted %s nodes" % deleted)
-
-def gather_descendants(v: View, root: Node, belongs_to: EdgeType):
-    """ Yields the he transitive closure of all nodes reachable from any node
-    contained in the given set of nodes along belongs_to edges in backward direction.
-    In other words, the descendants are returned including the root itself.
+def keep_only(view: View, nodes: NodeSet):
     """
-    edge_predicate = misc.create_edge_predicate(v.graph, belongs_to)
-    return misc.transitive_neighbors(root, v, edge_predicate, "backward")
+        Deletes all nodes in view but the ones in 'nodes'. Artifical nodes
+        are deleted no matter whether they are in 'nodes' or not.
+        view: view where nodes not included in 'nodes' are to be deleted
+        nodes: all nodes to be kept
+    """
+    deleted = 0
+    for node in view.xnodes():
+        if "Element.Is_Artificial" in node or node not in nodes:
+            view.remove(node)
+            deleted = deleted + 1
+    print("Deleted %s nodes." % deleted)
+
+def gather_descendants(view: View, root: Node, belongs_to: EdgeType):
+    """ Yields the transitive closure of all nodes reachable from given 'root' node
+    along belongs_to edges in backward direction. In other words, the 
+    descendants of 'root' are returned including the root itself.
+    """
+    edge_predicate = misc.create_edge_predicate(view.graph, belongs_to)
+    return misc.transitive_neighbors(root, view, edge_predicate, "backward")
     
 @rfgtool.with_rfg_types
 @bauhaustool.BauhausTool(INPUTS, OUTPUT)
