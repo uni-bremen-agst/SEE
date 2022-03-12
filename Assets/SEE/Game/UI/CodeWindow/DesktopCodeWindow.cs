@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.IDE;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -56,6 +58,13 @@ namespace SEE.Game.UI.CodeWindow
                 TextMesh.text = Text;
                 TextMesh.fontSize = FontSize;
             }
+
+            // Get button for IDE interaction and register events.
+            codeWindow.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
+                .onClick.AddListener(() =>
+                {
+                    IDEIntegration.Instance?.OpenFile(FilePath, SolutionPath, markedLine).Forget();
+                });
 
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with

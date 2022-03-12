@@ -195,7 +195,8 @@ namespace SEE.Tools
         {
             leafConstraint.Check();
             innerNodeConstraint.Check();
-            Graph graph = new Graph();
+            // Randomly generated graph do not need to have a base path; that is why we use the empty string.
+            Graph graph = new Graph("");
             ICollection<Node> leaves = CreateLeaves(graph, leafConstraint, leafAttributes);
             ICollection<Edge> leafEdges = CreateEdges(graph, leaves, leafConstraint);
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);

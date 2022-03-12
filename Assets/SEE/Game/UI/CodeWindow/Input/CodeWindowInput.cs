@@ -307,7 +307,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Populates the code window with the contents of the given file.
         /// This will overwrite any existing text.
         /// </summary>
-        /// <param name="filename">The filename for the file to read.</param>
+        /// <param name="filename">The platform-specific filename for the file to read.</param>
         /// <param name="syntaxHighlighting">Whether syntax highlighting shall be enabled.
         /// The language will be detected by looking at the file extension.
         /// If the language is not supported, an ArgumentException will be thrown.</param>
@@ -376,7 +376,7 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             const char PATH_SEPARATOR = '/';
-            // When there are different paths in the issue table, this implies that there are some files 
+            // When there are different paths in the issue table, this implies that there are some files
             // which aren't actually the one we're looking for (because we've only matched by filename so far).
             // In this case, we'll gradually refine our results until this isn't the case anymore.
             for (int skippedParts = path.Count(x => x == PATH_SEPARATOR) - 2; !MatchingPaths(allIssues); skippedParts--)
