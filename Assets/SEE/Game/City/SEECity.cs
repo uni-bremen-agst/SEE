@@ -64,6 +64,19 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
+        /// In this case, we will update <see cref="loadedGraph.BasePath"/> with the
+        /// new <see cref="ProjectPath.Path"/> if <see cref="loadedGraph"/> is not null.
+        /// </summary>
+        protected override void ProjectPathChanged()
+        {
+            if (loadedGraph != null)
+            {
+                loadedGraph.BasePath = ProjectPath.Path;
+            }
+        }
+
+        /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original LoadedGraph
         /// if all node types are relevant. It is null if no graph has been loaded yet

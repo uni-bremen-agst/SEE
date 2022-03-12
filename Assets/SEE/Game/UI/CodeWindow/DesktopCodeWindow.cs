@@ -63,7 +63,7 @@ namespace SEE.Game.UI.CodeWindow
             codeWindow.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                 .onClick.AddListener(() =>
                 {
-                    IDEIntegration.Instance?.OpenFile(FilePath, SolutionPath, VisibleLine).Forget();
+                    IDEIntegration.Instance?.OpenFile(FilePath, SolutionPath, markedLine).Forget();
                 });
 
             // Register events to find out when window was scrolled in.

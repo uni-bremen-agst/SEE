@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
 
                 foreach (InteractableObject elem in IDEIntegration.Instance?.PopPendingSelections())
                 {
-                    elem?.SetSelect(true, false);
+                    elem?.SetSelect(true, true);
                 }
             }
         }

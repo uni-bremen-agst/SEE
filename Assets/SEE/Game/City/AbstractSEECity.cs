@@ -44,11 +44,34 @@ namespace SEE.Game.City
         public DataPath CityPath = new DataPath();
 
         /// <summary>
+        /// The path to project where the source code can be found.
+        /// <see cref="ProjectPath"/>.
+        /// </summary>
+        [OdinSerialize]
+        private DataPath projectPath = new DataPath();
+
+        /// <summary>
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [OdinSerialize]
-        public DataPath ProjectPath = new DataPath();
+        public DataPath ProjectPath
+        {
+            get => projectPath;
+            set
+            {
+                if (projectPath != value)
+                {
+                    projectPath = value;
+                    ProjectPathChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
+        /// This gives our subclasses a chance to update their graphs.
+        /// </summary>
+        protected abstract void ProjectPathChanged();
 
         /// <summary>
         /// The solution path for our project. Abstractly, this is a configuration file
@@ -460,13 +483,15 @@ namespace SEE.Game.City
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty graph path.\n");
-                return new Graph();
+                Graph graph = new Graph(ProjectPath.Path);
+                return graph;
             }
 
             if (File.Exists(filename))
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
+                                                           basePath: ProjectPath.Path,
                                                            rootID: rootName ?? filename,
                                                            logger: new SEELogger());
                 graphCreator.Load();
@@ -482,7 +507,7 @@ namespace SEE.Game.City
             else
             {
                 Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
-                return new Graph();
+                return new Graph(ProjectPath.Path);
             }
         }
 
