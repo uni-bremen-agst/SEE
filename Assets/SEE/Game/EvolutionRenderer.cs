@@ -1084,6 +1084,21 @@ namespace SEE.Game
         private List<Graph> graphs;  // not serialized by Unity
 
         /// <summary>
+        /// Updates the base path of all graphs.
+        /// </summary>
+        /// <param name="basePath">the new base path to be set</param>
+        internal void ProjectPathChanged(string basePath)
+        {
+            if (graphs != null)
+            {
+                foreach (Graph graph in graphs)
+                {
+                    graph.BasePath = basePath;
+                }
+            }
+        }
+
+        /// <summary>
         /// The number of graphs of the graph series to be rendered.
         /// </summary>
         public int GraphCount => graphs.Count;

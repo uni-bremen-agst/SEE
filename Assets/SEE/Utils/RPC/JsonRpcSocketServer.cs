@@ -34,7 +34,7 @@ namespace SEE.Utils.RPC
     /// <summary>
     /// The implementation of JsonRpcServer that will use <see cref="TcpListener"/>.
     /// </summary>
-    public sealed class JsonRpcSocketServer : JsonRpcServer
+    internal sealed class JsonRpcSocketServer : JsonRpcServer
     {
         #region Client
 

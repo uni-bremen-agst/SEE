@@ -32,7 +32,7 @@ namespace SEE.Utils.RPC
     /// The base class of the inter-process communication implementation for
     /// communication between an IDE and SEE.
     /// </summary>
-    public abstract class JsonRpcServer : IDisposable
+    internal abstract class JsonRpcServer : IDisposable
     {
         /// <summary>
         /// This exception will be thrown, if creation of the server instance failed.
@@ -98,7 +98,6 @@ namespace SEE.Utils.RPC
         protected JsonRpcServer(object target)
         {
             Target = target;
-
             sourceToken = new CancellationTokenSource();
             Semaphore = new SemaphoreSlim(1, 1);
             RpcConnections = new HashSet<JsonRpcConnection>();
@@ -109,16 +108,14 @@ namespace SEE.Utils.RPC
         /// </summary>
         /// <exception cref="JsonRpcServerCreationFailedException">A server instance couldn't be initiated.</exception>
         /// <param name="maxClients">The maximal number of clients that can connect to the server.</param>
-        /// <returns>Async UniTask.</returns>
         public async UniTask Start(uint maxClients)
         {
-            if (Server.Status == UniTaskStatus.Pending)
+            if (Server.Status != UniTaskStatus.Pending)
             {
-                return;
+                Dispose();
+                Server = StartServerAsync(maxClients, sourceToken.Token);
+                await Server;
             }
-            Dispose();
-            Server = StartServerAsync(maxClients, sourceToken.Token);
-            await Server;
         }
 
         /// <summary>
@@ -171,7 +168,6 @@ namespace SEE.Utils.RPC
         /// </summary>
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
-        /// <returns></returns>
         public async UniTask CallRemoteProcessAsync(string targetName, params object[] arguments)
         {
             if (IsConnected())
@@ -197,7 +193,6 @@ namespace SEE.Utils.RPC
         /// <param name="connection">The connection.</param>
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
-        /// <returns></returns>
         public async UniTask CallRemoteProcessOnConnectionAsync(JsonRpcConnection connection,
             string targetName, params object[] arguments)
         {
@@ -210,7 +205,7 @@ namespace SEE.Utils.RPC
         /// <param name="connection">The connection.</param>
         /// <param name="targetName">Method name.</param>
         /// <param name="arguments">Parameters of the called method.</param>
-        /// <returns></returns>
+        /// <returns>default UniTask</returns>
         public async UniTask<T> CallRemoteProcessOnConnectionAsync<T>(JsonRpcConnection connection,
             string targetName, params object[] arguments)
         {
@@ -241,7 +236,7 @@ namespace SEE.Utils.RPC
         /// Check if a client is currently connected to the server.
         /// </summary>
         /// <returns>True when a client is connected to server.</returns>
-        public bool IsConnected()
+        private bool IsConnected()
         {
             return RpcConnections != null && RpcConnections.Count > 0;
         }

@@ -29,7 +29,7 @@ namespace VSSeeExtension.SEE
     public partial class SeeIntegration
     {
         /// <summary>
-        /// A class for all possible remote procedure calls from the server (SEE).
+        /// A class for all possible remote procedure calls to the server (SEE).
         /// </summary>
         public class SeeCalls
         {
@@ -80,7 +80,7 @@ namespace VSSeeExtension.SEE
             /// </summary>
             /// <param name="path">The absolute path to the source file.</param>
             /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column/length)</param>
-            /// <returns></returns>
+            /// <returns>Async Task.</returns>
             public async Task HighlightNodesAsync(string path, ICollection<Tuple<string, int, int, int>> nodes)
             {
                 await integration.rpc.CallRemoteProcessAsync("HighlightNodes", path, nodes);

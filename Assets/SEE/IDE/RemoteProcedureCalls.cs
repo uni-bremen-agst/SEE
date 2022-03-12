@@ -81,13 +81,39 @@ namespace SEE.IDE
             /// <param name="length">The length of the code range.</param>
             public void HighlightNode(string path, string name, int line, int column, int length)
             {
-                if (ideIntegration.cachedObjects.TryGetValue(path, out IDictionary<string, ICollection<GameObject>> dictionary) && dictionary
-                    .TryGetValue(ideIntegration.GenerateKey(name, line, column, length), out ICollection<GameObject> collection))
+                if (TryLookUp(path, name, line, column, length, out ICollection<GameObject> collection))
                 {
                     SetInteractableObjects(collection);
                 }
             }
 
+            /// <summary>
+            /// Retrieves the <paramref name="collection"/> contained in <see cref="ideIntegration.cachedObjects"/>
+            /// for the given attributes. Returns true if a collection is found. If none is found, false is
+            /// return and <paramref name="collection"/> will be null.
+            /// </summary>
+            /// <param name="path">the path of the search entity</param>
+            /// <param name="name">the name of the search entity</param>
+            /// <param name="line">the source line of the search entity</param>
+            /// <param name="column">the source column of the search entity</param>
+            /// <param name="length">the length of the declaring region of the search entity</param>
+            /// <param name="collection">the found collection or null</param>
+            /// <returns>true if a collection was found</returns>
+            private bool TryLookUp(string path, string name, int line, int column, int length, out ICollection<GameObject> collection)
+            {
+                collection = null;
+                if (!ideIntegration.cachedObjects.TryGetValue(path, out IDictionary<string, ICollection<GameObject>> dictionary))
+                {
+                    Debug.LogError($"Unknown file {path}.\n");
+                    return false;
+                }
+                if (!dictionary.TryGetValue(ideIntegration.GenerateKey(name, line, column, length), out collection))
+                {
+                    Debug.LogError($"Unknown entity [name={name} line={line} column={column} length={length}] in file {path}.\n");
+                    return false;
+                }
+                return true;
+            }
 
             /// <summary>
             /// Adds all edges from <see cref="cachedObjects"/> with the key created by
@@ -102,14 +128,14 @@ namespace SEE.IDE
             public void HighlightNodeReferences(string path, string name, int line, int column, int length)
             {
                 HashSet<GameObject> objects = new HashSet<GameObject>();
-                if (ideIntegration.cachedObjects.TryGetValue(path, out IDictionary<string, ICollection<GameObject>> dictionary) && dictionary
-                    .TryGetValue(ideIntegration.GenerateKey(name, line, column, length), out ICollection<GameObject> collection))
+                if (TryLookUp(path, name, line, column, length, out ICollection<GameObject> collection))
                 {
                     UniTask.Run(async () =>
                     {
                         await UniTask.SwitchToMainThread();
-                        SetInteractableObjects(SceneQueries.Find(new HashSet<string>(
-                            collection.SelectMany(x => x.GetNode().Incomings).Select(x => x.ID))));
+                        HashSet<string> incomingEdges
+                           = new HashSet<string>(collection.SelectMany(x => x.GetNode().Incomings).Select(x => x.ID));
+                        SetInteractableObjects(SceneQueries.Find(incomingEdges));
                     });
                 }
                 SetInteractableObjects(objects);
@@ -120,14 +146,12 @@ namespace SEE.IDE
             /// </summary>
             /// <param name="path">The absolute path to the source file.</param>
             /// <param name="nodes">A list of tuples representing the nodes. Order: (name/line/column)</param>
-            /// <returns></returns>
             public void HighlightNodes(string path, ICollection<Tuple<string, int, int, int>> nodes)
             {
                 HashSet<GameObject> objects = new HashSet<GameObject>();
                 foreach (var (name, line, column, length) in nodes)
                 {
-                    if (ideIntegration.cachedObjects.TryGetValue(path, out IDictionary<string, ICollection<GameObject>> dictionary) && dictionary
-                        .TryGetValue(ideIntegration.GenerateKey(name, line, column, length), out ICollection<GameObject> collection))
+                    if (TryLookUp(path, name, line, column, length, out ICollection<GameObject> collection))
                     {
                         objects.UnionWith(collection);
                     }
@@ -170,19 +194,19 @@ namespace SEE.IDE
                 UniTask.Run(async () =>
                 {
                     await UniTask.SwitchToMainThread();
-                    HashSet<InteractableObject> tmp = new HashSet<InteractableObject>();
+                    HashSet<InteractableObject> selections = new HashSet<InteractableObject>();
 
                     foreach (GameObject node in objects)
                     {
                         if (node.TryGetComponent(out InteractableObject obj))
                         {
-                            tmp.Add(obj);
+                            selections.Add(obj);
                         }
                     }
 
                     await UniTask.SwitchToThreadPool();
 
-                    ideIntegration.pendingSelections = tmp;
+                    ideIntegration.pendingSelections = selections;
                 });
             }
         }

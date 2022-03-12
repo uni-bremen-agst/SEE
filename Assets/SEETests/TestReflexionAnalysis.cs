@@ -215,8 +215,8 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
         protected static bool IsContained(Node from, Node to, string edgeType, IEnumerable<PropagatedEdge> propagatedEdges)
         {
-            return propagatedEdges.Any(edge => from.ID == edge.ThePropagatedEdge.Source.ID && 
-                                               to.ID == edge.ThePropagatedEdge.Target.ID && 
+            return propagatedEdges.Any(edge => from.ID == edge.ThePropagatedEdge.Source.ID &&
+                                               to.ID == edge.ThePropagatedEdge.Target.ID &&
                                                edgeType == edge.ThePropagatedEdge.Type);
         }
 
@@ -275,7 +275,7 @@ namespace SEE.Tools.Architecture
         protected virtual void Setup()
         {
             HierarchicalEdges = HierarchicalEdgeTypes();
-            fullGraph = new Graph();
+            fullGraph = new Graph("DUMMYBASEPATH");
             ResetEvents();
         }
 

@@ -248,15 +248,15 @@ namespace SEE.IDE
         /// Generates an appropriate key for a given node.
         /// </summary>
         /// <param name="node">The node.</param>
-        /// <param name="path">The generated path to the given node. Can be null.</param>
-        /// <param name="key">The generated key to the given node. Can be null.</param>
-        /// <returns>Generating was successful.</returns>
+        /// <param name="path">The retrieved absolute platform-dependent path of the given node. Can be null.</param>
+        /// <param name="key">The key generated for the given node. Can be null.</param>
+        /// <returns>True in case of success.</returns>
         private bool TryGenerateNodeKey(Node node, out string path, out string key)
         {
             path = null;
             try
             {
-                path = Path.GetFullPath(node.Path() + node.Filename());
+                path = Path.GetFullPath(node.AbsolutePlatformPath());
             }
             catch (Exception)
             {
@@ -274,7 +274,7 @@ namespace SEE.IDE
         /// <param name="name">The name of the element.</param>
         /// <param name="line">The line number of the element.</param>
         /// <param name="column">The column number of the element.</param>
-        /// <param name="length">The length of the code range.</param>
+        /// <param name="length">The length of the code range (the number of lines from the start of its declaration until its end).</param>
         /// <returns>A key for <see cref="cachedObjects"/>.</returns>
         private string GenerateKey(string name, int line, int column, int length)
         {
@@ -310,8 +310,7 @@ namespace SEE.IDE
         /// <returns>The set of elements to be highlighted.</returns>
         public HashSet<InteractableObject> PopPendingSelections()
         {
-            HashSet<InteractableObject> elements = new HashSet<InteractableObject>();
-            elements.UnionWith(pendingSelections);
+            HashSet<InteractableObject> elements = new HashSet<InteractableObject>(pendingSelections);
             pendingSelections.Clear();
             return elements;
         }
@@ -328,13 +327,14 @@ namespace SEE.IDE
             JsonRpcConnection connection = await LookForIDEConnection(solutionPath);
             if (connection != null)
             {
+                //string fullPath = Path.GetFullPath(filePath);
                 try
                 {
-                    await ideCalls.OpenFile(connection, Path.GetFullPath(filePath), line);
+                    await ideCalls.OpenFile(connection, filePath, line);
                 }
                 catch (Exception)
                 {
-                    ShowNotification.Error("File not found", "File path of node doesn't exist.");
+                    ShowNotification.Error("File not found", $"File path '{filePath}' of node doesn't exist.");
                 }
             }
         }

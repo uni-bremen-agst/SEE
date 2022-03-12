@@ -134,16 +134,19 @@ namespace VSSeeExtension.Utils.Helpers
         /// <param name="cancellationToken">To avoid the main thread transition when no longer
         /// needed.</param>
         /// <param name="element">The code element.</param>
-        /// <returns>Tuple column/line/length.</returns>
+        /// <returns>Tuple line/column/length.</returns>
         private static async Task<Tuple<int, int, int>> GetElementPositionAsync(
             CancellationToken cancellationToken, CodeElement element)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            // TODO: Maybe there is a better way to do this.
+            // text is the complete source text for element
             string text = element.StartPoint.CreateEditPoint().GetText(element.EndPoint);
+            // split into lines
             string[] split = text.Split('\n');
 
+            // The element's name followed by an arbitrary number of newlines and spaces
+            // followed by one of the following symbols: ; { = (
             Match match = Regex.Match(text, element.Name + @"[\s\n]*[;{=(]");
 
             int x = 0;
@@ -169,8 +172,10 @@ namespace VSSeeExtension.Utils.Helpers
             // For now will only use StartPoint and EndPoint.
             // return new Tuple<int, int, int>(x + element.StartPoint.Line, (x == 0 ?
             // element.StartPoint.DisplayColumn + y : y + 1), element.EndPoint.Line - (x + element.StartPoint.Line - 1));
-            return new Tuple<int, int, int>(element.StartPoint.Line, (x == 0 ?
-                element.StartPoint.DisplayColumn + y : y + 1), element.EndPoint.Line - (element.StartPoint.Line - 1));
+            return new Tuple<int, int, int>
+                (element.StartPoint.Line,
+                 (x == 0 ? element.StartPoint.DisplayColumn + y : y + 1),
+                 element.EndPoint.Line - (element.StartPoint.Line - 1));
         }
 
         /// <summary>
@@ -263,7 +268,7 @@ namespace VSSeeExtension.Utils.Helpers
         /// <param name="path">The absolute path of the file.</param>
         /// <param name="line">Go to this line number.</param>
         /// <returns>True when successfully opened.</returns>
-        public static async Task<bool> OpenFileAsync(CancellationToken cancellationToken, 
+        public static async Task<bool> OpenFileAsync(CancellationToken cancellationToken,
             string path, int? line = null)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

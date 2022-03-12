@@ -1,6 +1,6 @@
 @echo off
 
-REM This script create a GXL file for all C# source files located in directory src.
+REM This script creates a GXL file for all C# source files located in directory src.
 REM Precondition: The Axivion Suite must be installed.
 
 setlocal enabledelayedexpansion
