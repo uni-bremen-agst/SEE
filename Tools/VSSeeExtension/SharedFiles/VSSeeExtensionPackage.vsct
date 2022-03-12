@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h"/>
+
+  <!-- This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h"/>
+
+  <!-- The Commands section is where commands, menus, and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="VSSeeExtensionPackage">
+    <!-- Menus section. -->
+    <Menus>
+      <Menu guid="VSSeePackageCommandString" id="ExtensionSubMenu" priority="0x0100" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_MACROS"/>
+        <Strings>
+          <ButtonText>SEE</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="VSSeePackageCommandString" id="DocumentSubMenu" priority="0x0100" type="Menu">
+        <Parent guid="VSSeePackageCommandString" id="DocumentCommandGroup"/>
+        <Strings>
+          <ButtonText>SEE</ButtonText>
+        </Strings>
+      </Menu>
+      <Menu guid="VSSeePackageCommandString" id="SolutionExplorerSubMenu" priority="0x0100" type="Menu">
+        <Parent guid="VSSeePackageCommandString" id="SolutionExplorerCommandGroup"/>
+        <Strings>
+          <ButtonText>SEE</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
+    <!-- Groups section. -->
+    <Groups>
+      <Group guid="VSSeePackageCommandString" id="DocumentCommandGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="DocumentCommandClassSubGroup" priority="0x0600">
+        <Parent guid="VSSeePackageCommandString" id="DocumentSubMenu"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="DocumentCommandMethodSubGroup" priority="0x0600">
+        <Parent guid="VSSeePackageCommandString" id="DocumentSubMenu"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="SolutionExplorerCommandGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="SolutionExplorerCommandSubGroup" priority="0x0600">
+        <Parent guid="VSSeePackageCommandString" id="SolutionExplorerSubMenu"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="ExtensionCommandSubGroup" priority="0x0100">
+        <Parent guid="VSSeePackageCommandString" id="ExtensionSubMenu"/>
+      </Group>
+      <Group guid="VSSeePackageCommandString" id="InformationCommandGroup" priority="0x0200">
+        <Parent guid="VSSeePackageCommandString" id="ExtensionSubMenu"/>
+      </Group>
+    </Groups>
+
+    <!-- Buttons section. -->
+    <Buttons>
+      <Button guid="VSSeePackageCommandString" id="HighlightClassId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="DocumentCommandClassSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Highlight Class</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="VSSeePackageCommandString" id="HighlightMethodId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="DocumentCommandMethodSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Highlight Method</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="VSSeePackageCommandString" id="HighlightMethodReferencesId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="DocumentCommandMethodSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Highlight Method References</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="VSSeePackageCommandString" id="HighlightClassesId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="SolutionExplorerCommandSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Highlight all Classes</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="VSSeePackageCommandString" id="ConnectToSeeId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="ExtensionCommandSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Connect to SEE</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="VSSeePackageCommandString" id="DisconnectFromSeeId" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="ExtensionCommandSubGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Disconnect From SEE</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="VSSeePackageCommandString" id="About" priority="0x0100" type="Button">
+        <Parent guid="VSSeePackageCommandString" id="InformationCommandGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>About SEE</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <CommandPlacements>
+    <CommandPlacement guid="VSSeePackageCommandString" id="SolutionExplorerCommandGroup" priority="0x0100">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_EZDOCWINTAB"/>
+    </CommandPlacement>
+  </CommandPlacements>
+
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="VSSeeExtensionPackage" value="{d4d88e38-8a1b-49b1-a4fd-202a542a8afc}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="VSSeePackageCommandString" value="{f6a899b2-aab0-46ef-8980-f0e38ccc0dbf}">
+      <!-- Menus -->
+      <IDSymbol name="DocumentSubMenu" value="0x1000" />
+      <IDSymbol name="ExtensionSubMenu" value="0x1001"/>
+      <IDSymbol name="SolutionExplorerSubMenu" value="0x1002"/>
+
+      <!-- Groups -->
+      <IDSymbol name="DocumentCommandGroup" value="0x2000" />
+      <IDSymbol name="InformationCommandGroup" value="0x2001"/>
+      <IDSymbol name="DocumentCommandClassSubGroup" value="0x2002" />
+      <IDSymbol name="DocumentCommandMethodSubGroup" value="0x2003"/>
+      <IDSymbol name="ExtensionCommandSubGroup" value="0x2004"/>
+      <IDSymbol name="SolutionExplorerCommandSubGroup" value="0x2005"/>
+      <IDSymbol name="SolutionExplorerCommandGroup" value="0x2006"/>
+
+      <!-- Commands -->
+      <IDSymbol name="HighlightClassId" value="0x0100" />
+      <IDSymbol name="HighlightClassesId" value="0x0101" />
+      <IDSymbol name="HighlightMethodId" value="0x0102" />
+      <IDSymbol name="HighlightMethodReferencesId" value="0x0103"/>
+
+      <IDSymbol name="ConnectToSeeId" value="0x0110" />
+      <IDSymbol name="DisconnectFromSeeId" value="0x0111" />
+
+      <IDSymbol name="About" value="0x0120" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

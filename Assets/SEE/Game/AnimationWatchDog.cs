@@ -1,4 +1,6 @@
-﻿using SEE.Game.Evolution;
+﻿using SEE.DataModel.DG;
+using SEE.Game.Evolution;
+using System;
 
 namespace SEE.Game
 {

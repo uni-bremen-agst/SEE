@@ -46,7 +46,7 @@ namespace SEE.Tools.Architecture
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running incremental reflexion analysis");
             // Passing the empty graph as mapping argument to reflexion.
-            reflexion = new Reflexion(impl, arch, new Graph());
+            reflexion = new Reflexion(impl, arch, new Graph("DUMMYBASEPATH"));
             fullGraph = reflexion.FullGraph;
             reflexion.Register(this);
             reflexion.Run(); // from scratch
@@ -84,7 +84,7 @@ namespace SEE.Tools.Architecture
         {
             string platformPath = Filenames.OnCurrentPlatform(path);
             Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, "", logger);
+            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
             graphCreator.Load();
             Graph result = graphCreator.GetGraph();
             Assert.That(result, !Is.Null);

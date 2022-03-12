@@ -37,6 +37,9 @@ namespace SEE.DataModel.DG
         /// </summary>
         public bool NodeHierarchyHasChanged = true;
 
+        /// <summary>
+        /// <see cref="MaxDepth"/>.
+        /// </summary>
         private int maxDepth = -1;
 
         /// <summary>
@@ -56,7 +59,6 @@ namespace SEE.DataModel.DG
                 {
                     FinalizeNodeHierarchy();
                 }
-
                 return maxDepth;
             }
         }
@@ -64,11 +66,24 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="basePath">the base path of this graph; it will be prepended to
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of
+        /// this graph</param>
         /// <param name="name">name of the graph</param>
-        public Graph(string name = "")
+        public Graph(string basePath, string name = "")
         {
-            this.Name = name;
+            Name = name;
+            BasePath = basePath;
         }
+
+        /// <summary>
+        /// The base path of this graph. It will be prepended to the
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/>.
+        /// It should be set platform dependent.
+        ///
+        /// Note: This attribute will not be stored in a GXL file.
+        /// </summary>
+        public string BasePath { get; set; } = "";
 
         /// Adds a node to the graph.
         /// Preconditions:
@@ -387,6 +402,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
+        /// Not to be confused with <see cref="BasePath"/>.
         /// </summary>
         public string Path { get; set; } = "";
 
@@ -1066,7 +1082,7 @@ namespace SEE.DataModel.DG
         /// </returns>
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
         {
-            Graph subgraph = new Graph();
+            Graph subgraph = new Graph(BasePath);
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
             return subgraph;
