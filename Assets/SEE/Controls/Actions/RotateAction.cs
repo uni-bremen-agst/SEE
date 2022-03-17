@@ -91,6 +91,105 @@ namespace SEE.Controls.Actions
         /// <returns>always false</returns>
         public override bool Update()
         {
+#if UNITY_ANDROID
+            Transform cityRootNode = null;
+
+            if (Input.touchCount != 1)
+            {
+                rotating = false;
+                return false;
+            }
+
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+
+            bool synchronize = false;
+            Vector3 planeHitPoint;
+            if (touch.phase == TouchPhase.Began) // start or continue rotation
+            {
+                Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+                RaycastHit raycastHit;
+                if (Physics.Raycast(ray, out raycastHit))
+                {
+                    if (raycastHit.collider.tag == "Node")
+                    {
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
+                    }
+                }
+                if (cityRootNode)
+                {
+                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
+                    if (Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
+                    {
+                        rotating = true;
+                        hit.CityRootNode = cityRootNode;
+                        hit.Plane = plane;
+
+                        gizmo.gameObject.SetActive(true);
+                        gizmo.Center = hit.CityRootNode.position;
+
+                        Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
+                        float toHitAngle = toHit.Angle360();
+
+                        originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
+                        originalPosition = cityRootNode.position;
+                        startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
+                        gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
+                        gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
+                    }
+                }
+            }
+            if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint) && touch.phase == TouchPhase.Moved) // continue rotation
+            {
+                Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
+                float toHitAngle = toHit.Angle360();
+                float angle = AngleMod(startAngle + toHitAngle);
+                if (SEEInput.Snap())
+                {
+                    angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
+                }
+
+                hit.CityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.CityRootNode.rotation.eulerAngles.y);
+
+                float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
+                float currAngle = toHitAngle;
+
+                while (Mathf.Abs(currAngle + FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                {
+                    currAngle += FullCircleDegree;
+                }
+                while (Mathf.Abs(currAngle - FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
+                {
+                    currAngle -= FullCircleDegree;
+                }
+                if (SEEInput.Snap())
+                {
+                    currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
+                }
+                gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
+
+                synchronize = true;
+            }
+            else if (rotating && touch.phase == TouchPhase.Ended) // finalize rotation
+            {
+                rotating = false;
+                gizmo.gameObject.SetActive(false);
+
+                currentState = ReversibleAction.Progress.Completed;
+            }
+
+            if (synchronize)
+            {
+                new Net.RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
+            }
+
+            if (currentState != ReversibleAction.Progress.Completed)
+            {
+                currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
+            }
+
+            return true;
+#else
             InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
             Transform cityRootNode = null;
             CityCursor cityCursor = null;
@@ -232,6 +331,7 @@ namespace SEE.Controls.Actions
             }
 
             return true;
+#endif
         }
 
         /// <summary>
