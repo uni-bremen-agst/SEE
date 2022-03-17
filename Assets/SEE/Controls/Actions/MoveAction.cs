@@ -223,12 +223,123 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Material hitObjectMaterial;
 
+        private float distance;
+
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+#if UNITY_ANDROID
+            bool result = false;
+            Transform cityRootNode = null;
+            Transform touchedObject;
+            bool synchronize = false;
+            Vector3 planeHitPoint;
+
+            if (Input.touchCount != 1)
+            {
+                moving = false;
+                return result;
+            }
+
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+                RaycastHit raycastHit;
+                if (Physics.Raycast(ray, out raycastHit))
+                {
+                    if (raycastHit.collider.tag == "Node")
+                    {
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
+                        moving = true;
+                        touchedObject = raycastHit.transform;
+                        hit = new Hit(touchedObject);
+                        memento = new Memento(touchedObject);
+
+                        hit.InteractableObject.SetGrab(true, true);
+                        gizmo.gameObject.SetActive(true);
+
+                        distance = raycastHit.transform.position.z - Camera.main.transform.position.z;
+                        planeHitPoint = new Vector3(touchPosition.x, touchPosition.y, distance);
+                        dragStartTransformPosition = hit.HoveredObject.position;
+                        dragStartOffset = planeHitPoint - hit.HoveredObject.position;
+                        dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
+                    }
+                }
+
+            }
+            else if (moving && touch.phase == TouchPhase.Moved)
+            {
+                if (moving) // continue movement
+                {
+                    planeHitPoint = new Vector3(touchPosition.x, touchPosition.y, distance);
+                    Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+
+                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+
+                    Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
+                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    gizmo.SetPositions(startPoint, endPoint);
+
+                    SetHitObjectColor(hit.node);
+
+                    synchronize = true;
+                }
+            }
+            else if (moving && touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            {
+                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
+                // No canceling, no dragging, no reset, but still moving =>  finalize movement
+                if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
+                {
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
+                    if (parent != null)
+                    {
+                        // The move has come to a successful end.
+                        new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
+                        memento.SetNewParent(parent);
+                        memento.SetNewPosition(hit.HoveredObject.position);
+                        currentState = ReversibleAction.Progress.Completed;
+                        result = true;
+                    }
+                    else
+                    {
+                        // An attempt was made to move the hovered object outside of the city.
+                        // We need to reset it to its original position. And then we start from scratch.
+                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                        hit.HoveredObject.position = originalPosition;
+                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
+                        // The following assignment will override hit.interactableObject; that is why we
+                        // stored its value in interactableObjectToBeUngrabbed above.
+                        hit = new Hit();
+                    }
+
+                    synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
+                }
+                interactableObjectToBeUngrabbed.SetGrab(false, true);
+                gizmo.gameObject.SetActive(false);
+                ResetHitObjectColor();
+                moving = false;
+            }
+            if (synchronize)
+            {
+                new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
+            }
+
+            if (currentState != ReversibleAction.Progress.Completed)
+            {
+                currentState = moving ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
+            }
+
+            return result;
+
+#else
             bool result = false;
             InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
             Transform cityRootNode = null;
@@ -369,6 +480,7 @@ namespace SEE.Controls.Actions
             }
 
             return result;
+#endif
 
             #region Local Functions
 
