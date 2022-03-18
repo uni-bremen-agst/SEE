@@ -16,6 +16,7 @@ namespace SEE.Tools.Architecture
     /// </summary>
     internal class TestReflexionAnalysis : Observer
     {
+        // TODO: Test types as well
         protected const string call = "call";
         protected Graph fullGraph;
         protected Reflexion reflexion;
@@ -52,11 +53,11 @@ namespace SEE.Tools.Architecture
         /// List of edges propagated from the implementation onto the architecture for
         /// a single reflexion-analysis run.
         /// </summary>
-        protected List<PropagatedEdge> propagatedEdgesAdded = new List<PropagatedEdge>();
+        protected List<PropagatedEdgeAdded> propagatedEdgesAdded = new List<PropagatedEdgeAdded>();
         /// <summary>
         /// List of propagated dependency edges removed from the reflexion result.
         /// </summary>
-        protected List<PropagatedEdge> propagatedEdgesRemoved = new List<PropagatedEdge>();
+        protected List<PropagatedEdgeRemoved> propagatedEdgesRemoved = new List<PropagatedEdgeRemoved>();
 
         /// <summary>
         /// List of Maps_To edges added to the mapping.
@@ -83,10 +84,12 @@ namespace SEE.Tools.Architecture
         protected void ResetEvents()
         {
             edgeChanges = new List<EdgeChange>();
-            propagatedEdgesAdded = new List<PropagatedEdge>();
-            propagatedEdgesRemoved = new List<PropagatedEdge>();
+            propagatedEdgesAdded = new List<PropagatedEdgeAdded>();
+            propagatedEdgesRemoved = new List<PropagatedEdgeRemoved>();
             mapsToEdgesAdded = new List<MapsToEdgeAdded>();
             mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
+            implementationEdgesAdded = new List<ImplementationEdgeAdded>();
+            implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
         }
 
         /// <summary>
@@ -228,6 +231,13 @@ namespace SEE.Tools.Architecture
                                                to.ID == edge.ThePropagatedEdge.Target.ID &&
                                                edgeType == edge.ThePropagatedEdge.Type);
         }
+        
+        protected static bool IsNotContained(Node from, Node to, string edgeType, IEnumerable<EdgeChange> edgeChanges)
+        {
+            return !edgeChanges.Any(edge => from.ID == edge.Edge.Source.ID && 
+                                               to.ID == edge.Edge.Target.ID && 
+                                               edgeType == edge.Edge.Type);
+        }
 
         /// <summary>
         /// Dumps the results collected in mapsToEdges, edgeChanges, propagatedEdges, and removedEdges
@@ -236,12 +246,12 @@ namespace SEE.Tools.Architecture
         protected void DumpEvents()
         {
             Debug.Log("MAPS_TO EDGES ADDED TO MAPPING\n");
-            foreach (MapsToEdge e in mapsToEdgesAdded)
+            foreach (MapsToEdgeAdded e in mapsToEdgesAdded)
             {
                 Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge);
             }
             Debug.Log("MAPS_TO EDGES REMOVED FROM MAPPING\n");
-            foreach (MapsToEdge e in mapsToEdgesRemoved)
+            foreach (MapsToEdgeRemoved e in mapsToEdgesRemoved)
             {
                 Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge);
             }
@@ -261,6 +271,18 @@ namespace SEE.Tools.Architecture
             foreach (EdgeChange e in edgeChanges)
             {
                 Debug.LogFormat("changed {0} from {1} to {2}\n", e.Edge, e.OldState, e.NewState);
+            }
+            
+            Debug.Log("DEPENDENCIES ADDED IN IMPLEMENTATION");
+            foreach (ImplementationEdgeAdded e in implementationEdgesAdded)
+            {
+                Debug.Log($"added {e}");
+            }
+            
+            Debug.Log("DEPENDENCIES REMOVED IN IMPLEMENTATION");
+            foreach (ImplementationEdgeRemoved e in implementationEdgesRemoved)
+            {
+                Debug.Log($"removed {e}");
             }
         }
 
@@ -303,6 +325,8 @@ namespace SEE.Tools.Architecture
             mapsToEdgesAdded = null;
             mapsToEdgesRemoved = null;
             propagatedEdgesRemoved = null;
+            implementationEdgesAdded = null;
+            implementationEdgesRemoved = null;
         }
 
         protected Node NewNode(bool inArchitecture, string linkname, string type = "Routine")
@@ -366,6 +390,10 @@ namespace SEE.Tools.Architecture
                 case MapsToEdgeAdded added: mapsToEdgesAdded.Add(added);
                     break;
                 case MapsToEdgeRemoved @event: mapsToEdgesRemoved.Add(@event);
+                    break;
+                case ImplementationEdgeAdded @event: implementationEdgesAdded.Add(@event);
+                    break;
+                case ImplementationEdgeRemoved @event: implementationEdgesRemoved.Add(@event);
                     break;
                 default: Debug.LogError($"UNHANDLED CALLBACK: {changeEvent}\n");
                     break;

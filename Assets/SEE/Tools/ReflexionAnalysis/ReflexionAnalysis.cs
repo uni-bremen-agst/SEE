@@ -294,7 +294,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
         /// <returns>the counter of <paramref name="edge"/></returns>
-        public static int GetCounter(Edge edge) => edge.TryGetInt(CounterAttribute, out int value) ? value : 0;
+        public static int GetArchCounter(Edge edge)
+        {
+            Assert.IsTrue(edge.IsInArchitecture());
+            return edge.TryGetInt(CounterAttribute, out int value) ? value : 0;   
+        }
 
         /// <summary>
         /// Increases counter of <paramref name="edge"/> by <paramref name="value"/> (may be negative).
@@ -308,7 +312,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private void ChangePropagatedDependency(Edge edge, int value)
         {
             Assert.IsTrue(edge.IsInArchitecture() && !IsSpecified(edge));
-            int oldValue = GetCounter(edge);
+            int oldValue = GetArchCounter(edge);
             int newValue = oldValue + value;
             // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
             if (newValue <= 0)
@@ -341,7 +345,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">an implementation dependency whose counter is to be retrieved</param>
         /// <returns>value of the counter attribute of given implementation dependency</returns>
-        private int GetImplCounter(Edge edge = null)
+        private static int GetImplCounter(Edge edge = null)
         {
             // returns the value of the counter attribute of edge
             // at present, dependencies extracted from the source
@@ -369,85 +373,6 @@ namespace SEE.Tools.ReflexionAnalysis
         // edges (hierarchical as well as dependencies) will be removed, too.
         // Note also that an addition of an edge will imply an implicit addition of
         // its source and target node if there are not yet contained in the target graph.
-
-        #region Node
-
-
-        /// <summary>
-        /// Adds given node to the mapping graph.
-        /// Precondition: node must not be contained in the mapping graph.
-        /// Postcondition: node is contained in the mapping graph and the architecture
-        //   graph is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be added to the mapping graph</param>
-        //public void AddToMapping(Node node)
-        //{
-        //    throw new NotImplementedException(); // FIXME
-        //}
-
-        /// <summary>
-        /// Removes given node from mapping graph.
-        /// Precondition: node must be contained in the mapping graph.
-        /// Postcondition: node is no longer contained in the mapping graph and the architecture
-        ///   graph is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">node to be removed from the mapping</param>
-        //public void DeleteFromMapping(Node node)
-        //{
-        //    throw new NotImplementedException(); // FIXME
-        //}
-
-        /// <summary>
-        /// Adds given <paramref name="node"/> to architecture graph.
-        ///
-        /// Precondition: <paramref name="node"/> must not be contained in the architecture graph.
-        /// Postcondition: <paramref name="node"/> is contained in the architecture graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be added to the architecture graph</param>
-        public void AddToArchitecture(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes given <paramref name="node"/> from architecture graph.
-        /// Precondition: <paramref name="node"/> must be contained in the architecture graph.
-        /// Postcondition: <paramref name="node"/> is no longer contained in the architecture graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be removed from the architecture graph</param>
-        public void DeleteFromArchitecture(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Adds given <paramref name="node"/> to implementation graph.
-        /// Precondition: <paramref name="node"/> must not be contained in the implementation graph.
-        /// Postcondition: <paramref name="node"/> is contained in the implementation graph; all observers are
-        /// informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be added to the implementation graph</param>
-        public void AddToImplementation(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes the given <paramref name="node"/> from the implementation graph (and all its incoming and
-        /// outgoing edges).
-        /// Precondition: <paramref name="node"/> must be contained in the implementation graph.
-        /// Postcondition: <paramref name="node"/> is no longer contained in the implementation graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be removed from the implementation graph</param>
-        public void DeleteFromImplementation(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        #endregion
 
         #region Edge
 
@@ -917,7 +842,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
             foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
             {
-                summary[(int)GetState(edge)] += GetCounter(edge);
+                summary[(int)GetState(edge)] += GetArchCounter(edge);
             }
             return summary;
         }
@@ -1100,7 +1025,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private void ChangeSpecifiedDependency(Edge edge, int value)
         {
             Assert.IsTrue(edge.IsInArchitecture() && IsSpecified(edge));
-            int oldValue = GetCounter(edge);
+            int oldValue = GetArchCounter(edge);
             int newValue = oldValue + value;
             State state = GetState(edge);
 
@@ -1226,7 +1151,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Returns propagated dependency in architecture graph matching the type of
-        /// of the implementation dependency Edge exactly if one exists;
+        /// the implementation dependency Edge exactly if one exists;
         /// returns null if none can be found.
         /// Precondition: <paramref name="source"/> and <paramref name="target"/>
         /// are two architecture entities in architecture
@@ -1252,6 +1177,30 @@ namespace SEE.Tools.ReflexionAnalysis
             // All others (more precisely, at most one) are dependencies that were propagated from the
             // implementation graph to the architecture graph.
             return source.FromTo(target, itsType).SingleOrDefault(edge => !IsSpecified(edge));
+        }
+
+        /// <summary>
+        /// Returns propagated dependency in architecture graph matching the type of
+        /// the <paramref name="implementationEdge"/> exactly if one exists;
+        /// returns null if none can be found.
+        /// Precondition: <paramref name="implementationEdge"/> is an implementation dependency.
+        /// Postcondition: resulting edge is in architecture or null.
+        /// </summary>
+        /// <param name="implementationEdge">edge in implementation graph whose propagated edge shall be returned
+        /// (if it exists)</param>
+        /// <returns>the edge in the architecture graph propagated from <paramref name="implementationEdge"/>
+        /// with given type; null if there is no such edge</returns>
+        private Edge GetPropagatedDependency(Edge implementationEdge)
+        {
+            Assert.IsTrue(implementationEdge.IsInImplementation());
+            Node archSource = MapsTo(implementationEdge.Source);
+            Node archTarget = MapsTo(implementationEdge.Target);
+            if (archSource == null || archTarget == null)
+            {
+                return null;
+            }
+
+            return GetPropagatedDependency(archSource, archTarget, implementationEdge.Type);
         }
 
         /// <summary>
@@ -1491,7 +1440,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns true if a matching architecture dependency is found, also
         /// sets <paramref name="allowingEdgeOut"/> to that edge in that case.
-        /// If no such matching/ edge is found, false is returned and <paramref name="allowingEdgeOut"/> is null.
+        /// If no such matching edge is found, false is returned and <paramref name="allowingEdgeOut"/> is null.
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph.
         /// Postcondition: <paramref name="allowingEdgeOut"/> is a specified dependency in architecture graph or null.
         /// </summary>
@@ -1654,7 +1603,7 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (Edge edge in graph.Edges())
             {
                 // edge counter state
-                Debug.Log($"{AsClause(edge)} {GetCounter(edge)} {GetState(edge)}\n");
+                Debug.Log($"{AsClause(edge)} {GetArchCounter(edge)} {GetState(edge)}\n");
             }
         }
 

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Tools.ReflexionAnalysis;
+using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
@@ -23,11 +25,21 @@ namespace SEE.Tools.Architecture
         private Dictionary<int, Node> i;
 
         /// <summary>
+        /// The implementation edges in the implementation graph: (x, y) for an edge from ix to iy.
+        /// </summary>
+        private Dictionary<(int, int), Edge> ie;
+
+        /// <summary>
         /// The architecture nodes in the architecture graph: a[j] where 1 <= j <= 8.
         ///
         /// Note: a[0] does not exist.
         /// </summary>
         private Dictionary<int, Node> a;
+
+        /// <summary>
+        /// The architecture edges in the architecture graph: (x, y) for an edge from ax to ay.
+        /// </summary>
+        private Dictionary<(int, int), Edge> ae;
 
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,
@@ -87,10 +99,10 @@ namespace SEE.Tools.Architecture
         ///   a7
         ///   a8
         /// Dependency edges (n1 depends on n2: n1 -> n2):
-        ///   s1: a3 -> a7
-        ///   s2: a1 -> a3
-        ///   s3: a8 -> a8
-        ///   s4: a2 -> a4
+        ///   a3 -> a7
+        ///   a1 -> a3
+        ///   a8 -> a8
+        ///   a2 -> a4
         /// </summary>
         /// <returns></returns>
         private void AddArchitecture()
@@ -100,19 +112,63 @@ namespace SEE.Tools.Architecture
             {
                 a[j] = NewNode(true, "a" + j, "Component");
             }
+
             a[7].AddChild(a[6]);
             a[7].AddChild(a[5]);
 
             a[8].AddChild(a[1]);
             a[8].AddChild(a[2]);
 
-            Dictionary<int, Edge> s = new Dictionary<int, Edge>();
-            s[1] = AddToGraph(call, a[3], a[7]);
-            s[2] = AddToGraph(call, a[1], a[3]);
-            s[3] = AddToGraph(call, a[8], a[8]);
-            s[4] = AddToGraph(call, a[2], a[4]);
+            (int, int)[] edgesFromTo =
+            {
+                (3, 7), (1, 3), (8, 8), (2, 4)
+            };
+            ae = CreateEdgesDictionary(edgesFromTo, a);
         }
 
+        /// <summary>
+        /// Returns a new dictionary mapping from (source id, target id) to a newly created edge which maps from
+        /// <paramref name="nodes"/>[source id] to <paramref name="nodes"/>[target id].
+        /// </summary>
+        private Dictionary<(int, int), Edge> CreateEdgesDictionary(IEnumerable<(int, int)> edges,
+                                                                   IDictionary<int, Node> nodes)
+        {
+            return edges.ToDictionary(x => x, x => AddToGraph(call, nodes[x.Item1], nodes[x.Item2]));
+        }
+
+        /// <summary>
+        /// Creates an implementation as follows:
+        ///
+        /// Node hierarchy (child => parent):
+        ///   i1
+        ///   i2  => i1
+        ///   i3  => i2
+        ///   i4  => i3
+        ///   i5  => i3
+        ///   i6  => i3
+        ///   i7  => i2
+        ///   i8  => i7
+        ///   i9  => i7
+        ///   i10 => i7
+        ///   i11 => i1
+        ///   i12 => i11
+        ///   i13 => i11
+        ///   i14
+        ///   i15
+        ///   i16
+        ///   i17
+        ///
+        /// Dependency edges (n1 depends on n2: n1 -> n2):
+        ///   1: i3 -> i15
+        ///   2: i4 -> i16
+        ///   3: i5 -> i17
+        ///   4: i8 -> i6
+        ///   5: i9 -> i8
+        ///   6: i9 -> i10
+        ///   7: i12 -> i10
+        ///   8: i12 -> i9
+        ///   9: i14 -> i13
+        /// </summary>
         private void AddImplementation()
         {
             i = new Dictionary<int, Node>();
@@ -120,6 +176,7 @@ namespace SEE.Tools.Architecture
             {
                 i[j] = NewNode(false, "i" + j);
             }
+
             i[1].AddChild(i[2]);
             i[1].AddChild(i[11]);
 
@@ -137,18 +194,11 @@ namespace SEE.Tools.Architecture
             i[11].AddChild(i[12]);
             i[11].AddChild(i[13]);
 
-            Dictionary<int, Edge> _ = new Dictionary<int, Edge>
+            (int, int)[] edgesFromTo =
             {
-                [1] = AddToGraph(call, i[3], i[15]),
-                [2] = AddToGraph(call, i[4], i[16]),
-                [3] = AddToGraph(call, i[5], i[17]),
-                [4] = AddToGraph(call, i[8], i[6]),
-                [5] = AddToGraph(call, i[9], i[8]),
-                [6] = AddToGraph(call, i[9], i[10]),
-                [7] = AddToGraph(call, i[12], i[10]),
-                [8] = AddToGraph(call, i[12], i[9]),
-                [9] = AddToGraph(call, i[14], i[13])
+                (3, 15), (4, 16), (5, 17), (8, 6), (9, 8), (9, 10), (12, 10), (12, 9), (14, 13)
             };
+            ie = CreateEdgesDictionary(edgesFromTo, i);
         }
 
         //--------------------
@@ -289,6 +339,74 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(0, propagatedEdgesRemoved.Count);
         }
 
+        [Test]
+        public void TestSimpleAddImplEdge()
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            fullGraph = new Graph();
+            SetupReflexion();
+            ResetEvents();
+
+            // Example taken from Figure 4 of "Incremental Reflexion Analysis" (Koschke, 2011)
+            Node a_1 = NewNode(true, "a'1");
+            Node a_2 = NewNode(true, "a'2");
+            Node a1 = NewNode(true, "a1");
+            Node a2 = NewNode(true, "a2");
+            Node i_1 = NewNode(false, "i'1");
+            Node i_2 = NewNode(false, "i'2");
+            Node i1 = NewNode(false, "i1");
+            Node i2 = NewNode(false, "i2");
+            a_1.AddChild(a1);
+            a_2.AddChild(a2);
+
+            // We will now incrementally add the edges, starting with the architecture (creating an absence).
+            Edge ea12 = AddToGraph(call, a_1, a_2);
+            ResetEvents();
+            SetupReflexion();
+            Assert.That(IsAbsent(edgeChanges, a_1, a_2, call));
+            
+            ResetEvents();
+            reflexion.AddToMapping(i_1, a1);
+            reflexion.AddToMapping(i_2, a2);
+            reflexion.AddToMapping(i1, a1);
+            reflexion.AddToMapping(i2, a2);
+            Debug.Log("--- AFTER MAPPING ---");
+            DumpEvents();
+            
+            // Test addition
+            
+            ResetEvents();
+            Edge ei12 = reflexion.AddToImplementation(i1, i2, call);
+            Debug.Log("--- AFTER ADDITION OF ei12 ---");
+            DumpEvents();
+            Assert.That(IsConvergent(edgeChanges, a_1, a_2, call));
+            Assert.That(IsPropagated(a1, a2, call));
+            Assert.That(IsAllowed(edgeChanges, a1, a2, call));
+            
+            ResetEvents();
+            Edge ei_12 = reflexion.AddToImplementation(i_1, i_2, call);
+            Debug.Log("--- AFTER ADDITION OF ei_12 ---");
+            DumpEvents();
+            Assert.That(IsNotContained(a_1, a_2, call, edgeChanges));
+            Assert.That(IsNotContained(a1, a2, call, edgeChanges));
+            
+            // Test deletion
+            
+            ResetEvents();
+            reflexion.DeleteFromImplementation(ei_12);
+            Debug.Log("--- AFTER DELETION OF ei_12 ---");
+            DumpEvents();
+            Assert.That(IsNotContained(a_1, a_2, call, edgeChanges));
+            Assert.That(IsNotContained(a1, a2, call, edgeChanges));
+            
+            ResetEvents();
+            reflexion.DeleteFromImplementation(ei12);
+            Debug.Log("--- AFTER DELETION OF ei12 ---");
+            DumpEvents();
+            Assert.That(IsAbsent(edgeChanges, a_1, a_2, call));
+            Assert.That(IsUnpropagated(a1, a2, call));
+        }
+        
         [Test]
         public void TestIncrementalMapping()
         {
@@ -474,11 +592,15 @@ namespace SEE.Tools.Architecture
         }
 
         [Test]
-        public void TestIncrementalRefChange()
+        public void TestIncrementalImplRefChange()
         {
             //--------------------
             // initial state
             //--------------------
+            
+            // TODO: Why are the assertions below true?
+            
+            DumpEvents();
             Assert.That(IsAbsent(edgeChanges, a[3], a[7], call));
             Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
             Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
@@ -488,6 +610,15 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(0, propagatedEdgesRemoved.Count);
             Assert.AreEqual(0, implementationEdgesAdded.Count);
             Assert.AreEqual(0, implementationEdgesRemoved.Count);
+
+            ResetEvents();
+            reflexion.DeleteFromImplementation(ie[(14, 13)]);
+            DumpEvents();
+            Assert.AreEqual(0, mapsToEdgesAdded.Count);
+            Assert.AreEqual(0, propagatedEdgesAdded.Count);
+            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            Assert.AreEqual(0, implementationEdgesAdded.Count);
+            Assert.AreEqual(1, implementationEdgesRemoved.Count);
         }
     }
 }
