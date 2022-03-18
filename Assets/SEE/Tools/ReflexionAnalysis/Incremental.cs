@@ -13,35 +13,6 @@ namespace SEE.Tools.ReflexionAnalysis
     public partial class Reflexion
     {
         /// <summary>
-        /// Removes an edge from the implementation graph, adjusting the reflexion analysis incrementally.
-        /// This will reduce the counter attribute of a corresponding propagated edge, if it exists, and may
-        /// cause previously convergent edges to now become absent.
-        ///
-        /// Pre-condition: <paramref name="edge"/> is an implementation edge.
-        /// </summary>
-        /// <param name="edge">The implementation edge to be removed from the graph.</param>
-        public void DeleteImplementationEdge(Edge edge)
-        {
-            Assert.IsTrue(edge.IsInImplementation());
-            Edge propagated = GetPropagatedDependency(edge.Source, edge.Target, edge.Type);
-            if (propagated != null)
-            {
-                if (GetState(propagated) != State.Divergent)
-                {
-                    // A convergence exists that must be handled (i.e. by decreasing the matching specified edge's counter).
-                    if (!Lift(propagated.Source, propagated.Target, propagated.Type, -GetCounter(edge), out Edge _))
-                    {
-                        throw new InvalidOperationException($"Since this edge is {GetState(propagated)} and not "
-                                                            + "Divergent, it must have a matching specified edge.");
-                    }
-                }
-                ChangePropagatedDependency(propagated, -GetCounter(edge));
-            }
-            Notify(new ImplementationEdgeRemoved(edge));
-            FullGraph.RemoveEdge(edge);
-        }
-
-        /// <summary>
         /// Adds an edge from <paramref name="from"/> to <paramref name="to"/> of type <paramref name="type"/>
         /// to the implementation graph, returning the new edge and adjusting the reflexion analysis incrementally.
         /// This will propagate and lift the new edge, thereby increasing the counter of the matching specified edge
@@ -52,13 +23,45 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">Source of the new edge</param>
         /// <param name="to">Target of the new edge</param>
         /// <param name="type">Type of the new edge</param>
-        public void AddImplementationEdge(Node from, Node to, string type)  // TODO: Support counter in the future
+        /// <returns>The newly created edge</returns>
+        public Edge AddToImplementation(Node from, Node to, string type)  // TODO: Support counter in the future
         {
             Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
             Edge edge = new Edge(from, to, type);
+            edge.SetInImplementation();
             FullGraph.AddEdge(edge);
             Notify(new ImplementationEdgeAdded(edge));
             PropagateAndLiftDependency(edge);
+            return edge;
+        }
+        
+        /// <summary>
+        /// Removes an edge from the implementation graph, adjusting the reflexion analysis incrementally.
+        /// This will reduce the counter attribute of a corresponding propagated edge, if it exists, and may
+        /// cause previously convergent edges to now become absent.
+        ///
+        /// Pre-condition: <paramref name="edge"/> is an implementation edge.
+        /// </summary>
+        /// <param name="edge">The implementation edge to be removed from the graph.</param>
+        public void DeleteFromImplementation(Edge edge)
+        {
+            Assert.IsTrue(edge.IsInImplementation());
+            Edge propagated = GetPropagatedDependency(edge);
+            if (propagated != null)
+            {
+                if (GetState(propagated) != State.Divergent)
+                {
+                    // A convergence exists that must be handled (i.e. by decreasing the matching specified edge's counter).
+                    if (!Lift(propagated.Source, propagated.Target, propagated.Type, -GetImplCounter(edge), out Edge _))
+                    {
+                        throw new InvalidOperationException($"Since this edge is {GetState(propagated)} and not "
+                                                            + "Divergent, it must have a matching specified edge.");
+                    }
+                }
+                ChangePropagatedDependency(propagated, -GetImplCounter(edge));
+            }
+            Notify(new ImplementationEdgeRemoved(edge));
+            FullGraph.RemoveEdge(edge);
         }
 
         /// <summary>
@@ -136,6 +139,80 @@ namespace SEE.Tools.ReflexionAnalysis
 
             // Deletes the unique Maps_To edge.
             DeleteMapsTo(mapsToEdge);
+        }
+
+        /// <summary>
+        /// Adds given <paramref name="node"/> to architecture graph.
+        ///
+        /// Precondition: <paramref name="node"/> must not be contained in the architecture graph.
+        /// Postcondition: <paramref name="node"/> is contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the architecture graph</param>
+        public void AddToArchitecture(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes given <paramref name="node"/> from architecture graph.
+        /// Precondition: <paramref name="node"/> must be contained in the architecture graph.
+        /// Postcondition: <paramref name="node"/> is no longer contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be removed from the architecture graph</param>
+        public void DeleteFromArchitecture(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Adds given <paramref name="node"/> to implementation graph.
+        /// Precondition: <paramref name="node"/> must not be contained in the implementation graph.
+        /// Postcondition: <paramref name="node"/> is contained in the implementation graph; all observers are
+        /// informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the implementation graph</param>
+        public void AddToImplementation(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes the given <paramref name="node"/> from the implementation graph (and all its incoming and
+        /// outgoing edges).
+        /// Precondition: <paramref name="node"/> must be contained in the implementation graph.
+        /// Postcondition: <paramref name="node"/> is no longer contained in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be removed from the implementation graph</param>
+        public void DeleteFromImplementation(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Adds given node to the mapping graph.
+        /// Precondition: node must not be contained in the mapping graph.
+        /// Postcondition: node is contained in the mapping graph and the architecture
+        //   graph is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be added to the mapping graph</param>
+        public void AddToMapping(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Removes given node from mapping graph.
+        /// Precondition: node must be contained in the mapping graph.
+        /// Postcondition: node is no longer contained in the mapping graph and the architecture
+        ///   graph is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">node to be removed from the mapping</param>
+        public void DeleteFromMapping(Node node)
+        {
+            throw new NotImplementedException(); // FIXME
         }
     }
 }
