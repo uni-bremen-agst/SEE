@@ -51,6 +51,9 @@ namespace SEE.IDE
     /// </summary>
     public partial class IDEIntegration : MonoBehaviour
     {
+        [Tooltip("Whether the integration with the IDE should be enabled.")]
+        public bool EnableIDEIntegration = false;
+
         /// <summary>
         /// There is currently only an implementation for Visual Studio.
         /// </summary>
@@ -139,6 +142,17 @@ namespace SEE.IDE
         private HashSet<InteractableObject> pendingSelections;
 
         #region Initialization
+
+        /// <summary>
+        /// If <see cref="EnableIDEIntegration"/> is false, we will disable this component.
+        /// </summary>
+        public void Awake()
+        {
+            if (!EnableIDEIntegration)
+            {
+                enabled = false;
+            }
+        }
 
         /// <summary>
         /// Initializes all necessary objects for the inter-process communication
