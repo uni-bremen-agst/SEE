@@ -50,6 +50,19 @@ namespace SEE.Game.Avatars
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 StartCoroutine(SetUpSALSA());
             }
+            EnableLocalControl(IsLocalPlayer);
+        }
+
+        /// <summary>
+        /// Enables/disables local control of the aiming system of the avatar.
+        /// </summary>
+        /// <param name="isLocalPlayer">if true, the aiming system will be enabled, otherwise disabled</param>
+        private void EnableLocalControl(bool isLocalPlayer)
+        {
+            if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
+            {
+                aimingSystem.IsLocallyControlled = isLocalPlayer;
+            }
         }
 
         /// <summary>
