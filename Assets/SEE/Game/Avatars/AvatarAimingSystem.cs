@@ -2,7 +2,6 @@
 using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Utils;
-using System;
 using SEE.Controls;
 
 namespace SEE.Game.Avatars
@@ -42,6 +41,41 @@ namespace SEE.Game.Avatars
         public bool IsLocallyControlled = true;
 
         /// <summary>
+        /// Maximal length of laser beam.
+        /// </summary>
+        [Tooltip("Maximal length of laser beam.")]
+        public float LaserLength = 2.0f;
+
+        /// <summary>
+        /// The width of the laser beam.
+        /// </summary>
+        [Tooltip("Width of laser beam.")]
+        public float LaserWidth = 0.005f;
+
+        /// <summary>
+        /// Color of the laser beam when it hits anything.
+        /// </summary>
+        [Tooltip("Color of the laser beam when it hits anything.")]
+        public Color HitColor = Color.green;
+
+        /// <summary>
+        /// Color of the laser beam when it does not hit anything.
+        /// </summary>
+        [Tooltip("Color of the laser beam when it does not hit anything.")]
+        public Color MissColor = Color.red;
+
+        /// <summary>
+        /// The material of the laser beam. Will be used to change its
+        /// color depending upon whether it hits anything or not.
+        /// </summary>
+        private Material laserMaterial;
+
+        /// <summary>
+        /// The line renderer that draws the laser beam as a line.
+        /// </summary>
+        private LineRenderer laserLine;
+
+        /// <summary>
         /// AimPoser is a tool that returns an animation name based on direction.
         /// It will be searched in the scene by the name <see cref="AimPoserName"/>.
         /// There is only one <see cref="AimPoser"/> in the scene. That is why this
@@ -77,26 +111,9 @@ namespace SEE.Game.Avatars
         {
             IsPointing = !IsPointing;
             // Laser beam should be active only while we are pointing.
-            laser.SetActive(IsPointing);
+            laserLine.enabled = IsPointing;
+            aimIK.solver.target.gameObject.SetActive(IsPointing);
         }
-
-        /// <summary>
-        /// The laser beam for aiming. The laser starts at the aim transform and ends at the
-        /// aim target.
-        /// This reference will be used to turn the laser on and off depending upon <see cref="IsPointing"/>.
-        /// It is a child of the aim transform object <see cref="aimIK.solver.transform"/>, which was
-        /// set in the inspector for the avatar (component <see cref="AimIK"/>). Its name is defined
-        /// by <see cref="LaserName"/>.
-        /// </summary>
-        private GameObject laser;
-
-        /// <summary>
-        /// The name of the object representing the laser beam which starts at the object
-        /// <see cref="aimIK.solver.transform"/> and aims towards the object <see cref="aimIK.solver.target"/>
-        /// while the avatar is pointing.
-        /// Note: The laser is assumed to be a descendant of <see cref="aimIK.solver.transform"/>.
-        /// </summary>
-        private const string LaserName = "Laser";
 
         /// <summary>
         /// Retrieves the <see cref="AimPoser"/> from the scene when not already set.
@@ -122,27 +139,18 @@ namespace SEE.Game.Avatars
             /// we can control their update cycle ourselves.
             Aim.enabled = false;
             LookAt.enabled = false;
-            gameObject.TryGetComponentOrLog(out aimIK);
-            laser = GetLaser(aimIK.solver.transform);
-            MoveTarget();
-        }
-
-        /// <summary>
-        /// Returns the descendant of <paramref name="aimTransform"/> named <see cref="LaserName"/>.
-        /// </summary>
-        /// <param name="aimTransform">the game object in which to look up the laser</param>
-        /// <returns>the laser</returns>
-        /// <exception cref="Exception">thrown if there is no such laser, in which case this
-        /// component is also disabled</exception>
-        private GameObject GetLaser(Transform aimTransform)
-        {
-            Transform laser = aimTransform.transform.Find(LaserName);
-            if (laser == null)
+            if(gameObject.TryGetComponent(out aimIK))
             {
-                enabled = false;
-                throw new Exception($"The aim transform {aimTransform.gameObject.FullName()} of avatar {name} has no child named {LaserName}.");
+                laserMaterial = Materials.New(Materials.ShaderType.Opaque, MissColor);
+                laserLine = LineFactory.Draw(aimIK.solver.transform.gameObject, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
             }
-            return laser.gameObject;
+            else
+            {
+                Debug.LogError($"There is no {typeof(AimIK)} component attached to the game object {gameObject.FullName()}.\n");
+                enabled = false;
+                return;
+            }
+            MoveTarget();
         }
 
         /// <summary>
@@ -161,19 +169,29 @@ namespace SEE.Game.Avatars
             }
         }
 
-        public float LookAhead = 1.25f;
-
         /// <summary>
         /// Moves <see cref="aimIK.solver.target"/> to the end point of the laser beam,
         /// i.e., the point where the user is currently pointing to.
         /// </summary>
         private void MoveTarget()
         {
-            // TODO: We need a solution for VR and other environments, too.
-            Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-            aimIK.solver.target.position = ray.origin + ray.direction * LookAhead; // 2 * laser.transform.lossyScale.y;
-            Debug.DrawRay(ray.origin, ray.direction);
-            Debug.DrawLine(aimIK.solver.transform.position, aimIK.solver.target.position, Color.green);
+            if (IsPointing)
+            {
+                Color color;
+                if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
+                {
+                    aimIK.solver.target.position = raycastHit.point;
+                    color = HitColor;
+                }
+                else
+                {
+                    Ray ray = Raycasting.UserPointsTo();
+                    aimIK.solver.target.position = ray.origin + ray.direction * LaserLength;
+                    color = MissColor;
+                }
+                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
+                laserMaterial.color = color;
+            }
         }
 
         /// <summary>
