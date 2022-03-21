@@ -85,6 +85,28 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Resets the rotation of the last rotated CityRootNode
+        /// </summary>
+        public static void ResetRotate()
+        {
+            if (CityRootNodeMemory.CityRootNode)
+            {
+                gizmo.gameObject.SetActive(false);
+
+                CityRootNodeMemory.CityRootNode.RotateAround(CityRootNodeMemory.CityRootNode.position, Vector3.up, -CityRootNodeMemory.CityRootNode.rotation.eulerAngles.y);
+                SynchronizeCityRootNode();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="RotateNodeNetAction"/> to synchronize the CityRootNode with the network
+        /// </summary>
+        private static void SynchronizeCityRootNode()
+        {
+            new Net.RotateNodeNetAction(CityRootNodeMemory.CityRootNode.name, CityRootNodeMemory.CityRootNode.position, CityRootNodeMemory.CityRootNode.eulerAngles.y).Execute();
+        }
+
+        /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -92,7 +114,11 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
 #if UNITY_ANDROID
-            Transform cityRootNode = null;
+
+            Transform cityRootNodeMobile = null;
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+            Vector3 planeHitPoint;
 
             if (Input.touchCount != 1)
             {
@@ -100,11 +126,6 @@ namespace SEE.Controls.Actions
                 return false;
             }
 
-            Touch touch = Input.touches[0];
-            Vector3 touchPosition = touch.position;
-
-            bool synchronize = false;
-            Vector3 planeHitPoint;
             if (touch.phase == TouchPhase.Began) // start or continue rotation
             {
                 Ray ray = Camera.main.ScreenPointToRay(touchPosition);
@@ -113,16 +134,17 @@ namespace SEE.Controls.Actions
                 {
                     if (raycastHit.collider.tag == "Node")
                     {
-                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
+                        cityRootNodeMobile = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
+                        CityRootNodeMemory.CityRootNode = cityRootNodeMobile;
                     }
                 }
-                if (cityRootNode)
+                if (cityRootNodeMobile)
                 {
-                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
+                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNodeMobile.position);
                     if (Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
                         rotating = true;
-                        hit.CityRootNode = cityRootNode;
+                        hit.CityRootNode = cityRootNodeMobile;
                         hit.Plane = plane;
 
                         gizmo.gameObject.SetActive(true);
@@ -131,15 +153,15 @@ namespace SEE.Controls.Actions
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
 
-                        originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
-                        originalPosition = cityRootNode.position;
-                        startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
+                        originalEulerAngleY = cityRootNodeMobile.rotation.eulerAngles.y;
+                        originalPosition = cityRootNodeMobile.position;
+                        startAngle = AngleMod(cityRootNodeMobile.rotation.eulerAngles.y - toHitAngle);
                         gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
                         gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
                     }
                 }
             }
-            if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint) && touch.phase == TouchPhase.Moved) // continue rotation
+            else if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint) && touch.phase == TouchPhase.Moved) // continue rotation
             {
                 Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                 float toHitAngle = toHit.Angle360();
@@ -168,7 +190,7 @@ namespace SEE.Controls.Actions
                 }
                 gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
 
-                synchronize = true;
+                SynchronizeCityRootNode();
             }
             else if (rotating && touch.phase == TouchPhase.Ended) // finalize rotation
             {
@@ -176,11 +198,6 @@ namespace SEE.Controls.Actions
                 gizmo.gameObject.SetActive(false);
 
                 currentState = ReversibleAction.Progress.Completed;
-            }
-
-            if (synchronize)
-            {
-                new Net.RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
@@ -343,5 +360,13 @@ namespace SEE.Controls.Actions
         {
             return ((degrees % FullCircleDegree) + FullCircleDegree) % FullCircleDegree;
         }
+    }
+
+    /// <summary>
+    /// Saves the CityRootNode for mobile applications because a CityRootNode cant be detected by mouse hovering.
+    /// </summary>
+    internal static class CityRootNodeMemory
+    {
+        public static Transform CityRootNode;
     }
 }

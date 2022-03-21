@@ -159,9 +159,11 @@ namespace SEE.Game.UI.Menu
                 buttons[0][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => Deselect());
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
-                    => TriggerRedo()); 
+                    => TriggerRedo());
                 quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
-                     => TriggerUndo());
+                     => TriggerUndo()); 
+                quickButtons[3].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                      => RotateAction.ResetRotate());
                 quickButtons[5].SetActive(true);
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() 
                     => ExpandButton(arrowLeftSprite, arrowRightSprite));
