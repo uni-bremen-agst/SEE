@@ -114,17 +114,18 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
 #if UNITY_ANDROID
-
-            Transform cityRootNodeMobile = null;
-            Touch touch = Input.touches[0];
-            Vector3 touchPosition = touch.position;
-            Vector3 planeHitPoint;
-
+             // Check for touch input
             if (Input.touchCount != 1)
             {
                 rotating = false;
                 return false;
             }
+
+            Transform cityRootNodeMobile = null;
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+            Vector3 planeHitPoint;
+            CityCursor cityCursor = null;
 
             if (touch.phase == TouchPhase.Began) // start or continue rotation
             {
@@ -136,6 +137,7 @@ namespace SEE.Controls.Actions
                     {
                         cityRootNodeMobile = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
                         CityRootNodeMemory.CityRootNode = cityRootNodeMobile;
+                        cityCursor = cityRootNodeMobile.GetComponentInParent<CityCursor>();
                     }
                 }
                 if (cityRootNodeMobile)
@@ -145,10 +147,11 @@ namespace SEE.Controls.Actions
                     {
                         rotating = true;
                         hit.CityRootNode = cityRootNodeMobile;
+                        hit.Cursor = cityCursor;
                         hit.Plane = plane;
 
                         gizmo.gameObject.SetActive(true);
-                        gizmo.Center = hit.CityRootNode.position;
+                        gizmo.Center = cityCursor.E.HasFocus() ? hit.Cursor.E.ComputeCenter() : hit.CityRootNode.position;
 
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
