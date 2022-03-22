@@ -181,6 +181,7 @@ namespace SEE.Game.City
         /// Label in the configuration file for the label settings for leaf and inner nodes.
         /// </summary>
         private const string LabelSettingsLabel = "LabelSettings";
+        /// <summary>
         /// Label in the configuration file for the antenna settings for leaf and inner nodes.
         /// </summary>
         private const string AntennaSettingsLabel = "AntennnaSettings";
