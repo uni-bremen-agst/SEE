@@ -1824,6 +1824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1fecd2eb5326484b87b82e085f61a0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnableIDEIntegration: 0
   Type: 0
   MaxNumberOfIdes: 1
   Port: 26100
