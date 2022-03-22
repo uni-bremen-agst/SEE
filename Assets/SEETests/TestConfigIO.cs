@@ -803,6 +803,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
             Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
+            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
         }
@@ -832,6 +833,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
+            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
         }
