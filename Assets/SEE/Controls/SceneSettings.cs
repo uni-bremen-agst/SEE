@@ -224,7 +224,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Find or creates the kind of player required for the given <paramref name="inputType"/>.
+        /// Finds or creates the kind of player required for the given <paramref name="inputType"/>.
         /// For some players, additional game objects and/or components will be added to the
         /// scene required for the particular player to work correctly.
         /// </summary>
