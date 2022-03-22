@@ -3,6 +3,8 @@ using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Utils;
 using SEE.Controls;
+using SEE.Net.Actions;
+using Unity.Netcode;
 
 namespace SEE.Game.Avatars
 {
@@ -105,6 +107,12 @@ namespace SEE.Game.Avatars
         private AimIK aimIK;
 
         /// <summary>
+        /// The <see cref="NetworkObject"/> attached to the game object this <see cref="AvatarAimingSystem"/>
+        /// is attached to. It will be used to retrieve the <see cref="NetworkObject.NetworkObjectId"/>.
+        /// </summary>
+        private NetworkObject networkObject;
+
+        /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
         public void TogglePointing()
@@ -113,6 +121,10 @@ namespace SEE.Game.Avatars
             // Laser beam should be active only while we are pointing.
             laserLine.enabled = IsPointing;
             aimIK.solver.target.gameObject.SetActive(IsPointing);
+            if (IsLocallyControlled)
+            {
+                new TogglePointingAction(networkObject.NetworkObjectId).Execute();
+            }
         }
 
         /// <summary>
@@ -139,7 +151,7 @@ namespace SEE.Game.Avatars
             /// we can control their update cycle ourselves.
             Aim.enabled = false;
             LookAt.enabled = false;
-            if(gameObject.TryGetComponent(out aimIK))
+            if (gameObject.TryGetComponent(out aimIK))
             {
                 laserMaterial = Materials.New(Materials.ShaderType.Opaque, MissColor);
                 laserLine = LineFactory.Draw(aimIK.solver.transform.gameObject, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
@@ -150,6 +162,7 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
+            gameObject.TryGetComponentOrLog(out networkObject);
             MoveTarget();
         }
 
@@ -166,6 +179,11 @@ namespace SEE.Game.Avatars
                     TogglePointing();
                 }
                 MoveTarget();
+            }
+            else if (IsPointing)
+            {
+                // This code will be run for a non-local player currently pointing.
+                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
             }
         }
 
