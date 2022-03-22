@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions
                 Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                 float toHitAngle = toHit.Angle360();
                 float angle = AngleMod(startAngle + toHitAngle);
-                if (SEEInput.Snap())
+                if (SEEInput.SnapMobile)
                 {
                     angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                 }
@@ -187,7 +187,7 @@ namespace SEE.Controls.Actions
                 {
                     currAngle -= FullCircleDegree;
                 }
-                if (SEEInput.Snap())
+                if (SEEInput.SnapMobile)
                 {
                     currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
                 }

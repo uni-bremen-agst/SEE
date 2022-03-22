@@ -255,6 +255,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// While moving the city, snaps to one of eight predefined directions.
+        /// While rotating the city, rotates in 45 degree steps.
+        /// Gets set true by a virtual button in the mobile menu.
+        /// </summary>
+        public static bool SnapMobile = false;
+
+        /// <summary>
         /// The user wants to drag the hovered element of the city on its plane.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>

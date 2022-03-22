@@ -6,6 +6,7 @@ using UnityEngine.Assertions;
 using SEE.Controls.Actions;
 using System.Linq;
 using SEE.Controls;
+using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
 {
@@ -158,6 +159,13 @@ namespace SEE.Game.UI.Menu
                 }
                 buttons[0][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => Deselect());
+                buttons[3][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => ToggleSnapMode());
+                if (SEEInput.SnapMobile)
+                {
+                    Button snapButton = buttons[3][1].GetComponent<Button>();
+                    MarkButtonActive(snapButton);
+                }
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => TriggerRedo());
                 quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
@@ -400,6 +408,28 @@ namespace SEE.Game.UI.Menu
         private void Deselect()
         {
             InteractableObject.UnselectAll(true);
+        }
+
+        private void ToggleSnapMode()
+        {
+            SEEInput.SnapMobile = !SEEInput.SnapMobile;
+            
+            if (SEEInput.SnapMobile)
+            {
+                Button snapButton = buttons[3][1].GetComponent<Button>();
+                MarkButtonActive(snapButton);
+            }
+            else
+            {
+                buttons[3][1].GetComponent<Button>().colors = ColorBlock.defaultColorBlock;
+            }
+        }
+
+        private void MarkButtonActive(Button button)
+        {
+            ColorBlock colorBlock = button.colors;
+            colorBlock.normalColor = Color.green;
+            button.colors = colorBlock;
         }
 
     }
