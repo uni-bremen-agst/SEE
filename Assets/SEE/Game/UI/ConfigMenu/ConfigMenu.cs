@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
@@ -50,6 +49,9 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class ConfigMenu : DynamicUIBehaviour
     {
+        /// <summary>
+        /// <see cref="EditableInstances"/>.
+        /// </summary>
         private static List<EditableInstance> editableInstances;
         /// <summary>
         /// The list of SEECity instances this menu can manipulate.
@@ -106,21 +108,19 @@ namespace SEE.Game.UI.ConfigMenu
             return EditableInstances.FirstOrDefault();
         }
 
-        private void Start()
+        /// <summary>
+        /// Sets up <see cref="tabOutlet"/>, <see cref="tabButtons"/>, <see cref="actions"/>,
+        /// <see cref="canvas"/>, and <see cref="colorPickerControl"/>. Subscribes
+        /// <see cref="colorPickerControl.Reset()"/> to the <see cref="TabGroup"/> of
+        /// <see cref="tabButtons"/>.
+        /// </summary>
+        private void Awake()
         {
-            CurrentlyEditing = DefaultEditableInstance();
-            if (CurrentlyEditing == null)
-            {
-                Debug.LogWarning("There is no SEECity that can be configured in the scene.\n");
-                gameObject.SetActive(false);
-                return;
-            }
-            SetupCity(CurrentlyEditing);
             MustGetChild("Canvas/TabNavigation/TabOutlet", out tabOutlet);
             MustGetChild("Canvas/TabNavigation/Sidebar/TabButtons", out tabButtons);
             MustGetChild("Canvas/Actions", out actions);
             MustGetComponentInChild("Canvas", out canvas);
-            // initially the canvas should be inactive; it can be activated by the user on demand
+            // Initially the canvas should be inactive; it can be activated by the user on demand.
             Off();
             MustGetComponentInChild("Canvas/Picker 2.0", out colorPickerControl);
             colorPickerControl.gameObject.SetActive(false);
@@ -128,6 +128,26 @@ namespace SEE.Game.UI.ConfigMenu
             // Reset (hide) the color picker on page changes.
             tabButtons.MustGetComponent(out TabGroup tabGroupController);
             tabGroupController.SubscribeToUpdates(colorPickerControl.Reset);
+        }
+
+        /// <summary>
+        /// If <see cref="CurrentlyEditing"/> is not set, a default will be used.
+        /// If no default exists, this components sets <see cref="GameObject"/>
+        /// inactive. Otherwise all the GUI elements of this dialog will be set up.
+        /// </summary>
+        private void Start()
+        {
+            if (CurrentlyEditing == null)
+            {
+                CurrentlyEditing = DefaultEditableInstance();
+            }
+            if (CurrentlyEditing == null)
+            {
+                Debug.LogWarning("There is no SEECity that can be configured in the scene.\n");
+                gameObject.SetActive(false);
+                return;
+            }
+            SetupCity(CurrentlyEditing);
 
             MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CityLoadButton", out cityLoadButton);
             cityLoadButton.clickEvent.AddListener(() =>
@@ -160,19 +180,15 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupInstanceSwitch()
         {
-            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CitySwitch",
-                                    out editingInstanceSelector);
+            MustGetComponentInChild("Canvas/TabNavigation/Sidebar/CitySwitch", out editingInstanceSelector);
             editingInstanceSelector.itemList.Clear();
-            EditableInstances.ForEach(instance =>
-                                          editingInstanceSelector.CreateNewItem(
-                                              instance.DisplayValue));
+            EditableInstances.ForEach(instance => editingInstanceSelector.CreateNewItem(instance.DisplayValue));
             editingInstanceSelector.defaultIndex = EditableInstances.IndexOf(CurrentlyEditing);
             editingInstanceSelector.SetupSelector();
             editingInstanceSelector.selectorEvent.AddListener(index =>
             {
                 string displayValue = editingInstanceSelector.itemList[index].itemTitle;
-                EditableInstance newInstance =
-                    EditableInstances.Find(instance => instance.DisplayValue == displayValue);
+                EditableInstance newInstance = EditableInstances.Find(instance => instance.DisplayValue == displayValue);
                 OnInstanceChangeRequest.Invoke(newInstance);
             });
         }

@@ -166,7 +166,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType });
+            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
             graphReader.Load();
             return graphReader.GetGraph();
         }
@@ -201,7 +201,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph Create()
         {
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             // Note: GXL does currently not support attributes of graphs
             //graph.SetString("Date", "2020-04-02");
             //graph.SetToggle("IsGenerated");

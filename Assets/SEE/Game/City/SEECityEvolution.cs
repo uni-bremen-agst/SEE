@@ -105,6 +105,16 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
+        /// In this case, we will update all loaded graphs that we have passed to the
+        /// <see cref="evolutionRenderer"/>.
+        /// </summary>
+        protected override void ProjectPathChanged()
+        {
+            evolutionRenderer?.ProjectPathChanged(ProjectPath.Path);
+        }
+
+        /// <summary>
         /// Loads the graph data from the GXL files and the metrics from the CSV files contained
         /// in the directory with path PathPrefix and the metrics.
         /// </summary>
@@ -112,7 +122,7 @@ namespace SEE.Game.City
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: ProjectPath.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return graphsReader.graphs;
         }
 
@@ -131,7 +141,7 @@ namespace SEE.Game.City
         public Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
-            reader.Load(GXLDirectory.Path, HierarchicalEdges, rootName: GXLDirectory.Path, 1);
+            reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: ProjectPath.Path, rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {

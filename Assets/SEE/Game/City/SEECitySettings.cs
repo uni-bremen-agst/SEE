@@ -310,11 +310,11 @@ namespace SEE.Game.City
     public class AntennaSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
-        /// Which metric should determine the length of the section.
+        /// The metric which should determine the length of the section.
         /// </summary>
         public string Metric;
         /// <summary>
-        /// In which color the section should be drawn.
+        /// The color in which the section should be drawn.
         /// </summary>
         public Color Color;
 
@@ -378,9 +378,8 @@ namespace SEE.Game.City
                 return false;
             }
 
-            bool result = ConfigIO.Restore(values, MetricLabel, ref Metric);
-            result = ConfigIO.Restore(values, ColorLabel, ref Color) || result;
-            return result;
+            bool metricRestored = ConfigIO.Restore(values, MetricLabel, ref Metric);
+            return ConfigIO.Restore(values, ColorLabel, ref Color) || metricRestored;
         }
     }
 
@@ -441,10 +440,9 @@ namespace SEE.Game.City
                     }
                     foreach (object anObject in objects)
                     {
-                        Dictionary<string, object> antennaSection = anObject as Dictionary<string, object>;
-                        if (antennaSection == null)
+                        if (!(anObject is Dictionary<string, object> antennaSection))
                         {
-                            throw new InvalidCastException($"Value to be cast {antennaSection} is expected to be a dictionary. Actual type is {antennaSection.GetType().Name}");
+                            throw new InvalidCastException($"Value to be cast {anObject} is expected to be a dictionary. Actual type is {anObject.GetType().Name}");
                         }
                         AntennaSection section = new AntennaSection();
                         result = section.Restore(antennaSection) || result;
@@ -458,7 +456,7 @@ namespace SEE.Game.City
                 return false;
             }
 
-            // If AntennaSections has already an antenna section for the metric in newSection,
+            // If AntennaSections already has an antenna section for the metric in newSection,
             // it will be removed. Then the newSection is added to it.
             void AddAntennaSection(AntennaSection newSection)
             {

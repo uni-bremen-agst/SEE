@@ -23,15 +23,16 @@ namespace SEE.DataModel.DG.IO
         /// Precondition: <paramref name="rootID"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
-        /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="basePath">the base path of the graph</param>
         /// <param name="rootID">unique ID of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootID = "", SEE.Utils.ILogger logger = null)
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
             : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
             this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
+            this.basePath = basePath;
         }
 
         /// <summary>
@@ -41,13 +42,19 @@ namespace SEE.DataModel.DG.IO
         private readonly string rootName;
 
         /// <summary>
+        /// The base path of the graph to be loaded.
+        /// </summary>
+        private readonly string basePath;
+
+        /// <summary>
         /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
         public override void Load()
         {
             base.Load();
-            if (rootName.Length > 0)
+            graph.BasePath = basePath;
+            if (!string.IsNullOrWhiteSpace(rootName))
             {
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
@@ -129,7 +136,8 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartGraph()
         {
-            graph = new Graph();
+            // We don't know the base path yet, hence, we use the empty string.
+            graph = new Graph("");
             graph.Path = filename;
             if (reader.HasAttributes)
             {

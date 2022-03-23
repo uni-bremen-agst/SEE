@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 using SEE.DataModel;
+using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,7 +44,7 @@ namespace SEE.Game.UI.ConfigMenu
         public string DisplayValue { get; }
 
         /// <summary>
-        /// The name of the GameObject the SEECity is attached to.
+        /// The full name of the GameObject the SEECity is attached to.
         /// </summary>
         public string GameObjectName { get; }
 
@@ -54,16 +55,16 @@ namespace SEE.Game.UI.ConfigMenu
         /// and <see cref="EditableInstance.GameObjectName"/> of these are the name
         /// of the found game object.
         /// </summary>
-        /// <returns>all current <see cref="City.SEECity"/> names in the scene</returns>
+        /// <returns>all current instances of <see cref="City.SEECity"/> in the scene</returns>
         public static List<EditableInstance> AllEditableCodeCities()
         {
             List<EditableInstance> result = new List<EditableInstance>();
 
             foreach (GameObject city in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
             {
-                if (city.TryGetComponent(out City.SEECity seeCity))
+                if (city.TryGetComponent(out City.SEECity _))
                 {
-                    result.Add(new EditableInstance(city.name, city.name));
+                    result.Add(new EditableInstance(city.name, city.FullName()));
                 }
             }
             return result;
@@ -93,9 +94,20 @@ namespace SEE.Game.UI.ConfigMenu
 
             return Equals((EditableInstance)obj);
         }
+
         public override int GetHashCode()
         {
             return (GameObjectName != null ? GameObjectName.GetHashCode() : 0);
+        }
+
+        /// <summary>
+        /// Yields this instance as a string providing the <see cref="DisplayValue"/>
+        /// and <see cref="GameObjectName"/>.
+        /// </summary>
+        /// <returns>instance as a string</returns>
+        public override string ToString()
+        {
+            return "[" + DisplayValue + ", " + GameObjectName + "]";
         }
     }
 }
