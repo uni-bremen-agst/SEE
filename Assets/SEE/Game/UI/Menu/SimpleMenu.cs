@@ -9,7 +9,6 @@ using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
-
     /// <summary>
     /// A menu containing a list of <see cref="MenuEntry"/> items.
     /// The difference between this and the generic menu class is that the type parameter doesn't have to be
@@ -27,37 +26,90 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public partial class SimpleMenu<T>: PlatformDependentComponent where T : MenuEntry
+    public partial class SimpleMenu<T> : PlatformDependentComponent where T : MenuEntry
     {
         /// <summary>
         /// Event type which is used for the <see cref="OnMenuEntrySelected"/> event.
         /// Has the <see cref="MenuEntry"/> type <typeparamref name="T"/> as a parameter.
         /// </summary>
         [Serializable]
-        public class MenuEntrySelectedEvent : UnityEvent<T> {}
+        public class MenuEntrySelectedEvent : UnityEvent<T> { }
 
         /// <summary>
         /// The name of this menu. Displayed to the user.
         /// </summary>
-        public string Title = "Unnamed Menu";
+        private string title = "Unnamed Menu";
+
+        /// <summary>
+        /// The name of this menu. Displayed to the user.
+        /// </summary>
+        public string Title
+        {
+            get => title;
+            set
+            {
+                title = value;
+                UpdateDesktopTitle();
+            }
+        }
 
         /// <summary>
         /// Brief description of what this menu controls.
         /// Will be displayed to the user above the choices.
         /// The text may <i>not be longer than 3 lines!</i>
         /// </summary>
-        public string Description = "No description added.";
+        private string description = "No description added.";
+
+        /// <summary>
+        /// Brief description of what this menu controls.
+        /// Will be displayed to the user above the choices.
+        /// The text may <i>not be longer than 3 lines!</i>
+        /// </summary>
+        public string Description
+        {
+            get => description;
+            set
+            {
+                description = value;
+                UpdateDesktopDescription();
+            }
+        }
 
         /// <summary>
         /// Icon for this menu. Displayed along the title.
         /// Default is a generic settings (gear) icon.
         /// </summary>
-        public Sprite Icon;
+        private Sprite icon;
+
+        /// <summary>
+        /// Icon for this menu. Displayed along the title.
+        /// Default is a generic settings (gear) icon.
+        /// </summary>
+        public Sprite Icon
+        {
+            get => icon;
+            set
+            {
+                icon = value;
+                UpdateDesktopIcon();
+            }
+        }
+
+        /// <summary>
+        /// Whether the menu shall be shown. Managed by property <see cref="MenuShown"/>.
+        /// </summary>
+        private bool menuShown;
 
         /// <summary>
         /// Whether the menu shall be shown.
         /// </summary>
-        private bool MenuShown;
+        public bool MenuShown {
+            get => menuShown;
+            private set
+            {
+                menuShown = value;
+                OnMenuToggle.Invoke(value);
+            }}
 
         /// <summary>
         /// Whether the menu is currently shown or not.
@@ -71,6 +123,11 @@ namespace SEE.Game.UI.Menu
         /// Its parameter will be the chosen <see cref="MenuEntry"/> with type <typeparamref name="T"/>.
         /// </summary>
         public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new MenuEntrySelectedEvent();
+
+        /// <summary>
+        /// Event raised whenever <see cref="MenuShown"/> is set (no matter to what value).
+        /// </summary>
+        protected readonly UnityEvent<bool> OnMenuToggle = new UnityEvent<bool>();
 
         /// <summary>
         /// A list of menu entries for this menu.
@@ -145,7 +202,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The keyword recognizer used to detect the spoken menu entry titles.
         /// </summary>
-        private KeywordInput keywordInput;
+        protected KeywordInput keywordInput;
 
         /// <summary>
         /// If <paramref name="listen"/> is true, the <see cref="keywordInput"/>
@@ -188,7 +245,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The keyword to be used to close the menu verbally.
         /// </summary>
-        private const string CloseMenuCommand = "close menu";
+        protected const string CloseMenuCommand = "close menu";
 
         /// <summary>
         /// Returns the titles of all <see cref="entries"/> plus
@@ -197,7 +254,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns>titles of all <see cref="entries"/> appended by
         /// <see cref="CloseMenuCommand"/></returns>
-        private string[] GetMenuEntryTitles()
+        protected virtual string[] GetMenuEntryTitles()
         {
             IEnumerable<string> result = entries.Select(x => x.Title);
             return (allowNoSelection ? result : result.Append(CloseMenuCommand)).ToArray();
@@ -212,8 +269,9 @@ namespace SEE.Game.UI.Menu
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
-        private void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
+        protected virtual void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
         {
+            Debug.Log(args.text);
             int i = 0;
             foreach (string keyword in GetMenuEntryTitles())
             {
@@ -231,7 +289,7 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Displays the menu when it's hidden, and vice versa.
+        /// Displays the menu when it is hidden, and vice versa.
         /// </summary>
         public void ToggleMenu()
         {
@@ -251,7 +309,7 @@ namespace SEE.Game.UI.Menu
             entries.Add(entry);
             if (HasStarted)
             {
-                AddDesktopButtons(new []{entry});
+                AddDesktopButtons(new[] { entry });
             }
         }
 
@@ -316,8 +374,8 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
+            entry.DoAction?.Invoke();
             OnMenuEntrySelected.Invoke(entry);
-            entry.DoAction();
         }
 
         /// <summary>
@@ -326,7 +384,8 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private void Awake()
         {
-            Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
+            // Load default icon (can't be done during instantiation, only in Awake() or Start())
+            icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
 
         protected override void StartTouchGamepad() => StartDesktop();

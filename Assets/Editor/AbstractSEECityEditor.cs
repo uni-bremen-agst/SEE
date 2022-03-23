@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using SEE.Game;
 using SEE.Game.City;
@@ -17,9 +17,9 @@ namespace SEEEditor
     public class AbstractSEECityEditor : Editor
     {
         /// <summary>
-        /// the city to display
+        /// The city to be configured.
         /// </summary>
-        private AbstractSEECity city;
+        protected AbstractSEECity city;
 
         /// <summary>
         /// Whether the foldout for the general attributes of the city should be expanded.
@@ -62,9 +62,29 @@ namespace SEEEditor
         private bool showCompoundSpringEmbedder = false;
 
         /// <summary>
-        /// if true, listing of inner nodes with possible nodelayouts and inner node kinds is shown
+        /// If true, listing of inner nodes with possible nodelayouts and inner node kinds is shown
         /// </summary>
         protected bool showGraphListing = false;
+
+        /// <summary>
+        /// Whether the foldout for antenna attributes of leaf nodes should be expanded.
+        /// </summary>
+        protected bool showLeafAntennaAttributes = false;
+
+        /// <summary>
+        /// Whether the foldout for antenna attributes of inner nodes should be expanded.
+        /// </summary>
+        protected bool showInnerAntennaAttributes = false;
+
+        /// <summary>
+        /// Whether the foldout for label attributes of leaf nodes should be expanded.
+        /// </summary>
+        protected bool showLeafLabelAttributes = false;
+
+        /// <summary>
+        /// Whether the foldout for label attributes of inner nodes should be expanded.
+        /// </summary>
+        protected bool showInnerLabelAttributes = false;
 
         public override void OnInspectorGUI()
         {
@@ -317,9 +337,34 @@ namespace SEEEditor
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
                 settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                EditorGUI.EndDisabledGroup();
-                LabelSettings(ref settings.LabelSettings);
+                AntennaAttributes(ref showInnerAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "InnerNodeSettings.AntennaSettings.AntennaSections");
+                LabelSettings(ref showInnerLabelAttributes, ref settings.LabelSettings);
 
+                EditorGUI.indentLevel--;
+            }
+        }
+
+        /// <summary>
+        /// Renders the GUI for antenna attributes of leaf and inner nodes.
+        /// </summary>
+        /// <param name="antennaSettingsProperty">the path of the antenna settings to be set by this dialog part relative to the edited city</param>
+        private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, string antennaSettingsProperty)
+        {
+            showAntennaAttributes = EditorGUILayout.Foldout(showAntennaAttributes, "Antenna", true, EditorStyles.foldoutHeader);
+            if (showAntennaAttributes)
+            {
+
+                EditorGUI.indentLevel++;
+                antennaWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", antennaWidth));
+                SerializedProperty sections = serializedObject.FindProperty(antennaSettingsProperty);
+                if (sections != null)
+                {
+                    EditorGUILayout.PropertyField(sections, new GUIContent("Antenna sections"), true);
+                }
+                else
+                {
+                    Debug.LogError($"The instance of {city.GetType().FullName} does not have an attribute {antennaSettingsProperty}.\n");
+                }
                 EditorGUI.indentLevel--;
             }
         }
@@ -347,8 +392,8 @@ namespace SEEEditor
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
                 settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
                 settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
-                EditorGUI.EndDisabledGroup();
-                LabelSettings(ref settings.LabelSettings);
+                AntennaAttributes(ref showLeafAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "LeafNodeSettings.AntennaSettings.AntennaSections");
+                LabelSettings(ref showLeafLabelAttributes, ref settings.LabelSettings);
 
                 EditorGUI.indentLevel--;
             }
@@ -358,12 +403,16 @@ namespace SEEEditor
         /// Allows the user to set the attributes of <paramref name="labelAttributes"/>.
         /// </summary>
         /// <param name="labelAttributes">settings regarding the label above game nodes to be retrieved from the user</param>
-        private static void LabelSettings(ref LabelAttributes labelAttributes)
+        private static void LabelSettings(ref bool showLabelAttributes, ref LabelAttributes labelAttributes)
         {
-            labelAttributes.Show = EditorGUILayout.Toggle("Show labels", labelAttributes.Show);
-            labelAttributes.Distance = EditorGUILayout.FloatField("Label distance", labelAttributes.Distance);
-            labelAttributes.FontSize = EditorGUILayout.FloatField("Label font size", labelAttributes.FontSize);
-            labelAttributes.AnimationDuration = EditorGUILayout.FloatField("Label animation duration (in seconds)", labelAttributes.AnimationDuration);
+            showLabelAttributes = EditorGUILayout.Foldout(showLabelAttributes, "Labels", true, EditorStyles.foldoutHeader);
+            if (showLabelAttributes)
+            {
+                labelAttributes.Show = EditorGUILayout.Toggle("Show", labelAttributes.Show);
+                labelAttributes.Distance = EditorGUILayout.FloatField("Distance", labelAttributes.Distance);
+                labelAttributes.FontSize = EditorGUILayout.FloatField("Font size", labelAttributes.FontSize);
+                labelAttributes.AnimationDuration = EditorGUILayout.FloatField("Animation duration (in seconds)", labelAttributes.AnimationDuration);
+            }
         }
     }
 }

@@ -13,13 +13,11 @@ namespace SEE.GO
         /// <summary>
         /// Constructor to create Donut chart decorations.
         /// </summary>
-        /// <param name="nodeFactory">the factory that created the game objects to be decorated</param>
         /// <param name="scaler">for scaling the metrics</param>
         /// <param name="innerMetric">the metric to be visualized by the inner circle</param>
         /// <param name="metrics">the metrics to be put on the outer circle segments</param>
-        public DonutDecorator(NodeFactory nodeFactory, IScale scaler, string innerMetric, string[] metrics)
+        public DonutDecorator(IScale scaler, string innerMetric, string[] metrics)
         {
-            this.nodeFactory = nodeFactory;
             donutFactory = new DonutFactory(innerMetric, metrics);
             this.metrics = metrics;
             this.innerMetric = innerMetric;
@@ -42,11 +40,6 @@ namespace SEE.GO
         /// Defines the fraction of the radius of the inner circle w.r.t. radius.
         /// </summary>
         private const float fractionOfInnerCircle = 0.95f;
-
-        /// <summary>
-        /// The factory that created the game objects to be decorated.
-        /// </summary>
-        private readonly NodeFactory nodeFactory;
 
         /// <summary>
         /// The factory that created the game objects to be decorated.

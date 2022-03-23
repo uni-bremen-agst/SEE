@@ -1,10 +1,10 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using UnityEngine;
 using static SEE.Game.City.SEEReflexionCity;
 using static SEE.Utils.Raycasting;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Game
 {
@@ -72,13 +72,13 @@ namespace SEE.Game
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
                 Node movingNode = movingNodeRef.Value;
                 // Reflexion analysis: Dropping implementation node on architecture node
-                if (newGraphParent.HasToggle(ArchitectureLabel) && movingNode.HasToggle(ImplementationLabel))
+                if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
                     Map(movingNode, newGraphParent);
                 }
-                else if (newGraphParent.HasToggle(ImplementationLabel) && movingNode.HasToggle(ArchitectureLabel))
+                else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
                     ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
                                                                  + "architecture, not the other way around.");

@@ -25,7 +25,7 @@ namespace SEE.GO
             this.scaler = scaler;
             this.erosionScalingFactor = erosionScalingFactor;
         }
-        
+
         /// <summary>
         /// Prefix used for game objects containing erosion sprites.
         /// </summary>
@@ -87,11 +87,11 @@ namespace SEE.GO
                     // maximum value of the normalized metric. Hence, this value is in [0,1].
                     float metricScale = scaler.GetRelativeNormalizedValueInLevel(issue.Key, node);
 
-                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value, 
-                                                                     value.ToString(CultureInfo.InvariantCulture), 
-                                                                     new Color(metricScale, 0, 0, 
+                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value,
+                                                                     value.ToString(CultureInfo.InvariantCulture),
+                                                                     new Color(metricScale, 0, 0,
                                                                                Mathf.Lerp(0.75f, 1f, metricScale)));
-                    
+
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
                     // otherwise partial erosion display won't work!
                     sprite.name = $"{EROSION_SPRITE_PREFIX} {sprite.name} {node.SourceName}";
@@ -117,7 +117,7 @@ namespace SEE.GO
                     scale *= erosionScalingFactor;
 
                     sprite.transform.localScale = scale;
-                    sprite.transform.position = innerNodeFactory.Roof(gameNode.gameObject);
+                    sprite.transform.position = GetRoof(gameNode);
 
                     sprites.Add(sprite);
                 }
@@ -126,7 +126,7 @@ namespace SEE.GO
             // Now we stack the sprites on top of the roof of the building in
             // ascending order of their widths.
             {
-                Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
+                Vector3 currentRoof = GetRoof(gameNode);
                 currentRoof += Vector3.up * innerNodeFactory.GetSize(gameNode.gameObject).x / 6;
                 sprites.Sort(Comparer<GameObject>.Create((left, right) =>
                                                              GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
@@ -145,6 +145,22 @@ namespace SEE.GO
             {
                 sprite.transform.SetParent(gameNode.transform);
             }
+        }
+
+        /// <summary>
+        /// Returns the world-space center of the roof of <paramref name="gameNode"/> thereby
+        /// considering all descendants of <paramref name="gameNode"/>. More precisely, the
+        /// x and z co-ordinates are those of the game object referred to by <paramref name="gameNode"/>
+        /// and the y co-ordinate is the maximum y co-ordinate of that game object and all its
+        /// descendants in the game-objet hierarchy.
+        /// </summary>
+        /// <param name="gameNode">game node whose roof is to be determined</param>
+        /// <returns>world-space position of the roof of <paramref name="gameNode"/></returns>
+        protected static Vector3 GetRoof(NodeRef gameNode)
+        {
+            Vector3 position = gameNode.gameObject.transform.position;
+            position.y = gameNode.gameObject.GetMaxY();
+            return position;
         }
 
         /// <summary>
