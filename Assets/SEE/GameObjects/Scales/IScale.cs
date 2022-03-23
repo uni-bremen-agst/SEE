@@ -68,6 +68,27 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// If <paramref name="metricName"/> can be parsed as a number, the parsed number is
+        /// returned. If <paramref name="metricName"/> is the name of a metric, the corresponding
+        /// normalized value for <paramref name="node"/> is returned if it exists; otherwise 0
+        /// is returned.
+        /// </summary>
+        /// <param name="node">node whose metric is to be returned</param>
+        /// <param name="metricName">the name of a node metric or a number</param>
+        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        public float GetMetricValue(Node node, string metricName)
+        {
+            if (Utils.FloatUtils.TryGetFloat(metricName, out float value))
+            {
+                return value;
+            }
+            else
+            {
+                return GetNormalizedValue(metricName, node);
+            }
+        }
+
+        /// <summary>
         /// Yields a normalized value of the given node metric. The type of normalization
         /// is determined by concrete subclasses.
         /// </summary>

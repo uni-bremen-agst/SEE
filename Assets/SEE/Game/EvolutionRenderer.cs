@@ -64,15 +64,14 @@ namespace SEE.Game
                 graphRenderer = new GraphRenderer(cityEvolution, null);
                 Assert.IsNotNull(graphRenderer);
                 edgesAreDrawn = graphRenderer.AreEdgesDrawn();
+                Vector3 beamScale = new Vector3(cityEvolution.MarkerWidth, cityEvolution.MarkerHeight, cityEvolution.MarkerWidth);
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new Marker(graphRenderer,
-                                    markerWidth: cityEvolution.MarkerWidth,
+                marker = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,
-                                    deletionColor: cityEvolution.DeletionBeamColor,
-                                    duration: AnimationLag);
+                                    deletionColor: cityEvolution.DeletionBeamColor);
                 RegisterAllAnimators(animators);
                 phase1AnimationWatchDog = new Phase1AnimationWatchDog(this);
                 phase2AnimationWatchDog = new Phase2AnimationWatchDog(this);
@@ -114,7 +113,7 @@ namespace SEE.Game
         /// <summary>
         /// The marker used to mark the new and removed game objects.
         /// </summary>
-        private Marker marker;  // not serialized by Unity; will be set in CityEvolution property
+        private MarkerFactory marker;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The kind of comparison to determine whether there are any differences between
@@ -181,12 +180,13 @@ namespace SEE.Game
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
-        private float animationDuration = AbstractAnimator.DefaultAnimationTime;  // not serialized by Unity
+        [SerializeField]
+        private float animationDuration = AbstractAnimator.DefaultAnimationTime;
 
         /// <summary>
-        /// The duration of an animation.
+        /// The time in seconds for showing a single graph revision during auto-play animation.
         /// </summary>
-        public float AnimationDuration
+        public float AnimationLag
         {
             get => animationDuration;
             set
@@ -199,6 +199,8 @@ namespace SEE.Game
                         animator.MaxAnimationTime = value;
                         animator.AnimationsDisabled = value == 0;
                     });
+
+                    shownGraphHasChangedEvent.Invoke();
                 }
             }
         }
@@ -447,7 +449,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the animation from CurrentGraphShown to NextGraphToBeShown.
+        /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
         /// </summary>
         /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
@@ -877,12 +879,13 @@ namespace SEE.Game
                     marker.MarkChanged(currentGameNode);
                     // There is a change. It may or may not be the metric determining the style.
                     // We will not further check that and just call the following method.
-                    // If there is no change, this method does not to be called because then
-                    // we know that the metric values determining the style of the former and
-                    // the new graph node are the same.
+                    // If there is no change, this method does not need to be called because then
+                    // we know that the metric values determining the style and antenna of the former
+                    // and the new graph node are the same.
                     graphRenderer.AdjustStyle(currentGameNode);
                     break;
                 case Difference.Added:
+                    NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(currentGameNode.name);
                     marker.MarkBorn(currentGameNode);
                     break;
             }
@@ -973,14 +976,20 @@ namespace SEE.Game
         /// <param name="gameNode">new or existing game object representing a graph node</param>
         private void OnAnimationNodeAnimationFinished(object gameNode)
         {
-            if (gameNode is GameObject go && go.transform.parent == null)
+            if (gameNode is GameObject go)
             {
-                /// We will just put this game object under <see cref="gameObject"/>
-                /// (the game object representing the city as a whole) as a child. When
-                /// the animation is over and all nodes have reached their destination,
-                /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
-                /// actual logical game-node parent.
-                go.transform.SetParent(gameObject.transform);
+                graphRenderer.AdjustAntenna(go);
+                marker.AdjustMarkerY(go);
+
+                if (go.transform.parent == null)
+                {
+                    /// We will just put this game object under <see cref="gameObject"/>
+                    /// (the game object representing the city as a whole) as a child. When
+                    /// the animation is over and all nodes have reached their destination,
+                    /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
+                    /// actual logical game-node parent.
+                    go.transform.SetParent(gameObject.transform);
+                }
             }
             phase2AnimationWatchDog.Finished();
         }
@@ -1080,18 +1089,9 @@ namespace SEE.Game
         public int GraphCount => graphs.Count;
 
         /// <summary>
-        /// The time in seconds for showing a single graph revision during auto-play animation.
+        /// Current graph of the graph series to be rendered.
         /// </summary>
-        public float AnimationLag
-        {
-            get => AnimationDuration;
-            set
-            {
-                AnimationDuration = value;
-                marker?.SetDuration(value);
-                shownGraphHasChangedEvent.Invoke();
-            }
-        }
+        public Graph GraphCurrent => graphs[currentGraphIndex];
 
         /// <summary>
         /// The index of the currently visualized graph.
@@ -1161,6 +1161,7 @@ namespace SEE.Game
         public void SetGraphEvolution(List<Graph> graphs)
         {
             this.graphs = graphs;
+            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -1174,7 +1175,6 @@ namespace SEE.Game
             currentCity = null;
             nextCity = null;
 
-            graphRenderer.SetScaler(graphs);
             CalculateAllGraphLayouts(graphs);
 
             shownGraphHasChangedEvent.Invoke();
