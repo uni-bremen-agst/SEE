@@ -321,12 +321,13 @@ namespace SEEEditor
         {
             SEECity city = target as SEECity;
             Assert.IsNotNull(city);
-            showDataFiles = EditorGUILayout.Foldout(showDataFiles,
-                                                    "Data Files", true, EditorStyles.foldoutHeader);
+            showDataFiles = EditorGUILayout.Foldout(showDataFiles, "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
                 city.GXLPath = DataPathEditor.GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
                 city.CSVPath = DataPathEditor.GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
+                city.ProjectPath = DataPathEditor.GetDataPath("Project directory", city.ProjectPath, fileDialogue: false);
+                city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath, Filenames.ExtensionWithoutPeriod(Filenames.SolutionExtension));
             }
         }
 

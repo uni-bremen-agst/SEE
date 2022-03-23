@@ -1281,8 +1281,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Commit \n14dd02220ea0ff19b09ef6fa6ab8ce0c9ad56c02\nAuthor: Felix Gaebler\nTimestamp:
-    2014-03-16T18:26:47\nMessage:\nAdded commit information window\n"
+  m_Text: 
 --- !u!1 &2897607260313355069
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,7 +1451,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &4461994104216227612
 MonoBehaviour:
   m_ObjectHideFlags: 0

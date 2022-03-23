@@ -1577,7 +1577,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 1
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -131.81203, y: 0, z: -127.13038, w: 1}
+  m_margin: {x: -131.81203, y: 0, z: -68.09925, w: 1}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

@@ -49,9 +49,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="directory">the directory path where the GXL file are located in</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
+        /// <param name="basePath">the base path of the graphs</param>
         /// <param name="rootName">name of the root node if any needs to be added to have a unique root</param>
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
-        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string rootName, int maxRevisionsToLoad)
+        public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootName, int maxRevisionsToLoad)
         {
             IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
             if (sortedGraphNames.Count<string>() == 0)
@@ -67,6 +68,7 @@ namespace SEE.DataModel.DG.IO
                 // load graph (we can safely assume that the file exists because we retrieved its
                 // name just from the directory
                 GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes,
+                                                           basePath: basePath,
                                                            rootID: rootName,
                                                            logger: new SEELogger());
                 graphCreator.Load();

@@ -135,7 +135,7 @@ namespace SEE.Game.Evolution
         private const string RevisionSelectionCanvasGameObjectName = "RevisionSelectionCanvas";
 
         /// <summary>
-        /// The name of the graph attribute providing the commit id.
+        /// The name of the graph attribute providing the commit ID.
         /// </summary>
         private const string CommitIdAttributeName = "CommitId";
 
@@ -617,9 +617,9 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns commit id of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
+        /// Returns commit ID of the current graph <see cref="evolutionRenderer.GraphCurrent"/>.
         /// </summary>
-        /// <returns>commit id</returns>
+        /// <returns>commit ID</returns>
         private string CurrentCommitId()
         {
             return GetAttributeOfCurrentGraph(CommitIdAttributeName);
@@ -662,9 +662,9 @@ namespace SEE.Game.Evolution
         {
             animationDataModel.RevisionNumberText.text = (evolutionRenderer.CurrentGraphIndex + 1) + " / " + evolutionRenderer.GraphCount;
             animationDataModel.CommitInformationText.text = AllOrNothing("Commit #", CurrentCommitId())
-                + AllOrNothing("\nAuthor: ", CurrentAuthor())
-                + AllOrNothing("\nTimestamp: ", CurrentCommitTimestamp())
-                + AllOrNothing("\nMessage:\n", CurrentCommitMessage());
+                + AllOrNothing("Author: ", CurrentAuthor())
+                + AllOrNothing("Timestamp: ", CurrentCommitTimestamp())
+                + AllOrNothing("Message:\n", CurrentCommitMessage());
             animationDataModel.Slider.value = evolutionRenderer.CurrentGraphIndex;
 
             string AllOrNothing(string prefix, string postfix)
@@ -675,7 +675,7 @@ namespace SEE.Game.Evolution
                 }
                 else
                 {
-                    return prefix + postfix;
+                    return prefix + postfix + "\n";
                 }
             }
         }

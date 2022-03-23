@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.UI.CodeWindow;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -66,17 +68,9 @@ namespace SEE.Controls.Actions
                 && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
-                string selectedPath = selectedNode.Value.Path();
                 // If nothing is selected, there's nothing more we need to do
                 if (selectedNode == null)
                 {
-                    return false;
-                }
-                if (selectedPath == null)
-                {
-                    ShowNotification.Warn("No associated code",
-                                          $"Selected node '{selectedNode.Value.SourceName}' has no source code "
-                                          + "associated with it.");
                     return false;
                 }
 
@@ -100,7 +94,7 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                    codeWindow.EnterFromFile(Path.Combine(selectedPath, selectedFile));
+                    codeWindow.EnterFromFile(selectedNode.Value.AbsolutePlatformPath());
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
@@ -110,6 +104,16 @@ namespace SEE.Controls.Actions
                     codeWindow.VisibleLine = line.Value;
                 }
 
+                // Add solution path
+                GameObject cityObject = SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
+                if (cityObject == null || !cityObject.TryGetComponent(out AbstractSEECity city))
+                {
+                    ShowNotification.Warn("No code city",
+                      $"Selected node '{selectedNode.Value.SourceName}' is not contained in a code city.");
+                    return false;
+                }
+                codeWindow.SolutionPath = city.SolutionPath.Path;
+
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
                 {
@@ -117,7 +121,7 @@ namespace SEE.Controls.Actions
                     codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
                 }
                 spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
-                //TODO: Set font size etc in settings (maybe, or maybe that's too much)
+                // TODO: Set font size etc in settings (maybe, or maybe that's too much)
             }
 
             return false;

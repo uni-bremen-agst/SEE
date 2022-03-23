@@ -177,7 +177,7 @@ namespace SEE.Tools.Architecture
         public void TestMappingToSameComponentA()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph();
+            fullGraph = new Graph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 
@@ -213,7 +213,7 @@ namespace SEE.Tools.Architecture
         public void TestMappingToSameComponentB()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph();
+            fullGraph = new Graph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 
@@ -244,7 +244,7 @@ namespace SEE.Tools.Architecture
         public void TestRemapping()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph();
+            fullGraph = new Graph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 

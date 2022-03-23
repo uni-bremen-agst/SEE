@@ -71,7 +71,7 @@ namespace SEE.Game.Evolution
         /// <param name="nodeLayout">its node layout as a mapping of the nodes' IDs
         /// onto their ILayoutNode  (must not be null)</param>
         /// <param name="edgeLayout">its edge layout as a mapping of the edges' IDs
-        /// onto their ILayoutEdge (may not be null)</param>
+        /// onto their ILayoutEdge (may be null)</param>
         public LaidOutGraph(Graph graph,
                             Dictionary<string, ILayoutNode> nodeLayout,
                             Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout)
