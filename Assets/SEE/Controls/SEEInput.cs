@@ -271,6 +271,11 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// The user wants to drag the hovered element of the city on its plane.
+        /// </summary>
+        internal static bool DragTouched = false;
+
+        /// <summary>
         /// The user wants to start dragging the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>

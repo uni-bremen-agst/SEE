@@ -232,22 +232,19 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
 #if UNITY_ANDROID
-            bool result = false;
-            Transform cityRootNode = null;
-            Transform touchedObject;
-            bool synchronize = false;
-            Vector3 planeHitPoint;
-
+            // Check for touch input
             if (Input.touchCount != 1)
             {
                 moving = false;
-                return result;
+                return false;
             }
-
+            bool result = false;
+            bool synchronize = false;
             Touch touch = Input.touches[0];
             Vector3 touchPosition = touch.position;
-
-            if (touch.phase == TouchPhase.Began)
+            Transform hoveredObject = null;
+            Transform cityRootNode = null;
+            if (touch.phase == TouchPhase.Began) 
             {
                 Ray ray = Camera.main.ScreenPointToRay(touchPosition);
                 RaycastHit raycastHit;
@@ -255,43 +252,84 @@ namespace SEE.Controls.Actions
                 {
                     if (raycastHit.collider.tag == "Node")
                     {
-                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
-                        moving = true;
-                        touchedObject = raycastHit.transform;
-                        hit = new Hit(touchedObject);
-                        memento = new Memento(touchedObject);
-
-                        hit.InteractableObject.SetGrab(true, true);
-                        gizmo.gameObject.SetActive(true);
-
-                        distance = raycastHit.transform.position.z - Camera.main.transform.position.z;
-                        planeHitPoint = new Vector3(touchPosition.x, touchPosition.y, distance);
-                        dragStartTransformPosition = hit.HoveredObject.position;
-                        dragStartOffset = planeHitPoint - hit.HoveredObject.position;
-                        dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
+                        hoveredObject = raycastHit.transform;
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
                     }
                 }
-
             }
-            else if (moving && touch.phase == TouchPhase.Moved)
+            if (touch.phase == TouchPhase.Canceled) // cancel movement
             {
-                if (moving) // continue movement
+                if (moving)
                 {
-                    planeHitPoint = new Vector3(touchPosition.x, touchPosition.y, distance);
-                    Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    Positioner.Set(hit.HoveredObject, originalPosition);
+                    hit.InteractableObject.SetGrab(false, true);
+                    gizmo.gameObject.SetActive(false);
 
-                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
-
-                    Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                    gizmo.SetPositions(startPoint, endPoint);
-
-                    SetHitObjectColor(hit.node);
-
+                    moving = false;
+                    hit = new Hit();
                     synchronize = true;
                 }
+
+                ResetHitObjectColor();
             }
-            else if (moving && touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            else if (touch.phase == TouchPhase.Began) // start or continue movement
+            {
+                if (hoveredObject
+                    && RaycastPlane(new Plane(Vector3.up, hoveredObject.position), out Vector3 planeHitPoint)) // start movement
+                {
+                    moving = true;
+                    Transform draggedObject = SEEInput.DragTouched ? hoveredObject : cityRootNode;
+                    hit = new Hit(draggedObject);
+                    memento = new Memento(draggedObject);
+
+                    hit.InteractableObject.SetGrab(true, true);
+                    gizmo.gameObject.SetActive(true);
+                    dragStartTransformPosition = hit.HoveredObject.position;
+                    dragStartOffset = planeHitPoint - hit.HoveredObject.position;
+                    dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
+                }
+            }
+            else if (touch.phase == TouchPhase.Moved && moving && RaycastPlane(hit.Plane, out Vector3 planeHitPoint)) // continue movement
+            {
+                Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                if (SEEInput.SnapMobile)
+                {
+                    Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
+                    float angleDeg = point2.Angle360();
+                    float snappedAngleDeg = Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle;
+                    float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
+                    Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
+                    Vector2 proj = dir * Vector2.Dot(point2, dir);
+                    totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
+                }
+
+                Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+
+                Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
+                Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                gizmo.SetPositions(startPoint, endPoint);
+
+                SetHitObjectColor(hit.node);
+
+                synchronize = true;
+            }
+
+            else if (SEEInput.Reset()) // reset to center of table
+            {
+                if (hoveredObject && !moving)
+                {
+                    GO.Plane plane = hoveredObject.GetComponentInParent<GO.Plane>();
+                    hoveredObject.position = plane.CenterTop;
+                    new MoveNodeNetAction(hoveredObject.name, hoveredObject.position).Execute();
+                    gizmo.gameObject.SetActive(false);
+
+                    synchronize = false; // We just called MoveNodeNetAction for the synchronization.
+                }
+
+                ResetHitObjectColor();
+            }
+            else if (moving && touch.phase == TouchPhase.Ended)
             {
                 InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
@@ -327,6 +365,7 @@ namespace SEE.Controls.Actions
                 ResetHitObjectColor();
                 moving = false;
             }
+
             if (synchronize)
             {
                 new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();

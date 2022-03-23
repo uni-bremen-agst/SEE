@@ -7,6 +7,7 @@ using SEE.Controls.Actions;
 using System.Linq;
 using SEE.Controls;
 using UnityEngine.UI;
+using System;
 
 namespace SEE.Game.UI.Menu
 {
@@ -166,6 +167,13 @@ namespace SEE.Game.UI.Menu
                     Button snapButton = buttons[3][1].GetComponent<Button>();
                     MarkButtonActive(snapButton);
                 }
+                buttons[4][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => ToggleMoveMode());
+                if (SEEInput.DragTouched)
+                {
+                    Button snapButton = buttons[4][1].GetComponent<Button>();
+                    MarkButtonActive(snapButton);
+                }
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => TriggerRedo());
                 quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
@@ -176,7 +184,6 @@ namespace SEE.Game.UI.Menu
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() 
                     => ExpandButton(arrowLeftSprite, arrowRightSprite));
             }
-            
             #endregion
         }
 
@@ -410,6 +417,9 @@ namespace SEE.Game.UI.Menu
             InteractableObject.UnselectAll(true);
         }
 
+        /// <summary>
+        /// Activates/deactivates snap mode for rotation mode.
+        /// </summary>
         private void ToggleSnapMode()
         {
             SEEInput.SnapMobile = !SEEInput.SnapMobile;
@@ -425,6 +435,28 @@ namespace SEE.Game.UI.Menu
             }
         }
 
+        /// <summary>
+        /// Toggles move mode, whether the hole city shall be moved or just the touched object.
+        /// </summary>
+        private void ToggleMoveMode()
+        {
+            SEEInput.DragTouched = !SEEInput.DragTouched;
+
+            if (SEEInput.DragTouched)
+            {
+                Button snapButton = buttons[4][1].GetComponent<Button>();
+                MarkButtonActive(snapButton);
+            }
+            else
+            {
+                buttons[4][1].GetComponent<Button>().colors = ColorBlock.defaultColorBlock;
+            }
+        }
+
+        /// <summary>
+        /// Marks an button green to signalize that its active
+        /// </summary>
+        /// <param name="button"></param>
         private void MarkButtonActive(Button button)
         {
             ColorBlock colorBlock = button.colors;
