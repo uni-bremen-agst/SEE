@@ -223,8 +223,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Material hitObjectMaterial;
 
-        private float distance;
+        public static void ResetCityPosition()
+        {
+            if (CityRootNodeMemory.CityRootNode)
+            {
+                GO.Plane plane = CityRootNodeMemory.CityRootNode.GetComponentInParent<GO.Plane>();
+                CityRootNodeMemory.CityRootNode.position = plane.CenterTop;
+                new MoveNodeNetAction(CityRootNodeMemory.CityRootNode.name, CityRootNodeMemory.CityRootNode.position).Execute();
+                gizmo.gameObject.SetActive(false);
+            }
+            // ResetHitObjectColor();
+        }
 
+        /// <summary>
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -254,6 +265,7 @@ namespace SEE.Controls.Actions
                     {
                         hoveredObject = raycastHit.transform;
                         cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
+                        CityRootNodeMemory.CityRootNode = cityRootNode;
                     }
                 }
             }
@@ -313,21 +325,6 @@ namespace SEE.Controls.Actions
                 SetHitObjectColor(hit.node);
 
                 synchronize = true;
-            }
-
-            else if (SEEInput.Reset()) // reset to center of table
-            {
-                if (hoveredObject && !moving)
-                {
-                    GO.Plane plane = hoveredObject.GetComponentInParent<GO.Plane>();
-                    hoveredObject.position = plane.CenterTop;
-                    new MoveNodeNetAction(hoveredObject.name, hoveredObject.position).Execute();
-                    gizmo.gameObject.SetActive(false);
-
-                    synchronize = false; // We just called MoveNodeNetAction for the synchronization.
-                }
-
-                ResetHitObjectColor();
             }
             else if (moving && touch.phase == TouchPhase.Ended)
             {
