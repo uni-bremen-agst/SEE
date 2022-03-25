@@ -104,10 +104,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected void InitializeMobileMenu()
         {
+            Debug.Log(Entries.Count);
             #region set up buttons
             // for the entry menu the entries count is 3 (Host, Client, Settings),
             // therefore the menu need to be set up in the desktop way
-            if (Entries.Count < 21) 
+            if (Entries.Count < 18) 
             {
                 SetUpDesktopWindow();
                 SetUpDesktopContent();
@@ -123,7 +124,7 @@ namespace SEE.Game.UI.Menu
                 menuPanelHorizontal = MobileMenuGameObject.transform.Find("Horizontal Panel");
                 quickMenuPanel = MobileMenuGameObject.transform.Find("Left Panel");
 
-                Assert.IsTrue(ActionStateType.MobileMenuTypes.Count == 21);
+                Assert.IsTrue(ActionStateType.MobileMenuTypes.Count == 18);
 
                 AddMobileButtons(Entries);
 
@@ -158,6 +159,8 @@ namespace SEE.Game.UI.Menu
                 {
                     btn.SetActive(false);
                 }
+
+
                 buttons[0][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => Deselect());
                 buttons[3][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
@@ -171,8 +174,8 @@ namespace SEE.Game.UI.Menu
                     => ToggleMoveMode());
                 if (SEEInput.DragTouched)
                 {
-                    Button snapButton = buttons[4][1].GetComponent<Button>();
-                    MarkButtonActive(snapButton);
+                    Button dragButton = buttons[4][1].GetComponent<Button>();
+                    MarkButtonActive(dragButton);
                 }
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => TriggerRedo());
@@ -199,114 +202,115 @@ namespace SEE.Game.UI.Menu
         {
             GameObject[] selectButtons = new GameObject[2];
             GameObject[] deleteButton = new GameObject[1];
-            GameObject[] deleteButtons = new GameObject[3];
-            GameObject[] rotateButtons = new GameObject[5];
-            GameObject[] moveButtons = new GameObject[4];
-            int cnt = 0;
-            int selectCnt = 0;
-            int deleteCnt = 0;
-            int rotateCnt = 0;
-            int moveCnt = 0;
-            int quickButtonCnt = 0;
+            GameObject[] nodeInteractionButtons = new GameObject[4];
+            GameObject[] rotateButtons = new GameObject[2];
+            GameObject[] moveButtons = new GameObject[3];
+            int count = 0;
+            int selectCount = 0;
+            int nodeCount = 0;
+            int rotateCount = 0;
+            int moveCount = 0;
+            int quickButtonCount = 0;
             foreach (T entry in buttonEntries)
             {
                 // The count 0 represents the select mode button
-                if (cnt == 0)
+                if (count == 0)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    selectButtons[selectCnt] = iconButton;
-                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
-                    cnt++;
-                    selectCnt++;
+                    selectButtons[selectCount] = iconButton;
+                    selectButtons[selectCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    selectButtons[selectCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    selectButtons[selectCount].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    count++;
+                    selectCount++;
                 }
                 // The count smaller than 2 marks the select button group.
-                else if (cnt < 2)
+                else if (count < 2)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    selectButtons[selectCnt] = iconButton;
-                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    selectButtons[selectCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    cnt++;
-                    selectCnt++;
+                    selectButtons[selectCount] = iconButton;
+                    selectButtons[selectCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    selectButtons[selectCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    count++;
+                    selectCount++;
                 }
-                // The count 3 marks the delete Button.
-                else if (cnt == 2)
+                // The count 2 marks the delete Button.
+                else if (count == 2)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelVertical, false);
                     deleteButton[0] = iconButton;
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
                     deleteButton[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
-                    cnt++;
+                    count++;
                 }
-                // The count smaller 6 marks the delete multi button group.
-                else if (cnt < 6)
+                // The count smaller 7 marks the node interaction button group.
+                else if (count < 7)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    deleteButtons[deleteCnt] = iconButton;
-                    deleteButtons[deleteCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    deleteButtons[deleteCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    deleteCnt++;
-                    cnt++;
+                    nodeInteractionButtons[nodeCount] = iconButton;
+                    nodeInteractionButtons[nodeCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    nodeInteractionButtons[nodeCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    nodeInteractionButtons[nodeCount].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    nodeCount++;
+                    count++;
                 }
-                // The count 6 represents the rotate mode button
-                else if(cnt == 6)
+                // The count 7 represents the rotate mode button
+                else if(count == 7)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    rotateButtons[rotateCnt] = iconButton;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
-                    rotateCnt++;
-                    cnt++;
+                    rotateButtons[rotateCount] = iconButton;
+                    rotateButtons[rotateCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    rotateButtons[rotateCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    rotateButtons[rotateCount].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    rotateCount++;
+                    count++;
                 }
-                // The count smaller 11 marks the rotate button group.
-                else if (cnt < 11)
+                // The count smaller 9 marks the rotate button group.
+                else if (count < 9)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    rotateButtons[rotateCnt] = iconButton;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    rotateButtons[rotateCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    rotateCnt++;
-                    cnt++;
+                    rotateButtons[rotateCount] = iconButton;
+                    rotateButtons[rotateCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    rotateButtons[rotateCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    rotateCount++;
+                    count++;
                 }
-                // The count 11 represents the move mode button
-                else if (cnt == 11)
+                // The count 9 represents the move mode button
+                else if (count == 9)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    moveButtons[moveCnt] = iconButton;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
-                    moveCnt++;
-                    cnt++;
+                    moveButtons[moveCount] = iconButton;
+                    moveButtons[moveCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    moveButtons[moveCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    moveButtons[moveCount].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() => OnEntrySelected(entry));
+                    moveCount++;
+                    count++;
                 }
-                // The count smaller 15 marks the move button group.
-                else if (cnt < 15)
+                // The count smaller 12 marks the move button group.
+                else if (count < 12)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, menuPanelHorizontal, false);
-                    moveButtons[moveCnt] = iconButton;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    moveButtons[moveCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    moveCnt++;
-                    cnt++;
+                    moveButtons[moveCount] = iconButton;
+                    moveButtons[moveCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    moveButtons[moveCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    moveCount++;
+                    count++;
                 }
-                // The count smaller 21 marks the quick menu button group.
-                else if (cnt < 21)
+                // The count smaller 18 marks the quick menu button group.
+                else if (count < 18)
                 {
                     GameObject iconButton = PrefabInstantiator.InstantiatePrefab(ICON_BUTTON_PREFAB, quickMenuPanel, false);
-                    quickButtons[quickButtonCnt] = iconButton;
-                    quickButtons[quickButtonCnt].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
-                    quickButtons[quickButtonCnt].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
-                    cnt++;
-                    quickButtonCnt++;
+                    quickButtons[quickButtonCount] = iconButton;
+                    quickButtons[quickButtonCount].GetComponent<ButtonManagerBasicIcon>().name = entry.Title;
+                    quickButtons[quickButtonCount].GetComponent<ButtonManagerBasicIcon>().buttonIcon = entry.Icon;
+                    count++;
+                    quickButtonCount++;
                 }
             }
             buttons[0] = selectButtons;
             buttons[1] = deleteButton;
-            buttons[2] = deleteButtons;
+            buttons[2] = nodeInteractionButtons;
             buttons[3] = rotateButtons;
             buttons[4] = moveButtons;
             
