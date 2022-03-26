@@ -70,6 +70,94 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Adds the given dependency <paramref name="edge"/> to the architecture graph. This edge will
+        /// be considered as a specified dependency.
+        /// Preconditions:
+        /// <ul>
+        /// <li><paramref name="edge"/> is not yet in the reflexion graph.</li>
+        /// <li><paramref name="edge"/>'s connected nodes are contained in the architecture graph.</li>
+        /// <li><paramref name="edge"/> represents a dependency.</li>
+        /// </ul>
+        /// Postcondition: <paramref name="edge"/> is contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the dependency edge to be added to the architecture graph</param>
+        public void AddToArchitecture(Edge edge)
+        {
+            Assert.IsTrue(!FullGraph.ContainsEdge(edge));
+            Assert.IsTrue(edge.Source.IsInArchitecture() && edge.Target.IsInArchitecture());
+            edge.SetInArchitecture();
+            FullGraph.AddEdge(edge);
+            SetState(edge, State.Specified);
+            Notify(new ArchitectureEdgeAdded(edge));
+            
+            // We need to handle the propagated dependencies covered by this specified edge.
+            
+            // We don't care about order, but O(1) `Contains` is nice to have here, hence the Set
+            ISet<Node> targetKids = new HashSet<Node>(edge.Target.PostOrderDescendants());
+
+            bool IsCoveredEdge(Edge e) => !IsSpecified(e)
+                                          && targetKids.Contains(e.Target)
+                                          && e.HasSupertypeOf(edge.Type);
+
+            IEnumerable<Edge> coveredEdges = edge.Source.PostOrderDescendants()
+                                                 .SelectMany(x => x.Outgoings)
+                                                 .Where(IsCoveredEdge);
+            bool noneCovered = true;
+            foreach (Edge coveredEdge in coveredEdges)
+            {
+                noneCovered = false;
+                ChangeSpecifiedDependency(edge, GetImplCounter(coveredEdge));
+                Transition(coveredEdge, GetState(coveredEdge), State.Allowed);
+            }
+
+            if (noneCovered)
+            {
+                // In this case, we need to set the state manually because `ChangeSpecifiedDependency` wasn't called.
+                Transition(edge, State.Specified, State.Absent);
+                SetCounter(edge, 0);
+            }
+        }
+        
+        /// <summary>
+        /// Removes the given specified dependency <paramref name="edge"/> from the architecture.
+        /// Precondition: <paramref name="edge"/> must be contained in the architecture graph
+        ///   and must represent a specified dependency.
+        /// Postcondition: <paramref name="edge"/> is no longer contained in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
+        public void DeleteFromArchitecture(Edge edge)
+        {
+            Assert.IsTrue(FullGraph.ContainsEdge(edge));
+            Assert.IsTrue(edge.IsInArchitecture() && IsSpecified(edge));
+
+            if (GetState(edge) == State.Convergent)
+            {
+                // We need to handle the propagated dependencies covered by this specified edge.
+                
+                // We don't care about order, but O(1) `Contains` is nice to have here, hence the Set
+                ISet<Node> targetKids = new HashSet<Node>(edge.Target.PostOrderDescendants());
+
+                bool IsCoveredEdge(Edge e) => !IsSpecified(e) 
+                                              && targetKids.Contains(e.Target) 
+                                              && e.HasSupertypeOf(edge.Type);
+                
+                IEnumerable<Edge> coveredEdges = edge.Source.PostOrderDescendants()
+                                                     .SelectMany(x => x.Outgoings)
+                                                     .Where(IsCoveredEdge);
+                foreach (Edge coveredEdge in coveredEdges)
+                {
+                    Transition(coveredEdge, GetState(coveredEdge), State.Divergent);
+                }
+            }
+            
+            Notify(new ArchitectureEdgeRemoved(edge));
+            FullGraph.RemoveEdge(edge);
+        }
+        
+
+        /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
         /// re-runs the reflexion analysis incrementally.
         /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
