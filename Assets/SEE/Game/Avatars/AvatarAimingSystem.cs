@@ -139,7 +139,7 @@ namespace SEE.Game.Avatars
             if (AimPoser == null)
             {
                 GameObject aimPoser = GameObject.Find(AimPoserName);
-                if (aimPoser == null || !aimPoser.TryGetComponentOrLog(out AimPoser))
+                if (aimPoser == null || !aimPoser.TryGetComponent(out AimPoser))
                 {
                     Debug.LogError($"There is no game object named {AimPoserName} with a {typeof(AimPoser)} component in the scene.\n");
                     enabled = false;
