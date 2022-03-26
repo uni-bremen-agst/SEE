@@ -6,7 +6,7 @@ namespace SEE.Game.Avatars
     /// Animates the movements of the avatar this component is attached to
     /// based on the velocity and direction of the avatar's movement.
     /// </summary>
-    class AvatarMovementAnimator : MonoBehaviour
+    internal class AvatarMovementAnimator : MonoBehaviour
     {
         /// <summary>
         /// The animator attached to the game object (the avatar) that is used to
