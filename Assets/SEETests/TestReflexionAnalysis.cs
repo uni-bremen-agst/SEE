@@ -76,6 +76,15 @@ namespace SEE.Tools.Architecture
         /// List of Implementation edges removed from the mapping.
         /// </summary>
         protected List<ImplementationEdgeRemoved> implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
+        
+        /// <summary>
+        /// List of Architecture edges added to the mapping.
+        /// </summary>
+        protected List<ArchitectureEdgeAdded> architectureEdgesAdded = new List<ArchitectureEdgeAdded>();
+        /// <summary>
+        /// List of Architecture edges removed from the mapping.
+        /// </summary>
+        protected List<ArchitectureEdgeRemoved> architectureEdgesRemoved = new List<ArchitectureEdgeRemoved>();
 
         /// <summary>
         /// Re-sets the event caches edgeChanges, propagatedEdges, and removedEdges to
@@ -90,6 +99,8 @@ namespace SEE.Tools.Architecture
             mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
             implementationEdgesAdded = new List<ImplementationEdgeAdded>();
             implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
+            architectureEdgesAdded = new List<ArchitectureEdgeAdded>();
+            architectureEdgesRemoved = new List<ArchitectureEdgeRemoved>();
         }
 
         /// <summary>
@@ -284,6 +295,18 @@ namespace SEE.Tools.Architecture
             {
                 Debug.Log($"removed {e}");
             }
+            
+            Debug.Log("DEPENDENCIES ADDED IN ARCHITECTURE");
+            foreach (ArchitectureEdgeAdded e in architectureEdgesAdded)
+            {
+                Debug.Log($"added {e}");
+            }
+            
+            Debug.Log("DEPENDENCIES REMOVED IN ARCHITECTURE");
+            foreach (ArchitectureEdgeRemoved e in architectureEdgesRemoved)
+            {
+                Debug.Log($"removed {e}");
+            }
         }
 
         /// <summary>
@@ -327,6 +350,8 @@ namespace SEE.Tools.Architecture
             propagatedEdgesRemoved = null;
             implementationEdgesAdded = null;
             implementationEdgesRemoved = null;
+            architectureEdgesAdded = null;
+            architectureEdgesRemoved = null;
         }
 
         protected Node NewNode(bool inArchitecture, string linkname, string type = "Routine")
@@ -394,6 +419,10 @@ namespace SEE.Tools.Architecture
                 case ImplementationEdgeAdded @event: implementationEdgesAdded.Add(@event);
                     break;
                 case ImplementationEdgeRemoved @event: implementationEdgesRemoved.Add(@event);
+                    break;
+                case ArchitectureEdgeAdded @event: architectureEdgesAdded.Add(@event);
+                    break;
+                case ArchitectureEdgeRemoved @event: architectureEdgesRemoved.Add(@event);
                     break;
                 default: Debug.LogError($"UNHANDLED CALLBACK: {changeEvent}\n");
                     break;
