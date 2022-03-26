@@ -143,36 +143,30 @@ namespace SEE.Controls
         /// executing on this local instance of Unity.
         /// </summary>
         public static GameObject LocalPlayer
-        {   get
+        {
+            get
             {
                 if (localPlayer == null)
                 {
-                    if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
-                    {
-                        // The local player is holding the main camera. Remote players do not have
-                        // a camera attached. Hence, we only need to retrieve that camera.
-
-                        /// FIXME: This should be the case for all environments as soon as we
-                        /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
-                        /// <see cref="SEE.Game.Avatars.AvatarAdapter"/>
-                        localPlayer = MainCamera.Camera.gameObject;
-                    }
+                    localPlayer = LocalPlayerForDesktop();
                 }
                 return localPlayer;
-            }
-            private set
-            {
-                if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer)
+
+                static GameObject LocalPlayerForDesktop()
                 {
                     // The local player is holding the main camera. Remote players do not have
                     // a camera attached. Hence, we only need to retrieve that camera.
 
                     /// FIXME: This should be the case for all environments as soon as we
                     /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
-                    /// <see cref="SEE.Game.Avatars.AvatarAdapter"/>
-                    localPlayer = MainCamera.Camera.gameObject;
+                    /// <see cref="Game.Avatars.AvatarAdapter"/>
+                    return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
+                        MainCamera.Camera.gameObject : null;
                 }
-                else
+            }
+            private set
+            {
+                if (LocalPlayer == null)
                 {
                     localPlayer = value;
                 }
