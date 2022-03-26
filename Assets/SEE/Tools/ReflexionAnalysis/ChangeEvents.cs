@@ -216,4 +216,54 @@ namespace SEE.Tools.ReflexionAnalysis
             return base.ToString() + $": implementation edge '{AddedEdge}' has been added to the graph.";
         }
     }
+    
+    /// <summary>
+    /// A change event fired when an edge has been removed from the architecture.
+    /// </summary>
+    public class ArchitectureEdgeRemoved : ChangeEvent
+    {
+        /// <summary>
+        /// The edge removed from the Architecture.
+        /// </summary>
+        public readonly Edge RemovedEdge;
+
+        /// <summary>
+        /// Constructor preserving the edge removed from the architecture.
+        /// </summary>
+        /// <param name="removedEdge">the architecture edge being removed</param>
+        public ArchitectureEdgeRemoved(Edge removedEdge)
+        {
+            RemovedEdge = removedEdge;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $": architecture edge '{RemovedEdge}' has been removed from the graph.";
+        }
+    }
+    
+    /// <summary>
+    /// A change event fired when an edge has been added to the architecture.
+    /// </summary>
+    public class ArchitectureEdgeAdded : ChangeEvent
+    {
+        /// <summary>
+        /// The edge added to the Architecture.
+        /// </summary>
+        public readonly Edge AddedEdge;
+
+        /// <summary>
+        /// Constructor receiving the edge added to the architecture.
+        /// </summary>
+        /// <param name="addedEdge">the architecture edge being added</param>
+        public ArchitectureEdgeAdded(Edge addedEdge)
+        {
+            AddedEdge = addedEdge;
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $": architecture edge '{AddedEdge}' has been added to the graph.";
+        }
+    }
 }
