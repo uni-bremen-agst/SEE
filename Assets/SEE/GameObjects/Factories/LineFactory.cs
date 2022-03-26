@@ -116,7 +116,7 @@ namespace SEE.GO
         /// <param name="from">the start of the line</param>
         /// <param name="to">the end of the line</param>
         /// <param name="width">the width of the line</param>
-        /// <param name="material">the material to be used (will considered a shared material)</param>
+        /// <param name="material">the material to be used (will be considered a shared material)</param>
         /// <returns>the existing or newly added <see cref="LineRenderer"/></returns>
         internal static LineRenderer Draw(GameObject gameObject, Vector3 from, Vector3 to, float width, Material material = null)
         {
