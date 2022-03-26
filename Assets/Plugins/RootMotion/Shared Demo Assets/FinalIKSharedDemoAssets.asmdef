@@ -1,0 +1,16 @@
+{
+    "name": "FinalIKSharedDemoAssets",
+    "rootNamespace": "",
+    "references": [
+        "GUID:46a21e0309a070340b48841dea4af81b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
