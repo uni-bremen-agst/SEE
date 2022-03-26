@@ -93,8 +93,8 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file); 
-                    
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file);
+                        Debug.Log("NETWORK ADD");
                         break;
                     case RemoteAction.SingleAddChar:
                         ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file); 
