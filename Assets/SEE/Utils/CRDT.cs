@@ -25,58 +25,111 @@ namespace SEE.Utils
             public DeleteNotPossibleException(string v) : base(v)
             { }
         }
-
         public class PositionAlreadyExistsException : Exception
         {
             public PositionAlreadyExistsException(string v) : base(v)
             { }
         }
 
+        /// <summary>
+        /// The Identifier represents a position inside of the CRDT.
+        /// It contains the digit e.g. the index and the SiteID e.g. the user that added the char.
+        /// </summary>
         public class Identifier
         {
             private int digit;
             private string site;
+
+            /// <summary>
+            /// The Identifier represents a position inside of the CRDT.
+            /// It contains the digit e.g. the index and the SiteID e.g. the user that added the char.
+            /// </summary>
+            /// <param name="digit">The digit representing an index</param>
+            /// <param name="site">The SiteID of a user.</param>
             public Identifier(int digit, string site)
             {
                 this.digit = digit;
                 this.site = site;
             }
+
+            /// <summary>
+            /// Converts the Identifer to a string.
+            /// </summary>
+            /// <returns>The Identifier represented as string.</returns>
             public override string ToString()
             {
                 return "(" + digit + ", " + site + ")";
             }
 
+            /// <summary>
+            /// Gets the digit of a Identifier.
+            /// </summary>
+            /// <returns>The digit.</returns>
             public int GetDigit()
             {
                 return digit;
             }
+
+            /// <summary>
+            /// Sets the digit of the Identifier.
+            /// </summary>
+            /// <param name="digit">The digit to set.</param>
             public void SetDigit(int digit)
             {
                 this.digit = digit;
             }
+
+            /// <summary>
+            /// Gets the SiteID of the Identifier.
+            /// </summary>
+            /// <returns>The SiteID.</returns>
             public string GetSite()
             {
                 return site;
             }
         }
+
+        /// <summary>
+        ///  A CharObj represents an Char in the CRDT contains a position that is unique and a char as value.
+        /// </summary>
         public class CharObj
         {
             private Identifier[] position;
             private char value;
+
+            /// <summary>
+            /// A CharObj represents an Char in the CRDT contains a position that is unique and a char as value.
+            /// </summary>
+            /// <param name="value">The Char.</param>
+            /// <param name="position">The unique position in the CRDT.</param>
             public CharObj(char value, Identifier[] position)
             {
                 this.value = value;
                 this.position = position;
             }
 
+            /// <summary>
+            /// Gets the value of the CharObj btw. the Char.
+            /// </summary>
+            /// <returns>The value.</returns>
             public char GetValue()
             {
                 return value;
             }
+
+            /// <summary>
+            /// Gets the Identifier btw. Position.
+            /// </summary>
+            /// <returns>The Identifier[].</returns>
             public Identifier[] GetIdentifier()
             {
                 return position;
             }
+
+            /// <summary>
+            /// Converts the CharObj in to a string.
+            /// </summary>
+            /// <returns>The CharObj as String.</returns>
             public override string ToString()
             {
                 string result = value + " [";
@@ -101,8 +154,8 @@ namespace SEE.Utils
 
         }
         /// <summary>
-        /// The crdt history contains all local add and delete char operations, as well as the remote deleteChar operations, because that can blockade a inverse operation of a local add char
-        /// It contains a CharObj[] (char + position) and a operationType (add or delete or remoteDelete).
+        /// The crdt history contains all local add and delete char operations
+        /// It contains a CharObj[] (char + position) and a operationType (add or delete).
         /// </summary>
 
         private Stack<(CharObj[], operationType)> undoStack = new Stack<(CharObj[], operationType)>();
@@ -149,21 +202,33 @@ namespace SEE.Utils
             this.size = size;
         }
 
+        /// <summary>
+        /// Gets the SiteID of the User in the CRDT.
+        /// </summary>
+        /// <returns>The SiteID.</returns>
         public string getId()
         {
             return siteID;
         }
 
+        /// <summary>
+        /// Sets the SiteID of the user in the CRDT.
+        /// </summary>
+        /// <param name="id">The user ID to set.</param>
         public void setId(string id)
         {
             siteID = id;
         }
 
         /// <summary>
-        /// The chars of the CRDT with their positions
+        /// The chars of the CRDT with their positions.
         /// </summary>
         private List<CharObj> crdt = new List<CharObj>(capacity: 5000);
 
+        /// <summary>
+        /// Gets the CRDT.
+        /// </summary>
+        /// <returns>The CRDT.</returns>
         public List<CharObj> getCRDT()
         {
             return crdt;
@@ -172,10 +237,9 @@ namespace SEE.Utils
         /// <summary>
         /// Expects a string in the following format(| is not in the string only here for the readability): Char|PositionAsString|/|PositionAsString|\n|nextLine
         /// PositionAsString can be null (\0);
-        /// Adds the string to the CRDT only for remote use
+        /// Adds the string to the CRDT only for remote use.
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="file"></param>
+        /// <param name="text">The remote changes as string.</param>
         public void RemoteAddString(string text)
         {
             bool CharSet = false;
@@ -224,6 +288,11 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// For the later Connection of a client into an existing session //TODO: Actualy it doesnt work right now so it need to be reworked
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="position"></param>
         public void SingleRemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/)
         {
             if (IsEmpty())
@@ -245,6 +314,7 @@ namespace SEE.Utils
             if(position != null && position.Length > 0)
             {
                 int insertIdx =  FindFittingIndex(position); //TODO Eventuell try catch
+                Debug.Log("INSERT IDX " + insertIdx);
                 crdt.Insert(insertIdx, new CharObj(c, position));
                 changeEvent.Invoke(c, insertIdx, operationType.Add);
             }
@@ -339,11 +409,13 @@ namespace SEE.Utils
                 throw new DeleteNotPossibleException("Index is out of range!");
             }
         }
+
         /// <summary>
         /// Adds a string to the CRDT at the startIdx | for the small data changes
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
+        /// <param name="disarmUndo">At the start up we dont want to be able of using undo so we should disarm it</param>
         public void AddString(string s, int startIdx, bool disarmUndo = false)
         {
             List<CharObj> charObjs = new List<CharObj>(s.Length);
@@ -357,9 +429,7 @@ namespace SEE.Utils
                 CharObj[] charArr = charObjs.ToArray();
                 undoStack.Push((charArr, operationType.Add));
                 redoStack.Clear();
-            }
-            
-
+            }    
         }
 
         /// <summary>
@@ -367,7 +437,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        /// <param name="dontSyncCodeWindowChars"></param>
+        /// <param name="startUp">Is this the Startup from a CRDT btw. CodeWindow</param>
         public async UniTask AsyncAddString(string s, int startIdx, bool startUp = false)
         {
             await UniTask.SwitchToThreadPool();
@@ -406,6 +476,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="index">The index in the local string</param>
+        /// <param name="startUp">Is this the StartUp of an CRDT btw. the CodeWindow</param>
         public void AddChar(char c, int index, bool startUp = false)
         {
             Identifier[] position;
@@ -619,6 +690,11 @@ namespace SEE.Utils
             return (-1, null);
         }
 
+        /// <summary>
+        /// Finds the fitting index for a given position. 
+        /// </summary>
+        /// <param name="position">The position that needs an index</param>
+        /// <returns>The index</returns>
         public int FindFittingIndex(Identifier[] position)
         {
 
@@ -771,7 +847,13 @@ namespace SEE.Utils
             return delta;
         }
 
-
+        /// <summary>
+        /// Finds the next position where the given position fits in between the next smaller and bigger position using the binary search pattern
+        /// </summary>
+        /// <param name="position">The position that should be fit in</param>
+        /// <param name="start">The start of the search space</param>
+        /// <param name="end">The end of the search space</param>
+        /// <returns>The fitting index</returns>
         private int BinaryIndexFinder(Identifier[] position, int start, int end)
         {
             if (start < end)
@@ -841,7 +923,9 @@ namespace SEE.Utils
             return -1;
         }
 
-
+        /// <summary>
+        /// Undos the last operation
+        /// </summary>
         public void Undo()
         {
             if (undoStack.Count < 1)
@@ -878,6 +962,9 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Redos the last action
+        /// </summary>
         public void Redo()
         {
             if (redoStack.Count < 1)
