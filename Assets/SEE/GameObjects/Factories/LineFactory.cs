@@ -142,17 +142,22 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the vertices of the <paramref name="line"/> to <paramref name="linePoints"/>.
-        /// The number of points in <paramref name="line"/> and <paramref name="linePoints"/>
-        /// must match.
+        /// Sets the vertices of the <paramref name="line"/> to <paramref name="from"/>
+        /// and <paramref name="to"/>.
+        /// Precondition: <paramref name="line"/> must be a single line consisting of
+        /// two points. We do not want to change a true polyline by a single line.
         /// </summary>
         /// <param name="line">line to be redrawn</param>
         /// <param name="from">the start of the line</param>
         /// <param name="to">the end of the line</param>
         /// <exception cref="System.Exception">thrown if the number of points in <paramref name="line"/> is
-        /// different from 2</exception>
+        /// different from two</exception>
         internal static void ReDraw(LineRenderer line, Vector3 from, Vector3 to)
         {
+            if (line.positionCount != 2)
+            {
+                throw new System.Exception("Numbers of line points do not match.");
+            }
             line.SetPositions(new Vector3[] { from, to });
         }
     }
