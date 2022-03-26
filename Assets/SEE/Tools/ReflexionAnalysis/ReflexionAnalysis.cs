@@ -715,58 +715,6 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Adds the given dependency <paramref name="edge"/> to the architecture graph. This edge will
-        /// be considered as a specified dependency.
-        /// Precondition: <paramref name="edge"/> must not be contained in the architecture graph and must
-        /// represent a dependency.
-        /// Postcondition: <paramref name="edge"/> is contained in the architecture graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="edge">the dependency edge to be added to the architecture graph</param>
-        public void AddToArchitecture(Edge edge)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes the given specified dependency <paramref name="edge"/> from the architecture.
-        /// Precondition: <paramref name="edge"/> must be contained in the architecture graph
-        ///   and must represent a specified dependency.
-        /// Postcondition: <paramref name="edge"/> is no longer contained in the architecture graph and the reflexion
-        ///   data are updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
-        public void DeleteFromArchitecture(Edge edge)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Adds given dependency <paramref name="edge"/> to the implementation graph.
-        /// Precondition: <paramref name="edge"/> must not be contained in the implementation graph
-        /// Postcondition: <paramref name="edge"/> is contained in the implementation graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="edge">the dependency edge to be added to the implementation graph</param>
-        public void AddToDependencies(Edge edge)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes the given dependency <paramref name="edge"/> from the implementation graph.
-        /// Precondition: <paramref name="edge"/> must be contained in the implementation graph
-        ///   and edge must be a dependency.
-        /// Postcondition: <paramref name="edge"/> is no longer contained in the implementation graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="edge">the dependency edge to be removed from the implementation graph</param>
-        private void DeleteFromDependencies(Edge edge)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
         /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
         /// in the node hierarchy of the implementation graph.
         /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the

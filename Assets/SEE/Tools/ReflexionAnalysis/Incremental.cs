@@ -13,39 +13,44 @@ namespace SEE.Tools.ReflexionAnalysis
     public partial class Reflexion
     {
         /// <summary>
-        /// Adds an edge from <paramref name="from"/> to <paramref name="to"/> of type <paramref name="type"/>
-        /// to the implementation graph, returning the new edge and adjusting the reflexion analysis incrementally.
+        /// Adds an the given <paramref name="edge"/> to the implementation graph,
+        /// adjusting the reflexion analysis incrementally.
         /// This will propagate and lift the new edge, thereby increasing the counter of the matching specified edge
         /// if it exists.
         /// 
-        /// Pre-condition: <paramref name="from"/> and <paramref name="to"/> are contained in the implementation graph.
+        /// Preconditions:
+        /// <ul>
+        /// <li><paramref name="edge"/> is not yet in the reflexion graph.</li>
+        /// <li><paramref name="edge"/>'s connected nodes are contained in the implementation graph.</li>
+        /// </ul>
+        /// 
+        /// Postcondition: <paramref name="edge"/> is contained in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change by an <see cref="ImplementationEdgeAdded"/>
+        ///   event.
         /// </summary>
-        /// <param name="from">Source of the new edge</param>
-        /// <param name="to">Target of the new edge</param>
-        /// <param name="type">Type of the new edge</param>
-        /// <returns>The newly created edge</returns>
-        public Edge AddToImplementation(Node from, Node to, string type)  // TODO: Support counter in the future
+        /// <param name="edge">the new edge</param>
+        public void AddToImplementation(Edge edge)
         {
-            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
-            Edge edge = new Edge(from, to, type);
+            Assert.IsTrue(!FullGraph.ContainsEdge(edge));
+            Assert.IsTrue(edge.Source.IsInImplementation() && edge.Target.IsInImplementation());
             edge.SetInImplementation();
             FullGraph.AddEdge(edge);
             Notify(new ImplementationEdgeAdded(edge));
             PropagateAndLiftDependency(edge);
-            return edge;
         }
-        
+
         /// <summary>
         /// Removes an edge from the implementation graph, adjusting the reflexion analysis incrementally.
         /// This will reduce the counter attribute of a corresponding propagated edge, if it exists, and may
         /// cause previously convergent edges to now become absent.
         ///
-        /// Pre-condition: <paramref name="edge"/> is an implementation edge.
+        /// Precondition: <paramref name="edge"/> is an implementation edge contained in the reflexion graph.
         /// </summary>
         /// <param name="edge">The implementation edge to be removed from the graph.</param>
         public void DeleteFromImplementation(Edge edge)
         {
             Assert.IsTrue(edge.IsInImplementation());
+            Assert.IsTrue(FullGraph.ContainsEdge(edge));
             Edge propagated = GetPropagatedDependency(edge);
             if (propagated != null)
             {
