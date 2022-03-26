@@ -51,6 +51,15 @@ namespace SEE.IDE
     /// </summary>
     public partial class IDEIntegration : MonoBehaviour
     {
+        /// <summary>
+        /// Whether the integration with the IDE should be enabled.
+        ///
+        /// TODO: We need to turn this into a property to be able to enable/disable
+        /// IDE integration at run-time. But that needs a bit more thinking.
+        /// For the time being, it remains a regular field that will cause the
+        /// <see cref="Instance"/> to be destroyed in <see cref="Awake"/> in
+        /// case this field is false.
+        /// </summary>
         [Tooltip("Whether the integration with the IDE should be enabled.")]
         public bool EnableIDEIntegration = false;
 
@@ -151,6 +160,7 @@ namespace SEE.IDE
             if (!EnableIDEIntegration)
             {
                 enabled = false;
+                Destroy(this);
             }
         }
 
