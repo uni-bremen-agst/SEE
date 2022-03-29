@@ -491,6 +491,15 @@ namespace SEE.Controls
                 || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
         }
 
+        /// <summary>
+        /// True if the user wishes to point.
+        /// </summary>
+        /// <returns>true if the user wishes to point</returns>
+        public static bool TogglePointing()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Pointing);
+        }
+
         //--------------------------
         // Evolution
         //--------------------------

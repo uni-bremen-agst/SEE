@@ -108,6 +108,11 @@ namespace SEE.Game.City
         public LabelAttributes LabelSettings = new LabelAttributes();
 
         /// <summary>
+        /// Width of the outline for leaf and inner nodes.
+        /// </summary>
+        public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+
+        /// <summary>
         /// Saves the settings in the configuration file.
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
@@ -120,6 +125,7 @@ namespace SEE.Game.City
             ColorRange.Save(writer, ColorRangeLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
             AntennaSettings.Save(writer, AntennaSettingsLabel);
+            writer.Save(OutlineWidth, OutlineWidthLabel);
             SaveAdditionalAttributes(writer);
             writer.EndGroup();
         }
@@ -142,6 +148,7 @@ namespace SEE.Game.City
                 ColorRange.Restore(values, ColorRangeLabel);
                 LabelSettings.Restore(values, LabelSettingsLabel);
                 AntennaSettings.Restore(values, AntennaSettingsLabel);
+                ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
             }
         }
 
@@ -155,6 +162,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Label in the configuration file for the kind of object drawn for a node.
+        /// It must be visible to the subclasses.
         /// </summary>
         protected const string NodeKindsLabel = "Kind";
         /// <summary>
@@ -177,6 +185,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for the antenna settings for leaf and inner nodes.
         /// </summary>
         private const string AntennaSettingsLabel = "AntennnaSettings";
+        /// <summary>
+        /// Label in the configuration file for the width of the outline for leaf and inner nodes.
+        /// </summary>
+        private const string OutlineWidthLabel = "OutlineWidth";
     }
 
     /// <summary>
@@ -278,15 +290,28 @@ namespace SEE.Game.City
         public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
 
         /// <summary>
+        /// If true, persistent text labels will be added to inner nodes.
+        /// </summary>
+        public bool ShowNames = false;
+
+        /// <summary>
         /// Saves the settings specific to this class in the configuration file.
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
         protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
             writer.Save(Kind.ToString(), NodeKindsLabel);
+            writer.Save(ShowNames, ShowNamesLabel);
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
         }
 
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
         public override void Restore(Dictionary<string, object> attributes, string label)
         {
             base.Restore(attributes, label);
@@ -295,11 +320,13 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
+                ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
                 ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
             }
         }
 
         private const string InnerDonutMetricLabel = "InnerDonutMetric";
+        private const string ShowNamesLabel = "ShowNames";
     }
 
     /// <summary>

@@ -31,40 +31,41 @@ namespace SEE.Controls.Actions
             new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph",
                                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                                 RotateAction.CreateReversibleAction);
+        public static ActionStateType Hide { get; } =
+            new ActionStateType(2, "Hide", "Hides nodes or edges",
+                       Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
+
         public static ActionStateType Map { get; } =
-            new ActionStateType(2, "Map", "Map a node from one graph to another graph",
+            new ActionStateType(3, "Map", "Map a node from one graph to another graph",
                                 Color.green.Darker(), "Materials/ModernUIPack/Map",
                                 MappingAction.CreateReversibleAction);
         public static ActionStateType NewEdge { get; } =
-            new ActionStateType(3, "New Edge", "Draw a new edge between two nodes",
+            new ActionStateType(4, "New Edge", "Draw a new edge between two nodes",
                                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                                 AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
-            new ActionStateType(4, "New Node", "Create a new node",
+            new ActionStateType(5, "New Node", "Create a new node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                                 AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
-            new ActionStateType(5, "Edit Node", "Edit a node",
+            new ActionStateType(6, "Edit Node", "Edit a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                                 EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new ActionStateType(6, "Scale Node", "Scale a node",
+            new ActionStateType(7, "Scale Node", "Scale a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new ActionStateType(7, "Delete", "Delete a node or an edge",
+            new ActionStateType(8, "Delete", "Delete a node or an edge",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
-            new ActionStateType(8, "Show Code", "Display the source code of a node.",
+            new ActionStateType(9, "Show Code", "Display the source code of a node.",
                                 Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
-            new ActionStateType(9, "Draw", "Draw a line",
+            new ActionStateType(10, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
-        public static ActionStateType Hide { get; } =
-            new ActionStateType(10, "Hide Node", "Hides a node",
-                               Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
@@ -106,14 +107,14 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Constructor allowing to set <see cref="CreateReversible"/>.
-        /// 
+        ///
         /// This constructor is needed for the test cases which implement
-        /// their own variants of <see cref="ReversibleAction"/> and 
+        /// their own variants of <see cref="ReversibleAction"/> and
         /// which need to provide an <see cref="ActionStateType"/> of
         /// their own.
         /// </summary>
         /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
-        protected ActionStateType(CreateReversibleAction createReversible) 
+        protected ActionStateType(CreateReversibleAction createReversible)
         {
             CreateReversible = createReversible;
         }
