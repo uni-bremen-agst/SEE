@@ -21,7 +21,45 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
+#if UNITY_ANDROID
+            // Check for touch input
+            if (Input.touchCount != 1)
+            {
+                return result;
+            }
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
 
+            if (touch.phase == TouchPhase.Began)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+                RaycastHit raycastHit;
+                if (Physics.Raycast(ray, out raycastHit))
+                {
+                    if (raycastHit.collider.tag == "Node")
+                    {
+                        // the hit object is the parent in which to create the new node
+                        GameObject parent = raycastHit.collider.gameObject;
+                        // The position at which the parent was hit will be the center point of the new node
+                        Vector3 position = raycastHit.point;
+                        Vector3 scale = FindSize(parent, position);
+                        addedGameNode = GameNodeAdder.AddChild(parent, position: position, worldSpaceScale: scale);
+                        if (addedGameNode != null)
+                        {
+                            memento = new Memento(parent, position: position, scale: scale);
+                            memento.NodeID = addedGameNode.name;
+                            new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                            result = true;
+                            currentState = ReversibleAction.Progress.Completed;
+                        }
+                        else
+                        {
+                            Debug.LogError($"New node could not be created.\n");
+                        }
+                    }
+                }
+            }
+#else
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
@@ -45,6 +83,7 @@ namespace SEE.Controls.Actions
                     Debug.LogError($"New node could not be created.\n");
                 }
             }
+#endif
             return result;
         }
 

@@ -104,7 +104,6 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected void InitializeMobileMenu()
         {
-            Debug.Log(Entries.Count);
             #region set up buttons
             // for the entry menu the entries count is 3 (Host, Client, Settings),
             // therefore the menu need to be set up in the desktop way
