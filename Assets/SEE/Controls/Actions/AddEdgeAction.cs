@@ -129,6 +129,55 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
+#if UNITY_ANDROID
+            // Check for touch input
+            if (Input.touchCount != 1)
+            {
+                return false;
+            }
+
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+                RaycastHit raycastHit;
+                if (Physics.Raycast(ray, out raycastHit))
+                {
+                    if (raycastHit.collider.tag == "Node")
+                    {
+                        if (from == null)
+                        {
+                            // No source selected yet; this interaction is meant to set the source.
+                            from = raycastHit.collider.gameObject;
+                        }
+                        else if (to == null)
+                        {
+                            // Source is already set; this interaction is meant to set the target.
+                            to = raycastHit.collider.gameObject;
+                        }
+                    }
+                }
+                // Note: from == to may be possible.
+                if (from != null && to != null)
+                {
+                    // We have both source and target of the edge.
+                    // FIXME: In the future, we need to query the edge type from the user.
+                    memento = new Memento(from, to, DefaultEdgeType);
+                    createdEdge = CreateEdge(memento);
+
+                    if (createdEdge != null)
+                    {
+                        // action is completed (successfully or not; it does not matter)
+                        from = null;
+                        to = null;
+                        result = true;
+                        currentState = ReversibleAction.Progress.Completed;
+                    }
+                }
+            }
+#else
 
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
@@ -170,6 +219,7 @@ namespace SEE.Controls.Actions
                 from = null;
                 to = null;
             }
+#endif
             return result;
         }
 
