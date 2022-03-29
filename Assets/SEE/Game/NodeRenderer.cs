@@ -584,12 +584,10 @@ namespace SEE.Game
             }
 
             // Add text labels for all inner nodes
-            /*if (nodeLayout == NodeLayoutKind.Balloon
-                || nodeLayout == NodeLayoutKind.EvoStreets
-                || nodeLayout == NodeLayoutKind.CirclePacking)
+            if (Settings.InnerNodeSettings.ShowNames)
             {
                 AddLabels(innerNodes, innerNodeFactory);
-            }*/
+            }
 
             foreach (GameObject node in leafNodes.Concat(innerNodes))
             {
@@ -652,7 +650,8 @@ namespace SEE.Game
             // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
             // other nodes, and to show when a node is being highlighted by making it opaque.
             //TODO: Make transparency value configurable
-            Outline.Create(node, Color.black);
+            Outline.Create(node, Color.black,
+                           node.IsLeaf() ? Settings.LeafNodeSettings.OutlineWidth : Settings.InnerNodeSettings.OutlineWidth);
             node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
         }
 

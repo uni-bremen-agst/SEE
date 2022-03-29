@@ -339,7 +339,8 @@ namespace SEEEditor
                 settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
                 AntennaAttributes(ref showInnerAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "InnerNodeSettings.AntennaSettings.AntennaSections");
                 LabelSettings(ref showInnerLabelAttributes, ref settings.LabelSettings);
-
+                settings.ShowNames = EditorGUILayout.Toggle("Persistent names", settings.ShowNames);
+                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
                 EditorGUI.indentLevel--;
             }
         }
@@ -347,13 +348,14 @@ namespace SEEEditor
         /// <summary>
         /// Renders the GUI for antenna attributes of leaf and inner nodes.
         /// </summary>
+        /// <param name="showAntennaAttributes">whether the fold out for the antenna settings should be shown</param>
+        /// <param name="antennaWidth">the width of the antenna</param>
         /// <param name="antennaSettingsProperty">the path of the antenna settings to be set by this dialog part relative to the edited city</param>
         private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, string antennaSettingsProperty)
         {
             showAntennaAttributes = EditorGUILayout.Foldout(showAntennaAttributes, "Antenna", true, EditorStyles.foldoutHeader);
             if (showAntennaAttributes)
             {
-
                 EditorGUI.indentLevel++;
                 antennaWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", antennaWidth));
                 SerializedProperty sections = serializedObject.FindProperty(antennaSettingsProperty);
@@ -394,6 +396,7 @@ namespace SEEEditor
                 settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
                 AntennaAttributes(ref showLeafAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "LeafNodeSettings.AntennaSettings.AntennaSections");
                 LabelSettings(ref showLeafLabelAttributes, ref settings.LabelSettings);
+                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
 
                 EditorGUI.indentLevel--;
             }

@@ -48,12 +48,15 @@ namespace SEE.Game.Worlds
                 yield return null;
             }
 
-            // Terminate this co-routine.
+            // Terminate this co-routine if not run by the server.
             if (!networkManager.IsServer)
             {
                 yield break;
             }
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // The following code will be executed only on the server.
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             // Wait until Dissonance is created
             while (ReferenceEquals(dissonanceComms, null))
@@ -66,6 +69,7 @@ namespace SEE.Game.Worlds
             // ran on the server and on the local client that connects. We want
             // to spawn a player whenever a client connects.
             networkManager.OnClientConnectedCallback += Spawn;
+            networkManager.OnClientDisconnectCallback += ClientDisconnects;
             // Spawn the local player.
             Spawn(networkManager.LocalClientId);
         }
@@ -82,11 +86,11 @@ namespace SEE.Game.Worlds
         /// <param name="owner">the network ID of the owner</param>
         private void Spawn(ulong owner)
         {
-            numberOfSpawnedPlayers++;
             GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
                                             InitialPosition, Quaternion.Euler(InitialRotation));
+            numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
-            Debug.Log($"Spawned {player.name} (local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+            Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
@@ -95,6 +99,15 @@ namespace SEE.Game.Worlds
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
+        }
+
+        /// <summary>
+        /// Emits that the client with given <paramref name="networkID"/> has disconnected.
+        /// </summary>
+        /// <param name="networkID">the network ID of the disconnecting client</param>
+        private void ClientDisconnects(ulong networkID)
+        {
+            Debug.Log($"Player with ID {networkID} (local: {IsLocal(networkID)}) disconnects.\n");
         }
 
         /// <summary>

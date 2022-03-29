@@ -137,11 +137,41 @@ namespace SEE.Controls
             }
         }
 
+        private static GameObject localPlayer;
         /// <summary>
         /// The game object representing the active local player, that is, the player
         /// executing on this local instance of Unity.
         /// </summary>
-        public static GameObject LocalPlayer { get; private set; }
+        public static GameObject LocalPlayer
+        {
+            get
+            {
+                if (localPlayer == null)
+                {
+                    localPlayer = LocalPlayerForDesktop();
+                }
+                return localPlayer;
+
+                static GameObject LocalPlayerForDesktop()
+                {
+                    // The local player is holding the main camera. Remote players do not have
+                    // a camera attached. Hence, we only need to retrieve that camera.
+
+                    /// FIXME: This should be the case for all environments as soon as we
+                    /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
+                    /// <see cref="Game.Avatars.AvatarAdapter"/>
+                    return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
+                        MainCamera.Camera.gameObject : null;
+                }
+            }
+            private set
+            {
+                if (LocalPlayer == null)
+                {
+                    localPlayer = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
@@ -188,7 +218,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates the kind of player required for the given <paramref name="inputType"/>.
+        /// Finds or creates the kind of player required for the given <paramref name="inputType"/>.
         /// For some players, additional game objects and/or components will be added to the
         /// scene required for the particular player to work correctly.
         /// </summary>
@@ -202,25 +232,24 @@ namespace SEE.Controls
 
             switch (inputType)
             {
-                /// FIXME: This could should be moved to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                 case PlayerInputType.DesktopPlayer:
-                    /// The code original executed here has now be moved to
-                    /// <see cref="SEE.Game.Avatars.AvatarAdapter"/>. The other
-                    /// code must be moved there, too.
                     return null;
                 case PlayerInputType.VRPlayer:
                     {
+                        /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = PlayerFactory.CreateVRPlayer();
                         SetupVR(player);
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:
                     {
+                        /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = PlayerFactory.CreateHololensPlayer();
                         SetupMixedReality();
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
+                    /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                     player = PlayerFactory.CreateTouchGamepadPlayer();
                     break;
                 case PlayerInputType.None: return null; // No player needs to be created

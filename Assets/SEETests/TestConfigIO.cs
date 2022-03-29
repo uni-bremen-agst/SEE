@@ -788,7 +788,9 @@ namespace SEE.Utils
             city.InnerNodeSettings.HeightMetric = "X";
             city.InnerNodeSettings.ColorMetric = "X";
             city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
+            city.InnerNodeSettings.ShowNames = true;
             city.InnerNodeSettings.InnerDonutMetric = "X";
+            city.InnerNodeSettings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref city.InnerNodeSettings.AntennaSettings);
             WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
         }
@@ -799,7 +801,9 @@ namespace SEE.Utils
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
+            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
             Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
+            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
         }
@@ -814,6 +818,7 @@ namespace SEE.Utils
             city.LeafNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             city.LeafNodeSettings.MinimalBlockLength = 90000;
             city.LeafNodeSettings.MaximalBlockLength = 1000000;
+            city.LeafNodeSettings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref city.LeafNodeSettings.AntennaSettings);
             WipeOutLabelSettings(ref city.LeafNodeSettings.LabelSettings);
         }
@@ -828,6 +833,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
+            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
         }
