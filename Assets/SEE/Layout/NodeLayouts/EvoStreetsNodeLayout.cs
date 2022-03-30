@@ -19,32 +19,39 @@ namespace SEE.Layout.NodeLayouts
         : base(groundLevel)
         {
             name = "EvoStreets";
-            OffsetBetweenBuildings *= Unit;
-            StreetWidth *= Unit;
-            StreetHeight *= Unit;
+            offsetBetweenBuildings *= Unit;
+            streetHeight *= Unit;
         }
+
+        /// <summary>
+        /// The street width of the root node. The width of streets deeper in the hierarchy
+        /// will be downscaled by the "depth" relative to this value (<see cref="RelativeStreetWidth"/>).
+        /// It will be calculated by <see cref="CalculateStreetWidth(IList{ILayoutNode})"/>.
+        /// </summary>
+        private float streetWidth = 0.2f;
+
+        /// <summary>
+        /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
+        /// parameter of the widths and depths of all leaf nodes (the average) and adjusts
+        /// this statistical parameter by multiplying it with this factor <see cref="StreetWidthPercentage"/>.
+        /// </summary>
+        private const float StreetWidthPercentage = 0.3f;
 
         /// <summary>
         /// The distance between two neighboring leaf-node representations.
         /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
-        private readonly float OffsetBetweenBuildings = 1.0f;
-
-        /// <summary>
-        /// The base street width that will be adjusted by the "depth" of the street
-        /// (<see cref="RelativeStreetWidth"/>).
-        /// The actual value used will be multiplied by leafNodeFactory.Unit.
-        /// </summary>
-        private readonly float StreetWidth = 10.0f;
+        private readonly float offsetBetweenBuildings = 0.05f;
 
         /// <summary>
         /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
-        /// The actual value used will be multiplied by UnleafNodeFactory.Unit.
+        /// The actual value used will be multiplied by leafNodeFactory.Unit.
         /// </summary>
-        private readonly float StreetHeight = 0.05f;
+        private readonly float streetHeight = 0.0001f;
 
         /// <summary>
         /// The maximal depth of the ENode tree hierarchy. Set by Layout and used by RelativeStreetWidth.
+        /// The depth of a tree with only one node is 1.
         /// </summary>
         private int maximalDepth;
 
@@ -78,15 +85,40 @@ namespace SEE.Layout.NodeLayouts
             }
 
             {
+                streetWidth = CalculateStreetWidth(layoutNodes);
                 ILayoutNode root = roots.FirstOrDefault();
                 ENode rootNode = GenerateHierarchy(root);
                 maximalDepth = MaxDepth(root);
                 SetScalePivotsRotation(rootNode);
                 CalculationNodeLocation(rootNode, Vector3.zero);
                 Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
-                To_Layout(rootNode, ref layoutResult);
+                ToLayout(rootNode, ref layoutResult);
                 return layoutResult;
             }
+        }
+
+        /// <summary>
+        /// Returns the width of the street for the root as a percentage <see cref="StreetWidthPercentage"/>
+        /// of the average of all widths and depths of leaf nodes in <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">the nodes to be laid out</param>
+        /// <returns>width of street for the root</returns>
+        private float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
+        {
+            float result = 0;
+            int numberOfLeaves = 0;
+            foreach (ILayoutNode node in layoutNodes)
+            {
+                if (node.IsLeaf)
+                {
+                    numberOfLeaves++;
+                    result += node.AbsoluteScale.x > node.AbsoluteScale.z ? node.AbsoluteScale.x : node.AbsoluteScale.z;
+                }
+            }
+            // assert: numberOfLeaves > 0
+            result /= numberOfLeaves;
+            // result is now the average length over all widths and depths of all leave nodes.
+            return result * StreetWidthPercentage;
         }
 
         /// <summary>
@@ -94,19 +126,19 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="node">root of a subtree to be added to the layout result</param>
         /// <param name="layout_result">layout result</param>
-        private void To_Layout(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
+        private void ToLayout(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
-            if (node.IsHouse())
+            if (node.IsLeaf())
             {
-                Place_House(node, ref layout_result);
+                PlaceHouse(node, ref layout_result);
             }
             else
             {
                 // Street
-                Place_Street(node, ref layout_result);
+                PlaceStreet(node, ref layout_result);
                 foreach (ENode child in node.Children)
                 {
-                    To_Layout(child, ref layout_result);
+                    ToLayout(child, ref layout_result);
                 }
             }
         }
@@ -116,9 +148,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="node">leaf node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_House(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
+        private void PlaceHouse(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
-            layout_result[node.GraphNode] = new NodeTransform(node.Location, node.Scale, node.Rotation);
+            layout_result[node.GraphNode] = new NodeTransform(node.Location, node.Scale, 0/*node.Rotation*/);
         }
 
         /// <summary>
@@ -126,12 +158,12 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="node">inner node</param>
         /// <param name="layout_result">layout result</param>
-        private void Place_Street(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
+        private void PlaceStreet(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
         {
             layout_result[node.GraphNode]
                 = new NodeTransform(node.Location,
-                                    new Vector3(node.Scale.x, StreetHeight, node.Scale.z),
-                                    node.Rotation);
+                                    new Vector3(node.Scale.x, streetHeight, node.Scale.z),
+                                    0/*node.Rotation*/);
         }
 
         /// <summary>
@@ -148,8 +180,7 @@ namespace SEE.Layout.NodeLayouts
             };
             foreach (ILayoutNode child in root.Children())
             {
-                ENode kid = GenerateHierarchy(result, child);
-                result.Children.Add(kid);
+                result.Children.Add(GenerateHierarchy(result, child));
             }
             return result;
         }
@@ -169,29 +200,24 @@ namespace SEE.Layout.NodeLayouts
             };
             foreach (ILayoutNode child in node.Children())
             {
-                ENode kid = GenerateHierarchy(result, child);
-                result.Children.Add(kid);
+                result.Children.Add(GenerateHierarchy(result, child));
             }
             return result;
         }
 
         /// <summary>
-        /// Determines the location and rotation of leaf nodes (houses) and the location, rotation and scaling
+        /// Determines the location of leaf nodes (houses) and the location and scale
         /// of inner nodes (streets).
         /// </summary>
         /// <param name="node">node whose layout information is to be determined</param>
         /// <param name="newLoc">the position at which to locate the node</param>
         private void CalculationNodeLocation(ENode node, Vector3 newLoc)
         {
-            float nextX;
-            float nextZ;
-
             // Note: pivots are 2D vectors where the y component actually represents a value on the z axis in 3D
             Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.z / 2);
-            Vector2 rotatedfromPivot = fromPivot.GetRotated(node.Rotation);
-            Vector2 toPivot = rotatedfromPivot;
+            Vector2 toPivot = fromPivot.GetRotated(node.Rotation);
 
-            if (node.IsHouse())
+            if (node.IsLeaf())
             {
                 Vector3 toGoal = new Vector3(toPivot.x, groundLevel, toPivot.y);
                 node.Location = newLoc + toGoal;
@@ -199,102 +225,102 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 // street
-                Vector2 StreetfromPivot = new Vector2(node.Scale.x / 2, node.ZPivot);
-                Vector2 StreetRotatedfromPivot = StreetfromPivot.GetRotated(node.Rotation);
                 float relStreetWidth = RelativeStreetWidth(node);
-                Vector3 StreetToGoal = new Vector3(StreetRotatedfromPivot.x, groundLevel, StreetRotatedfromPivot.y);
+                Vector2 streetfromPivot = new Vector2(node.Scale.x / 2, node.ZPivot);
+                Vector2 streetRotatedfromPivot = streetfromPivot.GetRotated(node.Rotation);
+                Vector3 toGoal = new Vector3(streetRotatedfromPivot.x, groundLevel, streetRotatedfromPivot.y);
 
-                node.Location = newLoc + StreetToGoal;
+                node.Location = newLoc + toGoal;
                 node.Scale = new Vector3(node.Scale.x, node.Scale.y, relStreetWidth);
 
-                foreach (ENode eNode in node.Children)
+                foreach (ENode child in node.Children)
                 {
-                    float streetMod = eNode.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
-                    Vector2 relChild = new Vector2(eNode.XPivot, 0.0f);
+                    Vector2 relChild = new Vector2(child.XPivot, 0.0f);
                     relChild = relChild.GetRotated(node.Rotation);
+                    float streetMod = child.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
                     Vector2 relMy = new Vector2(0.0f, node.ZPivot + streetMod);
                     relMy = relMy.GetRotated(node.Rotation);
 
-                    nextX = newLoc.x + relChild.x + relMy.x;
-                    nextZ = newLoc.z + relChild.y + relMy.y;
+                    float nextX = newLoc.x + relChild.x + relMy.x;
+                    float nextZ = newLoc.z + relChild.y + relMy.y;
 
-                    CalculationNodeLocation(eNode, new Vector3(nextX, groundLevel, nextZ));
+                    CalculationNodeLocation(child, new Vector3(nextX, groundLevel, nextZ));
                 }
             }
         }
 
         /// <summary>
-        /// Sets the scale, pivots, and rotation of given node and all its descendants.
+        /// Sets the scale, pivots, and rotation of given <paramref name="node"/> and all its descendants.
         /// Does not yet set the exact positions, however.
         /// </summary>
         /// <param name="node">node whose scale, pivots, and rotation are to be set</param>
         private void SetScalePivotsRotation(ENode node)
         {
-            if (node.GraphNode.IsLeaf)
+            if (node.IsLeaf())
             {
                 SetHouseScale(node);
             }
             else
             {
-                // street
-                float leftPivotX = OffsetBetweenBuildings;
-                float RightPivotX = OffsetBetweenBuildings;
+                // node is depicted as a street
+                float leftPivotX = offsetBetweenBuildings;
+                float RightPivotX = offsetBetweenBuildings;
 
-                foreach (ENode newChildNode in node.Children)
+                foreach (ENode child in node.Children)
                 {
-                    newChildNode.Rotation =
-                        (leftPivotX <= RightPivotX) ? node.Rotation - 90.0f : node.Rotation + 90.0f; // could be a street
-                    newChildNode.Rotation = (Mathf.FloorToInt(newChildNode.Rotation) + 360) % 360;
-                    SetScalePivotsRotation(newChildNode);
+                    // child could be a street or house; we will rotate it no matter what; if it is
+                    // in fact a leaf, we will rotate it back below
+                    child.Rotation = (leftPivotX <= RightPivotX) ? node.Rotation - 90.0f : node.Rotation + 90.0f;
+                    child.Rotation = (Mathf.FloorToInt(child.Rotation) + 360) % 360;
+                    SetScalePivotsRotation(child);
                     // Pivot setting
                     if (leftPivotX <= RightPivotX)
                     {
-                        // left
-                        newChildNode.Left = true; // is default value
-                        if (newChildNode.GraphNode.IsLeaf)
+                        // child will be put on the left side of the street
+                        child.Left = true;
+                        if (child.IsLeaf())
                         {
                             // house
-                            leftPivotX += newChildNode.Scale.x;
-                            newChildNode.XPivot = leftPivotX;
-                            leftPivotX += OffsetBetweenBuildings;
+                            leftPivotX += child.Scale.x;
+                            child.XPivot = leftPivotX;
+                            leftPivotX += offsetBetweenBuildings;
                         }
                         else
                         {   // street
-                            newChildNode.XPivot = leftPivotX;
-                            leftPivotX += newChildNode.Scale.z;
-                            leftPivotX += OffsetBetweenBuildings;
+                            child.XPivot = leftPivotX;
+                            leftPivotX += child.Scale.z;
+                            leftPivotX += offsetBetweenBuildings;
                         }
                     }
                     else
                     {
-                        // right
-                        newChildNode.Left = false;
-                        if (newChildNode.GraphNode.IsLeaf)
+                        // child will be put on the right side of the street
+                        child.Left = false;
+                        if (child.IsLeaf())
                         {
                             // house
-                            newChildNode.XPivot = RightPivotX;
-                            RightPivotX += newChildNode.Scale.x;
-                            RightPivotX += OffsetBetweenBuildings;
+                            child.XPivot = RightPivotX;
+                            RightPivotX += child.Scale.x;
+                            RightPivotX += offsetBetweenBuildings;
                         }
                         else
                         {
                             // street
-                            RightPivotX += newChildNode.Scale.z;
-                            newChildNode.XPivot = RightPivotX;
-                            RightPivotX += OffsetBetweenBuildings;
+                            RightPivotX += child.Scale.z;
+                            child.XPivot = RightPivotX;
+                            RightPivotX += offsetBetweenBuildings;
                         }
                     }
 
-                    if (newChildNode.GraphNode.IsLeaf)
-                    {   // house
-                        newChildNode.Rotation =
-                            (newChildNode.Left) ? node.Rotation - 180.0f : node.Rotation; //is not a street
-                        newChildNode.Rotation = (Mathf.FloorToInt(newChildNode.Rotation) + 360) % 360;
+                    if (child.IsLeaf())
+                    {   // a house (leaf) was rotated above; we will rotate it back again
+                        child.Rotation = (child.Left) ? node.Rotation - 180.0f : node.Rotation;
+                        child.Rotation = (Mathf.FloorToInt(child.Rotation) + 360) % 360;
                     }
                 }
-                //for InParentNode is a street calculate its size
 
-                node.Scale = new Vector3(MaxWidthRequired(node, OffsetBetweenBuildings),
+                // node is a street, here we calculate its size
+                node.Scale = new Vector3(MaxWidthRequired(node, offsetBetweenBuildings),
                                          node.MaxChildZ,
                                          DepthRequired(node));
                 node.ZPivot = MaxLeftZ(node);
@@ -304,15 +330,14 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Sets the scale of the given leaf ENode according to the scale of the graph
         /// node it represents. The original scale of the graph node is maintained.
-        /// 
+        ///
         /// Precondition: node is a leaf
         /// </summary>
         /// <param name="node">ENode whose scale is to be set</param>
         private void SetHouseScale(ENode node)
         {
             // Scaled metric values for the dimensions.
-            Vector3 size = node.GraphNode.LocalScale;
-            node.Scale = new Vector3(size.x, size.y, size.z);
+            node.Scale = node.GraphNode.AbsoluteScale;
         }
 
         /// <summary>
@@ -326,10 +351,10 @@ namespace SEE.Layout.NodeLayouts
             float max = 0.0f;
             foreach (ENode child in node.Children)
             {
-                //Left children only             
+                //Left children only
                 if (child.Left)
                 {
-                    if (child.IsHouse())
+                    if (child.IsLeaf())
                     {
                         if (child.Scale.z > max)
                         {
@@ -349,7 +374,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Returns the depth of the area required for all children of given node.
+        /// Returns the depth of the area required for all children of given <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node whose required depth is to be determined</param>
         /// <returns>depth required</returns>
@@ -362,7 +387,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 if (eNode.Left)
                 {
-                    if (eNode.IsHouse())
+                    if (eNode.IsLeaf())
                     {
                         if (eNode.Scale.z > leftMax)
                         {
@@ -379,7 +404,7 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-                    if (eNode.IsHouse())
+                    if (eNode.IsLeaf())
                     {
                         if (eNode.Scale.z > rightMax)
                         {
@@ -400,8 +425,8 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Returns the maximum of the width required for left and right children.
-        /// 
-        /// Precondition: node is an inner node represented by a street
+        ///
+        /// Precondition: node is an inner node represented by a street.
         /// </summary>
         /// <param name="node">inner node</param>
         /// <param name="offset">offset between neighboring children</param>
@@ -417,33 +442,33 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the sum of the widths of all children on the left (if left is
         /// true) or on the right (if left is false) including the given offset between
         /// those and the relative width of the street representing the given inner node.
-        /// 
+        ///
         /// Precondition: node is an inner node represented by a street
         /// </summary>
         /// <param name="node">inner node</param>
         /// <param name="offset">offset between neighboring children</param>
-        /// <param name="left">if true, only left children are consider, otherwise only
+        /// <param name="left">if true, only left children are considered, otherwise only
         /// right children</param>
         /// <returns>the width required to place the respective children</returns>
         private float WidthRequired(ENode node, float offset, bool left)
         {
             float sum = offset;
 
-            foreach (ENode eNode in node.Children)
+            foreach (ENode child in node.Children)
             {
-                if (eNode.Left == left)
+                if (child.Left == left)
                 {
-                    if (eNode.IsHouse())
+                    if (child.IsLeaf())
                     {
-                        sum += eNode.Scale.x + offset;
+                        sum += child.Scale.x + offset;
                     }
                     else
                     {
-                        sum += eNode.Scale.z + offset;
+                        sum += child.Scale.z + offset;
                     }
                 }
             }
-            return sum + RelativeStreetWidth(node);
+            return sum;
         }
 
         /// <summary>
@@ -453,7 +478,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>width of the street</returns>
         private float RelativeStreetWidth(ENode node)
         {
-            return StreetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
+            return streetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
         }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)

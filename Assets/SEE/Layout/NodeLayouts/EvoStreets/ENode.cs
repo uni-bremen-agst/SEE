@@ -4,13 +4,15 @@ using UnityEngine;
 namespace SEE.Layout.NodeLayouts.EvoStreets
 {
     /// <summary>
-    /// Necessary layout data on graph nodes 
+    /// Necessary layout data on graph nodes for the EvoStreets layout.
     /// </summary>
     [System.Serializable]
-    public class ENode
+    internal class ENode
     {
-        public ENode() { }
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="node">the graph node represented by this <see cref="ENode"/></param>
         public ENode(ILayoutNode node)
         {
             GraphNode = node;
@@ -32,7 +34,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public ILayoutNode GraphNode;
 
         /// <summary>
-        /// The pivot world co-ordinate along the x axis.
+        /// The pivot world co-ordinate along the x axis. It denotes the right
+        /// corner of the node.
         /// </summary>
         public float XPivot;
 
@@ -42,7 +45,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public float ZPivot;
 
         /// <summary>
-        /// The rotation of the node within the x/y plane (ground) in degrees.
+        /// The rotation of the node within the x/z plane (ground) in degrees.
         /// </summary>
         public float Rotation;
 
@@ -73,19 +76,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// a street.
         /// </summary>
         /// <returns>Children.Count == 0</returns>
-        public bool IsHouse()
+        public bool IsLeaf()
         {
-            return GraphNode.IsLeaf;
-        }
-
-        /// <summary>
-        /// True if this node has at least one child in the original graph.  Inner nodes are
-        /// represented as streets in EvoStreets. A node is either a house or a street.
-        /// </summary>
-        /// <returns>Children.Count > 0</returns>
-        public bool IsStreet()
-        {
-            return !GraphNode.IsLeaf;
+            return Children.Count == 0;
         }
 
         /// <summary>
@@ -109,7 +102,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
         public override string ToString()
         {
-            return $"Node[ID={GraphNode.ID}]";
+            return $"ENode[ID={GraphNode.ID}, #Children={Children.Count}, Depth={Depth}, IsLeft={Left}, Location={Location}, Rotation={Rotation}, Scale={Scale}, XPivot={XPivot}, ZPivot={ZPivot}]";
         }
     }
 }
