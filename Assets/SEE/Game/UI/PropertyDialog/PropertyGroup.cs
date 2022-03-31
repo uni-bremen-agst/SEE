@@ -90,6 +90,14 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
+        /// Refers to <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartMobile()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
         /// Returns a new instantiation of prefab <see cref="configurationGroupPrefabPath"/>
         /// with given <paramref name="name"/>.
         /// </summary>

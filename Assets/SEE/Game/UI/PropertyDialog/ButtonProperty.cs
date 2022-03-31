@@ -120,6 +120,14 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
+        /// Refers to <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartMobile()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
         /// Sets up the tooltips for the button.
         /// </summary>
         /// <param name="button">The object to which the tooltip is to be attached</param>

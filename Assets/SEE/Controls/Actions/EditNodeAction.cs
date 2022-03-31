@@ -86,6 +86,59 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
+#if UNITY_ANDROID
+
+            switch (progress)
+            {
+                case ProgressState.NoNodeSelected:
+                    // Check for touch input
+                    if (Input.touchCount != 1)
+                    {
+                        return result;
+                    }
+                    Touch touch = Input.touches[0];
+                    Vector3 touchPosition = touch.position;
+                    if (touch.phase == TouchPhase.Began && progress == ProgressState.NoNodeSelected)
+                    {
+                        Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+                        RaycastHit raycastHit;
+                        if (Physics.Raycast(ray, out raycastHit))
+                        {
+                            // the hit object is the node to be edited
+                            GameObject editedNode = raycastHit.collider.gameObject;
+                            if (editedNode.TryGetNode(out Node node))
+                            {
+                                progress = ProgressState.WaitingForInput;
+                                memento = new Memento(node);
+                                OpenDialog();
+                            }
+                            else
+                            {
+                                Debug.LogError($"Game node {editedNode.name}'s node reference is null.\n");
+                            }
+                        }
+                    }
+                    break;
+
+                case ProgressState.WaitingForInput:
+                    // Waiting until the dialog is closed and all input is present
+                    break;
+
+                case ProgressState.ValuesAreGiven:
+                    progress = ProgressState.NoNodeSelected;
+                    result = true;
+                    currentState = ReversibleAction.Progress.Completed;
+                    NotifyClients(memento.node);
+                    break;
+
+                case ProgressState.EditIsCanceled:
+                    progress = ProgressState.NoNodeSelected;
+                    break;
+
+                default:
+                    throw new NotImplementedException("Unhandled case.");
+            }
+#else
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
@@ -126,7 +179,8 @@ namespace SEE.Controls.Actions
                 default:
                     throw new NotImplementedException("Unhandled case.");
             }
-            return result;
+#endif
+                    return result;
         }
 
         /// <summary>

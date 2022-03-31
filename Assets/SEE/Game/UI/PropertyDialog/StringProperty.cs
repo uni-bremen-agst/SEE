@@ -115,6 +115,14 @@ namespace SEE.Game.UI.PropertyDialog
         }
 
         /// <summary>
+        /// Refers to <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartMobile()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
         /// Sets <paramref name="parent"/> as the parent of the <see cref="inputField"/>.
         /// </summary>
         /// <param name="parent">new parent of <see cref="inputField"/></param>

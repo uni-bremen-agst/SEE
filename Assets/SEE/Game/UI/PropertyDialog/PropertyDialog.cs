@@ -176,5 +176,21 @@ namespace SEE.Game.UI.PropertyDialog
                 group.enabled = value;
             }
         }
+
+        /// <summary>
+        /// Refers to <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartMobile()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
+        /// Refers to <see cref="UpdateDesktop"/>
+        /// </summary>
+        protected override void UpdateMobile()
+        {
+            UpdateDesktop();
+        }
     }
 }

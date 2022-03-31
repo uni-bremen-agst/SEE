@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
             // Check for touch input
             if (Input.touchCount != 1)
             {
-                return false;
+                return result;
             }
 
             Touch touch = Input.touches[0];
