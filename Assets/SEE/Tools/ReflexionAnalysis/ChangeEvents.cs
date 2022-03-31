@@ -36,9 +36,9 @@ namespace SEE.Tools.ReflexionAnalysis
             NewState = newState;
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return $"{base.ToString()}: {Edge} changed from {OldState} to {NewState}";
+            return $"edge '{Edge}' changed from {OldState} to {NewState}.";
         }
     }
 
@@ -58,7 +58,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// propagated to the architecture graph.
         /// </summary>
         /// <param name="propagatedEdge">the propagated edge</param>
-        public PropagatedEdge(Edge propagatedEdge)
+        protected PropagatedEdge(Edge propagatedEdge)
         {
             ThePropagatedEdge = propagatedEdge;
         }
@@ -84,9 +84,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + ": new propagated edge " + ThePropagatedEdge;
+            return $"edge '{ThePropagatedEdge}' has been propagated.";
         }
     }
 
@@ -103,9 +103,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + ": unpropagated edge " + ThePropagatedEdge;
+            return $"edge '{ThePropagatedEdge}' has been unpropagated.";
         }
     }
 
@@ -123,7 +123,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Constructor preserving the Maps_To edge added to the mapping or removed from it.
         /// </summary>
         /// <param name="mapsToEdge">the Maps_To edge being added or removed</param>
-        public MapsToEdge(Edge mapsToEdge)
+        protected MapsToEdge(Edge mapsToEdge)
         {
             TheMapsToEdge = mapsToEdge;
         }
@@ -142,9 +142,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + ": new Maps_To edge " + TheMapsToEdge;
+            return $"Maps_To edge '{TheMapsToEdge}' has been added.";
         }
     }
 
@@ -161,9 +161,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + ": removed Maps_To edge " + TheMapsToEdge;
+            return $"Maps_To edge '{TheMapsToEdge}' has been removed.";
         }
     }
 
@@ -186,9 +186,9 @@ namespace SEE.Tools.ReflexionAnalysis
             RemovedEdge = removedEdge;
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + $": implementation edge '{RemovedEdge}' has been removed from the graph.";
+            return $"implementation edge '{RemovedEdge}' has been removed from the graph.";
         }
     }
     
@@ -211,9 +211,9 @@ namespace SEE.Tools.ReflexionAnalysis
             AddedEdge = addedEdge;
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + $": implementation edge '{AddedEdge}' has been added to the graph.";
+            return $"implementation edge '{AddedEdge}' has been added to the graph.";
         }
     }
     
@@ -236,9 +236,9 @@ namespace SEE.Tools.ReflexionAnalysis
             RemovedEdge = removedEdge;
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + $": architecture edge '{RemovedEdge}' has been removed from the graph.";
+            return $"architecture edge '{RemovedEdge}' has been removed from the graph.";
         }
     }
     
@@ -261,9 +261,9 @@ namespace SEE.Tools.ReflexionAnalysis
             AddedEdge = addedEdge;
         }
 
-        public override string ToString()
+        protected override string Description()
         {
-            return base.ToString() + $": architecture edge '{AddedEdge}' has been added to the graph.";
+            return $"architecture edge '{AddedEdge}' has been added to the graph.";
         }
     }
 }

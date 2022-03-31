@@ -207,16 +207,16 @@ namespace SEE.Tools.Architecture
 
         private void AssertMapped(Node implNode, Node archNode)
         {
-            Assert.AreEqual(1, mapsToEdgesAdded.Count);
-            Assert.AreEqual(implNode.ID, mapsToEdgesAdded[0].TheMapsToEdge.Source.ID);
-            Assert.AreEqual(archNode.ID, mapsToEdgesAdded[0].TheMapsToEdge.Target.ID);
+            MapsToEdgeAdded added = changes.OfType<MapsToEdgeAdded>().Single();
+            Assert.AreEqual(implNode.ID, added.TheMapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, added.TheMapsToEdge.Target.ID);
         }
 
         private void AssertUnmapped(Node implNode, Node archNode)
         {
-            Assert.AreEqual(1, mapsToEdgesRemoved.Count);
-            Assert.AreEqual(implNode.ID, mapsToEdgesRemoved[0].TheMapsToEdge.Source.ID);
-            Assert.AreEqual(archNode.ID, mapsToEdgesRemoved[0].TheMapsToEdge.Target.ID);
+            MapsToEdgeRemoved removed = changes.OfType<MapsToEdgeRemoved>().Single();
+            Assert.AreEqual(implNode.ID, removed.TheMapsToEdge.Source.ID);
+            Assert.AreEqual(archNode.ID, removed.TheMapsToEdge.Target.ID);
         }
 
         /// <summary>
@@ -246,11 +246,11 @@ namespace SEE.Tools.Architecture
             // i2 -> a1
             reflexion.AddToMapping(i2, a1);
             AssertMapped(i2, a1);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a1, a1, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsImplicitlyAllowed(edgeChanges, a1, a1, call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsImplicitlyAllowed(a1, a1, call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
             ResetEvents();
         }
 
@@ -282,11 +282,11 @@ namespace SEE.Tools.Architecture
             // i1 -> a1
             reflexion.AddToMapping(i1, a1);
             AssertMapped(i1, a1);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a1, a1, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsImplicitlyAllowed(edgeChanges, a1, a1, call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsImplicitlyAllowed(a1, a1, call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
             ResetEvents();
         }
 
@@ -313,34 +313,34 @@ namespace SEE.Tools.Architecture
             // i2 -> a2
             reflexion.AddToMapping(i2, a2);
             AssertMapped(i2, a2);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a1, a2, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsDivergent(edgeChanges, a1, a2, call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsDivergent(a1, a2, call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
             ResetEvents();
 
             // unmap i1
             reflexion.DeleteFromMapping(i1, a1);
             AssertUnmapped(i1, a1);
-            Assert.AreEqual(1, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(1);
             Assert.That(IsUnpropagated(a1, a2, call));
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, edgeChanges.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<EdgeChange>(0);
             ResetEvents();
 
             // i1 -> a2
             reflexion.AddToMapping(i1, a2);
             AssertMapped(i1, a2);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a2, a2, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsImplicitlyAllowed(edgeChanges, a2, a2, call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsImplicitlyAllowed(a2, a2, call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
         }
 
         [Test]
-        public void TestSimpleAddRemoveImplEdge()
+        public void TestSimpleImplEdgeChange()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
             fullGraph = new Graph("");
@@ -363,7 +363,7 @@ namespace SEE.Tools.Architecture
             Edge ea12 = AddToGraph(call, a_1, a_2);
             ResetEvents();
             SetupReflexion();
-            Assert.That(IsAbsent(edgeChanges, a_1, a_2, call));
+            Assert.That(IsAbsent(a_1, a_2, call));
             
             ResetEvents();
             reflexion.AddToMapping(i_1, a1);
@@ -376,31 +376,31 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             Edge ei12 = new Edge(i1, i2, call);
             reflexion.AddToImplementation(ei12);
-            Assert.That(IsConvergent(edgeChanges, a_1, a_2, call));
+            Assert.That(IsConvergent(a_1, a_2, call));
             Assert.That(IsPropagated(a1, a2, call));
-            Assert.That(IsAllowed(edgeChanges, a1, a2, call));
+            Assert.That(IsAllowed(a1, a2, call));
             
             ResetEvents();
             Edge ei_12 = new Edge(i_1, i_2, call);
             reflexion.AddToImplementation(ei_12);
-            Assert.That(IsNotContained(a_1, a_2, call, edgeChanges));
-            Assert.That(IsNotContained(a1, a2, call, edgeChanges));
+            Assert.That(IsNotContained(a_1, a_2, call));
+            Assert.That(IsNotContained(a1, a2, call));
             
             // Test deletion
             
             ResetEvents();
             reflexion.DeleteFromImplementation(ei_12);
-            Assert.That(IsNotContained(a_1, a_2, call, edgeChanges));
-            Assert.That(IsNotContained(a1, a2, call, edgeChanges));
+            Assert.That(IsNotContained(a_1, a_2, call));
+            Assert.That(IsNotContained(a1, a2, call));
             
             ResetEvents();
             reflexion.DeleteFromImplementation(ei12);
-            Assert.That(IsAbsent(edgeChanges, a_1, a_2, call));
+            Assert.That(IsAbsent(a_1, a_2, call));
             Assert.That(IsUnpropagated(a1, a2, call));
         }
 
         [Test]
-        public void TestSimpleArchEdgeChange()
+        public void TestSimpleIncrementalArchEdgeChange()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
             fullGraph = new Graph("");
@@ -423,83 +423,83 @@ namespace SEE.Tools.Architecture
             SetupReflexion();
             reflexion.AddToMapping(i1, a_1);
             reflexion.AddToMapping(i2, a_2);
-            Assert.That(IsAbsent(edgeChanges, a1, a2, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.AreEqual(2, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.AreEqual(0, architectureEdgesAdded.Count);
-            Assert.AreEqual(0, architectureEdgesRemoved.Count);
+            Assert.That(IsAbsent(a1, a2, call));
+            AssertEventCountEquals<EdgeChange>(1);
+            AssertEventCountEquals<MapsToEdgeAdded>(2);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            AssertEventCountEquals<ArchitectureEdgeAdded>(0);
+            AssertEventCountEquals<ArchitectureEdgeRemoved>(0);
             
             ResetEvents();
             reflexion.DeleteFromArchitecture(ea12);
-            Assert.AreEqual(0, edgeChanges.Count);  // no matching propagated edge exists
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.AreEqual(0, architectureEdgesAdded.Count);
-            Assert.IsTrue(architectureEdgesRemoved.Single().RemovedEdge.Equals(ea12));
+            AssertEventCountEquals<EdgeChange>(0);  // no matching propagated edge exists
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            AssertEventCountEquals<ArchitectureEdgeAdded>(0);
+            Assert.IsTrue(changes.OfType<ArchitectureEdgeRemoved>().Single().RemovedEdge.Equals(ea12));
             
             // We will now check the "left side" scenario of the figure.
             // We will restore the "left side" state by using the incremental operations.
             ResetEvents();
             ea12 = new Edge(a1, a2, call);
             reflexion.AddToArchitecture(ea12);
-            Assert.That(IsAbsent(edgeChanges, a1, a2, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.IsTrue(architectureEdgesAdded.Single().AddedEdge.Equals(ea12));
-            Assert.AreEqual(0, architectureEdgesRemoved.Count);
+            Assert.That(IsAbsent(a1, a2, call));
+            AssertEventCountEquals<EdgeChange>(1);
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            Assert.IsTrue(changes.OfType<ArchitectureEdgeAdded>().Single().AddedEdge.Equals(ea12));
+            AssertEventCountEquals<ArchitectureEdgeRemoved>(0);
             
             ResetEvents();
             Edge ei12 = new Edge(i1, i2, call);
             reflexion.AddToImplementation(ei12);
-            Assert.That(IsConvergent(edgeChanges, a1, a2, call));
-            Assert.That(IsAllowed(edgeChanges, a_1, a_2, call));
-            Assert.AreEqual(2, edgeChanges.Count);
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(1, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.AreEqual(0, architectureEdgesAdded.Count);
-            Assert.AreEqual(0, architectureEdgesRemoved.Count);
+            Assert.That(IsConvergent(a1, a2, call));
+            Assert.That(IsAllowed(a_1, a_2, call));
+            AssertEventCountEquals<EdgeChange>(2);
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(1);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            AssertEventCountEquals<ArchitectureEdgeAdded>(0);
+            AssertEventCountEquals<ArchitectureEdgeRemoved>(0);
             
             // Now we can check what happens once we remove ea12 (an allowed edge should become divergent).
             ResetEvents();
             reflexion.DeleteFromArchitecture(ea12);
-            Assert.That(IsDivergent(edgeChanges, a_1, a_2, call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.AreEqual(0, architectureEdgesAdded.Count);
-            Assert.AreEqual(1, architectureEdgesRemoved.Count);
+            Assert.That(IsDivergent(a_1, a_2, call));
+            AssertEventCountEquals<EdgeChange>(1);
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            AssertEventCountEquals<ArchitectureEdgeAdded>(0);
+            AssertEventCountEquals<ArchitectureEdgeRemoved>(1);
             
             // And one last time, we add it back to check the `AddToArchitecture` operation.
             ResetEvents();
             ea12 = new Edge(a1, a2, call);
             reflexion.AddToArchitecture(ea12);
-            Assert.That(IsConvergent(edgeChanges, a1, a2, call));
-            Assert.That(IsAllowed(edgeChanges, a_1, a_2, call));
-            Assert.AreEqual(2, edgeChanges.Count);
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
-            Assert.AreEqual(1, architectureEdgesAdded.Count);
-            Assert.AreEqual(0, architectureEdgesRemoved.Count);
+            Assert.That(IsConvergent(a1, a2, call));
+            Assert.That(IsAllowed(a_1, a_2, call));
+            AssertEventCountEquals<EdgeChange>(2);
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
+            AssertEventCountEquals<ArchitectureEdgeAdded>(1);
+            AssertEventCountEquals<ArchitectureEdgeRemoved>(0);
         }
 
         [Test]
@@ -508,15 +508,15 @@ namespace SEE.Tools.Architecture
             //--------------------
             // initial state
             //--------------------
-            Assert.That(IsAbsent(edgeChanges, a[3], a[7], call));
-            Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
-            Assert.That(IsAbsent(edgeChanges, a[2], a[4], call));
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
+            Assert.That(IsAbsent(a[3], a[7], call));
+            Assert.That(IsAbsent(a[1], a[3], call));
+            Assert.That(IsAbsent(a[8], a[8], call));
+            Assert.That(IsAbsent(a[2], a[4], call));
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
 
             //--------------------
             // incremental mapping
@@ -524,87 +524,87 @@ namespace SEE.Tools.Architecture
 
             ResetEvents();
             reflexion.AddToMapping(i[17], a[6]);
-            Assert.AreEqual(0, edgeChanges.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<EdgeChange>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
             AssertMapped(i[17], a[6]);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[16], a[6]);
-            Assert.AreEqual(0, edgeChanges.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<EdgeChange>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
             AssertMapped(i[16], a[6]);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[3], a[3]);
-            Assert.AreEqual(2, edgeChanges.Count);
-            Assert.That(IsConvergent(edgeChanges, a[3], a[7], call));
-            Assert.That(IsAllowed(edgeChanges, a[3], a[6], call));
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<EdgeChange>(2);
+            Assert.That(IsConvergent(a[3], a[7], call));
+            Assert.That(IsAllowed(a[3], a[6], call));
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a[3], a[6], call));
             AssertMapped(i[3], a[3]);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[15], a[5]);
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsAllowed(edgeChanges, a[3], a[5], call));
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsAllowed(a[3], a[5], call));
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a[3], a[5], call));
             AssertMapped(i[15], a[5]);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[1], a[1]);
             AssertMapped(i[1], a[1]);
-            Assert.AreEqual(2, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(2);
             Assert.That(IsPropagated(a[1], a[3], call));
             Assert.That(IsPropagated(a[1], a[1], call));
-            Assert.AreEqual(4, edgeChanges.Count);
-            Assert.That(IsAllowed(edgeChanges, a[1], a[3], call));
-            Assert.That(IsConvergent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAllowed(edgeChanges, a[1], a[1], call));
-            Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(4);
+            Assert.That(IsAllowed(a[1], a[3], call));
+            Assert.That(IsConvergent(a[1], a[3], call));
+            Assert.That(IsAllowed(a[1], a[1], call));
+            Assert.That(IsConvergent(a[8], a[8], call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[14], a[4]);
             AssertMapped(i[14], a[4]);
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(1);
             Assert.That(IsPropagated(a[4], a[1], call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsDivergent(edgeChanges, a[4], a[1], call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsDivergent(a[4], a[1], call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.AddToMapping(i[2], a[9]);
             AssertMapped(i[2], a[9]);
-            Assert.AreEqual(3, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(3);
             Assert.That(IsPropagated(a[9], a[3], call));
             Assert.That(IsPropagated(a[1], a[9], call));
             Assert.That(IsPropagated(a[9], a[9], call));
-            Assert.AreEqual(2, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(2);
             Assert.That(IsUnpropagated(a[1], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[1], call));
-            Assert.AreEqual(5, edgeChanges.Count);
-            Assert.That(IsDivergent(edgeChanges, a[9], a[3], call));
-            Assert.That(IsDivergent(edgeChanges, a[1], a[9], call));
-            Assert.That(IsImplicitlyAllowed(edgeChanges, a[9], a[9], call));
-            Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
+            AssertEventCountEquals<EdgeChange>(5);
+            Assert.That(IsDivergent(a[9], a[3], call));
+            Assert.That(IsDivergent(a[1], a[9], call));
+            Assert.That(IsImplicitlyAllowed(a[9], a[9], call));
+            Assert.That(IsAbsent(a[1], a[3], call));
+            Assert.That(IsAbsent(a[8], a[8], call));
 
             ResetEvents();
             reflexion.AddToMapping(i[10], a[2]);
             AssertMapped(i[10], a[2]);
-            Assert.AreEqual(2, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(2);
             Assert.That(IsPropagated(a[1], a[2], call));
             Assert.That(IsPropagated(a[9], a[2], call));
-            Assert.AreEqual(3, edgeChanges.Count);
-            Assert.That(IsAllowed(edgeChanges, a[1], a[2], call));
-            Assert.That(IsDivergent(edgeChanges, a[9], a[2], call));
-            Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<EdgeChange>(3);
+            Assert.That(IsAllowed(a[1], a[2], call));
+            Assert.That(IsDivergent(a[9], a[2], call));
+            Assert.That(IsConvergent(a[8], a[8], call));
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
 
             //----------------------
             // incremental unmapping
@@ -612,78 +612,78 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             reflexion.DeleteFromMapping(i[10], a[2]);
             AssertUnmapped(i[10], a[2]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(2, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(2);
             Assert.That(IsUnpropagated(a[1], a[2], call));
             Assert.That(IsUnpropagated(a[9], a[2], call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsAbsent(a[8], a[8], call));
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[2], a[9]);
             AssertUnmapped(i[2], a[9]);
-            Assert.AreEqual(2, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(2);
             Assert.That(IsPropagated(a[1], a[3], call));
             Assert.That(IsPropagated(a[1], a[1], call));
-            Assert.AreEqual(3, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(3);
             Assert.That(IsUnpropagated(a[9], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[9], call));
             Assert.That(IsUnpropagated(a[9], a[9], call));
-            Assert.AreEqual(4, edgeChanges.Count);
-            Assert.That(IsConvergent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsConvergent(edgeChanges, a[8], a[8], call));
-            Assert.That(IsAllowed(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAllowed(edgeChanges, a[1], a[1], call));
+            AssertEventCountEquals<EdgeChange>(4);
+            Assert.That(IsConvergent(a[1], a[3], call));
+            Assert.That(IsConvergent(a[8], a[8], call));
+            Assert.That(IsAllowed(a[1], a[3], call));
+            Assert.That(IsAllowed(a[1], a[1], call));
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[14], a[4]);
             AssertUnmapped(i[14], a[4]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(1, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(1);
             Assert.That(IsUnpropagated(a[4], a[1], call));
-            Assert.AreEqual(0, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[1], a[1]);
             AssertUnmapped(i[1], a[1]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(2, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(2);
             Assert.That(IsUnpropagated(a[1], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[1], call));
-            Assert.AreEqual(2, edgeChanges.Count);
-            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
-            Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
+            AssertEventCountEquals<EdgeChange>(2);
+            Assert.That(IsAbsent(a[8], a[8], call));
+            Assert.That(IsAbsent(a[1], a[3], call));
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[15], a[5]);
             AssertUnmapped(i[15], a[5]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(1, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(1);
             Assert.That(IsUnpropagated(a[3], a[5], call));
-            Assert.AreEqual(0, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[3], a[3]);
             AssertUnmapped(i[3], a[3]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(1, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(1);
             Assert.That(IsUnpropagated(a[3], a[6], call));
-            Assert.AreEqual(1, edgeChanges.Count);
-            Assert.That(IsAbsent(edgeChanges, a[3], a[7], call));
+            AssertEventCountEquals<EdgeChange>(1);
+            Assert.That(IsAbsent(a[3], a[7], call));
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[16], a[6]);
             AssertUnmapped(i[16], a[6]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, edgeChanges.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
             reflexion.DeleteFromMapping(i[17], a[6]);
             AssertUnmapped(i[17], a[6]);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, edgeChanges.Count);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<EdgeChange>(0);
         }
 
         [Test]
@@ -693,23 +693,23 @@ namespace SEE.Tools.Architecture
             // initial state
             //--------------------
             
-            Assert.That(IsAbsent(edgeChanges, a[3], a[7], call));
-            Assert.That(IsAbsent(edgeChanges, a[1], a[3], call));
-            Assert.That(IsAbsent(edgeChanges, a[8], a[8], call));
-            Assert.That(IsAbsent(edgeChanges, a[2], a[4], call));
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(0, implementationEdgesRemoved.Count);
+            Assert.That(IsAbsent(a[3], a[7], call));
+            Assert.That(IsAbsent(a[1], a[3], call));
+            Assert.That(IsAbsent(a[8], a[8], call));
+            Assert.That(IsAbsent(a[2], a[4], call));
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(0);
 
             ResetEvents();
             reflexion.DeleteFromImplementation(ie[(14, 13)]);
-            Assert.AreEqual(0, mapsToEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesAdded.Count);
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
-            Assert.AreEqual(0, implementationEdgesAdded.Count);
-            Assert.AreEqual(1, implementationEdgesRemoved.Count);
+            AssertEventCountEquals<MapsToEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeAdded>(0);
+            AssertEventCountEquals<PropagatedEdgeRemoved>(0);
+            AssertEventCountEquals<ImplementationEdgeAdded>(0);
+            AssertEventCountEquals<ImplementationEdgeRemoved>(1);
         }
     }
 }
