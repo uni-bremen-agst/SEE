@@ -376,8 +376,6 @@ namespace SEE.Game.UI.CodeWindow
                 //so that the code doesnot recognize any more that the key was pressed
                 if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
-                    ShowNotification.Info("Frameshift", "Frameshift");
-                    
                     switch (oldKeyCode)
                     {
                         case KeyCode.Backspace:
