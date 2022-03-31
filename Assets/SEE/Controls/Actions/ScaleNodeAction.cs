@@ -241,6 +241,97 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+#if UNITY_ANDROID
+            if (objectToScale != null)
+            {
+                // We can scale objectToScale.
+                if (!scalingGizmosAreDrawn)
+                {
+                    DrawGamingGizmos();
+                }
+                if (Input.touchCount == 1)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.touches[0].position);
+                    RaycastHit raycastHit;
+                    if (draggedSphere == null && Physics.Raycast(ray, out raycastHit))
+                    {
+                        draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
+                    }
+                    if (draggedSphere != null)
+                    {
+                        Scaling();
+                    }
+                }
+            }
+
+            // Check for touch input
+            if (Input.touchCount != 1)
+            {
+                return false;
+            }
+            Touch touch = Input.touches[0];
+            Vector3 touchPosition = touch.position;
+            if (touch.phase == TouchPhase.Began)
+            {
+                HitGraphElement hitGraphElement = Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _);
+                if (objectToScale != null)
+                {
+                    // An object to be scaled has been selected already. Yet, we have another selection event.
+                    // Is something else selected?
+                    if (objectToScale != raycastHit.collider.gameObject)
+                    {
+                        // The user has selected something different from objectToScale.
+                        // Is it one of our scaling gizmos?
+                        GameObject selectedScalingGizmo = SelectedScalingGizmo(raycastHit.collider.gameObject);
+                        if (selectedScalingGizmo != null)
+                        {
+                            draggedSphere = selectedScalingGizmo;
+                            return false;
+                        }
+                        else
+                        {
+                            // Summary: An object to be scaled had been selected. The user then tried another
+                            // selection. The user this time neither selected the object to be scaled again nor one
+                            // of the scaling gizmos. That means, the action is finished and needs to be
+                            // finalized if the user has actually triggered a change at all.
+                            if (objectToScale.transform.position != beforeAction.Position
+                                || objectToScale.transform.lossyScale != beforeAction.Scale)
+                            {
+                                currentState = ReversibleAction.Progress.Completed;
+                                // Scaling action is finalized.
+                                afterAction = new Memento(objectToScale);
+                                draggedSphere = null;
+                                return true;
+                            }
+                            else
+                            {
+                                // Nothing has changed. We will continue with the action.
+                                // We continue with the newly selected node if a node was selected.
+                                if (hitGraphElement == HitGraphElement.Node)
+                                {
+                                    objectToScale = raycastHit.collider.gameObject;
+                                }
+                                else
+                                {
+                                    objectToScale = null;
+                                }
+                                RemoveSpheres();
+                                draggedSphere = null;
+                                return false;
+                            }
+                        }
+                    }
+                }
+                else if (hitGraphElement == HitGraphElement.Node)
+                {
+                    // No object to be scaled had been selected yet, but now we have one.
+                    objectToScale = raycastHit.collider.gameObject;
+                    beforeAction = new Memento(objectToScale);
+                    return false;
+                }
+            }
+            return false;
+#else
             if (objectToScale != null)
             {
                 // We can scale objectToScale.
@@ -321,6 +412,7 @@ namespace SEE.Controls.Actions
                 }
             }
             return false;
+#endif
         }
 
         /// <summary>
