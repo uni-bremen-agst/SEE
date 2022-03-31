@@ -63,6 +63,9 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private bool FixSelection = false;
 
+        /// <summary>
+        /// The Key that has been pressed latestly
+        /// </summary>
         private KeyCode oldKeyCode;
 
         /// <summary>
@@ -103,6 +106,7 @@ namespace SEE.Game.UI.CodeWindow
                 TextMeshInputField.interactable = true;
                 TextMeshInputField.text = TextMesh.text = Text;
 
+                //Add the text of the code window to the crdt if the crdt is empty.
                 if (ICRDT.IsEmpty(Title))
                 {
                     TextMeshInputField.enabled = false;
@@ -116,7 +120,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
 
 
-                //Change Listener
+                //Change Listener listens for remote changes in the crdt to add them to the code window
                 ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => {
                     int clean = GetCleanIndex(end);
@@ -213,14 +217,18 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            //Input Handling
+            //Input Handling of the code window.
             if (TextMeshInputField.isFocused)
             {
+                // resets the old index after the cooldown expires.
                 if (Time.time > oldIDXCoolDown)
                 {
                     oldIDX = -1;
                 }
+
                 SEEInput.KeyboardShortcutsEnabled = false;
+
+                // Saves the changes made inside the code window.
                 if (SEEInput.SaveCodeWindow())
                 {
                     try
@@ -235,6 +243,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
 
+                //Undo / Redo handling.
                 if (SEEInput.CodeWindowUndo())
                 {
                     ShowNotification.Info("Undo", "");
@@ -246,6 +255,7 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
+                //Renew the syntax highliting (currently only on user request)
                 if (SEEInput.ReCalculateSyntaxHighliting())
                 {
                     ShowNotification.Info("Reloading Code", "");
@@ -254,10 +264,11 @@ namespace SEE.Game.UI.CodeWindow
                     ShowNotification.Info("Reloading Code Complete", "Recalculating Syntaxhighliting finished");
                 }
 
-                int idx = TextMeshInputField.caretPosition;
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 //get the input
+                int idx = TextMeshInputField.caretPosition;
                 string input = Input.inputString;
+                //remove specail chars that should not be in the string.    
                 if (input.Contains("\b"))
                 {
                     input = input.Replace("\b", "");
@@ -271,7 +282,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = "";
                 }
-
+                //insert the input string into the crdt.
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
                     valueHasChanged = false;
@@ -290,6 +301,7 @@ namespace SEE.Game.UI.CodeWindow
                     oldKeyCode = KeyCode.A;
                 }
 
+                //Handle other specail keys like delete, ctrl+v...
                 if ((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) && valueHasChanged)
                 {
                     returnPressed(idx);
@@ -450,6 +462,11 @@ namespace SEE.Game.UI.CodeWindow
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }
         }
+
+        /// <summary>
+        /// An asynchrone method to add the text into the crdt while the user can already read the content of the file.
+        /// </summary>
+        /// <returns></returns>
         private async UniTask AddStringStart()
         {
             ShowNotification.Info("Loading editor", "The Editable file is loading, please wait", 10);
@@ -459,6 +476,11 @@ namespace SEE.Game.UI.CodeWindow
             ShowNotification.Info("Editor ready", "You now can use the editor");
         }
 
+        /// <summary>
+        /// Removes the line numbers from the text.
+        /// </summary>
+        /// <param name="textWithNumbers">The text with line numbers</param>
+        /// <returns>The text without the line numbers</returns>
         private string removeLineNumbers(string textWithNumbers)
         {
             string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) =>
@@ -475,6 +497,11 @@ namespace SEE.Game.UI.CodeWindow
 
             return textWithOutNumbers;
         }
+
+        /// <summary>
+        /// Handles the press of the return key
+        /// </summary>
+        /// <param name="idx">the index at which the return should be added.</param>
         private void returnPressed(int idx)
         {
             valueHasChanged = false;
@@ -494,6 +521,10 @@ namespace SEE.Game.UI.CodeWindow
             ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
         }
 
+        /// <summary>
+        /// Deletes the selected text.
+        /// </summary>
+        /// <returns>returns false if no text was selected and true if text was selected and deleted.</returns>
         private bool deleteSelectedText()
         {
             if (selectedText != null)
