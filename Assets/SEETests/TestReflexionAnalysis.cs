@@ -45,62 +45,17 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// List of edges changed for a single reflexion-analysis run.
+        /// List of all changes for a single reflexion-analysis run or incremental change.
+        /// Since <see cref="ChangeEvent"/> is abstract, this will contain concrete subtypes.
         /// </summary>
-        protected List<EdgeChange> edgeChanges = new List<EdgeChange>();
-
-        /// <summary>
-        /// List of edges propagated from the implementation onto the architecture for
-        /// a single reflexion-analysis run.
-        /// </summary>
-        protected List<PropagatedEdgeAdded> propagatedEdgesAdded = new List<PropagatedEdgeAdded>();
-        /// <summary>
-        /// List of propagated dependency edges removed from the reflexion result.
-        /// </summary>
-        protected List<PropagatedEdgeRemoved> propagatedEdgesRemoved = new List<PropagatedEdgeRemoved>();
-
-        /// <summary>
-        /// List of Maps_To edges added to the mapping.
-        /// </summary>
-        protected List<MapsToEdgeAdded> mapsToEdgesAdded = new List<MapsToEdgeAdded>();
-        /// <summary>
-        /// List of Maps_To edges removed from the mapping.
-        /// </summary>
-        protected List<MapsToEdgeRemoved> mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
+        protected List<ChangeEvent> changes = new List<ChangeEvent>();
         
         /// <summary>
-        /// List of Implementation edges added to the mapping.
-        /// </summary>
-        protected List<ImplementationEdgeAdded> implementationEdgesAdded = new List<ImplementationEdgeAdded>();
-        /// <summary>
-        /// List of Implementation edges removed from the mapping.
-        /// </summary>
-        protected List<ImplementationEdgeRemoved> implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
-        
-        /// <summary>
-        /// List of Architecture edges added to the mapping.
-        /// </summary>
-        protected List<ArchitectureEdgeAdded> architectureEdgesAdded = new List<ArchitectureEdgeAdded>();
-        /// <summary>
-        /// List of Architecture edges removed from the mapping.
-        /// </summary>
-        protected List<ArchitectureEdgeRemoved> architectureEdgesRemoved = new List<ArchitectureEdgeRemoved>();
-
-        /// <summary>
-        /// Re-sets the event caches edgeChanges, propagatedEdges, and removedEdges to
-        /// to their initial value (empty).
+        /// Re-sets the event cache in <see cref="changes"/> to its initial value (empty).
         /// </summary>
         protected void ResetEvents()
         {
-            edgeChanges = new List<EdgeChange>();
-            propagatedEdgesAdded = new List<PropagatedEdgeAdded>();
-            propagatedEdgesRemoved = new List<PropagatedEdgeRemoved>();
-            mapsToEdgesAdded = new List<MapsToEdgeAdded>();
-            mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
-            implementationEdgesAdded = new List<ImplementationEdgeAdded>();
-            implementationEdgesRemoved = new List<ImplementationEdgeRemoved>();
-            architectureEdgesAdded = new List<ArchitectureEdgeAdded>();
-            architectureEdgesRemoved = new List<ArchitectureEdgeRemoved>();
+            changes = new List<ChangeEvent>();
         }
 
         /// <summary>
@@ -113,9 +68,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        private static bool HasNewState(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType, State state)
+        private bool HasNewState(Node source, Node target, string edgeType, State state)
         {
-            return edgeChanges.Any(e => e.Edge.Source == source && e.Edge.Target == target && e.Edge.Type == edgeType && e.NewState == state);
+            return changes.OfType<EdgeChange>().Any(e => e.Edge.Source == source && e.Edge.Target == target && e.Edge.Type == edgeType && e.NewState == state);
         }
 
         /// <summary>
@@ -127,9 +82,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsConvergent(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsConvergent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Convergent);
+            return HasNewState(source, target, edgeType, State.Convergent);
         }
 
         /// <summary>
@@ -141,9 +96,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsAllowed(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAllowed(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Allowed);
+            return HasNewState(source, target, edgeType, State.Allowed);
         }
 
         /// <summary>
@@ -155,9 +110,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsAbsent(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAbsent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Absent);
+            return HasNewState(source, target, edgeType, State.Absent);
         }
 
         /// <summary>
@@ -169,9 +124,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsImplicitlyAllowed(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsImplicitlyAllowed(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.ImplicitlyAllowed);
+            return HasNewState(source, target, edgeType, State.ImplicitlyAllowed);
         }
 
         /// <summary>
@@ -183,9 +138,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsAllowedAbsent(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAllowedAbsent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.AllowedAbsent);
+            return HasNewState(source, target, edgeType, State.AllowedAbsent);
         }
 
         /// <summary>
@@ -197,9 +152,9 @@ namespace SEE.Tools.Architecture
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected static bool IsDivergent(IEnumerable<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsDivergent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Divergent);
+            return HasNewState(source, target, edgeType, State.Divergent);
         }
 
         /// <summary>
@@ -212,7 +167,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesAdded</returns>
         protected bool IsPropagated(Node from, Node to, string edgeType)
         {
-            return IsContained(from, to, edgeType, propagatedEdgesAdded);
+            return IsContained<PropagatedEdgeAdded>(from, to, edgeType);
         }
 
         /// <summary>
@@ -225,7 +180,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesRemoved</returns>
         protected bool IsUnpropagated(Node from, Node to, string edgeType)
         {
-            return IsContained(from, to, edgeType, propagatedEdgesRemoved);
+            return IsContained<PropagatedEdgeRemoved>(from, to, edgeType);
         }
 
         /// <summary>
@@ -236,18 +191,23 @@ namespace SEE.Tools.Architecture
         /// <param name="to">target of the propagated edge</param>
         /// <param name="edgeType">type of the propagated edge</param>
         /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
-        protected static bool IsContained(Node from, Node to, string edgeType, IEnumerable<PropagatedEdge> propagatedEdges)
+        protected bool IsContained<T>(Node from, Node to, string edgeType) where T: PropagatedEdge
         {
-            return propagatedEdges.Any(edge => from.ID == edge.ThePropagatedEdge.Source.ID &&
+            return changes.OfType<T>().Any(edge => from.ID == edge.ThePropagatedEdge.Source.ID &&
                                                to.ID == edge.ThePropagatedEdge.Target.ID &&
                                                edgeType == edge.ThePropagatedEdge.Type);
         }
         
-        protected static bool IsNotContained(Node from, Node to, string edgeType, IEnumerable<EdgeChange> edgeChanges)
+        protected bool IsNotContained(Node from, Node to, string edgeType)
         {
-            return !edgeChanges.Any(edge => from.ID == edge.Edge.Source.ID && 
+            return !changes.OfType<EdgeChange>().Any(edge => from.ID == edge.Edge.Source.ID && 
                                                to.ID == edge.Edge.Target.ID && 
                                                edgeType == edge.Edge.Type);
+        }
+
+        protected void AssertEventCountEquals<T>(int expected) where T : ChangeEvent
+        {
+            Assert.AreEqual(expected, changes.OfType<T>().Count());
         }
 
         /// <summary>
@@ -256,56 +216,10 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected void DumpEvents()
         {
-            Debug.Log("MAPS_TO EDGES ADDED TO MAPPING\n");
-            foreach (MapsToEdgeAdded e in mapsToEdgesAdded)
+            Debug.Log("CHANGES IN REFLEXION\n\n");
+            foreach (ChangeEvent e in changes)
             {
-                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge);
-            }
-            Debug.Log("MAPS_TO EDGES REMOVED FROM MAPPING\n");
-            foreach (MapsToEdgeRemoved e in mapsToEdgesRemoved)
-            {
-                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge);
-            }
-
-            Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
-            foreach (PropagatedEdgeAdded e in propagatedEdgesAdded)
-            {
-                Debug.LogFormat("propagated {0}\n", e.ThePropagatedEdge);
-            }
-            Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
-            foreach (PropagatedEdgeRemoved e in propagatedEdgesRemoved)
-            {
-                Debug.LogFormat("removed {0}\n", e.ThePropagatedEdge);
-            }
-
-            Debug.Log("DEPENDENCIES CHANGED IN ARCHITECTURE\n");
-            foreach (EdgeChange e in edgeChanges)
-            {
-                Debug.LogFormat("changed {0} from {1} to {2}\n", e.Edge, e.OldState, e.NewState);
-            }
-            
-            Debug.Log("DEPENDENCIES ADDED IN IMPLEMENTATION");
-            foreach (ImplementationEdgeAdded e in implementationEdgesAdded)
-            {
-                Debug.Log($"added {e}");
-            }
-            
-            Debug.Log("DEPENDENCIES REMOVED IN IMPLEMENTATION");
-            foreach (ImplementationEdgeRemoved e in implementationEdgesRemoved)
-            {
-                Debug.Log($"removed {e}");
-            }
-            
-            Debug.Log("DEPENDENCIES ADDED IN ARCHITECTURE");
-            foreach (ArchitectureEdgeAdded e in architectureEdgesAdded)
-            {
-                Debug.Log($"added {e}");
-            }
-            
-            Debug.Log("DEPENDENCIES REMOVED IN ARCHITECTURE");
-            foreach (ArchitectureEdgeRemoved e in architectureEdgesRemoved)
-            {
-                Debug.Log($"removed {e}");
+                Debug.Log(e);
             }
         }
 
@@ -343,15 +257,7 @@ namespace SEE.Tools.Architecture
             reflexion = null;
             HierarchicalEdges = null;
             logger = null;
-            edgeChanges = null;
-            propagatedEdgesAdded = null;
-            mapsToEdgesAdded = null;
-            mapsToEdgesRemoved = null;
-            propagatedEdgesRemoved = null;
-            implementationEdgesAdded = null;
-            implementationEdgesRemoved = null;
-            architectureEdgesAdded = null;
-            architectureEdgesRemoved = null;
+            changes = null;
         }
 
         protected Node NewNode(bool inArchitecture, string linkname, string type = "Routine")
@@ -404,29 +310,7 @@ namespace SEE.Tools.Architecture
         /// <param name="changeEvent">the event that occurred</param>
         public virtual void Update(ChangeEvent changeEvent)
         {
-            switch (changeEvent)
-            {
-                case EdgeChange @event: edgeChanges.Add(@event);
-                    break;
-                case PropagatedEdgeAdded added: propagatedEdgesAdded.Add(added);
-                    break;
-                case PropagatedEdgeRemoved @event: propagatedEdgesRemoved.Add(@event);
-                    break;
-                case MapsToEdgeAdded added: mapsToEdgesAdded.Add(added);
-                    break;
-                case MapsToEdgeRemoved @event: mapsToEdgesRemoved.Add(@event);
-                    break;
-                case ImplementationEdgeAdded @event: implementationEdgesAdded.Add(@event);
-                    break;
-                case ImplementationEdgeRemoved @event: implementationEdgesRemoved.Add(@event);
-                    break;
-                case ArchitectureEdgeAdded @event: architectureEdgesAdded.Add(@event);
-                    break;
-                case ArchitectureEdgeRemoved @event: architectureEdgesRemoved.Add(@event);
-                    break;
-                default: Debug.LogError($"UNHANDLED CALLBACK: {changeEvent}\n");
-                    break;
-            }
+            changes.Add(changeEvent);
         }
     }
 }
