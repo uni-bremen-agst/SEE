@@ -488,7 +488,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Returns the Text without the XML Tags
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The clean text</returns>
         private  string GetCleanText()
         {
             string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
@@ -497,7 +497,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Returns the Text without the XML Tags
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The clean text</returns>
         private async UniTask<string> AsyncGetCleanText()
         {
             await UniTask.SwitchToThreadPool();
