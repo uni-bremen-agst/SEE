@@ -154,14 +154,25 @@ namespace SEE.Game.UI.Menu
 
                 quickButtons[5].GetComponent<ButtonManagerBasicIcon>().buttonIcon = arrowLeftSprite;
 
+                // Initially hide the quick menu
                 foreach (GameObject btn in quickButtons)
                 {
                     btn.SetActive(false);
                 }
 
-
+                // Setting listener to deselect objects 
                 buttons[0][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => Deselect());
+
+                // Setting listeners for the node interaction buttons, so that it is clear which one is active
+                for (int i = 0; i < 4; i++)
+                {
+                    int buttonIndex = i;
+                    buttons[2][buttonIndex].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => ShowNodeActiveNodeInteraction(2, buttonIndex));
+                }
+
+                // Setting the listener for the snap rotate mode
                 buttons[3][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => ToggleSnapMode());
                 if (SEEInput.SnapMobile)
@@ -169,6 +180,8 @@ namespace SEE.Game.UI.Menu
                     Button snapButton = buttons[3][1].GetComponent<Button>();
                     MarkButtonActive(snapButton);
                 }
+
+                // Setting the listener for the dragging move mode
                 buttons[4][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => ToggleMoveMode());
                 if (SEEInput.DragTouched)
@@ -176,6 +189,8 @@ namespace SEE.Game.UI.Menu
                     Button dragButton = buttons[4][1].GetComponent<Button>();
                     MarkButtonActive(dragButton);
                 }
+
+                // Adding quick menu button listeners
                 quickButtons[0].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => TriggerRedo());
                 quickButtons[1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
@@ -467,6 +482,38 @@ namespace SEE.Game.UI.Menu
             ColorBlock colorBlock = button.colors;
             colorBlock.normalColor = Color.green;
             button.colors = colorBlock;
+        }
+
+        /// <summary>
+        /// Marks an button white to signalize that its inactive
+        /// </summary>
+        /// <param name="button"></param>
+        private void MarkButtonInactive(Button button)
+        {
+            ColorBlock colorBlock = button.colors;
+            colorBlock.normalColor = Color.white;
+            button.colors = colorBlock;
+        }
+
+        /// <summary>
+        /// The method marks the selected button green and the other ones white
+        /// </summary>
+        /// <param name="buttonNr"></param>
+        private void ShowNodeActiveNodeInteraction(int buttonLine, int buttonNr)
+        {
+            for (int i = 0; i < buttons[2].Length; i++)
+            {
+                if (i == buttonNr)
+                {
+                    Button button = buttons[buttonLine][i].GetComponent<Button>();
+                    MarkButtonActive(button);
+                }
+                else
+                {
+                    Button button = buttons[buttonLine][i].GetComponent<Button>();
+                    MarkButtonInactive(button);
+                }
+            }
         }
 
     }
