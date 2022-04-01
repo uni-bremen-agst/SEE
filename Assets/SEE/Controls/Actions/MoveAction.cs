@@ -288,7 +288,7 @@ namespace SEE.Controls.Actions
             else if (touch.phase == TouchPhase.Began) // start or continue movement
             {
                 if (hoveredObject
-                    && RaycastPlane(new Plane(Vector3.up, hoveredObject.position), out Vector3 planeHitPoint)) // start movement
+                    && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint)) // start movement
                 {
                     moving = true;
                     Transform draggedObject = SEEInput.DragTouched ? hoveredObject : cityRootNode;
