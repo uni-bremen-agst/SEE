@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
@@ -35,7 +36,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(edge.Source.IsInImplementation() && edge.Target.IsInImplementation());
             edge.SetInImplementation();
             FullGraph.AddEdge(edge);
-            Notify(new ImplementationEdgeAdded(edge));
+            Notify(new ImplementationEdgeEvent(edge, ChangeType.Addition));
             PropagateAndLiftDependency(edge);
         }
 
@@ -65,7 +66,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
-            Notify(new ImplementationEdgeRemoved(edge));
+            Notify(new ImplementationEdgeEvent(edge, ChangeType.Removal));
             FullGraph.RemoveEdge(edge);
         }
 
@@ -89,7 +90,7 @@ namespace SEE.Tools.ReflexionAnalysis
             edge.SetInArchitecture();
             FullGraph.AddEdge(edge);
             SetState(edge, State.Specified);
-            Notify(new ArchitectureEdgeAdded(edge));
+            Notify(new ArchitectureEdgeEvent(edge, ChangeType.Addition));
             
             // We need to handle the propagated dependencies covered by this specified edge.
             
@@ -152,7 +153,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
             
-            Notify(new ArchitectureEdgeRemoved(edge));
+            Notify(new ArchitectureEdgeEvent(edge, ChangeType.Removal));
             FullGraph.RemoveEdge(edge);
         }
         

@@ -167,7 +167,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesAdded</returns>
         protected bool IsPropagated(Node from, Node to, string edgeType)
         {
-            return IsContained<PropagatedEdgeAdded>(from, to, edgeType);
+            return IsContained(from, to, edgeType, ChangeType.Addition);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesRemoved</returns>
         protected bool IsUnpropagated(Node from, Node to, string edgeType)
         {
-            return IsContained<PropagatedEdgeRemoved>(from, to, edgeType);
+            return IsContained(from, to, edgeType, ChangeType.Removal);
         }
 
         /// <summary>
@@ -190,12 +190,13 @@ namespace SEE.Tools.Architecture
         /// <param name="from">source of the propagated edge</param>
         /// <param name="to">target of the propagated edge</param>
         /// <param name="edgeType">type of the propagated edge</param>
+        /// <param name="change">change type for the propagated edge</param>
         /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
-        protected bool IsContained<T>(Node from, Node to, string edgeType) where T: PropagatedEdge
+        protected bool IsContained(Node from, Node to, string edgeType, ChangeType change)
         {
-            return changes.OfType<T>().Any(edge => from.ID == edge.ThePropagatedEdge.Source.ID &&
-                                               to.ID == edge.ThePropagatedEdge.Target.ID &&
-                                               edgeType == edge.ThePropagatedEdge.Type);
+            return changes.OfType<PropagatedEdgeEvent>().Any(edge => from.ID == edge.PropagatedEdge.Source.ID &&
+                                               to.ID == edge.PropagatedEdge.Target.ID &&
+                                               edgeType == edge.PropagatedEdge.Type && change == edge.Change);
         }
         
         protected bool IsNotContained(Node from, Node to, string edgeType)
@@ -205,9 +206,9 @@ namespace SEE.Tools.Architecture
                                                edgeType == edge.Edge.Type);
         }
 
-        protected void AssertEventCountEquals<T>(int expected) where T : ChangeEvent
+        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null) where T : ChangeEvent
         {
-            Assert.AreEqual(expected, changes.OfType<T>().Count());
+            Assert.AreEqual(expected, changes.OfType<T>().Count(x => change == null || x.Change == change));
         }
 
         /// <summary>

@@ -329,7 +329,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // edge, we do not need to inform them about its state change from
                 // divergent/allowed/implicitlyAllowed to undefined.
                 SetCounter(edge, 0);
-                Notify(new PropagatedEdgeRemoved(edge));
+                Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
                 FullGraph.RemoveEdge(edge);
             }
             else
@@ -393,7 +393,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // add Maps_To edge to Mapping
             Edge mapsTo = new Edge(from, to, MapsToType);
             FullGraph.AddEdge(mapsTo);
-            Notify(new MapsToEdgeAdded(mapsTo));
+            Notify(new MapsToEdgeEvent(mapsTo, ChangeType.Addition));
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
             // First notify before we delete the mapsTo edge for good.
-            Notify(new MapsToEdgeRemoved(mapsTo));
+            Notify(new MapsToEdgeEvent(mapsTo, ChangeType.Removal));
             FullGraph.RemoveEdge(mapsTo);
         }
 
@@ -1041,7 +1041,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     case State.AllowedAbsent:
                         // The edge is a left-over from a previous analysis and should be
                         // removed. Before we actually do that, we need to notify all observers.
-                        Notify(new PropagatedEdgeRemoved(edge));
+                        Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
                         toBeRemoved.Add(edge);
                         break;
                     default:
@@ -1353,7 +1353,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // propagatedArchitectureDep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
             // because it has just come into existence, we need to let our observers know about it
-            Notify(new PropagatedEdgeAdded(propagatedArchitectureDep));
+            Notify(new PropagatedEdgeEvent(propagatedArchitectureDep, ChangeType.Addition));
 
             if (Lift(archSource, archTarget, edgeType, counter, out allowingEdgeOut))
             {
