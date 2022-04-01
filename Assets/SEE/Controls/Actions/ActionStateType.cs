@@ -132,9 +132,9 @@ namespace SEE.Controls.Actions
                                       Color.white.Darker(), "Materials/ModernUIPack/Horizontal Selector",
                                       MoveAction.CreateReversibleAction);
 
-        public static ActionStateType MoveCity { get; } =
-            new ActionStateType(21, "Move City", "Move the whole City",
-                                      Color.white.Darker(), "Icons/n",
+        public static ActionStateType MoveObject { get; } =
+            new ActionStateType(21, "Move Object", "Move single object",
+                                      Color.white.Darker(), "Icons/1",
                                       null);
 
         public static ActionStateType EightDirections { get; } =
