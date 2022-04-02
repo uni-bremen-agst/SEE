@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects.Decorators;
+using SEE.GO.Decorators;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
