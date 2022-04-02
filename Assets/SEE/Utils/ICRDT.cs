@@ -12,8 +12,6 @@ namespace SEE.Utils
 {
     public static class ICRDT
     {
-
-        //private static CRDT crdt = new CRDT(new Guid().ToString());//TODO wie bekomme ich die SiteID hier richtig?
         /// <summary>
         /// A dictionary for the CRDTs with the filename as key
         /// </summary>
@@ -28,9 +26,8 @@ namespace SEE.Utils
         /// Finds or creates an CRDT instance by the name of the file
         /// </summary>
         /// <param name="file">The name of the file</param>
-        /// <param name="size">optinal File Size for more effizient sizing of the CRDT</param>
         /// <returns>A crdt instance</returns>
-        private static CRDT GetInstanceByName(string file, int size = 1000)
+        private static CRDT GetInstanceByName(string file)
         {
             
             if(crdts != null && crdts.Count > 0 && crdts.ContainsKey(file))
@@ -39,7 +36,7 @@ namespace SEE.Utils
             }
             else
             {
-                crdts.Add(file, new CRDT(playerIdManager.GetClientID().ToString(), file, size));
+                crdts.Add(file, new CRDT(playerIdManager.GetClientID().ToString(), file));
                 return crdts[file];
             }
         }
@@ -60,6 +57,7 @@ namespace SEE.Utils
                 }
             }
         }
+
         /// <summary>
         /// Syncs all Code Windows to a new Client.
         /// </summary>
@@ -117,9 +115,9 @@ namespace SEE.Utils
         /// <param name="c">The char to add.</param>
         /// <param name="position">The position of the char.</param>
         /// <param name="file">The fileame of the crdt in which the char should be inserted.</param>
-        public static void RemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition */, string file)
+        public static void RemoteAddChar(char c, Identifier[] position, string file)
         {
-            GetInstanceByName(file).RemoteAddChar(c, position /*, prePosition*/);
+            GetInstanceByName(file).RemoteAddChar(c, position);
         }
 
         /// <summary>
@@ -129,9 +127,9 @@ namespace SEE.Utils
         /// <param name="c">The char to add.</param>
         /// <param name="position">The position of the char.</param>
         /// <param name="file">The fileame of the crdt in which the char should be inserted.</param>
-        public static void SingleRemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/, string file)
+        public static void SingleRemoteAddChar(char c, Identifier[] position, string file)
         {
-            GetInstanceByName(file).SingleRemoteAddChar(c, position/*, prePosition*/);
+            GetInstanceByName(file).SingleRemoteAddChar(c, position);
         }
 
         /// <summary>
@@ -152,7 +150,7 @@ namespace SEE.Utils
         /// <param name="file">The fileame of the crdt in which the string should be added.</param>
         public static void AddString(string s, int startIdx, string file)
         {
-            CRDT crdt = GetInstanceByName(file, s.Length);
+            CRDT crdt = GetInstanceByName(file);
             if (GetLocalID() > 0  && crdt.getId().Equals("0"))
             {
                 crdt.setId(GetLocalID().ToString());
@@ -171,7 +169,7 @@ namespace SEE.Utils
         /// <returns></returns>
         public static async UniTask AsyncAddString(string s, int startIdx, string file, bool startUp = false)
         {
-            await GetInstanceByName(file, s.Length).AsyncAddString(s, startIdx, startUp);
+            await GetInstanceByName(file).AsyncAddString(s, startIdx, startUp);
         }
 
         /// <summary>
@@ -277,7 +275,7 @@ namespace SEE.Utils
         /// <param name="file">The filename of the crdt.</param>
         public static void RemoteAddString(string text, string file)
         {
-            GetInstanceByName(file, text.Length).RemoteAddString(text);
+            GetInstanceByName(file).RemoteAddString(text);
         }
     }
 
