@@ -68,9 +68,6 @@ namespace SEE.Net
         /// </summary>
         public string position;
 
-        //TODO: CAN WARSCHEINLICH BE REMOVED NO LONGER NEEDED IF THE CHANGE WORKS
-        public string prePosition;
-
         /// <summary>
         /// The name of the file in which changes should be made.
         /// </summary>
@@ -117,11 +114,10 @@ namespace SEE.Net
                 switch (state)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file);
-                        Debug.Log("NETWORK ADD");
+                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), file);
                         break;
                     case RemoteAction.SingleAddChar:
-                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file)/*, ICRDT.StringToPosition(prePosition, file)*/, file); 
+                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file), file); 
                     
                        break;
 
@@ -160,16 +156,13 @@ namespace SEE.Net
         /// <param name="c">The char that should be added.</param>
         /// <param name="position">The position at which it should be added.</param>
         /// <param name="file">The filename of the crdt in which it should be added.</param>
-        public void AddChar(char c, Identifier[] position /*, Identifier[] prePosition*/, string file)
+        public void AddChar(char c, Identifier[] position, string file)
         {
-            Debug.Log("ADD" + c + position);
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
-            //this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.AddChar;
             Execute(null);
-           
         }
 
         /// <summary>
@@ -180,16 +173,13 @@ namespace SEE.Net
         /// <param name="position">The position at which it should be added.</param>
         /// <param name="file">The filename of the crdt in which it should be added.</param>
         /// <param name="recipient">The recipient that should receive the cahnge.</param>
-        public void SingleAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/, string file, IPEndPoint[] recipient)
+        public void SingleAddChar(char c, Identifier[] position, string file, IPEndPoint[] recipient)
         {
-
             this.file = file;
             this.c = c;
             this.position = ICRDT.PositionToString(position, file);
-            //this.prePosition = ICRDT.PositionToString(prePosition, file);
             state = RemoteAction.SingleAddChar;
             Execute(recipient);
-
         }
 
         /// <summary>
@@ -199,7 +189,6 @@ namespace SEE.Net
         /// <param name="filename">The filename of the crdt in which the string should be added.</param>
         public void AddString(string text, string filename)
         {
-            Debug.Log("ADD" + text);
             this.file = filename;
             this.text = text;
             this.state = RemoteAction.AddString;

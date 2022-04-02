@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Profiling;
 using static SEE.Game.UI.CodeWindow.CodeWindow;
 
 // Based on the explenaitions and code from https://digitalfreepen.com/2017/10/06/simple-real-time-collaborative-text-editor.html
@@ -164,8 +163,6 @@ namespace SEE.Utils
         /// <summary>
         /// A buffer to reduce the initial network traffic than oppening a file
         /// </summary>
-        //public List<(char, Identifier[], Identifier[], string)> networkbuffer = new List<(char, Identifier[], Identifier[], string)>();
-
         public string networkbuffer = "";
 
         /// <summary>
@@ -179,14 +176,6 @@ namespace SEE.Utils
         private string filename;
 
         /// <summary>
-        /// The size of the CRDT at the start
-        /// </summary>
-        private int size;
-
-
-        //private LinkedList<CharObj> crdt = new LinkedList<CharObj>();
-
-        /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
         /// </summary>
         public UnityEvent<char, int, operationType> changeEvent = new UnityEvent<char, int, operationType>();
@@ -195,11 +184,10 @@ namespace SEE.Utils
         /// Constructs a CRDT
         /// </summary>
         /// <param name="siteID"></param>
-        public CRDT(string siteID, string filename, int size = 5000)
+        public CRDT(string siteID, string filename)
         {
             this.siteID = siteID;
             this.filename = filename;
-            this.size = size;
         }
 
         /// <summary>
@@ -255,26 +243,8 @@ namespace SEE.Utils
                     CharSet = true;
                 }
                 else
-                { 
-                    /*
-                    if (c == '/')
-                    {
-                        pos1 = StringToPosition(tmpPos);
-                        tmpPos = "";
-                        continue;
-                    }
+                {
                     if (c == '\n')
-                    {
-                        pos2 = StringToPosition(tmpPos);
-                        tmpPos = "";
-                        RemoteAddChar(ch, pos1, pos2);
-                        pos1 = null;
-                        pos2 = null;
-                        ch = '\0';
-                        CharSet = false;
-                        continue;
-                    } */
-                    if(c == '\n')
                     {
                         RemoteAddChar(ch, StringToPosition(tmpPos));
                         tmpPos = "";
@@ -283,7 +253,7 @@ namespace SEE.Utils
                         continue;
                     }
                     tmpPos += c;
-                    
+
                 }
             }
         }
@@ -293,11 +263,11 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c"></param>
         /// <param name="position"></param>
-        public void SingleRemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/)
+        public void SingleRemoteAddChar(char c, Identifier[] position)
         {
             if (IsEmpty())
             {
-                RemoteAddChar(c, position/*, prePosition*/);
+                RemoteAddChar(c, position);
             }
         }
 
@@ -306,15 +276,28 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="position">The position at which the Char should be added</param>
-        /// <param name="prePosition">The position befor the Char, can be null if its the Char at index 0</param>
-        public void RemoteAddChar(char c, Identifier[] position/*, Identifier[] prePosition*/) //TODO AM ENDE DES TEXTES EINFUEGEN KOENTE PROBBLEMATISCH SEIN AKTUELL
+        public void RemoteAddChar(char c, Identifier[] position)
         {
-
-            
-            if(position != null && position.Length > 0)
+            if (position != null && position.Length > 0)
             {
-                int insertIdx =  FindFittingIndex(position); //TODO Eventuell try catch
-                Debug.Log("INSERT IDX " + insertIdx);
+                if (crdt.Count == 0)
+                {
+                    crdt.Add(new CharObj(c, position));
+                    changeEvent.Invoke(c, crdt.Count - 1, operationType.Add);
+                    return;
+                }
+                int insertIdx = FindFittingIndex(position);
+                if (insertIdx == -1)
+                {
+                    ShowNotification.Error("Failure during remote change", "A requested remote change could not be inserted, because no fitting position was found!");
+                    return;
+                }
+                if (insertIdx >= crdt.Count)
+                {
+                    crdt.Add(new CharObj(c, position));
+                    changeEvent.Invoke(c, insertIdx, operationType.Add);
+                    return;
+                }
                 crdt.Insert(insertIdx, new CharObj(c, position));
                 changeEvent.Invoke(c, insertIdx, operationType.Add);
             }
@@ -322,40 +305,6 @@ namespace SEE.Utils
             {
                 ShowNotification.Error("Failure during remote change", "RemoteAddChar failed! The position was empty.");
             }
-
-
-            /*int insertIdx;
-            if (prePosition != null && prePosition.Length > 0)
-            {
-                if (ComparePosition(prePosition, position) < 0)
-                {
-                    (int, CharObj) found = Find(prePosition);
-                    crdt.Insert(found.Item1 + 1, new CharObj(c, position));
-                    insertIdx = found.Item1 + 1;
-                }
-                else
-                {
-                    ShowNotification.Error("Failure during remote change", "RemoteAddChar failed! Something is wrong with the order of the Chars.");
-                    return;
-                }
-
-            }
-            else
-            {
-                int idx = FindNextFittingIndex(position, 0);
-                if (idx < crdt.Count())
-                {
-                    crdt.Insert(idx, new CharObj(c, position));
-                    insertIdx = idx;
-                }
-                else
-                {
-                    crdt.Add(new CharObj(c, position));
-                    insertIdx = crdt.Count - 1;
-                }
-
-            }
-            changeEvent.Invoke(c, insertIdx, operationType.Add); */
         }
 
         /// <summary>
@@ -429,7 +378,7 @@ namespace SEE.Utils
                 CharObj[] charArr = charObjs.ToArray();
                 undoStack.Push((charArr, operationType.Add));
                 redoStack.Clear();
-            }    
+            }
         }
 
         /// <summary>
@@ -444,7 +393,7 @@ namespace SEE.Utils
             List<CharObj> charObjs = new List<CharObj>(s.Length);
             if (!startUp)
             {
-                
+
                 for (int i = 0; i < s.Length; i++)
                 {
                     AddChar(s[i], i + startIdx, startUp);
@@ -506,31 +455,13 @@ namespace SEE.Utils
                 crdt.Add(new CharObj(c, position));
             }
 
-
-            if (index - 1 >= 0)
+            if (startUp)
             {
-                if (startUp)
-                {
-                    //networkbuffer.Add((c, position, crdt[index - 1].GetIdentifier(), filename));
-                    networkbuffer += c + PositionToString(position) /*+ "/" + PositionToString(crdt[index - 1].GetIdentifier()) */+ "\n";
-                }
-                else
-                {
-                    new NetCRDT().AddChar(c, position, /*crdt[index - 1].GetIdentifier(), */ filename);
-                }
+                networkbuffer += c + PositionToString(position) + "\n";
             }
             else
             {
-                if (startUp)
-                {
-                    //networkbuffer.Add((c, position, null, filename));
-                    networkbuffer += c + PositionToString(position) /*+ "/" + null */ + "\n";
-
-                }
-                else
-                {
-                    new NetCRDT().AddChar(c, position, /* null, */ filename);
-                }
+                new NetCRDT().AddChar(c, position, filename);
             }
         }
 
@@ -667,7 +598,6 @@ namespace SEE.Utils
             {
                 Identifier[] tmp = { headP1 };
                 return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(pos1.Skip(1)), FromIEnumToIdentifier(pos2.Skip(1)), site)));
-
             }
             else
             {
@@ -697,7 +627,6 @@ namespace SEE.Utils
         /// <returns>The index</returns>
         public int FindFittingIndex(Identifier[] position)
         {
-
             return BinaryIndexFinder(position, 0, crdt.Count - 1);
         }
 
@@ -731,7 +660,6 @@ namespace SEE.Utils
             {
                 ret[i] = ienum.ElementAt(i);
             }
-
             return ret;
         }
 
@@ -751,11 +679,8 @@ namespace SEE.Utils
             {
                 inc[i] = elm;
                 i = i--;
-
             }
-
             int[] incValue = Add(value, inc);
-
             return incValue[incValue.Length - 1] == 0 ? Add(incValue, inc) : incValue;
         }
 
@@ -802,7 +727,6 @@ namespace SEE.Utils
             int[] result = new int[size];
             for (int i = 0; i < size; i++)
             {
-
                 if (i >= o1.Length)
                 {
                     result[i] = o2[i];
@@ -861,30 +785,30 @@ namespace SEE.Utils
                 int length = end - start + 1;
                 int mid = 0;
                 mid = length / 2 + start;
-                if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
+                if (ComparePosition(crdt[mid].GetIdentifier(), position) < 0)
                 {
-                    throw new PositionAlreadyExistsException("The searched Position already exists in the CRDT!");
+                    return BinaryIndexFinder(position, mid + 1, end);
                 }
                 else if (ComparePosition(crdt[mid].GetIdentifier(), position) > 0)
                 {
-                    return BinarySearch(position, start, mid - 1);
+                    return BinaryIndexFinder(position, start, mid - 1);
                 }
                 else
                 {
-                    return BinarySearch(position, mid + 1, end);
+                    throw new PositionAlreadyExistsException("The searched Position already exists in the CRDT!");
                 }
             }
-            if (start < crdt.Count && ComparePosition(crdt[start].GetIdentifier(), position) == 0)
+            if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == 0)
             {
                 throw new PositionAlreadyExistsException("The searched Position already exists in the CRDT!");
             }
-            else if (start < crdt.Count && ComparePosition(crdt[start].GetIdentifier(), position) == 1)
+            else if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == 1)
             {
-                return start;
+                return end;
             }
-            else if (start +1 < crdt.Count && ComparePosition(crdt[start].GetIdentifier(), position) == -1)
+            else if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == -1)
             {
-                return start + 1;
+                return end + 1;
             }
             return -1;
         }
@@ -1016,15 +940,8 @@ namespace SEE.Utils
             {
                 crdt.Add(c);
             }
-            
-            if (index - 1 >= 0)
-            {
-                new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier()/*, crdt[index - 1].GetIdentifier()*/, filename);
-            }
-            else
-            {
-                new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier()/*, null*/, filename);
-            }
+
+            new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), filename);
             changeEvent.Invoke(c.GetValue(), index, operationType.Add);
         }
 
@@ -1035,20 +952,19 @@ namespace SEE.Utils
         public void SyncCodeWindows(IPEndPoint[] recipient)
         {
             int idx = 0;
-           foreach(CharObj c in crdt)
+            foreach (CharObj c in crdt)
             {
-                if(idx != 0)
+                if (idx != 0)
                 {
-                    new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier()/*, crdt[idx - 1].GetIdentifier()*/, filename);
+                    new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), filename);
                 }
                 else
                 {
-                    new NetCRDT().SingleAddChar(c.GetValue(), c.GetIdentifier()/*, null*/, filename, recipient);
-
+                    new NetCRDT().SingleAddChar(c.GetValue(), c.GetIdentifier(), filename, recipient);
                 }
                 idx++;
             }
-           
+
         }
 
         /// <summary>
