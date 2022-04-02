@@ -2,14 +2,13 @@
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SEE.GameObjects.Decorators
+namespace SEE.GO.Decorators
 {
     /// <summary>
     /// A decorator for game nodes generating an antenna representing various metrics

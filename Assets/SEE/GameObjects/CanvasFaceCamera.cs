@@ -4,7 +4,7 @@
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.GO
 {
     /// <summary>
     /// This script can be added to a Canvas GameObject to make it always face the main camera.
