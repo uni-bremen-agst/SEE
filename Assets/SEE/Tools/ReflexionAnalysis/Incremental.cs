@@ -64,8 +64,10 @@ namespace SEE.Tools.ReflexionAnalysis
                                                             + "Divergent, it must have a matching specified edge.");
                     }
                 }
+
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
+
             Notify(new ImplementationEdgeEvent(edge, ChangeType.Removal));
             FullGraph.RemoveEdge(edge);
         }
@@ -91,9 +93,9 @@ namespace SEE.Tools.ReflexionAnalysis
             FullGraph.AddEdge(edge);
             SetState(edge, State.Specified);
             Notify(new ArchitectureEdgeEvent(edge, ChangeType.Addition));
-            
+
             // We need to handle the propagated dependencies covered by this specified edge.
-            
+
             // We don't care about order, but O(1) `Contains` is nice to have here, hence the Set
             ISet<Node> targetKids = new HashSet<Node>(edge.Target.PostOrderDescendants());
 
@@ -119,7 +121,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 SetCounter(edge, 0);
             }
         }
-        
+
         /// <summary>
         /// Removes the given specified dependency <paramref name="edge"/> from the architecture.
         /// Precondition: <paramref name="edge"/> must be contained in the architecture graph
@@ -136,14 +138,14 @@ namespace SEE.Tools.ReflexionAnalysis
             if (GetState(edge) == State.Convergent)
             {
                 // We need to handle the propagated dependencies covered by this specified edge.
-                
+
                 // We don't care about order, but O(1) `Contains` is nice to have here, hence the Set
                 ISet<Node> targetKids = new HashSet<Node>(edge.Target.PostOrderDescendants());
 
-                bool IsCoveredEdge(Edge e) => !IsSpecified(e) 
-                                              && targetKids.Contains(e.Target) 
+                bool IsCoveredEdge(Edge e) => !IsSpecified(e)
+                                              && targetKids.Contains(e.Target)
                                               && e.HasSupertypeOf(edge.Type);
-                
+
                 IEnumerable<Edge> coveredEdges = edge.Source.PostOrderDescendants()
                                                      .SelectMany(x => x.Outgoings)
                                                      .Where(IsCoveredEdge);
@@ -152,11 +154,11 @@ namespace SEE.Tools.ReflexionAnalysis
                     Transition(coveredEdge, GetState(coveredEdge), State.Divergent);
                 }
             }
-            
+
             Notify(new ArchitectureEdgeEvent(edge, ChangeType.Removal));
             FullGraph.RemoveEdge(edge);
         }
-        
+
 
         /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
@@ -307,6 +309,69 @@ namespace SEE.Tools.ReflexionAnalysis
         public void DeleteFromMapping(Node node)
         {
             throw new NotImplementedException(); // FIXME
+        }
+
+        /// <summary>
+        /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
+        /// in the node hierarchy of the implementation graph.
+        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
+        /// implementation graph; <paramref name="child"/> has no current parent.
+        /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
+        /// implementation graph and the reflexion data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        /// <param name="parent">parent node</param>
+        public void AddChildInImplementation(Node child, Node parent)
+        {
+            // TODO: What if parent is a child of child?
+            Assert.IsNull(child.Parent);
+            Assert.IsTrue(child.IsInImplementation() && parent.IsInImplementation());
+
+            parent.AddChild(child);
+            if (!IsExplicitlyMapped(child))
+            {
+                // An implicit mapping will only be created if child wasn't already explicitly mapped.
+                Node target = MapsTo(parent);
+                if (target != null)
+                {
+                    // All non-mapped children of child will now be implicitly mapped onto target.
+                    List<Node> subtree = MappedSubtree(child);
+                    ChangeMap(subtree, target);
+                    // We'll also have to handle the resulting new propagated dependencies, of course.
+                    Map(subtree, target);
+                }
+            }
+
+            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Addition));
+        }
+
+        /// <summary>
+        /// Removes given <paramref name="child"/> from its parent in the node hierarchy of
+        /// the implementation graph.
+        /// Precondition: <paramref name="child"/> and parent must be contained in the hierarchy graph;
+        ///    child has a parent.
+        /// Postcondition: <paramref name="child"/> has no longer a parent in the implementation graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        public void UnparentInImplementation(Node child)
+        {
+            Node parent = child.Parent;
+            Assert.IsNotNull(parent);
+            Assert.IsTrue(child.IsInImplementation());
+
+            Node formerTarget = MapsTo(child);
+            child.Reparent(null);
+            if (formerTarget != null && !IsExplicitlyMapped(child))
+            {
+                // If child was implicitly mapped, this was due to parent, which means we now 
+                // have to revert that effect on child and its subtree.
+                List<Node> subtree = MappedSubtree(child);
+                Unmap(subtree, formerTarget);
+                ChangeMap(subtree, null);
+            }
+
+            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Removal));
         }
     }
 }

@@ -558,6 +558,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private void Map(List<Node> subtree, Node newTarget)
         {
             Assert.IsTrue(newTarget.IsInArchitecture());
+            Assert.IsTrue(subtree.All(x => x.IsInImplementation() && MapsTo(x) == newTarget));
             HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
         }
 
@@ -712,35 +713,6 @@ namespace SEE.Tools.ReflexionAnalysis
             // First notify before we delete the mapsTo edge for good.
             Notify(new MapsToEdgeEvent(mapsTo, ChangeType.Removal));
             FullGraph.RemoveEdge(mapsTo);
-        }
-
-        /// <summary>
-        /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
-        /// in the node hierarchy of the implementation graph.
-        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
-        /// hierarchy graph; <paramref name="child"/> has no current parent.
-        /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
-        /// implementation graph and the reflexion data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="child">child node</param>
-        /// <param name="parent">parent node</param>
-        public void AddChildInImplementation(Node child, Node parent)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes given <paramref name="child"/> from its parent in the node hierarchy of
-        /// the implementation graph.
-        /// Precondition: <paramref name="child"/> and parent must be contained in the hierarchy graph;
-        ///    child has a parent.
-        /// Postcondition: <paramref name="child"/> has no longer a parent in the implementation graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="child">child node</param>
-        public void UnparentInImplementation(Node child)
-        {
-            throw new NotImplementedException(); // FIXME
         }
 
         #endregion
