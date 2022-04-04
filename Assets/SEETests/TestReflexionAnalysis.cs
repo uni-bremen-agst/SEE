@@ -49,7 +49,7 @@ namespace SEE.Tools.Architecture
         /// Since <see cref="ChangeEvent"/> is abstract, this will contain concrete subtypes.
         /// </summary>
         protected List<ChangeEvent> changes = new List<ChangeEvent>();
-        
+
         /// <summary>
         /// Re-sets the event cache in <see cref="changes"/> to its initial value (empty).
         /// </summary>
@@ -59,10 +59,9 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// True if edgeChanges has an edge from source to target with given edgeType whose new state is the
+        /// True if changes has an edge from source to target with given edgeType whose new state is the
         /// given state.
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
@@ -74,13 +73,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.convergent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Convergent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsConvergent(Node source, Node target, string edgeType)
         {
@@ -88,13 +85,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Allowed).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowed(Node source, Node target, string edgeType)
         {
@@ -102,13 +97,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.absent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Absent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsAbsent(Node source, Node target, string edgeType)
         {
@@ -116,13 +109,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.ImplicitlyAllowed).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsImplicitlyAllowed(Node source, Node target, string edgeType)
         {
@@ -130,13 +121,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.AllowedAbsent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsAllowedAbsent(Node source, Node target, string edgeType)
         {
@@ -144,13 +133,11 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.divergent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Divergent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
         protected bool IsDivergent(Node source, Node target, string edgeType)
         {
@@ -195,15 +182,15 @@ namespace SEE.Tools.Architecture
         protected bool IsContained(Node from, Node to, string edgeType, ChangeType change)
         {
             return changes.OfType<PropagatedEdgeEvent>().Any(edge => from.ID == edge.PropagatedEdge.Source.ID &&
-                                               to.ID == edge.PropagatedEdge.Target.ID &&
-                                               edgeType == edge.PropagatedEdge.Type && change == edge.Change);
+                                                                     to.ID == edge.PropagatedEdge.Target.ID &&
+                                                                     edgeType == edge.PropagatedEdge.Type && change == edge.Change);
         }
-        
+
         protected bool IsNotContained(Node from, Node to, string edgeType)
         {
-            return !changes.OfType<EdgeChange>().Any(edge => from.ID == edge.Edge.Source.ID && 
-                                               to.ID == edge.Edge.Target.ID && 
-                                               edgeType == edge.Edge.Type);
+            return !changes.OfType<EdgeChange>().Any(edge => from.ID == edge.Edge.Source.ID &&
+                                                             to.ID == edge.Edge.Target.ID &&
+                                                             edgeType == edge.Edge.Type);
         }
 
         protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null) where T : ChangeEvent
@@ -269,13 +256,15 @@ namespace SEE.Tools.Architecture
                 SourceName = linkname,
                 Type = type
             };
-            if (inArchitecture) {
+            if (inArchitecture)
+            {
                 result.SetInArchitecture();
             }
             else
             {
                 result.SetInImplementation();
             }
+
             fullGraph.AddNode(result);
             return result;
         }
