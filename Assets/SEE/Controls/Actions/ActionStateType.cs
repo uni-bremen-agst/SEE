@@ -139,7 +139,7 @@ namespace SEE.Controls.Actions
 
         public static ActionStateType EightDirections { get; } =
             new ActionStateType(22, "8-Directions Mode", "8-Directions Mode",
-                                      Color.white.Darker(), "Materials/ModernUIPack/Plus",
+                                      Color.white.Darker(), "Icons/8",
                                       null);
 
         // Quick Menu group on the left side

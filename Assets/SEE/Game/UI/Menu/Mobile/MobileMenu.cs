@@ -181,12 +181,20 @@ namespace SEE.Game.UI.Menu
                     MarkButtonActive(snapButton);
                 }
 
-                // Setting the listener for the dragging move mode
+                // Setting the listener for the dragging move mode (single object/hole city)
                 buttons[4][1].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
                     => ToggleMoveMode());
                 if (SEEInput.DragTouched)
                 {
                     Button dragButton = buttons[4][1].GetComponent<Button>();
+                    MarkButtonActive(dragButton);
+                }
+                // Setting the listener for the dragging move mode (single object/hole city)
+                buttons[4][2].GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(()
+                    => ToggleEightDirectionMode());
+                if (SEEInput.EightDirectionMode)
+                {
+                    Button dragButton = buttons[4][2].GetComponent<Button>();
                     MarkButtonActive(dragButton);
                 }
 
@@ -464,12 +472,30 @@ namespace SEE.Game.UI.Menu
 
             if (SEEInput.DragTouched)
             {
-                Button snapButton = buttons[4][1].GetComponent<Button>();
-                MarkButtonActive(snapButton);
+                Button dragButton = buttons[4][1].GetComponent<Button>();
+                MarkButtonActive(dragButton);
             }
             else
             {
                 buttons[4][1].GetComponent<Button>().colors = ColorBlock.defaultColorBlock;
+            }
+        }
+
+        /// <summary>
+        /// Toggles the mode how nodes/cities are moved from free mode to eight-directions and back.
+        /// </summary>
+        private void ToggleEightDirectionMode()
+        {
+            SEEInput.EightDirectionMode = !SEEInput.EightDirectionMode;
+
+            if (SEEInput.EightDirectionMode)
+            {
+                Button eightButton = buttons[4][2].GetComponent<Button>();
+                MarkButtonActive(eightButton);
+            }
+            else
+            {
+                buttons[4][2].GetComponent<Button>().colors = ColorBlock.defaultColorBlock;
             }
         }
 

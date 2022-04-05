@@ -305,7 +305,7 @@ namespace SEE.Controls.Actions
             else if (touch.phase == TouchPhase.Moved && moving && RaycastPlane(hit.Plane, out Vector3 planeHitPoint)) // continue movement
             {
                 Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
-                if (SEEInput.SnapMobile)
+                if (SEEInput.EightDirectionMode)
                 {
                     Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
                     float angleDeg = point2.Angle360();

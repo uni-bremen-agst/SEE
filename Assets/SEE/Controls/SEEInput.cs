@@ -276,6 +276,11 @@ namespace SEE.Controls
         internal static bool DragTouched = false;
 
         /// <summary>
+        /// The user wants to move nodes or the city in one of eight predefined directions.
+        /// </summary>
+        internal static bool EightDirectionMode = false;
+
+        /// <summary>
         /// The user wants to start dragging the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
