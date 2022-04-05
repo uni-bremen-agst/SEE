@@ -301,6 +301,28 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Returns the the counter of given dependency <paramref name="edge"/>.
+        /// Precondition: <paramref name="edge"/> is either in the architecture or the implementation graph.
+        /// </summary>
+        /// <param name="edge">an architecture or implementation dependency whose counter is to be retrieved</param>
+        /// <returns>the counter of <paramref name="edge"/></returns>
+        public static int GetCounter(Edge edge)
+        {
+            if (edge.IsInArchitecture())
+            {
+                return GetArchCounter(edge);
+            } 
+            else if (edge.IsInImplementation())
+            {
+                return GetImplCounter(edge);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        /// <summary>
         /// Increases counter of <paramref name="edge"/> by <paramref name="value"/> (may be negative).
         /// If its counter drops to zero, the edge is removed.
         /// Notifies if edge's state changes.

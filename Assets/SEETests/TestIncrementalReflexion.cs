@@ -2,6 +2,7 @@
 using SEE.DataModel.DG;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
@@ -505,6 +506,75 @@ namespace SEE.Tools.Architecture
             Assert.That(IsDivergent(a[1], a[9], call));
             Assert.That(IsDivergent(a[9], a[3], call));
             Assert.AreEqual(changes.Count, 9);
+        }
+
+        [Test]
+        public void TestIncrementalArchHierarchyChange()
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            fullGraph = new Graph("");
+            SetupReflexion();
+
+            // Example taken from Figure 10 of "Incremental Reflexion Analysis" (Koschke, 2011).
+            // We set up nodes first:
+            Node a1 = NewNode(true, "a1");
+            Node a2 = NewNode(true, "a2");
+            Node a3 = NewNode(true, "a3");
+            Node a_1 = NewNode(true, "a'1");
+            Node a_2 = NewNode(true, "a'2");
+            Node a_3 = NewNode(true, "a'3");
+            Node a_4 = NewNode(true, "a'4");
+            Node i1 = NewNode(false, "i1");
+            Node i2 = NewNode(false, "i2");
+            Node i3 = NewNode(false, "i3");
+            Node i4 = NewNode(false, "i4");
+            
+            // Then we add the hierarchy:
+            a1.AddChild(a_1);
+            a2.AddChild(a_2);
+            a3.AddChild(a_3);
+            a3.AddChild(a_4);
+            
+            // Now we setup references:
+            AddToGraph(call, a2, a1);
+            AddToGraph(call, a2, a3);
+            AddToGraph(call, i1, i2);
+            AddToGraph(call, i2, i3);
+            AddToGraph(call, i2, i4);
+            
+            // And finally, we setup the mapping:
+            AddToGraph(MapsToType, i1, a_1);
+            AddToGraph(MapsToType, i2, a_2);
+            AddToGraph(MapsToType, i3, a_3);
+            AddToGraph(MapsToType, i4, a_4);
+            
+            ResetEvents();
+            reflexion.Run();
+            Assert.That(IsAbsent(a2, a1, call));
+            Assert.That(IsConvergent(a2, a3, call));
+            Assert.That(IsDivergent(a_1, a_2, call));
+            Assert.That(IsAllowed(a_2, a_3, call));
+            Assert.That(IsAllowed(a_2, a_4, call));
+            AssertEventCountEquals<EdgeChange>(5);
+            AssertEventCountEquals<PropagatedEdgeEvent>(3, ChangeType.Addition);
+            Assert.AreEqual(8, changes.Count);
+            
+            // Now we start testing what we actually want to check: Incremental changes to the arch hierarchy.
+            ResetEvents();
+            reflexion.UnparentInArchitecture(a_2);
+            Assert.That(IsAbsent(a2, a3, call));
+            Assert.That(IsDivergent(a_2, a_3, call));
+            Assert.That(IsDivergent(a_2, a_4, call));
+            AssertEventCountEquals<ArchitectureHierarchyChangeEvent>(1, ChangeType.Removal);
+            Assert.AreEqual(4, changes.Count);
+            
+            ResetEvents();
+            reflexion.AddChildInArchitecture(a_2, a2);
+            Assert.That(IsConvergent(a2, a3, call));
+            Assert.That(IsAllowed(a_2, a_3, call));
+            Assert.That(IsAllowed(a_2, a_4, call));
+            AssertEventCountEquals<ArchitectureHierarchyChangeEvent>(1, ChangeType.Addition);
+            Assert.AreEqual(4, changes.Count);
         }
 
         /// <summary>

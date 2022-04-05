@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Net;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
@@ -328,6 +330,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(child.IsInImplementation() && parent.IsInImplementation());
 
             parent.AddChild(child);
+            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Addition));
             if (!IsExplicitlyMapped(child))
             {
                 // An implicit mapping will only be created if child wasn't already explicitly mapped.
@@ -341,14 +344,12 @@ namespace SEE.Tools.ReflexionAnalysis
                     Map(subtree, target);
                 }
             }
-
-            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Addition));
         }
 
         /// <summary>
         /// Removes given <paramref name="child"/> from its parent in the node hierarchy of
         /// the implementation graph.
-        /// Precondition: <paramref name="child"/> and parent must be contained in the hierarchy graph;
+        /// Precondition: <paramref name="child"/> and parent must be contained in the implementation graph;
         ///    child has a parent.
         /// Postcondition: <paramref name="child"/> has no longer a parent in the implementation graph and the reflexion
         ///   data is updated; all observers are informed of the change.
@@ -362,6 +363,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
             Node formerTarget = MapsTo(child);
             child.Reparent(null);
+            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Removal));
             if (formerTarget != null && !IsExplicitlyMapped(child))
             {
                 // If child was implicitly mapped, this was due to parent, which means we now 
@@ -370,8 +372,144 @@ namespace SEE.Tools.ReflexionAnalysis
                 Unmap(subtree, formerTarget);
                 ChangeMap(subtree, null);
             }
-
-            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Removal));
         }
+
+        /// <summary>
+        /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
+        /// in the node hierarchy of the architecture graph.
+        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
+        /// architecture graph; <paramref name="child"/> has no current parent.
+        /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
+        /// architecture graph and the reflexion data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        /// <param name="parent">parent node</param>
+        public void AddChildInArchitecture(Node child, Node parent)
+        {
+            Assert.IsTrue(child.IsInArchitecture());
+            Assert.IsTrue(parent.IsInArchitecture());
+            Assert.IsNull(child.Parent);
+            
+            // TODO: Check that no redundant-specified dependencies come into existence when subtree is connected
+            PartitionedDependencies divergent = DivergentRefsInSubtree(child);
+            // New relationship needs to be present for lifting, so we'll add it first
+            parent.AddChild(child);
+            Notify(new ArchitectureHierarchyChangeEvent(parent, child, ChangeType.Addition));
+            
+            foreach (Edge edge in divergent.OutgoingCross)
+            {
+                if (Lift(parent, edge.Target, edge.Type, GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Allowed);
+                }
+            }
+
+            foreach (Edge edge in divergent.IncomingCross)
+            {
+                if (Lift(edge.Source, parent, edge.Type, GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Allowed);
+                }
+            }
+
+            foreach (Edge edge in divergent.Inner)
+            {
+                if (Lift(edge.Source, edge.Target, edge.Type, -GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Allowed);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes given <paramref name="child"/> from its parent in the node hierarchy of
+        /// the architecture graph.
+        /// Precondition: <paramref name="child"/> and parent must be contained in the architecture graph;
+        ///    child has a parent.
+        /// Postcondition: <paramref name="child"/> has no longer a parent in the architecture graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        public void UnparentInArchitecture(Node child)
+        {
+            Node parent = child.Parent;
+            Assert.IsNotNull(parent);
+            Assert.IsTrue(child.IsInArchitecture());
+
+            PartitionedDependencies allowed = AllowedRefsInSubtree(child);
+            foreach (Edge edge in allowed.OutgoingCross)
+            {
+                if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Divergent);
+                }
+            }
+
+            foreach (Edge edge in allowed.IncomingCross)
+            {
+                if (Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Divergent);
+                }
+            }
+
+            foreach (Edge edge in allowed.Inner)
+            {
+                if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _) 
+                    || Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
+                {
+                    Transition(edge, GetState(edge), State.Divergent);
+                }
+            }
+            
+            child.Reparent(null);
+            Notify(new ArchitectureHierarchyChangeEvent(parent, child, ChangeType.Removal));
+        }
+
+        #region Helper
+
+        // TODO: Move other helper methods here
+
+        private class PartitionedDependencies
+        {
+            [NotNull]
+            public readonly ISet<Edge> OutgoingCross;
+
+            [NotNull]
+            public readonly ISet<Edge> IncomingCross;
+
+            [NotNull]
+            public readonly ISet<Edge> Inner;
+
+            public PartitionedDependencies([NotNull] ISet<Edge> outgoingCross, [NotNull] ISet<Edge> incomingCross, [NotNull] ISet<Edge> inner)
+            {
+                OutgoingCross = outgoingCross ?? throw new ArgumentNullException(nameof(outgoingCross));
+                IncomingCross = incomingCross ?? throw new ArgumentNullException(nameof(incomingCross));
+                Inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            }
+        }
+
+        private static PartitionedDependencies RefsInSubtree(Node root, Predicate<Edge> predicate)
+        {
+            IList<Node> descendants = root.PostOrderDescendants();
+            (HashSet<Edge> oc, HashSet<Edge> ic, HashSet<Edge> i) = (new HashSet<Edge>(), new HashSet<Edge>(), new HashSet<Edge>());
+            foreach (Node descendant in descendants)
+            {
+                ILookup<bool, Edge> outgoings = descendant.Outgoings.Where(e => predicate(e) && !IsSpecified(e))
+                                                          .ToLookup(e => descendants.Contains(e.Target));
+                oc.UnionWith(outgoings[false]);
+                i.UnionWith(outgoings[true]);
+                ic.UnionWith(descendant.Incomings.Where(e => predicate(e) && !IsSpecified(e) && descendants.Contains(e.Source)));
+            }
+
+            return new PartitionedDependencies(oc, ic, i);
+        }
+
+        // TODO: What about ImplicitlyAllowed and AllowedAbsence?
+        private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
+        
+        private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
+
+        #endregion
     }
 }
