@@ -270,6 +270,9 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // child could be a street or house; we will rotate it no matter what; if it is
                     // in fact a leaf, we will rotate it back below
+
+                    // If leftPivotX <= RightPivotX, child will be placed on the left side of the street.
+                    //
                     child.Rotation = (leftPivotX <= RightPivotX) ? node.Rotation - 90.0f : node.Rotation + 90.0f;
                     child.Rotation = (Mathf.FloorToInt(child.Rotation) + 360) % 360;
                     SetScalePivotsRotation(child);
@@ -314,7 +317,7 @@ namespace SEE.Layout.NodeLayouts
 
                     if (child.IsLeaf())
                     {   // a house (leaf) was rotated above; we will rotate it back again
-                        child.Rotation = (child.Left) ? node.Rotation - 180.0f : node.Rotation;
+                        child.Rotation = child.Left ? node.Rotation - 180.0f : node.Rotation;
                         child.Rotation = (Mathf.FloorToInt(child.Rotation) + 360) % 360;
                     }
                 }
