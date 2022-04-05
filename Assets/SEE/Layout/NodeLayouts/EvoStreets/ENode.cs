@@ -6,7 +6,6 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
     /// <summary>
     /// Necessary layout data on graph nodes for the EvoStreets layout.
     /// </summary>
-    [System.Serializable]
     internal class ENode
     {
         /// <summary>
