@@ -45,7 +45,8 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            if(ICRDT.GetLocalID() == 0)
+            // In case we do not have an ID yet, we request one.
+            if (ICRDT.GetLocalID() == 0)
             {
                 new NetCRDT().RequestID();
             }
