@@ -59,13 +59,13 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// A try to fix the bug that the TMP selects to many characters if you select
+        /// An attempt to fix the bug that the TMP selects too many characters if you select
         /// a word at the end of a line with ctrl + rightArrow.
         /// </summary>
         private bool fixSelection = false;
 
         /// <summary>
-        /// The Key that has been pressed latestly
+        /// The key that has been pressed last.
         /// </summary>
         private KeyCode oldKeyCode;
 
@@ -80,7 +80,6 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindow.SetActive(show);
             }
         }
-
 
         protected override void StartDesktop()
         {
@@ -116,7 +115,7 @@ namespace SEE.Game.UI.CodeWindow
                 else
                 {
                     // TextMeshInputField.text = ICRDT.PrintString(Title);
-                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    EnterFromTokens(SEEToken.fromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
 
@@ -145,7 +144,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 1;
+                                TextMeshInputField.caretPosition++;
                                /* if (c.Equals('\n'))
                                 {
                                     TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 10;
@@ -156,7 +155,7 @@ namespace SEE.Game.UI.CodeWindow
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
-                                TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 1;
+                                TextMeshInputField.caretPosition--;
                                 /*if (c.Equals('\n'))
                                 {
                                     TextMeshInputField.caretPosition = TextMeshInputField.caretPosition + 10;
@@ -217,7 +216,7 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void UpdateDesktop()
         {
-            //Input Handling of the code window.
+            // Input handling of the code window.
             if (TextMeshInputField.isFocused)
             {
                 // resets the old index after the cooldown expires.
@@ -233,7 +232,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     try
                     {
-                        File.WriteAllText(FilePath, removeLineNumbers(ICRDT.PrintString(Title)));
+                        File.WriteAllText(FilePath, RemoveLineNumbers(ICRDT.PrintString(Title)));
                         ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
                     }
                     catch (Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException
@@ -243,7 +242,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
 
-                //Undo / Redo handling.
+                // Undo / Redo handling.
                 if (SEEInput.CodeWindowUndo())
                 {
                     ShowNotification.Info("Undo", "");
@@ -255,21 +254,21 @@ namespace SEE.Game.UI.CodeWindow
                     ICRDT.Redo(Title);
                 }
 
-                //Renew the syntax highliting (currently only on user request)
+                // Renew the syntax highliting (currently only on user request).
                 if (SEEInput.ReCalculateSyntaxHighliting())
                 {
                     ShowNotification.Info("Reloading Code", "");
-                    EnterFromTokens(SEEToken.fromString(removeLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    EnterFromTokens(SEEToken.fromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                     ShowNotification.Info("Reloading Code Complete", "Recalculating Syntaxhighliting finished");
                 }
 
-                //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
-                // get the input
+                // https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
+                // Get the input.
                 int idx = TextMeshInputField.caretPosition;
                 string input = Input.inputString;
 
-                // remove special chars that should not be in the string.
+                // Remove special chars that should not be in the string.
                 if (input.Contains("\b"))
                 {
                     input = input.Replace("\b", "");
@@ -278,7 +277,7 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = input.Replace("\r", "");
                 }
-                if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+                if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
                 {
                     input = "";
                 }
@@ -297,15 +296,15 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     oldIDX = idx;
                     oldIDXCoolDown = Time.time + 0.1f;
-                    deleteSelectedText();
+                    DeleteSelectedText();
                     ICRDT.AddString(input, idx - input.Length, Title);
                     oldKeyCode = KeyCode.A;
                 }
 
-                //Handle other special keys such as delete, ctrl+v...
+                // Handle other special keys such as delete, ctrl+v...
                 if ((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) && valueHasChanged)
                 {
-                    returnPressed(idx);
+                    ReturnPressed(idx);
                     oldKeyCode = KeyCode.Return;
                     valueHasChanged = false;
                 }
@@ -313,11 +312,10 @@ namespace SEE.Game.UI.CodeWindow
                 if (Input.GetKey(KeyCode.Delete) && valueHasChanged)
                 {
                     valueHasChanged = false;
-                    if (!deleteSelectedText())
+                    if (!DeleteSelectedText())
                     {
                         ICRDT.DeleteString(idx, idx, Title);
                     }
-
                     oldKeyCode = KeyCode.Delete;
                 }
 
@@ -334,7 +332,7 @@ namespace SEE.Game.UI.CodeWindow
                     oldIDX = idx;
                     oldIDXCoolDown = Time.time + 0.1f;
                     valueHasChanged = false;
-                    if (!deleteSelectedText())
+                    if (!DeleteSelectedText())
                     {
                         ICRDT.DeleteString(idx, idx, Title);
                         oldKeyCode = KeyCode.Backspace;
@@ -345,14 +343,13 @@ namespace SEE.Game.UI.CodeWindow
                         fixSelection = false;
                         oldKeyCode = KeyCode.None;
                     }
-
-
                 }
+
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
                 {
                     if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
-                        deleteSelectedText();
+                        DeleteSelectedText();
                         //Versuch die auto indentions auch bei strg +v bei zubehalten, muss aber noch im codewindow auch gemacht werden. Das einfachste waere einfach das syntax highliting neu zu kalkulier. dann darf aber kein knopf gedrückt werden
                        /* string tmp = string.Join("\n", GUIUtility.systemCopyBuffer.Split('\n').Select((x, i) =>
                             {
@@ -369,12 +366,11 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
                 {
-                    deleteSelectedText();
+                    DeleteSelectedText();
                 }
 
-
-                //catches the changes in the code window that happens on a frame shift
-                //so that the code doesnot recognize any more that the key was pressed
+                // Catches the changes in the code window that happen on a frame shift
+                // so that the code does not recognize any more that the key was pressed.
                 if (valueHasChanged && oldKeyCode != KeyCode.None)
                 {
                     switch (oldKeyCode)
@@ -386,10 +382,10 @@ namespace SEE.Game.UI.CodeWindow
                             ICRDT.DeleteString(idx + 1, idx + 1, Title);
                             break;
                         case KeyCode.KeypadEnter:
-                            returnPressed(idx);
+                            ReturnPressed(idx);
                             break;
                         case KeyCode.Return:
-                            returnPressed(idx);
+                            ReturnPressed(idx);
                             break;
                         default:
                             ICRDT.AddString(input, idx - 1, Title);
@@ -436,9 +432,6 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
-
-
-
         /// <summary>
         /// Recalculates the <see cref="excessLines"/> using the current window height and line height of the text.
         /// This method should be called every time the window height or the line height changes.
@@ -480,7 +473,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         /// <param name="textWithNumbers">The text with line numbers</param>
         /// <returns>The text without the line numbers</returns>
-        private string removeLineNumbers(string textWithNumbers)
+        private string RemoveLineNumbers(string textWithNumbers)
         {
             string textWithOutNumbers = string.Join("\n", textWithNumbers.Split('\n').Select((x, i) =>
             {
@@ -498,10 +491,10 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// Handles the press of the return key
+        /// Handles the case when the return key is pressed.
         /// </summary>
-        /// <param name="idx">the index at which the return should be added.</param>
-        private void returnPressed(int idx)
+        /// <param name="idx">the index at which the return should be added</param>
+        private void ReturnPressed(int idx)
         {
             valueHasChanged = false;
             if (idx == oldIDX)
@@ -510,7 +503,7 @@ namespace SEE.Game.UI.CodeWindow
             }
             oldIDX = idx;
             oldIDXCoolDown = Time.time + 0.1f;
-            if(deleteSelectedText() && fixSelection)
+            if(DeleteSelectedText() && fixSelection)
                 {
                     TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
                     fixSelection = false;
@@ -524,7 +517,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Deletes the selected text.
         /// </summary>
         /// <returns>returns false if no text was selected and true if text was selected and deleted.</returns>
-        private bool deleteSelectedText()
+        private bool DeleteSelectedText()
         {
             if (selectedText != null)
             {
