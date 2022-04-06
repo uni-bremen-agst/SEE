@@ -59,7 +59,10 @@ namespace Dissonance.Demo
         /// </summary>
         private ChatLogController log;
 
-        public void Start ()
+        /// <summary>
+        /// Sets <see cref="Comms"/>, <see cref="input"/>, and <see cref="log"/>.
+        /// </summary>
+        private void Start ()
         {
             Comms = Comms ?? FindObjectOfType<DissonanceComms>();
 
@@ -104,7 +107,7 @@ namespace Dissonance.Demo
         /// (<see cref="isInputtingText"/>) and calls <see cref="ShowTextInput(string)"/> with
         /// the activated channel.
         /// </summary>
-        public void Update ()
+        private void Update ()
         {
             if (!isInputtingText)
             {
