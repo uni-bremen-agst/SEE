@@ -116,12 +116,12 @@ namespace SEE.Controls
         /// <summary>
         /// Saves the current position when recording paths.
         /// </summary>
-        internal static readonly KeyCode SavePathPosition = Register(KeyCode.F3, Scope.CameraPaths, "Saves the current position when recording paths.");
+        internal static readonly KeyCode SavePathPosition = Register(KeyCode.F11, Scope.CameraPaths, "Saves the current position when recording paths.");
 
         /// <summary>
         /// Starts/stops the automated path replay.
         /// </summary>
-        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F4, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
+        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F12, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
 
         //-----------------------------------------------------
         // Metric charts
