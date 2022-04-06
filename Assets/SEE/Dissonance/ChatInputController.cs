@@ -1,88 +1,156 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using SEE.Controls;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace Dissonance.Demo
 {
-    public class ChatInputController
-        : MonoBehaviour
+    /// <summary>
+    /// Controls the input to the Dissonance voice chat. This component is attached
+    /// to the ChatBox game object of the chat canvas.
+    /// </summary>
+    public class ChatInputController : MonoBehaviour
     {
-        #region fields and properties
-        private bool _isInputtingText;
-        private string _targetChannel;
+        /// <summary>
+        /// Whether we are currently allowing input to the chat text field.
+        /// </summary>
+        private bool isInputtingText;
 
+        /// <summary>
+        /// Name of the channel at which to send the text messages.
+        /// </summary>
+        private string targetChannel;
+
+        /// <summary>
+        /// The dissonance communication retrieved from the scene.
+        /// </summary>
         public DissonanceComms Comms;
+
+        /// <summary>
+        /// The name of the global channel.
+        /// </summary>
+        private const string GlobalChannel = "Global";
+
+        /// <summary>
+        /// The name of the channel for team 1.
+        /// </summary>
         public string Team1Channel = "A";
+
+        /// <summary>
+        /// The name of the channel for team 2.
+        /// </summary>
         public string Team2Channel = "B";
 
-        private InputField _input;
-        private ChatLogController _log;
-        #endregion
+        /// <summary>
+        /// The name of the game object holding the <see cref="input"/> text field of the chat.
+        /// </summary>
+        private const string ChatInputGameObjectName = "ChatInput";
+
+        /// <summary>
+        /// The text input field where the text messages are entered. It will be retrieved
+        /// from a game object named <see cref="ChatInputGameObjectName"/> in <see cref="Start"/>.
+        /// </summary>
+        private InputField input;
+
+        /// <summary>
+        /// The logger for the chat. This component must be attached to the same game object
+        /// this component is attached to.
+        /// </summary>
+        private ChatLogController log;
 
         public void Start ()
         {
             Comms = Comms ?? FindObjectOfType<DissonanceComms>();
 
-            _input = GetComponentsInChildren<InputField>().Single(a => a.name == "ChatInput");
-            _input.gameObject.SetActive(false);
+            input = GetComponentsInChildren<InputField>().Single(a => a.name == ChatInputGameObjectName);
+            input.gameObject.SetActive(false);
 
-            _input.onEndEdit.AddListener(OnInputEndEdit);
+            input.onEndEdit.AddListener(OnInputEndEdit);
 
-            _log = GetComponent<ChatLogController>();
+            log = GetComponent<ChatLogController>();
         }
 
+        /// <summary>
+        /// Call back that is called when editing of the <see cref="input"/> field
+        /// has been ended (event <see cref="input.onEndEdit"/>).
+        /// </summary>
+        /// <param name="message">the entered message</param>
         private void OnInputEndEdit([CanBeNull] string message)
         {
             if (!string.IsNullOrEmpty(message))
             {
-                //Send the text to dissonance network
-                if (Comms != null)
-                    Comms.Text.Send(_targetChannel, message);
+                // Send the text to dissonance network.
+                Comms?.Text.Send(targetChannel, message);
 
-                //Display in the local log
-                if (_log != null)
-                    _log.AddMessage(string.Format("Me ({0}): {1}", _targetChannel, message), Color.gray);
+                // Display in the local log.
+                log?.AddMessage(string.Format("Me ({0}): {1}", targetChannel, message), Color.gray);
             }
 
-            //Clear the UI
-            _input.text = "";
-            _input.gameObject.SetActive(false);
-            _isInputtingText = false;
+            // Clear the UI.
+            input.text = "";
+            input.gameObject.SetActive(false);
+            EnableEditing(false);
 
-            //Stop forcing the chat visible
-            if (_log!= null)
-                _log.ForceShow = false;
+            // Stop forcing the chat visible.
+            if (log != null)
+            {
+                log.ForceShow = false;
+            }
         }
 
+        /// <summary>
+        /// Monitors the keyboard keys for toggling the voice chats if we're not inputting text
+        /// (<see cref="isInputtingText"/>) and calls <see cref="ShowTextInput(string)"/> with
+        /// the activated channel.
+        /// </summary>
         public void Update ()
         {
-            //Monitor keyboard keys if we're not inputting text
-            if (!_isInputtingText)
+            if (!isInputtingText)
             {
-                var global = Input.GetKey(KeyCode.Y);
-                var red = Input.GetKey(KeyCode.U);
-                var blue = Input.GetKey(KeyCode.I);
-
-                //If a key is pressed
-                if (global)
-                    ShowTextInput("Global");
-                else if (red)
+                if (SEEInput.ToggleGlobalChat())
+                {
+                    ShowTextInput(GlobalChannel);
+                }
+                else if (SEEInput.ToggleTeam1Channel())
+                {
                     ShowTextInput(Team1Channel);
-                else if (blue)
+                }
+                else if (SEEInput.ToggleTeam2Channel())
+                {
                     ShowTextInput(Team2Channel);
+                }
             }
         }
 
+        /// <summary>
+        /// Enables entering text into the chat and sends it to the
+        /// the given <paramref name="channel"/>.
+        /// </summary>
+        /// <param name="channel">name of the channel</param>
         private void ShowTextInput(string channel)
         {
-            _isInputtingText = true;
-            _targetChannel = channel;
-            _input.gameObject.SetActive(true);
-            _input.ActivateInputField();
+            EnableEditing(true);
+            targetChannel = channel;
+            input.gameObject.SetActive(true);
+            input.ActivateInputField();
 
-            //Force the chat log to show
-            if (_log != null)
-                _log.ForceShow = true;
+            // Force the chat log to show.
+            if (log != null)
+            {
+                log.ForceShow = true;
+            }
+        }
+
+        /// <summary>
+        /// Enables/disables editing and disables/enables the keyboard shortcuts of <see cref="SEEInput"/>.
+        /// </summary>
+        /// <param name="enable">whether editing should be enabled and the <see cref="SEEInput"/>
+        /// keyboard shortcuts should be disabled</param>
+        private void EnableEditing(bool enable)
+        {
+            isInputtingText = enable;
+            SEEInput.KeyboardShortcutsEnabled = !enable;
         }
     }
 }
