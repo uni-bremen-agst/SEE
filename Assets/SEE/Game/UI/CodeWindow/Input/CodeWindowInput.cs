@@ -18,14 +18,9 @@ namespace SEE.Game.UI.CodeWindow
     public partial class CodeWindow
     {
         /// <summary>
-        /// The needed padding for the line numbers
+        /// The needed padding for the line numbers.
         /// </summary>
         private int neededPadding = 0;
-
-        /// <summary>
-        /// The text without the syntax highlitign
-        /// </summary>
-        private string cleanText;
 
         /// <summary>
         /// A dictionary mapping each link ID to its issues.
@@ -281,7 +276,10 @@ namespace SEE.Game.UI.CodeWindow
                 Assert.IsTrue(linkCounter < char.MaxValue);
                 char[] reservedCharacters = {'<', '>', '"', '\''}; // these characters would break our formatting
                 // Increase link counter until it contains an allowed character
-                while (reservedCharacters.Contains(++linkCounter)) ;
+                while (reservedCharacters.Contains(++linkCounter))
+                {
+                    // intentionally left blank
+                }
             }
 
             #endregion
@@ -443,7 +441,7 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// Get index within the "rich" text (with markup tags) from index in the "clean" text (with markup tags).
+        /// Returns the index within the "rich" text (with markup tags) from index in the "clean" text (with markup tags).
         /// </summary>
         /// <param name="cleanIndex">The index within the "clean" text.</param>
         /// <returns>The index within the "rich" text.</returns>
@@ -454,7 +452,7 @@ namespace SEE.Game.UI.CodeWindow
         /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
         /// To remedy this, you can call this method with an index in the "clean" version.
         /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
-        /// corresponding indices in the text with tags present, which in our example would be 20 and 38.
+        /// corresponding index in the text with tags present, which in our example would be 20 and 38.
         /// </example>
         private int GetRichIndex(int cleanIndex)
         {
@@ -472,28 +470,6 @@ namespace SEE.Game.UI.CodeWindow
             return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
         }
 
-        /// <summary>
-        /// Returns the line at the given <paramref name="lineNumber"/> from the <see cref="TextMesh"/>
-        /// without any XML tags.
-        /// </summary>
-        /// <param name="lineNumber">The line number whose cleaned up line shall be returned</param>
-        /// <returns>The line at <paramref name="lineNumber"/> without any XML tags</returns>
-        private string GetCleanLine(int lineNumber) =>
-                //FIXME: There may be an issue here
-            new string(TextMesh.textInfo.characterInfo
-                    .SkipWhile(x => x.lineNumber + 1 != lineNumber) 
-                    .TakeWhile(x => x.lineNumber + 1 == lineNumber).Select(x => x.character).ToArray());
-
-
-        /// <summary>
-        /// Returns the Text without the XML Tags
-        /// </summary>
-        /// <returns>The clean text</returns>
-        private  string GetCleanText()
-        {
-            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
-            return ret;
-        }
         /// <summary>
         /// Returns the Text without the XML Tags
         /// </summary>
