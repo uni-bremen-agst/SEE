@@ -19,24 +19,6 @@ namespace SEE.Controls
         /// </summary>
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
-        //----------------------------------------------------
-        // Chat
-        //----------------------------------------------------
-        public static bool GlobalChat()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.Y);
-        }
-        public static bool RedChat()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.U);
-        }
-        public static bool BlueChat()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyCode.I);
-        }
-
-
-
         //-----------------------------------------------------
         // General key bindings
         //-----------------------------------------------------
@@ -135,7 +117,7 @@ namespace SEE.Controls
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
-            } 
+            }
             else
             {
                 return false;
@@ -167,7 +149,7 @@ namespace SEE.Controls
             {
             return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
 
-            } 
+            }
             else
             {
                 return false;
@@ -198,7 +180,7 @@ namespace SEE.Controls
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
-            } 
+            }
             return false;
 #endif
 #if UNITY_EDITOR == true
@@ -222,7 +204,7 @@ namespace SEE.Controls
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
                 return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
-            } 
+            }
             return false;
 #endif
 #if UNITY_EDITOR == true
@@ -232,7 +214,7 @@ namespace SEE.Controls
                 return !KeyboardShortcutsEnabled;
             }
             return false;
-#endif  
+#endif
         }
 
         /// <summary>
@@ -659,6 +641,37 @@ namespace SEE.Controls
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        //----------------------------------------------------
+        // Chat
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to toggle the global text chat.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleGlobalChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleGlobalChat);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 1.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam1Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam1Channel);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 2.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam2Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
         }
     }
 }
