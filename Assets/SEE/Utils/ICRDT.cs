@@ -245,7 +245,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="file">The fileame of the crdt</param>
         /// <returns>A change event, that notifies the user if the content of the crdt changes.</returns>
-        public static UnityEvent<char, int, operationType> GetChangeEvent(string file)
+        public static UnityEvent<char, int, OperationType> GetChangeEvent(string file)
         {
             return GetInstanceByName(file).changeEvent;
         }

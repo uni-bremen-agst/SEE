@@ -157,8 +157,8 @@ namespace SEE.Utils
         /// It contains a CharObj[] (char + position) and a operationType (add or delete).
         /// </summary>
 
-        private Stack<(CharObj[], operationType)> undoStack = new Stack<(CharObj[], operationType)>();
-        private Stack<(CharObj[], operationType)> redoStack = new Stack<(CharObj[], operationType)>();
+        private Stack<(CharObj[], OperationType)> undoStack = new Stack<(CharObj[], OperationType)>();
+        private Stack<(CharObj[], OperationType)> redoStack = new Stack<(CharObj[], OperationType)>();
 
         /// <summary>
         /// A buffer to reduce the initial network traffic than oppening a file
@@ -178,7 +178,7 @@ namespace SEE.Utils
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
         /// </summary>
-        public UnityEvent<char, int, operationType> changeEvent = new UnityEvent<char, int, operationType>();
+        public UnityEvent<char, int, OperationType> changeEvent = new UnityEvent<char, int, OperationType>();
 
         /// <summary>
         /// Constructs a CRDT
@@ -283,7 +283,7 @@ namespace SEE.Utils
                 if (crdt.Count == 0)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, crdt.Count - 1, operationType.Add);
+                    changeEvent.Invoke(c, crdt.Count - 1, OperationType.Add);
                     return;
                 }
                 int insertIdx = FindFittingIndex(position);
@@ -295,11 +295,11 @@ namespace SEE.Utils
                 if (insertIdx >= crdt.Count)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, insertIdx, operationType.Add);
+                    changeEvent.Invoke(c, insertIdx, OperationType.Add);
                     return;
                 }
                 crdt.Insert(insertIdx, new CharObj(c, position));
-                changeEvent.Invoke(c, insertIdx, operationType.Add);
+                changeEvent.Invoke(c, insertIdx, OperationType.Add);
             }
             else
             {
@@ -316,7 +316,7 @@ namespace SEE.Utils
             (int, CharObj) found = Find(position);
             if (-1 < found.Item1)
             {
-                changeEvent.Invoke(' ', found.Item1, operationType.Delete);
+                changeEvent.Invoke(' ', found.Item1, OperationType.Delete);
                 crdt.RemoveAt(found.Item1);
             }
             else
@@ -338,7 +338,7 @@ namespace SEE.Utils
                 charObjs.Add(crdt[i]);
                 DeleteChar(i);
             }
-            undoStack.Push((charObjs.ToArray(), operationType.Delete));
+            undoStack.Push((charObjs.ToArray(), OperationType.Delete));
             redoStack.Clear();
         }
 
@@ -376,7 +376,7 @@ namespace SEE.Utils
             if (!disarmUndo)
             {
                 CharObj[] charArr = charObjs.ToArray();
-                undoStack.Push((charArr, operationType.Add));
+                undoStack.Push((charArr, OperationType.Add));
                 redoStack.Clear();
             }
         }
@@ -411,7 +411,7 @@ namespace SEE.Utils
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
-                undoStack.Push((charArr, operationType.Add));
+                undoStack.Push((charArr, OperationType.Add));
                 redoStack.Clear();
             }
             else
@@ -857,16 +857,16 @@ namespace SEE.Utils
                 ShowNotification.Info("Undo Failure", "Undo Stack is empty!");
                 return;
             }
-            (CharObj[], operationType) lastOperation = undoStack.Pop();
+            (CharObj[], OperationType) lastOperation = undoStack.Pop();
             switch (lastOperation.Item2)
             {
-                case operationType.Add:
+                case OperationType.Add:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, operationType.Delete);
+                            changeEvent.Invoke(' ', idx, OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -874,14 +874,14 @@ namespace SEE.Utils
                             ShowNotification.Warn("Undo Failure", "Undo not possible, Char is already deleted!");
                         }
                     }
-                    redoStack.Push((lastOperation.Item1, operationType.Delete));
+                    redoStack.Push((lastOperation.Item1, OperationType.Delete));
                     break;
-                case operationType.Delete:
+                case OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         internalAddCharObj(c);
                     }
-                    redoStack.Push((lastOperation.Item1, operationType.Add));
+                    redoStack.Push((lastOperation.Item1, OperationType.Add));
                     break;
             }
         }
@@ -896,16 +896,16 @@ namespace SEE.Utils
                 ShowNotification.Info("Redo Failure", "Redo Stack is empty!");
                 return;
             }
-            (CharObj[], operationType) lastOperation = redoStack.Pop();
+            (CharObj[], OperationType) lastOperation = redoStack.Pop();
             switch (lastOperation.Item2)
             {
-                case operationType.Add:
+                case OperationType.Add:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, operationType.Delete);
+                            changeEvent.Invoke(' ', idx, OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -913,14 +913,14 @@ namespace SEE.Utils
                             ShowNotification.Warn("Redo Failure", "Redo not possible, Char is already deleted!");
                         }
                     }
-                    undoStack.Push((lastOperation.Item1, operationType.Delete));
+                    undoStack.Push((lastOperation.Item1, OperationType.Delete));
                     break;
-                case operationType.Delete:
+                case OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         internalAddCharObj(c);
                     }
-                    undoStack.Push((lastOperation.Item1, operationType.Add));
+                    undoStack.Push((lastOperation.Item1, OperationType.Add));
                     break;
             }
         }
@@ -942,7 +942,7 @@ namespace SEE.Utils
             }
 
             new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), filename);
-            changeEvent.Invoke(c.GetValue(), index, operationType.Add);
+            changeEvent.Invoke(c.GetValue(), index, OperationType.Add);
         }
 
         /// <summary>
