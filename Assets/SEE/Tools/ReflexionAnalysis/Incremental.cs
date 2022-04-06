@@ -4,7 +4,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Net;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
@@ -229,7 +228,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
-            Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault();
+            Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
             if (mapsToEdge == null)
             {
                 throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
@@ -515,6 +514,168 @@ namespace SEE.Tools.ReflexionAnalysis
         private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
         
         private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
+        
+        /// <summary>
+        /// Reverts the effect of the mapping indicated by <paramref name="mapsTo"/>.
+        /// Precondition: <paramref name="mapsTo"/>.Source is in the implementation graph and is a mapper,
+        /// <paramref name="mapsTo"/>.Target is in the architecture graph, and mapsTo is in the mapping graph.
+        /// Postconditions:
+        /// (1) <paramref name="mapsTo"/> is removed from the graph.
+        /// (2) <paramref name="mapsTo"/>.Source is removed from <see cref="explicitMapsToTable"/>
+        /// (3) all nodes in the mapped subtree rooted by <paramref name="mapsTo"/>.Source are first unmapped
+        /// and then -- if <paramref name="mapsTo"/>.Source has a mapped parent -- mapped onto the same target
+        /// as the mapped parent of <paramref name="mapsTo"/>.Source; <see cref="implicitMapsToTable"/>
+        /// is adjusted accordingly
+        /// (4) all other reflexion data is adjusted and all observers are notified
+        /// </summary>
+        /// <param name="mapsTo">the mapping which shall be reverted</param>
+        private void DeleteMapsTo(Edge mapsTo)
+        {
+            if (!IsExplicitlyMapped(mapsTo.Source))
+            {
+                throw new ArgumentException($"Implementation node {mapsTo.Source} is not mapped explicitly.");
+            }
+            else if (!explicitMapsToTable.Remove(mapsTo.Source.ID))
+            {
+                throw new ArgumentException($"Implementation node {mapsTo.Source} is not mapped explicitly.");
+            }
+
+            // All nodes in the subtree rooted by mapsTo.Source and mapped onto the same target as mapsTo.Source.
+            List<Node> subtree = MappedSubtree(mapsTo.Source);
+            Unmap(subtree, mapsTo.Target);
+            Node implSourceParent = mapsTo.Source.Parent;
+            if (implSourceParent == null)
+            {
+                // If mapsTo.Source has no parent, all nodes in subtree are not mapped at all any longer.
+                ChangeMap(subtree, null);
+            }
+            else
+            {
+                // If mapsTo.Source has a parent, all nodes in subtree should be mapped onto
+                // the architecture node onto which the parent is mapped -- if the parent
+                // is mapped at all (implicitly or explicitly).
+                if (implicitMapsToTable.TryGetValue(implSourceParent.ID, out Node newTarget))
+                {
+                    // newTarget is the architecture node onto which the parent of mapsTo.Source is mapped.
+                    ChangeMap(subtree, newTarget);
+                }
+                if (newTarget != null)
+                {
+                    Map(subtree, newTarget);
+                }
+            }
+            // First notify before we delete the mapsTo edge for good.
+            Notify(new EdgeEvent(mapsTo, ChangeType.Removal, AffectedGraph.Mapping));
+            FullGraph.RemoveEdge(mapsTo);
+        }
+
+        /// <summary>
+        /// Returns propagated dependency in architecture graph matching the type of
+        /// the <paramref name="implementationEdge"/> exactly if one exists;
+        /// returns null if none can be found.
+        /// Precondition: <paramref name="implementationEdge"/> is an implementation dependency.
+        /// Postcondition: resulting edge is in architecture or null.
+        /// </summary>
+        /// <param name="implementationEdge">edge in implementation graph whose propagated edge shall be returned
+        /// (if it exists)</param>
+        /// <returns>the edge in the architecture graph propagated from <paramref name="implementationEdge"/>
+        /// with given type; null if there is no such edge</returns>
+        private Edge GetPropagatedDependency(Edge implementationEdge)
+        {
+            Assert.IsTrue(implementationEdge.IsInImplementation());
+            Node archSource = MapsTo(implementationEdge.Source);
+            Node archTarget = MapsTo(implementationEdge.Target);
+            if (archSource == null || archTarget == null)
+            {
+                return null;
+            }
+
+            return GetPropagatedDependency(archSource, archTarget, implementationEdge.Type);
+        }
+
+        /// <summary>
+        /// Reverts the effect of the mapping of every node in the given <paramref name="subtree"/> onto the
+        /// reflexion data. That is, every non-dangling incoming and outgoing dependency of every
+        /// node in the subtree will be "unpropagated" and "unlifted".
+        /// Precondition: given <paramref name="oldTarget"/> is non-null and contained in the architecture graph
+        /// and all nodes in <paramref name="subtree"/> are in the implementation graph.
+        /// All nodes in <paramref name="subtree"/> were originally mapped onto <paramref name="oldTarget"/>.
+        /// </summary>
+        /// <param name="subtree">implementation nodes whose mapping is to be reverted</param>
+        /// <param name="oldTarget">architecture node onto which the nodes in <paramref name="subtree"/>
+        /// were mapped originally</param>
+        private void Unmap(List<Node> subtree, Node oldTarget)
+        {
+            Assert.IsTrue(oldTarget.IsInArchitecture());
+            HandleMappedSubtree(subtree, oldTarget, DecreaseAndLift);
+        }
+
+        /// <summary>
+        /// Adds an edge of type <see cref="MapsToType"/> between <paramref name="from"/> and <paramref name="to"/>.
+        ///
+        /// Precondition: <paramref name="from"/> is contained in the implementation graph and <paramref name="to"/> is
+        /// contained in the architecture graph.
+        /// Postcondition: there is a Maps_To edge from <paramref name="from"/> to <paramref name="to"/> in the mapping.
+        /// graph.
+        /// </summary>
+        /// <param name="from">source of the Maps_To edge</param>
+        /// <param name="to">target of the Maps_To edge</param>
+        private void AddToMappingGraph(Node from, Node to)
+        {
+            Assert.IsTrue(from.IsInImplementation());
+            Assert.IsTrue(to.IsInArchitecture());
+            // add Maps_To edge to Mapping
+            Edge mapsTo = new Edge(from, to, MapsToType);
+            FullGraph.AddEdge(mapsTo);
+            Notify(new EdgeEvent(mapsTo, ChangeType.Addition, AffectedGraph.Mapping));
+        }
+
+        /// <summary>
+        /// All nodes in given <paramref name="subtree"/> are implicitly mapped onto given <paramref name="target"/>
+        /// architecture node if <paramref name="target"/> != null. If <paramref name="target"/> == null,
+        /// all nodes in given subtree are removed from implicitMapsToTable.
+        ///
+        /// Precondition: <paramref name="target"/> is either null, or is in the architecture graph and all nodes in
+        /// <paramref name="subtree"/> are in the implementation graph.
+        /// </summary>
+        /// <param name="subtree">list of nodes to be mapped onto <paramref name="target"/></param>
+        /// <param name="target">architecture node onto which to map all nodes in <paramref name="subtree"/></param>
+        private void ChangeMap(List<Node> subtree, Node target)
+        {
+            Assert.IsTrue(target == null || target.IsInArchitecture());
+            if (target == null)
+            {
+                foreach (Node node in subtree)
+                {
+                    Assert.IsTrue(node.IsInImplementation());
+                    implicitMapsToTable.Remove(node.ID);
+                }
+            }
+            else
+            {
+                foreach (Node node in subtree)
+                {
+                    Assert.IsTrue(node.IsInImplementation());
+                    implicitMapsToTable[node.ID] = target;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Maps every node in the given subtree onto <paramref name="newTarget"/>. That is, every non-dangling incoming
+        /// and outgoing dependency of every node in the <paramref name="subtree"/> will be propagated and lifted.
+        /// Precondition: given <paramref name="newTarget"/> is non-null and contained in the architecture graph
+        /// and all nodes in <paramref name="subtree"/> are in the implementation graph.
+        /// All nodes in <paramref name="subtree"/> are to be mapped onto <paramref name="newTarget"/>.
+        /// </summary>
+        /// <param name="subtree">implementation nodes whose mapping is to be put into effect</param>
+        /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
+        private void Map(List<Node> subtree, Node newTarget)
+        {
+            Assert.IsTrue(newTarget.IsInArchitecture());
+            Assert.IsTrue(subtree.All(x => x.IsInImplementation() && MapsTo(x) == newTarget));
+            HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
+        }
 
         #endregion
     }
