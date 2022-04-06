@@ -315,6 +315,26 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
 
+        /// <summary>
+        /// Undoes an edit in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowUndo = Register(KeyCode.F5, Scope.CodeViewer, "Undoes an edit in the source-code viewer.");
+
+        /// <summary>
+        /// Redoes an undone edit in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowRedo = Register(KeyCode.F6, Scope.CodeViewer, "Redoes an undone edit in the source-code viewer.");
+
+        /// <summary>
+        /// Saves the content of the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowSave = Register(KeyCode.F7, Scope.CodeViewer, "Saves the content of the source-code viewer.");
+
+        /// <summary>
+        /// Refreshes syntax highlighting in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode RefreshSyntaxHighlighting = Register(KeyCode.F8, Scope.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
+
         //-----------------------------------------------------
         // Text chat to communicate with other remote players
         //-----------------------------------------------------
