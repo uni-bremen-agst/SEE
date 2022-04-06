@@ -38,7 +38,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(edge.Source.IsInImplementation() && edge.Target.IsInImplementation());
             edge.SetInImplementation();
             FullGraph.AddEdge(edge);
-            Notify(new ImplementationEdgeEvent(edge, ChangeType.Addition));
+            Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Implementation));
             PropagateAndLiftDependency(edge);
         }
 
@@ -70,7 +70,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
 
-            Notify(new ImplementationEdgeEvent(edge, ChangeType.Removal));
+            Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Implementation));
             FullGraph.RemoveEdge(edge);
         }
 
@@ -94,7 +94,7 @@ namespace SEE.Tools.ReflexionAnalysis
             edge.SetInArchitecture();
             FullGraph.AddEdge(edge);
             SetState(edge, State.Specified);
-            Notify(new ArchitectureEdgeEvent(edge, ChangeType.Addition));
+            Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Architecture));
 
             // We need to handle the propagated dependencies covered by this specified edge.
 
@@ -157,7 +157,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
 
-            Notify(new ArchitectureEdgeEvent(edge, ChangeType.Removal));
+            Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Architecture));
             FullGraph.RemoveEdge(edge);
         }
 
@@ -242,7 +242,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Adds given <paramref name="node"/> to architecture graph.
         ///
-        /// Precondition: <paramref name="node"/> must not be contained in the architecture graph.
+        /// Precondition: <paramref name="node"/> must not be contained in the reflexion graph.
         /// Postcondition: <paramref name="node"/> is contained in the architecture graph and the reflexion
         ///   data is updated; all observers are informed of the change.
         /// </summary>
@@ -328,9 +328,11 @@ namespace SEE.Tools.ReflexionAnalysis
             // TODO: What if parent is a child of child?
             Assert.IsNull(child.Parent);
             Assert.IsTrue(child.IsInImplementation() && parent.IsInImplementation());
+            Assert.IsTrue(FullGraph.ContainsNode(child));
+            Assert.IsTrue(FullGraph.ContainsNode(parent));
 
             parent.AddChild(child);
-            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Addition));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, AffectedGraph.Implementation));
             if (!IsExplicitlyMapped(child))
             {
                 // An implicit mapping will only be created if child wasn't already explicitly mapped.
@@ -360,10 +362,11 @@ namespace SEE.Tools.ReflexionAnalysis
             Node parent = child.Parent;
             Assert.IsNotNull(parent);
             Assert.IsTrue(child.IsInImplementation());
+            Assert.IsTrue(FullGraph.ContainsNode(child));
 
             Node formerTarget = MapsTo(child);
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, AffectedGraph.Implementation));
             child.Reparent(null);
-            Notify(new ImplementationHierarchyChangeEvent(parent, child, ChangeType.Removal));
             if (formerTarget != null && !IsExplicitlyMapped(child))
             {
                 // If child was implicitly mapped, this was due to parent, which means we now 
@@ -389,12 +392,14 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(child.IsInArchitecture());
             Assert.IsTrue(parent.IsInArchitecture());
             Assert.IsNull(child.Parent);
+            Assert.IsTrue(FullGraph.ContainsNode(child));
+            Assert.IsTrue(FullGraph.ContainsNode(parent));
             
             // TODO: Check that no redundant-specified dependencies come into existence when subtree is connected
             PartitionedDependencies divergent = DivergentRefsInSubtree(child);
             // New relationship needs to be present for lifting, so we'll add it first
             parent.AddChild(child);
-            Notify(new ArchitectureHierarchyChangeEvent(parent, child, ChangeType.Addition));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, AffectedGraph.Architecture));
             
             foreach (Edge edge in divergent.OutgoingCross)
             {
@@ -435,6 +440,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Node parent = child.Parent;
             Assert.IsNotNull(parent);
             Assert.IsTrue(child.IsInArchitecture());
+            Assert.IsTrue(FullGraph.ContainsNode(child));
 
             PartitionedDependencies allowed = AllowedRefsInSubtree(child);
             foreach (Edge edge in allowed.OutgoingCross)
@@ -462,8 +468,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
             
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, AffectedGraph.Architecture));
             child.Reparent(null);
-            Notify(new ArchitectureHierarchyChangeEvent(parent, child, ChangeType.Removal));
         }
 
         #region Helper
@@ -495,11 +501,11 @@ namespace SEE.Tools.ReflexionAnalysis
             (HashSet<Edge> oc, HashSet<Edge> ic, HashSet<Edge> i) = (new HashSet<Edge>(), new HashSet<Edge>(), new HashSet<Edge>());
             foreach (Node descendant in descendants)
             {
-                ILookup<bool, Edge> outgoings = descendant.Outgoings.Where(e => predicate(e) && !IsSpecified(e))
+                ILookup<bool, Edge> outgoings = descendant.Outgoings.Where(e => e.IsInArchitecture() && predicate(e) && !IsSpecified(e))
                                                           .ToLookup(e => descendants.Contains(e.Target));
                 oc.UnionWith(outgoings[false]);
                 i.UnionWith(outgoings[true]);
-                ic.UnionWith(descendant.Incomings.Where(e => predicate(e) && !IsSpecified(e) && descendants.Contains(e.Source)));
+                ic.UnionWith(descendant.Incomings.Where(e => e.IsInArchitecture() && predicate(e) && !IsSpecified(e) && descendants.Contains(e.Source)));
             }
 
             return new PartitionedDependencies(oc, ic, i);
