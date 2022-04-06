@@ -124,14 +124,7 @@ namespace SEE.Controls
             }
 #else
             // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            if (Input.GetKeyDown(KeyBindings.CodeWindowUndo))
-            {
-                return !KeyboardShortcutsEnabled;
-            }
-            else
-            {
-                return false;
-            }
+            return Input.GetKeyDown(KeyBindings.CodeWindowUndo) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -150,11 +143,7 @@ namespace SEE.Controls
             return false;
 #else
             //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            if (Input.GetKeyDown(KeyBindings.CodeWindowRedo))
-            {
-                return !KeyboardShortcutsEnabled;
-            }
-            return false;
+            return Input.GetKeyDown(KeyBindings.CodeWindowRedo) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -168,8 +157,7 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-            return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
-
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
             }
             else
             {
@@ -177,16 +165,8 @@ namespace SEE.Controls
             }
 #else
             // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
-            if (Input.GetKeyDown(KeyBindings.CodeWindowSave))
-            {
-                return !KeyboardShortcutsEnabled;
-            }
-            else
-            {
-                return false;
-            }
+            return Input.GetKeyDown(KeyBindings.CodeWindowSave) && !KeyboardShortcutsEnabled;
 #endif
-
         }
 
         /// <summary>
@@ -204,11 +184,7 @@ namespace SEE.Controls
             return false;
 #else
             // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
-            if (Input.GetKeyDown(KeyBindings.RefreshSyntaxHighlighting))
-            {
-                return !KeyboardShortcutsEnabled;
-            }
-            return false;
+            return Input.GetKeyDown(KeyBindings.RefreshSyntaxHighlighting) && !KeyboardShortcutsEnabled;
 #endif
         }
 
