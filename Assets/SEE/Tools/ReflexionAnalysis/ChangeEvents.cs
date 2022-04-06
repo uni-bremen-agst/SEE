@@ -31,7 +31,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">edge being changed</param>
         /// <param name="old_state">the old state of the edge</param>
         /// <param name="new_state">the new state of the edge after the change</param>
-        public EdgeChange(Edge edge, State oldState, State newState)
+        public EdgeChange(Edge edge, State oldState, State newState) : base(AffectedGraph.Architecture)
         {
             Edge = edge;
             OldState = oldState;
@@ -61,7 +61,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="propagatedEdge">the propagated edge</param>
         /// <param name="change">the type of change to <paramref name="propagatedEdge"/></param>
-        public PropagatedEdgeEvent(Edge propagatedEdge, ChangeType change) : base(change)
+        public PropagatedEdgeEvent(Edge propagatedEdge, ChangeType change) : base(AffectedGraph.FullReflexion, change)
         {
             PropagatedEdge = propagatedEdge;
         }
@@ -71,83 +71,35 @@ namespace SEE.Tools.ReflexionAnalysis
     }
 
     /// <summary>
-    /// A change event fired when a Maps_To edge was added to the mapping or removed from it.
+    /// A change event fired when an edge was added to the reflexion graph or removed from it.
+    /// The specific graph type it was added to/removed from is stored in <see cref="Affected"/>.
     /// </summary>
-    public class MapsToEdgeEvent : ChangeEvent
+    public class EdgeEvent : ChangeEvent
     {
         /// <summary>
-        /// The Maps_To edge added to the mapping or removed from it.
+        /// The edge added to the graph or removed from it.
         /// </summary>
-        public readonly Edge MapsToEdge;
+        public readonly Edge Edge;
 
         /// <summary>
-        /// Constructor preserving the Maps_To edge added to the mapping or removed from it.
+        /// Constructor preserving the edge added to the graph or removed from it.
         /// </summary>
-        /// <param name="mapsToEdge">the Maps_To edge being added or removed</param>
-        /// <param name="change">the type of change to <paramref name="mapsToEdge"/></param>
-        public MapsToEdgeEvent(Edge mapsToEdge, ChangeType change) : base(change)
+        /// <param name="edge">the edge being added or removed</param>
+        /// <param name="change">the type of change to <paramref name="edge"/></param>
+        /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
+        public EdgeEvent(Edge edge, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
         {
-            MapsToEdge = mapsToEdge;
+            Edge = edge;
         }
 
         protected override string Description() => 
-            $"Maps_To edge '{MapsToEdge}' has been {(Change == ChangeType.Addition ? "Added" : "Removed")}.";
-    }
-
-    /// <summary>
-    /// A change event fired when an edge has been added to or removed from the implementation.
-    /// </summary>
-    public class ImplementationEdgeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The edge added to or removed from the Implementation.
-        /// </summary>
-        public readonly Edge ImplementationEdge;
-
-        /// <summary>
-        /// Constructor preserving the edge added to or removed from the implementation.
-        /// </summary>
-        /// <param name="implementationEdge">the implementation edge being added or removed</param>
-        /// <param name="change">the type of change to <paramref name="implementationEdge"/></param>
-        public ImplementationEdgeEvent(Edge implementationEdge, ChangeType change) : base(change)
-        {
-            ImplementationEdge = implementationEdge;
-        }
-
-        protected override string Description() => 
-            $"implementation edge '{ImplementationEdge}' has been "
-            + $"{(Change == ChangeType.Addition ? "added to" : "removed from")} the graph.";
-    }
-    
-    /// <summary>
-    /// A change event fired when an edge has been removed from or added to the architecture.
-    /// </summary>
-    public class ArchitectureEdgeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The edge removed from or added to the architecture.
-        /// </summary>
-        public readonly Edge ArchitectureEdge;
-
-        /// <summary>
-        /// Constructor preserving the edge removed from or added to the architecture.
-        /// </summary>
-        /// <param name="architectureEdge">the architecture edge being removed or added</param>
-        /// <param name="change">the type of change to <paramref name="architectureEdge"/></param>
-        public ArchitectureEdgeEvent(Edge architectureEdge, ChangeType change) : base(change)
-        {
-            ArchitectureEdge = architectureEdge;
-        }
-
-        protected override string Description() => 
-            $"architecture edge '{ArchitectureEdge}' has been "
-            + $"{(Change == ChangeType.Addition ? "added to" : "removed from")} the graph.";
+            $"{Affected} edge '{Edge}' has been {(Change == ChangeType.Addition ? "Added" : "Removed")}.";
     }
 
     /// <summary>
     /// A change event fired when a node is added or removed as a child.
     /// </summary>
-    public abstract class HierarchyChangeEvent : ChangeEvent
+    public class HierarchyChangeEvent : ChangeEvent
     {
         /// <summary>
         /// The parent node, having <see cref="Child"/> as its direct child.
@@ -159,43 +111,17 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node Child;
 
-        protected HierarchyChangeEvent(Node parent, Node child, ChangeType change) : base(change)
+        public HierarchyChangeEvent(Node parent, Node child, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
         {
+            if (affectedGraph == AffectedGraph.Mapping || affectedGraph == AffectedGraph.FullReflexion)
+            {
+                throw new ArgumentException("Only architecture or implementation hierarchy can be changed!");
+            }
             Parent = parent;
             Child = child;
         }
-    }
 
-    /// <summary>
-    /// A change event fired when an implementation node is added or removed as a child.
-    /// </summary>
-    public class ImplementationHierarchyChangeEvent : HierarchyChangeEvent
-    {
         protected override string Description() => 
-            $"implementation node '{Child}'"
-            + $" {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent}'";
-
-        public ImplementationHierarchyChangeEvent(Node parent, Node child, ChangeType change) 
-            : base(parent, child, change)
-        {
-            // Nothing remains to be done.
-        }
+            $"{Affected} node '{Child}' {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent}'";
     }
-    
-    /// <summary>
-    /// A change event fired when an architecture node is added or removed as a child.
-    /// </summary>
-    public class ArchitectureHierarchyChangeEvent : HierarchyChangeEvent
-    {
-        protected override string Description() => 
-            $"architecture node '{Child}'"
-            + $" {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent}'";
-
-        public ArchitectureHierarchyChangeEvent(Node parent, Node child, ChangeType change) 
-            : base(parent, child, change)
-        {
-            // Nothing remains to be done.
-        }
-    }
-    
 }

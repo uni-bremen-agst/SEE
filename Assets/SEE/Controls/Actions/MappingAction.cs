@@ -208,8 +208,11 @@ namespace SEE.Controls.Actions
                 case PropagatedEdgeEvent changedEvent:
                     HandlePropagatedEdge(changedEvent);
                     break;
-                case MapsToEdgeEvent changedEvent:
-                    HandleMapsToEdgeAdded(changedEvent);
+                case EdgeEvent changedEvent:
+                    if (changedEvent.Affected == AffectedGraph.Mapping)
+                    {
+                        HandleMapsToEdgeAdded(changedEvent);
+                    }
                     break;
                 default:
                     Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
@@ -353,11 +356,11 @@ namespace SEE.Controls.Actions
             Debug.Log(propagatedEdgeEvent.ToString());
         }
 
-        private void HandleMapsToEdgeAdded(MapsToEdgeEvent mapsToEdgeEvent)
+        private void HandleMapsToEdgeAdded(EdgeEvent mapsToEdgeEvent)
         {
             Debug.Log(mapsToEdgeEvent.ToString());
 
-            Edge edge = mapsToEdgeEvent.MapsToEdge;
+            Edge edge = mapsToEdgeEvent.Edge;
             // Added:
             //LineRenderer lineRenderer = CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID);
             //edgeToFinalizedMappingEdges[edge] = lineRenderer;

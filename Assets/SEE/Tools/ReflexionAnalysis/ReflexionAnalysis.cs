@@ -193,6 +193,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the state of <paramref name="edge"/> in the architecture</returns>
         public static State GetState(Edge edge)
         {
+            Assert.IsTrue(edge.IsInArchitecture());
             if (edge.TryGetInt(StateAttribute, out int value))
             {
                 return (State)value;
@@ -415,7 +416,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // add Maps_To edge to Mapping
             Edge mapsTo = new Edge(from, to, MapsToType);
             FullGraph.AddEdge(mapsTo);
-            Notify(new MapsToEdgeEvent(mapsTo, ChangeType.Addition));
+            Notify(new EdgeEvent(mapsTo, ChangeType.Addition, AffectedGraph.Mapping));
         }
 
         /// <summary>
@@ -733,7 +734,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
             // First notify before we delete the mapsTo edge for good.
-            Notify(new MapsToEdgeEvent(mapsTo, ChangeType.Removal));
+            Notify(new EdgeEvent(mapsTo, ChangeType.Removal, AffectedGraph.Mapping));
             FullGraph.RemoveEdge(mapsTo);
         }
 

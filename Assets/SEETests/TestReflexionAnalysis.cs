@@ -193,9 +193,9 @@ namespace SEE.Tools.Architecture
                                                              edgeType == edge.Edge.Type);
         }
 
-        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null) where T : ChangeEvent
+        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, AffectedGraph? affectedGraph = null) where T : ChangeEvent
         {
-            Assert.AreEqual(expected, changes.OfType<T>().Count(x => change == null || x.Change == change));
+            Assert.AreEqual(expected, changes.OfType<T>().Count(x => (change == null || x.Change == change) && (affectedGraph == null || x.Affected == affectedGraph)));
         }
 
         /// <summary>
