@@ -122,10 +122,9 @@ namespace SEE.Controls
             {
                 return false;
             }
-#endif
-#if UNITY_EDITOR == true
-            //ctrl keys replaced with f5 in the editor
-            if (Input.GetKeyDown(KeyCode.F5))
+#else
+            // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            if (Input.GetKeyDown(KeyBindings.CodeWindowUndo))
             {
                 return !KeyboardShortcutsEnabled;
             }
@@ -134,7 +133,29 @@ namespace SEE.Controls
                 return false;
             }
 #endif
+        }
 
+        /// <summary>
+        /// Re-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowRedo()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+            }
+            return false;
+#else
+            //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            if (Input.GetKeyDown(KeyBindings.CodeWindowRedo))
+            {
+                return !KeyboardShortcutsEnabled;
+            }
+            return false;
+#endif
         }
 
         /// <summary>
@@ -154,10 +175,9 @@ namespace SEE.Controls
             {
                 return false;
             }
-#endif
-#if UNITY_EDITOR == true
-            //ctrl keys replaced with f5 in the editor
-            if (Input.GetKeyDown(KeyCode.F7))
+#else
+            // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
+            if (Input.GetKeyDown(KeyBindings.CodeWindowSave))
             {
                 return !KeyboardShortcutsEnabled;
             }
@@ -167,30 +187,6 @@ namespace SEE.Controls
             }
 #endif
 
-        }
-
-        /// <summary>
-        /// Re-does the last change in the CodeWindow
-        /// </summary>
-        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool CodeWindowRedo()
-        {
-#if UNITY_EDITOR == false
-            // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-            {
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
-            }
-            return false;
-#endif
-#if UNITY_EDITOR == true
-            //ctrl keys replaced with F6 in the editor
-            if (Input.GetKeyDown(KeyCode.F6))
-            {
-                return !KeyboardShortcutsEnabled;
-            }
-            return false;
-#endif
         }
 
         /// <summary>
@@ -206,10 +202,9 @@ namespace SEE.Controls
                 return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
             }
             return false;
-#endif
-#if UNITY_EDITOR == true
-            //ctrl keys replaced with F8 in the editor
-            if (Input.GetKeyDown(KeyCode.F8))
+#else
+            // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
+            if (Input.GetKeyDown(KeyBindings.RefreshSyntaxHighlighting))
             {
                 return !KeyboardShortcutsEnabled;
             }
