@@ -1,9 +1,5 @@
-using Cysharp.Threading.Tasks;
-using SEE.Controls;
 using SEE.Utils;
-using System.Collections.Generic;
 using System.Net;
-using UnityEngine;
 using static SEE.Utils.CRDT;
 
 namespace SEE.Net
@@ -25,66 +21,61 @@ namespace SEE.Net
             /// <summary>
             /// In this state a RemoteDelteChar() should be executed on each client.
             /// </summary>
-            DelteChar,
+            DeleteChar,
             /// <summary>
             /// In this state a RemoteAddChar() should be executed on each client.
             /// </summary>
             AddChar,
-
             /// <summary>
-            /// Adds a List of single char operation to the crdt to save network load.
+            /// Adds a list of single char operations to the crdt to save network load.
             /// </summary>
             AddString,
-
             /// <summary>
-            /// For ID requesting from the server.
+            /// For requesting an ID from the server.
             /// </summary>
             RequestID,
-
             /// <summary>
-            /// The return of the IP from the Server.
+            /// The return of the ID from the Server.
             /// </summary>
             SetID,
-
             /// <summary>
-            /// IUf a new client joins the game.
+            /// If a new client joins the game.
             /// </summary>
             SingleAddChar,
-
         };
 
         /// <summary>
         /// The specific instance of <see cref="RemoteAction"/>
         /// </summary>
-        public RemoteAction state = RemoteAction.Init;
+        public RemoteAction State = RemoteAction.Init;
 
         /// <summary>
         /// The character that will be transmitted.
         /// </summary>
-        public char c;
-        
+        public char Character;
+
         /// <summary>
-        ///  The position of the character.
+        ///  The position of the character in the file.
         /// </summary>
-        public string position;
+        public string Position;
 
         /// <summary>
         /// The name of the file in which changes should be made.
         /// </summary>
-        public string file;
+        public string File;
 
         /// <summary>
         /// The text that should be transmitted.
         /// </summary>
-        public string text;
+        public string Text;
 
         /// <summary>
-        /// The siteID of the user
+        /// The site ID of the user.
         /// </summary>
-        public int id;
+        public int ID;
 
         /// <summary>
-        /// Initaily left empty
+        /// Constructor.
         /// </summary>
         public NetCRDT() : base()
         {
@@ -96,11 +87,10 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            if (state.Equals(RemoteAction.RequestID))
+            if (State == RemoteAction.RequestID)
             {
-                int id = ICRDT.RequestID();
-                new NetCRDT().SetID(GetRequester(), id);
-                state = RemoteAction.Init;
+                new NetCRDT().SetID(GetRequester(), ICRDT.RequestID());
+                State = RemoteAction.Init;
             }
         }
 
@@ -111,62 +101,62 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                switch (state)
+                switch (State)
                 {
                     case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(c, ICRDT.StringToPosition(position, file), file);
+                        ICRDT.RemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
                         break;
                     case RemoteAction.SingleAddChar:
-                        ICRDT.SingleRemoteAddChar(c, ICRDT.StringToPosition(position, file), file); 
-                    
+                        ICRDT.SingleRemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
+
                        break;
 
-                    case RemoteAction.DelteChar:
-                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(position, file), file);
-                        
+                    case RemoteAction.DeleteChar:
+                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(Position, File), File);
+
                         break;
                     case RemoteAction.AddString:
-                        ICRDT.RemoteAddString(text, file);
+                        ICRDT.RemoteAddString(Text, File);
                         break;
                 }
             }
 
-            if (state.Equals(RemoteAction.SetID))
+            if (State.Equals(RemoteAction.SetID))
             {
-                ICRDT.SetLocalID(id);
+                ICRDT.SetLocalID(ID);
             }
         }
 
         /// <summary>
-        /// Deletes a char on each client.
+        /// Deletes a character on each client.
         /// </summary>
-        /// <param name="position">The position at which a char should be deleted.</param>
-        /// <param name="file">The filename of the crdt in which the char should be deleted.</param>
+        /// <param name="position">The position at which a character should be deleted.</param>
+        /// <param name="file">The filename of the crdt in which the character should be deleted.</param>
         public void DeleteChar(Identifier[] position, string file)
         {
-            this.file = file;
-            this.position = ICRDT.PositionToString(position, file);
-            state = RemoteAction.DelteChar;
+            this.File = file;
+            this.Position = ICRDT.PositionToString(position, file);
+            State = RemoteAction.DeleteChar;
             Execute(null);
         }
 
         /// <summary>
-        /// Adds a char on each client.
+        /// Adds a character on each client.
         /// </summary>
-        /// <param name="c">The char that should be added.</param>
+        /// <param name="c">The character that should be added.</param>
         /// <param name="position">The position at which it should be added.</param>
         /// <param name="file">The filename of the crdt in which it should be added.</param>
         public void AddChar(char c, Identifier[] position, string file)
         {
-            this.file = file;
-            this.c = c;
-            this.position = ICRDT.PositionToString(position, file);
-            state = RemoteAction.AddChar;
+            this.File = file;
+            this.Character = c;
+            this.Position = ICRDT.PositionToString(position, file);
+            State = RemoteAction.AddChar;
             Execute(null);
         }
 
         /// <summary>
-        /// Adds a char on a specific client. Used for synchronising 
+        /// Adds a character on a specific client. Used for synchronizing
         /// the content of the crdt with a new client that joins an existing session.
         /// </summary>
         /// <param name="c">The char that should be added.</param>
@@ -175,10 +165,10 @@ namespace SEE.Net
         /// <param name="recipient">The recipient that should receive the cahnge.</param>
         public void SingleAddChar(char c, Identifier[] position, string file, IPEndPoint[] recipient)
         {
-            this.file = file;
-            this.c = c;
-            this.position = ICRDT.PositionToString(position, file);
-            state = RemoteAction.SingleAddChar;
+            this.File = file;
+            this.Character = c;
+            this.Position = ICRDT.PositionToString(position, file);
+            State = RemoteAction.SingleAddChar;
             Execute(recipient);
         }
 
@@ -189,9 +179,9 @@ namespace SEE.Net
         /// <param name="filename">The filename of the crdt in which the string should be added.</param>
         public void AddString(string text, string filename)
         {
-            this.file = filename;
-            this.text = text;
-            this.state = RemoteAction.AddString;
+            this.File = filename;
+            this.Text = text;
+            this.State = RemoteAction.AddString;
             Execute(null);
         }
 
@@ -200,7 +190,7 @@ namespace SEE.Net
         /// </summary>
         public void RequestID()
         {
-            state = RemoteAction.RequestID;
+            State = RemoteAction.RequestID;
             Execute(null);
         }
 
@@ -211,10 +201,9 @@ namespace SEE.Net
         /// <param name="id">The id that should be set.</param>
         public void SetID(IPEndPoint player, int id)
         {
-            IPEndPoint[] playerArr = { player };
-            this.id = id;
-            state = RemoteAction.SetID;
-            Execute(playerArr);
+            this.ID = id;
+            State = RemoteAction.SetID;
+            Execute(new IPEndPoint[] { player });
         }
     }
 }
