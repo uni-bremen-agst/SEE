@@ -50,7 +50,7 @@ namespace SEE.Controls
         private SelectionMenu CodeWindowMenu;
 
         /// <summary>
-        /// A <see cref="StateIndicator"/> which displays the IP address of the window we're viewing currently. 
+        /// A <see cref="StateIndicator"/> which displays the IP address of the window we're viewing currently.
         /// </summary>
         private StateIndicator SpaceIndicator;
 
@@ -137,7 +137,7 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<CodeSpaceManager>().Length > 1)
             {
-                Debug.LogError("Warning: More than one CodeSpaceManager is present in the scene! "
+                Debug.LogError($"Warning: More than one  {typeof(CodeSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "code windows across the network! No new indicator will be created.\n");
                 foreach (CodeSpaceManager manager in FindObjectsOfType<CodeSpaceManager>())

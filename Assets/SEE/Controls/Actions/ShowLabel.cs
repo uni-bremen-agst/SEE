@@ -260,7 +260,7 @@ namespace SEE.Controls.Actions
                 startLabelPosition,
                 (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
                 lift: true,
-                textColor: Color.black.ColorWithAlpha(0f)) ;
+                textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
             nodeLabel.transform.SetParent(gameObject.transform);
 
