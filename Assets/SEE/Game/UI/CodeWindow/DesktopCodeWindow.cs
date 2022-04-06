@@ -43,25 +43,26 @@ namespace SEE.Game.UI.CodeWindow
         private float oldIDXCoolDown = 0f;
 
         /// <summary>
-        /// The Type of a remote operation
+        /// The type of a remote operation.
         /// </summary>
         public enum OperationType
         {
             /// <summary>
-            /// Add a char to the CodeWindow.
+            /// Add a character to the CodeWindow.
             /// </summary>
             Add,
 
             /// <summary>
-            /// Remove a char from the CodeWindow.
+            /// Remove a character from the CodeWindow.
             /// </summary>
             Delete
         }
 
         /// <summary>
-        /// A try to fix the bug that the TMP select to much chars if you select a word at the end of a line with ctrl + rightArrow
+        /// A try to fix the bug that the TMP selects to many characters if you select
+        /// a word at the end of a line with ctrl + rightArrow.
         /// </summary>
-        private bool FixSelection = false;
+        private bool fixSelection = false;
 
         /// <summary>
         /// The Key that has been pressed latestly
@@ -106,7 +107,7 @@ namespace SEE.Game.UI.CodeWindow
                 TextMeshInputField.interactable = true;
                 TextMeshInputField.text = TextMesh.text = Text;
 
-                //Add the text of the code window to the crdt if the crdt is empty.
+                // Add the text of the code window to the crdt if the crdt is empty.
                 if (ICRDT.IsEmpty(Title))
                 {
                     TextMeshInputField.enabled = false;
@@ -119,16 +120,15 @@ namespace SEE.Game.UI.CodeWindow
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
 
-
-                //Change Listener listens for remote changes in the crdt to add them to the code window
-                ICRDT.GetChangeEvent(Title).AddListener(updateCodeWindow);
+                // Change Listener that listens for remote changes in the crdt to add them to the code window
+                ICRDT.GetChangeEvent(Title).AddListener(UpdateCodeWindow);
                 TextMeshInputField.onTextSelection.AddListener((text, start, end) => {
                     int clean = GetCleanIndex(end);
                     int richIdx = GetRichIndex(clean - 1);
                     if (TextMeshInputField.text[richIdx].Equals('\n'))
                     {
                         clean--;
-                        FixSelection = true;
+                        fixSelection = true;
                     }
                    selectedText = new Tuple<int, int>(GetCleanIndex(start), clean);
                 });
@@ -136,8 +136,8 @@ namespace SEE.Game.UI.CodeWindow
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
                 TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true; });
 
-                //Updates the entries in the CodeWindow
-                void updateCodeWindow(char c, int idx, OperationType type)
+                // Updates the entries in the CodeWindow.
+                void UpdateCodeWindow(char c, int idx, OperationType type)
                 {
                     switch (type)
                     {
@@ -339,10 +339,10 @@ namespace SEE.Game.UI.CodeWindow
                         ICRDT.DeleteString(idx, idx, Title);
                         oldKeyCode = KeyCode.Backspace;
                     }
-                    else if (FixSelection)
+                    else if (fixSelection)
                     {
                         TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
-                        FixSelection = false;
+                        fixSelection = false;
                         oldKeyCode = KeyCode.None;
                     }
 
@@ -510,10 +510,10 @@ namespace SEE.Game.UI.CodeWindow
             }
             oldIDX = idx;
             oldIDXCoolDown = Time.time + 0.1f;
-            if(deleteSelectedText() && FixSelection)
+            if(deleteSelectedText() && fixSelection)
                 {
                     TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
-                    FixSelection = false;
+                    fixSelection = false;
                 }
             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
             TextMeshInputField.MoveToEndOfLine(false, false);
