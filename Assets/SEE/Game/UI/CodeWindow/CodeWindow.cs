@@ -24,8 +24,6 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private TextMeshProUGUI TextMesh;
 
-        private TMP_InputField TextMeshInputField;
-
         /// <summary>
         /// Path to the file whose content is displayed in this code window.
         /// May be <c>null</c> if the code window was filled using <see cref="EnterFromText"/> instead.

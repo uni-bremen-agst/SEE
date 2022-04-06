@@ -21,39 +21,39 @@ namespace SEE.Game.UI.CodeWindow
     /// </summary>
     public partial class CodeWindow
     {
-
         /// <summary>
         /// Scrollbar which controls the currently visible area of the code window.
         /// </summary>
         private ScrollRect scrollRect;
 
-        private TMP_InputField.TextSelectionEvent textSelection = null;
-
         private Tuple<int, int> selectedText;
 
+        private TMP_InputField TextMeshInputField;
+
         /// <summary>
-        /// The old index, if changes happens faster than the carret moves
+        /// The old index, if changes happen faster than the carret moves.
         /// </summary>
         private int oldIDX = -1;
 
         /// <summary>
-        /// Indicates that a changes was made in the CodeWindow and the inputlistener has to react
+        /// Indicates that a change was made in the CodeWindow and the inputlistener has to react.
         /// </summary>
         private bool valueHasChanged = false;
 
         private float oldIDXCoolDown = 0f;
+
         /// <summary>
         /// The Type of a remote operation
         /// </summary>
-        public enum operationType
+        public enum OperationType
         {
             /// <summary>
-            /// Add a char to the codewindow
+            /// Add a char to the CodeWindow.
             /// </summary>
             Add,
 
             /// <summary>
-            /// Remove a char from the CodeWindow
+            /// Remove a char from the CodeWindow.
             /// </summary>
             Delete
         }
@@ -130,18 +130,18 @@ namespace SEE.Game.UI.CodeWindow
                         clean--;
                         FixSelection = true;
                     }
-                   selectedText = new Tuple<int, int>(GetCleanIndex(start), clean); 
+                   selectedText = new Tuple<int, int>(GetCleanIndex(start), clean);
                 });
 
                 TextMeshInputField.onEndTextSelection.AddListener((text, start, end) => { selectedText = null; });
                 TextMeshInputField.onValueChanged.AddListener((text) => { valueHasChanged = true; });
 
                 //Updates the entries in the CodeWindow
-                void updateCodeWindow(char c, int idx, operationType type)
+                void updateCodeWindow(char c, int idx, OperationType type)
                 {
                     switch (type)
                     {
-                        case operationType.Add:
+                        case OperationType.Add:
                             TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
                             if (TextMeshInputField.caretPosition > idx)
                             {
@@ -152,7 +152,7 @@ namespace SEE.Game.UI.CodeWindow
                                 } */
                             }
                             break;
-                        case operationType.Delete:
+                        case OperationType.Delete:
                             TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
                             if (TextMeshInputField.caretPosition > idx)
                             {
@@ -265,15 +265,15 @@ namespace SEE.Game.UI.CodeWindow
                 }
 
                 //https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
-                //get the input
+                // get the input
                 int idx = TextMeshInputField.caretPosition;
                 string input = Input.inputString;
-                //remove specail chars that should not be in the string.    
+
+                // remove special chars that should not be in the string.
                 if (input.Contains("\b"))
                 {
                     input = input.Replace("\b", "");
                 }
-
                 if (input.Contains("\r"))
                 {
                     input = input.Replace("\r", "");
@@ -282,7 +282,8 @@ namespace SEE.Game.UI.CodeWindow
                 {
                     input = "";
                 }
-                //insert the input string into the crdt.
+
+                // Insert the input string into the crdt.
                 if (!string.IsNullOrEmpty(input) && valueHasChanged)
                 {
                     valueHasChanged = false;
@@ -301,7 +302,7 @@ namespace SEE.Game.UI.CodeWindow
                     oldKeyCode = KeyCode.A;
                 }
 
-                //Handle other specail keys like delete, ctrl+v...
+                //Handle other special keys such as delete, ctrl+v...
                 if ((Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter)) && valueHasChanged)
                 {
                     returnPressed(idx);
@@ -316,7 +317,7 @@ namespace SEE.Game.UI.CodeWindow
                     {
                         ICRDT.DeleteString(idx, idx, Title);
                     }
-                    
+
                     oldKeyCode = KeyCode.Delete;
                 }
 
@@ -344,7 +345,7 @@ namespace SEE.Game.UI.CodeWindow
                         FixSelection = false;
                         oldKeyCode = KeyCode.None;
                     }
-                   
+
 
                 }
                 if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
