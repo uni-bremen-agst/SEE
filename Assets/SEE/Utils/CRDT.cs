@@ -278,7 +278,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// For the later connection of a client into an existing session.
-        /// TODO: Actualy it doesn't work correctly now; so it needs to be reworked.
+        /// TODO: Actually it doesn't work correctly now; so it needs to be reworked.
         /// </summary>
         /// <param name="c"></param>
         /// <param name="position"></param>
