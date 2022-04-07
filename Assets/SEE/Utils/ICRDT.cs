@@ -208,7 +208,7 @@ namespace SEE.Utils
         /// Converts a string into a position.
         /// </summary>
         /// <param name="s">The string that should be converted.</param>
-        /// <param name="file">The filename which crdt should be used.</param> //TODO: Probablly obsolete because we do not change anything inside the crdt, maybe we should move the code to the icrdt?
+        /// <param name="file">The filename which crdt should be used.</param> //TODO: Probably obsolete because we do not change anything inside the crdt, maybe we should move the code to the icrdt?
         /// <returns>the position</returns>
         public static Identifier[] StringToPosition(string s, string file)
         {
