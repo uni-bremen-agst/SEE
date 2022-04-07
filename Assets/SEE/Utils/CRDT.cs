@@ -9,9 +9,14 @@ using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Game.UI.CodeWindow.CodeWindow;
 
-// Based on the explenaitions and code from https://digitalfreepen.com/2017/10/06/simple-real-time-collaborative-text-editor.html
 namespace SEE.Utils
+
 {
+    /// <summary>
+    /// A Conflict-Free Replicated Data Type (CRDT) for collaboratively edited text.
+    /// Based on the explanation and code from
+    /// https://digitalfreepen.com/2017/10/06/simple-real-time-collaborative-text-editor.html
+    /// </summary>
     public class CRDT
     {
         public class RemoteDeleteNotPossibleException : Exception
@@ -31,20 +36,27 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// The Identifier represents a position inside of the CRDT.
-        /// It contains the digit e.g. the index and the SiteID e.g. the user that added the char.
+        /// An <see cref="Identifier"/> represents a position inside of the CRDT.
+        /// It contains the digit, i.e., the index, and the site ID, i.e. the user that
+        /// added the character.
         /// </summary>
         public class Identifier
         {
+            /// <summary>
+            /// Represents an index, i.e., a position of an insertion to the CRDT.
+            /// </summary>
             private int digit;
-            private string site;
 
             /// <summary>
-            /// The Identifier represents a position inside of the CRDT.
-            /// It contains the digit e.g. the index and the SiteID e.g. the user that added the char.
+            /// The site ID of a user who contributed the inserted character.
             /// </summary>
-            /// <param name="digit">The digit representing an index</param>
-            /// <param name="site">The SiteID of a user.</param>
+            private readonly string site;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="digit">The digit representing an index.</param>
+            /// <param name="site">The site ID of a user.</param>
             public Identifier(int digit, string site)
             {
                 this.digit = digit;
@@ -61,7 +73,7 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Gets the digit of a Identifier.
+            /// Returns the digit of a Identifier.
             /// </summary>
             /// <returns>The digit.</returns>
             public int GetDigit()
@@ -79,7 +91,7 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Gets the SiteID of the Identifier.
+            /// Returns the SiteID of the Identifier.
             /// </summary>
             /// <returns>The SiteID.</returns>
             public string GetSite()
@@ -89,18 +101,23 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        ///  A CharObj represents an Char in the CRDT contains a position that is unique and a char as value.
+        ///  A CharObj represents a character in the CRDT. It consists of a unique position
+        ///  in the CRDT and the inserted character.
         /// </summary>
         public class CharObj
         {
-            private Identifier[] position;
-            private char value;
+            private readonly Identifier[] position;
 
             /// <summary>
-            /// A CharObj represents an Char in the CRDT contains a position that is unique and a char as value.
+            /// Character inserted to the CRDT.
             /// </summary>
-            /// <param name="value">The Char.</param>
-            /// <param name="position">The unique position in the CRDT.</param>
+            private readonly char value;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="value">The character inserted to the CRDT.</param>
+            /// <param name="position">The unique position in the CRDT where to insert the character.</param>
             public CharObj(char value, Identifier[] position)
             {
                 this.value = value;
@@ -108,16 +125,16 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Gets the value of the CharObj btw. the Char.
+            /// Returns the character that was inserted to the CRDT.
             /// </summary>
-            /// <returns>The value.</returns>
+            /// <returns>The inserted character</returns>
             public char GetValue()
             {
                 return value;
             }
 
             /// <summary>
-            /// Gets the Identifier btw. Position.
+            /// Gets the Identifier or Position, respectively.
             /// </summary>
             /// <returns>The Identifier[].</returns>
             public Identifier[] GetIdentifier()
@@ -126,54 +143,56 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Converts the CharObj in to a string.
+            /// Converts the CharObj into a string.
             /// </summary>
             /// <returns>The CharObj as String.</returns>
             public override string ToString()
             {
                 string result = value + " [";
-                bool fst = true;
-                foreach (Identifier i in position)
+                bool firstIteration = true;
+                foreach (Identifier index in position)
                 {
-                    if (!fst)
+                    if (!firstIteration)
                     {
                         result += ", ";
                     }
                     else
                     {
-                        fst = false;
+                        firstIteration = false;
                     }
-                    if (i != null)
+                    if (index != null)
                     {
-                        result += i.ToString();
+                        result += index.ToString();
                     }
                 }
                 return result + "] ";
             }
-
         }
+
         /// <summary>
-        /// The crdt history contains all local add and delete char operations
+        /// The crdt history contains all local operations adding or deleting a character.
         /// It contains a CharObj[] (char + position) and a operationType (add or delete).
         /// </summary>
-
         private Stack<(CharObj[], OperationType)> undoStack = new Stack<(CharObj[], OperationType)>();
+        /// <summary>
+        /// Undone operations that can be redone.
+        /// </summary>
         private Stack<(CharObj[], OperationType)> redoStack = new Stack<(CharObj[], OperationType)>();
 
         /// <summary>
-        /// A buffer to reduce the initial network traffic than oppening a file
+        /// A buffer to reduce the initial network traffic when oppening a file.
         /// </summary>
         public string networkbuffer = "";
 
         /// <summary>
-        /// The ID 
+        /// The site ID, that is, the user that inserted the character.
         /// </summary>
         private string siteID;
 
         /// <summary>
-        /// The name of the file that is managed with this CRDT
+        /// The name of the file that is managed by this CRDT-
         /// </summary>
-        private string filename;
+        private readonly string filename;
 
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
@@ -181,9 +200,10 @@ namespace SEE.Utils
         public UnityEvent<char, int, OperationType> changeEvent = new UnityEvent<char, int, OperationType>();
 
         /// <summary>
-        /// Constructs a CRDT
+        /// Constructs a CRDT.
         /// </summary>
-        /// <param name="siteID"></param>
+        /// <param name="siteID">the site ID, i.e., the user editing the file</param>
+        /// <param name="filename">the name of the file being edited</param>
         public CRDT(string siteID, string filename)
         {
             this.siteID = siteID;
@@ -191,49 +211,48 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Gets the SiteID of the User in the CRDT.
+        /// Returns the site ID of the user in the CRDT.
         /// </summary>
-        /// <returns>The SiteID.</returns>
-        public string getId()
+        /// <returns>The site ID.</returns>
+        public string GetId()
         {
             return siteID;
         }
 
         /// <summary>
-        /// Sets the SiteID of the user in the CRDT.
+        /// Sets the site ID of the user in the CRDT.
         /// </summary>
         /// <param name="id">The user ID to set.</param>
-        public void setId(string id)
+        public void SetId(string id)
         {
             siteID = id;
         }
 
         /// <summary>
-        /// The chars of the CRDT with their positions.
+        /// The characters of the CRDT with their positions.
         /// </summary>
-        private List<CharObj> crdt = new List<CharObj>(capacity: 5000);
+        private readonly List<CharObj> crdt = new List<CharObj>(capacity: 5000);
 
         /// <summary>
-        /// Gets the CRDT.
+        /// Returns the CRDT.
         /// </summary>
         /// <returns>The CRDT.</returns>
-        public List<CharObj> getCRDT()
+        public List<CharObj> GetCRDT()
         {
             return crdt;
         }
 
         /// <summary>
-        /// Expects a string in the following format(| is not in the string only here for the readability): Char|PositionAsString|/|PositionAsString|\n|nextLine
+        /// Expects a string in the following format (| is not in the string; only here for the readability):
+        /// Char|PositionAsString|/|PositionAsString|\n|nextLine
         /// PositionAsString can be null (\0);
         /// Adds the string to the CRDT only for remote use.
         /// </summary>
-        /// <param name="text">The remote changes as string.</param>
+        /// <param name="text">The remote changes as a string.</param>
         public void RemoteAddString(string text)
         {
             bool CharSet = false;
             char ch = '\0';
-            Identifier[] pos1 = null;
-            //Identifier[] pos2 = null;
             string tmpPos = "";
             foreach (char c in text)
             {
@@ -253,13 +272,13 @@ namespace SEE.Utils
                         continue;
                     }
                     tmpPos += c;
-
                 }
             }
         }
 
         /// <summary>
-        /// For the later Connection of a client into an existing session //TODO: Actualy it doesnt work right now so it need to be reworked
+        /// For the later connection of a client into an existing session.
+        /// TODO: Actualy it doesn't work correctly now; so it needs to be reworked.
         /// </summary>
         /// <param name="c"></param>
         /// <param name="position"></param>
@@ -308,10 +327,10 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// The Remoteoperation to remove a Char from the CRDT
+        /// The remote operation to remove a character from the CRDT.
         /// </summary>
-        /// <param name="position">The position at which the Char should be deleted</param>
-        public void RemoteDeleteChar(Identifier[] position) //TODO Maybe i need a version counter for every action!
+        /// <param name="position">The position at which the character should be deleted</param>
+        public void RemoteDeleteChar(Identifier[] position) //TODO Maybe I need a version counter for every action!
         {
             (int, CharObj) found = Find(position);
             if (-1 < found.Item1)
@@ -321,12 +340,12 @@ namespace SEE.Utils
             }
             else
             {
-                throw new RemoteDeleteNotPossibleException("The position is in the CRDT!");
+                throw new RemoteDeleteNotPossibleException("The position is not in the CRDT!");
             }
         }
 
         /// <summary>
-        /// Deletes every char between the start and end index (inclusive start and end index)
+        /// Deletes every character between <paramref name="startIdx"/> and <paramref name="endIdx"/> (inclusive).
         /// </summary>
         /// <param name="startIdx">The start index</param>
         /// <param name="endIdx">The end index</param>
@@ -343,29 +362,30 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Removes a Char from the CRDT at a given index
+        /// Removes a character from the CRDT at given <paramref name="index"/>.
         /// </summary>
-        /// <param name="index">The index at which the Char should be removed</param>
+        /// <param name="index">The index at which the character should be removed</param>
         public void DeleteChar(int index)
         {
-            if (crdt.Count() > index && index > -1)
+            if (0 <= index && index < crdt.Count())
             {
                 new NetCRDT().DeleteChar(crdt[index].GetIdentifier(), filename);
                 crdt.RemoveAt(index);
             }
             else
             {
-                throw new DeleteNotPossibleException("Index is out of range!");
+                throw new DeleteNotPossibleException($"Index {index} is out of range!");
             }
         }
 
         /// <summary>
-        /// Adds a string to the CRDT at the startIdx | for the small data changes
+        /// Adds the string <paramref name="s"/> to the CRDT at the <paramref name="startIdx"/>
+        /// | for the small data changes.
         /// </summary>
         /// <param name="s">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        /// <param name="disarmUndo">At the start up we dont want to be able of using undo so we should disarm it</param>
-        public void AddString(string s, int startIdx, bool disarmUndo = false)
+        /// <param name="disableUndo">At the start up we do not want to be able of using undo so we should disable it</param>
+        public void AddString(string s, int startIdx, bool disableUndo = false)
         {
             List<CharObj> charObjs = new List<CharObj>(s.Length);
             for (int i = 0; i < s.Length; i++)
@@ -373,7 +393,7 @@ namespace SEE.Utils
                 AddChar(s[i], i + startIdx);
                 charObjs.Add(crdt[i + startIdx]);
             }
-            if (!disarmUndo)
+            if (!disableUndo)
             {
                 CharObj[] charArr = charObjs.ToArray();
                 undoStack.Push((charArr, OperationType.Add));
@@ -382,29 +402,29 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Adds a string to the CRDT at the startIdx this is for huge datastream in async mode
+        /// Adds <paramref name="addedString"/> to the CRDT at the <paramref name="startIdx"/>.
+        /// This method is intended for a large datastream in async mode.
         /// </summary>
-        /// <param name="s">The string that should be added</param>
+        /// <param name="addedString">The string that should be added</param>
         /// <param name="startIdx">The start index of the string in the file</param>
-        /// <param name="startUp">Is this the Startup from a CRDT btw. CodeWindow</param>
-        public async UniTask AsyncAddString(string s, int startIdx, bool startUp = false)
+        /// <param name="startUp">Is this the start-up from a CRDT or CodeWindow, respectively</param>
+        public async UniTask AsyncAddString(string addedString, int startIdx, bool startUp = false)
         {
             await UniTask.SwitchToThreadPool();
-            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            List<CharObj> charObjs = new List<CharObj>(addedString.Length);
             if (!startUp)
             {
-
-                for (int i = 0; i < s.Length; i++)
+                for (int i = 0; i < addedString.Length; i++)
                 {
-                    AddChar(s[i], i + startIdx, startUp);
+                    AddChar(addedString[i], i + startIdx, startUp);
                     charObjs.Add(crdt[i + startIdx]);
                 }
             }
             else
             {
-                for (int i = 0; i < s.Length; i++)
+                for (int i = 0; i < addedString.Length; i++)
                 {
-                    AddChar(s[i], i + startIdx, startUp);
+                    AddChar(addedString[i], i + startIdx, startUp);
                 }
             }
             await UniTask.SwitchToMainThread();
@@ -421,12 +441,12 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Adds a new Char to the CRDT structure
+        /// Adds <paramref name="addition"/>  to the CRDT at the <paramref name="index"/>.
         /// </summary>
-        /// <param name="c">The Char to add</param>
+        /// <param name="addition">The character to add</param>
         /// <param name="index">The index in the local string</param>
-        /// <param name="startUp">Is this the StartUp of an CRDT btw. the CodeWindow</param>
-        public void AddChar(char c, int index, bool startUp = false)
+        /// <param name="startUp">Is this the start-up from a CRDT or CodeWindow, respectively</param>
+        public void AddChar(char addition, int index, bool startUp = false)
         {
             Identifier[] position;
             if (index - 1 >= 0 && crdt.Count > index)
@@ -448,54 +468,57 @@ namespace SEE.Utils
 
             if (crdt.Count > index)
             {
-                crdt.Insert(index, new CharObj(c, position));
+                crdt.Insert(index, new CharObj(addition, position));
             }
             else
             {
-                crdt.Add(new CharObj(c, position));
+                crdt.Add(new CharObj(addition, position));
             }
 
             if (startUp)
             {
-                networkbuffer += c + PositionToString(position) + "\n";
+                networkbuffer += addition + PositionToString(position) + "\n";
             }
             else
             {
-                new NetCRDT().AddChar(c, position, filename);
+                new NetCRDT().AddChar(addition, position, filename);
             }
         }
 
         /// <summary>
-        /// Finds the Index to a Position
+        /// Returns the index for the given <paramref name="position"/>.
         /// </summary>
         /// <param name="position">The position</param>
-        /// <returns>The index of the Position or -1 if the position isnt in the crdt</returns>
+        /// <returns>The index of <paramref name="position"/> or -1 if <paramref name="position"/>
+        /// is not in the crdt</returns>
         public int GetIndexByPosition(Identifier[] position)
         {
             return BinarySearch(position, 0, crdt.Count - 1);
         }
 
         /// <summary>
-        /// Compares two Positions and returns wether the first identifier is larger smaller or greater then the second
+        /// Compares <paramref name="first"/> and <paramref name="second"/>.
         /// </summary>
-        /// <param name="o1">The first position</param>
-        /// <param name="o2">The second position</param>
-        /// <returns>-1 if o1 < o2; 0 if o1 == o2; 1 if o1 > o2</o2>  </returns>
-        public int ComparePosition(Identifier[] o1, Identifier[] o2)
+        /// <param name="first">The first position</param>
+        /// <param name="second">The second position</param>
+        /// <returns>-1 if <paramref name="first"/> < <paramref name="second"/>;
+        /// 0 if <paramref name="first"/> == <paramref name="second"/>;
+        /// 1 if <paramref name="first"/> > <paramref name="second"/></returns>
+        public int ComparePosition(Identifier[] first, Identifier[] second)
         {
-            for (int i = 0; i < Mathf.Min(o1.Length, o2.Length); i++)
+            for (int i = 0; i < Mathf.Min(first.Length, second.Length); i++)
             {
-                int cmp = CompareIdentifier(o1[i], o2[i]);
+                int cmp = CompareIdentifier(first[i], second[i]);
                 if (cmp != 0)
                 {
                     return cmp;
                 }
             }
-            if (o1.Length < o2.Length)
+            if (first.Length < second.Length)
             {
                 return -1;
             }
-            else if (o1.Length > o2.Length)
+            else if (first.Length > second.Length)
             {
                 return 1;
             }
@@ -506,28 +529,30 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// A comperator for Identifiers
+        /// A comparator for <see cref="Identifier"/>s.
         /// </summary>
-        /// <param name="o1">Identifier one</param>
-        /// <param name="o2">Identifier two</param>
-        /// <returns>-1 if o1 < o2; 0 if o1 == o2; 1 if o1 > o2 </returns>
-        public int CompareIdentifier(Identifier o1, Identifier o2)
+        /// <param name="first">Identifier one</param>
+        /// <param name="second">Identifier two</param>
+        /// <returns>-1 if <paramref name="first"/> < <paramref name="second"/>;
+        /// 0 if <paramref name="first"/> == <paramref name="second"/>;
+        /// 1 if <paramref name="first"/> > <paramref name="second"/></returns>
+        public int CompareIdentifier(Identifier first, Identifier second)
         {
-            if (o1.GetDigit() < o2.GetDigit())
+            if (first.GetDigit() < second.GetDigit())
             {
                 return -1;
             }
-            else if (o1.GetDigit() > o2.GetDigit())
+            else if (first.GetDigit() > second.GetDigit())
             {
                 return 1;
             }
             else
             {
-                if (String.Compare(o1.GetSite(), o2.GetSite()) < 0)
+                if (String.Compare(first.GetSite(), second.GetSite()) < 0)
                 {
                     return -1;
                 }
-                else if (String.Compare(o1.GetSite(), o2.GetSite()) > 0)
+                else if (String.Compare(first.GetSite(), second.GetSite()) > 0)
                 {
                     return 1;
                 }
@@ -539,39 +564,40 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Generates a new position between two old positions, or a complete new one if no position given or only one.
+        /// Generates a new position between two old positions, or a complete new one
+        /// if no or only one position is given.
         /// </summary>
-        /// <param name="pos1">Before position</param>
-        /// <param name="pos2">After position</param>
+        /// <param name="before">Before position</param>
+        /// <param name="after">After position</param>
         /// <param name="site">The site ID of the requester</param>
         /// <returns>A new position</returns>
-        public Identifier[] GeneratePositionBetween(Identifier[] pos1, Identifier[] pos2, string site)
+        public Identifier[] GeneratePositionBetween(Identifier[] before, Identifier[] after, string site)
         {
             Identifier headP1, headP2;
             int pos1Length, pos2Length;
-            if (pos1 != null && pos1.Any())
+            if (before != null && before.Any())
             {
-                headP1 = pos1[0];
-                pos1Length = pos1.Length;
+                headP1 = before[0];
+                pos1Length = before.Length;
             }
             else
             {
                 headP1 = new Identifier(0, site);
                 pos1Length = 1;
-                pos1 = new Identifier[1];
-                pos1[0] = headP1;
+                before = new Identifier[1];
+                before[0] = headP1;
             }
-            if (pos2 != null && pos2.Any())
+            if (after != null && after.Any())
             {
-                headP2 = pos2[0];
-                pos2Length = pos2.Length;
+                headP2 = after[0];
+                pos2Length = after.Length;
             }
             else
             {
                 headP2 = new Identifier(int.MaxValue, site);
                 pos2Length = 1;
-                pos2 = new Identifier[1];
-                pos2[0] = headP2;
+                after = new Identifier[1];
+                after[0] = headP2;
             }
 
             if (headP1.GetDigit() != headP2.GetDigit())
@@ -580,36 +606,39 @@ namespace SEE.Utils
                 int[] digitP2 = new int[pos2Length];
                 for (int i = 0; i < pos1Length; i++)
                 {
-                    digitP1[i] = pos1[i].GetDigit();
+                    digitP1[i] = before[i].GetDigit();
                 }
                 for (int i = 0; i < pos2Length; i++)
                 {
-                    digitP2[i] = pos2[i].GetDigit();
+                    digitP2[i] = after[i].GetDigit();
                 }
                 int[] delta = CalcDelta(digitP1, digitP2);
-                return ToIdentifierList(Increment(digitP1, delta), pos1, pos2, site);
+                return ToIdentifierList(Increment(digitP1, delta), before, after, site);
             }
             else if (String.Compare(headP1.GetSite(), headP2.GetSite()) < 0)
             {
                 Identifier[] tmp = { headP1 };
-                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(pos1.Skip(1)), null, site)));
+                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(before.Skip(1)), null, site)));
             }
             else if (headP1.GetSite() == headP2.GetSite())
             {
                 Identifier[] tmp = { headP1 };
-                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(pos1.Skip(1)), FromIEnumToIdentifier(pos2.Skip(1)), site)));
+                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(before.Skip(1)),
+                                                                                FromIEnumToIdentifier(after.Skip(1)),
+                                                                                site)));
             }
             else
             {
-                throw new Exception("The CRDT has a wrong order");
+                throw new Exception("The CRDT has a wrong order.");
             }
         }
 
         /// <summary>
-        /// Finds a CharObj in the CRDT by the position
+        /// Finds a CharObj in the CRDT at the <paramref name="position"/>.
         /// </summary>
         /// <param name="position">The position of the CharObj to find</param>
-        /// <returns>A tuple of the index and the CharObj, Returns (-1,null) if the position is not in the CRDT</returns>
+        /// <returns>A tuple of the index and the CharObj or(-1, null) if the
+        /// position is not in the CRDT</returns>
         public (int, CharObj) Find(Identifier[] position)
         {
             int find = BinarySearch(position, 0, crdt.Count - 1);
@@ -621,7 +650,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Finds the fitting index for a given position. 
+        /// Finds the fitting index for a given <paramref name="position"/>.
         /// </summary>
         /// <param name="position">The position that needs an index</param>
         /// <returns>The index</returns>
@@ -631,11 +660,13 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Finds the next fitting index for a position by recursive testing if the startIdx fitts.
+        /// Finds the next fitting index for a position by recursively testing if
+        /// the <paramref name="startIdx"/> fits.
         /// </summary>
-        /// <param name="position">The position that need an idx</param>
-        /// <param name="startIdx">The idx wich should be tested first</param>
-        /// <returns>The index at which the position should be placed. WARNING CAN BE GREATER THEN THE SIZE OF THE CRDT!</returns>
+        /// <param name="position">The position that needs an index</param>
+        /// <param name="startIdx">The index wich should be tested first</param>
+        /// <returns>The index at which the position should be placed.
+        /// WARNING CAN BE GREATER THAN THE SIZE OF THE CRDT!</returns>
         private int FindNextFittingIndex(Identifier[] position, int startIdx)
         {
             if (startIdx < crdt.Count() && ComparePosition(crdt[startIdx].GetIdentifier(), position) < 0)
@@ -649,7 +680,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Converts a IEnumerable to an Identifier[]
+        /// Converts an IEnumerable to an Identifier[].
         /// </summary>
         /// <param name="ienum">The enum that should be converted</param>
         /// <returns>The Identifier[]</returns>
@@ -664,7 +695,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Increments the value a little less than the delta size
+        /// Increments the value a little less than the delta size.
         /// </summary>
         /// <param name="value">The value that should be incremented</param>
         /// <param name="delta">The referenze size</param>
@@ -685,13 +716,13 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Creates a new identifier list (position identifier) 
+        /// Creates a new identifier list (position identifier).
         /// </summary>
         /// <param name="newPos">The new position to insert</param>
         /// <param name="before">The position before the new one</param>
         /// <param name="after">The position after the new one</param>
         /// <param name="site">The site id from the user</param>
-        /// <returns>A list of identifier, representing a position</returns>
+        /// <returns>A list of identifiers representing a position</returns>
         private Identifier[] ToIdentifierList(int[] newPos, Identifier[] before, Identifier[] after, string site)
         {
             return FromIEnumToIdentifier(newPos.Select((digit, index) =>
@@ -718,61 +749,60 @@ namespace SEE.Utils
         /// <summary>
         /// Adds two arrays elm by elm
         /// </summary>
-        /// <param name="o1">The first array</param>
-        /// <param name="o2">The second array</param>
-        /// <returns>The array that contains the summ of o1 and o2</returns>
-        private int[] Add(int[] o1, int[] o2)
+        /// <param name="first">The first array</param>
+        /// <param name="second">The second array</param>
+        /// <returns>The array that contains the sum of <paramref name="first"/> and <paramref name="second"/></returns>
+        private int[] Add(int[] first, int[] second)
         {
-            int size = Math.Max(o1.Length, o2.Length);
-            int[] result = new int[size];
-            for (int i = 0; i < size; i++)
+            int[] result = new int[(Math.Max(first.Length, second.Length))];
+            for (int i = 0; i < result.Length; i++)
             {
-                if (i >= o1.Length)
+                if (i >= first.Length)
                 {
-                    result[i] = o2[i];
+                    result[i] = second[i];
                 }
-                else if (i >= o2.Length)
+                else if (i >= second.Length)
                 {
-                    result[i] = o1[i];
+                    result[i] = first[i];
                 }
                 else
                 {
-                    result[i] = o1[i] + o2[i];
+                    result[i] = first[i] + second[i];
                 }
             }
             return result;
         }
 
         /// <summary>
-        /// Calculates the difference delta between each value in the arrays
+        /// Calculates the difference delta between each value in the given arrays.
         /// </summary>
-        /// <param name="o1">The first array</param>
-        /// <param name="o2">The second array</param>
+        /// <param name="first">The first array</param>
+        /// <param name="second">The second array</param>
         /// <returns>An array with the delta values</returns>
-        private int[] CalcDelta(int[] o1, int[] o2)
+        private int[] CalcDelta(int[] first, int[] second)
         {
-            int size = Mathf.Max(o1.Length, o2.Length);
-            int[] delta = new int[size];
-            for (int i = 0; i < size; i++)
+            int[] delta = new int[(Mathf.Max(first.Length, second.Length))];
+            for (int i = 0; i < delta.Length; i++)
             {
-                if (o1.Length <= i)
+                if (first.Length <= i)
                 {
-                    delta[i] = o2[i];
+                    delta[i] = second[i];
                 }
-                else if (o2.Length <= i)
+                else if (second.Length <= i)
                 {
-                    delta[i] = o1.Length;
+                    delta[i] = first.Length;
                 }
                 else
                 {
-                    delta[i] = Mathf.Abs(o1[i] - o2[i]);
+                    delta[i] = Mathf.Abs(first[i] - second[i]);
                 }
             }
             return delta;
         }
 
         /// <summary>
-        /// Finds the next position where the given position fits in between the next smaller and bigger position using the binary search pattern
+        /// Finds the next position where the given position fits in between the
+        /// <paramref name="start"/> and <paramref name="end"/> using binary search.
         /// </summary>
         /// <param name="position">The position that should be fit in</param>
         /// <param name="start">The start of the search space</param>
@@ -782,9 +812,7 @@ namespace SEE.Utils
         {
             if (start < end)
             {
-                int length = end - start + 1;
-                int mid = 0;
-                mid = length / 2 + start;
+                int mid = (end - start + 1) / 2 + start;
                 if (ComparePosition(crdt[mid].GetIdentifier(), position) < 0)
                 {
                     return BinaryIndexFinder(position, mid + 1, end);
@@ -814,19 +842,19 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Binarysearches the CRDT for a given position
+        /// Searches the CRDT for <paramref name="position"/> in the range from <paramref name="start"/>
+        /// to <paramref name="end"/>.
         /// </summary>
         /// <param name="position">The position that is searched</param>
-        /// <param name="start">The start index, usaly 0 if the full CRDT should be searched</param>
-        /// <param name="end">The end index, usaly crdt.Count if the full CRDT should be searched</param>
+        /// <param name="start">The start index, usually 0 if the complete CRDT should be searched</param>
+        /// <param name="end">The end index, usually crdt.Count if the complete CRDT should be searched</param>
         /// <returns>The index at which the position is placed or -1 if the position is not contained in the CRDT</returns>
         private int BinarySearch(Identifier[] position, int start, int end)
         {
             if (start < end)
             {
                 int length = end - start + 1;
-                int mid = 0;
-                mid = length / 2 + start;
+                int mid = length / 2 + start;
                 if (ComparePosition(crdt[mid].GetIdentifier(), position) == 0)
                 {
                     return mid;
@@ -848,7 +876,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Undos the last operation
+        /// Undoes the last edit operation.
         /// </summary>
         public void Undo()
         {
@@ -879,7 +907,7 @@ namespace SEE.Utils
                 case OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
-                        internalAddCharObj(c);
+                        InternalAddCharObj(c);
                     }
                     redoStack.Push((lastOperation.Item1, OperationType.Add));
                     break;
@@ -887,7 +915,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Redos the last action
+        /// Redoes the last undone edit operation.
         /// </summary>
         public void Redo()
         {
@@ -918,7 +946,7 @@ namespace SEE.Utils
                 case OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
-                        internalAddCharObj(c);
+                        InternalAddCharObj(c);
                     }
                     undoStack.Push((lastOperation.Item1, OperationType.Add));
                     break;
@@ -926,10 +954,10 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// ReAdds a existing CharObj into the crdt, used for undo and redo
+        /// Re-adds an existing CharObj into the crdt, used for undo and redo
         /// </summary>
         /// <param name="c">The CharObj that should be added</param>
-        private void internalAddCharObj(CharObj c)
+        private void InternalAddCharObj(CharObj c)
         {
             int index = FindNextFittingIndex(c.GetIdentifier(), 0);
             if (index < crdt.Count)
@@ -946,7 +974,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// For a new client later in the network
+        /// For a new client later in the network to synchronize it to the current state.
         /// </summary>
         /// <param name="recipient"></param>
         public void SyncCodeWindows(IPEndPoint[] recipient)
@@ -964,23 +992,25 @@ namespace SEE.Utils
                 }
                 idx++;
             }
-
         }
 
         /// <summary>
-        /// Transforms an string into a position
+        /// Transforms a string into a position-
         /// </summary>
         /// <param name="s">The string contianing the position</param>
         /// <returns>a position - Identifier[]</returns>
         public Identifier[] StringToPosition(string s)
         {
+            if (string.IsNullOrEmpty(s))
+            {
+                return null;
+            }
             List<Identifier> ret = new List<Identifier>();
             string digit = "";
             string siteID = "";
             bool isDigit = false;
             bool isSiteID = false;
             bool next = false;
-            if (s == null || s == "") return null;
             foreach (char c in s)
             {
                 if (c == '(')
@@ -1020,7 +1050,7 @@ namespace SEE.Utils
                     }
                 }
             }
-            //The last element in the string hasnt a comma behind it so we need to insert it here!
+            // The last element in the string hasn't a comma behind it so we need to insert it here!
             if (digit != "" && siteID != "")
             {
                 ret.Add(new Identifier(int.Parse(digit), siteID));
@@ -1030,67 +1060,70 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Converts a position into a string
+        /// Converts a position into a string.
         /// </summary>
         /// <param name="position">The position that should be converted to a string</param>
         /// <returns>A string of a position</returns>
         public string PositionToString(Identifier[] position)
         {
-            string ret = "";
-            bool fst = true;
-            if (position == null) return null;
-            foreach (Identifier i in position)
+            if (position == null)
             {
-                if (!fst)
+                return null;
+            }
+            string result = "";
+            bool first = true;
+            foreach (Identifier identifier in position)
+            {
+                if (!first)
                 {
-                    ret += ", ";
+                    result += ", ";
                 }
                 else
                 {
-                    fst = false;
+                    first = false;
                 }
-                ret += i.ToString();
+                result += identifier.ToString();
             }
-            return ret;
+            return result;
         }
 
         /// <summary>
-        /// Converts the CRDT values to a String 
+        /// Converts the CRDT values to a string
         /// </summary>
-        /// <returns>The readable String of the values in the CRDT</returns>
+        /// <returns>The readable string of the values in the CRDT</returns>
         public string PrintString()
         {
-            string ret = "";
-            foreach (CharObj elm in crdt)
+            string result = "";
+            foreach (CharObj element in crdt)
             {
-                ret += elm.GetValue();
+                result += element.GetValue();
             }
-            return ret;
+            return result;
         }
 
         /// <summary>
-        /// Converts the CRDT to a String
+        /// Converts the CRDT to a string.
         /// </summary>
         /// <returns>A string representing the CRDT</returns>
         public override string ToString()
         {
-            string ret = "";
             if (crdt == null)
             {
                 return "CRDT EMPTY!";
             }
-            foreach (CharObj elm in crdt)
+            string result = "";
+            foreach (CharObj element in crdt)
             {
-                if (elm != null)
+                if (element != null)
                 {
-                    ret += elm.ToString();
+                    result += element.ToString();
                 }
             }
-            return ret;
+            return result;
         }
 
         /// <summary>
-        /// Tests if the CRDT is empyt
+        /// Tests if the CRDT is empty.
         /// </summary>
         /// <returns>True if the CRDT is empty, false if not</returns>
         public bool IsEmpty()
