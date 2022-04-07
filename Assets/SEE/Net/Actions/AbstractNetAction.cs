@@ -121,7 +121,6 @@ namespace SEE.Net
             return result;
         }
 
-
         /// <summary>
         /// Executes this action for the server and every client.
         ///
