@@ -50,9 +50,9 @@ namespace SEE.Utils
             {
                 foreach(KeyValuePair<string, CRDT> entry in crdts)
                 {
-                    if(entry.Value.getId() == "0")
+                    if(entry.Value.GetId() == "0")
                     {
-                        entry.Value.setId(playerIdManager.GetClientID().ToString());
+                        entry.Value.SetId(playerIdManager.GetClientID().ToString());
                     }
                 }
             }
@@ -151,9 +151,9 @@ namespace SEE.Utils
         public static void AddString(string s, int startIdx, string file)
         {
             CRDT crdt = GetInstanceByName(file);
-            if (GetLocalID() > 0  && crdt.getId().Equals("0"))
+            if (GetLocalID() > 0  && crdt.GetId().Equals("0"))
             {
-                crdt.setId(GetLocalID().ToString());
+                crdt.SetId(GetLocalID().ToString());
             }
              crdt.AddString(s, startIdx);
         }
@@ -181,9 +181,9 @@ namespace SEE.Utils
         public static void DeleteString(int startIdx, int endIdx, string file)
         {
             CRDT crdt = GetInstanceByName(file);
-            if (GetLocalID() > 0 && crdt.getId().Equals("0"))
+            if (GetLocalID() > 0 && crdt.GetId().Equals("0"))
             {
-                crdt.setId(GetLocalID().ToString());
+                crdt.SetId(GetLocalID().ToString());
             }
             crdt.DeleteString(startIdx, endIdx);
         }
