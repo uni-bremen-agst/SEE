@@ -18,7 +18,6 @@
     "com.unity.toolchain.linux-x86_64": "1.0.0",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.management": "4.2.1",
-
     "com.unity.xr.windowsmr": "4.6.1",
     "com.valvesoftware.unity.openvr": "file:../Assets/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",
     "judah4.hsvcolorpickerunity": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
