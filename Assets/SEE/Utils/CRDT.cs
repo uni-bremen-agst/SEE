@@ -747,7 +747,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Adds two arrays elm by elm
+        /// Adds two arrays elementy by element.
         /// </summary>
         /// <param name="first">The first array</param>
         /// <param name="second">The second array</param>
