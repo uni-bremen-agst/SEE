@@ -279,7 +279,7 @@ namespace SEE.Utils
     /// The PlayerIdMangager manages the site IDs of the users. The instance of the server will
     /// increase the playerIDCounter and the clients will save their own ids inside the playerIdManager.
     /// </summary>
-    class  PlayerIdManager
+    internal class  PlayerIdManager
     {
         /// <summary>
         /// The number of all players using a crdt in the session.
