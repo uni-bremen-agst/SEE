@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -8,12 +7,11 @@ using static SEE.Utils.CRDT;
 
 namespace SEETests
 { //TODO fix remote addchar calls and find out why all tests fail cause of networkerrors
-    
-    /*
+
     public class TestCRDT
     {
         [Test]
-        public void testPositionToString()
+        public void TestPositionToString()
         {
             CRDT crdt = new CRDT(new GUID().ToString(), "test");
             Identifier[] pos = new Identifier[] { new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
@@ -21,7 +19,7 @@ namespace SEETests
         }
 
         [Test]
-        public void testStringToPosition()
+        public void TestStringToPosition()
         {
             CRDT crdt = new CRDT(new GUID().ToString(), "test");
             Identifier[] pos = new Identifier[] {new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
@@ -31,7 +29,7 @@ namespace SEETests
         }
 
         [Test]
-        public void testDeleteChar()
+        public void TestDeleteChar()
         {
             CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
@@ -53,12 +51,11 @@ namespace SEETests
             }
             catch (DeleteNotPossibleException)
             {
-
             }
         }
 
         [Test]
-        public void testRemoteDeleteChar()
+        public void TestRemoteDeleteChar()
         {
             CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
@@ -69,9 +66,9 @@ namespace SEETests
             test.AddChar(' ', 5);
             test.AddChar('!', 6);
 
-            test.RemoteDeleteChar(test.getCRDT()[2].GetIdentifier());
+            test.RemoteDeleteChar(test.GetCRDT()[2].GetIdentifier());
             Assert.AreEqual("HALO !", test.PrintString());
-            test.RemoteDeleteChar(test.getCRDT()[3].GetIdentifier());
+            test.RemoteDeleteChar(test.GetCRDT()[3].GetIdentifier());
             Assert.AreEqual("HAL !", test.PrintString());
             try
             {
@@ -80,10 +77,10 @@ namespace SEETests
             }
             catch (RemoteDeleteNotPossibleException)
             {
-
             }
         }
 
+        /* TODO: Fix RemoteAddChar and re-enable this test case.
         [Test]
         public void RemoteAndAddCharSameTimePos0()
         {
@@ -94,15 +91,16 @@ namespace SEETests
             crdt2.AddChar('a', 0);
             crdt2.AddChar('a', 0);
 
-            crdt2.RemoteAddChar('A', crdt1.getCRDT()[0].GetIdentifier(), null);
-            crdt1.RemoteAddChar('a', crdt2.getCRDT()[1].GetIdentifier(), null);
-            crdt1.RemoteAddChar('a', crdt2.getCRDT()[1].GetIdentifier(), null);
+            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[0].GetIdentifier(), null);
+            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier(), null);
+            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier(), null);
             Assert.AreEqual("Aaa", crdt1.PrintString());
             Assert.AreEqual("Aaa", crdt2.PrintString());
         }
+        */
 
         [Test]
-        public void testAddChar()
+        public void TestAddChar()
         {
             CRDT test = new CRDT(new GUID().ToString(), "test");
             test.AddChar('H', 0);
@@ -115,51 +113,53 @@ namespace SEETests
             test.AddChar(':', 6);
             test.AddChar('(', 6);
             Debug.LogWarning(test.PrintString());
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[1].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[2].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[3].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[0].GetIdentifier(), test.getCRDT()[4].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[1].GetIdentifier(), test.getCRDT()[2].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[1].GetIdentifier(), test.getCRDT()[3].GetIdentifier()));
-            Assert.AreEqual(-1, test.ComparePosition(test.getCRDT()[2].GetIdentifier(), test.getCRDT()[3].GetIdentifier()));
-            Assert.AreEqual(1, test.ComparePosition(test.getCRDT()[6].GetIdentifier(), test.getCRDT()[1].GetIdentifier()));
-            Assert.AreEqual(0, test.ComparePosition(test.getCRDT()[2].GetIdentifier(), test.getCRDT()[2].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[0].GetIdentifier(), test.GetCRDT()[1].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[0].GetIdentifier(), test.GetCRDT()[2].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[0].GetIdentifier(), test.GetCRDT()[3].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[0].GetIdentifier(), test.GetCRDT()[4].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[1].GetIdentifier(), test.GetCRDT()[2].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[1].GetIdentifier(), test.GetCRDT()[3].GetIdentifier()));
+            Assert.AreEqual(-1, test.ComparePosition(test.GetCRDT()[2].GetIdentifier(), test.GetCRDT()[3].GetIdentifier()));
+            Assert.AreEqual(1, test.ComparePosition(test.GetCRDT()[6].GetIdentifier(), test.GetCRDT()[1].GetIdentifier()));
+            Assert.AreEqual(0, test.ComparePosition(test.GetCRDT()[2].GetIdentifier(), test.GetCRDT()[2].GetIdentifier()));
             Assert.AreEqual("HALLO (:!", test.PrintString());
         }
 
+        /* TODO: Fix RemoteAddChar and re-enable this test case.
         [Test]
-        public void testRemoteAdd()
+        public void TestRemoteAdd()
         {
             CRDT crdt1 = new CRDT("1", "test");
             CRDT crdt2 = new CRDT("2", "test");
 
             crdt1.AddChar('H', 0);
-            crdt2.RemoteAddChar('H', crdt1.getCRDT()[0].GetIdentifier(), null);
+            crdt2.RemoteAddChar('H', crdt1.GetCRDT()[0].GetIdentifier(), null);
 
             crdt1.AddChar('A', 1);
-            crdt2.RemoteAddChar('A', crdt1.getCRDT()[1].GetIdentifier(), crdt1.getCRDT()[0].GetIdentifier());
+            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[1].GetIdentifier(), crdt1.GetCRDT()[0].GetIdentifier());
 
             crdt1.AddChar('L', 2);
-            crdt2.RemoteAddChar('L', crdt1.getCRDT()[2].GetIdentifier(), crdt1.getCRDT()[1].GetIdentifier());
+            crdt2.RemoteAddChar('L', crdt1.GetCRDT()[2].GetIdentifier(), crdt1.GetCRDT()[1].GetIdentifier());
 
             crdt1.AddChar('O', 3);
-            crdt2.RemoteAddChar('O', crdt1.getCRDT()[3].GetIdentifier(), crdt1.getCRDT()[2].GetIdentifier());
+            crdt2.RemoteAddChar('O', crdt1.GetCRDT()[3].GetIdentifier(), crdt1.GetCRDT()[2].GetIdentifier());
 
             //Simulate sync problems
             crdt2.AddChar('l', 2);
 
             crdt1.AddChar('!', 4);
-            crdt2.RemoteAddChar('!', crdt1.getCRDT()[4].GetIdentifier(), crdt1.getCRDT()[3].GetIdentifier());
+            crdt2.RemoteAddChar('!', crdt1.GetCRDT()[4].GetIdentifier(), crdt1.GetCRDT()[3].GetIdentifier());
 
-            crdt1.RemoteAddChar('l', crdt2.getCRDT()[2].GetIdentifier(), crdt2.getCRDT()[1].GetIdentifier());
+            crdt1.RemoteAddChar('l', crdt2.GetCRDT()[2].GetIdentifier(), crdt2.GetCRDT()[1].GetIdentifier());
             //End sync problem
             crdt1.AddChar('_', 0);
-            crdt2.RemoteAddChar('_', crdt1.getCRDT()[0].GetIdentifier(), null);
+            crdt2.RemoteAddChar('_', crdt1.GetCRDT()[0].GetIdentifier(), null);
 
 
-            print(crdt1);
-            print(crdt2);
+            Print(crdt1);
+            Print(crdt2);
         }
+        */
 
         [Test]
         public void TestToString()
@@ -193,7 +193,7 @@ namespace SEETests
         [Test]
         public void TestFind()
         {
-            //This test also covers find 
+            //This test also covers find
             string id = "test";
             CRDT crdt = new CRDT(id, id);
             crdt.AddChar('a', 0);
@@ -207,23 +207,23 @@ namespace SEETests
             crdt.AddChar('i', 8);
 
             Identifier[] wrong = { new Identifier(99, "99"), new Identifier(22, "22"), new Identifier(77, "77") };
-            Assert.AreEqual(0, crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item1);
+            Assert.AreEqual(0, crdt.Find(crdt.GetCRDT()[0].GetIdentifier()).Item1);
             Debug.Log("works");
-            Assert.AreEqual(1, crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item1);
-            Assert.AreEqual(2, crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item1);
+            Assert.AreEqual(1, crdt.Find(crdt.GetCRDT()[1].GetIdentifier()).Item1);
+            Assert.AreEqual(2, crdt.Find(crdt.GetCRDT()[2].GetIdentifier()).Item1);
             Debug.Log("works2");
-            Assert.AreEqual(3, crdt.Find(crdt.getCRDT()[3].GetIdentifier()).Item1);
-            Assert.AreEqual(7, crdt.Find(crdt.getCRDT()[7].GetIdentifier()).Item1);
-            Assert.AreEqual(8, crdt.Find(crdt.getCRDT()[8].GetIdentifier()).Item1);
+            Assert.AreEqual(3, crdt.Find(crdt.GetCRDT()[3].GetIdentifier()).Item1);
+            Assert.AreEqual(7, crdt.Find(crdt.GetCRDT()[7].GetIdentifier()).Item1);
+            Assert.AreEqual(8, crdt.Find(crdt.GetCRDT()[8].GetIdentifier()).Item1);
             Debug.Log("works");
             Assert.AreEqual(-1, crdt.Find(wrong).Item1);
 
-            Assert.AreEqual(crdt.getCRDT()[0], crdt.Find(crdt.getCRDT()[0].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[1], crdt.Find(crdt.getCRDT()[1].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[2], crdt.Find(crdt.getCRDT()[2].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[3], crdt.Find(crdt.getCRDT()[3].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[7], crdt.Find(crdt.getCRDT()[7].GetIdentifier()).Item2);
-            Assert.AreEqual(crdt.getCRDT()[8], crdt.Find(crdt.getCRDT()[8].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[0], crdt.Find(crdt.GetCRDT()[0].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[1], crdt.Find(crdt.GetCRDT()[1].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[2], crdt.Find(crdt.GetCRDT()[2].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[3], crdt.Find(crdt.GetCRDT()[3].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[7], crdt.Find(crdt.GetCRDT()[7].GetIdentifier()).Item2);
+            Assert.AreEqual(crdt.GetCRDT()[8], crdt.Find(crdt.GetCRDT()[8].GetIdentifier()).Item2);
             Assert.AreEqual(null, crdt.Find(wrong).Item2);
         }
 
@@ -231,36 +231,31 @@ namespace SEETests
         /// TODO REMOVE
         /// </summary>
         [Test]
-        public void testBinarySearch2()
+        public void TestBinarySearch2()
         {
             Debug.Log(7 / 2);
-            //This test also covers find 
+            //This test also covers find
             List<int> i = new List<int>(){ 1, 3, 4 };
             i.Insert(1, 2);
             foreach(int e in i)
             {
                 Debug.Log(e);
             }
-            
         }
 
         [Test]
-        public void testIsEmpty()
+        public void TestIsEmpty()
         {
             CRDT crdt = new CRDT("test", "test");
             Assert.IsTrue(crdt.IsEmpty());
             crdt.AddChar('c', 0);
             Assert.IsFalse(crdt.IsEmpty());
         }
-        
 
-        private void print(CRDT crdt)
+        private void Print(CRDT crdt)
         {
             Debug.LogWarning("CRDT: " + crdt.ToString());
             Debug.LogWarning(crdt.PrintString());
         }
-
-
-
-    } */
+    }
 }
