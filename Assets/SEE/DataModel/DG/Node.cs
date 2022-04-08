@@ -616,13 +616,14 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the list of outgoing edges from this node to the given
         /// target node that have exactly the given edge type.
+        /// If the given edge type is null, it will not be taken into account.
         ///
         /// Precondition: target must not be null
         /// </summary>
         /// <param name="target">target node</param>
-        /// <param name="its_type">requested edge type</param>
+        /// <param name="itsType">requested edge type</param>
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
-        public List<Edge> FromTo(Node target, string its_type)
+        public List<Edge> FromTo(Node target, string itsType = null)
         {
             if (ReferenceEquals(target, null))
             {
@@ -630,7 +631,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                return Outgoings.Where(edge => edge.Target == target && edge.Type == its_type).ToList();
+                return Outgoings.Where(edge => edge.Target == target && (itsType == null || edge.Type == itsType)).ToList();
             }
         }
 

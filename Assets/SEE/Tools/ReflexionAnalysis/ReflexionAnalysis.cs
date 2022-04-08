@@ -1103,7 +1103,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">the target of the edge</param>
         /// <param name="itsType">the type of the edge</param>
         /// <returns>the new edge</returns>
-        private Edge Add(Node from, Node to, string itsType)
+        private Edge AddEdge(Node from, Node to, string itsType)
         {
             // Note: a propagated edge between the same two architectural entities may be specified as well;
             // hence, we may have multiple edges in between.
@@ -1156,7 +1156,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private Edge NewImplDepInArchitecture(Node archSource, Node archTarget, string edgeType, out Edge allowingEdgeOut)
         {
             const int counter = 1;
-            Edge propagatedArchitectureDep = Add(archSource, archTarget, edgeType);
+            Edge propagatedArchitectureDep = AddEdge(archSource, archTarget, edgeType);
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
 

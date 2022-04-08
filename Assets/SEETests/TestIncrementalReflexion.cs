@@ -376,27 +376,25 @@ namespace SEE.Tools.Architecture
             // Test addition
 
             ResetEvents();
-            Edge ei12 = new Edge(i1, i2, call);
-            reflexion.AddToImplementation(ei12);
+            reflexion.AddToImplementation(i1, i2, call);
             Assert.That(IsConvergent(a_1, a_2, call));
             Assert.That(IsPropagated(a1, a2, call));
             Assert.That(IsAllowed(a1, a2, call));
 
             ResetEvents();
-            Edge ei_12 = new Edge(i_1, i_2, call);
-            reflexion.AddToImplementation(ei_12);
+            reflexion.AddToImplementation(i_1, i_2, call);
             Assert.That(IsNotContained(a_1, a_2, call));
             Assert.That(IsNotContained(a1, a2, call));
 
             // Test deletion
 
             ResetEvents();
-            reflexion.DeleteFromImplementation(ei_12);
+            reflexion.DeleteFromImplementation(i_1, i_2, call);
             Assert.That(IsNotContained(a_1, a_2, call));
             Assert.That(IsNotContained(a1, a2, call));
 
             ResetEvents();
-            reflexion.DeleteFromImplementation(ei12);
+            reflexion.DeleteFromImplementation(i1, i2, call);
             Assert.That(IsAbsent(a_1, a_2, call));
             Assert.That(IsUnpropagated(a1, a2, call));
         }
@@ -439,16 +437,14 @@ namespace SEE.Tools.Architecture
             // We will now check the "left side" scenario of the figure.
             // We will restore the "left side" state by using the incremental operations.
             ResetEvents();
-            ea12 = new Edge(a1, a2, call);
-            reflexion.AddToArchitecture(ea12);
+            reflexion.AddToArchitecture(a1, a2, call);
             Assert.That(IsAbsent(a1, a2, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.IsTrue(changes.OfType<EdgeEvent>().Single(x => x.Change == ChangeType.Addition && x.Affected == AffectedGraph.Architecture).Edge.Equals(ea12));
             Assert.AreEqual(2, changes.Count);
 
             ResetEvents();
-            Edge ei12 = new Edge(i1, i2, call);
-            reflexion.AddToImplementation(ei12);
+            reflexion.AddToImplementation(i1, i2, call);
             Assert.That(IsConvergent(a1, a2, call));
             Assert.That(IsAllowed(a_1, a_2, call));
             AssertEventCountEquals<EdgeChange>(2);
@@ -458,7 +454,7 @@ namespace SEE.Tools.Architecture
 
             // Now we can check what happens once we remove ea12 (an allowed edge should become divergent).
             ResetEvents();
-            reflexion.DeleteFromArchitecture(ea12);
+            reflexion.DeleteFromArchitecture(a1, a2, call);
             Assert.That(IsDivergent(a_1, a_2, call));
             AssertEventCountEquals<EdgeChange>(1);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, AffectedGraph.Architecture);
@@ -466,8 +462,7 @@ namespace SEE.Tools.Architecture
 
             // And one last time, we add it back to check the `AddToArchitecture` operation.
             ResetEvents();
-            ea12 = new Edge(a1, a2, call);
-            reflexion.AddToArchitecture(ea12);
+            reflexion.AddToArchitecture(a1, a2, call);
             Assert.That(IsConvergent(a1, a2, call));
             Assert.That(IsAllowed(a_1, a_2, call));
             AssertEventCountEquals<EdgeChange>(2);

@@ -14,31 +14,54 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </summary>
     public partial class Reflexion
     {
+        // TODO: implement proper error types
+        
         /// <summary>
-        /// Adds an the given <paramref name="edge"/> to the implementation graph,
+        /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
+        /// to the given node <paramref name="to"/> and adds it to the implementation graph,
         /// adjusting the reflexion analysis incrementally.
         /// This will propagate and lift the new edge, thereby increasing the counter of the matching specified edge
         /// if it exists.
         /// 
         /// Preconditions:
         /// <ul>
-        /// <li><paramref name="edge"/> is not yet in the reflexion graph.</li>
-        /// <li><paramref name="edge"/>'s connected nodes are contained in the implementation graph.</li>
+        /// <li><paramref name="from"/> is contained in the implementation graph.</li>
+        /// <li><paramref name="to"/> is contained in the implementation graph.</li>
         /// </ul>
         /// 
-        /// Postcondition: <paramref name="edge"/> is contained in the implementation graph and the reflexion
-        ///   data is updated; all observers are informed of the change by an <see cref="ImplementationEdgeAdded"/>
-        ///   event.
+        /// Postcondition: A new edge from <paramref name="from"/> to <paramref name="to"/>
+        ///   is contained in the implementation graph and the reflexion data is updated;
+        ///   all observers are informed of the change by an <see cref="EdgeAdded"/> event.
         /// </summary>
-        /// <param name="edge">the new edge</param>
-        public void AddToImplementation(Edge edge)
+        /// <param name="from">source node of the new edge</param>
+        /// <param name="to">target node of the new edge</param>
+        /// <param name="type">type of the new edge</param>
+        public void AddToImplementation(Node from, Node to, string type)
         {
-            Assert.IsTrue(!FullGraph.ContainsEdge(edge));
-            Assert.IsTrue(edge.Source.IsInImplementation() && edge.Target.IsInImplementation());
-            edge.SetInImplementation();
-            FullGraph.AddEdge(edge);
+            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
+            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
+            Edge edge = AddEdge(from, to, type);
             Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Implementation));
             PropagateAndLiftDependency(edge);
+        }
+
+        /// <summary>
+        /// Removes all edges from <paramref name="from"/> to <paramref name="to"/>
+        /// with the given <paramref name="type"/> from the implementation graph,
+        /// adjusting the reflexion analysis incrementally.
+        /// This will reduce the counter attribute of a corresponding propagated edge, if it exists, and may
+        /// cause previously convergent edges to now become absent.
+        ///
+        /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the implementation graph and have
+        /// at least one edge connecting them.
+        /// </summary>
+        /// <param name="from">Source node of the edge which shall be deleted</param>
+        /// <param name="to">Target node of the edge which shall be deleted</param>
+        /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        public void DeleteFromImplementation(Node from, Node to, string type = null)
+        {
+            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
+            from.FromTo(to, type).ForEach(DeleteFromImplementation);
         }
 
         /// <summary>
@@ -72,26 +95,32 @@ namespace SEE.Tools.ReflexionAnalysis
             Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Implementation));
             FullGraph.RemoveEdge(edge);
         }
-
+        
         /// <summary>
-        /// Adds the given dependency <paramref name="edge"/> to the architecture graph. This edge will
-        /// be considered as a specified dependency.
+        /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
+        /// to the given node <paramref name="to"/> and adds it to the architecture graph,
+        /// adjusting the reflexion analysis incrementally.
+        /// This edge will be considered as a specified dependency.
+        /// It may not be redundant.
+        /// 
         /// Preconditions:
         /// <ul>
-        /// <li><paramref name="edge"/> is not yet in the reflexion graph.</li>
-        /// <li><paramref name="edge"/>'s connected nodes are contained in the architecture graph.</li>
-        /// <li><paramref name="edge"/> represents a dependency.</li>
+        /// <li><paramref name="from"/> is contained in the architecture graph.</li>
+        /// <li><paramref name="to"/> is contained in the architecture graph.</li>
+        /// <li>The newly created specified edge will not be redundant.</li>
         /// </ul>
-        /// Postcondition: <paramref name="edge"/> is contained in the architecture graph and the reflexion
-        ///   data is updated; all observers are informed of the change.
+        /// Postcondition: A new edge from <paramref name="from"/> to <paramref name="to"/> is contained in the
+        ///   architecture graph and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
-        /// <param name="edge">the dependency edge to be added to the architecture graph</param>
-        public void AddToArchitecture(Edge edge)
+        /// <param name="from">source node of the new edge</param>
+        /// <param name="to">target node of the new edge</param>
+        /// <param name="type">type of the new edge</param>
+        public void AddToArchitecture(Node from, Node to, string type)
         {
-            Assert.IsTrue(!FullGraph.ContainsEdge(edge));
-            Assert.IsTrue(edge.Source.IsInArchitecture() && edge.Target.IsInArchitecture());
-            edge.SetInArchitecture();
-            FullGraph.AddEdge(edge);
+            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
+            Assert.IsTrue(from.IsInArchitecture() && to.IsInArchitecture());
+            // TODO: Verify that edge is not redundant
+            Edge edge = AddEdge(from, to, type);
             SetState(edge, State.Specified);
             Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Architecture));
 
@@ -121,6 +150,23 @@ namespace SEE.Tools.ReflexionAnalysis
                 Transition(edge, State.Specified, State.Absent);
                 SetCounter(edge, 0);
             }
+        }
+
+        /// <summary>
+        /// Removes all edges from <paramref name="from"/> to <paramref name="to"/>
+        /// with the given <paramref name="type"/> from the architecture graph,
+        /// adjusting the reflexion analysis incrementally.
+        ///
+        /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph and have
+        /// exactly one edge connecting them.
+        /// </summary>
+        /// <param name="from">Source node of the edge which shall be deleted</param>
+        /// <param name="to">Target node of the edge which shall be deleted</param>
+        /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        public void DeleteFromArchitecture(Node from, Node to, string type = null)
+        {
+            Assert.IsTrue(from.IsInArchitecture() && to.IsInArchitecture());
+            from.FromTo(to, type).ForEach(DeleteFromArchitecture);
         }
 
         /// <summary>
@@ -201,6 +247,20 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Removes the given Maps_To <paramref name="edge"/> from the mapping graph.
+        /// Precondition: <paramref name="edge"/> must be in the mapping graph.
+        /// Postcondition: the edge is no longer contained in the mapping graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">The edge that shall be removed from the mapping graph.</param>
+        public void DeleteFromMapping(Edge edge)
+        {
+            Assert.IsTrue(edge.IsInMapping());
+            Assert.IsTrue(FullGraph.ContainsEdge(edge));
+            DeleteFromMapping(edge.Source, edge.Target);
+        }
+
+        /// <summary>
         /// Removes the Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
         /// from the mapping graph.
         /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
@@ -217,16 +277,8 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             Assert.IsTrue(from.IsInImplementation());
             Assert.IsTrue(to.IsInArchitecture());
-            if (!FullGraph.ContainsNode(from))
-            {
-                throw new ArgumentException($"Node {from} is not in the graph.");
-            }
-
-            if (!FullGraph.ContainsNode(to))
-            {
-                throw new ArgumentException($"Node {to} is not in the graph.");
-            }
-
+            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
+            
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
             Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
             if (mapsToEdge == null)
@@ -508,11 +560,25 @@ namespace SEE.Tools.ReflexionAnalysis
             }
         }
 
-        public void Add(Edge edge)
+        public void Add(Node from, Node to, string type = null)
         {
-            Assert.IsFalse(FullGraph.ContainsEdge(edge));
-            throw new NotImplementedException();
-            // TODO: Consistently accept (from, to) or edges directly
+            if (from.IsInArchitecture() && to.IsInArchitecture())
+            {
+                AddToArchitecture(from, to, type);
+            }
+            else if (from.IsInImplementation() && to.IsInImplementation())
+            {
+                AddToImplementation(from, to, type);
+            }
+            else if (from.IsInImplementation() && to.IsInArchitecture())
+            {
+                Assert.IsNull(type);
+                AddToMapping(from, to);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public void Delete(Edge edge)
