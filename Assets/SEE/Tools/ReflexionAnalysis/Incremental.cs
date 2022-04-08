@@ -471,6 +471,72 @@ namespace SEE.Tools.ReflexionAnalysis
             child.Reparent(null);
         }
 
+        #region Aggregator Methods
+
+        public void Add(Node node)
+        {
+            Assert.IsFalse(FullGraph.ContainsNode(node));
+            if (node.IsInArchitecture())
+            {
+                AddToArchitecture(node);
+            } 
+            else if (node.IsInImplementation())
+            {
+                AddToImplementation(node);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public void Delete(Node node)
+        {
+            Assert.IsTrue(FullGraph.ContainsNode(node));
+            if (node.IsInArchitecture())
+            {
+                DeleteFromArchitecture(node);
+            } 
+            else if (node.IsInImplementation())
+            {
+                DeleteFromImplementation(node);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public void Add(Edge edge)
+        {
+            Assert.IsFalse(FullGraph.ContainsEdge(edge));
+            throw new NotImplementedException();
+            // TODO: Consistently accept (from, to) or edges directly
+        }
+
+        public void Delete(Edge edge)
+        {
+            Assert.IsTrue(FullGraph.ContainsEdge(edge));
+            if (edge.IsInArchitecture())
+            {
+                DeleteFromArchitecture(edge);
+            }
+            else if (edge.IsInImplementation())
+            {
+                DeleteFromImplementation(edge);
+            }
+            else if (edge.IsInMapping())
+            { 
+                DeleteFromMapping(edge.Source, edge.Target);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        #endregion
+
         #region Helper
 
         // TODO: Move other helper methods here
