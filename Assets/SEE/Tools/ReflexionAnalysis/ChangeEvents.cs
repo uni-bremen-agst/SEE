@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 
@@ -123,5 +124,27 @@ namespace SEE.Tools.ReflexionAnalysis
 
         protected override string Description() => 
             $"{Affected} node '{Child}' {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent}'";
+    }
+
+    /// <summary>
+    /// A change event fired when a node is added to or removed from the graph.
+    /// </summary>
+    public class NodeChangeEvent : ChangeEvent
+    {
+        /// <summary>
+        /// The node which has either been added to or deleted from the graph.
+        /// </summary>
+        public readonly Node Node;
+
+        public NodeChangeEvent(Node node, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
+        {
+            if (affectedGraph != AffectedGraph.Architecture && affectedGraph != AffectedGraph.Implementation)
+            {
+                throw new ArgumentException("Nodes can only be added to architecture or implementation!");
+            }
+            Node = node;
+        }
+
+        protected override string Description() => $"node '{Node}' {(Change == ChangeType.Addition ? "added to" : "removed from")} {Affected}";
     }
 }

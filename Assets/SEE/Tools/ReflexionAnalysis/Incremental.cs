@@ -248,11 +248,16 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be added to the architecture graph</param>
         public void AddToArchitecture(Node node)
         {
-            throw new NotImplementedException(); // FIXME
+            Assert.IsTrue(!FullGraph.ContainsNode(node));
+            node.SetInArchitecture();
+            FullGraph.AddNode(node);
+            Notify(new NodeChangeEvent(node, ChangeType.Addition, AffectedGraph.Architecture));
+            // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
         /// <summary>
         /// Removes given <paramref name="node"/> from architecture graph.
+        /// Any connected edges are incrementally removed from the graph as well.
         /// Precondition: <paramref name="node"/> must be contained in the architecture graph.
         /// Postcondition: <paramref name="node"/> is no longer contained in the architecture graph and the reflexion
         ///   data is updated; all observers are informed of the change.
@@ -260,19 +265,31 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be removed from the architecture graph</param>
         public void DeleteFromArchitecture(Node node)
         {
-            throw new NotImplementedException(); // FIXME
+            Assert.IsTrue(node.IsInArchitecture());
+            Assert.IsTrue(FullGraph.ContainsNode(node));
+            foreach (Edge connected in node.Incomings.Union(node.Outgoings))
+            {
+                Delete(connected);
+            }
+            Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Architecture));
+            // TODO: Should children become orphans or attached to parents?
+            FullGraph.RemoveNode(node);
         }
 
         /// <summary>
         /// Adds given <paramref name="node"/> to implementation graph.
-        /// Precondition: <paramref name="node"/> must not be contained in the implementation graph.
+        /// Precondition: <paramref name="node"/> must not be contained in the reflexion graph.
         /// Postcondition: <paramref name="node"/> is contained in the implementation graph; all observers are
         /// informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the implementation graph</param>
         public void AddToImplementation(Node node)
         {
-            throw new NotImplementedException(); // FIXME
+            Assert.IsTrue(!FullGraph.ContainsNode(node));
+            node.SetInImplementation();
+            FullGraph.AddNode(node);
+            Notify(new NodeChangeEvent(node, ChangeType.Addition, AffectedGraph.Implementation));
+            // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
         /// <summary>
@@ -285,31 +302,15 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be removed from the implementation graph</param>
         public void DeleteFromImplementation(Node node)
         {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Adds given node to the mapping graph.
-        /// Precondition: node must not be contained in the mapping graph.
-        /// Postcondition: node is contained in the mapping graph and the architecture
-        //   graph is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">the node to be added to the mapping graph</param>
-        public void AddToMapping(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
-        }
-
-        /// <summary>
-        /// Removes given node from mapping graph.
-        /// Precondition: node must be contained in the mapping graph.
-        /// Postcondition: node is no longer contained in the mapping graph and the architecture
-        ///   graph is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="node">node to be removed from the mapping</param>
-        public void DeleteFromMapping(Node node)
-        {
-            throw new NotImplementedException(); // FIXME
+            Assert.IsTrue(node.IsInImplementation());
+            Assert.IsTrue(FullGraph.ContainsNode(node));
+            foreach (Edge connected in node.Incomings.Union(node.Outgoings))
+            {
+                Delete(connected);
+            }
+            Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Implementation));
+            // TODO: Should children become orphans or attached to parents?
+            FullGraph.RemoveNode(node);
         }
 
         /// <summary>
@@ -394,7 +395,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(FullGraph.ContainsNode(child));
             Assert.IsTrue(FullGraph.ContainsNode(parent));
             
-            // TODO: Check that no redundant-specified dependencies come into existence when subtree is connected
+            // TODO: Check that no redundant specified dependencies come into existence when subtree is connected
             PartitionedDependencies divergent = DivergentRefsInSubtree(child);
             // New relationship needs to be present for lifting, so we'll add it first
             parent.AddChild(child);
@@ -538,8 +539,6 @@ namespace SEE.Tools.ReflexionAnalysis
         #endregion
 
         #region Helper
-
-        // TODO: Move other helper methods here
 
         private class PartitionedDependencies
         {
