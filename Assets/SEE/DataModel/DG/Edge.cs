@@ -24,8 +24,8 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the edge</param>
         public Edge(Node source, Node target, string type)
         {
-            this.Source = source;
-            this.Target = target;
+            Source = source;
+            Target = target;
             Type = type;
         }
 
