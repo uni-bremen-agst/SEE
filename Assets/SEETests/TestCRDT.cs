@@ -6,7 +6,7 @@ using UnityEngine;
 using static SEE.Utils.CRDT;
 
 namespace SEETests
-{ //TODO fix remote addchar calls and find out why all tests fail cause of networkerrors
+{ //TODO  find out why all tests fail cause of networkerrors (PlaymodeTests?)
 
     public class TestCRDT
     {
@@ -80,7 +80,6 @@ namespace SEETests
             }
         }
 
-        /* TODO: Fix RemoteAddChar and re-enable this test case.
         [Test]
         public void RemoteAndAddCharSameTimePos0()
         {
@@ -91,13 +90,12 @@ namespace SEETests
             crdt2.AddChar('a', 0);
             crdt2.AddChar('a', 0);
 
-            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[0].GetIdentifier(), null);
-            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier(), null);
-            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier(), null);
+            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[0].GetIdentifier());
+            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier());
+            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier());
             Assert.AreEqual("Aaa", crdt1.PrintString());
             Assert.AreEqual("Aaa", crdt2.PrintString());
         }
-        */
 
         [Test]
         public void TestAddChar()
@@ -125,7 +123,6 @@ namespace SEETests
             Assert.AreEqual("HALLO (:!", test.PrintString());
         }
 
-        /* TODO: Fix RemoteAddChar and re-enable this test case.
         [Test]
         public void TestRemoteAdd()
         {
@@ -133,33 +130,32 @@ namespace SEETests
             CRDT crdt2 = new CRDT("2", "test");
 
             crdt1.AddChar('H', 0);
-            crdt2.RemoteAddChar('H', crdt1.GetCRDT()[0].GetIdentifier(), null);
+            crdt2.RemoteAddChar('H', crdt1.GetCRDT()[0].GetIdentifier());
 
             crdt1.AddChar('A', 1);
-            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[1].GetIdentifier(), crdt1.GetCRDT()[0].GetIdentifier());
+            crdt2.RemoteAddChar('A', crdt1.GetCRDT()[1].GetIdentifier());
 
             crdt1.AddChar('L', 2);
-            crdt2.RemoteAddChar('L', crdt1.GetCRDT()[2].GetIdentifier(), crdt1.GetCRDT()[1].GetIdentifier());
+            crdt2.RemoteAddChar('L', crdt1.GetCRDT()[2].GetIdentifier());
 
             crdt1.AddChar('O', 3);
-            crdt2.RemoteAddChar('O', crdt1.GetCRDT()[3].GetIdentifier(), crdt1.GetCRDT()[2].GetIdentifier());
+            crdt2.RemoteAddChar('O', crdt1.GetCRDT()[3].GetIdentifier());
 
             //Simulate sync problems
             crdt2.AddChar('l', 2);
 
             crdt1.AddChar('!', 4);
-            crdt2.RemoteAddChar('!', crdt1.GetCRDT()[4].GetIdentifier(), crdt1.GetCRDT()[3].GetIdentifier());
+            crdt2.RemoteAddChar('!', crdt1.GetCRDT()[4].GetIdentifier());
 
-            crdt1.RemoteAddChar('l', crdt2.GetCRDT()[2].GetIdentifier(), crdt2.GetCRDT()[1].GetIdentifier());
+            crdt1.RemoteAddChar('l', crdt2.GetCRDT()[2].GetIdentifier());
             //End sync problem
             crdt1.AddChar('_', 0);
-            crdt2.RemoteAddChar('_', crdt1.GetCRDT()[0].GetIdentifier(), null);
+            crdt2.RemoteAddChar('_', crdt1.GetCRDT()[0].GetIdentifier());
 
 
             Print(crdt1);
             Print(crdt2);
         }
-        */
 
         [Test]
         public void TestToString()
