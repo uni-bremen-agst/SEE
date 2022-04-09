@@ -123,7 +123,6 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    // TextMeshInputField.text = ICRDT.PrintString(Title);
                     EnterFromTokens(SEEToken.fromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
