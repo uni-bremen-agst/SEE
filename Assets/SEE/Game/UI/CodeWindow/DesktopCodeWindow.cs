@@ -31,6 +31,9 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private Tuple<int, int> selectedText;
 
+        /// <summary>
+        /// Represents the TextMeshInputField from the code window in which the user can edit text.
+        /// </summary>
         private TMP_InputField TextMeshInputField;
 
         /// <summary>
