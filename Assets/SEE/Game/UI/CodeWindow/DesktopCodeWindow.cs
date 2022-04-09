@@ -26,6 +26,9 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private ScrollRect scrollRect;
 
+        /// <summary>
+        /// Contains the start and end index of the selected (highlited with the mouse) text from the code window.
+        /// </summary>
         private Tuple<int, int> selectedText;
 
         private TMP_InputField TextMeshInputField;
