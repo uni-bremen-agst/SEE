@@ -7,6 +7,9 @@ using static SEE.Utils.CRDT;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// The static interface to use and maintain the actual <see cref="CRDT"/>
+    /// </summary>
     public static class ICRDT
     {
         /// <summary>
