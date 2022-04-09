@@ -180,15 +180,6 @@ namespace SEE.Utils
             return GetInstanceByName(file).PrintString();
         }
 
-        /// <summary>
-        /// Converts the whole crdt for <paramref name="file"/> inclusive positions into a string.
-        /// </summary>
-        /// <param name="file">The name of the file that should be printed.</param>
-        /// <returns>The whole crdt as a string.</returns>
-        public static string ToString(string file)
-        {
-            return GetInstanceByName(file).ToString();
-        }
 
         /// <summary>
         /// Converts a string into a position.
