@@ -41,23 +41,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Updates the id of each CRDT -- if the id is still zero -- to the actual site ID.
-        /// </summary>
-        public static void UpdateAlleCRDTids()
-        {
-            if (crdts.Count > 0)
-            {
-                foreach(KeyValuePair<string, CRDT> entry in crdts)
-                {
-                    if(entry.Value.GetId() == "0")
-                    {
-                        entry.Value.SetId(playerIdManager.GetClientID().ToString());
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Synchronizes all CodeWindows to a new client.
         /// </summary>
         public static void SyncCodeWindows(IPEndPoint[] recipient)
