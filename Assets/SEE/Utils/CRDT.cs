@@ -117,6 +117,9 @@ namespace SEE.Utils
         /// </summary>
         public class CharObj
         {
+            /// <summary>
+            /// An array that represents a position. A position contains mutlitple tuples of (digit, site).
+            /// </summary>
             private readonly Identifier[] position;
 
             /// <summary>
