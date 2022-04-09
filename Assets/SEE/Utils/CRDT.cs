@@ -19,16 +19,27 @@ namespace SEE.Utils
     /// </summary>
     public class CRDT
     {
+        /// <summary>
+        /// An exception that will be thrown, if a remoteDelete operation is not possible, because the char that should be deleted couldnt be found in the <see cref="CRDT"/>.
+        /// </summary>
         public class RemoteDeleteNotPossibleException : Exception
         {
             public RemoteDeleteNotPossibleException(string v) : base(v)
             { }
         }
+
+        /// <summary>
+        /// An exception that will be thrown, if a delete operation is not possible, because the requested index is lower than zero or higher than the lenght of the <see cref="CRDT"/>.
+        /// </summary>
         public class DeleteNotPossibleException : Exception
         {
             public DeleteNotPossibleException(string v) : base(v)
             { }
         }
+
+        /// <summary>
+        /// An exception that will be thrown, if a remoteAdd operation trys to add a char with a position thats allready existing in the <see cref="CRDT"/>.
+        /// </summary>
         public class PositionAlreadyExistsException : Exception
         {
             public PositionAlreadyExistsException(string v) : base(v)
