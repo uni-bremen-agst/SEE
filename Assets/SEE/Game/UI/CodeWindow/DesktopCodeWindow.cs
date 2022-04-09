@@ -46,6 +46,9 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         private bool valueHasChanged = false;
 
+        /// <summary>
+        // A timestamp set after every manipulation of the code window which is used to know then the oldIDX should be resetted.
+        /// </summary>
         private float oldIDXCoolDown = 0f;
 
         /// <summary>
