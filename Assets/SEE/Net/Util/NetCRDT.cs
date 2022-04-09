@@ -39,9 +39,9 @@ namespace SEE.Net
             /// </summary>
             SetID,
             /// <summary>
-            /// If a new client joins the game.
+            /// Sync the CRDT with only one client, if a new client joins the game.
             /// </summary>
-            SingleAddChar,
+            SyncWithNewClient,
         };
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace SEE.Net
                     case RemoteAction.AddChar:
                         ICRDT.RemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
                         break;
-                    case RemoteAction.SingleAddChar:
+                    case RemoteAction.SyncWithNewClient:
                         ICRDT.SingleRemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
 
                        break;
@@ -168,7 +168,7 @@ namespace SEE.Net
             this.File = file;
             this.Character = c;
             this.Position = ICRDT.PositionToString(position, file);
-            State = RemoteAction.SingleAddChar;
+            State = RemoteAction.SyncWithNewClient;
             Execute(recipient);
         }
 
