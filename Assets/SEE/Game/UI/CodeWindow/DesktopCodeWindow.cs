@@ -350,17 +350,6 @@ namespace SEE.Game.UI.CodeWindow
                     if (!string.IsNullOrEmpty(GUIUtility.systemCopyBuffer))
                     {
                         DeleteSelectedText();
-                        //Versuch die auto indentions auch bei strg +v bei zubehalten, muss aber noch im codewindow auch gemacht werden. Das einfachste waere einfach das syntax highliting neu zu kalkulier. dann darf aber kein knopf gedrückt werden
-                       /* string tmp = string.Join("\n", GUIUtility.systemCopyBuffer.Split('\n').Select((x, i) =>
-                            {
-                                if (i != 0)
-                                {
-                                    x.Insert(0, (new string(' ', neededPadding + 1)));
-                                }
-                                return x;
-                            }).ToList());
-                        Debug.Log("tmp " + tmp); */
-
                         ICRDT.AddString(GUIUtility.systemCopyBuffer, idx - GUIUtility.systemCopyBuffer.Length, Title);
                     }
                 }
