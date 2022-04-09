@@ -153,10 +153,6 @@ namespace SEE.Game.UI.CodeWindow
                             if (TextMeshInputField.caretPosition > idx)
                             {
                                 TextMeshInputField.caretPosition++;
-                               /* if (c.Equals('\n'))
-                                {
-                                    TextMeshInputField.caretPosition = TextMeshInputField.caretPosition - 10;
-                                } */
                             }
                             break;
                         case OperationType.Delete:
