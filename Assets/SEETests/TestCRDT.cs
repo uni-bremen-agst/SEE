@@ -227,22 +227,6 @@ namespace SEETests
             Assert.AreEqual(null, crdt.Find(wrong).Item2);
         }
 
-        /// <summary>
-        /// TODO REMOVE
-        /// </summary>
-        [Test]
-        public void TestBinarySearch2()
-        {
-            Debug.Log(7 / 2);
-            //This test also covers find
-            List<int> i = new List<int>(){ 1, 3, 4 };
-            i.Insert(1, 2);
-            foreach(int e in i)
-            {
-                Debug.Log(e);
-            }
-        }
-
         [Test]
         public void TestIsEmpty()
         {
