@@ -37,7 +37,7 @@ namespace SEE.Game.UI.CodeWindow
         private TMP_InputField TextMeshInputField;
 
         /// <summary>
-        /// The old index, if changes happen faster than the carret moves.
+        /// The old index of the carret inside the text. Used to calculate the real index than the carret position changes is slower or faster than the real input.
         /// </summary>
         private int oldIDX = -1;
 
