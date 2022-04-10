@@ -441,7 +441,8 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
-        /// Calculates the position of a letter (index) in the "rich" text (with markup tags). Given the position of the letter in the "clean" text. (Without markup tags)
+        /// Calculates the position of a letter (index) in the "rich" text (with markup tags). Given the
+        /// position of the letter in the "clean" text (Without markup tags).
         /// </summary>
         /// <param name="cleanIndex">The index within the "clean" text.</param>
         /// <returns>The index within the "rich" text.</returns>
