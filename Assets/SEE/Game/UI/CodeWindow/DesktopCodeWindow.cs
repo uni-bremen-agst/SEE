@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -27,7 +26,8 @@ namespace SEE.Game.UI.CodeWindow
         private ScrollRect scrollRect;
 
         /// <summary>
-        /// Contains the start and end index of the selected (highlited with the mouse) text from the code window.
+        /// Contains the start and end index of the selected (highlighted with the mouse) text
+        /// from the code window.
         /// </summary>
         private Tuple<int, int> selectedText;
 
@@ -37,7 +37,8 @@ namespace SEE.Game.UI.CodeWindow
         private TMP_InputField TextMeshInputField;
 
         /// <summary>
-        /// The old index of the carret inside the text. Used to calculate the real index than the carret position changes is slower or faster than the real input.
+        /// The old index of the carret inside the text. Used to calculate the real index if the carret
+        /// position change is slower or faster than the real input.
         /// </summary>
         private int oldIDX = -1;
 
@@ -47,7 +48,8 @@ namespace SEE.Game.UI.CodeWindow
         private bool valueHasChanged = false;
 
         /// <summary>
-        // A timestamp set after every manipulation of the code window which is used to know then the oldIDX should be resetted.
+        /// A timestamp set after every manipulation of the code window that is used to know when
+        /// the <see cref="oldIDX"/> should be reset.
         /// </summary>
         private float oldIDXCoolDown = 0f;
 

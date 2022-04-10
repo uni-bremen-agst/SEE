@@ -39,7 +39,7 @@ namespace SEE.Net
             /// </summary>
             SetID,
             /// <summary>
-            /// Sync the CRDT with only one client, if a new client joins the game.
+            /// Synchronizes the CRDT with only one client when a new client joins the game.
             /// </summary>
             SyncWithNewClient,
         };

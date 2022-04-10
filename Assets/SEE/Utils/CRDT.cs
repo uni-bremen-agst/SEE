@@ -20,7 +20,8 @@ namespace SEE.Utils
     public class CRDT
     {
         /// <summary>
-        /// An exception that will be thrown, if a remoteDelete operation is not possible, because the char that should be deleted couldnt be found in the <see cref="CRDT"/>.
+        /// An exception that will be thrown when a remoteDelete operation is not possible
+        /// because the character that should be deleted could not be found in the <see cref="CRDT"/>.
         /// </summary>
         public class RemoteDeleteNotPossibleException : Exception
         {
@@ -29,7 +30,9 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// An exception that will be thrown, if a delete operation is not possible, because the requested index is lower than zero or higher than the lenght of the <see cref="CRDT"/>.
+        /// An exception that will be thrown when a delete operation is not possible
+        /// because the requested index is smaller than zero or greater than the length
+        /// of the <see cref="CRDT"/>.
         /// </summary>
         public class DeleteNotPossibleException : Exception
         {
@@ -38,7 +41,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// An exception that will be thrown, if a remoteAdd operation trys to add a char with a position thats allready existing in the <see cref="CRDT"/>.
+        /// An exception that will be thrown when a remoteAdd operation tries to add
+        /// a character at a position that already exists in the <see cref="CRDT"/>.
         /// </summary>
         public class PositionAlreadyExistsException : Exception
         {
@@ -48,7 +52,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// An <see cref="Identifier"/> represents a position inside of the CRDT.
-        /// It contains the digit, i.e., the index, and the site ID, i.e. the user that
+        /// It contains the digit, i.e., the index, and the site ID, i.e., the user that
         /// added the character.
         /// </summary>
         public class Identifier
@@ -118,7 +122,7 @@ namespace SEE.Utils
         public class CharObj
         {
             /// <summary>
-            /// An array that represents a position. A position contains mutlitple tuples of (digit, site).
+            /// An array that represents a position. A position contains mutltiple tuples of (digit, site).
             /// </summary>
             private readonly Identifier[] position;
 
@@ -761,7 +765,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Adds up two arrays elementy by element.
+        /// Adds up two arrays element by element.
         /// </summary>
         /// <param name="first">The first array</param>
         /// <param name="second">The second array</param>
