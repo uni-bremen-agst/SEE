@@ -48,7 +48,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
-      "version": "1.15.13",
+      "version": "1.15.15",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -299,7 +299,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.windowsmr": {
-      "version": "4.6.1",
+      "version": "4.6.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
