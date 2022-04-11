@@ -780,7 +780,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             Assert.IsTrue(root.IsInImplementation());
             Assert.IsTrue(target.IsInArchitecture());
-            List<Node> children = root.Children();
+            IList<Node> children = root.Children();
             foreach (Node child in children)
             {
                 // child is contained in implementation
