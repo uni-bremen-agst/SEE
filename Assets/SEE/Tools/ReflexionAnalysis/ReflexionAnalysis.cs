@@ -443,7 +443,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree
         /// are to be mapped as new</param>
         /// <param name="handler">delegate handling the necessary adjustment</param>
-        private void HandleMappedSubtree(List<Node> subtree, Node archNode, HandleMappingChange handler)
+        private void HandleMappedSubtree(IEnumerable<Node> subtree, Node archNode, HandleMappingChange handler)
         {
             Assert.IsTrue(archNode.IsInArchitecture());
             // An inner dependency may occur twice in the iteration below, once in the set
@@ -1214,7 +1214,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             Assert.IsTrue(from.IsInArchitecture());
             Assert.IsTrue(to.IsInArchitecture());
-            List<Node> parents = to.Ascendants();
+            IList<Node> parents = to.Ascendants();
             Assert.IsTrue(parents.All(x => x.IsInArchitecture()));
             Node cursor = from;
             Assert.IsTrue(cursor.IsInArchitecture());

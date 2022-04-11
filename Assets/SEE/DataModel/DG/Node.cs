@@ -154,7 +154,7 @@ namespace SEE.DataModel.DG
         /// including the node itself.
         /// </summary>
         /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
-        public List<Node> Ascendants()
+        public IList<Node> Ascendants()
         {
             List<Node> result = new List<Node>();
             Node cursor = this;
@@ -174,6 +174,7 @@ namespace SEE.DataModel.DG
         /// <returns>transitive descendants of this node in post order</returns>
         public IList<Node> PostOrderDescendants()
         {
+            // FIXME: Check for cycles in the graph, aborting with an appropriate exception (maybe in a separate method)
             IList<Node> result = new List<Node>();
             PostOrderDescendants(this);
             return result;
