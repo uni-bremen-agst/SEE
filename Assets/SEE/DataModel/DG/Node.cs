@@ -440,12 +440,12 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The descendants of the node.
-        /// Note: This is not a copy. Do not modify the result.
+        /// Note: This is not a copy. The result can't be modified.
         /// </summary>
         /// <returns>descendants of the node</returns>
-        public List<Node> Children()
+        public IList<Node> Children()
         {
-            return children;
+            return children.AsReadOnly();
         }
 
         /// <summary>
