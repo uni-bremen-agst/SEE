@@ -15,7 +15,7 @@ namespace SEE.Tools.ReflexionAnalysis
     public partial class Reflexion
     {
         // TODO: implement proper error types
-        
+
         /// <summary>
         /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
         /// to the given node <paramref name="to"/> and adds it to the implementation graph,
@@ -95,7 +95,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Implementation));
             FullGraph.RemoveEdge(edge);
         }
-        
+
         /// <summary>
         /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
         /// to the given node <paramref name="to"/> and adds it to the architecture graph,
@@ -119,7 +119,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
             Assert.IsTrue(from.IsInArchitecture() && to.IsInArchitecture());
-            // TODO: Verify that edge is not redundant
+            AssertNotRedundant(from, to, type);
             Edge edge = AddEdge(from, to, type);
             SetState(edge, State.Specified);
             Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Architecture));
@@ -278,7 +278,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(from.IsInImplementation());
             Assert.IsTrue(to.IsInArchitecture());
             Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
-            
+
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
             Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
             if (mapsToEdge == null)
@@ -323,9 +323,9 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Delete(connected);
             }
+
             Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Architecture));
-            // TODO: Should children become orphans or attached to parents?
-            FullGraph.RemoveNode(node);
+            FullGraph.RemoveNode(node, false);
         }
 
         /// <summary>
@@ -360,9 +360,9 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Delete(connected);
             }
+
             Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Implementation));
-            // TODO: Should children become orphans or attached to parents?
-            FullGraph.RemoveNode(node);
+            FullGraph.RemoveNode(node, false);
         }
 
         /// <summary>
@@ -377,7 +377,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="parent">parent node</param>
         public void AddChildInImplementation(Node child, Node parent)
         {
-            // TODO: What if parent is a child of child?
+            // TODO: Check for cycles in hierarchy (currently only first level is checked)
+            Assert.IsFalse(child.Children().Contains(parent));
             Assert.IsNull(child.Parent);
             Assert.IsTrue(child.IsInImplementation() && parent.IsInImplementation());
             Assert.IsTrue(FullGraph.ContainsNode(child));
@@ -432,8 +433,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
         /// in the node hierarchy of the architecture graph.
-        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
-        /// architecture graph; <paramref name="child"/> has no current parent.
+        /// Preconditions:
+        /// - <paramref name="child"/> and <paramref name="parent"/> must be contained in the
+        ///   architecture graph; <paramref name="child"/> has no current parent.
+        /// - No redundant specified dependencies must come into existence when the subtree is connected.
         /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
         /// architecture graph and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
@@ -444,15 +447,47 @@ namespace SEE.Tools.ReflexionAnalysis
             Assert.IsTrue(child.IsInArchitecture());
             Assert.IsTrue(parent.IsInArchitecture());
             Assert.IsNull(child.Parent);
+            ISet<Node> childDescendants = new HashSet<Node>(child.PostOrderDescendants());
+            // FIXME: This assert will either be false or a stack overflow will have occurred.
+            Assert.IsFalse(childDescendants.Contains(parent));
             Assert.IsTrue(FullGraph.ContainsNode(child));
             Assert.IsTrue(FullGraph.ContainsNode(parent));
-            
-            // TODO: Check that no redundant specified dependencies come into existence when subtree is connected
+
+            // Check that no redundant specified dependencies come into existence when subtree is connected.
+            // There are two possibilities for this to happen: Either the subtree rooted by `child` contains
+            // an outgoing edge, or an incoming edge, that is made redundant by the `parent` it is attached to
+            // (or one of its ascendants).This is why we iterate through the parent's parents,
+            // which will also include the parent itself.
+            foreach (Node ascendant in parent.Ascendants())
+            {
+                foreach (Edge outgoing in ascendant.Outgoings)
+                {
+                    // We needn't check the "supertree", as we are already iterating over ascendants, hence
+                    // we are setting that parameter to empty collections. 
+                    // Since the only change in this operation will be the additional subtree rooted by `child`,
+                    // we only need to compare this outgoing edge by that subtree.
+                    AssertNotRedundant(outgoing.Source, outgoing.Target, outgoing.Type,
+                                       fromSupertree: new Node[] { }, toSupertree: new HashSet<Node>(),
+                                       fromSubtree: childDescendants);
+                }
+
+                foreach (Edge incoming in ascendant.Incomings)
+                {
+                    // We needn't check the "supertree", as we are already iterating over ascendants, hence
+                    // we are setting that parameter to empty collections. 
+                    // Since the only change in this operation will be the additional subtree rooted by `child`,
+                    // we only need to compare this outgoing edge by that subtree.
+                    AssertNotRedundant(incoming.Source, incoming.Target, incoming.Type, 
+                                       fromSupertree: new Node[] {}, toSupertree: new HashSet<Node>(), 
+                                       toSubtree: childDescendants);
+                }
+            }
+
             PartitionedDependencies divergent = DivergentRefsInSubtree(child);
             // New relationship needs to be present for lifting, so we'll add it first
             parent.AddChild(child);
             Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, AffectedGraph.Architecture));
-            
+
             foreach (Edge edge in divergent.OutgoingCross)
             {
                 if (Lift(parent, edge.Target, edge.Type, GetCounter(edge), out _))
@@ -513,13 +548,13 @@ namespace SEE.Tools.ReflexionAnalysis
 
             foreach (Edge edge in allowed.Inner)
             {
-                if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _) 
+                if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _)
                     || Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
                     Transition(edge, GetState(edge), State.Divergent);
                 }
             }
-            
+
             Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, AffectedGraph.Architecture));
             child.Reparent(null);
         }
@@ -532,7 +567,7 @@ namespace SEE.Tools.ReflexionAnalysis
             if (node.IsInArchitecture())
             {
                 AddToArchitecture(node);
-            } 
+            }
             else if (node.IsInImplementation())
             {
                 AddToImplementation(node);
@@ -549,7 +584,7 @@ namespace SEE.Tools.ReflexionAnalysis
             if (node.IsInArchitecture())
             {
                 DeleteFromArchitecture(node);
-            } 
+            }
             else if (node.IsInImplementation())
             {
                 DeleteFromImplementation(node);
@@ -593,7 +628,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 DeleteFromImplementation(edge);
             }
             else if (edge.IsInMapping())
-            { 
+            {
                 DeleteFromMapping(edge.Source, edge.Target);
             }
             else
@@ -643,9 +678,9 @@ namespace SEE.Tools.ReflexionAnalysis
 
         // TODO: What about ImplicitlyAllowed and AllowedAbsence?
         private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
-        
+
         private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
-        
+
         /// <summary>
         /// Reverts the effect of the mapping indicated by <paramref name="mapsTo"/>.
         /// Precondition: <paramref name="mapsTo"/>.Source is in the implementation graph and is a mapper,
@@ -690,11 +725,13 @@ namespace SEE.Tools.ReflexionAnalysis
                     // newTarget is the architecture node onto which the parent of mapsTo.Source is mapped.
                     ChangeMap(subtree, newTarget);
                 }
+
                 if (newTarget != null)
                 {
                     Map(subtree, newTarget);
                 }
             }
+
             // First notify before we delete the mapsTo edge for good.
             Notify(new EdgeEvent(mapsTo, ChangeType.Removal, AffectedGraph.Mapping));
             FullGraph.RemoveEdge(mapsTo);
@@ -801,11 +838,57 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="subtree">implementation nodes whose mapping is to be put into effect</param>
         /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
-        private void Map(List<Node> subtree, Node newTarget)
+        private void Map(IReadOnlyCollection<Node> subtree, Node newTarget)
         {
             Assert.IsTrue(newTarget.IsInArchitecture());
             Assert.IsTrue(subtree.All(x => x.IsInImplementation() && MapsTo(x) == newTarget));
             HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
+        }
+
+        /// <summary>
+        /// Checks whether a specified dependency between <paramref name="from"/> and <paramref name="to"/>
+        /// (which may or may not exist) would be redundant—if so, throws an exception.
+        ///
+        /// An edge e1 is redundant with another edge e2 if e1 has the same type as e2 and if either e1 is a part of e2
+        /// or e2 is a part of e1. This means that we have to check all descendants of
+        /// <paramref name="from"/> and look for edges which connect to descendants of <paramref name="to"/>,
+        /// as well as do this for all parents of <paramref name="from"/>.
+        ///
+        /// Pre-conditions:
+        /// - <paramref name="from"/> and <paramref name="to"/> are in the architecture graph.
+        /// </summary>
+        /// <param name="from">Source of the supposed edge</param>
+        /// <param name="to">Target of the supposed edge</param>
+        /// <param name="type">Type of the supposed edge</param>
+        /// <param name="fromSubtree">Subtree (descendants) of <paramref name="from"/>—if not given,
+        /// we'll simply enumerate all descendants of <paramref name="from"/> ourselves</param>
+        /// <param name="fromSupertree">Supertree (ascendants) of <paramref name="from"/>—if not given,
+        /// we'll simply enumerate all ascendants of <paramref name="from"/> ourselves</param>
+        /// <param name="toSubtree">Subtree (descendants) of <paramref name="to"/>—if not given,
+        /// we'll simply enumerate all descendants of <paramref name="to"/> ourselves</param>
+        /// <param name="toSupertree">Supertree (ascendants) of <paramref name="to"/>—if not given,
+        /// we'll simply enumerate all ascendants of <paramref name="to"/> ourselves</param>
+        private static void AssertNotRedundant(Node from, Node to, string type,
+                                               IEnumerable<Node> fromSubtree = null, IEnumerable<Node> fromSupertree = null,
+                                               ISet<Node> toSubtree = null, ISet<Node> toSupertree = null)
+        {
+            fromSubtree ??= from.PostOrderDescendants();
+            fromSupertree ??= from.Ascendants();
+            // We use HashSets here due to O(1) `contains`, which is the only method we call on these.
+            toSupertree ??= new HashSet<Node>(to.Ascendants());
+            toSubtree ??= new HashSet<Node>(to.PostOrderDescendants());
+
+            // TODO: Once a true type hierarchy exists, this needs to be updated
+            Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => IsSpecified(edge) && edge.HasSupertypeOf(type) && targets.Contains(edge.Target);
+
+            if (fromSupertree.SelectMany(x => x.Outgoings).Any(IsRedundantIn(toSupertree)))
+            {
+                throw new InvalidOperationException($"Edge from {from} to {to} would be redundant in ascendants!");
+            }
+            else if (fromSubtree.SelectMany(x => x.Outgoings).Any(IsRedundantIn(toSubtree)))
+            {
+                throw new InvalidOperationException($"Edge from {from} to {to} would be redundant in descendants!");
+            }
         }
 
         #endregion
