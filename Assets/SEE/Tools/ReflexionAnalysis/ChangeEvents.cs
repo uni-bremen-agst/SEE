@@ -32,7 +32,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">edge being changed</param>
         /// <param name="old_state">the old state of the edge</param>
         /// <param name="new_state">the new state of the edge after the change</param>
-        public EdgeChange(Edge edge, State oldState, State newState) : base(AffectedGraph.Architecture)
+        public EdgeChange(Edge edge, State oldState, State newState) : base(ReflexionSubgraph.Architecture)
         {
             Edge = edge;
             OldState = oldState;
@@ -62,7 +62,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="propagatedEdge">the propagated edge</param>
         /// <param name="change">the type of change to <paramref name="propagatedEdge"/></param>
-        public PropagatedEdgeEvent(Edge propagatedEdge, ChangeType change) : base(AffectedGraph.FullReflexion, change)
+        public PropagatedEdgeEvent(Edge propagatedEdge, ChangeType change) : base(ReflexionSubgraph.Architecture, change)
         {
             PropagatedEdge = propagatedEdge;
         }
@@ -88,7 +88,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">the edge being added or removed</param>
         /// <param name="change">the type of change to <paramref name="edge"/></param>
         /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Edge edge, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
+        public EdgeEvent(Edge edge, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
         {
             Edge = edge;
         }
@@ -112,9 +112,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node Child;
 
-        public HierarchyChangeEvent(Node parent, Node child, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
+        public HierarchyChangeEvent(Node parent, Node child, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
         {
-            if (affectedGraph == AffectedGraph.Mapping || affectedGraph == AffectedGraph.FullReflexion)
+            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
             {
                 throw new ArgumentException("Only architecture or implementation hierarchy can be changed!");
             }
@@ -136,9 +136,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node Node;
 
-        public NodeChangeEvent(Node node, ChangeType change, AffectedGraph affectedGraph) : base(affectedGraph, change)
+        public NodeChangeEvent(Node node, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
         {
-            if (affectedGraph != AffectedGraph.Architecture && affectedGraph != AffectedGraph.Implementation)
+            if (affectedGraph != ReflexionSubgraph.Architecture && affectedGraph != ReflexionSubgraph.Implementation)
             {
                 throw new ArgumentException("Nodes can only be added to architecture or implementation!");
             }

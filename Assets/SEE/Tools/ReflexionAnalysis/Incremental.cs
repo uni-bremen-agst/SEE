@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
@@ -38,10 +40,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="type">type of the new edge</param>
         public void AddToImplementation(Node from, Node to, string type)
         {
-            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
-            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
+            AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInImplementation(),
+                          () => new NotInSubgraphException(Implementation, from));
+            AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInImplementation(),
+                          () => new NotInSubgraphException(Implementation, to));
             Edge edge = AddEdge(from, to, type);
-            Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Implementation));
+            Notify(new EdgeEvent(edge, ChangeType.Addition, Implementation));
             PropagateAndLiftDependency(edge);
         }
 
@@ -60,7 +64,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
         public void DeleteFromImplementation(Node from, Node to, string type = null)
         {
-            Assert.IsTrue(from.IsInImplementation() && to.IsInImplementation());
+            AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInImplementation(),
+                          () => new NotInSubgraphException(Implementation, to));
             from.FromTo(to, type).ForEach(DeleteFromImplementation);
         }
 
@@ -74,8 +79,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">The implementation edge to be removed from the graph.</param>
         public void DeleteFromImplementation(Edge edge)
         {
-            Assert.IsTrue(edge.IsInImplementation());
-            Assert.IsTrue(FullGraph.ContainsEdge(edge));
+            AssertOrThrow(edge.IsInImplementation() && FullGraph.ContainsEdge(edge),
+                          () => new NotInSubgraphException(Implementation, edge));
             Edge propagated = GetPropagatedDependency(edge);
             if (propagated != null)
             {
@@ -92,7 +97,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
 
-            Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Implementation));
+            Notify(new EdgeEvent(edge, ChangeType.Removal, Implementation));
             FullGraph.RemoveEdge(edge);
         }
 
@@ -117,12 +122,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="type">type of the new edge</param>
         public void AddToArchitecture(Node from, Node to, string type)
         {
-            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
-            Assert.IsTrue(from.IsInArchitecture() && to.IsInArchitecture());
+            AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInArchitecture(),
+                          () => new NotInSubgraphException(Architecture, from));
+            AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInArchitecture(),
+                          () => new NotInSubgraphException(Architecture, to));
             AssertNotRedundant(from, to, type);
             Edge edge = AddEdge(from, to, type);
             SetState(edge, State.Specified);
-            Notify(new EdgeEvent(edge, ChangeType.Addition, AffectedGraph.Architecture));
+            Notify(new EdgeEvent(edge, ChangeType.Addition, Architecture));
 
             // We need to handle the propagated dependencies covered by this specified edge.
 
@@ -165,7 +172,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
         public void DeleteFromArchitecture(Node from, Node to, string type = null)
         {
-            Assert.IsTrue(from.IsInArchitecture() && to.IsInArchitecture());
+            AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
+            AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             from.FromTo(to, type).ForEach(DeleteFromArchitecture);
         }
 
@@ -179,8 +187,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
         public void DeleteFromArchitecture(Edge edge)
         {
-            Assert.IsTrue(FullGraph.ContainsEdge(edge));
-            Assert.IsTrue(edge.IsInArchitecture() && IsSpecified(edge));
+            AssertOrThrow(FullGraph.ContainsEdge(edge) && edge.IsInArchitecture(),
+                          () => new NotInSubgraphException(Architecture, edge));
+            AssertOrThrow(IsSpecified(edge), () => new ExpectedSpecifiedEdgeException(edge));
 
             if (GetState(edge) == State.Convergent)
             {
@@ -202,7 +211,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
 
-            Notify(new EdgeEvent(edge, ChangeType.Removal, AffectedGraph.Architecture));
+            Notify(new EdgeEvent(edge, ChangeType.Removal, Architecture));
             FullGraph.RemoveEdge(edge);
         }
 
@@ -219,31 +228,26 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
         public void AddToMapping(Node from, Node to)
         {
-            Assert.IsTrue(from.IsInImplementation());
-            Assert.IsTrue(to.IsInArchitecture());
-            if (IsExplicitlyMapped(from))
-            {
-                throw new ArgumentException($"Node {from.ID} is already mapped explicitly.");
-            }
-            else
-            {
-                // all nodes that should be mapped onto 'to', too, as a consequence of
-                // mapping 'from'
-                List<Node> subtree = MappedSubtree(from);
-                // was 'from' mapped implicitly at all?
-                if (implicitMapsToTable.TryGetValue(from.ID, out Node oldTarget))
-                {
-                    // from was actually mapped implicitly onto oldTarget
-                    Unmap(subtree, oldTarget);
-                }
+            AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
+            AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
+            AssertOrThrow(!IsExplicitlyMapped(from), () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
 
-                AddToMappingGraph(from, to);
-                // adjust explicit mapping
-                explicitMapsToTable[from.ID] = to;
-                // adjust implicit mapping
-                ChangeMap(subtree, to);
-                Map(subtree, to);
+            // all nodes that should be mapped onto 'to', too, as a consequence of
+            // mapping 'from'
+            List<Node> subtree = MappedSubtree(from);
+            // was 'from' mapped implicitly at all?
+            if (implicitMapsToTable.TryGetValue(from.ID, out Node oldTarget))
+            {
+                // from was actually mapped implicitly onto oldTarget
+                Unmap(subtree, oldTarget);
             }
+
+            AddToMappingGraph(from, to);
+            // adjust explicit mapping
+            explicitMapsToTable[from.ID] = to;
+            // adjust implicit mapping
+            ChangeMap(subtree, to);
+            Map(subtree, to);
         }
 
         /// <summary>
@@ -255,8 +259,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="edge">The edge that shall be removed from the mapping graph.</param>
         public void DeleteFromMapping(Edge edge)
         {
-            Assert.IsTrue(edge.IsInMapping());
-            Assert.IsTrue(FullGraph.ContainsEdge(edge));
+            AssertOrThrow(edge.IsInMapping() && FullGraph.ContainsEdge(edge),
+                          () => new NotInSubgraphException(Mapping, edge));
             DeleteFromMapping(edge.Source, edge.Target);
         }
 
@@ -275,9 +279,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// to be removed from the mapping graph </param>
         public void DeleteFromMapping(Node from, Node to)
         {
-            Assert.IsTrue(from.IsInImplementation());
-            Assert.IsTrue(to.IsInArchitecture());
-            Assert.IsTrue(FullGraph.ContainsNode(from) && FullGraph.ContainsNode(to));
+            AssertOrThrow(from.IsInImplementation() && FullGraph.ContainsNode(from),
+                          () => new NotInSubgraphException(Implementation, from));
+            AssertOrThrow(to.IsInArchitecture() && FullGraph.ContainsNode(to),
+                          () => new NotInSubgraphException(Architecture, to));
 
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
             Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
@@ -300,16 +305,18 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be added to the architecture graph</param>
         public void AddToArchitecture(Node node)
         {
-            Assert.IsTrue(!FullGraph.ContainsNode(node));
+            AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
             node.SetInArchitecture();
             FullGraph.AddNode(node);
-            Notify(new NodeChangeEvent(node, ChangeType.Addition, AffectedGraph.Architecture));
+            Notify(new NodeChangeEvent(node, ChangeType.Addition, Architecture));
             // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
         /// <summary>
         /// Removes given <paramref name="node"/> from architecture graph.
         /// Any connected edges are incrementally removed from the graph as well.
+        /// Any children of the <paramref name="node"/> will become children of
+        /// node's parent node—if none exists, they will become roots.
         /// Precondition: <paramref name="node"/> must be contained in the architecture graph.
         /// Postcondition: <paramref name="node"/> is no longer contained in the architecture graph and the reflexion
         ///   data is updated; all observers are informed of the change.
@@ -317,14 +324,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be removed from the architecture graph</param>
         public void DeleteFromArchitecture(Node node)
         {
-            Assert.IsTrue(node.IsInArchitecture());
-            Assert.IsTrue(FullGraph.ContainsNode(node));
+            AssertOrThrow(node.IsInArchitecture() && FullGraph.ContainsNode(node),
+                          () => new NotInSubgraphException(Architecture, node));
             foreach (Edge connected in node.Incomings.Union(node.Outgoings))
             {
                 Delete(connected);
             }
 
-            Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Architecture));
+            Notify(new NodeChangeEvent(node, ChangeType.Removal, Architecture));
             FullGraph.RemoveNode(node, false);
         }
 
@@ -337,10 +344,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be added to the implementation graph</param>
         public void AddToImplementation(Node node)
         {
-            Assert.IsTrue(!FullGraph.ContainsNode(node));
+            AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
             node.SetInImplementation();
             FullGraph.AddNode(node);
-            Notify(new NodeChangeEvent(node, ChangeType.Addition, AffectedGraph.Implementation));
+            Notify(new NodeChangeEvent(node, ChangeType.Addition, Implementation));
             // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
@@ -354,14 +361,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">the node to be removed from the implementation graph</param>
         public void DeleteFromImplementation(Node node)
         {
-            Assert.IsTrue(node.IsInImplementation());
-            Assert.IsTrue(FullGraph.ContainsNode(node));
+            AssertOrThrow(node.IsInImplementation() && FullGraph.ContainsNode(node),
+                          () => new NotInSubgraphException(Implementation, node));
             foreach (Edge connected in node.Incomings.Union(node.Outgoings))
             {
                 Delete(connected);
             }
 
-            Notify(new NodeChangeEvent(node, ChangeType.Removal, AffectedGraph.Implementation));
+            Notify(new NodeChangeEvent(node, ChangeType.Removal, Implementation));
             FullGraph.RemoveNode(node, false);
         }
 
@@ -378,14 +385,15 @@ namespace SEE.Tools.ReflexionAnalysis
         public void AddChildInImplementation(Node child, Node parent)
         {
             // TODO: Check for cycles in hierarchy (currently only first level is checked)
-            Assert.IsFalse(child.Children().Contains(parent));
-            Assert.IsNull(child.Parent);
-            Assert.IsTrue(child.IsInImplementation() && parent.IsInImplementation());
-            Assert.IsTrue(FullGraph.ContainsNode(child));
-            Assert.IsTrue(FullGraph.ContainsNode(parent));
+            AssertOrThrow(!child.Children().Contains(parent), () => new CyclicHierarchyException());
+            AssertOrThrow(child.Parent == null, () => new NotAnOrphanException(child));
+            AssertOrThrow(child.IsInImplementation() && FullGraph.ContainsNode(child),
+                          () => new NotInSubgraphException(Implementation, child));
+            AssertOrThrow(parent.IsInImplementation() && FullGraph.ContainsNode(parent),
+                          () => new NotInSubgraphException(Implementation, parent));
 
             parent.AddChild(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, AffectedGraph.Implementation));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, Implementation));
             if (!IsExplicitlyMapped(child))
             {
                 // An implicit mapping will only be created if child wasn't already explicitly mapped.
@@ -413,12 +421,12 @@ namespace SEE.Tools.ReflexionAnalysis
         public void UnparentInImplementation(Node child)
         {
             Node parent = child.Parent;
-            Assert.IsNotNull(parent);
-            Assert.IsTrue(child.IsInImplementation());
-            Assert.IsTrue(FullGraph.ContainsNode(child));
+            AssertOrThrow(parent != null, () => new IsAnOrphanException(parent));
+            AssertOrThrow(child.IsInImplementation() && FullGraph.ContainsNode(child),
+                          () => new NotInSubgraphException(Implementation, child));
 
             Node formerTarget = MapsTo(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, AffectedGraph.Implementation));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, Implementation));
             child.Reparent(null);
             if (formerTarget != null && !IsExplicitlyMapped(child))
             {
@@ -444,14 +452,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="parent">parent node</param>
         public void AddChildInArchitecture(Node child, Node parent)
         {
-            Assert.IsTrue(child.IsInArchitecture());
-            Assert.IsTrue(parent.IsInArchitecture());
-            Assert.IsNull(child.Parent);
+            AssertOrThrow(child.IsInArchitecture() && FullGraph.ContainsNode(child),
+                          () => new NotInSubgraphException(Architecture, child));
+            AssertOrThrow(parent.IsInArchitecture() && FullGraph.ContainsNode(parent),
+                          () => new NotInSubgraphException(Architecture, parent));
+            AssertOrThrow(child.Parent == null, () => new NotAnOrphanException(child));
             ISet<Node> childDescendants = new HashSet<Node>(child.PostOrderDescendants());
             // FIXME: This assert will either be false or a stack overflow will have occurred.
-            Assert.IsFalse(childDescendants.Contains(parent));
-            Assert.IsTrue(FullGraph.ContainsNode(child));
-            Assert.IsTrue(FullGraph.ContainsNode(parent));
+            AssertOrThrow(!childDescendants.Contains(parent), () => new CyclicHierarchyException());
 
             // Check that no redundant specified dependencies come into existence when subtree is connected.
             // There are two possibilities for this to happen: Either the subtree rooted by `child` contains
@@ -477,8 +485,8 @@ namespace SEE.Tools.ReflexionAnalysis
                     // we are setting that parameter to empty collections. 
                     // Since the only change in this operation will be the additional subtree rooted by `child`,
                     // we only need to compare this outgoing edge by that subtree.
-                    AssertNotRedundant(incoming.Source, incoming.Target, incoming.Type, 
-                                       fromSupertree: new Node[] {}, toSupertree: new HashSet<Node>(), 
+                    AssertNotRedundant(incoming.Source, incoming.Target, incoming.Type,
+                                       fromSupertree: new Node[] { }, toSupertree: new HashSet<Node>(),
                                        toSubtree: childDescendants);
                 }
             }
@@ -486,7 +494,7 @@ namespace SEE.Tools.ReflexionAnalysis
             PartitionedDependencies divergent = DivergentRefsInSubtree(child);
             // New relationship needs to be present for lifting, so we'll add it first
             parent.AddChild(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, AffectedGraph.Architecture));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, Architecture));
 
             foreach (Edge edge in divergent.OutgoingCross)
             {
@@ -525,9 +533,9 @@ namespace SEE.Tools.ReflexionAnalysis
         public void UnparentInArchitecture(Node child)
         {
             Node parent = child.Parent;
-            Assert.IsNotNull(parent);
-            Assert.IsTrue(child.IsInArchitecture());
-            Assert.IsTrue(FullGraph.ContainsNode(child));
+            AssertOrThrow(parent != null, () => new IsAnOrphanException(child));
+            AssertOrThrow(child.IsInArchitecture() && FullGraph.ContainsNode(child),
+                          () => new NotInSubgraphException(Architecture, child));
 
             PartitionedDependencies allowed = AllowedRefsInSubtree(child);
             foreach (Edge edge in allowed.OutgoingCross)
@@ -555,7 +563,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
 
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, AffectedGraph.Architecture));
+            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, Architecture));
             child.Reparent(null);
         }
 
@@ -563,7 +571,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public void Add(Node node)
         {
-            Assert.IsFalse(FullGraph.ContainsNode(node));
             if (node.IsInArchitecture())
             {
                 AddToArchitecture(node);
@@ -580,7 +587,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public void Delete(Node node)
         {
-            Assert.IsTrue(FullGraph.ContainsNode(node));
             if (node.IsInArchitecture())
             {
                 DeleteFromArchitecture(node);
@@ -607,7 +613,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else if (from.IsInImplementation() && to.IsInArchitecture())
             {
-                Assert.IsNull(type);
+                AssertOrThrow(type == null,
+                              () => new ArgumentException($"{nameof(type)} must not bet set when adding a mapping!"));
                 AddToMapping(from, to);
             }
             else
@@ -618,7 +625,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public void Delete(Edge edge)
         {
-            Assert.IsTrue(FullGraph.ContainsEdge(edge));
             if (edge.IsInArchitecture())
             {
                 DeleteFromArchitecture(edge);
@@ -697,14 +703,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="mapsTo">the mapping which shall be reverted</param>
         private void DeleteMapsTo(Edge mapsTo)
         {
-            if (!IsExplicitlyMapped(mapsTo.Source))
-            {
-                throw new ArgumentException($"Implementation node {mapsTo.Source} is not mapped explicitly.");
-            }
-            else if (!explicitMapsToTable.Remove(mapsTo.Source.ID))
-            {
-                throw new ArgumentException($"Implementation node {mapsTo.Source} is not mapped explicitly.");
-            }
+            AssertOrThrow(IsExplicitlyMapped(mapsTo.Source) && explicitMapsToTable.Remove(mapsTo.Source.ID),
+                          () => new NotExplicitlyMappedException(mapsTo.Source));
 
             // All nodes in the subtree rooted by mapsTo.Source and mapped onto the same target as mapsTo.Source.
             List<Node> subtree = MappedSubtree(mapsTo.Source);
@@ -733,7 +733,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // First notify before we delete the mapsTo edge for good.
-            Notify(new EdgeEvent(mapsTo, ChangeType.Removal, AffectedGraph.Mapping));
+            Notify(new EdgeEvent(mapsTo, ChangeType.Removal, Mapping));
             FullGraph.RemoveEdge(mapsTo);
         }
 
@@ -750,7 +750,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// with given type; null if there is no such edge</returns>
         private Edge GetPropagatedDependency(Edge implementationEdge)
         {
-            Assert.IsTrue(implementationEdge.IsInImplementation());
+            AssertOrThrow(implementationEdge.IsInImplementation(),
+                          () => new NotInSubgraphException(Implementation, implementationEdge));
             Node archSource = MapsTo(implementationEdge.Source);
             Node archTarget = MapsTo(implementationEdge.Target);
             if (archSource == null || archTarget == null)
@@ -772,9 +773,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="subtree">implementation nodes whose mapping is to be reverted</param>
         /// <param name="oldTarget">architecture node onto which the nodes in <paramref name="subtree"/>
         /// were mapped originally</param>
-        private void Unmap(List<Node> subtree, Node oldTarget)
+        private void Unmap(IEnumerable<Node> subtree, Node oldTarget)
         {
-            Assert.IsTrue(oldTarget.IsInArchitecture());
+            AssertOrThrow(oldTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, oldTarget));
             HandleMappedSubtree(subtree, oldTarget, DecreaseAndLift);
         }
 
@@ -790,12 +791,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">target of the Maps_To edge</param>
         private void AddToMappingGraph(Node from, Node to)
         {
-            Assert.IsTrue(from.IsInImplementation());
-            Assert.IsTrue(to.IsInArchitecture());
+            AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
+            AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             // add Maps_To edge to Mapping
             Edge mapsTo = new Edge(from, to, MapsToType);
             FullGraph.AddEdge(mapsTo);
-            Notify(new EdgeEvent(mapsTo, ChangeType.Addition, AffectedGraph.Mapping));
+            Notify(new EdgeEvent(mapsTo, ChangeType.Addition, Mapping));
         }
 
         /// <summary>
@@ -810,12 +811,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="target">architecture node onto which to map all nodes in <paramref name="subtree"/></param>
         private void ChangeMap(List<Node> subtree, Node target)
         {
-            Assert.IsTrue(target == null || target.IsInArchitecture());
+            AssertOrThrow(target == null || target.IsInArchitecture(),
+                          () => new NotInSubgraphException(Architecture, target));
             if (target == null)
             {
                 foreach (Node node in subtree)
                 {
-                    Assert.IsTrue(node.IsInImplementation());
+                    AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
                     implicitMapsToTable.Remove(node.ID);
                 }
             }
@@ -823,7 +825,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 foreach (Node node in subtree)
                 {
-                    Assert.IsTrue(node.IsInImplementation());
+                    AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
                     implicitMapsToTable[node.ID] = target;
                 }
             }
@@ -840,8 +842,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="newTarget">architecture node onto which the nodes in subtree are to be mapped</param>
         private void Map(IReadOnlyCollection<Node> subtree, Node newTarget)
         {
-            Assert.IsTrue(newTarget.IsInArchitecture());
-            Assert.IsTrue(subtree.All(x => x.IsInImplementation() && MapsTo(x) == newTarget));
+            AssertOrThrow(newTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, newTarget));
+            Node notInImpl = subtree.FirstOrDefault(x => !x.IsInImplementation());
+            AssertOrThrow(notInImpl == null, () => new NotInSubgraphException(Implementation, notInImpl));
+            AssertOrThrow(subtree.All(x => MapsTo(x) == newTarget),
+                          () => new CorruptStateException("Mapping failed: " +
+                                                          $"nodes in subtree were not all mapped to {newTarget}!"));
             HandleMappedSubtree(subtree, newTarget, IncreaseAndLift);
         }
 
@@ -881,13 +887,32 @@ namespace SEE.Tools.ReflexionAnalysis
             // TODO: Once a true type hierarchy exists, this needs to be updated
             Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => IsSpecified(edge) && edge.HasSupertypeOf(type) && targets.Contains(edge.Target);
 
-            if (fromSupertree.SelectMany(x => x.Outgoings).Any(IsRedundantIn(toSupertree)))
+            Edge redundantSuper = fromSupertree.SelectMany(x => x.Outgoings).FirstOrDefault(IsRedundantIn(toSupertree));
+            AssertOrThrow(redundantSuper == null,
+                          () => new RedundantSpecifiedEdgeException(redundantSuper, new Edge(from, to, type)));
+            Edge redundantSub = fromSubtree.SelectMany(x => x.Outgoings).FirstOrDefault(IsRedundantIn(toSubtree));
+            AssertOrThrow(redundantSub == null,
+                          () => new RedundantSpecifiedEdgeException(redundantSub, new Edge(from, to, type)));
+        }
+
+        // TODO: Use <exception> tags in documentation where applicable
+        // TODO: Use AssertOrThrow in regular ReflexionAnalysis as well
+
+        /// <summary>
+        /// Throws the Exception generated by <paramref name="exception"/>
+        /// iff <paramref name="condition"/> evaluates to false.
+        ///
+        /// Note: The JIT compiler will try to inline this, making the cost of calling this method very low.
+        /// </summary>
+        /// <param name="condition">The condition that shall be evaluated</param>
+        /// <param name="exception">Method returning the exception that shall be thrown if the
+        /// <paramref name="condition"/> evaluates to false</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AssertOrThrow(bool condition, Func<Exception> exception)
+        {
+            if (!condition)
             {
-                throw new InvalidOperationException($"Edge from {from} to {to} would be redundant in ascendants!");
-            }
-            else if (fromSubtree.SelectMany(x => x.Outgoings).Any(IsRedundantIn(toSubtree)))
-            {
-                throw new InvalidOperationException($"Edge from {from} to {to} would be redundant in descendants!");
+                throw exception();
             }
         }
 

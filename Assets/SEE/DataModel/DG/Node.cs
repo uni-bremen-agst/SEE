@@ -293,6 +293,11 @@ namespace SEE.DataModel.DG
             return result;
         }
 
+        public override string ToShortString()
+        {
+            return $"{SourceName} [{Type}]";
+        }
+
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>

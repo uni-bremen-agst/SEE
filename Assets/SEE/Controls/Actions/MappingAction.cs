@@ -209,7 +209,7 @@ namespace SEE.Controls.Actions
                     HandlePropagatedEdge(changedEvent);
                     break;
                 case EdgeEvent changedEvent:
-                    if (changedEvent.Affected == AffectedGraph.Mapping)
+                    if (changedEvent.Affected == ReflexionSubgraph.Mapping)
                     {
                         HandleMapsToEdgeAdded(changedEvent);
                     }
