@@ -5,6 +5,7 @@ Copyright (C) Axivion GmbH, 2011-2020
 Initially written in C++ on Jul 24, 2011.
 Rewritten in C# on Jan 14, 2020.
 Refactored to work on a single graph on Feb 17, 2022.
+Incremental Reflexion Analysis operations implemented in April 2022.
 
 Purpose:
 Implements incremental reflexion analysis. For detailed documentation refer to
@@ -28,8 +29,6 @@ Internally, the reflexion analysis operates on a single graph, distinguishing be
 architecture and implementation by checking a corresponding attribute, whereas the
 mapping graph simply consists of all Maps_To edges and their connected nodes.
 
-Open issues: implementation of incremental analysis is missing.
-
 */
 
 using System;
@@ -40,6 +39,7 @@ using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
@@ -193,7 +193,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the state of <paramref name="edge"/> in the architecture</returns>
         public static State GetState(Edge edge)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             if (edge.TryGetInt(StateAttribute, out int value))
             {
                 return (State)value;
@@ -240,7 +240,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if edge is a specified architecture dependency</returns>
         private static bool IsSpecified(Edge edge)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             State state = GetState(edge);
             return state == State.Specified || state == State.Convergent || state == State.Absent;
         }
@@ -265,7 +265,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be set</param>
         private static void SetCounter(Edge edge, int value)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             edge.SetInt(CounterAttribute, value);
         }
 
@@ -278,7 +278,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be added</param>
         private void AddToCounter(Edge edge, int value)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             if (edge.TryGetInt(CounterAttribute, out int oldValue))
             {
                 edge.SetInt(CounterAttribute, oldValue + value);
@@ -297,8 +297,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the counter of <paramref name="edge"/></returns>
         public static int GetArchCounter(Edge edge)
         {
-            Assert.IsTrue(edge.IsInArchitecture());
-            return edge.TryGetInt(CounterAttribute, out int value) ? value : 0;   
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
+            return edge.TryGetInt(CounterAttribute, out int value) ? value : 0;
         }
 
         /// <summary>
@@ -312,14 +312,15 @@ namespace SEE.Tools.ReflexionAnalysis
             if (edge.IsInArchitecture())
             {
                 return GetArchCounter(edge);
-            } 
+            }
             else if (edge.IsInImplementation())
             {
                 return GetImplCounter(edge);
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException($"Can't retrieve counter of edge '{edge.ToShortString()}' "
+                                                + "because it's neither in implementation nor in architecture!");
             }
         }
 
@@ -334,7 +335,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">value to be added</param>
         private void ChangePropagatedDependency(Edge edge, int value)
         {
-            Assert.IsTrue(edge.IsInArchitecture() && !IsSpecified(edge));
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
+            AssertOrThrow(!IsSpecified(edge), () => new ExpectedPropagatedEdgeException(edge));
             int oldValue = GetArchCounter(edge);
             int newValue = oldValue + value;
             // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
@@ -379,6 +381,7 @@ namespace SEE.Tools.ReflexionAnalysis
         #endregion
 
         #region Modifiers
+
         // The following operations manipulate the relevant graphs of the
         // context and trigger the incremental update of the reflexion results;
         // if anything in the reflexion results changes, all observers are informed
@@ -445,7 +448,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="handler">delegate handling the necessary adjustment</param>
         private void HandleMappedSubtree(IEnumerable<Node> subtree, Node archNode, HandleMappingChange handler)
         {
-            Assert.IsTrue(archNode.IsInArchitecture());
+            AssertOrThrow(archNode.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archNode));
             // An inner dependency may occur twice in the iteration below, once in the set
             // of outgoing edges and once in the set of incoming edges of any nodes in the subtree.
             // We may call the handler only once for these; that is why we need to keep a log of
@@ -453,7 +456,7 @@ namespace SEE.Tools.ReflexionAnalysis
             ISet<Edge> innerEdgesAlreadyHandled = new HashSet<Edge>();
             foreach (Node implNode in subtree)
             {
-                Assert.IsTrue(implNode.IsInImplementation());
+                AssertOrThrow(implNode.IsInImplementation(), () => new NotInSubgraphException(Implementation, implNode));
                 foreach (Edge outgoing in implNode.Outgoings.Where(x => x.IsInImplementation()))
                 {
                     if (implicitMapsToTable.TryGetValue(outgoing.Target.ID, out Node oldTarget))
@@ -476,9 +479,10 @@ namespace SEE.Tools.ReflexionAnalysis
                         }
                     }
                 }
+
                 foreach (Edge incoming in implNode.Incomings.Where(x => x.IsInImplementation()))
                 {
-                    Assert.IsTrue(incoming.IsInImplementation());
+                    AssertOrThrow(incoming.IsInImplementation(), () => new NotInSubgraphException(Implementation, incoming));
                     if (implicitMapsToTable.TryGetValue(incoming.Source.ID, out Node oldTarget))
                     {
                         // incoming is not dangling; it is either an incoming cross or inner dependency
@@ -520,9 +524,9 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             if (from != null && to != null)
             {
-                Assert.IsTrue(implementationDependency.IsInImplementation());
-                Assert.IsTrue(from.IsInArchitecture());
-                Assert.IsTrue(to.IsInArchitecture());
+                AssertOrThrow(implementationDependency.IsInImplementation(), () => new NotInSubgraphException(Implementation, implementationDependency));
+                AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
+                AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
                 Edge propagatedEdge = GetPropagatedDependency(from, to, implementationDependency.Type);
                 // It can happen that one of the edges end is not mapped, hence, no edge was propagated.
                 if (propagatedEdge != null)
@@ -532,6 +536,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     {
                         // matching specified architecture dependency found; no state change
                     }
+
                     ChangePropagatedDependency(propagatedEdge, counter);
                 }
             }
@@ -553,9 +558,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </remarks>
         private void IncreaseAndLift(Edge implementationDependency, Node from, Node to)
         {
-            Assert.IsTrue(implementationDependency.IsInImplementation());
-            Assert.IsTrue(from.IsInArchitecture());
-            Assert.IsTrue(to.IsInArchitecture());
+            AssertOrThrow(implementationDependency.IsInImplementation(), () => new NotInSubgraphException(Implementation, implementationDependency));
+            AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
+            AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             // safely ignore from and to
             PropagateAndLiftDependency(implementationDependency);
         }
@@ -572,7 +577,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">root node of the subtree</param>
         private List<Node> MappedSubtree(Node node)
         {
-            Assert.IsTrue(node.IsInImplementation());
+            AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
             return node.Children().Where(x => !IsExplicitlyMapped(x))
                        .SelectMany(MappedSubtree).Prepend(node).ToList();
         }
@@ -626,6 +631,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 summary[(int)GetState(edge)] += GetArchCounter(edge);
             }
+
             return summary;
         }
 
@@ -694,7 +700,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>True iff <paramref name="edge"/> has been propagated</returns>
         private bool IsPropagated(Edge edge)
         {
-            Assert.IsTrue(edge.IsInImplementation());
+            AssertOrThrow(edge.IsInImplementation(), () => new NotInSubgraphException(Implementation, edge));
             return MapsTo(edge.Source) != null && MapsTo(edge.Target) != null;
         }
 
@@ -738,8 +744,8 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
-                Assert.IsTrue(source.IsInImplementation());
-                Assert.IsTrue(target.IsInArchitecture());
+                AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
+                AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 explicitMapsToTable[source.ID] = target;
                 //explicitMapsToTable[InImplementation[source.ID]] = InArchitecture[target.ID];
             }
@@ -750,8 +756,8 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
-                Assert.IsTrue(source.IsInImplementation());
-                Assert.IsTrue(target.IsInArchitecture());
+                AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
+                AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 AddSubtreeToImplicitMap(source, target);
             }
         }
@@ -778,8 +784,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="target">architecture node that is the target of the implicit mapping</param>
         private void AddSubtreeToImplicitMap(Node root, Node target)
         {
-            Assert.IsTrue(root.IsInImplementation());
-            Assert.IsTrue(target.IsInArchitecture());
+            AssertOrThrow(root.IsInImplementation(), () => new NotInSubgraphException(Implementation, root));
+            AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
             IList<Node> children = root.Children();
             foreach (Node child in children)
             {
@@ -789,6 +795,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddSubtreeToImplicitMap(child, target);
                 }
             }
+
             implicitMapsToTable[root.ID] = target;
         }
 
@@ -806,7 +813,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="value">the value to be added to the edge's counter</param>
         private void ChangeSpecifiedDependency(Edge edge, int value)
         {
-            Assert.IsTrue(edge.IsInArchitecture() && IsSpecified(edge));
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
+            AssertOrThrow(IsSpecified(edge), () => new ExpectedSpecifiedEdgeException(edge));
             int oldValue = GetArchCounter(edge);
             int newValue = oldValue + value;
             State state = GetState(edge);
@@ -819,6 +827,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Transition(edge, state, State.Absent);
             }
+
             SetCounter(edge, newValue);
         }
 
@@ -879,7 +888,7 @@ namespace SEE.Tools.ReflexionAnalysis
                         toBeRemoved.Add(edge);
                         break;
                     default:
-                        throw new InvalidOperationException($"Unknown state '{state}' encountered!");
+                        throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state encountered!");
                 }
             }
 
@@ -902,7 +911,7 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (KeyValuePair<string, Node> mapsTo in implicitMapsToTable)
             {
                 Node sourceNode = FullGraph.GetNode(mapsTo.Key);
-                Assert.IsTrue(sourceNode.IsInImplementation());
+                AssertOrThrow(sourceNode.IsInImplementation(), () => new NotInSubgraphException(Implementation, sourceNode));
                 if (IsRelevant(sourceNode))
                 {
                     // Node is contained in implementation graph and implicitMapsToTable
@@ -951,8 +960,8 @@ namespace SEE.Tools.ReflexionAnalysis
             Node target, // target of edge; must be in architecture
             string itsType) // the edge type that must match exactly
         {
-            Assert.IsTrue(source.IsInArchitecture());
-            Assert.IsTrue(target.IsInArchitecture());
+            AssertOrThrow(source.IsInArchitecture(), () => new NotInSubgraphException(Architecture, source));
+            AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
             // There may be multiple (more precisely, two or less) edges from source to target with itsType,
             // but at most one that was specified by the user in the architecture model (we assume that
             // the architecture graph does not have redundant specified dependencies).
@@ -969,11 +978,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="implementationDependency">the implementation edge to be propagated</param>
         private void PropagateAndLiftDependency(Edge implementationDependency)
         {
-            Assert.IsTrue(implementationDependency.IsInImplementation());
+            AssertOrThrow(implementationDependency.IsInImplementation(), () => new NotInSubgraphException(Implementation, implementationDependency));
             Node implSource = implementationDependency.Source;
             Node implTarget = implementationDependency.Target;
-            Assert.IsTrue(implSource.IsInImplementation());
-            Assert.IsTrue(implTarget.IsInImplementation());
+            AssertOrThrow(implSource.IsInImplementation(), () => new NotInSubgraphException(Implementation, implSource));
+            AssertOrThrow(implTarget.IsInImplementation(), () => new NotInSubgraphException(Implementation, implTarget));
             string implType = implementationDependency.Type;
 
             Node archSource = MapsTo(implSource);
@@ -984,24 +993,27 @@ namespace SEE.Tools.ReflexionAnalysis
                 // source or target are not mapped; so we cannot do anything
                 return;
             }
-            
-            Assert.IsTrue(archSource.IsInArchitecture());
-            Assert.IsTrue(archTarget.IsInArchitecture());
+
+            AssertOrThrow(archSource.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archSource));
+            AssertOrThrow(archTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archTarget));
             Edge architectureDependency = GetPropagatedDependency(archSource, archTarget, implType);
-            Assert.IsTrue(architectureDependency == null || architectureDependency.IsInArchitecture());
+            AssertOrThrow(architectureDependency == null || architectureDependency.IsInArchitecture(),
+                          () => new NotInSubgraphException(Architecture, architectureDependency));
             Edge allowingEdge = null;
             if (architectureDependency == null)
             {
                 // a propagated dependency has not existed yet; we need to create one
                 architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, out allowingEdge);
-                Assert.IsTrue(architectureDependency.IsInArchitecture());
+                AssertOrThrow(architectureDependency.IsInArchitecture(), () => new NotInSubgraphException(Architecture, architectureDependency));
             }
             else
             {
                 // a propagated dependency exists already
                 int implCounter = GetImplCounter(implementationDependency);
-                Assert.IsTrue(architectureDependency.Source.IsInArchitecture());
-                Assert.IsTrue(architectureDependency.Target.IsInArchitecture());
+                AssertOrThrow(architectureDependency.Source.IsInArchitecture(), 
+                              () => new NotInSubgraphException(Architecture, architectureDependency.Source));
+                AssertOrThrow(architectureDependency.Target.IsInArchitecture(), 
+                              () => new NotInSubgraphException(Architecture, architectureDependency.Target));
                 Lift(architectureDependency.Source, architectureDependency.Target,
                      implType, implCounter, out allowingEdge);
                 ChangePropagatedDependency(architectureDependency, implCounter);
@@ -1021,7 +1033,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
         private void PropagateAndLiftOutgoingDependencies(Node node)
         {
-            Assert.IsTrue(node.IsInImplementation());
+            AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
             foreach (Edge edge in node.Outgoings.Where(x => x.IsInImplementation()))
             {
                 // edge is in implementation
@@ -1043,7 +1055,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the architecture node upon which node is mapped or null</returns>
         private Node MapsTo(Node node)
         {
-            Assert.IsTrue(node.IsInImplementation());
+            AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
             return implicitMapsToTable.TryGetValue(node.ID, out Node target) ? target : null;
         }
 
@@ -1057,16 +1069,17 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if this causing edge is a dependency from child to parent</returns>
         private bool IsDependencyToParent(Edge edge)
         {
-            Assert.IsTrue(edge.IsInImplementation());
+            AssertOrThrow(edge.IsInImplementation(), () => new NotInSubgraphException(Implementation, edge));
             Node mappedSource = MapsTo(edge.Source);
             Node mappedTarget = MapsTo(edge.Target);
 
             if (mappedSource != null && mappedTarget != null)
             {
-                Assert.IsTrue(mappedSource.IsInArchitecture());
-                Assert.IsTrue(mappedTarget.IsInArchitecture());
+                AssertOrThrow(mappedSource.IsInArchitecture(), () => new NotInSubgraphException(Architecture, mappedSource));
+                AssertOrThrow(mappedTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, mappedTarget));
                 return IsDescendantOf(mappedSource, mappedTarget);
             }
+
             return false;
         }
 
@@ -1086,6 +1099,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 cursor = cursor.Parent;
             }
+
             return cursor == ancestor;
         }
 
@@ -1116,14 +1130,15 @@ namespace SEE.Tools.ReflexionAnalysis
             };
             if (from.IsInImplementation())
             {
-                Assert.IsTrue(to.IsInImplementation());
+                AssertOrThrow(to.IsInImplementation(), () => new NotInSubgraphException(Implementation, to));
                 result.SetInImplementation();
-            } 
+            }
             else if (from.IsInArchitecture())
             {
-                Assert.IsTrue(to.IsInArchitecture());
+                AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
                 result.SetInArchitecture();
             }
+
             FullGraph.AddEdge(result);
             return result;
         }
@@ -1192,6 +1207,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 Transition(propagatedArchitectureDep, State.Undefined, State.Divergent);
                 allowingEdgeOut = null;
             }
+
             return propagatedArchitectureDep;
         }
 
@@ -1212,32 +1228,36 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>True if a matching architecture dependency is found</returns>
         private bool Lift(Node from, Node to, string edgeType, int counter, out Edge allowingEdgeOut)
         {
-            Assert.IsTrue(from.IsInArchitecture());
-            Assert.IsTrue(to.IsInArchitecture());
+            AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
+            AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             IList<Node> parents = to.Ascendants();
-            Assert.IsTrue(parents.All(x => x.IsInArchitecture()));
+            Node notInArch = parents.FirstOrDefault(x => !x.IsInArchitecture());
+            AssertOrThrow(notInArch == null, () => new NotInSubgraphException(Architecture, notInArch));
             Node cursor = from;
-            Assert.IsTrue(cursor.IsInArchitecture());
+            AssertOrThrow(cursor.IsInArchitecture(), () => new NotInSubgraphException(Architecture, cursor));
             while (cursor != null)
             {
                 IEnumerable<Edge> outs = cursor.Outgoings.Where(x => x.IsInArchitecture());
                 foreach (Edge edge in outs)
                 {
-                    Assert.IsTrue(edge.IsInArchitecture());
+                    AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
                     // Assert: edge is in architecture; edgeType is the type of edge
                     // being propagated and lifted; it may be more concrete than the
                     // type of the specified architecture dependency.
                     if (IsSpecified(edge)
                         // && edge.HasSupertypeOf(edgeType) FIXME: We consider that edges match independent of their types
                         && parents.Contains(edge.Target))
-                    {   // matching architecture dependency found
+                    {
+                        // matching architecture dependency found
                         ChangeSpecifiedDependency(edge, counter);
                         allowingEdgeOut = edge;
                         return true;
                     }
                 }
+
                 cursor = cursor.Parent;
             }
+
             // no matching architecture dependency found
             allowingEdgeOut = null;
             return false;
@@ -1357,6 +1377,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Debug.Log(node.ToString());
             }
+
             Debug.Log("EDGES\n");
             foreach (Edge edge in graph.Edges())
             {
