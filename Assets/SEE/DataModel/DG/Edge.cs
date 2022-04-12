@@ -128,6 +128,11 @@ namespace SEE.DataModel.DG
             return result;
         }
 
+        public override string ToShortString()
+        {
+            return $"({Source}) --({Type})-> ({Target})";
+        }
+
         /// <summary>
         /// Unique ID of this edge.
         /// </summary>

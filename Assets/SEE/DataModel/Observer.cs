@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel
+﻿using SEE.Tools.ReflexionAnalysis;
+
+namespace SEE.DataModel
 {
 
     /// <summary>
@@ -17,32 +19,6 @@
         Removal
     }
 
-    /// <summary>
-    /// Which subgraph was affected by a change.
-    /// </summary>
-    public enum AffectedGraph
-    {
-        /// <summary>
-        /// The implementation graph was affected by this change.
-        /// </summary>
-        Implementation,
-        
-        /// <summary>
-        /// The architecture graph was affected by this change.
-        /// </summary>
-        Architecture,
-        
-        /// <summary>
-        /// The mapping graph was affected by this change.
-        /// </summary>
-        Mapping,
-        
-        /// <summary>
-        /// The full reflexion graph (or multiple subgraphs) were affected by this change.
-        /// </summary>
-        FullReflexion
-    }
-    
     /// <summary>
     /// The event information about the change of the state of the observed subject.
     /// This class is intended to be specialized for more specific change events.
@@ -69,17 +45,17 @@
         /// Which graph was affected by this event.
         ///
         /// Note that this only counts towards direct changes—e.g., a <see cref="MapsToEdgeEvent"/> will have this
-        /// attribute set to <see cref="AffectedGraph.Mapping"/>, even though the architecture graph may be affected
+        /// attribute set to <see cref="ReflexionSubgraph.Mapping"/>, even though the architecture graph may be affected
         /// as well due to changes to its propagated edges.
         /// 
         /// If an event can't be clearly traced to a single subgraph, this attribute will be set to
-        /// <see cref="AffectedGraph.FullReflexion"/>.
+        /// <see cref="ReflexionSubgraph.FullReflexion"/>.
         /// </summary>
-        public readonly AffectedGraph Affected;
+        public readonly ReflexionSubgraph Affected;
 
         public override string ToString() => $"{GetType().Name}: {Description()}";
 
-        protected ChangeEvent(AffectedGraph affectedGraph, ChangeType? change = null)
+        protected ChangeEvent(ReflexionSubgraph affectedGraph, ChangeType? change = null)
         {
             Change = change;
             Affected = affectedGraph;
