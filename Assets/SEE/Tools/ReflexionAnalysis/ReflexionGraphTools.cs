@@ -4,9 +4,36 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
+    /// <summary>
+    /// Type of a reflexion subgraph.
+    /// </summary>
+    public enum ReflexionSubgraph
+    {
+        /// <summary>
+        /// The implementation graph.
+        /// </summary>
+        Implementation,
+        
+        /// <summary>
+        /// The architecture graph.
+        /// </summary>
+        Architecture,
+        
+        /// <summary>
+        /// The mapping graph.
+        /// </summary>
+        Mapping,
+        
+        /// <summary>
+        /// The full reflexion graph.
+        /// </summary>
+        FullReflexion
+    }
+    
     /// <summary>
     /// Reflexion graph consisting of architecture, implementation, and mapping nodes and edges.
     /// Nodes and edges are marked with toggles to differentiate these types.
@@ -15,75 +42,121 @@ namespace SEE.Tools.ReflexionAnalysis
     public static class ReflexionGraphTools
     {
         /// <summary>
-        /// Label for the architecture toggle added to each graph element of the architecture city.
+        /// Returns the label of this <paramref name="subgraph"/>, or <c>null</c> if this subgraph is not identified
+        /// by a label (such as <see cref="ReflexionSubgraph.Mapping"/>).
         /// </summary>
-        private const string ArchitectureLabel = "Architecture";
-
-        /// <summary>
-        /// Label for the implementation toggle added to each graph element of the implementation city.
-        /// </summary>
-        private const string ImplementationLabel = "Implementation";
-
+        /// <param name="subgraph">Subgraph type for which the label shall be returned</param>
+        /// <returns>Label of this subgraph type</returns>
+        public static string GetLabel(this ReflexionSubgraph subgraph)
+        {
+            return subgraph switch
+            {
+                Implementation => "Implementation",
+                Architecture => "Architecture",
+                Mapping => null, // identified by edges' nodes
+                FullReflexion => null, // simply the whole graph
+                _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
+            };
+        }
+        
         /// <summary>
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
         /// </summary>
         public const string MapsToType = "Maps_To";
 
         /// <summary>
+        /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
+        /// </summary>
+        /// <param name="subgraph">Subgraph whose containment of this <paramref name="element"/> will be checked</param>
+        /// <returns>
+        /// Whether this <paramref name="element"/> is contained in the given <paramref name="subgraph"/> type.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
+        {
+            switch (subgraph)
+            {
+                case Implementation:
+                case Architecture: 
+                    return element.HasToggle(subgraph.GetLabel());
+                case Mapping:
+                    // Either a "Maps_To" edge or a node connected to such an edge
+                    return element is Edge edge && edge.HasSupertypeOf(MapsToType) 
+                           || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
+                case FullReflexion: 
+                    return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
+                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+            }
+        }
+
+        /// <summary>
+        /// Marks this <paramref name="element"/> as being in the given <paramref name="subgraph"/>.
+        /// This will also remove it from other subgraphs, if applicable.
+        /// </summary>
+        /// <param name="subgraph">The subgraph this <paramref name="element"/> shall get assigned to.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="subgraph"/> is
+        /// <see cref="Mapping"/> or <see cref="FullReflexion"/>.</exception>
+        public static void SetIn(this GraphElement element, ReflexionSubgraph subgraph)
+        {
+            switch (subgraph)
+            {
+                case Implementation: 
+                    element.UnsetToggle(Architecture.GetLabel());
+                    element.SetToggle(Implementation.GetLabel());
+                    break;
+                case Architecture:
+                    element.UnsetToggle(Implementation.GetLabel());
+                    element.SetToggle(Architecture.GetLabel());
+                    break;
+                case Mapping:
+                case FullReflexion: throw new InvalidOperationException("Can't explicitly assign graph element to " 
+                                                                        + $"'{subgraph}' (only implicitly)!");
+                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+            }
+        }
+
+        /// <summary>
         /// Returns true if <paramref name="element"/> is in the architecture graph.
         /// </summary>
-        public static bool IsInArchitecture(this GraphElement element) => element.HasToggle(ArchitectureLabel);
+        public static bool IsInArchitecture(this GraphElement element) => element.IsIn(Architecture);
 
         /// <summary>
         /// Returns true if <paramref name="element"/> is in the implementation graph.
         /// </summary>
-        public static bool IsInImplementation(this GraphElement element) => element.HasToggle(ImplementationLabel);
+        public static bool IsInImplementation(this GraphElement element) => element.IsIn(Implementation);
 
         /// <summary>
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
-        public static bool IsInMapping(this Edge edge) => edge.HasSupertypeOf(MapsToType);
-
-        /// <summary>
-        /// Returns true if <paramref name="node"/> is in the mapping graph.
-        /// </summary>
-        public static bool IsInMapping(this Node node) => node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
+        public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the architecture graph.
         /// This will also remove it from the implementation graph, if applicable.
         /// </summary>
-        public static void SetInArchitecture(this GraphElement element)
-        {
-            element.UnsetToggle(ImplementationLabel);
-            element.SetToggle(ArchitectureLabel);
-        }
+        public static void SetInArchitecture(this GraphElement element) => element.SetIn(Architecture);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the implementation graph.
         /// This will also remove it from the architecture graph, if applicable.
         /// </summary>
-        public static void SetInImplementation(this GraphElement element)
-        {
-            element.UnsetToggle(ArchitectureLabel);
-            element.SetToggle(ImplementationLabel);
-        }
+        public static void SetInImplementation(this GraphElement element) => element.SetIn(Implementation);
 
         /// <summary>
-        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
-        /// the given <paramref name="graph"/>.
+        /// Marks each node and edge of the given <paramref name="graph"/> as being contained in the given
+        /// <paramref name="subgraph"/>.
         /// </summary>
-        /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
-        /// <param name="label">The value of the toggle attribute</param>
-        /// <param name="labelRootNode">Whether to label the root node of the <paramref name="graph"/>, too</param>
-        public static void MarkGraphNodes(this Graph graph, string label, bool labelRootNode = true)
+        /// <param name="graph">The graph whose nodes and edges shall be marked</param>
+        /// <param name="subgraph">The subgraph the nodes and edges will be marked with</param>
+        /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too</param>
+        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => labelRootNode || node.Type != GraphRenderer.RootType)
+                                                           .Where(node => markRootNode || node.Type != GraphRenderer.RootType)
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
-                graphElement.SetToggle(label);
+                graphElement.SetIn(subgraph);
             }
         }
 
@@ -104,9 +177,10 @@ namespace SEE.Tools.ReflexionAnalysis
                                             + "the full graph.");
             }
 
-            // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
-            ArchitectureGraph.MarkGraphNodes(ArchitectureLabel);
-            ImplementationGraph.MarkGraphNodes(ImplementationLabel);
+            // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
+            // automatically belongs to it
+            ArchitectureGraph.MarkGraphNodesIn(Architecture);
+            ImplementationGraph.MarkGraphNodesIn(Implementation);
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;
@@ -167,12 +241,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
         public static (Graph implementation, Graph architecture, Graph mapping) Disassemble(this Graph FullGraph)
         {
-            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] { ImplementationLabel });
-            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] { ArchitectureLabel });
-            // Mapping graph's edges will have neither architecture nor implementation label and will only contain
-            // nodes connected to those edges.
-            Graph MappingGraph = FullGraph.SubgraphByEdges(x => !x.HasToggle(ImplementationLabel)
-                                                                && !x.HasToggle(ArchitectureLabel));
+            Graph ImplementationGraph = FullGraph.SubgraphBy(IsInImplementation);
+            Graph ArchitectureGraph = FullGraph.SubgraphBy(IsInArchitecture);
+            Graph MappingGraph = FullGraph.SubgraphBy(IsInMapping);
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
     }
