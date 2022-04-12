@@ -196,9 +196,12 @@ namespace SEE.Net
             }
             private set
             {
-                Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
                 Assert.IsNotNull(value, "The main Unity thread must not be null!");
-                mainThread = value;
+                if (mainThread != value)
+                {
+                    Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                    mainThread = value;
+                }
             }
         }
 
