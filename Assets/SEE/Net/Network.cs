@@ -34,7 +34,7 @@ namespace SEE.Net
         /// <summary>
         /// The single unique instance of the network.
         /// </summary>
-        public static Network Instance { get; set; }
+        public static Network Instance { get; private set; }
 
         /// <summary>
         /// The maximal port number.
@@ -229,16 +229,11 @@ namespace SEE.Net
             {
                 if (Instance != this)
                 {
-                    Util.Logger.LogError("There must not be more than one Network component! "
-                        + $"This component in {gameObject.FullName()} will be destroyed!\n");
-                    Destroy(this);
-                    return;
+                    Util.Logger.LogWarning("There must not be more than one Network component! "
+                        + $"The component {typeof(Network)} in {Instance.gameObject.FullName()} will be destroyed!\n");
                 }
             }
-            else
-            {
-                Instance = this;
-            }
+            Instance = this;
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
         }
@@ -405,6 +400,8 @@ namespace SEE.Net
 
         /// <summary>
         /// Shuts down the server and the client.
+        /// This method is called only when this component is destroyed, which
+        /// may be at the very end of the game.
         /// </summary>
         private void OnDestroy()
         {
@@ -441,6 +438,8 @@ namespace SEE.Net
                     }
                 }
             }
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            Debug.Log("Network is shut down.\n");
         }
 
         /// <summary>
@@ -527,8 +526,11 @@ namespace SEE.Net
         /// </summary>
         private void OnServerStarted()
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
 
         /// <summary>
@@ -543,8 +545,24 @@ namespace SEE.Net
             // Now we have loaded the scene that is supposed to contain settings for the voice chat
             // system. We can now turn on the voice chat system.
             Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
-            StartVoiceChat();
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            StartVoiceChat();
+        }
+
+        /// <summary>
+        /// Unregisters itself from <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        private void OnSceneUnloaded(Scene scene)
+        {
+            Debug.Log($"Unloaded scene {scene.name}.\n");
+            if (scene.name == GameScene)
+            {
+                SceneManager.sceneUnloaded -= OnSceneUnloaded;
+                ShutdownNetwork();
+                Destroy(Instance);
+            }
         }
 
         /// <summary>
@@ -567,7 +585,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartHost(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartHost));
+            StartCoroutine(ShutdownNetwork(InternalStartHost));
 
             void InternalStartHost()
             {
@@ -604,7 +622,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartClient(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartClient));
+            StartCoroutine(ShutdownNetwork(InternalStartClient));
 
             void InternalStartClient()
             {
@@ -673,7 +691,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartServer(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartServer));
+            StartCoroutine(ShutdownNetwork(InternalStartServer));
 
             void InternalStartServer()
             {
@@ -699,21 +717,21 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// A delegate that will be called in <see cref="RestartNetwork(StartNetwork)"/> when
-        /// the network has been shut down (if needed at all) to (re-)start the network.
+        /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when
+        /// the network has been shut down (if needed at all), for instance, to (re-)start the network.
         /// </summary>
-        delegate void StartNetwork();
+        delegate void OnShutdownFinished();
 
         /// <summary>
-        /// If the network is already running, it will be shut down. Finally, <paramref name="startNetwork"/>
+        /// If the network is already running, it will be shut down. Finally, <paramref name="onShutdownFinished"/>
         /// will be called.
         ///
         /// This method is used as a co-routine started in <see cref="StartHost(CallBack)"/>,
         /// <see cref="StartServer(CallBack)"/>, and <see cref="StartClient(CallBack)"/>.
         /// </summary>
-        /// <param name="startNetwork">function to be called to start the network</param>
+        /// <param name="onShutdownFinished">function to be called at the end of the shutdown</param>
         /// <returns>whether to continue this co-routine</returns>
-        private IEnumerator RestartNetwork(StartNetwork startNetwork)
+        private IEnumerator ShutdownNetwork(OnShutdownFinished onShutdownFinished)
         {
             // In case we are connected, we will first disconnect.
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
@@ -735,7 +753,7 @@ namespace SEE.Net
 
             ShutdownNetwork();
 
-            startNetwork();
+            onShutdownFinished();
         }
 
         /// <summary>
