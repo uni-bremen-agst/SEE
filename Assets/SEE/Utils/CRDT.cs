@@ -841,12 +841,12 @@ namespace SEE.Utils
                 }
                 else
                 {
-                    throw new PositionAlreadyExistsException("The searched Position already exists in the CRDT!");
+                    throw new PositionAlreadyExistsException("The searched position exists in the CRDT already!");
                 }
             }
             if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == 0)
             {
-                throw new PositionAlreadyExistsException("The searched Position already exists in the CRDT!");
+                throw new PositionAlreadyExistsException("The searched position exists in the CRDT already!");
             }
             else if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == 1)
             {
