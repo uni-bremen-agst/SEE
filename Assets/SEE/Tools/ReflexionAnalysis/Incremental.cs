@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -16,8 +15,6 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </summary>
     public partial class Reflexion
     {
-        // TODO: implement proper error types
-
         /// <summary>
         /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
         /// to the given node <paramref name="to"/> and adds it to the implementation graph,
@@ -38,6 +35,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">source node of the new edge</param>
         /// <param name="to">target node of the new edge</param>
         /// <param name="type">type of the new edge</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/> is
+        /// not in the implementation graph</exception>
         public void AddToImplementation(Node from, Node to, string type)
         {
             AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInImplementation(),
@@ -58,12 +57,17 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the implementation graph and have
         /// at least one edge connecting them.
+        /// If the latter isn't true, this method will have no effect.
         /// </summary>
         /// <param name="from">Source node of the edge which shall be deleted</param>
         /// <param name="to">Target node of the edge which shall be deleted</param>
         /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="to"/> or <paramref name="from"/> is
+        /// not present in the implementation graph</exception>
         public void DeleteFromImplementation(Node from, Node to, string type = null)
         {
+            AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInImplementation(),
+                          () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, to));
             from.FromTo(to, type).ForEach(DeleteFromImplementation);
@@ -77,6 +81,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: <paramref name="edge"/> is an implementation edge contained in the reflexion graph.
         /// </summary>
         /// <param name="edge">The implementation edge to be removed from the graph.</param>
+        /// <exception cref="NotInSubgraphException">When the given <paramref name="edge"/> is not in the
+        /// implementation graph.</exception>
         public void DeleteFromImplementation(Edge edge)
         {
             AssertOrThrow(edge.IsInImplementation() && FullGraph.ContainsEdge(edge),
@@ -120,6 +126,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">source node of the new edge</param>
         /// <param name="to">target node of the new edge</param>
         /// <param name="type">type of the new edge</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
+        /// is not contained in the architecture graph.</exception>
+        /// <exception cref="RedundantSpecifiedEdgeException">When the edge from <paramref name="from"/> to
+        /// <paramref name="to"/> would be redundant to another specified edge.</exception>
         public void AddToArchitecture(Node from, Node to, string type)
         {
             AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInArchitecture(),
@@ -166,10 +176,13 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph and have
         /// exactly one edge connecting them.
+        /// If the latter isn't true, this method will have no effect.
         /// </summary>
         /// <param name="from">Source node of the edge which shall be deleted</param>
         /// <param name="to">Target node of the edge which shall be deleted</param>
         /// <param name="type">Type of the edge which shall be deleted. If <c>null</c>, will be ignored.</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
+        /// is not contained in the architecture graph.</exception>
         public void DeleteFromArchitecture(Node from, Node to, string type = null)
         {
             AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
@@ -185,6 +198,10 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the specified dependency edge to be removed from the architecture graph</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="edge"/>
+        /// is not contained in the architecture graph.</exception>
+        /// <exception cref="ExpectedSpecifiedEdgeException">When the given <paramref name="edge"/> is not
+        /// a specified edge.</exception>
         public void DeleteFromArchitecture(Edge edge)
         {
             AssertOrThrow(FullGraph.ContainsEdge(edge) && edge.IsInArchitecture(),
@@ -226,6 +243,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">the source of the Maps_To edge to be added to the mapping graph</param>
         /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
+        /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
+        /// architecture graph.</exception>
+        /// <exception cref="AlreadyExplicitlyMappedException">When <paramref name="from"/> is already explicitly
+        /// mapped to an architecture node.</exception>
         public void AddToMapping(Node from, Node to)
         {
             AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
@@ -257,6 +279,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">The edge that shall be removed from the mapping graph.</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="edge"/>
+        /// is not contained in the mapping graph.</exception>
         public void DeleteFromMapping(Edge edge)
         {
             AssertOrThrow(edge.IsInMapping() && FullGraph.ContainsEdge(edge),
@@ -277,6 +301,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// to be removed from the mapping graph </param>
         /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
+        /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
+        /// architecture graph.</exception>
         public void DeleteFromMapping(Node from, Node to)
         {
             AssertOrThrow(from.IsInImplementation() && FullGraph.ContainsNode(from),
@@ -303,6 +330,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the architecture graph</param>
+        /// <exception cref="AlreadyContainedException">When the given <paramref name="node"/> is already
+        /// present in the reflexion graph.</exception>
         public void AddToArchitecture(Node node)
         {
             AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
@@ -322,6 +351,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the architecture graph</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="node"/>
+        /// is not contained in the architecture graph.</exception>
         public void DeleteFromArchitecture(Node node)
         {
             AssertOrThrow(node.IsInArchitecture() && FullGraph.ContainsNode(node),
@@ -342,6 +373,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// informed of the change.
         /// </summary>
         /// <param name="node">the node to be added to the implementation graph</param>
+        /// <exception cref="AlreadyContainedException">When the given <paramref name="node"/> is already
+        /// present in the reflexion graph.</exception>
         public void AddToImplementation(Node node)
         {
             AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
@@ -359,6 +392,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="node">the node to be removed from the implementation graph</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="node"/>
+        /// is not contained in the implementation graph.</exception>
         public void DeleteFromImplementation(Node node)
         {
             AssertOrThrow(node.IsInImplementation() && FullGraph.ContainsNode(node),
@@ -382,6 +417,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="child">child node</param>
         /// <param name="parent">parent node</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="child"/> or <paramref name="parent"/>
+        /// is not contained in the implementation graph.</exception>
+        /// <exception cref="CyclicHierarchyException">When adding <paramref name="child"/> as a child of
+        /// <paramref name="parent"/> would result in cycles in the part-of hierarchy.</exception>
+        /// <exception cref="NotAnOrphanException">When the given <paramref name="child"/>
+        /// already has a parent.</exception>
         public void AddChildInImplementation(Node child, Node parent)
         {
             // TODO: Check for cycles in hierarchy (currently only first level is checked)
@@ -418,6 +459,10 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="child">child node</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="child"/>
+        /// is not contained in the implementation graph.</exception>
+        /// <exception cref="IsAnOrphanException">When <paramref name="child"/> has no parent from which it could
+        /// be "unparented".</exception>
         public void UnparentInImplementation(Node child)
         {
             Node parent = child.Parent;
@@ -450,6 +495,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="child">child node</param>
         /// <param name="parent">parent node</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="child"/> or <paramref name="parent"/>
+        /// is not contained in the architecture graph.</exception>
+        /// <exception cref="CyclicHierarchyException">When adding <paramref name="child"/> as a child of
+        /// <paramref name="parent"/> would result in cycles in the part-of hierarchy.</exception>
+        /// <exception cref="NotAnOrphanException">When the given <paramref name="child"/>
+        /// already has a parent.</exception>
+        /// <exception cref="RedundantSpecifiedEdgeException">When redundant specified dependencies would
+        /// come into existence once the subtree was connected.</exception>
         public void AddChildInArchitecture(Node child, Node parent)
         {
             AssertOrThrow(child.IsInArchitecture() && FullGraph.ContainsNode(child),
@@ -458,7 +511,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Architecture, parent));
             AssertOrThrow(child.Parent == null, () => new NotAnOrphanException(child));
             ISet<Node> childDescendants = new HashSet<Node>(child.PostOrderDescendants());
-            // FIXME: This assert will either be false or a stack overflow will have occurred.
+            // TODO: Proper cycle checking?
             AssertOrThrow(!childDescendants.Contains(parent), () => new CyclicHierarchyException());
 
             // Check that no redundant specified dependencies come into existence when subtree is connected.
@@ -530,6 +583,10 @@ namespace SEE.Tools.ReflexionAnalysis
         ///   data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="child">child node</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="child"/>
+        /// is not contained in the architecture graph.</exception>
+        /// <exception cref="IsAnOrphanException">When <paramref name="child"/> has no parent from which it could
+        /// be "unparented".</exception>
         public void UnparentInArchitecture(Node child)
         {
             Node parent = child.Parent;
@@ -569,22 +626,17 @@ namespace SEE.Tools.ReflexionAnalysis
 
         #region Aggregator Methods
 
-        public void Add(Node node)
-        {
-            if (node.IsInArchitecture())
-            {
-                AddToArchitecture(node);
-            }
-            else if (node.IsInImplementation())
-            {
-                AddToImplementation(node);
-            }
-            else
-            {
-                throw new NotSupportedException();
-            }
-        }
-
+        /// <summary>
+        /// Deletes given <paramref name="node"/> from its graph, which is either the architecture or the
+        /// implementation graph.
+        ///
+        /// Pre-condition: <paramref name="node"/> is contained in either the architecture or the implementation graph.
+        /// Postcondition: <paramref name="node"/> is no longer contained in its graph and the reflexion data
+        /// is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="node">the node to be removed from its graph</param>
+        /// <exception cref="NotSupportedException">When <paramref name="node"/> is neither in the architecture
+        /// nor the implementation graph.</exception>
         public void Delete(Node node)
         {
             if (node.IsInArchitecture())
@@ -597,24 +649,60 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException("Given node must be either in architecture or implementation graph!");
             }
         }
 
+        /// <summary>
+        /// Creates an edge of given <paramref name="type"/> (or Maps_To if no type was given)
+        /// from the given node <paramref name="from"/>
+        /// to the given node <paramref name="to"/> and adds it to a fitting subgraph of the reflexion graph,
+        /// adjusting the reflexion analysis incrementally.
+        ///
+        /// If both <paramref name="from"/> and <paramref name="to"/> belong to the architecture graph, the new edge
+        /// will be added to the architecture graph as well (vice versa for the implementation graph.)
+        /// If <paramref name="from"/> belongs to the implementation graph and <paramref name="to"/> belongs to the
+        /// architecture graph, the new edge will be added as a Mapping edge (<paramref name="type"/>
+        /// must be <c>null</c> in such a case!).
+        /// Any other case will result in a <see cref="NotSupportedException"/>.
+        /// 
+        /// Preconditions:
+        /// <ul>
+        /// <li><paramref name="from"/> is contained in the reflexion graph.</li>
+        /// <li><paramref name="to"/> is contained in the reflexion graph.</li>
+        /// <li>If added to the architecture graph, the newly created specified edge will not be redundant.</li>
+        /// <li>If added to the mapping graph, <paramref name="from"/> must not already be explicitly mapped.</li>
+        /// </ul>
+        /// Postcondition: A new edge from <paramref name="from"/> to <paramref name="to"/> is contained in the
+        ///   architecture graph and the reflexion data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="from">source node of the new edge</param>
+        /// <param name="to">target node of the new edge</param>
+        /// <param name="type">type of the new edge</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
+        /// is not contained in the reflexion graph.</exception>
+        /// <exception cref="RedundantSpecifiedEdgeException">When the edge from <paramref name="from"/> to
+        /// <paramref name="to"/> would be redundant to another specified edge.</exception>
+        /// <exception cref="AlreadyExplicitlyMappedException">When <paramref name="from"/> is already explicitly
+        /// mapped to an architecture node and <paramref name="to"/> is in the architecture graph.</exception>
         public void Add(Node from, Node to, string type = null)
         {
             if (from.IsInArchitecture() && to.IsInArchitecture())
             {
+                AssertOrThrow(type != null,
+                              () => new ArgumentException($"{nameof(type)} must be set when adding an architecture edge!"));
                 AddToArchitecture(from, to, type);
             }
             else if (from.IsInImplementation() && to.IsInImplementation())
             {
+                AssertOrThrow(type != null,
+                              () => new ArgumentException($"{nameof(type)} must be set when adding an implementation edge!"));
                 AddToImplementation(from, to, type);
             }
             else if (from.IsInImplementation() && to.IsInArchitecture())
             {
                 AssertOrThrow(type == null,
-                              () => new ArgumentException($"{nameof(type)} must not bet set when adding a mapping!"));
+                              () => new ArgumentException($"{nameof(type)} must not be set when adding a mapping!"));
                 AddToMapping(from, to);
             }
             else
@@ -623,6 +711,20 @@ namespace SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Removes the given <paramref name="edge"/> from the reflexion graph.
+        /// Precondition: <paramref name="edge"/> must be contained in the reflexion graph.
+        /// If it belongs to the architecture graph, it must represent a specified dependency.
+        /// Postcondition: <paramref name="edge"/> is no longer contained in the reflexion graph and the reflexion
+        ///   data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="edge">the specified edge to be removed from the reflexion graph</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="edge"/>
+        /// is not contained in the reflexion graph.</exception>
+        /// <exception cref="ExpectedSpecifiedEdgeException">When the given <paramref name="edge"/> is not
+        /// a specified edge.</exception>
+        /// <exception cref="NotSupportedException">When the given <paramref name="edge"/> is neither in
+        /// the architecture, implementation, nor mapping graph.</exception>
         public void Delete(Edge edge)
         {
             if (edge.IsInArchitecture())
@@ -639,7 +741,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException("Given edge must be either in architecture, implementation, or mapping graph!");
             }
         }
 
@@ -647,14 +749,27 @@ namespace SEE.Tools.ReflexionAnalysis
 
         #region Helper
 
+        /// <summary>
+        /// A set of dependencies partitioned into outgoing cross, incoming cross, and inner dependencies
+        /// in reference to a subtree (not contained in this class).
+        /// </summary>
         private class PartitionedDependencies
         {
+            /// <summary>
+            /// Set of dependencies whose source is in the subtree, but whose target is outside of the subtree.
+            /// </summary>
             [NotNull]
             public readonly ISet<Edge> OutgoingCross;
 
+            /// <summary>
+            /// Set of dependencies whose source is outside of the subtree, but whose target is in the subtree.
+            /// </summary>
             [NotNull]
             public readonly ISet<Edge> IncomingCross;
 
+            /// <summary>
+            /// Set of dependencies whose source is in the subtree and whose target is also in the subtree.
+            /// </summary>
             [NotNull]
             public readonly ISet<Edge> Inner;
 
@@ -666,8 +781,18 @@ namespace SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// Returns the propagated dependencies of the subtree rooted by <paramref name="root"/> which fulfill
+        /// the given <paramref name="predicate"/> as a partitioned set.
+        /// The returned dependencies will be partitioned into three kinds (see <see cref="PartitionedDependencies"/>).
+        /// </summary>
+        /// <param name="root">Node whose subtree's propagated dependencies shall be returned</param>
+        /// <param name="predicate">The predicate a dependency must fulfill to be included</param>
+        /// <returns>Propagated dependencies of the subtree rooted by <paramref name="root"/> which fulfill
+        /// the given <paramref name="predicate"/></returns>
         private static PartitionedDependencies RefsInSubtree(Node root, Predicate<Edge> predicate)
         {
+            AssertOrThrow(root.IsInArchitecture(), () => new NotInSubgraphException(Architecture, root));
             IList<Node> descendants = root.PostOrderDescendants();
             (HashSet<Edge> oc, HashSet<Edge> ic, HashSet<Edge> i) = (new HashSet<Edge>(), new HashSet<Edge>(), new HashSet<Edge>());
             foreach (Node descendant in descendants)
@@ -683,8 +808,21 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         // TODO: What about ImplicitlyAllowed and AllowedAbsence?
+        
+        /// <summary>
+        /// Returns all allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.
+        /// See <see cref="RefsInSubtree"/> for details.
+        /// </summary>
+        /// <param name="root">Node whose subtree's allowed propagated dependencies shall be returned</param>
+        /// <returns>All allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
         private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
 
+        /// <summary>
+        /// Returns all divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.
+        /// See <see cref="RefsInSubtree"/> for details.
+        /// </summary>
+        /// <param name="root">Node whose subtree's divergent propagated dependencies shall be returned</param>
+        /// <returns>All divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
         private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
 
         /// <summary>
@@ -862,6 +1000,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Pre-conditions:
         /// - <paramref name="from"/> and <paramref name="to"/> are in the architecture graph.
+        /// - There are not yet any redundant specified edges in the graph (excluding the supposed edge between
+        /// <paramref name="from"/> and <paramref name="to"/>).
         /// </summary>
         /// <param name="from">Source of the supposed edge</param>
         /// <param name="to">Target of the supposed edge</param>
@@ -874,6 +1014,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// we'll simply enumerate all descendants of <paramref name="to"/> ourselves</param>
         /// <param name="toSupertree">Supertree (ascendants) of <paramref name="to"/>—if not given,
         /// we'll simply enumerate all ascendants of <paramref name="to"/> ourselves</param>
+        /// <exception cref="RedundantSpecifiedEdgeException">If the edge between <paramref name="from"/>
+        /// and <paramref name="to"/> is redundant in relation to the given sub- and supertrees.</exception>
         private static void AssertNotRedundant(Node from, Node to, string type,
                                                IEnumerable<Node> fromSubtree = null, IEnumerable<Node> fromSupertree = null,
                                                ISet<Node> toSubtree = null, ISet<Node> toSupertree = null)
@@ -894,9 +1036,6 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(redundantSub == null,
                           () => new RedundantSpecifiedEdgeException(redundantSub, new Edge(from, to, type)));
         }
-
-        // TODO: Use <exception> tags in documentation where applicable
-        // TODO: Use AssertOrThrow in regular ReflexionAnalysis as well
 
         /// <summary>
         /// Throws the Exception generated by <paramref name="exception"/>
