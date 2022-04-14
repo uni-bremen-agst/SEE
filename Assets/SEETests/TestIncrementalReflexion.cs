@@ -783,4 +783,11 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(1, changes.Count);
         }
     }
+    
+    // TODO: Test redundant specified edge in AddToArchitecture and AddChildInArchitecture (incoming and outgoing!)
+    // TODO: More complex UnparentInArchitecture tests, with IncomingCross and Inner
+    // TODO: Test {AddTo,DeleteFrom}{Architecture,Implementation}(Node)
+    // TODO: Test DeleteFromMapping(Edge)
+    // TODO: Use aggregator methods to cover those as well
+    // TODO: Check error cases
 }

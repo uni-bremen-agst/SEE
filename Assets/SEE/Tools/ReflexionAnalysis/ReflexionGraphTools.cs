@@ -54,7 +54,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 Implementation => "Implementation",
                 Architecture => "Architecture",
                 Mapping => null, // identified by edges' nodes
-                FullReflexion => null, // simply the whole graph
+                ReflexionSubgraph.FullReflexion => null, // simply the whole graph
                 _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
             };
         }
@@ -83,7 +83,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     // Either a "Maps_To" edge or a node connected to such an edge
                     return element is Edge edge && edge.HasSupertypeOf(MapsToType) 
                            || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
-                case FullReflexion: 
+                case ReflexionSubgraph.FullReflexion: 
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
@@ -95,7 +95,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="subgraph">The subgraph this <paramref name="element"/> shall get assigned to.</param>
         /// <exception cref="InvalidOperationException">If <paramref name="subgraph"/> is
-        /// <see cref="Mapping"/> or <see cref="FullReflexion"/>.</exception>
+        /// <see cref="Mapping"/> or <see cref="ReflexionSubgraph.FullReflexion"/>.</exception>
         public static void SetIn(this GraphElement element, ReflexionSubgraph subgraph)
         {
             switch (subgraph)
@@ -109,8 +109,8 @@ namespace SEE.Tools.ReflexionAnalysis
                     element.SetToggle(Architecture.GetLabel());
                     break;
                 case Mapping:
-                case FullReflexion: throw new InvalidOperationException("Can't explicitly assign graph element to " 
-                                                                        + $"'{subgraph}' (only implicitly)!");
+                case ReflexionSubgraph.FullReflexion: throw new InvalidOperationException("Can't explicitly assign graph element to " 
+                                                                                      + $"'{subgraph}' (only implicitly)!");
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
         }
