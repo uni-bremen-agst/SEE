@@ -69,6 +69,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// An exception that will be thrown when a redo operation is impossible.
+        /// </summary>
+        public class RedoNotPossibleException : Exception
+        {
+            public RedoNotPossibleException(string v) : base(v)
+            { }
+        }
+
+        /// <summary>
         /// An <see cref="Identifier"/> represents a position inside of the CRDT.
         /// It contains the digit, i.e., the index, and the site ID, i.e., the user that
         /// added the character.
@@ -955,12 +964,12 @@ namespace SEE.Utils
         /// <summary>
         /// Redoes the last undone edit operation.
         /// </summary>
+        /// <exception cref="RedoNotPossibleException">Throws an exception than the redo is impossible because of an empty redo stack or the action could not be redone.</exception>
         public void Redo()
         {
             if (redoStack.Count < 1)
             {
-                ShowNotification.Info("Redo Failure", "Redo Stack is empty!");
-                return;
+                throw new RedoNotPossibleException("Redo Stack is empty!");
             }
             (CharObj[], OperationType) lastOperation = redoStack.Pop();
             switch (lastOperation.Item2)
@@ -976,7 +985,7 @@ namespace SEE.Utils
                         }
                         else
                         {
-                            ShowNotification.Warn("Redo Failure", "Redo not possible, Char is already deleted!");
+                            throw new RedoNotPossibleException("Redo not possible, Char is already deleted!");
                         }
                     }
                     undoStack.Push((lastOperation.Item1, OperationType.Delete));
