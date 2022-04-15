@@ -49,6 +49,15 @@ namespace SEE.Utils
             public PositionAlreadyExistsException(string v) : base(v)
             { }
         }
+        
+        /// <summary>
+        /// An exception that will be thrown when a remoteAdd operation fails, for example the submited position was empty or no fitting index could be found.
+        /// </summary>
+        public class RemoteAddCharNotPossibleException : Exception
+        {
+            public RemoteAddCharNotPossibleException(string v) : base(v)
+            { }
+        }
 
         /// <summary>
         /// An <see cref="Identifier"/> represents a position inside of the CRDT.
@@ -313,6 +322,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The Char to add</param>
         /// <param name="position">The position at which the Char should be added</param>
+        /// <exception cref="RemoteAddCharNotPossibleException">Throws an Exception if no fitting index for the change could be found or the position is null.</exception>
         public void RemoteAddChar(char c, Identifier[] position)
         {
             if (position != null && position.Length > 0)
@@ -326,8 +336,7 @@ namespace SEE.Utils
                 int insertIdx = FindFittingIndex(position);
                 if (insertIdx == -1)
                 {
-                    ShowNotification.Error("Failure during remote change", "A requested remote change could not be inserted, because no fitting position was found!");
-                    return;
+                    throw new RemoteAddCharNotPossibleException("A requested remote change could not be inserted, because no fitting position was found!");
                 }
                 if (insertIdx >= crdt.Count)
                 {
@@ -340,14 +349,15 @@ namespace SEE.Utils
             }
             else
             {
-                ShowNotification.Error("Failure during remote change", "RemoteAddChar failed! The position was empty.");
+                throw new RemoteAddCharNotPossibleException("RemoteAddChar failed! The position was empty.");
             }
         }
 
         /// <summary>
-        /// The remote operation to remove a character from the CRDT.
+        /// The remote operation to remove a character from the <see cref="crdt"/>.
         /// </summary>
         /// <param name="position">The position at which the character should be deleted</param>
+        /// <exception cref="RemoteDeleteNotPossibleException">Throws the exception when the requested position is not contained by the <see cref="crdt"/></exception>
         public void RemoteDeleteChar(Identifier[] position) //TODO Maybe I need a version counter for every action!
         {
             (int, CharObj) found = Find(position);
@@ -826,6 +836,7 @@ namespace SEE.Utils
         /// <param name="start">The start of the search space</param>
         /// <param name="end">The end of the search space</param>
         /// <returns>The fitting index</returns>
+        /// <exception cref="PositionAlreadyExistsException">Throws the exception when the position that should be added in the <see cref="crdt"/> already is represent in the crdt</exception>
         private int BinaryIndexFinder(Identifier[] position, int start, int end)
         {
             if (start < end)
