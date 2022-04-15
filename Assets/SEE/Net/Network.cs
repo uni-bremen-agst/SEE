@@ -413,6 +413,7 @@ namespace SEE.Net
             Server.Shutdown();
             Client.Shutdown();
 
+#if !UNITY_ANDROID
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);
@@ -438,6 +439,7 @@ namespace SEE.Net
                     }
                 }
             }
+#endif
         }
 
         /// <summary>
@@ -780,7 +782,7 @@ namespace SEE.Net
             }
         }
 
-        #region ConfigIO
+#region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -903,9 +905,9 @@ namespace SEE.Net
             }
         }
 
-        #endregion
+#endregion
 
-        #region Vivox
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -1036,6 +1038,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        #endregion
+#endregion
     }
 }
