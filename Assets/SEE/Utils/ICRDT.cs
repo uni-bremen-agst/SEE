@@ -81,17 +81,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Gets the index of an entry by its position.
-        /// </summary>
-        /// <param name="position">The position to find.</param>
-        /// <param name="file">The fileame of the crdt to search in.</param>
-        /// <returns>The index of the position.</returns>
-        public static int GetIndexByPosition(Identifier[] position, string file)
-        {
-            return GetInstanceByName(file).GetIndexByPosition(position);
-        }
-
-        /// <summary>
         /// Adds <paramref name="c"/> to the CRDT remotely.
         /// </summary>
         /// <param name="c">The character to add.</param>
