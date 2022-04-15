@@ -20,6 +20,14 @@ namespace SEE.Utils
     public class CRDT
     {
         /// <summary>
+        /// An exception that will be thrown when a failure with the <see cref="crdt"/> happens.
+        /// </summary>
+        public class CRDTfailureException : Exception
+        {
+            public CRDTfailureException(string v) : base(v)
+            { }
+        }
+        /// <summary>
         /// An exception that will be thrown when a remoteDelete operation is not possible
         /// because the character that should be deleted could not be found in the <see cref="CRDT"/>.
         /// </summary>
@@ -411,6 +419,7 @@ namespace SEE.Utils
         /// Removes a character from the CRDT at given <paramref name="index"/>.
         /// </summary>
         /// <param name="index">The index at which the character should be removed</param>
+        /// <exception cref="DeleteNotPossibleException">Throws an exception than the requested index is out of range.</exception>
         public void DeleteChar(int index)
         {
             if (0 <= index && index < crdt.Count())
@@ -617,6 +626,7 @@ namespace SEE.Utils
         /// <param name="after">After position</param>
         /// <param name="site">The site ID of the requester</param>
         /// <returns>A new position</returns>
+        /// <exception cref="CRDTfailureException">Throws an exception than the <see cref="crdt"/> has the wrong order.</exception>
         public Identifier[] GeneratePositionBetween(Identifier[] before, Identifier[] after, string site)
         {
             Identifier headP1, headP2;
@@ -675,7 +685,7 @@ namespace SEE.Utils
             }
             else
             {
-                throw new Exception("The CRDT has a wrong order.");
+                throw new CRDTfailureException("The CRDT has a wrong order.");
             }
         }
 
