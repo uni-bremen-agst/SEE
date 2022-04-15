@@ -12,6 +12,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static SEE.Utils.CRDT;
 
 namespace SEE.Game.UI.CodeWindow
 {
@@ -248,12 +249,26 @@ namespace SEE.Game.UI.CodeWindow
                 if (SEEInput.CodeWindowUndo())
                 {
                     ShowNotification.Info("Undo", "");
-                    ICRDT.Undo(Title);
+                    try
+                    {
+                        ICRDT.Undo(Title);
+                    }
+                    catch(UndoNotPossibleExcpetion e)
+                    {
+                        ShowNotification.Error("Undo failure", e.Message);
+                    }
                 }
                 if (SEEInput.CodeWindowRedo())
                 {
                     ShowNotification.Info("Redo", "");
-                    ICRDT.Redo(Title);
+                    try
+                    {
+                        ICRDT.Redo(Title);
+                    }
+                    catch(RedoNotPossibleException e)
+                    {
+                        ShowNotification.Error("Redo failure", e.Message);
+                    }
                 }
 
                 // Renew the syntax highliting (currently only on user request).
