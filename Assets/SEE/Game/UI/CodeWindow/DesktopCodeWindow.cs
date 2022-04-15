@@ -235,7 +235,7 @@ namespace SEE.Game.UI.CodeWindow
                     try
                     {
                         File.WriteAllText(FilePath, RemoveLineNumbers(ICRDT.PrintString(Title)));
-                        ShowNotification.Info("Saving Successfull", "File " + Title + " was saved succesfully");
+                        ShowNotification.Info("Successful Saving", "File " + Title + " was saved succesfully");
                     }
                     catch (Exception e) when (e is DirectoryNotFoundException || e is PathTooLongException || e is IOException
                     || e is NotSupportedException || e is ArgumentNullException || e is UnauthorizedAccessException || e is SecurityException)
