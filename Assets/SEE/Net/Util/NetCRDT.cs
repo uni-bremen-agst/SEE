@@ -75,13 +75,6 @@ namespace SEE.Net
         public int ID;
 
         /// <summary>
-        /// Constructor.
-        /// </summary>
-        public NetCRDT() : base()
-        {
-        }
-
-        /// <summary>
         /// Things to execute on the server.
         /// Generates a ID for each client.
         /// </summary>
