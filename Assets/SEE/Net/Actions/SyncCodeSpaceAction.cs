@@ -19,15 +19,6 @@ namespace SEE.Net
         public CodeSpace.CodeSpaceValues Space;
 
         /// <summary>
-        /// Creates a new SyncCodeSpaceAction with the given <paramref name="space"/>.
-        /// </summary>
-        /// <param name="space">The code space which shall be sent across the network.</param>
-        public SyncCodeSpaceAction(CodeSpace space)
-        {
-            UpdateSpace(space, false);
-        }
-
-        /// <summary>
         /// For the given <paramref name="space"/>, create a value object, and depending on <paramref name="execute"/>,
         /// send it over the network as well.
         /// </summary>
@@ -39,7 +30,7 @@ namespace SEE.Net
             {
                 return;
             }
-            
+
             Space = space.ToValueObject(SYNC_FULL_TEXT);
 
             if (execute)
@@ -47,7 +38,7 @@ namespace SEE.Net
                 Execute();
             }
         }
-        
+
         protected override void ExecuteOnServer()
         {
             // Nothing needs to be done on the server
@@ -62,7 +53,7 @@ namespace SEE.Net
                     // If no code space manager exists, there is nothing we can (or should) do.
                     return;
                 }
-                
+
                 CodeSpaceManager.ManagerInstance.UpdateCodeSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }
