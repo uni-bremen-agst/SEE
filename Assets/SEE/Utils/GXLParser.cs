@@ -1,20 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Xml;
 
 namespace SEE.Utils
 {
     public class GXLParser : IDisposable
     {
-        public GXLParser(string filename, SEE.Utils.ILogger logger = null)
+        public GXLParser(string filename, ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
+#if UNITY_ANDROID
+#if !UNITY_EDITOR
+            reader = new XmlTextReader(WebRequests.GetStream(filename));
+#else
             reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
             };
+#endif
+#else
+            reader = new XmlTextReader(filename)
+            {
+                WhitespaceHandling = WhitespaceHandling.None
+            };
+#endif
         }
 
         protected enum State
