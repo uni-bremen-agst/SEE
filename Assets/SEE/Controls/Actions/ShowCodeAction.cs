@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using SEE.Game;
 using SEE.Game.City;
@@ -32,7 +31,6 @@ namespace SEE.Controls.Actions
             // Changes to the code space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
-
         public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
 
         /// <summary>
@@ -43,21 +41,18 @@ namespace SEE.Controls.Actions
 
         public override ReversibleAction NewInstance() => CreateReversibleAction();
 
-        public override void Start()
+        public override void Awake()
         {
             // In case we do not have an ID yet, we request one.
             if (ICRDT.GetLocalID() == 0)
             {
                 new NetCRDT().RequestID();
             }
-            const string title = "Code Space Manager";
-            GameObject gameObject = GameObject.Find(title) ?? new GameObject(title);
-            if (!gameObject.TryGetComponent(out spaceManager))
-            {
-                spaceManager = gameObject.AddComponent<CodeSpaceManager>();
-            }
-
-            syncAction = new SyncCodeSpaceAction(spaceManager[CodeSpaceManager.LOCAL_PLAYER]);
+            spaceManager = CodeSpaceManager.ManagerInstance;
+        }
+        public override void Start()
+        {
+            syncAction = new SyncCodeSpaceAction();
             spaceManager.OnActiveCodeWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
         }
 

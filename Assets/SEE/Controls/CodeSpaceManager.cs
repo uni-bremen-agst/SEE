@@ -148,7 +148,6 @@ namespace SEE.Controls
             else
             {
                 SpaceIndicator = gameObject.AddComponent<StateIndicator>();
-                SpaceIndicator.name = "Code Space Indicator";
                 // Anchor to lower left
                 SpaceIndicator.AnchorMin = Vector2.zero;
                 SpaceIndicator.AnchorMax = Vector2.zero;

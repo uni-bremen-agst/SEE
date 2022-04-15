@@ -29,6 +29,11 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 // I am the avatar of the local player.
+                if (!gameObject.TryGetComponent(out CodeSpaceManager _))
+                {
+                    gameObject.AddComponent<CodeSpaceManager>();
+                }
+
                 switch (PlayerSettings.GetInputType())
                 {
                     case PlayerInputType.DesktopPlayer:
