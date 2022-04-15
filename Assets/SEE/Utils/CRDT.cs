@@ -60,6 +60,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// An exception that will be thrown when a undo operation is impossible.
+        /// </summary>
+        public class UndoNotPossibleExcpetion : Exception
+        {
+            public UndoNotPossibleExcpetion(string v) : base(v)
+            { }
+        }
+
+        /// <summary>
         /// An <see cref="Identifier"/> represents a position inside of the CRDT.
         /// It contains the digit, i.e., the index, and the site ID, i.e., the user that
         /// added the character.
@@ -907,12 +916,12 @@ namespace SEE.Utils
         /// <summary>
         /// Undoes the last edit operation.
         /// </summary>
+        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation can´t be undone</exception>
         public void Undo()
         {
             if (undoStack.Count < 1)
             {
-                ShowNotification.Info("Undo Failure", "Undo Stack is empty!");
-                return;
+                throw new UndoNotPossibleExcpetion("Undo Stack is empty!");
             }
             (CharObj[], OperationType) lastOperation = undoStack.Pop();
             switch (lastOperation.Item2)
@@ -928,7 +937,7 @@ namespace SEE.Utils
                         }
                         else
                         {
-                            ShowNotification.Warn("Undo Failure", "Undo not possible, Char is already deleted!");
+                            throw new UndoNotPossibleExcpetion("Undo not possible, Char is already deleted!");
                         }
                     }
                     redoStack.Push((lastOperation.Item1, OperationType.Delete));
