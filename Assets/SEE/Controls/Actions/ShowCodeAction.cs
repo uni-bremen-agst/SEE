@@ -108,6 +108,7 @@ namespace SEE.Controls.Actions
                       $"Selected node '{selectedNode.Value.SourceName}' is not contained in a code city.");
                     return false;
                 }
+                codeWindow.ShowIssues = city.ErosionSettings.ShowIssuesInCodeWindow;
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet

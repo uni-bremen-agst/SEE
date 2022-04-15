@@ -48,7 +48,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
-        public static SEECity ContainingCity(this GameObject gameObject)
+        public static AbstractSEECity ContainingCity(this GameObject gameObject)
         {
             if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
             {
@@ -57,7 +57,7 @@ namespace SEE.GO
             else
             {
                 Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out SEECity city))
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out AbstractSEECity city))
                 {
                     return city;
                 }

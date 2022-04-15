@@ -339,7 +339,10 @@ namespace SEE.Game.UI.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.fromFile(filename));
-                        MarkIssues(filename).Forget(); // initiate issue search
+                        if (ShowIssues)
+                        {
+                            MarkIssues(filename).Forget(); // initiate issue search
+                        }
                     }
                     catch (ArgumentException e)
                     {
