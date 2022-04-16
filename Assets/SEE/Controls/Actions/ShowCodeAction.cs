@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SEE.Game;
 using SEE.Game.City;
@@ -69,18 +70,29 @@ namespace SEE.Controls.Actions
                 {
                     return false;
                 }
+                // File name of source code file to read from it
+                string selectedFile = selectedNode.Value.Filename();
+                if (selectedFile == null)
+                {
+                    ShowNotification.Warn("No file", $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                    return false;
+                }
+                string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                if (!File.Exists(absolutePlatformPath))
+                {
+                    ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                    return false;
+                }
+                if ((File.GetAttributes(absolutePlatformPath) & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    ShowNotification.Warn("Not a file", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' is a directory.");
+                    return false;
+                }
 
                 // Create new code window for active selection, or use existing one
                 if (!selectedNode.TryGetComponent(out CodeWindow codeWindow))
                 {
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
-                    // Pass file name of source code file to read from it
-                    string selectedFile = selectedNode.Value.Filename();
-                    if (selectedFile == null)
-                    {
-                        Debug.LogError("Source path was set, but source filename was not. Can't show code window.\n");
-                        return false;
-                    }
 
                     codeWindow.Title = selectedNode.Value.SourceName;
                     // If SourceName differs from Source.File (except for its file extension), display both
@@ -90,7 +102,7 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                    codeWindow.EnterFromFile(selectedNode.Value.AbsolutePlatformPath());
+                    codeWindow.EnterFromFile(absolutePlatformPath);
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
