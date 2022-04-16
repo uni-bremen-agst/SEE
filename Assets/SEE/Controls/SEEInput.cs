@@ -173,7 +173,7 @@ namespace SEE.Controls
         /// Recalculates the Syntaxhighliting
         /// </summary>
         /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ReCalculateSyntaxHighliting()
+        public static bool ReCalculateSyntaxHighlighting()
         {
 #if UNITY_EDITOR == false
            // Ctrl keys are not available when running the game in the editor
