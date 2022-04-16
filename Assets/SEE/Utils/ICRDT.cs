@@ -85,8 +85,9 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="c">The character to add.</param>
         /// <param name="position">The position of the character.</param>
-        /// <param name="file">The name of the file in which the character should be inserted.</param>+
-        /// <exception cref="RemoteAddCharNotPossibleException">Throws an Exception if no fitting index for the change could be found or the position is null.</exception>
+        /// <param name="file">The name of the file in which the character should be inserted.</param>
+        /// <exception cref="RemoteAddCharNotPossibleException">Thrown if no fitting
+        /// index for the change could be found or the position is null.</exception>
         public static void RemoteAddChar(char c, Identifier[] position, string file)
         {
             GetInstanceByName(file).RemoteAddChar(c, position);
@@ -109,7 +110,8 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="position">The position at which a character should be deleted.</param>
         /// <param name="file">The name of the file in which a character should be deleted.</param>
-        /// /// <exception cref="RemoteDeleteNotPossibleException">Throws the exception when the requested position is not contained by the <see cref="crdt"/></exception>
+        /// <exception cref="RemoteDeleteNotPossibleException">Thrown when the
+        /// requested position is not contained by the <see cref="crdt"/></exception>
         public static void RemoteDeleteChar(Identifier[] position, string file)
         {
             GetInstanceByName(file).RemoteDeleteChar(position);
@@ -174,9 +176,11 @@ namespace SEE.Utils
 
         /// <summary>
         /// Converts a string into a position.
+        /// TODO: Probably obsolete because we do not change anything inside the crdt;
+        /// maybe we should move the code to the icrdt?
         /// </summary>
         /// <param name="s">The string that should be converted.</param>
-        /// <param name="file">The filename which crdt should be used.</param> //TODO: Probably obsolete because we do not change anything inside the crdt, maybe we should move the code to the icrdt?
+        /// <param name="file">The filename which crdt should be used.</param>
         /// <returns>the position</returns>
         public static Identifier[] StringToPosition(string s, string file)
         {
@@ -185,9 +189,10 @@ namespace SEE.Utils
 
         /// <summary>
         /// Converts a position into a string.
+        /// TODO: same as above.
         /// </summary>
         /// <param name="position">The position that should be converted.</param>
-        /// <param name="file">The name of the file that should be used for conversion.</param> //TODO: same as above.
+        /// <param name="file">The name of the file that should be used for conversion.</param>
         /// <returns>the position as a string</returns>
         public static string PositionToString(Identifier[] position, string file)
         {
@@ -218,7 +223,8 @@ namespace SEE.Utils
         /// Perfomes an undo.
         /// </summary>
         /// <param name="file">The name of the file in which an undo should be performed.</param>
-        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation can´t be undone</exception>
+        /// <exception cref="UndoNotPossibleExcpetion">Thrown when the undo could not be performed,
+        /// e.g., the undo stack is empty or the operation cannot be undone</exception>
         public static void Undo(string file)
         {
             GetInstanceByName(file).Undo();
@@ -228,7 +234,8 @@ namespace SEE.Utils
         /// Performs a redo.
         /// </summary>
         /// <param name="file">The name of the file in which the redo should be perfomed</param>
-        /// <exception cref="RedoNotPossibleException">Throws an exception than the redo is impossible because of an empty redo stack or the action could not be redone.</exception>
+        /// <exception cref="RedoNotPossibleException">Thrown when the redo is impossible
+        /// because of an empty redo stack or the action could not be redone.</exception>
         public static void Redo(string file)
         {
             GetInstanceByName(file).Redo();
