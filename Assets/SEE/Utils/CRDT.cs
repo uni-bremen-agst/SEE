@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using SEE.Game.UI.Notification;
 using SEE.Net;
 using System;
 using System.Collections.Generic;
@@ -22,9 +21,9 @@ namespace SEE.Utils
         /// <summary>
         /// An exception that will be thrown when a failure with the <see cref="crdt"/> happens.
         /// </summary>
-        public class CRDTfailureException : Exception
+        public class CRDTFailureException : Exception
         {
-            public CRDTfailureException(string v) : base(v)
+            public CRDTFailureException(string v) : base(v)
             { }
         }
         /// <summary>
@@ -57,7 +56,7 @@ namespace SEE.Utils
             public PositionAlreadyExistsException(string v) : base(v)
             { }
         }
-        
+
         /// <summary>
         /// An exception that will be thrown when a remoteAdd operation fails, for example the submited position was empty or no fitting index could be found.
         /// </summary>
@@ -626,7 +625,7 @@ namespace SEE.Utils
         /// <param name="after">After position</param>
         /// <param name="site">The site ID of the requester</param>
         /// <returns>A new position</returns>
-        /// <exception cref="CRDTfailureException">Throws an exception than the <see cref="crdt"/> has the wrong order.</exception>
+        /// <exception cref="CRDTFailureException">Throws an exception than the <see cref="crdt"/> has the wrong order.</exception>
         public Identifier[] GeneratePositionBetween(Identifier[] before, Identifier[] after, string site)
         {
             Identifier headP1, headP2;
@@ -685,7 +684,7 @@ namespace SEE.Utils
             }
             else
             {
-                throw new CRDTfailureException("The CRDT has a wrong order.");
+                throw new CRDTFailureException("The CRDT has a wrong order.");
             }
         }
 
