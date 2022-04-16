@@ -271,8 +271,8 @@ namespace SEE.Game.UI.CodeWindow
                     }
                 }
 
-                // Renew the syntax highliting (currently only on user request).
-                if (SEEInput.ReCalculateSyntaxHighliting())
+                // Renew the syntax highlighting (currently only on user request).
+                if (SEEInput.ReCalculateSyntaxHighlighting())
                 {
                     ShowNotification.Info("Reloading Code", "");
                     EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)),
