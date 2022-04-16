@@ -126,7 +126,7 @@ namespace SEE.Game.UI.CodeWindow
                 }
                 else
                 {
-                    EnterFromTokens(SEEToken.fromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                 }
 
@@ -255,7 +255,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     catch(UndoNotPossibleExcpetion e)
                     {
-                        ShowNotification.Error("Undo failure", e.Message);
+                        ShowNotification.Error("Undo Failure", e.Message);
                     }
                 }
                 if (SEEInput.CodeWindowRedo())
@@ -267,7 +267,7 @@ namespace SEE.Game.UI.CodeWindow
                     }
                     catch(RedoNotPossibleException e)
                     {
-                        ShowNotification.Error("Redo failure", e.Message);
+                        ShowNotification.Error("Redo Failure", e.Message);
                     }
                 }
 
@@ -275,7 +275,8 @@ namespace SEE.Game.UI.CodeWindow
                 if (SEEInput.ReCalculateSyntaxHighliting())
                 {
                     ShowNotification.Info("Reloading Code", "");
-                    EnterFromTokens(SEEToken.fromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
+                    EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)),
+                                                        TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?.Substring(1))));
                     TextMeshInputField.text = TextMesh.text = Text;
                     ShowNotification.Info("Reloading Code Complete", "Recalculating Syntaxhighliting finished");
                 }
