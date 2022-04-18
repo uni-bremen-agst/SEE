@@ -1,4 +1,6 @@
-﻿using SEE.Tools.ReflexionAnalysis;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.DataModel
 {
@@ -26,15 +28,6 @@ namespace SEE.DataModel
     public abstract class ChangeEvent
     {
         /// <summary>
-        /// A textual representation of the event.
-        /// Must be human-readable, distinguishable from other <see cref="ChangeEvent"/>s, and
-        /// contain all relevant information about the event.
-        /// The name of the class needn't be included, as <see cref="ToString"/> will contain it.
-        /// </summary>
-        /// <returns>Textual representation of the event.</returns>
-        protected abstract string Description();
-        
-        /// <summary>
         /// Type of change for this event, i.e., whether the relevant graph element has been added or removed.
         ///
         /// May be null if not applicable to this type.
@@ -52,6 +45,15 @@ namespace SEE.DataModel
         /// <see cref="ReflexionSubgraph.FullReflexion"/>.
         /// </summary>
         public readonly ReflexionSubgraph Affected;
+        
+        /// <summary>
+        /// A textual representation of the event.
+        /// Must be human-readable, distinguishable from other <see cref="ChangeEvent"/>s, and
+        /// contain all relevant information about the event.
+        /// The name of the class needn't be included, as <see cref="ToString"/> will contain it.
+        /// </summary>
+        /// <returns>Textual representation of the event.</returns>
+        protected abstract string Description();
 
         public override string ToString() => $"{GetType().Name}: {Description()}";
 

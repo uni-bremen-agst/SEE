@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using SEE.DataModel;
@@ -294,13 +295,12 @@ namespace SEE.Tools.Architecture
 
         /// <summary>
         /// Callback of reflexion analysis. Will be called by reflexion analysis on every
-        /// state change. Collects the events in the respective change-event lists
-        /// edgeChanges, propagatedEdges, removedEdges.
+        /// state change. Collects the events in the change-event list.
         /// </summary>
         /// <param name="changeEvent">the event that occurred</param>
         public virtual void Update(ChangeEvent changeEvent)
         {
-            changes.Add(changeEvent);
+            changes = changes.Incorporate(changeEvent).ToList();
         }
     }
 }
