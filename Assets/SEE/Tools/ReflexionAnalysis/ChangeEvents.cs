@@ -41,7 +41,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         protected override string Description()
         {
-            return $"edge '{Edge}' changed from {OldState} to {NewState}.";
+            return $"edge '{Edge.ToShortString()}' changed from {OldState} to {NewState}.";
         }
     }
 
@@ -68,7 +68,7 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         protected override string Description() =>
-            $"edge '{PropagatedEdge}' has been {(Change == ChangeType.Removal ? "un" : "")}propagated.";
+            $"edge '{PropagatedEdge.ToShortString()}' has been {(Change == ChangeType.Removal ? "un" : "")}propagated.";
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         protected override string Description() => 
-            $"{Affected} edge '{Edge}' has been {(Change == ChangeType.Addition ? "Added" : "Removed")}.";
+            $"{Affected} edge '{Edge.ToShortString()}' has been {(Change == ChangeType.Addition ? "Added" : "Removed")}.";
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         protected override string Description() => 
-            $"{Affected} node '{Child}' {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent}'";
+            $"{Affected} node '{Child.ToShortString()}' {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent.ToShortString()}'";
     }
 
     /// <summary>
@@ -145,6 +145,6 @@ namespace SEE.Tools.ReflexionAnalysis
             Node = node;
         }
 
-        protected override string Description() => $"node '{Node}' {(Change == ChangeType.Addition ? "added to" : "removed from")} {Affected}";
+        protected override string Description() => $"node '{Node.ToShortString()}' {(Change == ChangeType.Addition ? "added to" : "removed from")} {Affected}";
     }
 }

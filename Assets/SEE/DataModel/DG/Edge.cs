@@ -130,7 +130,7 @@ namespace SEE.DataModel.DG
 
         public override string ToShortString()
         {
-            return $"({Source}) --({Type})-> ({Target})";
+            return $"({Source.ToShortString()}) --({Type})-> ({Target.ToShortString()})";
         }
 
         /// <summary>
