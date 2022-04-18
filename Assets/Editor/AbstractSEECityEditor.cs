@@ -305,6 +305,7 @@ namespace SEEEditor
 
                 settings.ShowInnerErosions = EditorGUILayout.Toggle("Show inner erosions", settings.ShowInnerErosions);
                 settings.ShowLeafErosions = EditorGUILayout.Toggle("Show leaf erosions", settings.ShowLeafErosions);
+                settings.ShowLeafErosions = EditorGUILayout.Toggle("Show issues in code windows", settings.ShowIssuesInCodeWindow);
                 settings.LoadDashboardMetrics = EditorGUILayout.Toggle("Load metrics from Dashboard", settings.LoadDashboardMetrics);
                 if (settings.LoadDashboardMetrics)
                 {
