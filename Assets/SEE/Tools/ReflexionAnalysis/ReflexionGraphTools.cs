@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine;
@@ -17,23 +18,23 @@ namespace SEE.Tools.ReflexionAnalysis
         /// The implementation graph.
         /// </summary>
         Implementation,
-        
+
         /// <summary>
         /// The architecture graph.
         /// </summary>
         Architecture,
-        
+
         /// <summary>
         /// The mapping graph.
         /// </summary>
         Mapping,
-        
+
         /// <summary>
         /// The full reflexion graph.
         /// </summary>
         FullReflexion
     }
-    
+
     /// <summary>
     /// Reflexion graph consisting of architecture, implementation, and mapping nodes and edges.
     /// Nodes and edges are marked with toggles to differentiate these types.
@@ -54,11 +55,115 @@ namespace SEE.Tools.ReflexionAnalysis
                 Implementation => "Implementation",
                 Architecture => "Architecture",
                 Mapping => null, // identified by edges' nodes
-                ReflexionSubgraph.FullReflexion => null, // simply the whole graph
+                FullReflexion => null, // simply the whole graph
                 _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
             };
         }
-        
+
+        /// <summary>
+        /// "Incorporates" the given <paramref name="newEvent"/> into <paramref name="events"/>.
+        ///
+        /// For all event types except <see cref="EdgeChange"/> (see below), this means that if
+        /// <paramref name="events"/> contains a redundant event
+        /// (which must be the "inverse" of the given <paramref name="newEvent"/>),
+        /// it will be removed and <paramref name="newEvent"/> will not be added to <paramref name="events"/>
+        /// (because the two events cancel each other out).
+        /// If no such redundant event exists, <paramref name="newEvent"/> will simply be added to the
+        /// <paramref name="events"/>.
+        ///
+        /// For <see cref="EdgeChange"/> events, all such events which have the same edge as <paramref name="newEvent"/>
+        /// will be removed from <paramref name="events"/> and a modified version of
+        /// <paramref name="newEvent"/> will be added to it in which the OldState is equal to the OldState of the first
+        /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
+        /// This has the effect of reducing a chain of EdgeEvents like this (written as [old state, new state]):
+        /// <code>[x1, x2] -> [x2, x3] -> [x3, x4] -> [x4, x5]</code>
+        /// to this:
+        /// <code>[x1, x5]</code>
+        ///
+        /// This method can be used if you perform multiple incremental reflexion analysis operations in a row and only
+        /// care about the total changes to the graph, but not each individual step.
+        ///
+        /// Pre-conditions:
+        /// - <paramref name="newEvent"/> is not yet in <paramref name="events"/>.
+        /// - <paramref name="events"/> is a list of non-"redundant" events, which is true if all events in
+        ///   <paramref name="events"/> have been added using this method.
+        /// </summary>
+        /// <param name="events">List of events into which <paramref name="newEvent"/> shall be incorporated.
+        /// May be modified in the course of this method.</param>
+        /// <param name="newEvent">The event to incorporate into <paramref name="events"/>.</param>
+        /// <returns>A modified version of <paramref name="events"/> into which <paramref name="newEvent"/>
+        /// was added.</returns>
+        public static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, ChangeEvent newEvent) =>
+            newEvent switch
+            {
+                EdgeChange edgeChange => events.Incorporate(edgeChange),
+                EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
+                HierarchyChangeEvent hierarchyChangeEvent =>
+                    events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
+                                                                  && e.Parent == hierarchyChangeEvent.Parent),
+                NodeChangeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
+                PropagatedEdgeEvent propagatedEdgeEvent =>
+                    events.Incorporate(propagatedEdgeEvent, e => e.PropagatedEdge == propagatedEdgeEvent.PropagatedEdge),
+                _ => throw new ArgumentOutOfRangeException(nameof(newEvent))
+            };
+
+        /// <summary>
+        /// Removes all EdgeChange events with the same edge as <paramref name="edgeChange"/>
+        /// from <paramref name="events"/> and adds a modified version of
+        /// <paramref name="edgeChange"/> to it in which the OldState is equal to the OldState of the first
+        /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
+        /// </summary>
+        /// <param name="events">The events into which <paramref name="edgeChange"/> shall be incorporated</param>
+        /// <param name="edgeChange">The event which shall be incorporated into <paramref name="events"/></param>
+        /// <returns>A modified list of <paramref name="events"/> into which <paramref name="edgeChange"/>
+        /// has been incorporated.</returns>
+        private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, EdgeChange edgeChange)
+        {
+            // We only care about the most recent NewState of an edge.
+            // However, we also care about the first OldState of an edge, so we find it first.
+            State? oldState = events.OfType<EdgeChange>().FirstOrDefault(x => x.Edge == edgeChange.Edge)?.OldState;
+            EdgeChange newEvent = new EdgeChange(edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
+            // Now we just have to filter out previous EdgeChange events and add the new one.
+            return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
+        }
+
+
+        /// <summary>
+        /// Adds <paramref name="newEvent"/> into <paramref name="events"/> and returns the result iff no element
+        /// in <paramref name="events"/> is redundant as specified by <paramref name="isRedundant"/>.
+        /// If, on the other hand, an element in <paramref name="events"/> is redundant, that element will be removed
+        /// from <paramref name="events"/> and <paramref name="newEvent"/> will be ignored.
+        ///
+        /// Pre-condition: There is at most one redundant event in <paramref name="events"/> and
+        /// <paramref name="newEvent"/> is not yet in <paramref name="events"/>.
+        /// </summary>
+        /// <param name="events">List of ChangeEvents</param>
+        /// <param name="newEvent">The new event to be incorporated into <paramref name="events"/></param>
+        /// <param name="isRedundant">Function which returns true iff an element is redundant to
+        /// <paramref name="newEvent"/></param>
+        /// <typeparam name="T">Type of the new event</typeparam>
+        /// <returns>A version of <paramref name="events"/> into which <paramref name="newEvent"/> was
+        /// incorporated</returns>
+        private static IList<ChangeEvent> Incorporate<T>(this IList<ChangeEvent> events, T newEvent,
+                                                         Func<T, bool> isRedundant) where T : ChangeEvent
+        {
+            // Due to the precondition, there can be at most one redundant event of this type in `events`.
+            ChangeEvent redundant = events.SingleOrDefault(x => x is T e && isRedundant(e));
+            if (redundant != null)
+            {
+                // Since the same thing (edge/child/...) can't be removed or added twice, it must be the inverse
+                // operation of newEvent. This means we can simply remove that one and ignore the newEvent.
+                events.Remove(redundant);
+                return events;
+            }
+            else
+            {
+                // Otherwise, the new event must be non-redundant.
+                events.Add(newEvent);
+                return events;
+            }
+        }
+
         /// <summary>
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
         /// </summary>
@@ -77,13 +182,13 @@ namespace SEE.Tools.ReflexionAnalysis
             switch (subgraph)
             {
                 case Implementation:
-                case Architecture: 
+                case Architecture:
                     return element.HasToggle(subgraph.GetLabel());
                 case Mapping:
                     // Either a "Maps_To" edge or a node connected to such an edge
-                    return element is Edge edge && edge.HasSupertypeOf(MapsToType) 
+                    return element is Edge edge && edge.HasSupertypeOf(MapsToType)
                            || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
-                case ReflexionSubgraph.FullReflexion: 
+                case ReflexionSubgraph.FullReflexion:
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
@@ -100,7 +205,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             switch (subgraph)
             {
-                case Implementation: 
+                case Implementation:
                     element.UnsetToggle(Architecture.GetLabel());
                     element.SetToggle(Implementation.GetLabel());
                     break;
@@ -109,8 +214,9 @@ namespace SEE.Tools.ReflexionAnalysis
                     element.SetToggle(Architecture.GetLabel());
                     break;
                 case Mapping:
-                case ReflexionSubgraph.FullReflexion: throw new InvalidOperationException("Can't explicitly assign graph element to " 
-                                                                                      + $"'{subgraph}' (only implicitly)!");
+                case ReflexionSubgraph.FullReflexion:
+                    throw new InvalidOperationException("Can't explicitly assign graph element to "
+                                                        + $"'{subgraph}' (only implicitly)!");
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
         }
