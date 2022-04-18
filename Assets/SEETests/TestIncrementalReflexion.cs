@@ -1,10 +1,12 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
@@ -209,16 +211,14 @@ namespace SEE.Tools.Architecture
 
         private void AssertMapped(Node implNode, Node archNode)
         {
-            EdgeEvent eventAdded = changes.OfType<EdgeEvent>().Single(x => x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraph.Mapping);
-            Assert.AreEqual(implNode.ID, eventAdded.Edge.Source.ID);
-            Assert.AreEqual(archNode.ID, eventAdded.Edge.Target.ID);
+            Assert.GreaterOrEqual(changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraph.Mapping &&
+                                                                         x.Edge.Source.ID == implNode.ID && x.Edge.Target.ID == archNode.ID), 1);
         }
 
         private void AssertUnmapped(Node implNode, Node archNode)
         {
-            EdgeEvent eventRemoved = changes.OfType<EdgeEvent>().Single(x => x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraph.Mapping);
-            Assert.AreEqual(implNode.ID, eventRemoved.Edge.Source.ID);
-            Assert.AreEqual(archNode.ID, eventRemoved.Edge.Target.ID);
+            Assert.GreaterOrEqual(changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraph.Mapping &&
+                                                                         x.Edge.Source.ID == implNode.ID && x.Edge.Target.ID == archNode.ID), 1);
         }
 
         /// <summary>
@@ -501,6 +501,8 @@ namespace SEE.Tools.Architecture
             Assert.That(IsDivergent(a[1], a[9], call));
             Assert.That(IsDivergent(a[9], a[3], call));
             Assert.AreEqual(changes.Count, 9);
+            Assert.Throws<NotAnOrphanException>(() => reflexion.AddChildInImplementation(i[7], i[2]));
+            Assert.Throws<CyclicHierarchyException>(() => reflexion.AddChildInImplementation(i[2], i[7]));
         }
 
         [Test]
@@ -523,26 +525,26 @@ namespace SEE.Tools.Architecture
             Node i2 = NewNode(false, "i2");
             Node i3 = NewNode(false, "i3");
             Node i4 = NewNode(false, "i4");
-            
+
             // Then we add the hierarchy:
             a1.AddChild(a_1);
             a2.AddChild(a_2);
             a3.AddChild(a_3);
             a3.AddChild(a_4);
-            
+
             // Now we setup references:
             AddToGraph(call, a2, a1);
             AddToGraph(call, a2, a3);
             AddToGraph(call, i1, i2);
             AddToGraph(call, i2, i3);
             AddToGraph(call, i2, i4);
-            
+
             // And finally, we setup the mapping:
             AddToGraph(MapsToType, i1, a_1);
             AddToGraph(MapsToType, i2, a_2);
             AddToGraph(MapsToType, i3, a_3);
             AddToGraph(MapsToType, i4, a_4);
-            
+
             ResetEvents();
             reflexion.Run();
             Assert.That(IsAbsent(a2, a1, call));
@@ -553,7 +555,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(5);
             AssertEventCountEquals<PropagatedEdgeEvent>(3, ChangeType.Addition);
             Assert.AreEqual(8, changes.Count);
-            
+
             // Now we start testing what we actually want to check: Incremental changes to the arch hierarchy.
             ResetEvents();
             reflexion.UnparentInArchitecture(a_2);
@@ -562,7 +564,17 @@ namespace SEE.Tools.Architecture
             Assert.That(IsDivergent(a_2, a_4, call));
             AssertEventCountEquals<HierarchyChangeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
             Assert.AreEqual(4, changes.Count);
-            
+
+            // Quick diversion: Adding an edge from a'2 to a'3 should work, but then adding a'2 as a child to a2 should
+            // result in a redundant specified edge.
+            ResetEvents();
+            reflexion.Add(a_2, a_3, call);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            Assert.Throws<RedundantSpecifiedEdgeException>(() => reflexion.AddChildInArchitecture(a_2, a2));
+            ResetEvents();
+            reflexion.DeleteFromArchitecture(a_2, a_3, call);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
+
             ResetEvents();
             reflexion.AddChildInArchitecture(a_2, a2);
             Assert.That(IsConvergent(a2, a3, call));
@@ -570,6 +582,12 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAllowed(a_2, a_4, call));
             AssertEventCountEquals<HierarchyChangeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture);
             Assert.AreEqual(4, changes.Count);
+
+            // Now we test some additional error cases.
+            Assert.Throws<NotAnOrphanException>(() => reflexion.AddChildInArchitecture(a_2, a2));
+            Assert.Throws<CyclicHierarchyException>(() => reflexion.AddChildInArchitecture(a2, a_2));
+            Assert.Throws<NotInSubgraphException>(() => reflexion.AddChildInArchitecture(a2, i2));
+            Assert.Throws<RedundantSpecifiedEdgeException>(() => reflexion.Add(a_2, a_3, call));
         }
 
         /// <summary>
@@ -782,8 +800,175 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Implementation);
             Assert.AreEqual(1, changes.Count);
         }
+
+        private static IEnumerable<IList<int>> BigIncrementalOrderings()
+        {
+            IEnumerable<IList<int>> orderings = new[]
+            {
+                new List<int> { 0, 1, 2, 3, 4, 5, 6 },
+                new List<int> { 0, 2, 1, 3, 5, 4, 6 },
+                new List<int> { 3, 4, 5, 0, 1, 2, 6 },
+                new List<int> { 3, 5, 4, 0, 2, 1, 6 },
+                new List<int> { 3, 0, 4, 5, 2, 1, 6 },
+            };
+
+            // If 0 and 3 are at the start, the rest can be in any order. Thus, we generate all permutations.
+            return orderings.Concat(new[] { 1, 2, 4, 5, 6 }.Permutations().Select(x => new[] { 0, 3 }.Concat(x).ToList()));
+        }
+
+
+        [Test]
+        [TestCaseSource(nameof(BigIncrementalOrderings))]
+        public void TestBigIncremental(IList<int> order)
+        {
+            // We want to start with fresh empty graphs (Setup creates filled ones)
+            fullGraph = new Graph("");
+            SetupReflexion();
+
+            // Now we recreate Figure 3 from the paper, but we do it fully incrementally.
+            // We want to verify that the order of operations here does not matter, so we'll try multiple
+            // orderings. The test is parameterized over the order of the operations for this purpose.
+
+            List<Action> incrementalMethods = new List<Action>
+            {
+                AddArchNodes, // 0
+                AddArchHierarchy, // 1, depends on 0
+                AddArchEdges, // 2, depends on 0
+                AddImplNodes, // 3
+                AddImplHierarchy, // 4, depends on 3
+                AddImplEdges, // 5, depends on 3
+                AddMapping // 6, depends on 0 and 3
+            };
+            foreach (int o in order)
+            {
+                incrementalMethods[o]();
+            }
+
+            // Verifying that everything went as it should:
+            Debug.Log($"Tested Order: {string.Join(" ", order)}");
+            DumpEvents();
+            AssertMapped(i[17], a[6]);
+            AssertMapped(i[16], a[6]);
+            AssertMapped(i[3], a[3]);
+            AssertMapped(i[15], a[5]);
+            AssertMapped(i[1], a[1]);
+            AssertMapped(i[14], a[4]);
+            // Only in Figure 8: AssertMapped(i[2], a[9]);
+            AssertMapped(i[10], a[2]);
+            Assert.That(IsConvergent(a[3], a[7], call));
+            Assert.That(IsConvergent(a[1], a[3], call));
+            Assert.That(IsConvergent(a[8], a[8], call));
+            Assert.That(IsAbsent(a[2], a[4], call));
+            Assert.That(IsDivergent(a[4], a[1], call));
+            Assert.That(IsPropagated(a[3], a[5], call));
+            Assert.That(IsPropagated(a[3], a[6], call));
+            Assert.That(IsPropagated(a[1], a[3], call));
+            Assert.That(IsPropagated(a[1], a[1], call));
+            Assert.That(IsPropagated(a[1], a[2], call));
+            Assert.That(IsPropagated(a[4], a[1], call));
+            // Technically 7 propagated edges, but it's actually 6 where one has a counter of 2
+            AssertEventCountEquals<PropagatedEdgeEvent>(6, ChangeType.Addition);
+            AssertEventCountEquals<HierarchyChangeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<HierarchyChangeEvent>(12, ChangeType.Addition, ReflexionSubgraph.Implementation);
+            AssertEventCountEquals<NodeChangeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<NodeChangeEvent>(17, ChangeType.Addition, ReflexionSubgraph.Implementation);
+            AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<EdgeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Implementation);
+        }
+
+        #region Recreating Figure 3
+
+        private void AddMapping()
+        {
+            reflexion.Add(i[17], a[6]);
+            reflexion.Add(i[16], a[6]);
+            reflexion.Add(i[3], a[3]);
+            reflexion.Add(i[15], a[5]);
+            reflexion.Add(i[1], a[1]);
+            reflexion.Add(i[14], a[4]);
+            // Only in Figure 8: reflexion.Add(i[2], a[9]);
+            reflexion.Add(i[10], a[2]);
+        }
+
+        private void AddImplEdges()
+        {
+            (int, int)[] implEdgesFromTo =
+            {
+                (3, 15), (4, 16), (5, 17), (8, 6), (9, 8), (9, 10), (12, 10), (12, 9), (14, 13)
+            };
+            ie = implEdgesFromTo.ToDictionary(x => x, x => reflexion.AddToImplementation(i[x.Item1], i[x.Item2], call));
+        }
+
+        private void AddImplHierarchy()
+        {
+            reflexion.AddChildInImplementation(i[2], i[1]);
+            reflexion.AddChildInImplementation(i[11], i[1]);
+
+            reflexion.AddChildInImplementation(i[3], i[2]);
+            reflexion.AddChildInImplementation(i[7], i[2]);
+
+            reflexion.AddChildInImplementation(i[4], i[3]);
+            reflexion.AddChildInImplementation(i[5], i[3]);
+            reflexion.AddChildInImplementation(i[6], i[3]);
+
+            reflexion.AddChildInImplementation(i[8], i[7]);
+            reflexion.AddChildInImplementation(i[9], i[7]);
+            reflexion.AddChildInImplementation(i[10], i[7]);
+
+            reflexion.AddChildInImplementation(i[12], i[11]);
+            reflexion.AddChildInImplementation(i[13], i[11]);
+        }
+
+        private void AddImplNodes()
+        {
+            i = new Dictionary<int, Node>();
+            for (int j = 1; j <= 17; j++)
+            {
+                i[j] = new Node
+                {
+                    ID = "i" + j,
+                    SourceName = "i" + j,
+                    Type = "Component"
+                };
+                reflexion.AddToImplementation(i[j]);
+            }
+        }
+
+        private void AddArchEdges()
+        {
+            (int, int)[] archEdgesFromTo =
+            {
+                (3, 7), (1, 3), (8, 8), (2, 4)
+            };
+            ae = archEdgesFromTo.ToDictionary(x => x, x => reflexion.AddToArchitecture(a[x.Item1], a[x.Item2], call));
+        }
+
+        private void AddArchHierarchy()
+        {
+            reflexion.AddChildInArchitecture(a[6], a[7]);
+            reflexion.AddChildInArchitecture(a[5], a[7]);
+            reflexion.AddChildInArchitecture(a[1], a[8]);
+            reflexion.AddChildInArchitecture(a[2], a[8]);
+        }
+
+        private void AddArchNodes()
+        {
+            a = new Dictionary<int, Node>();
+            for (int j = 1; j <= 9; j++)
+            {
+                a[j] = new Node
+                {
+                    ID = "a" + j,
+                    SourceName = "a" + j,
+                    Type = "Component"
+                };
+                reflexion.AddToArchitecture(a[j]);
+            }
+        }
+
+        #endregion
     }
-    
+
     // TODO: Test redundant specified edge in Add and AddChildInArchitecture (incoming and outgoing!)
     // TODO: More complex UnparentInArchitecture tests, with IncomingCross and Inner
     // TODO: Test {AddTo,DeleteFrom}{Architecture,Implementation}(Node)

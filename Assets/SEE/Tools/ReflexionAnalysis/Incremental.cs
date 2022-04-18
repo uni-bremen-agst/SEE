@@ -37,7 +37,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="type">type of the new edge</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/> is
         /// not in the implementation graph</exception>
-        public void AddToImplementation(Node from, Node to, string type)
+        /// <returns>The newly created edge</returns>
+        public Edge AddToImplementation(Node from, Node to, string type)
         {
             AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, from));
@@ -46,6 +47,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge edge = AddEdge(from, to, type);
             Notify(new EdgeEvent(edge, ChangeType.Addition, Implementation));
             PropagateAndLiftDependency(edge);
+            return edge;
         }
 
         /// <summary>
@@ -130,7 +132,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// is not contained in the architecture graph.</exception>
         /// <exception cref="RedundantSpecifiedEdgeException">When the edge from <paramref name="from"/> to
         /// <paramref name="to"/> would be redundant to another specified edge.</exception>
-        public void AddToArchitecture(Node from, Node to, string type)
+        /// <returns>The newly created specified edge</returns>
+        public Edge AddToArchitecture(Node from, Node to, string type)
         {
             AssertOrThrow(FullGraph.ContainsNode(from) && from.IsInArchitecture(),
                           () => new NotInSubgraphException(Architecture, from));
@@ -167,6 +170,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 Transition(edge, State.Specified, State.Absent);
                 SetCounter(edge, 0);
             }
+
+            return edge;
         }
 
         /// <summary>
@@ -175,8 +180,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// adjusting the reflexion analysis incrementally.
         ///
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph and have
-        /// exactly one edge connecting them.
-        /// If the latter isn't true, this method will have no effect.
+        /// exactly one specified edge connecting them.
         /// </summary>
         /// <param name="from">Source node of the edge which shall be deleted</param>
         /// <param name="to">Target node of the edge which shall be deleted</param>
@@ -187,7 +191,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
-            from.FromTo(to, type).ForEach(DeleteFromArchitecture);
+            DeleteFromArchitecture(from.FromTo(to, type).Single(IsSpecified));
         }
 
         /// <summary>
