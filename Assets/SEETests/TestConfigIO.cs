@@ -691,6 +691,7 @@ namespace SEE.Utils
             city.ErosionSettings.LoadDashboardMetrics = !city.ErosionSettings.LoadDashboardMetrics;
             city.ErosionSettings.IssuesAddedFromVersion = "XXX";
             city.ErosionSettings.OverrideMetrics = !city.ErosionSettings.OverrideMetrics;
+            city.ErosionSettings.ShowIssuesInCodeWindow = !city.ErosionSettings.ShowIssuesInCodeWindow;
             city.ErosionSettings.ErosionScalingFactor++;
 
             city.ErosionSettings.StyleIssue = "X";
@@ -717,6 +718,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.LoadDashboardMetrics, actual.LoadDashboardMetrics);
             Assert.AreEqual(expected.IssuesAddedFromVersion, actual.IssuesAddedFromVersion);
             Assert.AreEqual(expected.OverrideMetrics, actual.OverrideMetrics);
+            Assert.AreEqual(expected.ShowIssuesInCodeWindow, actual.ShowIssuesInCodeWindow);
             Assert.AreEqual(expected.ErosionScalingFactor, actual.ErosionScalingFactor);
 
             Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);

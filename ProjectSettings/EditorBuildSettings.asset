@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SEEWorld.unity
     guid: 9ab2e369579f32649a51edfc1ff8f6ea
+  - enabled: 1
+    path: Assets/Scenes/Empty.unity
+    guid: 67f0e197243711742bebaeb3faad1a3c
   m_configObjects:
     Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 351bfecbc61689d4c9c773c5d7ecb666, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 6c0adfe4412ec65478203550e4aa7823, type: 2}

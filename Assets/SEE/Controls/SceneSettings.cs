@@ -148,21 +148,9 @@ namespace SEE.Controls
             {
                 if (localPlayer == null)
                 {
-                    localPlayer = LocalPlayerForDesktop();
+                    localPlayer = instance.CreatePlayer(PlayerSettings.GetInputType());
                 }
                 return localPlayer;
-
-                static GameObject LocalPlayerForDesktop()
-                {
-                    // The local player is holding the main camera. Remote players do not have
-                    // a camera attached. Hence, we only need to retrieve that camera.
-
-                    /// FIXME: This should be the case for all environments as soon as we
-                    /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
-                    /// <see cref="Game.Avatars.AvatarAdapter"/>
-                    return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
-                        MainCamera.Camera.gameObject : null;
-                }
             }
             private set
             {
@@ -182,7 +170,6 @@ namespace SEE.Controls
             playerInputType = PlayerSettings.GetInputType();
             Debug.Log($"Player input type: {playerInputType}.\n");
             VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer);
-            LocalPlayer = CreatePlayer(playerInputType);
         }
 
         /// <summary>
@@ -233,12 +220,15 @@ namespace SEE.Controls
             switch (inputType)
             {
                 case PlayerInputType.DesktopPlayer:
-                    return null;
+                    // position and rotation of the local desktop player are set
+                    // elsewhere by the player spawner. That is why we can return
+                    // this local player immedidately.
+                    return LocalPlayerForDesktop();
                 case PlayerInputType.VRPlayer:
                     {
                         /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = PlayerFactory.CreateVRPlayer();
-                        SetupVR(player);
+                        SetupVR(player, Ground);
                     }
                     break;
                 case PlayerInputType.HoloLensPlayer:
@@ -259,6 +249,18 @@ namespace SEE.Controls
             player.transform.position = PlayerOrigin;
             player.transform.rotation = Quaternion.Euler(0, PlayerYRotation, 0);
             return player;
+
+            static GameObject LocalPlayerForDesktop()
+            {
+                // The local player is holding the main camera. Remote players do not have
+                // a camera attached. Hence, we only need to retrieve that camera.
+
+                /// FIXME: This should be the case for all environments as soon as we
+                /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
+                /// <see cref="Game.Avatars.AvatarAdapter"/>
+                return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
+                    MainCamera.Camera.gameObject : null;
+            }
         }
 
         /// <summary>
@@ -270,10 +272,11 @@ namespace SEE.Controls
         /// the ground (a Unity Plane would be attached to it).
         /// </summary>
         /// <param name="player">the current VR player</param>
+        /// <param name="ground"></param>
         /// <exception cref="Exception">thrown if there is no plane named <see cref="FloorName"/> in the scene</exception>
-        private void SetupVR(GameObject player)
+        private static void SetupVR(GameObject player, GameObject ground)
         {
-            if (Ground == null)
+            if (ground == null)
             {
                 throw new InvalidOperationException("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
             }
@@ -287,9 +290,9 @@ namespace SEE.Controls
                     // into a transparent material. This way the game object becomes invisible.
                     // For this reason, we will clone the floor and move the cloned floor slightly above
                     // its origin and then attach the TeleportArea to the cloned floor.
-                    Vector3 position = Ground.transform.position;
+                    Vector3 position = ground.transform.position;
                     position.y += 0.01f;
-                    GameObject clonedFloor = Instantiate(Ground, position, Ground.transform.rotation);
+                    GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
                     clonedFloor.AddComponent<TeleportArea>();
                 }
                 {
