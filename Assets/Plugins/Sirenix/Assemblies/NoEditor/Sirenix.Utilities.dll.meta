@@ -12,6 +12,11 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
+      : 
+    second:
+      enabled: 0
+      settings: {}
+  - first:
       : N3DS
     second:
       enabled: 1
@@ -85,31 +90,21 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
-      WebGL: WebGL
+      Standalone: Win
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Win64
     second:
       enabled: 1
       settings: {}
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
-      enabled: 1
+      enabled: 0
       settings:
         CPU: AnyCPU
-  - first:
-      XboxOne: XboxOne
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      iPhone: iOS
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      tvOS: tvOS
-    second:
-      enabled: 1
-      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 

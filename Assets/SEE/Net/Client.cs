@@ -86,8 +86,10 @@ namespace SEE.Net
                 }
                 if (!success)
                 {
-                    Logger.Log($"No server connection could be established. You may want to check your firewall configuration.");
-                    throw new NoServerConnection($"Cannot connect to server {Network.RemoteServerIPAddress}:{Network.Instance.ServerActionPort}.");
+                    int serverActionPort = Network.Instance == null ? -1 : Network.Instance.ServerActionPort;
+                    string message = $"Cannot connect to server {Network.RemoteServerIPAddress}:{serverActionPort}.";
+                    Logger.Log(message);
+                    throw new NoServerConnection(message);
                 }
 
                 initialized = true;

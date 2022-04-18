@@ -31,6 +31,11 @@ namespace SEE.Game.UI.CodeWindow
         public string FilePath;
 
         /// <summary>
+        /// Whether code issues should be downloaded and added to the shown code.
+        /// </summary>
+        public bool ShowIssues = false;
+
+        /// <summary>
         /// The line that was marked (1-indexed). Unlike <see cref="VisibleLine"/>,
         /// this line is independent of scrolling.
         /// </summary>

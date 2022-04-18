@@ -709,11 +709,17 @@ namespace SEE.Game.City
         /// Whether metrics retrieved from the dashboard shall override existing metrics.
         /// </summary>
         public bool OverrideMetrics = true;
+
         /// <summary>
         /// Factor by which erosion icons shall be scaled.
         /// </summary>
         [Range(0.0f, float.MaxValue)]
         public float ErosionScalingFactor = 1.5f;
+
+        /// <summary>
+        /// Whether code issues should be downloaded and shown in code viewers.
+        /// </summary>
+        public bool ShowIssuesInCodeWindow = false;
 
         /// <summary>
         /// The attribute name of the metric representing architecture violations.
@@ -791,6 +797,7 @@ namespace SEE.Game.City
             writer.Save(ShowLeafErosions, ShowLeafErosionsLabel);
             writer.Save(LoadDashboardMetrics, LoadDashboardMetricsLabel);
             writer.Save(OverrideMetrics, OverrideMetricsLabel);
+            writer.Save(ShowIssuesInCodeWindow, ShowIssuesInCodeWindowLabel);
             writer.Save(IssuesAddedFromVersion, IssuesFromVersionLabel);
             writer.Save(ErosionScalingFactor, ErosionScalingFactorLabel);
 
@@ -822,6 +829,7 @@ namespace SEE.Game.City
                 ConfigIO.Restore(values, ShowLeafErosionsLabel, ref ShowLeafErosions);
                 ConfigIO.Restore(values, LoadDashboardMetricsLabel, ref LoadDashboardMetrics);
                 ConfigIO.Restore(values, OverrideMetricsLabel, ref OverrideMetrics);
+                ConfigIO.Restore(values, ShowIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
                 ConfigIO.Restore(values, IssuesFromVersionLabel, ref IssuesAddedFromVersion);
                 ConfigIO.Restore(values, ErosionScalingFactorLabel, ref ErosionScalingFactor);
 
@@ -849,6 +857,7 @@ namespace SEE.Game.City
         private const string LoadDashboardMetricsLabel = "LoadDashboardMetrics";
         private const string IssuesFromVersionLabel = "IssuesAddedFromVersion";
         private const string OverrideMetricsLabel = "OverrideMetrics";
+        private const string ShowIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
 
         private const string StyleIssueLabel = "StyleIssue";
         private const string UniversalIssueLabel = "UniversalIssue";

@@ -249,12 +249,9 @@ namespace SEE.Controls.Actions
                 return;
             }
             currentlyDestroying = false;
-
             string shownText = node.SourceName;
-
             Vector3 roof = gameObject.transform.position;
             roof.y += gameObject.transform.lossyScale.y / 2;
-
             // Now we create the label.
             // We define starting and ending positions for the animation.
             Vector3 startLabelPosition = roof;
