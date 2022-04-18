@@ -1536,6 +1536,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -8950,6 +8951,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -10351,6 +10353,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -11375,6 +11378,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -12264,7 +12268,7 @@ MonoBehaviour:
       - Metric: Metric.Lines.Comment
         Color: {r: 0, g: 0, b: 0, a: 1}
       - Metric: Metric.Lines.Fixme
-        Color: {r: 0.9254902, g: 0.49019608, b: 0.3254902, a: 1}
+        Color: {r: 0.9254902, g: 0.4901961, b: 0.3254902, a: 1}
       - Metric: Metric.Halstead.Volume
         Color: {r: 0.3254902, g: 0.8627451, b: 0.9254902, a: 1}
       AntennaWidth: 0.1
@@ -12308,6 +12312,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -13553,6 +13558,7 @@ MonoBehaviour:
     IssuesAddedFromVersion: 
     OverrideMetrics: 1
     ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
