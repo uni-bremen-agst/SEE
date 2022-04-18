@@ -124,7 +124,7 @@ namespace SEE.Game
                 if (parentTransform != null)
                 {
                     GameObject parent = parentTransform.gameObject;
-                    SEECity city = parent.ContainingCity();
+                    SEECity city = parent.ContainingCity() as SEECity;
                     if (city != null)
                     {
                         city.Renderer.RedrawAsLeafNode(parent);

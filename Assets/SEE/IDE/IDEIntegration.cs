@@ -223,10 +223,13 @@ namespace SEE.IDE
         public void OnDestroy()
         {
             // To prevent show notification while destroying.
-            server.Connected -= ConnectedToClient;
-            server.Disconnected -= DisconnectedFromClient;
+            if (server != null)
+            {
+                server.Connected -= ConnectedToClient;
+                server.Disconnected -= DisconnectedFromClient;
 
-            server?.Dispose();
+                server.Dispose();
+            }
             Instance = null;
         }
 

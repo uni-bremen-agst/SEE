@@ -154,7 +154,6 @@ namespace SEE.GO.Menu
                 {
                     ModeMenu.SelectEntry(i);
                     break;
-
                 }
             }
 

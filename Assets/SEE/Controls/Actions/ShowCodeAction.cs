@@ -32,7 +32,6 @@ namespace SEE.Controls.Actions
             // Changes to the code space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
-
         public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
 
         /// <summary>
@@ -43,16 +42,18 @@ namespace SEE.Controls.Actions
 
         public override ReversibleAction NewInstance() => CreateReversibleAction();
 
+        public override void Awake()
+        {
+            // In case we do not have an ID yet, we request one.
+            if (ICRDT.GetLocalID() == 0)
+            {
+                new NetCRDT().RequestID();
+            }
+            spaceManager = CodeSpaceManager.ManagerInstance;
+        }
         public override void Start()
         {
-            const string title = "Code Space Manager";
-            GameObject gameObject = GameObject.Find(title) ?? new GameObject(title);
-            if (!gameObject.TryGetComponent(out spaceManager))
-            {
-                spaceManager = gameObject.AddComponent<CodeSpaceManager>();
-            }
-
-            syncAction = new SyncCodeSpaceAction(spaceManager[CodeSpaceManager.LOCAL_PLAYER]);
+            syncAction = new SyncCodeSpaceAction();
             spaceManager.OnActiveCodeWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
         }
 
@@ -69,18 +70,29 @@ namespace SEE.Controls.Actions
                 {
                     return false;
                 }
+                // File name of source code file to read from it
+                string selectedFile = selectedNode.Value.Filename();
+                if (selectedFile == null)
+                {
+                    ShowNotification.Warn("No file", $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                    return false;
+                }
+                string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                if (!File.Exists(absolutePlatformPath))
+                {
+                    ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                    return false;
+                }
+                if ((File.GetAttributes(absolutePlatformPath) & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    ShowNotification.Warn("Not a file", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' is a directory.");
+                    return false;
+                }
 
                 // Create new code window for active selection, or use existing one
                 if (!selectedNode.TryGetComponent(out CodeWindow codeWindow))
                 {
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
-                    // Pass file name of source code file to read from it
-                    string selectedFile = selectedNode.Value.Filename();
-                    if (selectedFile == null)
-                    {
-                        Debug.LogError("Source path was set, but source filename was not. Can't show code window.\n");
-                        return false;
-                    }
 
                     codeWindow.Title = selectedNode.Value.SourceName;
                     // If SourceName differs from Source.File (except for its file extension), display both
@@ -90,7 +102,7 @@ namespace SEE.Controls.Actions
                         codeWindow.Title += $" ({selectedFile})";
                     }
 
-                    codeWindow.EnterFromFile(selectedNode.Value.AbsolutePlatformPath());
+                    codeWindow.EnterFromFile(absolutePlatformPath);
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
@@ -108,6 +120,7 @@ namespace SEE.Controls.Actions
                       $"Selected node '{selectedNode.Value.SourceName}' is not contained in a code city.");
                     return false;
                 }
+                codeWindow.ShowIssues = city.ErosionSettings.ShowIssuesInCodeWindow;
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet

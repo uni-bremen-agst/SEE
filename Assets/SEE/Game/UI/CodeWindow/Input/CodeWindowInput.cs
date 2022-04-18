@@ -18,6 +18,11 @@ namespace SEE.Game.UI.CodeWindow
     public partial class CodeWindow
     {
         /// <summary>
+        /// The needed padding for the line numbers.
+        /// </summary>
+        private int neededPadding = 0;
+
+        /// <summary>
         /// A dictionary mapping each link ID to its issues.
         /// </summary>
         private readonly Dictionary<char, List<Issue>> issueDictionary = new Dictionary<char, List<Issue>>();
@@ -71,7 +76,7 @@ namespace SEE.Game.UI.CodeWindow
                                + TokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
                                           .Aggregate(0, (l, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
-            int neededPadding = assumedLines.ToString().Length;
+             neededPadding = assumedLines.ToString().Length;
 
             Text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
@@ -271,7 +276,10 @@ namespace SEE.Game.UI.CodeWindow
                 Assert.IsTrue(linkCounter < char.MaxValue);
                 char[] reservedCharacters = {'<', '>', '"', '\''}; // these characters would break our formatting
                 // Increase link counter until it contains an allowed character
-                while (reservedCharacters.Contains(++linkCounter));
+                while (reservedCharacters.Contains(++linkCounter))
+                {
+                    // intentionally left blank
+                }
             }
 
             #endregion
@@ -290,7 +298,7 @@ namespace SEE.Game.UI.CodeWindow
                 throw new ArgumentException("Given text must not be empty or null.\n");
             }
 
-            int neededPadding = $"{text.Length}".Length;
+            neededPadding = $"{text.Length}".Length;
             Text = "";
             for (int i = 0; i < text.Length; i++)
             {
@@ -331,7 +339,10 @@ namespace SEE.Game.UI.CodeWindow
                     try
                     {
                         EnterFromTokens(SEEToken.fromFile(filename));
-                        MarkIssues(filename).Forget(); // initiate issue search
+                        if (ShowIssues)
+                        {
+                            MarkIssues(filename).Forget(); // initiate issue search
+                        }
                     }
                     catch (ArgumentException e)
                     {
@@ -402,6 +413,7 @@ namespace SEE.Game.UI.CodeWindow
             try
             {
                 TextMesh.text = Text;
+                TextMeshInputField.text = Text;
                 TextMesh.ForceMeshUpdate();
             }
             catch (IndexOutOfRangeException)
@@ -429,6 +441,49 @@ namespace SEE.Game.UI.CodeWindow
             static IEnumerable<SourceCodeEntity> SplitUpIntoLines(SourceCodeEntity entity)
                 => Enumerable.Range(entity.line, entity.endLine - entity.line + 1 ?? 1)
                              .Select(l => new SourceCodeEntity(entity.path, l, null, entity.content));
+        }
+
+        /// <summary>
+        /// Calculates the position of a letter (index) in the "rich" text (with markup tags). Given the
+        /// position of the letter in the "clean" text (Without markup tags).
+        /// </summary>
+        /// <param name="cleanIndex">The index within the "clean" text.</param>
+        /// <returns>The index within the "rich" text.</returns>
+        /// <example>
+        /// Assume we have the source line <c>&lt;color red&gt;private class&lt;/color&gt; Test {</c>.
+        /// As we can see, rich tags have been inserted so that the "private class" keywords are rendered in red.
+        /// This is a problem when we later want to e.g. highlight "class Test". It's no longer possible to simply
+        /// search the text for "class Test" and highlight that part, because it's broken up by <c>&lt;/color&gt;</c>.
+        /// To remedy this, you can call this method with an index in the "clean" version.
+        /// In our example, this would be 9 (before "class") and 19 (after "Test"). This method will then return the
+        /// corresponding index in the text with tags present, which in our example would be 20 and 38.
+        /// </example>
+        private int GetRichIndex(int cleanIndex)
+        {
+            return TextMesh.textInfo.characterInfo[cleanIndex].index;
+        }
+
+        /// <summary>
+        /// Returns the clean index for a given rich index
+        /// See also <see cref="GetRichIndex(int)"/>
+        /// </summary>
+        /// <param name="richIndex"></param>
+        /// <returns>clean index</returns>
+        private int GetCleanIndex(int richIndex)
+        {
+            return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
+        }
+
+        /// <summary>
+        /// Returns the Text without the XML Tags
+        /// </summary>
+        /// <returns>The clean text</returns>
+        private async UniTask<string> AsyncGetCleanText()
+        {
+            await UniTask.SwitchToThreadPool();
+            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
+            await UniTask.SwitchToMainThread();
+            return ret;
         }
     }
 }
