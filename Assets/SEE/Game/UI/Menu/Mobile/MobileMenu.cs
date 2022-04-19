@@ -382,6 +382,15 @@ namespace SEE.Game.UI.Menu
                 }
                 MobileMenuShown = true;
             }
+            // Set node interaction buttons back to white
+            if (ClickedIndex != 2)
+            {
+                for (int i = 0; i < buttons[2].Length; i++)
+                {
+                    Button button = buttons[2][i].GetComponent<Button>();
+                    MarkButtonInactive(button);
+                }
+            }
         }
 
         /// <summary>
