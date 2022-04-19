@@ -704,7 +704,11 @@ namespace SEE.Controls.Actions
         /// than <see cref="minimalSphereScale"/>, <see cref="minimalSphereScale"/> will
         /// be used instead.
         /// </summary>
+#if UNITY_ANDROID
+        private const float relativeSphereScale = 0.5f;
+#else
         private const float relativeSphereScale = 0.1f;
+#endif
 
         /// <summary>
         /// Sets the radius of a sphere dependent on the X and Z scale of <paramref name="sphere"/>
