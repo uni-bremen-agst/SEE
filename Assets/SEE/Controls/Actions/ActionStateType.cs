@@ -122,8 +122,8 @@ namespace SEE.Controls.Actions
                                       RotateAction.CreateReversibleAction);
 
         public static ActionStateType RotateCity { get; } =
-            new ActionStateType(19, "Rotate City", "Rotate the City",
-                                      Color.white.Darker(), "Icons/n",
+            new ActionStateType(19, "Rotate 8-Steps", "Rotate the City in 8 steps",
+                                      Color.white.Darker(), "Icons/8",
                                       null);
 
         // Move button group on the right side
