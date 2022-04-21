@@ -845,7 +845,7 @@ namespace SEE.Tools.Architecture
             }
 
             // Verifying that everything went as it should:
-            Debug.Log($"Tested Order: {string.Join(" ", order)}");
+            Debug.Log($"Tested Order: {string.Join(",", order)}");
             DumpEvents();
             AssertMapped(i[17], a[6]);
             AssertMapped(i[16], a[6]);
