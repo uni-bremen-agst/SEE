@@ -805,7 +805,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                                           .ToLookup(e => descendants.Contains(e.Target));
                 oc.UnionWith(outgoings[false]);
                 i.UnionWith(outgoings[true]);
-                ic.UnionWith(descendant.Incomings.Where(e => e.IsInArchitecture() && predicate(e) && !IsSpecified(e) && descendants.Contains(e.Source)));
+                ic.UnionWith(descendant.Incomings.Where(e => e.IsInArchitecture() && predicate(e) && !IsSpecified(e) && !descendants.Contains(e.Source)));
             }
 
             return new PartitionedDependencies(oc, ic, i);
