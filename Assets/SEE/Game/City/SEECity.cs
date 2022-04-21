@@ -265,6 +265,9 @@ namespace SEE.Game.City
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
             {
+                string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ?
+                    "EMPTY" : erosionSettings.IssuesAddedFromVersion;
+                Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
                 await MetricImporter.LoadDashboard(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
             }
