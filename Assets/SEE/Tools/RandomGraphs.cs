@@ -12,7 +12,7 @@ namespace SEE.Tools
     ///
     /// Note: This class must be serializable. The names of the attributes must
     /// be consistent with the string literals used to retrieved them in
-    /// SeeCityRandomEditor.
+    /// SEECityRandomEditor.
     /// </summary>
     [Serializable]
     public class RandomAttributeDescriptor : ConfigIO.PersistentConfigItem
