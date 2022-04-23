@@ -24,8 +24,8 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the edge</param>
         public Edge(Node source, Node target, string type)
         {
-            this.Source = source;
-            this.Target = target;
+            Source = source;
+            Target = target;
             Type = type;
         }
 
@@ -126,6 +126,11 @@ namespace SEE.DataModel.DG
             result += base.ToString();
             result += "}";
             return result;
+        }
+
+        public override string ToShortString()
+        {
+            return $"({Source.ToShortString()}) --({Type})-> ({Target.ToShortString()})";
         }
 
         /// <summary>
