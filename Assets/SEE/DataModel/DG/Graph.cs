@@ -1210,7 +1210,10 @@ namespace SEE.DataModel.DG
             GetRoots().ForEach(rootNode =>
             {
                 rootAction?.Invoke(rootNode);
-                rootNode.Children().ForEach(child => TraverseTree(child, innerNodeAction, leafAction));
+                foreach (Node child in rootNode.Children())
+                {
+                    TraverseTree(child, innerNodeAction, leafAction);
+                }
             });
         }
 
@@ -1253,7 +1256,10 @@ namespace SEE.DataModel.DG
             else
             {
                 innerNodeAction?.Invoke(node);
-                node.Children().ForEach(childNode => TraverseTree(childNode, innerNodeAction, leafAction));
+                foreach (Node child in node.Children())
+                {
+                    TraverseTree(child, innerNodeAction, leafAction);
+                }
             }
         }
 
