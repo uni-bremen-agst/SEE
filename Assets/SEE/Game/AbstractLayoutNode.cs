@@ -122,7 +122,7 @@ namespace SEE.Game
             IList<ILayoutNode> result;
             if (!IsLeaf)
             {
-                List<Node> children = node.Children();
+                IList<Node> children = node.Children();
                 result = new List<ILayoutNode>(children.Count);
                 foreach (Node node in children)
                 {

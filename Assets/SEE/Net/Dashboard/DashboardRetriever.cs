@@ -58,7 +58,7 @@ namespace SEE.Net.Dashboard
         /// The API token for the Axivion Dashboard.
         /// </summary>
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.0000000000014.l-qjyU2eTKuNl7v0PsBb4qfI3sVHvtwKGGeOTKV_3eE";
+        public string Token = "0.0000000000016.9SGjXPqUhOKygmJuKLo63yNhyx6bx4RQbMD2h2BlIEU";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
@@ -110,7 +110,7 @@ namespace SEE.Net.Dashboard
         public Color DeadEntityIssueColor = Color.black;
         public Color MetricViolationIssueColor = Color.magenta;
         public Color StyleViolationIssueColor = Color.cyan;
-        
+
         /// <summary>
         /// Whether to hide any possibly copyrighted texts.
         /// </summary>

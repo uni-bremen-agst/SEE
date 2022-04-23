@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Tools;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -13,9 +14,9 @@ namespace SEE.Game.City
     public class SEECityRandom : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="SEECityRandom.Save(ConfigWriter)"/> and 
-        /// <see cref="SEECityRandom.Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEECityRandom.Save(ConfigWriter)"/> and
+        /// <see cref="SEECityRandom.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
@@ -30,15 +31,28 @@ namespace SEE.Game.City
 
         /// <summary>
         /// The leaf node attributes and their constraints for the random generation of their values.
+        ///
+        /// Note: The type of this attribute must be <see cref="List{T}"/> because that type
+        /// can be serialized by Unity. It cannot be a generic <see cref="IList{T}"/>.
+        /// The serialization is used in <see cref="SEEEditor.SEECityRandomEditor"/>.
         /// </summary>
-        public IList<RandomAttributeDescriptor> LeafAttributes = Defaults();
-
-        public static int DefaultAttributeMean = 10;
-
-        public static int DefaultAttributeStandardDerivation = 3;
+        [SerializeField]
+        public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
         /// <summary>
-        /// Returns the default settings for leaf node attribute constraints (for the random 
+        /// The default value for the mean of the distribution from which to generate
+        /// leaf metrics randomly.
+        /// </summary>
+        public static int DefaultAttributeMean = 10;
+
+        /// <summary>
+        /// The default value for the standard deviation of the distribution from which to generate
+        /// leaf metrics randomly.
+        /// </summary>
+        public static int DefaultAttributeStandardDeviation = 3;
+
+        /// <summary>
+        /// Returns the default settings for leaf node attribute constraints (for the random
         /// generation of their values).
         /// </summary>
         /// <returns>default settings for leaf node attribute constraints</returns>
@@ -55,17 +69,24 @@ namespace SEE.Game.City
 
             foreach (string attribute in leafAttributeNames)
             {
-                result.Add(new RandomAttributeDescriptor(attribute, DefaultAttributeMean, DefaultAttributeStandardDerivation));
+                result.Add(new RandomAttributeDescriptor(attribute, DefaultAttributeMean, DefaultAttributeStandardDeviation));
             }
             return result;
         }
 
+        /// <summary>
+        /// Loads the graph data and draws the graph.
+        /// </summary>
         public override void LoadAndDrawGraph()
         {
             LoadData();
             DrawGraph();
         }
 
+        /// <summary>
+        /// Generates the graph randomly according <see cref="LeafConstraint"/>,
+        /// <see cref="InnerNodeConstraint"/>, and <see cref="LeafAttributes"/>.
+        /// </summary>
         public override void LoadData()
         {
             // generate graph randomly
@@ -77,9 +98,17 @@ namespace SEE.Game.City
         // Input/output of configuration attributes
         //----------------------------------------------------------------------------
 
-        // The labels for the configuration attributes in the configuration file.
+        /// <summary>
+        /// Label of LeafConstraint in the configuration file.
+        /// </summary>
         private const string LeafConstraintLabel = "LeafConstraint";
+        /// <summary>
+        /// Label of InnerNodeConstraint in the configuration file.
+        /// </summary>
         private const string InnerNodeConstraintLabel = "InnerNodeConstraint";
+        /// <summary>
+        /// Label of LeafAttributes in the configuration file.
+        /// </summary>
         private const string LeafAttributesLabel = "LeafAttributes";
 
         /// <summary>
@@ -90,7 +119,7 @@ namespace SEE.Game.City
             base.Save(writer);
             LeafConstraint.Save(writer, LeafConstraintLabel);
             InnerNodeConstraint.Save(writer, InnerNodeConstraintLabel);
-            writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list       
+            writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list
         }
 
         /// <summary>
@@ -102,7 +131,13 @@ namespace SEE.Game.City
             LeafConstraint.Restore(attributes, LeafConstraintLabel);
             InnerNodeConstraint.Restore(attributes, InnerNodeConstraintLabel);
             // LeafAttributes are stored as a list
-            ConfigIO.RestoreList(attributes, LeafAttributesLabel, ref LeafAttributes);
+            {
+                /// This is a bit akward because attribute <see cref="LeafAttributes"/>
+                /// must be a <see cref="List{T}"/> and cannot be a <see cref="IList{T}"/>.
+                IList<RandomAttributeDescriptor> leafAttributes = LeafAttributes;
+                ConfigIO.RestoreList(attributes, LeafAttributesLabel, ref leafAttributes);
+                LeafAttributes = leafAttributes as List<RandomAttributeDescriptor>;
+            }
         }
     }
 }

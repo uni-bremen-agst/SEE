@@ -76,7 +76,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
@@ -224,6 +224,12 @@ namespace SEE.DataModel.DG
         {
             return " \"type\": " + type + "\",\n" + base.ToString();
         }
+
+        /// <summary>
+        /// Returns a short string representation of this graph element, intended for user-facing output.
+        /// </summary>
+        /// <returns>short string representation of graph element</returns>
+        public abstract string ToShortString();
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
