@@ -9,25 +9,46 @@ using UnityEngine;
 namespace SEEEditor
 {
     /// <summary>
-    /// A custom editor for instances of SEECityRandom as an extension 
+    /// A custom editor for instances of SEECityRandom as an extension
     /// of the AbstractSEECityEditor.
     /// </summary>
     [CustomEditor(typeof(SEECityRandom))]
     [CanEditMultipleObjects]
     public class SEECityRandomEditor : SEECityEditor
     {
+        /// <summary>
+        /// The name of the attribute <see cref="SEECityRandom.LeafAttributes"/>.
+        /// </summary>
+        private const string LeafAttributesPropertyPath = "LeafAttributes";
+
+        /// <summary>
+        /// The list of entries in attribute <see cref="SEECityRandom.LeafAttributes"/>.
+        /// </summary>
         private ReorderableList leafAttributes;
 
+        /// <summary>
+        /// For a more convenient way to edit the <see cref="SEE.Tools.RandomGraphs.RandomAttributeDescriptor"/>
+        /// entries in attribute <see cref="SEECityRandom.LeafAttributes"/>, we are using a
+        /// <see cref="UnityEditorInternal.ReorderableList"/> as explained in
+        /// https://blog.terresquall.com/2020/03/creating-reorderable-lists-in-the-unity-inspector/.
+        /// Note: <see cref="UnityEditorInternal.ReorderableList"/> is an internal class of Unity.
+        /// </summary>
         public void OnEnable()
         {
             SEECityRandom city = target as SEECityRandom;
 
-            leafAttributes = new ReorderableList(serializedObject, serializedObject.FindProperty("LeafAttributes"),
+            SerializedProperty leafAttributesProperty = serializedObject.FindProperty(LeafAttributesPropertyPath);
+            if (leafAttributesProperty == null)
+            {
+                Debug.LogError($"Property {LeafAttributesPropertyPath} does not exist in {typeof(SEECityRandom)}.\n");
+            }
+
+            leafAttributes = new ReorderableList(serializedObject, leafAttributesProperty,
                                                  false, true, true, true);
             leafAttributes.drawHeaderCallback
                 = (Rect rect) =>
                 {
-                    EditorGUI.LabelField(rect, "Leaf node attributes (Name, Mean, SD)");
+                    EditorGUI.LabelField(rect, "Leaf node attributes (Name, Mean, Standard Deviation)");
                 };
             leafAttributes.drawElementCallback
                 = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -62,7 +83,7 @@ namespace SEEEditor
         }
 
         /// <summary>
-        /// In addition to the other attributes inherited, the specific attributes of 
+        /// In addition to the other attributes inherited, the specific attributes of
         /// the SEEDynCity instance are shown and set here.
         /// </summary>
         protected override void Attributes()
