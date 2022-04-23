@@ -127,7 +127,6 @@ namespace SEE.Tools.ReflexionAnalysis
             return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
         }
 
-
         /// <summary>
         /// Adds <paramref name="newEvent"/> into <paramref name="events"/> and returns the result iff no element
         /// in <paramref name="events"/> is redundant as specified by <paramref name="isRedundant"/>.
