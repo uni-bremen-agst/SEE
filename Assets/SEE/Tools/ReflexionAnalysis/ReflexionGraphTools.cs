@@ -1,12 +1,40 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
+    /// <summary>
+    /// Type of a reflexion subgraph.
+    /// </summary>
+    public enum ReflexionSubgraph
+    {
+        /// <summary>
+        /// The implementation graph.
+        /// </summary>
+        Implementation,
+
+        /// <summary>
+        /// The architecture graph.
+        /// </summary>
+        Architecture,
+
+        /// <summary>
+        /// The mapping graph.
+        /// </summary>
+        Mapping,
+
+        /// <summary>
+        /// The full reflexion graph.
+        /// </summary>
+        FullReflexion
+    }
+
     /// <summary>
     /// Reflexion graph consisting of architecture, implementation, and mapping nodes and edges.
     /// Nodes and edges are marked with toggles to differentiate these types.
@@ -15,14 +43,126 @@ namespace SEE.Tools.ReflexionAnalysis
     public static class ReflexionGraphTools
     {
         /// <summary>
-        /// Label for the architecture toggle added to each graph element of the architecture city.
+        /// Returns the label of this <paramref name="subgraph"/>, or <c>null</c> if this subgraph is not identified
+        /// by a label (such as <see cref="ReflexionSubgraph.Mapping"/>).
         /// </summary>
-        private const string ArchitectureLabel = "Architecture";
+        /// <param name="subgraph">Subgraph type for which the label shall be returned</param>
+        /// <returns>Label of this subgraph type</returns>
+        public static string GetLabel(this ReflexionSubgraph subgraph)
+        {
+            return subgraph switch
+            {
+                Implementation => "Implementation",
+                Architecture => "Architecture",
+                Mapping => null, // identified by edges' nodes
+                FullReflexion => null, // simply the whole graph
+                _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
+            };
+        }
 
         /// <summary>
-        /// Label for the implementation toggle added to each graph element of the implementation city.
+        /// "Incorporates" the given <paramref name="newEvent"/> into <paramref name="events"/>.
+        ///
+        /// For all event types except <see cref="EdgeChange"/> (see below), this means that if
+        /// <paramref name="events"/> contains a redundant event
+        /// (which must be the "inverse" of the given <paramref name="newEvent"/>),
+        /// it will be removed and <paramref name="newEvent"/> will not be added to <paramref name="events"/>
+        /// (because the two events cancel each other out).
+        /// If no such redundant event exists, <paramref name="newEvent"/> will simply be added to the
+        /// <paramref name="events"/>.
+        ///
+        /// For <see cref="EdgeChange"/> events, all such events which have the same edge as <paramref name="newEvent"/>
+        /// will be removed from <paramref name="events"/> and a modified version of
+        /// <paramref name="newEvent"/> will be added to it in which the OldState is equal to the OldState of the first
+        /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
+        /// This has the effect of reducing a chain of EdgeEvents like this (written as [old state, new state]):
+        /// <code>[x1, x2] -> [x2, x3] -> [x3, x4] -> [x4, x5]</code>
+        /// to this:
+        /// <code>[x1, x5]</code>
+        ///
+        /// This method can be used if you perform multiple incremental reflexion analysis operations in a row and only
+        /// care about the total changes to the graph, but not each individual step.
+        ///
+        /// Pre-conditions:
+        /// - <paramref name="newEvent"/> is not yet in <paramref name="events"/>.
+        /// - <paramref name="events"/> is a list of non-"redundant" events, which is true if all events in
+        ///   <paramref name="events"/> have been added using this method.
         /// </summary>
-        private const string ImplementationLabel = "Implementation";
+        /// <param name="events">List of events into which <paramref name="newEvent"/> shall be incorporated.
+        /// May be modified in the course of this method.</param>
+        /// <param name="newEvent">The event to incorporate into <paramref name="events"/>.</param>
+        /// <returns>A modified version of <paramref name="events"/> into which <paramref name="newEvent"/>
+        /// was added.</returns>
+        public static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, ChangeEvent newEvent) =>
+            newEvent switch
+            {
+                EdgeChange edgeChange => events.Incorporate(edgeChange),
+                EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
+                HierarchyChangeEvent hierarchyChangeEvent =>
+                    events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
+                                                                  && e.Parent == hierarchyChangeEvent.Parent),
+                NodeChangeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
+                PropagatedEdgeEvent propagatedEdgeEvent =>
+                    events.Incorporate(propagatedEdgeEvent, e => e.PropagatedEdge == propagatedEdgeEvent.PropagatedEdge),
+                _ => throw new ArgumentOutOfRangeException(nameof(newEvent))
+            };
+
+        /// <summary>
+        /// Removes all EdgeChange events with the same edge as <paramref name="edgeChange"/>
+        /// from <paramref name="events"/> and adds a modified version of
+        /// <paramref name="edgeChange"/> to it in which the OldState is equal to the OldState of the first
+        /// EdgeChange event in <paramref name="events"/> if one exists (otherwise the event will not be modified).
+        /// </summary>
+        /// <param name="events">The events into which <paramref name="edgeChange"/> shall be incorporated</param>
+        /// <param name="edgeChange">The event which shall be incorporated into <paramref name="events"/></param>
+        /// <returns>A modified list of <paramref name="events"/> into which <paramref name="edgeChange"/>
+        /// has been incorporated.</returns>
+        private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, EdgeChange edgeChange)
+        {
+            // We only care about the most recent NewState of an edge.
+            // However, we also care about the first OldState of an edge, so we find it first.
+            State? oldState = events.OfType<EdgeChange>().FirstOrDefault(x => x.Edge == edgeChange.Edge)?.OldState;
+            EdgeChange newEvent = new EdgeChange(edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
+            // Now we just have to filter out previous EdgeChange events and add the new one.
+            return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
+        }
+
+
+        /// <summary>
+        /// Adds <paramref name="newEvent"/> into <paramref name="events"/> and returns the result iff no element
+        /// in <paramref name="events"/> is redundant as specified by <paramref name="isRedundant"/>.
+        /// If, on the other hand, an element in <paramref name="events"/> is redundant, that element will be removed
+        /// from <paramref name="events"/> and <paramref name="newEvent"/> will be ignored.
+        ///
+        /// Pre-condition: There is at most one redundant event in <paramref name="events"/> and
+        /// <paramref name="newEvent"/> is not yet in <paramref name="events"/>.
+        /// </summary>
+        /// <param name="events">List of ChangeEvents</param>
+        /// <param name="newEvent">The new event to be incorporated into <paramref name="events"/></param>
+        /// <param name="isRedundant">Function which returns true iff an element is redundant to
+        /// <paramref name="newEvent"/></param>
+        /// <typeparam name="T">Type of the new event</typeparam>
+        /// <returns>A version of <paramref name="events"/> into which <paramref name="newEvent"/> was
+        /// incorporated</returns>
+        private static IList<ChangeEvent> Incorporate<T>(this IList<ChangeEvent> events, T newEvent,
+                                                         Func<T, bool> isRedundant) where T : ChangeEvent
+        {
+            // Due to the precondition, there can be at most one redundant event of this type in `events`.
+            ChangeEvent redundant = events.SingleOrDefault(x => x is T e && isRedundant(e));
+            if (redundant != null)
+            {
+                // Since the same thing (edge/child/...) can't be removed or added twice, it must be the inverse
+                // operation of newEvent. This means we can simply remove that one and ignore the newEvent.
+                events.Remove(redundant);
+                return events;
+            }
+            else
+            {
+                // Otherwise, the new event must be non-redundant.
+                events.Add(newEvent);
+                return events;
+            }
+        }
 
         /// <summary>
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
@@ -30,60 +170,99 @@ namespace SEE.Tools.ReflexionAnalysis
         public const string MapsToType = "Maps_To";
 
         /// <summary>
+        /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
+        /// </summary>
+        /// <param name="subgraph">Subgraph whose containment of this <paramref name="element"/> will be checked</param>
+        /// <returns>
+        /// Whether this <paramref name="element"/> is contained in the given <paramref name="subgraph"/> type.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
+        {
+            switch (subgraph)
+            {
+                case Implementation:
+                case Architecture:
+                    return element.HasToggle(subgraph.GetLabel());
+                case Mapping:
+                    // Either a "Maps_To" edge or a node connected to such an edge
+                    return element is Edge edge && edge.HasSupertypeOf(MapsToType)
+                           || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
+                case ReflexionSubgraph.FullReflexion:
+                    return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
+                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+            }
+        }
+
+        /// <summary>
+        /// Marks this <paramref name="element"/> as being in the given <paramref name="subgraph"/>.
+        /// This will also remove it from other subgraphs, if applicable.
+        /// </summary>
+        /// <param name="subgraph">The subgraph this <paramref name="element"/> shall get assigned to.</param>
+        /// <exception cref="InvalidOperationException">If <paramref name="subgraph"/> is
+        /// <see cref="Mapping"/> or <see cref="ReflexionSubgraph.FullReflexion"/>.</exception>
+        public static void SetIn(this GraphElement element, ReflexionSubgraph subgraph)
+        {
+            switch (subgraph)
+            {
+                case Implementation:
+                    element.UnsetToggle(Architecture.GetLabel());
+                    element.SetToggle(Implementation.GetLabel());
+                    break;
+                case Architecture:
+                    element.UnsetToggle(Implementation.GetLabel());
+                    element.SetToggle(Architecture.GetLabel());
+                    break;
+                case Mapping:
+                case ReflexionSubgraph.FullReflexion:
+                    throw new InvalidOperationException("Can't explicitly assign graph element to "
+                                                        + $"'{subgraph}' (only implicitly)!");
+                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+            }
+        }
+
+        /// <summary>
         /// Returns true if <paramref name="element"/> is in the architecture graph.
         /// </summary>
-        public static bool IsInArchitecture(this GraphElement element) => element.HasToggle(ArchitectureLabel);
+        public static bool IsInArchitecture(this GraphElement element) => element.IsIn(Architecture);
 
         /// <summary>
         /// Returns true if <paramref name="element"/> is in the implementation graph.
         /// </summary>
-        public static bool IsInImplementation(this GraphElement element) => element.HasToggle(ImplementationLabel);
+        public static bool IsInImplementation(this GraphElement element) => element.IsIn(Implementation);
 
         /// <summary>
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
-        public static bool IsInMapping(this Edge edge) => edge.HasSupertypeOf(MapsToType);
-
-        /// <summary>
-        /// Returns true if <paramref name="node"/> is in the mapping graph.
-        /// </summary>
-        public static bool IsInMapping(this Node node) => node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
+        public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the architecture graph.
         /// This will also remove it from the implementation graph, if applicable.
         /// </summary>
-        public static void SetInArchitecture(this GraphElement element)
-        {
-            element.UnsetToggle(ImplementationLabel);
-            element.SetToggle(ArchitectureLabel);
-        }
+        public static void SetInArchitecture(this GraphElement element) => element.SetIn(Architecture);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the implementation graph.
         /// This will also remove it from the architecture graph, if applicable.
         /// </summary>
-        public static void SetInImplementation(this GraphElement element)
-        {
-            element.UnsetToggle(ArchitectureLabel);
-            element.SetToggle(ImplementationLabel);
-        }
+        public static void SetInImplementation(this GraphElement element) => element.SetIn(Implementation);
 
         /// <summary>
-        /// Adds a toggle attribute <paramref name="label"/> to each node and edge of
-        /// the given <paramref name="graph"/>.
+        /// Marks each node and edge of the given <paramref name="graph"/> as being contained in the given
+        /// <paramref name="subgraph"/>.
         /// </summary>
-        /// <param name="graph">The graph whose nodes and edges shall be marked with a toggle attribute</param>
-        /// <param name="label">The value of the toggle attribute</param>
-        /// <param name="labelRootNode">Whether to label the root node of the <paramref name="graph"/>, too</param>
-        public static void MarkGraphNodes(this Graph graph, string label, bool labelRootNode = true)
+        /// <param name="graph">The graph whose nodes and edges shall be marked</param>
+        /// <param name="subgraph">The subgraph the nodes and edges will be marked with</param>
+        /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too</param>
+        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => labelRootNode || node.Type != GraphRenderer.RootType)
+                                                           .Where(node => markRootNode || node.Type != GraphRenderer.RootType)
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
-                graphElement.SetToggle(label);
+                graphElement.SetIn(subgraph);
             }
         }
 
@@ -104,9 +283,10 @@ namespace SEE.Tools.ReflexionAnalysis
                                             + "the full graph.");
             }
 
-            // MappingGraph needn't be labeled, as any remaining/new edge automatically belongs to it
-            ArchitectureGraph.MarkGraphNodes(ArchitectureLabel);
-            ImplementationGraph.MarkGraphNodes(ImplementationLabel);
+            // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
+            // automatically belongs to it
+            ArchitectureGraph.MarkGraphNodesIn(Architecture);
+            ImplementationGraph.MarkGraphNodesIn(Implementation);
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;
@@ -167,12 +347,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
         public static (Graph implementation, Graph architecture, Graph mapping) Disassemble(this Graph FullGraph)
         {
-            Graph ImplementationGraph = FullGraph.SubgraphByToggleAttributes(new[] { ImplementationLabel });
-            Graph ArchitectureGraph = FullGraph.SubgraphByToggleAttributes(new[] { ArchitectureLabel });
-            // Mapping graph's edges will have neither architecture nor implementation label and will only contain
-            // nodes connected to those edges.
-            Graph MappingGraph = FullGraph.SubgraphByEdges(x => !x.HasToggle(ImplementationLabel)
-                                                                && !x.HasToggle(ArchitectureLabel));
+            Graph ImplementationGraph = FullGraph.SubgraphBy(IsInImplementation);
+            Graph ArchitectureGraph = FullGraph.SubgraphBy(IsInArchitecture);
+            Graph MappingGraph = FullGraph.SubgraphBy(IsInMapping);
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
     }
