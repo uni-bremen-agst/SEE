@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
@@ -271,20 +271,20 @@ namespace SEE.Tools.Architecture
         private void CommonImplicitlyAllowed()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
+            Assert.That(IsImplicitlyAllowed(N1_C1, N1_C1, call));
             // 4 absences
-            Assert.That(IsAbsent(edgeChanges, N2, N1, call));
-            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
             // 0 divergences
-            Assert.AreEqual(5, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         [Test]
@@ -334,18 +334,18 @@ namespace SEE.Tools.Architecture
         private void CommonHierarchyAccess()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
 
             // 4 absences
-            Assert.That(IsAbsent(edgeChanges, N2, N1, call));
-            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
             // 0 divergences
-            Assert.AreEqual(5, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         [Test]
@@ -356,7 +356,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1, call));
+            Assert.That(IsImplicitlyAllowed(N1_C1, N1, call));
             CommonHierarchyAccess();
         }
 
@@ -369,7 +369,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1, call));
+            Assert.That(IsImplicitlyAllowed(N1_C1, N1, call));
             CommonHierarchyAccess();
         }
 
@@ -381,7 +381,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 implicitly allowed propagated dependencies
-            Assert.That(IsImplicitlyAllowed(edgeChanges, N1_C1, N1_C1, call));
+            Assert.That(IsImplicitlyAllowed(N1_C1, N1_C1, call));
             CommonHierarchyAccess();
         }
 
@@ -393,7 +393,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 disallowed propagated dependencies
-            Assert.That(IsDivergent(edgeChanges, N1, N1_C1, call));
+            Assert.That(IsDivergent(N1, N1_C1, call));
             CommonHierarchyAccess();
         }
 
@@ -414,25 +414,25 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 4 propagated edges
-            Assert.AreEqual(4, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(4, ChangeType.Addition);
 
             // 4 convergences
-            Assert.That(IsConvergent(edgeChanges, N2, N1, call));
-            Assert.That(IsConvergent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsConvergent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsConvergent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsConvergent(N2, N1, call));
+            Assert.That(IsConvergent(N1_C1, N2_C1, call));
+            Assert.That(IsConvergent(N3, N1_C2, call));
+            Assert.That(IsConvergent(N3, N2_C1, call));
 
             // 4 allowed propagated dependencies
-            Assert.That(IsAllowed(edgeChanges, N1_C1, N2_C1, call));  // covers n1_c1_c1 -> n2_c1 and n1_c1_c2 -> n2_c1
-            Assert.That(IsAllowed(edgeChanges, N2, N1_C2, call));
-            Assert.That(IsAllowed(edgeChanges, N3, N2_C1, call));
-            Assert.That(IsAllowed(edgeChanges, N3, N1_C2, call));
+            Assert.That(IsAllowed(N1_C1, N2_C1, call));  // covers n1_c1_c1 -> n2_c1 and n1_c1_c2 -> n2_c1
+            Assert.That(IsAllowed(N2, N1_C2, call));
+            Assert.That(IsAllowed(N3, N2_C1, call));
+            Assert.That(IsAllowed(N3, N1_C2, call));
             // 0 absences
 
             // 0 divergences
-            Assert.AreEqual(8, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(8);
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         [Test]
@@ -442,37 +442,37 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
 
             // 1 convergences
-            Assert.That(IsConvergent(edgeChanges, N2, N1, call));
+            Assert.That(IsConvergent(N2, N1, call));
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(edgeChanges, N2, N1, call));
+            Assert.That(IsAllowed(N2, N1, call));
             // 3 absences
-            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
             // 0 divergences
-            Assert.AreEqual(5, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         private void CommonTestConvergences345()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
 
             // 1 convergences
-            Assert.That(IsConvergent(edgeChanges, N2, N1, call));
+            Assert.That(IsConvergent(N2, N1, call));
             // 3 absences
-            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
             // 0 divergences
-            Assert.AreEqual(5, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         [Test]
@@ -482,7 +482,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(edgeChanges, N2_C1, N1_C2, call));
+            Assert.That(IsAllowed(N2_C1, N1_C2, call));
 
             CommonTestConvergences345();
         }
@@ -494,7 +494,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(edgeChanges, N2_C1, N1_C1, call));
+            Assert.That(IsAllowed(N2_C1, N1_C1, call));
 
             CommonTestConvergences345();
         }
@@ -506,7 +506,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 allowed propagated dependencies
-            Assert.That(IsAllowed(edgeChanges, N2_C1, N1, call));
+            Assert.That(IsAllowed(N2_C1, N1, call));
 
             CommonTestConvergences345();
         }
@@ -518,18 +518,18 @@ namespace SEE.Tools.Architecture
         private void CommonAbsences()
         {
             // 1 propagated edges
-            Assert.AreEqual(1, propagatedEdgesAdded.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
 
             // 4 absences
-            Assert.That(IsAbsent(edgeChanges, N2, N1, call));
-            Assert.That(IsAbsent(edgeChanges, N1_C1, N2_C1, call));
-            Assert.That(IsAbsent(edgeChanges, N3, N1_C2, call));
-            Assert.That(IsAllowedAbsent(edgeChanges, N3, N2_C1, call));
+            Assert.That(IsAbsent(N2, N1, call));
+            Assert.That(IsAbsent(N1_C1, N2_C1, call));
+            Assert.That(IsAbsent(N3, N1_C2, call));
+            Assert.That(IsAllowedAbsent(N3, N2_C1, call));
             // 0 convergences
-            Assert.AreEqual(5, edgeChanges.Count);
+            AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            Assert.AreEqual(0, propagatedEdgesRemoved.Count);
+            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
         }
 
         [Test]
@@ -539,7 +539,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1, N2, call));
+            Assert.That(IsDivergent(N1, N2, call));
 
             CommonAbsences();
         }
@@ -551,7 +551,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1_C1, N2, call));
+            Assert.That(IsDivergent(N1_C1, N2, call));
 
             CommonAbsences();
         }
@@ -564,7 +564,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1_C1, N2, call));
+            Assert.That(IsDivergent(N1_C1, N2, call));
 
             CommonAbsences();
         }
@@ -576,7 +576,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1, N2_C1, call));
+            Assert.That(IsDivergent(N1, N2_C1, call));
 
             CommonAbsences();
         }
@@ -588,7 +588,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1_C2, N2_C1, call));
+            Assert.That(IsDivergent(N1_C2, N2_C1, call));
 
             CommonAbsences();
         }
@@ -601,7 +601,7 @@ namespace SEE.Tools.Architecture
             reflexion.Run();
 
             // 1 divergent propagated dependency
-            Assert.That(IsDivergent(edgeChanges, N1_C1, N1_C2, call));
+            Assert.That(IsDivergent(N1_C1, N1_C2, call));
 
             CommonAbsences();
         }

@@ -205,17 +205,14 @@ namespace SEE.Controls.Actions
                 case EdgeChange changedEvent:
                     HandleEdgeChange(changedEvent);
                     break;
-                case PropagatedEdgeAdded changedEvent:
-                    HandlePropagatedEdgeAdded(changedEvent);
+                case PropagatedEdgeEvent changedEvent:
+                    HandlePropagatedEdge(changedEvent);
                     break;
-                case PropagatedEdgeRemoved changedEvent:
-                    HandlePropagatedEdgeRemoved(changedEvent);
-                    break;
-                case MapsToEdgeAdded changedEvent:
-                    HandleMapsToEdgeAdded(changedEvent);
-                    break;
-                case MapsToEdgeRemoved changedEvent:
-                    HandleMapsToEdgeRemoved(changedEvent);
+                case EdgeEvent changedEvent:
+                    if (changedEvent.Affected == ReflexionSubgraph.Mapping)
+                    {
+                        HandleMapsToEdgeAdded(changedEvent);
+                    }
                     break;
                 default:
                     Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent);
@@ -354,30 +351,21 @@ namespace SEE.Controls.Actions
 #endif
         }
 
-        private void HandlePropagatedEdgeRemoved(PropagatedEdgeRemoved propagatedEdgeRemoved)
+        private void HandlePropagatedEdge(PropagatedEdgeEvent propagatedEdgeEvent)
         {
-            Debug.Log(propagatedEdgeRemoved.ToString());
+            Debug.Log(propagatedEdgeEvent.ToString());
         }
 
-        private void HandlePropagatedEdgeAdded(PropagatedEdgeAdded propagatedEdgeAdded)
+        private void HandleMapsToEdgeAdded(EdgeEvent mapsToEdgeEvent)
         {
-            Debug.Log(propagatedEdgeAdded.ToString());
-        }
+            Debug.Log(mapsToEdgeEvent.ToString());
 
-        private void HandleMapsToEdgeAdded(MapsToEdgeAdded mapsToEdgeAdded)
-        {
-            Debug.Log(mapsToEdgeAdded.ToString());
-
-            Edge edge = mapsToEdgeAdded.TheMapsToEdge;
+            Edge edge = mapsToEdgeEvent.Edge;
+            // Added:
             //LineRenderer lineRenderer = CreateFinalizedHoverEdge(edge.Source.ID, edge.Target.ID);
             //edgeToFinalizedMappingEdges[edge] = lineRenderer;
-        }
-
-        private void HandleMapsToEdgeRemoved(MapsToEdgeRemoved mapsToEdgeRemoved)
-        {
-            Debug.Log(mapsToEdgeRemoved.ToString());
-
-            Edge edge = mapsToEdgeRemoved.TheMapsToEdge;
+            
+            // Removed: 
             //LineRenderer r = edgeToFinalizedMappingEdges[edge];
             //edgeToFinalizedMappingEdges.Remove(edge);
             //UnityEngine.Object.Destroy(r.gameObject);
