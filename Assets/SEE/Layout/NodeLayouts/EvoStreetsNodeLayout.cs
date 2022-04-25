@@ -85,14 +85,16 @@ namespace SEE.Layout.NodeLayouts
             }
 
             {
-                streetWidth = CalculateStreetWidth(layoutNodes);
+                TreeDescriptor treeDescriptor;
+                treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
                 ILayoutNode root = roots.FirstOrDefault();
                 ENode rootNode = GenerateHierarchy(root);
-                maximalDepth = MaxDepth(root);
-                SetScalePivotsRotation(rootNode);
+                treeDescriptor.MaximalDepth = MaxDepth(root);
+
+                SetScalePivotsRotation(rootNode, treeDescriptor);
                 CalculationNodeLocation(rootNode, Vector3.zero);
                 Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
-                ToLayout(rootNode, ref layoutResult);
+                rootNode.ToLayout(ref layoutResult, groundLevel, streetHeight);
                 return layoutResult;
             }
         }
@@ -122,85 +124,21 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Adds the layout information of the given node and all its descendants to the layout result.
-        /// </summary>
-        /// <param name="node">root of a subtree to be added to the layout result</param>
-        /// <param name="layout_result">layout result</param>
-        private void ToLayout(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
-        {
-            if (node.IsLeaf())
-            {
-                PlaceHouse(node, ref layout_result);
-            }
-            else
-            {
-                // Street
-                PlaceStreet(node, ref layout_result);
-                foreach (ENode child in node.Children)
-                {
-                    ToLayout(child, ref layout_result);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds the layout information of the given node assumed to be a leaf to the layout result.
-        /// </summary>
-        /// <param name="node">leaf node</param>
-        /// <param name="layout_result">layout result</param>
-        private void PlaceHouse(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
-        {
-            layout_result[node.GraphNode] = new NodeTransform(node.Location, node.Scale, 0/*node.Rotation*/);
-        }
-
-        /// <summary>
-        /// Adds the layout information of the given node assumed to be an inner node to the layout result.
-        /// </summary>
-        /// <param name="node">inner node</param>
-        /// <param name="layout_result">layout result</param>
-        private void PlaceStreet(ENode node, ref Dictionary<ILayoutNode, NodeTransform> layout_result)
-        {
-            layout_result[node.GraphNode]
-                = new NodeTransform(node.Location,
-                                    new Vector3(node.Scale.x, streetHeight, node.Scale.z),
-                                    0/*node.Rotation*/);
-        }
-
-        /// <summary>
         /// Creates the ENode tree hierarchy starting at given root node. The root has
         /// depth 0.
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
-        private ENode GenerateHierarchy(ILayoutNode root)
+        private ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
         {
-            ENode result = new ENode(root)
+            ENode result = ENodeFactory.Create(root);
+            result.TreeDepth = depth;
+            if (result is EInner)
             {
-                Depth = 0
-            };
-            foreach (ILayoutNode child in root.Children())
-            {
-                result.Children.Add(GenerateHierarchy(result, child));
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Creates the ENode tree hierarchy starting at given node.
-        /// </summary>
-        /// <param name="parent">parent of node in the ENode tree hierarchy</param>
-        /// <param name="node">root of a subtree in the original graph</param>
-        /// <returns>ENode representing node</returns>
-        private ENode GenerateHierarchy(ENode parent, ILayoutNode node)
-        {
-            ENode result = new ENode(node)
-            {
-                Depth = parent.Depth + 1,
-                ParentNode = parent
-            };
-            foreach (ILayoutNode child in node.Children())
-            {
-                result.Children.Add(GenerateHierarchy(result, child));
+                foreach (ILayoutNode child in root.Children())
+                {
+                    (result as EInner).AddChild(GenerateHierarchy(child, depth + 1));
+                }
             }
             return result;
         }
@@ -214,39 +152,39 @@ namespace SEE.Layout.NodeLayouts
         private void CalculationNodeLocation(ENode node, Vector3 newLoc)
         {
             // Note: pivots are 2D vectors where the y component actually represents a value on the z axis in 3D
-            Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.z / 2);
-            Vector2 toPivot = fromPivot.GetRotated(node.Rotation);
+            //Vector2 fromPivot = new Vector2(node.Scale.x / 2, node.Scale.z / 2);
+            //Vector2 toPivot = fromPivot.GetRotated(node.Rotation);
 
-            if (node.IsLeaf())
-            {
-                Vector3 toGoal = new Vector3(toPivot.x, groundLevel, toPivot.y);
-                node.Location = newLoc + toGoal;
-            }
-            else
-            {
-                // street
-                float relStreetWidth = RelativeStreetWidth(node);
-                Vector2 streetfromPivot = new Vector2(node.Scale.x / 2, node.ZPivot);
-                Vector2 streetRotatedfromPivot = streetfromPivot.GetRotated(node.Rotation);
-                Vector3 toGoal = new Vector3(streetRotatedfromPivot.x, groundLevel, streetRotatedfromPivot.y);
+            //if (node.IsLeaf())
+            //{
+            //    Vector3 toGoal = new Vector3(toPivot.x, groundLevel, toPivot.y);
+            //    node.Location = newLoc + toGoal;
+            //}
+            //else
+            //{
+            //    // street
+            //    float relStreetWidth = RelativeStreetWidth(node);
+            //    Vector2 streetfromPivot = new Vector2(node.Scale.x / 2, node.ZPivot);
+            //    Vector2 streetRotatedfromPivot = streetfromPivot.GetRotated(node.Rotation);
+            //    Vector3 toGoal = new Vector3(streetRotatedfromPivot.x, groundLevel, streetRotatedfromPivot.y);
 
-                node.Location = newLoc + toGoal;
-                node.Scale = new Vector3(node.Scale.x, node.Scale.y, relStreetWidth);
+            //    node.Location = newLoc + toGoal;
+            //    node.Scale = new Vector3(node.Scale.x, node.Scale.y, relStreetWidth);
 
-                foreach (ENode child in node.Children)
-                {
-                    Vector2 relChild = new Vector2(child.XPivot, 0.0f);
-                    relChild = relChild.GetRotated(node.Rotation);
-                    float streetMod = child.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
-                    Vector2 relMy = new Vector2(0.0f, node.ZPivot + streetMod);
-                    relMy = relMy.GetRotated(node.Rotation);
+            //    foreach (ENode child in node.Children)
+            //    {
+            //        Vector2 relChild = new Vector2(child.XPivot, 0.0f);
+            //        relChild = relChild.GetRotated(node.Rotation);
+            //        float streetMod = child.Left ? -relStreetWidth / 2 : +relStreetWidth / 2;
+            //        Vector2 relMy = new Vector2(0.0f, node.ZPivot + streetMod);
+            //        relMy = relMy.GetRotated(node.Rotation);
 
-                    float nextX = newLoc.x + relChild.x + relMy.x;
-                    float nextZ = newLoc.z + relChild.y + relMy.y;
+            //        float nextX = newLoc.x + relChild.x + relMy.x;
+            //        float nextZ = newLoc.z + relChild.y + relMy.y;
 
-                    CalculationNodeLocation(child, new Vector3(nextX, groundLevel, nextZ));
-                }
-            }
+            //        CalculationNodeLocation(child, new Vector3(nextX, groundLevel, nextZ));
+            //    }
+            //}
         }
 
         /// <summary>
@@ -254,8 +192,12 @@ namespace SEE.Layout.NodeLayouts
         /// Does not yet set the exact positions, however.
         /// </summary>
         /// <param name="node">node whose scale, pivots, and rotation are to be set</param>
-        private void SetScalePivotsRotation(ENode node)
+        private void SetScalePivotsRotation(ENode node, TreeDescriptor treeDescriptor)
         {
+            node.SetSize(Orientation.East, treeDescriptor);
+            node.SetLocation(Orientation.East, new Location(0, 0));
+            node.Print();
+            /*
             if (node.IsLeaf())
             {
                 SetHouseScale(node);
@@ -328,19 +270,7 @@ namespace SEE.Layout.NodeLayouts
                                          DepthRequired(node));
                 node.ZPivot = MaxLeftZ(node);
             }
-        }
-
-        /// <summary>
-        /// Sets the scale of the given leaf ENode according to the scale of the graph
-        /// node it represents. The original scale of the graph node is maintained.
-        ///
-        /// Precondition: node is a leaf
-        /// </summary>
-        /// <param name="node">ENode whose scale is to be set</param>
-        private void SetHouseScale(ENode node)
-        {
-            // Scaled metric values for the dimensions.
-            node.Scale = node.GraphNode.AbsoluteScale;
+            */
         }
 
         /// <summary>
@@ -349,82 +279,82 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="node">node whose maximum is to be determined</param>
         /// <returns>maximum depth of width</returns>
-        private float MaxLeftZ(ENode node)
-        {
-            float max = 0.0f;
-            foreach (ENode child in node.Children)
-            {
-                //Left children only
-                if (child.Left)
-                {
-                    if (child.IsLeaf())
-                    {
-                        if (child.Scale.z > max)
-                        {
-                            max = child.Scale.z;
-                        }
-                    }
-                    else
-                    {
-                        if (child.Scale.x > max)
-                        {
-                            max = child.Scale.x;
-                        }
-                    }
-                }
-            }
-            return max;
-        }
+        //private float MaxLeftZ(ENode node)
+        //{
+        //    float max = 0.0f;
+        //    foreach (ENode child in node.Children)
+        //    {
+        //        //Left children only
+        //        if (child.Left)
+        //        {
+        //            if (child.IsLeaf())
+        //            {
+        //                if (child.Scale.z > max)
+        //                {
+        //                    max = child.Scale.z;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (child.Scale.x > max)
+        //                {
+        //                    max = child.Scale.x;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return max;
+        //}
 
         /// <summary>
         /// Returns the depth of the area required for all children of given <paramref name="node"/>.
         /// </summary>
         /// <param name="node">node whose required depth is to be determined</param>
         /// <returns>depth required</returns>
-        private float DepthRequired(ENode node)
-        {
-            float leftMax = 0.0f;
-            float rightMax = 0.0f;
+        //private float DepthRequired(ENode node)
+        //{
+        //    float leftMax = 0.0f;
+        //    float rightMax = 0.0f;
 
-            foreach (ENode eNode in node.Children)
-            {
-                if (eNode.Left)
-                {
-                    if (eNode.IsLeaf())
-                    {
-                        if (eNode.Scale.z > leftMax)
-                        {
-                            leftMax = eNode.Scale.z;
-                        }
-                    }
-                    else
-                    {
-                        if (eNode.Scale.x > leftMax)
-                        {
-                            leftMax = eNode.Scale.x;
-                        }
-                    }
-                }
-                else
-                {
-                    if (eNode.IsLeaf())
-                    {
-                        if (eNode.Scale.z > rightMax)
-                        {
-                            rightMax = eNode.Scale.z;
-                        }
-                    }
-                    else
-                    {
-                        if (eNode.Scale.x > rightMax)
-                        {
-                            rightMax = eNode.Scale.x;
-                        }
-                    }
-                }
-            }
-            return leftMax + rightMax + RelativeStreetWidth(node);
-        }
+        //    foreach (ENode eNode in node.Children)
+        //    {
+        //        if (eNode.Left)
+        //        {
+        //            if (eNode.IsLeaf())
+        //            {
+        //                if (eNode.Scale.z > leftMax)
+        //                {
+        //                    leftMax = eNode.Scale.z;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (eNode.Scale.x > leftMax)
+        //                {
+        //                    leftMax = eNode.Scale.x;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (eNode.IsLeaf())
+        //            {
+        //                if (eNode.Scale.z > rightMax)
+        //                {
+        //                    rightMax = eNode.Scale.z;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (eNode.Scale.x > rightMax)
+        //                {
+        //                    rightMax = eNode.Scale.x;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return leftMax + rightMax + RelativeStreetWidth(node);
+        //}
 
         /// <summary>
         /// Returns the maximum of the width required for left and right children.
@@ -457,20 +387,20 @@ namespace SEE.Layout.NodeLayouts
         {
             float sum = offset;
 
-            foreach (ENode child in node.Children)
-            {
-                if (child.Left == left)
-                {
-                    if (child.IsLeaf())
-                    {
-                        sum += child.Scale.x + offset;
-                    }
-                    else
-                    {
-                        sum += child.Scale.z + offset;
-                    }
-                }
-            }
+            //foreach (ENode child in node.Children)
+            //{
+            //    if (child.Left == left)
+            //    {
+            //        if (child.IsLeaf())
+            //        {
+            //            sum += child.Scale.x + offset;
+            //        }
+            //        else
+            //        {
+            //            sum += child.Scale.z + offset;
+            //        }
+            //    }
+            //}
             return sum;
         }
 
@@ -481,10 +411,11 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>width of the street</returns>
         private float RelativeStreetWidth(ENode node)
         {
-            return streetWidth * ((maximalDepth + 1) - node.Depth) / (maximalDepth + 1);
+            return streetWidth * ((maximalDepth + 1) - node.TreeDepth) / (maximalDepth + 1);
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
+                                                                      ICollection<SublayoutLayoutNode> sublayouts)
         {
             throw new NotImplementedException();
         }
