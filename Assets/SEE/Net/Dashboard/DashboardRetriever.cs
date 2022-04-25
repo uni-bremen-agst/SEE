@@ -9,8 +9,10 @@ using System.Text;
 using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Net.Dashboard.Model.Issues;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
+using static SEE.Utils.EnvironmentVariableRetriever;
 
 namespace SEE.Net.Dashboard
 {
@@ -31,6 +33,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// The public key for the X.509 certificate authority from the dashboard's certificate.
         /// </summary>
+        [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
         [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
         public string PublicKey = "3082020A0282020100B20ACB6E1639D673B6AF9E9F36578F66068AFDA50327DC2AB0F804E2F8"
@@ -51,12 +54,14 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
         /// </summary>
+        [EnvironmentVariable("DASHBOARD_BASE_URL")]
         [Tooltip("The URL to the Axivion Dashboard, up to the project name.")]
         public string BaseUrl = "https://stvive.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
 
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
+        [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
         public string Token = "0.0000000000016.9SGjXPqUhOKygmJuKLo63yNhyx6bx4RQbMD2h2BlIEU";
 
@@ -64,6 +69,7 @@ namespace SEE.Net.Dashboard
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
         /// instead of silently ignoring the extra fields.
         /// </summary>
+        [EnvironmentVariable("DASHBOARD_STRICT_MODE")]
         [Tooltip("Whether to throw an error if Dashboard models have more fields than the C# models.")]
         public bool StrictMode = false;
 
@@ -114,6 +120,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Whether to hide any possibly copyrighted texts.
         /// </summary>
+        [EnvironmentVariable("DASHBOARD_HIDE_COPYRIGHTED_TEXT")]
         [Tooltip("Whether to hide any possibly copyrighted texts.")]
         public bool HideCopyrightedTexts = false;
 
@@ -303,6 +310,11 @@ namespace SEE.Net.Dashboard
                 StyleViolationIssue _ => StyleViolationIssueColor,
                 _ => throw new ArgumentOutOfRangeException(nameof(issue), issue, "Unknown issue kind!")
             };
+
+        private void Awake()
+        {
+            SetEnvironmentVariableFields(this);
+        }
 
         /// <summary>
         /// Checks the component for incorrect values and throws an <see cref="ArgumentException"/> if necessary.
