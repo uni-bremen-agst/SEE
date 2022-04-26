@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using System.Security;
-using Microsoft.SqlServer.Server;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -85,8 +84,7 @@ namespace SEE.Utils
                     }
                     catch (SecurityException e)
                     {
-                        // If no environment variable can be retrieved for security reasons, we'll log a warning
-                        // and stop.
+                        // If no environment variable can be retrieved for security reasons, we'll log a warning and stop.
                         Debug.LogWarning($"Couldn't retrieve environment variable {environmentVariable}: {e}");
                         break;
                     }
@@ -98,10 +96,15 @@ namespace SEE.Utils
                         {
                             result = Convert.ChangeType(result, fieldType);
                         }
-                        catch (Exception e) when (e is FormatException || e is OverflowException)
+                        // These are the only problems which are the user's fault, hence we log them here.
+                        catch (FormatException e)
                         {
-                            // These are the only problems that's the user's fault, hence we log it here.
                             Debug.LogWarning($"Invalid format for environment variable {environmentVariable}: {e}");
+                            continue;
+                        }
+                        catch (OverflowException e)
+                        {
+                            Debug.LogWarning($"Overflow for environment variable {environmentVariable}: {e}");
                             continue;
                         }
                         fieldInfo.SetValue(target, result);
