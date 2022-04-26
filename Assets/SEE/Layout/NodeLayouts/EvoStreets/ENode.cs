@@ -148,10 +148,10 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Note: This value will be computed assuming only the orientation towards East
         /// or North by <see cref="SetSize(Orientation, LayoutDescriptor)"/> and, hence, is always positive.
         /// </summary>
-        internal float distanceFromOrigin;
+        internal float DistanceFromOrigin;
 
         /// <summary>
-        /// Sets <see cref="distanceFromOrigin"/> as the sum of <paramref name="currentDistanceFromOrigin"/>
+        /// Sets <see cref="DistanceFromOrigin"/> as the sum of <paramref name="currentDistanceFromOrigin"/>
         /// and the length (extent, really, i.e., half of <see cref="Length(Orientation)"/>) of this node
         /// along the given <paramref name="orientation"/>.
         /// Returns <paramref name="currentDistanceFromOrigin"/> plus the length of the <see cref="Rectangle"/>
@@ -163,8 +163,8 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         internal float SetDistanceFromOrigin(float currentDistanceFromOrigin, Orientation orientation)
         {
             float extent = Length(orientation) / 2.0f;
-            distanceFromOrigin = currentDistanceFromOrigin + extent;
-            return distanceFromOrigin + extent;
+            DistanceFromOrigin = currentDistanceFromOrigin + extent;
+            return DistanceFromOrigin + extent;
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>node as a human-readable string</returns>
         public override string ToString()
         {
-            return $"ENode[ID={GraphNode.ID}, Depth={TreeDepth}, IsLeft={Left}, Rectangle={Rectangle}, distanceFromOrigin={distanceFromOrigin.ToString("F4")}]";
+            return $"ENode[ID={GraphNode.ID}, Depth={TreeDepth}, IsLeft={Left}, Rectangle={Rectangle}, distanceFromOrigin={DistanceFromOrigin.ToString("F4")}]";
         }
 
         /// <summary>
@@ -559,7 +559,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             {
                 Orientation childOrientation = child.Rotate(orientation);
                 // Move child parallel to the street.
-                Location childCenter = MoveTo(origin, child.distanceFromOrigin, orientation);
+                Location childCenter = MoveTo(origin, child.DistanceFromOrigin, orientation);
                 // Move child to the edge of the street
                 childCenter = MoveTo(childCenter, streetExtent + child.Length(childOrientation) / 2, childOrientation);
                 child.SetLocation(childOrientation, childCenter);
