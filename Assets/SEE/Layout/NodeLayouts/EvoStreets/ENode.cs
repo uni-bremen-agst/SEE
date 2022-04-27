@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.Assertions.Assert;
 
 namespace SEE.Layout.NodeLayouts.EvoStreets
 {
@@ -205,12 +206,12 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public bool Left;
 
         /// <summary>
-        /// Adds the layout information of this <see cref="ENode"/> to the <paramref name="layout_result"/>.
+        /// Adds the layout information of this <see cref="ENode"/> to the <paramref name="layoutResult"/>.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layout_result"/></param>
-        /// <param name="layout_result">layout where to add the layout information</param>
+        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
+        /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
-        public abstract void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layout_result, float groundLevel, float streetHeight);
+        public abstract void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight);
 
         /// <summary>
         /// Prints this node with an indentation proportional to its <see cref="TreeDepth"/>. Can be used for debugging.
@@ -226,7 +227,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>node as a human-readable string</returns>
         public override string ToString()
         {
-            return $"ENode[ID={GraphNode.ID}, Depth={TreeDepth}, IsLeft={Left}, Rectangle={Rectangle}, distanceFromOrigin={DistanceFromOrigin.ToString("F4")}]";
+            return $"ENode[ID={GraphNode.ID}, Depth={TreeDepth}, IsLeft={Left}, Rectangle={Rectangle}, distanceFromOrigin={DistanceFromOrigin:F4}]";
         }
 
         /// <summary>
@@ -247,14 +248,16 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         internal Orientation Rotate(Orientation orientation)
         {
             // FIXME: In C# version 9, we can use the 'or' operator here.
-            return orientation switch
+            switch (orientation)
             {
-                Orientation.East => Left ? Orientation.North : Orientation.South,
-                Orientation.West => Left ? Orientation.North : Orientation.South,
-                Orientation.North => Left ? Orientation.West : Orientation.East,
-                Orientation.South => Left ? Orientation.West : Orientation.East,
-                _ => throw new NotImplementedException($"Unhandled case {orientation}.")
-            };
+                case Orientation.East:
+                case Orientation.West:
+                    return Left ? Orientation.North : Orientation.South;
+                case Orientation.North:
+                case Orientation.South:
+                    return Left ? Orientation.West : Orientation.East;
+                default: throw new NotImplementedException($"Unhandled case {orientation}.");
+            }
         }
     }
 
@@ -274,7 +277,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Sets <see cref="Rectangle.Width"/> and <see cref="Rectangle.Depth"/> of this node
         /// to the absolute scale of its underlying <see cref="GraphNode"/>.
-        /// For reasons of uniformity (unambigious interpretation), the orientation
+        /// For reasons of uniformity (unambiguous interpretation), the orientation
         /// of a leaf is always towards East/West, that is, its width metric is
         /// depicted uniformly along the x axis in world space.
         /// </summary>
@@ -297,15 +300,15 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// Adds the layout information of this <see cref="ELeaf"/> to the <paramref name="layout_result"/>.
+        /// Adds the layout information of this <see cref="ELeaf"/> to the <paramref name="layoutResult"/>.
         /// <seealso cref="ENode.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layout_result"/></param>
-        /// <param name="layout_result">layout where to add the layout information</param>
+        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
+        /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">will be ignored</param>
-        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layout_result, float groundLevel, float streetHeight)
+        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
         {
-            layout_result[GraphNode] = new NodeTransform(new Vector3(Rectangle.Center.X, groundLevel, Rectangle.Center.Y),
+            layoutResult[GraphNode] = new NodeTransform(new Vector3(Rectangle.Center.X, groundLevel, Rectangle.Center.Y),
                                                          new Vector3 (Rectangle.Width, GraphNode.AbsoluteScale.y, Rectangle.Depth),
                                                          0);
         }
@@ -349,14 +352,14 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The children of this inner node in the hierarchy.
         /// </summary>
-        public List<ENode> Children = new List<ENode>();
+        private readonly List<ENode> Children = new List<ENode>();
 
         /// <summary>
         /// This is the rectangle for the street itself representing the inner node.
         /// The attribute <see cref="Rectangle"/> relates to the rectangle enclosing
         /// this street and all children of this inner node.
         /// </summary>
-        public Rectangle Street;
+        private Rectangle Street;
 
         /// <summary>
         /// Calculates and sets the necessary size of <see cref="Rectangle"/> and <see cref="Street"/>
@@ -368,7 +371,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         ///    with respect to the given <paramref name="orientation"/> in the predefined order of <see cref="Children"/>
         ///    in such a way that both sides of the streets occupy a similar sum of lengths of those <see cref="Children"/>.
         ///    The distribution is greedy, that is, does not guarantee that the overall length of the <see cref="Street"/>
-        ///    is minimized. At the begin and end of the <see cref="Street"/> as well as between neighboring <see cref="Children"/>,
+        ///    is minimized. At the beginning and end of the <see cref="Street"/> as well as between neighboring <see cref="Children"/>,
         ///    <paramref name="treeDescriptor.OffsetBetweenBuildings"/> will be added. The length of the <see cref="Street"/>
         ///    is chosen to cover exactly the length of this alignment. The street width (which would be <see cref="Street.Depth"/>
         ///    if <paramref name="orientation"/> is <see cref="Orientation.East"/> and <see cref="Street.Width"/>
@@ -443,7 +446,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
             }
             else
             {
-                // assert: orientation == Orientation.North
+                AreEqual(orientation, Orientation.North);
                 Street.Depth = Mathf.Max(leftOffset, rightOffset);
                 Street.Width = RelativeStreetWidth(this);
                 Rectangle.Depth = Street.Depth;
@@ -457,7 +460,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
             float RelativeStreetWidth(EInner node)
             {
-                return treeDescriptor.StreetWidth * ((treeDescriptor.MaximalDepth + 1) - node.TreeDepth) / (treeDescriptor.MaximalDepth + 1);
+                return treeDescriptor.StreetWidth * (treeDescriptor.MaximalDepth + 1 - node.TreeDepth) / (treeDescriptor.MaximalDepth + 1);
             }
         }
 
@@ -473,19 +476,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>maximal length of <paramref name="children"/></returns>
         private static float Max(IList<ENode> children, bool left, bool width)
         {
-            float result = 0;
-            foreach (ENode child in children)
-            {
-                if (child.Left == left)
-                {
-                    float length = width ? child.Rectangle.Width : child.Rectangle.Depth;
-                    if (length > result)
-                    {
-                        result = length;
-                    }
-                }
-            }
-            return result;
+            return children.Where(child => child.Left == left)
+                           .Select(child => width ? child.Rectangle.Width : child.Rectangle.Depth)
+                           .Prepend(0).Max();
         }
 
         /// <summary>
@@ -531,7 +524,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
 
         /// <summary>
         /// Sets the center location of <see cref="Rectangle"/> of the node to
-        /// <paramref name="centerLocation"/> based  on <paramref name="orientation"/>.
+        /// <paramref name="centerLocation"/> based on <paramref name="orientation"/>.
         /// Sets the center location of the <see cref="Street"/>.
         /// </summary>
         /// <param name="orientation">the orientation of this node</param>
@@ -567,25 +560,25 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// Adds the layout information of this <see cref="EInner"/> to the <paramref name="layout_result"/>.
+        /// Adds the layout information of this <see cref="EInner"/> to the <paramref name="layoutResult"/>.
         ///
         /// Unlike <see cref="ELeaf.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>, this
         /// method adds the data from <see cref="Street"/> because that rectangle is used to depict an inner
         /// node. The attribute <see cref="Rectangle"/> is just the area enclosing this street and all
         /// representations of the descendants of this node.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layout_result"/></param>
-        /// <param name="layout_result">layout where to add the layout information</param>
+        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
+        /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
-        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layout_result, float groundLevel, float streetHeight)
+        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
         {
-            layout_result[GraphNode]
+            layoutResult[GraphNode]
                 = new NodeTransform(new Vector3(Street.Center.X, groundLevel, Street.Center.Y),
                                     new Vector3(Street.Width, streetHeight, Street.Depth),
                                     0);
             foreach (ENode child in Children)
             {
-                child.ToLayout(ref layout_result, groundLevel, streetHeight);
+                child.ToLayout(ref layoutResult, groundLevel, streetHeight);
             }
         }
     }
