@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SEETests
@@ -18,6 +19,14 @@ namespace SEETests
          * work at all (i.e. cause no error). Before more useful tests can be implemented, a project with constant
          * properties has to be created, because the currently existing SEE project is too dynamic to reliably test.
          */
+        
+        [SetUp]
+        public void SetUp()
+        {
+            GameObject retrieverObject = new GameObject("Retriever");
+            retrieverObject.AddComponent<DashboardRetriever>();
+        }
+        
         [UnityTest]
         public IEnumerator testDashboardVersionCorrect() => UniTask.ToCoroutine(async () =>
         {
