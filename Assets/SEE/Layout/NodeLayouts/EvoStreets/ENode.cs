@@ -189,7 +189,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The node in the original graph this ENode is representing.
         /// </summary>
-        protected ILayoutNode GraphNode;
+        protected readonly ILayoutNode GraphNode;
 
         /// <summary>
         /// The depth of this node in the hierarchy. A root has depth 0. This
