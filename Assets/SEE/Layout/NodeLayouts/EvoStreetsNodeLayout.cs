@@ -93,7 +93,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">the nodes to be laid out</param>
         /// <returns>width of street for the root</returns>
-        private float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
+        private static float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
         {
             float result = 0;
             int numberOfLeaves = 0;
