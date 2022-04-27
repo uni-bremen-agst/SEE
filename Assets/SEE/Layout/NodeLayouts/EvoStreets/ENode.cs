@@ -79,7 +79,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>co-ordinates as a human-readable string</returns>
         public override string ToString()
         {
-            return $"[x={X.ToString("F4")}, y={Y.ToString("F4")}]";
+            return $"[x={X:F4}, y={Y:F4}]";
         }
     }
 
@@ -109,7 +109,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>rectangle as a human-readable string</returns>
         public override string ToString()
         {
-            return $"[center={Center}, width={Width.ToString("F4")}, depth={Depth.ToString("F4")}]";
+            return $"[center={Center}, width={Width:F4}, depth={Depth:F4}]";
         }
     }
 
@@ -128,7 +128,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// The the outermost enclosing rectangle of this node (and possibly its descendants)
+        /// The outermost enclosing rectangle of this node (and possibly its descendants)
         /// in world space.
         /// </summary>
         public Rectangle Rectangle;
@@ -190,7 +190,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The node in the original graph this ENode is representing.
         /// </summary>
-        protected ILayoutNode GraphNode;
+        protected readonly ILayoutNode GraphNode;
 
         /// <summary>
         /// The depth of this node in the hierarchy. A root has depth 0. This

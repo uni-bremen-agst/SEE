@@ -93,7 +93,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">the nodes to be laid out</param>
         /// <returns>width of street for the root</returns>
-        private float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
+        private static float CalculateStreetWidth(IList<ILayoutNode> layoutNodes)
         {
             float result = 0;
             int numberOfLeaves = 0;
@@ -105,7 +105,7 @@ namespace SEE.Layout.NodeLayouts
                     result += node.AbsoluteScale.x > node.AbsoluteScale.z ? node.AbsoluteScale.x : node.AbsoluteScale.z;
                 }
             }
-            // assert: numberOfLeaves > 0
+            UnityEngine.Assertions.Assert.IsTrue(numberOfLeaves > 0);
             result /= numberOfLeaves;
             // result is now the average length over all widths and depths of all leaf nodes.
             return result * StreetWidthPercentage;
@@ -117,15 +117,15 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
-        private ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
+        private static ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
         {
             ENode result = ENodeFactory.Create(root);
             result.TreeDepth = depth;
-            if (result is EInner)
+            if (result is EInner inner)
             {
                 foreach (ILayoutNode child in root.Children())
                 {
-                    (result as EInner).AddChild(GenerateHierarchy(child, depth + 1));
+                    inner.AddChild(GenerateHierarchy(child, depth + 1));
                 }
             }
             return result;
