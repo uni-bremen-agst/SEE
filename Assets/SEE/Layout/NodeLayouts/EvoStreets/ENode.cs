@@ -78,7 +78,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>co-ordinates as a human-readable string</returns>
         public override string ToString()
         {
-            return $"[x={X.ToString("F4")}, y={Y.ToString("F4")}]";
+            return $"[x={X:F4}, y={Y:F4}]";
         }
     }
 
