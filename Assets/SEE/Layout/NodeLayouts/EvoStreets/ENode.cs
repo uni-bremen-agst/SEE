@@ -127,7 +127,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         }
 
         /// <summary>
-        /// The the outermost enclosing rectangle of this node (and possibly its descendants)
+        /// The outermost enclosing rectangle of this node (and possibly its descendants)
         /// in world space.
         /// </summary>
         public Rectangle Rectangle;
