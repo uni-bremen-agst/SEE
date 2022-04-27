@@ -105,7 +105,7 @@ namespace SEE.Layout.NodeLayouts
                     result += node.AbsoluteScale.x > node.AbsoluteScale.z ? node.AbsoluteScale.x : node.AbsoluteScale.z;
                 }
             }
-            // assert: numberOfLeaves > 0
+            UnityEngine.Assertions.Assert.IsTrue(numberOfLeaves > 0);
             result /= numberOfLeaves;
             // result is now the average length over all widths and depths of all leaf nodes.
             return result * StreetWidthPercentage;
