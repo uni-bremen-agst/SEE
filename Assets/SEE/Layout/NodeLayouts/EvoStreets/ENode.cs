@@ -352,14 +352,14 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The children of this inner node in the hierarchy.
         /// </summary>
-        public readonly List<ENode> Children = new List<ENode>();
+        private readonly List<ENode> Children = new List<ENode>();
 
         /// <summary>
         /// This is the rectangle for the street itself representing the inner node.
         /// The attribute <see cref="Rectangle"/> relates to the rectangle enclosing
         /// this street and all children of this inner node.
         /// </summary>
-        public Rectangle Street;
+        private Rectangle Street;
 
         /// <summary>
         /// Calculates and sets the necessary size of <see cref="Rectangle"/> and <see cref="Street"/>
