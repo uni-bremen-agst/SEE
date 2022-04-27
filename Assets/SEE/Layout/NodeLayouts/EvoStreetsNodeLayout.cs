@@ -121,11 +121,11 @@ namespace SEE.Layout.NodeLayouts
         {
             ENode result = ENodeFactory.Create(root);
             result.TreeDepth = depth;
-            if (result is EInner)
+            if (result is EInner inner)
             {
                 foreach (ILayoutNode child in root.Children())
                 {
-                    (result as EInner).AddChild(GenerateHierarchy(child, depth + 1));
+                    inner.AddChild(GenerateHierarchy(child, depth + 1));
                 }
             }
             return result;
