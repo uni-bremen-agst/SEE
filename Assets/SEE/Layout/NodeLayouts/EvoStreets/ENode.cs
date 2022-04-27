@@ -108,7 +108,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>rectangle as a human-readable string</returns>
         public override string ToString()
         {
-            return $"[center={Center}, width={Width.ToString("F4")}, depth={Depth.ToString("F4")}]";
+            return $"[center={Center}, width={Width:F4}, depth={Depth:F4}]";
         }
     }
 
