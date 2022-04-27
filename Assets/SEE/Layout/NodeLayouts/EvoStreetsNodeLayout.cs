@@ -117,7 +117,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="root">root of the hierarchy</param>
         /// <returns>root ENode</returns>
-        private ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
+        private static ENode GenerateHierarchy(ILayoutNode root, int depth = 0)
         {
             ENode result = ENodeFactory.Create(root);
             result.TreeDepth = depth;
