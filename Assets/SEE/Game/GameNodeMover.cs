@@ -1,8 +1,8 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using UnityEngine;
-using static SEE.Game.City.SEEReflexionCity;
 using static SEE.Utils.Raycasting;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
@@ -76,7 +76,7 @@ namespace SEE.Game
                 {
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
-                    Map(movingNode, newGraphParent);
+                    newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent);
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
