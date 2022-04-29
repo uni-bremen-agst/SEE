@@ -119,7 +119,7 @@ namespace SEE.Utils
                     NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
                     if (nodeRef != null && nodeRef.Value != null
-                        && (referenceNode == null || nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph))
+                        && (referenceNode == null || (referenceNode.Value != null && nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph)))
                     {
                         // update newParent when we found a node deeper into the tree
                         if (hitNode == null || nodeRef.Value.Level > hitNode.Level)
