@@ -74,6 +74,6 @@ namespace SEE.DataModel
         /// changed. The given parameter gives more details about the change.
         /// </summary>
         /// <param name="changeEvent">details about the change of the state</param>
-        void Update(ChangeEvent changeEvent);
+        void NewChange(ChangeEvent changeEvent);
     }
 }
