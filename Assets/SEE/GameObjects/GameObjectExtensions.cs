@@ -39,6 +39,7 @@ namespace SEE.GO
                     return edgeRef.Value.ID;
                 }
             }
+
             return nodeRef.Value.ID;
         }
 
@@ -48,7 +49,18 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
-        public static AbstractSEECity ContainingCity(this GameObject gameObject)
+        public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city of type <typeparamref name="T"/>
+        /// this object is contained in will be returned. Otherwise null is returned.
+        /// </summary>
+        /// <param name="gameObject">graph node or edge whose containing city of type <typeparamref name="T"/>
+        /// is requested</param>
+        /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
+        /// or null</returns>
+        /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
+        public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
             if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
             {
@@ -57,7 +69,7 @@ namespace SEE.GO
             else
             {
                 Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out AbstractSEECity city))
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
@@ -94,10 +106,12 @@ namespace SEE.GO
             {
                 result.Add(gameObject);
             }
+
             foreach (Transform child in gameObject.transform)
             {
                 result.AddRange(child.gameObject.AllDescendants(tag));
             }
+
             return result;
         }
 
@@ -127,6 +141,7 @@ namespace SEE.GO
                     }
                 }
             }
+
             return null;
         }
 
@@ -149,8 +164,10 @@ namespace SEE.GO
                 {
                     result.Add(child.gameObject);
                 }
+
                 result.AddRange(child.gameObject.Descendants(gameObjectIDs));
             }
+
             return result;
         }
 
@@ -168,6 +185,7 @@ namespace SEE.GO
             {
                 return renderer.sharedMaterial.renderQueue;
             }
+
             Debug.LogWarning($"GetRenderQueue: Game object {gameObject.name} has no renderer.\n");
             return 0;
         }
@@ -263,10 +281,12 @@ namespace SEE.GO
             {
                 renderer.enabled = show;
             }
+
             if (gameObject.TryGetComponent(out Collider collider))
             {
                 collider.enabled = show;
             }
+
             if (includingChildren)
             {
                 foreach (Transform child in gameObject.transform)
@@ -325,6 +345,7 @@ namespace SEE.GO
                 {
                     max = roof;
                 }
+
                 foreach (Transform child in root.transform)
                 {
                     if (child.gameObject.activeInHierarchy)
@@ -374,6 +395,7 @@ namespace SEE.GO
                                + $"on game object '{gameObject.name}'.\n");
                 return false;
             }
+
             return true;
         }
 
@@ -392,8 +414,7 @@ namespace SEE.GO
         {
             if (!gameObject.TryGetComponent(out component))
             {
-                throw new InvalidOperationException(
-                    $"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
             }
         }
 
@@ -440,6 +461,7 @@ namespace SEE.GO
             {
                 node = nodeRef.Value;
             }
+
             return node != null;
         }
 
@@ -505,6 +527,7 @@ namespace SEE.GO
             {
                 edge = edgeRef.Value;
             }
+
             return edge != null;
         }
 
@@ -549,6 +572,7 @@ namespace SEE.GO
                 gameObject = gameObject.transform.parent.gameObject;
                 result = gameObject.name + "/" + result;
             }
+
             return result;
         }
 
