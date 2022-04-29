@@ -298,7 +298,7 @@ namespace SEE.Tools.Architecture
         /// state change. Collects the events in the change-event list.
         /// </summary>
         /// <param name="changeEvent">the event that occurred</param>
-        public virtual void Update(ChangeEvent changeEvent)
+        public virtual void NewChange(ChangeEvent changeEvent)
         {
             changes = changes.Incorporate(changeEvent).ToList();
         }
