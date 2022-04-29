@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Utils;
@@ -17,7 +18,7 @@ namespace SEE.Game.City
     /// NOTE: It is assumed the implementation and architecture graphs are not edited!
     /// TODO: In fact, we should disallow this programmatically, too.
     /// </summary>
-    public class SEEReflexionCity : SEECity
+    public class SEEReflexionCity : SEECity, Observer
     {
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
@@ -48,6 +49,19 @@ namespace SEE.Game.City
         /// Name of this code city.
         /// </summary>
         public string CityName = "Reflexion Analysis";
+
+        /// <summary>
+        /// Reflexion analysis. Use this to make changes to the graph
+        /// (such as mappings, hierarchies, and so on), <b>do not modify
+        /// the underlying Graph directly!</b>
+        /// </summary>
+        public Reflexion Analysis;
+
+        /// <summary>
+        /// List of <see cref="ChangeEvent"/>s received from the reflexion <see cref="Analysis"/>.
+        /// Note that this list is constructed by using <see cref="ReflexionGraphTools.Incorporate"/>.
+        /// </summary>
+        private readonly List<ChangeEvent> Events = new List<ChangeEvent>();
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -112,41 +126,14 @@ namespace SEE.Game.City
 
                 LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
+                Events.Clear();
+                Analysis = new Reflexion(LoadedGraph);
+                Analysis.Register(this);
+                Analysis.Run();
+                Debug.Log("Initialized Reflexion Analysis.\n");
             }
 
             #endregion
-        }
-
-        /// <summary>
-        /// Maps the node <paramref name="from"/> to the node <paramref name="to"/>.
-        /// This will result in a "Maps_To" edge being created between the two, and will cause
-        /// the <paramref name="from"/> node to be moved to the <paramref name="to"/> node.
-        /// Because "Maps_To" should be a mapping corresponding to an injective function,
-        /// existing outgoing "Maps_To" edges from the <paramref name="from"/> node and incoming "Maps_To" edges to the
-        /// <paramref name="to"/> node will be replaced.
-        /// </summary>
-        /// <param name="from">The node to map from.</param>
-        /// <param name="to">The node to map to.</param>
-        /// <exception cref="ArgumentException">
-        /// If <paramref name="from"/> and <paramref name="to"/> are not in the same graph, or if
-        /// the mapping isn't from an implementation node to an architecture node.
-        /// </exception>
-        public static void Map(Node from, Node to)
-        {
-            from.AssertNotNull(nameof(from));
-            to.AssertNotNull(nameof(to));
-            if (!from.IsInImplementation() || !to.IsInArchitecture())
-            {
-                throw new ArgumentException($"{nameof(from)} must be an implementation node, and"
-                                            + $"{nameof(to)} must be an architecture node!");
-            }
-
-            if (!ReferenceEquals(from.ItsGraph, to.ItsGraph))
-            {
-                throw new ArgumentException("The two nodes must be in the same graph!");
-            }
-
-            // TODO(falko17): Invoke reflexion analysis
         }
 
         public override void SaveData()
@@ -227,6 +214,17 @@ namespace SEE.Game.City
             CsvArchitecturePath.Restore(attributes, CsvArchitectureLabel);
             CsvImplementationPath.Restore(attributes, CsvImplementationLabel);
             ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
+        }
+
+        /// <summary>
+        /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>
+        /// and logs it to the console.
+        /// </summary>
+        /// <param name="changeEvent">The change event received from the reflexion analysis</param>
+        public void NewChange(ChangeEvent changeEvent)
+        {
+            Debug.Log(changeEvent);
+            Events.Incorporate(changeEvent);
         }
     }
 }

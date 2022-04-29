@@ -185,9 +185,9 @@ namespace SEE.Tools.ReflexionAnalysis
                     return element.HasToggle(subgraph.GetLabel());
                 case Mapping:
                     // Either a "Maps_To" edge or a node connected to such an edge
-                    return element is Edge edge && edge.HasSupertypeOf(MapsToType)
-                           || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
-                case ReflexionSubgraph.FullReflexion:
+                    return (element is Edge edge && edge.HasSupertypeOf(MapsToType))
+                           || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping));
+                case FullReflexion:
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
@@ -213,7 +213,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     element.SetToggle(Architecture.GetLabel());
                     break;
                 case Mapping:
-                case ReflexionSubgraph.FullReflexion:
+                case FullReflexion:
                     throw new InvalidOperationException("Can't explicitly assign graph element to "
                                                         + $"'{subgraph}' (only implicitly)!");
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
