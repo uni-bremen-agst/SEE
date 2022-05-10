@@ -59,8 +59,8 @@ Material:
     - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
-    - _PortalMax: {r: -0.24699998, g: 0.511, b: 0, a: 0}
-    - _PortalMin: {r: -1.247, g: -0.489, b: 0, a: 0}
+    - _PortalMax: {r: -0.12400001, g: -3.6800003, b: 0, a: 0}
+    - _PortalMin: {r: -1.1240001, g: -4.6800003, b: 0, a: 0}
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_BuildTextureStacks: []
 --- !u!114 &11400000

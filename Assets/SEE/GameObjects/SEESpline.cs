@@ -38,7 +38,7 @@ namespace SEE.GO
     /// The geometric characteristics of the generated mesh, e.g., the radius
     /// of the tube, can be set via properties. By setting a property, the
     /// rendering of the spline is updated in the next frame. If an update
-    /// needs to be applied immediatly, call <see cref="UpdateMesh"/> after
+    /// needs to be applied immediately, call <see cref="UpdateMesh"/> after
     /// setting one or more properties.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
@@ -68,7 +68,7 @@ namespace SEE.GO
         /// </summary>
         public BSpline Spline
         {
-            get { return spline; }
+            get => spline;
             set
             {
                 spline = value;
@@ -94,7 +94,7 @@ namespace SEE.GO
         /// </summary>
         public float Radius
         {
-            get { return radius; }
+            get => radius;
             set
             {
                 radius = Math.Max(0.0001f, value);
@@ -115,7 +115,7 @@ namespace SEE.GO
         /// </summary>
         public int TubularSegments
         {
-            get { return tubularSegments; }
+            get => tubularSegments;
             set
             {
                 int max = Math.Max(5, value);
@@ -140,7 +140,7 @@ namespace SEE.GO
         /// </summary>
         public int RadialSegments
         {
-            get { return radialSegments; }
+            get => radialSegments;
             set
             {
                 int max = Math.Max(3, value);
@@ -325,10 +325,10 @@ namespace SEE.GO
             mesh = filter.mesh;
             updateMaterial = updateMaterial // Implies new mesh.
                 || // Or the geometrics of the mesh have changed.
-                (mesh.vertices.Length != vertices.Count ||
-                 mesh.normals.Length  != normals.Count  ||
-                 mesh.tangents.Length != tangents.Count ||
-                 mesh.uv.Length != uvs.Count);
+                mesh.vertices.Length != vertices.Count ||
+                mesh.normals.Length  != normals.Count  ||
+                mesh.tangents.Length != tangents.Count ||
+                mesh.uv.Length != uvs.Count;
             if (updateMaterial)
             {
                 mesh.Clear();
@@ -348,9 +348,9 @@ namespace SEE.GO
             }
 
             // Remove line renderer.
-            if (gameObject.TryGetComponent(out LineRenderer renderer))
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                Destroy(renderer);
+                Destroy(lineRenderer);
             }
 
             return mesh;
@@ -363,22 +363,22 @@ namespace SEE.GO
         protected virtual void UpdateMaterial()
         {
             if (!gameObject.TryGetComponent(out MeshFilter filter) ||
-                !gameObject.TryGetComponent(out MeshRenderer renderer))
+                !gameObject.TryGetComponent(out MeshRenderer meshRenderer))
             {
                 return;
             }
 
-            if (renderer.sharedMaterial == null)
+            if (meshRenderer.sharedMaterial == null)
             {
-                renderer.sharedMaterial = defaultMaterial;
+                meshRenderer.sharedMaterial = defaultMaterial;
             }
-            if (renderer.sharedMaterial.shader == defaultMaterial.shader)
+            if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
             {
                 // Don't re-color non-default material.
                 Mesh mesh = filter.mesh;
                 Vector2[] uv = mesh.uv;
                 Color[] colors = new Color[uv.Length];
-                for (var i = 0; i < uv.Length; i++)
+                for (int i = 0; i < uv.Length; i++)
                 {
                     colors[i] = Color.Lerp(Color.red, Color.green, uv[i].y);
                 }
