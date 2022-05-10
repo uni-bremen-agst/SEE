@@ -18,6 +18,70 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
+        public GameObject DrawEdge(Edge edge, GameObject from = null, GameObject to = null)
+        {
+            from ??= edge.Source.RetrieveGameNode();
+            to ??= edge.Target.RetrieveGameNode();
+            
+            // Save edge layout so that we can restore it if we need to select a default layout.
+            EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
+            if (savedEdgeLayout == EdgeLayoutKind.None)
+            {
+                Debug.LogWarning($"An edge {edge.ID} from {edge.Source.ID} to {edge.Target.ID} was added to the graph, but no edge layout was chosen.\n");
+                // Select default layout
+                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
+            }
+
+            // Creating the game object representing the edge.
+            // The edge layout will be calculated for the following gameNodes. This list will
+            // contain the source and target of the edge but also all their ascendants. The
+            // ascendants are needed for hierarchical layouts.
+            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
+            // We add the ascendants of the source and target nodes in case the edge layout is hierarchical.
+            AddAscendants(from, gameNodes);
+            AddAscendants(to, gameNodes);
+            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new Dictionary<Node, ILayoutNode>();
+            // The layout nodes corresponding to those game nodes.
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, nodeToLayoutNode);
+
+            LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
+            LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
+            // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
+            // to the edge layouter.
+            foreach (LayoutGameNode layoutNode in layoutNodes)
+            {
+                if (layoutNode.ItsNode == edge.Source)
+                {
+                    fromLayoutNode = layoutNode;
+                }
+
+                // note: fromNode = toNode is possible, hence, there is no 'else' here.
+                if (layoutNode.ItsNode == edge.Target)
+                {
+                    toLayoutNode = layoutNode;
+                }
+            }
+
+            Assert.IsNotNull(fromLayoutNode, $"source node {edge.Source.ID} does not have a layout node.\n");
+            Assert.IsNotNull(toLayoutNode, $"target node {edge.Target.ID} does not have a layout node.\n");
+            // The single layout edge between source and target. We want the layout only for this edge.
+            ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
+                { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
+            // Calculate the edge layout (for the single edge only).
+            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
+            GameObject resultingEdge = edges.First();
+            InteractionDecorator.PrepareForInteraction(resultingEdge);
+            // The edge becomes a child of the root node of the game-node hierarchy
+            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
+            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
+            resultingEdge.transform.SetParent(rootNode.transform);
+            // The portal of the new edge is inherited from the codeCity.
+            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
+            // Reset original edge layout.
+            Settings.EdgeLayoutSettings.Kind = savedEdgeLayout;
+            return resultingEdge;
+        }
+
         /// <summary>
         /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
         /// based on the current settings. A new edge will be added to the underlying graph, too.
@@ -48,8 +112,7 @@ namespace SEE.Game
 
             if (fromNode.ItsGraph != toNode.ItsGraph)
             {
-                throw new Exception(
-                    $"The source {from.name} and target {to.name} of the edge are in different graphs.");
+                throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
             // Creating the edge in the underlying graph
@@ -57,66 +120,8 @@ namespace SEE.Game
 
             Graph graph = fromNode.ItsGraph;
             graph.AddEdge(edge);
-            // Save edge layout so that we can restore it if we need to select a default layout.
-            EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
-            if (savedEdgeLayout == EdgeLayoutKind.None)
-            {
-                Debug.LogWarning(
-                    $"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
-                // Select default layout
-                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
-            }
 
-            // Creating the game object representing the edge.
-            // The edge layout will be calculated for the following gameNodes. This list will
-            // contain the source and target of the edge but also all their ascendants. The
-            // ascendants are needed for hierarchical layouts.
-            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
-            // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
-            AddAscendants(from, gameNodes);
-            AddAscendants(to, gameNodes);
-            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-            // The layout nodes corresponding to those game nodes.
-            ICollection<LayoutGameNode> layoutNodes =
-                ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, to_layout_node);
-
-            LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
-            LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
-            // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
-            // to the edge layouter.
-            foreach (LayoutGameNode layoutNode in layoutNodes)
-            {
-                //TODO: Should this be a ReferenceEquals() or Equals() comparison?
-                if (layoutNode.ItsNode == fromNode)
-                {
-                    fromLayoutNode = layoutNode;
-                }
-
-                // note: fromNode = toNode is possible, hence, there is no 'else' here.
-                if (layoutNode.ItsNode == toNode)
-                {
-                    toLayoutNode = layoutNode;
-                }
-            }
-
-            Assert.IsNotNull(fromLayoutNode, $"source node {fromNode.ID} does not have a layout node.\n");
-            Assert.IsNotNull(toLayoutNode, $"target node {toNode.ID} does not have a layout node.\n");
-            // The single layout edge between source and target. We want the layout only for this edge.
-            ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
-                {new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge)};
-            // Calculate the edge layout (for the single edge only).
-            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-            GameObject resultingEdge = edges.First();
-            InteractionDecorator.PrepareForInteraction(resultingEdge);
-            // The edge becomes a child of the root node of the game-node hierarchy
-            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
-            resultingEdge.transform.SetParent(rootNode.transform);
-            // The portal of the new edge is inherited from the codeCity.
-            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
-            // Reset original edge layout.
-            Settings.EdgeLayoutSettings.Kind = savedEdgeLayout;
-            return resultingEdge;
+            return DrawEdge(edge);
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
         /// <param name="gameNodes">where to add the ascendants</param>
-        private static void AddAscendants(GameObject node, HashSet<GameObject> gameNodes)
+        private static void AddAscendants(GameObject node, ISet<GameObject> gameNodes)
         {
             GameObject cursor = node;
             while (cursor != null && cursor.CompareTag(Tags.Node))
@@ -145,7 +150,7 @@ namespace SEE.Game
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent,
-            bool draw = true)
+                                                  bool draw = true)
         {
             return EdgeLayout(ToLayoutNodes(gameNodes), parent, draw);
         }
@@ -160,7 +165,7 @@ namespace SEE.Game
         /// <param name="draw">decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, GameObject parent,
-            bool draw = true)
+                                                   bool draw = true)
         {
             ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
             AddToParent(result, parent);
@@ -204,7 +209,7 @@ namespace SEE.Game
         /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes, ICollection<LayoutGraphEdge<T>> layoutEdges,
-            bool draw = true)
+                                                      bool draw = true)
             where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             IEdgeLayout layout = GetEdgeLayout();
@@ -216,13 +221,12 @@ namespace SEE.Game
 #if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
-            EdgeFactory edgeFactory = new EdgeFactory(
-                layout,
-                Settings.EdgeLayoutSettings.EdgeWidth,
-                Settings.EdgeSelectionSettings.TubularSegments,
-                Settings.EdgeSelectionSettings.Radius,
-                Settings.EdgeSelectionSettings.RadialSegments,
-                Settings.EdgeSelectionSettings.AreSelectable);
+            EdgeFactory edgeFactory = new EdgeFactory(layout,
+                                                      Settings.EdgeLayoutSettings.EdgeWidth,
+                                                      Settings.EdgeSelectionSettings.TubularSegments,
+                                                      Settings.EdgeSelectionSettings.Radius,
+                                                      Settings.EdgeSelectionSettings.RadialSegments,
+                                                      Settings.EdgeSelectionSettings.AreSelectable);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
             // Calculate only
@@ -263,7 +267,7 @@ namespace SEE.Game
                     return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
                 case EdgeLayoutKind.Bundling:
                     return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance,
-                        Settings.EdgeLayoutSettings.Tension, rdp);
+                                                 Settings.EdgeLayoutSettings.Tension, rdp);
                 case EdgeLayoutKind.None:
                     // nothing to be done
                     return null;

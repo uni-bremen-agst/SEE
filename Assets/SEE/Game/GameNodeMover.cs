@@ -74,6 +74,7 @@ namespace SEE.Game
                 // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
+                    // TODO: Make sure this action is still reversible
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
                     newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);

@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
+using SEE.GO;
 using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
@@ -223,8 +224,66 @@ namespace SEE.Game.City
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
         public void NewChange(ChangeEvent changeEvent)
         {
+            // TODO: Make sure these actions don't interfere with reversible actions.
+            // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
+            switch (changeEvent)
+            {
+                case EdgeChange edgeChange: HandleEdgeChange(edgeChange);
+                    break;
+                case EdgeEvent edgeEvent: HandleEdgeEvent(edgeEvent);
+                    break;
+                case HierarchyChangeEvent hierarchyChangeEvent: HandleHierarchyChangeEvent(hierarchyChangeEvent);
+                    break;
+                case NodeChangeEvent nodeChangeEvent: HandleNodeChangeEvent(nodeChangeEvent);
+                    break;
+                case PropagatedEdgeEvent propagatedEdgeEvent: HandlePropagatedEdgeEvent(propagatedEdgeEvent);
+                    break;
+            }
+            
             Debug.Log(changeEvent);
+
             Events.Incorporate(changeEvent);
+        }
+        
+        private void HandleEdgeChange(EdgeChange edgeChange) 
+        {
+            // FIXME: Handle event
+        }
+        
+        private void HandleEdgeEvent(EdgeEvent edgeEvent) 
+        {
+            if (edgeEvent.Change == ChangeType.Addition)
+            {
+                // I don't use GameEdgeAdder here due to its performance disadvantage—we can access Renderer directly.
+                // TODO: Make sure new edge isn't modifiable (e.g., can't be removed by users).
+                // FIXME: NullReferenceException due to root node being null?
+                GameObject edgeObject = Renderer.DrawEdge(edgeEvent.Edge);
+                if (edgeObject.TryGetComponent(out SEESpline spline))
+                {
+                    // TODO: Introduce possibility to change colors in spline
+                    spline.Radius = 0.001f;
+                }
+            }
+
+            if (edgeEvent.Change == ChangeType.Removal)
+            {
+                // FIXME: Handle edge removal
+            }
+        }
+        
+        private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent) 
+        {
+            // FIXME: Handle event
+        }
+        
+        private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent) 
+        {
+            // FIXME: Handle event
+        }
+        
+        private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent) 
+        {
+            // FIXME: Handle event
         }
     }
 }
