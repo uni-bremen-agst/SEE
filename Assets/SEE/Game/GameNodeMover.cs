@@ -76,7 +76,7 @@ namespace SEE.Game
                 {
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
-                    newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent);
+                    newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
@@ -94,6 +94,7 @@ namespace SEE.Game
                         movingNode.Reparent(newGraphParent);
                         movingObject.transform.SetParent(newGameParent.transform);
                     }
+
                     return newGameParent;
                 }
             }
@@ -166,14 +167,17 @@ namespace SEE.Game
             {
                 target.x = movingObjectPos.x;
             }
+
             if (!lockY)
             {
                 target.y = movingObjectPos.y;
             }
+
             if (!lockZ)
             {
                 target.z = movingObjectPos.z;
             }
+
             movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 

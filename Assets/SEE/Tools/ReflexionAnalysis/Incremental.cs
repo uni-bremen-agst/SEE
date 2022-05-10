@@ -240,23 +240,32 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
         /// re-runs the reflexion analysis incrementally.
-        /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
-        /// explicitly and <paramref name="to"/> is contained in the architecture graph.
+        /// Preconditions: <paramref name="from"/> is contained in the implementation graph
+        /// and <paramref name="to"/> is contained in the architecture graph.
+        /// If <paramref name="overrideMapping"/> is false, <paramref name="from"/> must not yet be explicitly mapped.
         /// Postcondition: Created edge is contained in the mapping graph and the reflexion
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="from">the source of the Maps_To edge to be added to the mapping graph</param>
         /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
+        /// <param name="overrideMapping">whether any existing mapping from <paramref name="from"/> shall be
+        /// replaced by this one</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
         /// <exception cref="AlreadyExplicitlyMappedException">When <paramref name="from"/> is already explicitly
-        /// mapped to an architecture node.</exception>
-        public void AddToMapping(Node from, Node to)
+        /// mapped to an architecture node and <paramref name="overrideMapping"/> is false.</exception>
+        public void AddToMapping(Node from, Node to, bool overrideMapping = false)
         {
             AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
-            AssertOrThrow(!IsExplicitlyMapped(from), () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
+
+            if (IsExplicitlyMapped(from))
+            {
+                // Existing mapping is only allowed if it can be overridden
+                AssertOrThrow(overrideMapping, () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
+                DeleteFromMapping(from, MapsTo(from));
+            }
 
             // all nodes that should be mapped onto 'to', too, as a consequence of
             // mapping 'from'
