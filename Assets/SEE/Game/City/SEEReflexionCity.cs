@@ -228,41 +228,50 @@ namespace SEE.Game.City
             // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
             switch (changeEvent)
             {
-                case EdgeChange edgeChange: HandleEdgeChange(edgeChange);
+                case EdgeChange edgeChange:
+                    HandleEdgeChange(edgeChange);
                     break;
-                case EdgeEvent edgeEvent: HandleEdgeEvent(edgeEvent);
+                case EdgeEvent edgeEvent:
+                    HandleEdgeEvent(edgeEvent);
                     break;
-                case HierarchyChangeEvent hierarchyChangeEvent: HandleHierarchyChangeEvent(hierarchyChangeEvent);
+                case HierarchyChangeEvent hierarchyChangeEvent:
+                    HandleHierarchyChangeEvent(hierarchyChangeEvent);
                     break;
-                case NodeChangeEvent nodeChangeEvent: HandleNodeChangeEvent(nodeChangeEvent);
+                case NodeChangeEvent nodeChangeEvent:
+                    HandleNodeChangeEvent(nodeChangeEvent);
                     break;
-                case PropagatedEdgeEvent propagatedEdgeEvent: HandlePropagatedEdgeEvent(propagatedEdgeEvent);
+                case PropagatedEdgeEvent propagatedEdgeEvent:
+                    HandlePropagatedEdgeEvent(propagatedEdgeEvent);
                     break;
             }
-            
+
             Debug.Log(changeEvent);
 
             Events.Incorporate(changeEvent);
         }
-        
-        private void HandleEdgeChange(EdgeChange edgeChange) 
+
+        private void HandleEdgeChange(EdgeChange edgeChange)
         {
-            // FIXME: Handle event
+            // TODO: This doesn't work for propagated edges. We may have to maintain a map for that.
+            GameObject edge = GameObject.Find(edgeChange.Edge.ID);
+            // TODO: Are edges *always* SEESplines?
+            if (edge != null && edge.TryGetComponent(out SEESpline spline))
+            {
+                // TODO: Introduce possibility to change colors in spline based on NewState.
+                // For now, we simply change the radius to leave a visible change.
+                spline.Radius = 0.001f;
+            }
+            else
+            {
+                Debug.LogError($"Couldn't find edge {edgeChange.Edge}!");
+            }
         }
-        
-        private void HandleEdgeEvent(EdgeEvent edgeEvent) 
+
+        private void HandleEdgeEvent(EdgeEvent edgeEvent)
         {
             if (edgeEvent.Change == ChangeType.Addition)
             {
-                // I don't use GameEdgeAdder here due to its performance disadvantage—we can access Renderer directly.
-                // TODO: Make sure new edge isn't modifiable (e.g., can't be removed by users).
-                // FIXME: NullReferenceException due to root node being null?
-                GameObject edgeObject = Renderer.DrawEdge(edgeEvent.Edge);
-                if (edgeObject.TryGetComponent(out SEESpline spline))
-                {
-                    // TODO: Introduce possibility to change colors in spline
-                    spline.Radius = 0.001f;
-                }
+                // FIXME: Handle edge addition based on subgraph type, handle MapsTo specially
             }
 
             if (edgeEvent.Change == ChangeType.Removal)
@@ -270,18 +279,18 @@ namespace SEE.Game.City
                 // FIXME: Handle edge removal
             }
         }
-        
-        private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent) 
+
+        private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
         {
             // FIXME: Handle event
         }
-        
-        private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent) 
+
+        private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent)
         {
             // FIXME: Handle event
         }
-        
-        private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent) 
+
+        private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
         {
             // FIXME: Handle event
         }
