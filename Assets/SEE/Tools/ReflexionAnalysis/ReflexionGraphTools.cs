@@ -234,6 +234,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
         public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
+        
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is in the reflexion graph.
+        /// </summary>
+        public static bool IsInReflexion(this GraphElement element) => element.IsIn(FullReflexion);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the architecture graph.
