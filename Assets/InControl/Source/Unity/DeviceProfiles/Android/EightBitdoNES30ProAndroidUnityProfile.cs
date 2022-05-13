@@ -31,25 +31,25 @@ namespace InControl.UnityDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "A",
-					Target = InputControlType.Action1,
+					Target = InputControlType.Action2,
 					Source = Button( 0 )
 				},
 				new InputControlMapping
 				{
 					Name = "B",
-					Target = InputControlType.Action2,
+					Target = InputControlType.Action1,
 					Source = Button( 1 )
 				},
 				new InputControlMapping
 				{
 					Name = "X",
-					Target = InputControlType.Action3,
+					Target = InputControlType.Action4,
 					Source = Button( 2 )
 				},
 				new InputControlMapping
 				{
 					Name = "Y",
-					Target = InputControlType.Action4,
+					Target = InputControlType.Action3,
 					Source = Button( 3 )
 				},
 				new InputControlMapping
@@ -87,6 +87,18 @@ namespace InControl.UnityDeviceProfiles
 					Name = "R2",
 					Target = InputControlType.RightTrigger,
 					Source = Button( 7 )
+				},
+				new InputControlMapping
+				{
+					Name = "L3",
+					Target = InputControlType.LeftStickButton,
+					Source = Button( 8 )
+				},
+				new InputControlMapping
+				{
+					Name = "R3",
+					Target = InputControlType.RightStickButton,
+					Source = Button( 9 )
 				}
 			};
 

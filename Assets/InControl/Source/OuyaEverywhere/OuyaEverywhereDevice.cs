@@ -1,4 +1,3 @@
-
 #if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
 using tv.ouya.console.api;
 #endif
@@ -122,9 +121,9 @@ namespace InControl
 		public bool IsConnected
 		{
 			get
-			{ 
+			{
 				#if UNITY_ANDROID && INCONTROL_OUYA && !UNITY_EDITOR
-				return OuyaSDK.OuyaInput.IsControllerConnected( DeviceIndex ); 
+				return OuyaSDK.OuyaInput.IsControllerConnected( DeviceIndex );
 				#else
 				return false;
 				#endif
@@ -132,4 +131,3 @@ namespace InControl
 		}
 	}
 }
-

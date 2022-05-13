@@ -19,6 +19,7 @@ namespace InControl
 
 		#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS || UNITY_TVOS
 
+
 		[DllImport( libraryName, EntryPoint = "InControl_Init", CallingConvention = callingConvention )]
 		public static extern void Init( NativeInputOptions options );
 
@@ -66,8 +67,8 @@ namespace InControl
 		[DllImport( libraryName, EntryPoint = "InControl_GetButtonGlyphName", CallingConvention = callingConvention )]
 		public static extern UInt32 GetButtonGlyphName( UInt32 handle, UInt32 index, out IntPtr glyphName );
 
-		#else
 
+		#else
 		public static void Init( NativeInputOptions options ) { }
 		public static void Stop() { }
 		public static void GetVersionInfo( out NativeVersionInfo versionInfo ) { versionInfo = new NativeVersionInfo(); }

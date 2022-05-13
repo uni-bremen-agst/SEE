@@ -5,7 +5,7 @@ namespace InControl
 	using UnityEngine;
 
 
-	[CustomEditor( typeof( TouchManager ) )]
+	[CustomEditor( typeof(TouchManager) )]
 	public class TouchManagerEditor : Editor
 	{
 		TouchManager touchManager;
@@ -79,11 +79,11 @@ namespace InControl
 			style.richText = true;
 			bool showWarning = false;
 			var text = "" +
-					   "<b>Warning:</b>\n" +
-					   "Some cameras are set to include the current touch controls layer (" +
-					   LayerMask.LayerToName( controlsLayer ) +
-					   ") in their culling mask. This may cause duplicates ghosting of controls or other " +
-						"unexpected visual results.";
+			           "<b>Warning:</b>\n" +
+			           "Some cameras are set to include the current touch controls layer (" +
+			           LayerMask.LayerToName( controlsLayer ) +
+			           ") in their culling mask. This may cause duplicates ghosting of controls or other " +
+			           "unexpected visual results.";
 
 			foreach (var camera in Camera.allCameras)
 			{
@@ -112,10 +112,10 @@ namespace InControl
 			style.richText = true;
 			bool showWarning = false;
 			var text = "" +
-					   "<b>Warning:</b>\n" +
-					   "Some controls are not on the current touch controls layer (" +
-					   LayerMask.LayerToName( controlsLayer ) +
-					   "). This will most likely cause these controls to both render and function incorrectly.";
+			           "<b>Warning:</b>\n" +
+			           "Some controls are not on the current touch controls layer (" +
+			           LayerMask.LayerToName( controlsLayer ) +
+			           "). This will most likely cause these controls to both render and function incorrectly.";
 
 			foreach (var control in FindObjectsOfType<TouchControl>())
 			{
@@ -136,4 +136,3 @@ namespace InControl
 	}
 }
 #endif
-

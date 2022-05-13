@@ -1,3 +1,8 @@
+### v1.8.8
+* Various Android profiles added and fixed (thanks Chris!)
+* Renamed `BindingSourceRejectionType.DuplicateBindingOnActionSet` to `BindingSourceRejectionType.DuplicateBindingOnAction`
+* Minor bug fixes.
+
 ### v1.8.7
 * Fixed `UnityMouseProvider` to include horizontal scroll value in `GetDeltaScroll()`
 * Fixed an issue causing GC alloc in `UnityMouseProvider`.

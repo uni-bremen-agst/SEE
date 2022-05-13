@@ -4,7 +4,7 @@ namespace InControl
 	using UnityEditor;
 
 
-	[CustomEditor( typeof( TouchTrackControl ) )]
+	[CustomEditor( typeof(TouchTrackControl) )]
 	public class TouchTrackControlEditor : TouchControlEditor
 	{
 		void OnEnable()

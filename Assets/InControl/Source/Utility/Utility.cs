@@ -221,7 +221,7 @@ namespace InControl
 		internal static bool TargetIsStandard( InputControlType target )
 		{
 			return (target >= InputControlType.LeftStickUp && target <= InputControlType.Action12) ||
-			       (target >= InputControlType.Command && target <= InputControlType.DPadY);
+			       (target >= InputControlType.Command && target <= InputControlType.RightCommand);
 		}
 
 

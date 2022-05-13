@@ -5,4 +5,3 @@
 		void Update( ulong updateTick, float deltaTime );
 	}
 }
-

@@ -32,6 +32,7 @@ namespace InControl
 		GoogleStadia,
 		Vive,
 		Oculus,
+		Logitech,
+		Thrustmaster,
 	}
 }
-

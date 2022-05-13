@@ -55,9 +55,10 @@
 		public static bool operator ==( UnknownDeviceControl a, UnknownDeviceControl b )
 		{
 			if (ReferenceEquals( null, a ))
-			{	
+			{
 				return ReferenceEquals( null, b );
 			}
+
 			return a.Equals( b );
 		}
 
@@ -140,4 +141,3 @@
 		}
 	}
 }
-

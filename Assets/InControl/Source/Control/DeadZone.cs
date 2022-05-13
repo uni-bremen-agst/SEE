@@ -104,6 +104,7 @@
 			{
 				return Vector2.zero;
 			}
+
 			return new Vector2( vx / magnitude, vy / magnitude );
 		}
 
@@ -123,13 +124,14 @@
 			{
 				return Vector2.zero;
 			}
+
 			var normal = new Vector2( x / magnitude, y / magnitude );
 			if (magnitude > upperDeadZone)
 			{
 				return normal;
 			}
+
 			return normal * ((magnitude - lowerDeadZone) / (upperDeadZone - lowerDeadZone));
 		}
 	}
 }
-

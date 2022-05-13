@@ -141,7 +141,7 @@ namespace InControl.UnityDeviceProfiles
 				DPadUpMapping2( 6 ),
 				DPadDownMapping2( 6 ),
 
-#if !UNITY_2018_3_OR_NEWER
+				#if !UNITY_2018_3_OR_NEWER
 				new InputControlMapping
 				{
 					Name = "Left Trigger",
@@ -158,7 +158,7 @@ namespace InControl.UnityDeviceProfiles
 					SourceRange = InputRangeType.ZeroToMinusOne,
 					TargetRange = InputRangeType.ZeroToOne,
 				},
-#endif
+				#endif
 
 				new InputControlMapping
 				{

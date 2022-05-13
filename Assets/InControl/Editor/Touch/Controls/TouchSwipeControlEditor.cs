@@ -4,7 +4,7 @@ namespace InControl
 	using UnityEditor;
 
 
-	[CustomEditor( typeof( TouchSwipeControl ) )]
+	[CustomEditor( typeof(TouchSwipeControl) )]
 	public class TouchSwipeControlEditor : TouchControlEditor
 	{
 		void OnEnable()
