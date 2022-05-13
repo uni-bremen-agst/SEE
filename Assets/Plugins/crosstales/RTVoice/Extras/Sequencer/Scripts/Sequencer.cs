@@ -12,7 +12,7 @@ namespace Crosstales.RTVoice.Tool
 
       /// <summary>All available sequences.</summary>
       [Header("Configuration")]
-      [Tooltip("All available sequences.")] public Model.Sequence[] Sequences;
+      [Tooltip("All available sequences.")] public Crosstales.RTVoice.Model.Sequence[] Sequences;
 
       /// <summary>Delay in seconds before the Sequencer starts processing (default: 0).</summary>
       [Tooltip("Delay in seconds before the Sequencer starts processing (default: 0).")] public float Delay;
@@ -36,7 +36,7 @@ namespace Crosstales.RTVoice.Tool
 
       /// <summary>Returns the current Sequence.</summary>
       /// <returns>The current Sequence.</returns>
-      public Model.Sequence CurrentSequence => Sequences[currentIndex];
+      public Crosstales.RTVoice.Model.Sequence CurrentSequence => Sequences[currentIndex];
 
       #endregion
 
@@ -65,7 +65,7 @@ namespace Crosstales.RTVoice.Tool
          if (Delay < 0f)
             Delay = 0f;
 
-         foreach (Model.Sequence seq in Sequences.Where(seq => !seq.Initialized))
+         foreach (Crosstales.RTVoice.Model.Sequence seq in Sequences.Where(seq => !seq.Initialized))
          {
             seq.Rate = 1f;
             seq.Pitch = 1f;
@@ -132,7 +132,7 @@ namespace Crosstales.RTVoice.Tool
 
       #region Callback methods
 
-      private void speakCompleteMethod(Model.Wrapper wrapper)
+      private void speakCompleteMethod(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (playAllSequences)
          {
@@ -167,11 +167,11 @@ namespace Crosstales.RTVoice.Tool
          }
       }
 
-      private IEnumerator playMe(Model.Sequence seq)
+      private IEnumerator playMe(Crosstales.RTVoice.Model.Sequence seq)
       {
          yield return new WaitForSeconds(Delay);
 
-         uidCurrentSpeaker = seq.Mode == Model.Enum.SpeakMode.Speak
+         uidCurrentSpeaker = seq.Mode == Crosstales.RTVoice.Model.Enum.SpeakMode.Speak
             ? Speaker.Instance.Speak(seq.Text, seq.Source, seq.Voices.Voice, true, seq.Rate, seq.Pitch, seq.Volume)
             : Speaker.Instance.SpeakNative(seq.Text, seq.Voices.Voice, seq.Rate, seq.Pitch, seq.Volume);
       }
@@ -179,4 +179,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

@@ -6,7 +6,7 @@ using System.Linq;
 namespace Crosstales.Common.EditorUtil
 {
    /// <summary>Base for various Editor helper functions.</summary>
-   public abstract class BaseEditorHelper : Util.BaseHelper
+   public abstract class BaseEditorHelper : Crosstales.Common.Util.BaseHelper
    {
       #region Static variables
 
@@ -192,7 +192,7 @@ namespace Crosstales.Common.EditorUtil
                   process.Start();
 
                   if (isWindowsEditor)
-                     process.WaitForExit(Util.BaseConstants.PROCESS_KILL_TIME);
+                     process.WaitForExit(Crosstales.Common.Util.BaseConstants.PROCESS_KILL_TIME);
 
                   success = true;
                }
@@ -445,8 +445,8 @@ namespace Crosstales.Common.EditorUtil
          // header
          sb.AppendLine("echo ##############################################################################");
          sb.AppendLine("echo #                                                                            #");
-         sb.AppendLine("echo #  Common 2021.1.0 - Windows                                                 #");
-         sb.AppendLine("echo #  Copyright 2018-2021 by www.crosstales.com                                 #");
+         sb.AppendLine("echo #  Common 2022.1.0 - Windows                                                 #");
+         sb.AppendLine("echo #  Copyright 2018-2022 by www.crosstales.com                                 #");
          sb.AppendLine("echo #                                                                            #");
          sb.AppendLine("echo #  This script restarts Unity.                                               #");
          sb.AppendLine("echo #  This will take some time, so please be patient and DON'T CLOSE THIS       #");
@@ -461,7 +461,7 @@ namespace Crosstales.Common.EditorUtil
          // check if Unity is closed
          sb.AppendLine(":waitloop");
          sb.Append("if not exist \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp\\UnityLockfile\" goto waitloopend");
          sb.AppendLine();
          sb.AppendLine("echo.");
@@ -484,9 +484,9 @@ namespace Crosstales.Common.EditorUtil
          sb.AppendLine("echo #  Restarting Unity                                                          #");
          sb.AppendLine("echo ##############################################################################");
          sb.Append("start \"\" \"");
-         sb.Append(ValidatePath(EditorApplication.applicationPath, false));
+         sb.Append(Crosstales.Common.Util.FileHelper.ValidatePath(EditorApplication.applicationPath, false));
          sb.Append("\" -projectPath \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH.Substring(0, Util.BaseConstants.APPLICATION_PATH.Length - 1));
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH.Substring(0, Crosstales.Common.Util.BaseConstants.APPLICATION_PATH.Length - 1));
          sb.Append("\"");
 
          if (!string.IsNullOrEmpty(executeMethod))
@@ -501,7 +501,7 @@ namespace Crosstales.Common.EditorUtil
          // check if Unity is started
          sb.AppendLine(":waitloop2");
          sb.Append("if exist \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp\\UnityLockfile\" goto waitloopend2");
          sb.AppendLine();
          sb.AppendLine("echo Waiting for Unity to start...");
@@ -534,8 +534,8 @@ namespace Crosstales.Common.EditorUtil
          // header
          sb.AppendLine("echo \"+----------------------------------------------------------------------------+\"");
          sb.AppendLine("echo \"¦                                                                            ¦\"");
-         sb.AppendLine("echo \"¦  Common 2021.1.0 - macOS                                                   ¦\"");
-         sb.AppendLine("echo \"¦  Copyright 2018-2021 by www.crosstales.com                                 ¦\"");
+         sb.AppendLine("echo \"¦  Common 2022.1.0 - macOS                                                   ¦\"");
+         sb.AppendLine("echo \"¦  Copyright 2018-2022 by www.crosstales.com                                 ¦\"");
          sb.AppendLine("echo \"¦                                                                            ¦\"");
          sb.AppendLine("echo \"¦  This script restarts Unity.                                               ¦\"");
          sb.AppendLine("echo \"¦  This will take some time, so please be patient and DON'T CLOSE THIS       ¦\"");
@@ -550,7 +550,7 @@ namespace Crosstales.Common.EditorUtil
 
          // check if Unity is closed
          sb.Append("while [ -f \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp/UnityLockfile\" ]");
          sb.AppendLine();
          sb.AppendLine("do");
@@ -574,7 +574,7 @@ namespace Crosstales.Common.EditorUtil
          sb.Append("open -a \"");
          sb.Append(EditorApplication.applicationPath);
          sb.Append("\" --args -projectPath \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("\"");
 
          if (!string.IsNullOrEmpty(executeMethod))
@@ -588,7 +588,7 @@ namespace Crosstales.Common.EditorUtil
          //check if Unity is started
          sb.AppendLine("echo");
          sb.Append("while [ ! -f \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp/UnityLockfile\" ]");
          sb.AppendLine();
          sb.AppendLine("do");
@@ -621,8 +621,8 @@ namespace Crosstales.Common.EditorUtil
          // header
          sb.AppendLine("echo \"+----------------------------------------------------------------------------+\"");
          sb.AppendLine("echo \"¦                                                                            ¦\"");
-         sb.AppendLine("echo \"¦  Common 2021.1.0 - Linux                                                   ¦\"");
-         sb.AppendLine("echo \"¦  Copyright 2018-2021 by www.crosstales.com                                 ¦\"");
+         sb.AppendLine("echo \"¦  Common 2022.1.0 - Linux                                                   ¦\"");
+         sb.AppendLine("echo \"¦  Copyright 2018-2022 by www.crosstales.com                                 ¦\"");
          sb.AppendLine("echo \"¦                                                                            ¦\"");
          sb.AppendLine("echo \"¦  This script restarts Unity.                                               ¦\"");
          sb.AppendLine("echo \"¦  This will take some time, so please be patient and DON'T CLOSE THIS       ¦\"");
@@ -637,7 +637,7 @@ namespace Crosstales.Common.EditorUtil
 
          // check if Unity is closed
          sb.Append("while [ -f \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp/UnityLockfile\" ]");
          sb.AppendLine();
          sb.AppendLine("do");
@@ -661,7 +661,7 @@ namespace Crosstales.Common.EditorUtil
          sb.Append('"');
          sb.Append(EditorApplication.applicationPath);
          sb.Append("\" --args -projectPath \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("\"");
 
          if (!string.IsNullOrEmpty(executeMethod))
@@ -676,7 +676,7 @@ namespace Crosstales.Common.EditorUtil
          // check if Unity is started
          sb.AppendLine("echo");
          sb.Append("while [ ! -f \"");
-         sb.Append(Util.BaseConstants.APPLICATION_PATH);
+         sb.Append(Crosstales.Common.Util.BaseConstants.APPLICATION_PATH);
          sb.Append("Temp/UnityLockfile\" ]");
          sb.AppendLine();
          sb.AppendLine("do");
@@ -711,4 +711,4 @@ namespace Crosstales.Common.EditorUtil
    }
 }
 #endif
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

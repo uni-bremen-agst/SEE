@@ -12,14 +12,14 @@ namespace Crosstales.RTVoice
       #region Variables
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("ClipCacheSize")] [Header("Cache Settings"), Tooltip("Size of the clip cache in MB (default: 256)"), Range(16, 1024), SerializeField]
-      private int clipCacheSize = Util.Constants.DEFAULT_CACHE_SIZE_CLIPS;
+      private int clipCacheSize = Crosstales.RTVoice.Util.Constants.DEFAULT_CACHE_SIZE_CLIPS;
 
       [Tooltip("Automatically loads and saves the cache (default: false)"), SerializeField] private bool persistCache;
 
       ///<summary>Dictionary with all cached clips.</summary>
-      public readonly System.Collections.Generic.Dictionary<Model.Wrapper, AudioClip> Clips = new System.Collections.Generic.Dictionary<Model.Wrapper, AudioClip>();
+      public readonly System.Collections.Generic.Dictionary<Crosstales.RTVoice.Model.Wrapper, AudioClip> Clips = new System.Collections.Generic.Dictionary<Crosstales.RTVoice.Model.Wrapper, AudioClip>();
 
-      private readonly System.Collections.Generic.List<Model.Wrapper> clipKeys = new System.Collections.Generic.List<Model.Wrapper>();
+      private readonly System.Collections.Generic.List<Crosstales.RTVoice.Model.Wrapper> clipKeys = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Wrapper>();
 
       private Transform tf;
 
@@ -33,8 +33,8 @@ namespace Crosstales.RTVoice
       ///<summary>Size of the clip cache in Bytes.</summary>
       public int ClipCacheSize
       {
-         get => clipCacheSize * Util.Constants.FACTOR_MB;
-         set => clipCacheSize = Mathf.Clamp(value / Util.Constants.FACTOR_MB, 1, Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS);
+         get => clipCacheSize * Crosstales.RTVoice.Util.Constants.FACTOR_MB;
+         set => clipCacheSize = Mathf.Clamp(value / Crosstales.RTVoice.Util.Constants.FACTOR_MB, 1, Crosstales.RTVoice.Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS);
       }
 
       /// <summary>Current size of the clip cache in Bytes.</summary>
@@ -66,9 +66,9 @@ namespace Crosstales.RTVoice
          {
             clipCacheSize = 16;
          }
-         else if (clipCacheSize > Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS)
+         else if (clipCacheSize > Crosstales.RTVoice.Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS)
          {
-            clipCacheSize = Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS;
+            clipCacheSize = Crosstales.RTVoice.Util.Constants.DEFAULT_MAX_CACHE_SIZE_CLIPS;
          }
       }
 
@@ -97,7 +97,7 @@ namespace Crosstales.RTVoice
       /// <summary>Returns the AudioClip for a given key.</summary>
       /// <param name="key">Key for the AudioClip.</param>
       /// <returns>AudioClip for the given key.</returns>
-      public AudioClip GetClip(Model.Wrapper key)
+      public AudioClip GetClip(Crosstales.RTVoice.Model.Wrapper key)
       {
          if (key != null)
          {
@@ -112,7 +112,7 @@ namespace Crosstales.RTVoice
 
       /// <summary>Removes an AudioClip for a given key.</summary>
       /// <param name="key">Key for the AudioClip.</param>
-      public void RemoveClip(Model.Wrapper key)
+      public void RemoveClip(Crosstales.RTVoice.Model.Wrapper key)
       {
          if (key != null && Clips.ContainsKey(key))
          {
@@ -125,7 +125,7 @@ namespace Crosstales.RTVoice
       /// <summary>Adds an AudioClip for a given key.</summary>
       /// <param name="key">Key for the AudioClip.</param>
       /// <param name="data">AudioClip for the key.</param>
-      public void AddClip(Model.Wrapper key, AudioClip data)
+      public void AddClip(Crosstales.RTVoice.Model.Wrapper key, AudioClip data)
       {
          if (key != null && data != null && !Clips.ContainsKey(key))
          {
@@ -142,10 +142,10 @@ namespace Crosstales.RTVoice
       /// <summary>Clears the clips cache.</summary>
       public void ClearClipCache()
       {
-         Util.Context.NumberOfCachedSpeeches = 0;
-         Util.Context.NumberOfNonCachedSpeeches = 0;
+         Crosstales.RTVoice.Util.Context.NumberOfCachedSpeeches = 0;
+         Crosstales.RTVoice.Util.Context.NumberOfNonCachedSpeeches = 0;
 
-         foreach (System.Collections.Generic.KeyValuePair<Model.Wrapper, AudioClip> kvp in Clips)
+         foreach (System.Collections.Generic.KeyValuePair<Crosstales.RTVoice.Model.Wrapper, AudioClip> kvp in Clips)
          {
             Destroy(kvp.Value);
          }
@@ -165,7 +165,7 @@ namespace Crosstales.RTVoice
       {
          System.Collections.Generic.List<DataStore> data = Clips.Select(kvp => new DataStore(kvp.Key, Crosstales.Common.Audio.WavMaster.FromAudioClip(kvp.Value))).ToList();
 
-         Common.Util.XmlHelper.SerializeToFile(data, dataStorePath);
+         Crosstales.Common.Util.XmlHelper.SerializeToFile(data, dataStorePath);
 
          Debug.Log("SaveCache: " + data.Count);
       }
@@ -175,7 +175,7 @@ namespace Crosstales.RTVoice
       {
          if (System.IO.File.Exists(dataStorePath))
          {
-            System.Collections.Generic.List<DataStore> data = Common.Util.XmlHelper.DeserializeFromFile<System.Collections.Generic.List<DataStore>>(dataStorePath);
+            System.Collections.Generic.List<DataStore> data = Crosstales.Common.Util.XmlHelper.DeserializeFromFile<System.Collections.Generic.List<DataStore>>(dataStorePath);
 
             if (data != null)
             {
@@ -196,7 +196,7 @@ namespace Crosstales.RTVoice
    [System.Serializable]
    public class DataStore
    {
-      public Model.Wrapper wrapper;
+      public Crosstales.RTVoice.Model.Wrapper wrapper;
       public byte[] Data;
 
       /// <summary>Default.</summary>
@@ -207,11 +207,11 @@ namespace Crosstales.RTVoice
       /// <summary>Instantiate the class.</summary>
       /// <param name="wrapper">Wrapper of the speech.</param>
       /// <param name="data">Data of the speech.</param>
-      public DataStore(Model.Wrapper wrapper, byte[] data)
+      public DataStore(Crosstales.RTVoice.Model.Wrapper wrapper, byte[] data)
       {
          this.wrapper = wrapper;
          Data = data;
       }
    }
 }
-// © 2020-2021 crosstales LLC (https://www.crosstales.com)
+// © 2020-2022 crosstales LLC (https://www.crosstales.com)

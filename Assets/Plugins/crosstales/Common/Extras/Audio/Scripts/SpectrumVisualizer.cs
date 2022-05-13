@@ -59,7 +59,7 @@ namespace Crosstales.Common.Audio
                tempCube = Instantiate(VisualPrefab, new Vector3(position.x - ii * Width, position.y, position.z), Quaternion.identity);
             }
 
-            tempCube.GetComponent<Renderer>().material.color = Util.BaseHelper.HSVToRGB(360f / samplesPerChannel * ii, 1f, 1f, Opacity);
+            tempCube.GetComponent<Renderer>().material.color = Crosstales.Common.Util.BaseHelper.HSVToRGB(360f / samplesPerChannel * ii, 1f, 1f, Opacity);
 
             visualTransforms[ii] = tempCube.GetComponent<Transform>();
             visualTransforms[ii].parent = tf;
@@ -78,4 +78,4 @@ namespace Crosstales.Common.Audio
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

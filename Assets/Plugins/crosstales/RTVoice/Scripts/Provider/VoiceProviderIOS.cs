@@ -10,10 +10,10 @@ namespace Crosstales.RTVoice.Provider
    {
       #region Variables
 
-      private static System.Collections.Generic.List<Model.Voice> cachediOSVoices = new System.Collections.Generic.List<Model.Voice>();
+      private static System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> cachediOSVoices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>();
 
       private static bool isWorking;
-      private static Model.Wrapper wrapperNative;
+      private static Crosstales.RTVoice.Model.Wrapper wrapperNative;
       private static bool isPaused;
       private static string[] speechTextArray;
       private static int wordIndex;
@@ -34,7 +34,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override string DefaultVoiceName => "Daniel";
 
-      public override System.Collections.Generic.List<Model.Voice> Voices => cachediOSVoices;
+      public override System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> Voices => cachediOSVoices;
 
       public override bool isWorkingInEditor => false;
 
@@ -46,7 +46,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool isSpeakSupported => false;
 
-      public override bool isPlatformSupported => Util.Helper.isIOSBasedPlatform;
+      public override bool isPlatformSupported => Crosstales.RTVoice.Util.Helper.isIOSBasedPlatform;
 
       public override bool isSSMLSupported => false;
 
@@ -72,21 +72,21 @@ namespace Crosstales.RTVoice.Provider
 
          if (voices.Length % 3 == 0)
          {
-            System.Collections.Generic.List<Model.Voice> voicesList = new System.Collections.Generic.List<Model.Voice>(60);
+            System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voicesList = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>(60);
 
             //for (int ii = 0; ii < voices.Length; ii += 2)
             for (int ii = 0; ii < voices.Length; ii += 3)
             {
                string name = voices[ii + 1];
                string culture = voices[ii + 2];
-               Model.Voice newVoice = new Model.Voice(name, "iOS voice: " + name + " " + culture, Util.Helper.AppleVoiceNameToGender(name), "unknown", culture, voices[ii], "Apple");
+               Crosstales.RTVoice.Model.Voice newVoice = new Crosstales.RTVoice.Model.Voice(name, "iOS voice: " + name + " " + culture, Crosstales.RTVoice.Util.Helper.AppleVoiceNameToGender(name), "unknown", culture, voices[ii], "Apple");
 
                voicesList.Add(newVoice);
             }
 
             cachediOSVoices = voicesList.OrderBy(s => s.Name).ToList();
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Voices read: " + cachediOSVoices.CTDump());
          }
          else
@@ -121,7 +121,7 @@ namespace Crosstales.RTVoice.Provider
       /// <summary>Called every time a new word is spoken.</summary>
       public static void WordSpoken(string word)
       {
-         //if (Util.Constants.DEV_DEBUG)
+         //if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
          Debug.Log($"Word spoken: {word}"); //TODO test word from iOS!
 
          if (wrapperNative != null)
@@ -153,17 +153,17 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator SpeakNative(Model.Wrapper wrapper)
+      public override IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          yield return speak(wrapper, true);
       }
 
-      public override IEnumerator Speak(Model.Wrapper wrapper)
+      public override IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          yield return speak(wrapper, false);
       }
 
-      public override IEnumerator Generate(Model.Wrapper wrapper)
+      public override IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Debug.LogError("'Generate' is not supported for iOS!");
          yield return null;
@@ -199,7 +199,7 @@ namespace Crosstales.RTVoice.Provider
 
       #region Private methods
 
-      private IEnumerator speak(Model.Wrapper wrapper, bool isNative)
+      private IEnumerator speak(Crosstales.RTVoice.Model.Wrapper wrapper, bool isNative)
       {
 #if !UNITY_EDITOR || CT_DEVELOP
          if (wrapper == null)
@@ -235,7 +235,7 @@ namespace Crosstales.RTVoice.Provider
 
                isWorking = true;
 
-               speechTextArray = Util.Helper.CleanText(wrapper.Text, false).Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
+               speechTextArray = Crosstales.RTVoice.Util.Helper.CleanText(wrapper.Text, false).Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
                wordIndex = 0;
                wrapperNative = wrapper;
 
@@ -246,7 +246,7 @@ namespace Crosstales.RTVoice.Provider
                   yield return null;
                } while (isWorking && !silence);
 
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("Text spoken: " + wrapper.Text);
 
                wrapperNative = null;
@@ -272,17 +272,17 @@ namespace Crosstales.RTVoice.Provider
             result = 1f + (rate - 1f) * 0.25f;
          }
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.Log("calculateRate: " + result + " - " + rate);
 
          return result;
       }
 
-      private string getVoiceId(Model.Wrapper wrapper)
+      private string getVoiceId(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper != null && string.IsNullOrEmpty(wrapper.Voice?.Identifier))
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.LogWarning("'wrapper.Voice' or 'wrapper.Voice.Identifier' is null! Using the OS 'default' voice.");
 
             return Speaker.Instance.VoiceForName(DefaultVoiceName)?.Identifier;
@@ -298,12 +298,12 @@ namespace Crosstales.RTVoice.Provider
 
 #if UNITY_EDITOR
 
-      public override void GenerateInEditor(Model.Wrapper wrapper)
+      public override void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Debug.LogError("'GenerateInEditor' is not supported for iOS!");
       }
 
-      public override void SpeakNativeInEditor(Model.Wrapper wrapper)
+      public override void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Debug.LogError("'SpeakNativeInEditor' is not supported for iOS!");
       }
@@ -345,4 +345,4 @@ namespace Crosstales.RTVoice.Provider
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

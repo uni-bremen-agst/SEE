@@ -1,5 +1,21 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2022.1.0 - 24.03.2022
+* Speaker: "Force 32bit" for Windows added
+* Editor integration improved
+* Fixes for namespaces
+* "00-Simple_Example" demo scene added
+* Updated to Common 2022.1.0
+
+## 2021.3.7 - 06.01.2022
+* Fix for AWS, Azure and MaryTTS
+
+## 2021.3.6 - 05.01.2022
+* Integration of "Google Cloud Text To Speech" improved
+* Fix for MaryTTS
+* Android TTS updated
+* Updated to Common 2021.3.6
+
 ## 2021.3.5 - 24.11.2021
 * Unnecessary logs removed
 * PlatformProvider improved

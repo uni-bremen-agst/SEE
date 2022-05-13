@@ -10,7 +10,7 @@ namespace Crosstales.RTVoice.Tool
       #region Variables
 
       /// <summary>The new gender for all voices.</summary>
-      [Tooltip("The new gender for all voices.")] public Model.Enum.Gender NewGender;
+      [Tooltip("The new gender for all voices.")] public Crosstales.RTVoice.Model.Enum.Gender NewGender;
 
 /*
         /// <summary>Refresh on voices ready (default: true).</summary>
@@ -32,7 +32,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void OnDestroy()
       {
-         if (!Util.Helper.isEditorMode && Speaker.Instance != null)
+         if (Speaker.Instance != null)
             Speaker.Instance.OnVoicesReady -= Change;
       }
 
@@ -43,7 +43,7 @@ namespace Crosstales.RTVoice.Tool
 
       public void GenderChanged(int index)
       {
-         NewGender = (Model.Enum.Gender)index;
+         NewGender = (Crosstales.RTVoice.Model.Enum.Gender)index;
 
          Change();
       }
@@ -52,7 +52,7 @@ namespace Crosstales.RTVoice.Tool
       {
          if (!ESpeakOnly || ESpeakOnly && Speaker.Instance.ESpeakMode)
          {
-            foreach (Model.Voice voice in Speaker.Instance.Voices)
+            foreach (Crosstales.RTVoice.Model.Voice voice in Speaker.Instance.Voices)
             {
                voice.Gender = NewGender;
             }
@@ -62,4 +62,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

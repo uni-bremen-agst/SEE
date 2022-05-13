@@ -5,13 +5,13 @@ using UnityEngine;
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'PlatformProvider'-class.</summary>
-   [CustomEditor(typeof(Tool.PlatformProvider))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.PlatformProvider))]
    [CanEditMultipleObjects]
    public class PlatformProviderEditor : Editor
    {
       #region Variables
 
-      private Tool.PlatformProvider script;
+      private Crosstales.RTVoice.Tool.PlatformProvider script;
 
       #endregion
 
@@ -27,7 +27,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.PlatformProvider)target;
+         script = (Crosstales.RTVoice.Tool.PlatformProvider)target;
       }
 
       public override void OnInspectorGUI()
@@ -40,7 +40,7 @@ namespace Crosstales.RTVoice.EditorExtension
          }
          else
          {
-            EditorUtil.EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
             EditorGUILayout.HelpBox("Script is disabled!", MessageType.Info);
          }
       }
@@ -49,4 +49,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

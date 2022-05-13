@@ -94,4 +94,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

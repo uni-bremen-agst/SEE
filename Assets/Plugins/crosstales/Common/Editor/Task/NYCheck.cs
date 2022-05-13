@@ -24,9 +24,9 @@ namespace Crosstales.Common.EditorTask
 
          if (!year.Equals(lastYear) && month.Equals("01"))
          {
-            Debug.LogWarning(Util.BaseHelper.CreateString("-", 400));
+            Debug.LogWarning(Crosstales.Common.Util.BaseHelper.CreateString("-", 400));
             Debug.LogWarning($"<color=yellow>¸.•°*”˜˜”*°•.¸ ★</color>  <b><color=darkblue>crosstales LLC</color></b> wishes you a <b>happy</b> and <b>successful <color=orange>{year}</color></b>!  <color=yellow>★ ¸.•*¨`*•.</color><color=cyan>♫</color><color=red>❤</color><color=lime>♫</color><color=red>❤</color><color=magenta>♫</color><color=red>❤</color>");
-            Debug.LogWarning(Util.BaseHelper.CreateString("-", 400));
+            Debug.LogWarning(Crosstales.Common.Util.BaseHelper.CreateString("-", 400));
 
             if (!year.Equals("9999"))
                EditorPrefs.SetString(KEY_NYCHECK_DATE, year);
@@ -37,4 +37,4 @@ namespace Crosstales.Common.EditorTask
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

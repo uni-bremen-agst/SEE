@@ -3,7 +3,7 @@
 namespace Crosstales.RTVoice.Util
 {
    /// <summary>Collected constants of very general utility for the asset.</summary>
-   public abstract class Constants : Common.Util.BaseConstants
+   public abstract class Constants : Crosstales.Common.Util.BaseConstants
    {
       #region Constant variables
 
@@ -14,16 +14,16 @@ namespace Crosstales.RTVoice.Util
       public const string ASSET_NAME_SHORT = "RTV PRO";
 
       /// <summary>Version of the asset.</summary>
-      public const string ASSET_VERSION = "2021.3.5";
+      public const string ASSET_VERSION = "2022.1.0";
 
       /// <summary>Build number of the asset.</summary>
-      public const int ASSET_BUILD = 20211124;
+      public const int ASSET_BUILD = 20220324;
 
       /// <summary>Create date of the asset (YYYY, MM, DD).</summary>
       public static readonly System.DateTime ASSET_CREATED = new System.DateTime(2015, 4, 29);
 
       /// <summary>Change date of the asset (YYYY, MM, DD).</summary>
-      public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2021, 11, 24);
+      public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2022, 3, 24);
 
       /// <summary>URL of the PRO asset in UAS.</summary>
       public const string ASSET_PRO_URL = "https://assetstore.unity.com/packages/slug/41068?aid=1011lNGT";
@@ -111,11 +111,10 @@ namespace Crosstales.RTVoice.Util
       //public const string KEY_TTS_MACOS = KEY_PREFIX + "TTS_MACOS";
 
       // Default values
-      public static readonly string DEFAULT_AUDIOFILE_PATH = Helper.ValidatePath(Application.temporaryCachePath);
+      public static readonly string DEFAULT_AUDIOFILE_PATH = Crosstales.Common.Util.FileHelper.ValidatePath(Application.temporaryCachePath);
       public const bool DEFAULT_AUDIOFILE_AUTOMATIC_DELETE = true;
 
       public const bool DEFAULT_ENFORCE_STANDALONE_TTS = true;
-      //public const string DEFAULT_TTS_WINDOWS_BUILD = @"/RTVoiceTTSWrapper.exe";
 
       public const string DEFAULT_TTS_MACOS = "say";
 
@@ -157,4 +156,4 @@ namespace Crosstales.RTVoice.Util
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

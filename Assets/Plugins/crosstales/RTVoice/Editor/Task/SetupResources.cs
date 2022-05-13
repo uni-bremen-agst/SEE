@@ -6,7 +6,7 @@ namespace Crosstales.RTVoice.EditorTask
 {
    /// <summary>Moves all needed resources to 'Editor Default Resources'.</summary>
    [InitializeOnLoad]
-   public class SetupResources : Common.EditorTask.BaseSetupResources
+   public class SetupResources : Crosstales.Common.EditorTask.BaseSetupResources
    {
       #region Constructor
 
@@ -24,9 +24,9 @@ namespace Crosstales.RTVoice.EditorTask
       {
 #if !CT_DEVELOP
          string path = Application.dataPath;
-         string assetpath = "Assets" + EditorUtil.EditorConfig.ASSET_PATH;
+         string assetpath = "Assets" + Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH;
 
-         string sourceFolder = path + EditorUtil.EditorConfig.ASSET_PATH + "Icons/";
+         string sourceFolder = path + Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH + "Icons/";
          string source = assetpath + "Icons/";
 
          string targetFolder = path + "/Editor Default Resources/crosstales/RTVoice/";
@@ -41,4 +41,4 @@ namespace Crosstales.RTVoice.EditorTask
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

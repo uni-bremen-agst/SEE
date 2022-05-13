@@ -15,38 +15,18 @@ namespace Crosstales.Common.Util
 
       protected static readonly System.Random rnd = new System.Random();
 
-      protected const string file_prefix = "file://";
-
       public static bool ApplicationIsPlaying = Application.isPlaying;
-      private static string applicationDataPath = Application.dataPath;
 
       private static string[] args;
+
+      private static int androidAPILevel = 0;
 
       #endregion
 
 
       #region Properties
 
-      /// <summary>Checks if an Internet connection is available.</summary>
-      /// <returns>True if an Internet connection is available.</returns>
-      public static bool isInternetAvailable
-      {
-         get
-         {
-#if CT_OC
-            if (OnlineCheck.OnlineCheck.Instance == null)
-            {
-               return Application.internetReachability != NetworkReachability.NotReachable;
-            }
-            else
-            {
-               return OnlineCheck.OnlineCheck.Instance.isInternetAvailable;
-            }
-#else
-            return Application.internetReachability != NetworkReachability.NotReachable;
-#endif
-         }
-      }
+      #region Platforms
 
       /// <summary>Checks if the current platform is Windows.</summary>
       /// <returns>True if the current platform is Windows.</returns>
@@ -262,6 +242,8 @@ namespace Crosstales.Common.Util
          }
       }
 
+      #endregion
+
       /// <summary>Checks if we are in Editor mode.</summary>
       /// <returns>True if in Editor mode.</returns>
       public static bool isEditorMode => isEditor && !ApplicationIsPlaying;
@@ -289,45 +271,43 @@ namespace Crosstales.Common.Util
 
       /// <summary>Returns the current platform.</summary>
       /// <returns>The current platform.</returns>
-      public static Model.Enum.Platform CurrentPlatform
+      public static Crosstales.Common.Model.Enum.Platform CurrentPlatform
       {
          get
          {
             if (isWindowsPlatform)
-               return Model.Enum.Platform.Windows;
+               return Crosstales.Common.Model.Enum.Platform.Windows;
 
             if (isMacOSPlatform)
-               return Model.Enum.Platform.OSX;
+               return Crosstales.Common.Model.Enum.Platform.OSX;
 
             if (isLinuxPlatform)
-               return Model.Enum.Platform.Linux;
+               return Crosstales.Common.Model.Enum.Platform.Linux;
 
             if (isAndroidPlatform)
-               return Model.Enum.Platform.Android;
+               return Crosstales.Common.Model.Enum.Platform.Android;
 
             if (isIOSBasedPlatform)
-               return Model.Enum.Platform.IOS;
+               return Crosstales.Common.Model.Enum.Platform.IOS;
 
             if (isWSABasedPlatform)
-               return Model.Enum.Platform.WSA;
+               return Crosstales.Common.Model.Enum.Platform.WSA;
 
-            return isWebPlatform ? Model.Enum.Platform.Web : Model.Enum.Platform.Unsupported;
+            return isWebPlatform ? Crosstales.Common.Model.Enum.Platform.Web : Crosstales.Common.Model.Enum.Platform.Unsupported;
          }
       }
 
-      /// <summary>Returns the path to the the "Streaming Assets".</summary>
-      /// <returns>The path to the the "Streaming Assets".</returns>
-      public static string StreamingAssetsPath
+      /// <summary>Returns the Android API level of the current device (Android only)".</summary>
+      /// <returns>The Android API level of the current device.</returns>
+      public static int AndroidAPILevel
       {
          get
          {
-            if (isAndroidPlatform && !isEditor)
-               return $"jar:file://{applicationDataPath}!/assets/";
-
-            if (isIOSBasedPlatform && !isEditor)
-               return $"{applicationDataPath}/Raw/";
-
-            return $"{applicationDataPath}/StreamingAssets/";
+#if UNITY_ANDROID
+            if (androidAPILevel == 0)
+               androidAPILevel = int.Parse(SystemInfo.operatingSystem.Substring(SystemInfo.operatingSystem.IndexOf("-") + 1, 3));
+#endif
+            return androidAPILevel;
          }
       }
 
@@ -347,7 +327,6 @@ namespace Crosstales.Common.Util
       {
          //Debug.Log("initialize");
          ApplicationIsPlaying = Application.isPlaying;
-         applicationDataPath = Application.dataPath;
 /*
          if (!isEditorMode)
          {
@@ -362,22 +341,6 @@ namespace Crosstales.Common.Util
 
 
       #region Public methods
-
-      /// <summary>Opens the given URL with the file explorer or browser.</summary>
-      /// <param name="url">URL to open</param>
-      /// <returns>True uf the URL was valid.</returns>
-      public static bool OpenURL(string url)
-      {
-         if (isValidURL(url))
-         {
-            openURL(url);
-
-            return true;
-         }
-
-         Debug.LogWarning($"URL was invalid: {url}");
-         return false;
-      }
 
       /// <summary>Creates a string of characters with a given length.</summary>
       /// <param name="replaceChars">Characters to generate the string (if more than one character is used, the generated string will be a randomized result of all characters)</param>
@@ -405,484 +368,6 @@ namespace Crosstales.Common.Util
          return string.Empty;
       }
 
-      /// <summary>Determines if an AudioSource has an active clip.</summary>
-      /// <param name="source">AudioSource to check.</param>
-      /// <returns>True if the AudioSource has an active clip.</returns>
-      [System.ObsoleteAttribute("Use the extension method 'CTHasActiveClip' instead")]
-      public static bool hasActiveClip(AudioSource source) //TODO remove in the future
-      {
-         return source.CTHasActiveClip();
-      }
-
-#if (!UNITY_WSA && !UNITY_XBOXONE) || UNITY_EDITOR
-      /// <summary>HTTPS-certification callback.</summary>
-      public static bool RemoteCertificateValidationCallback(object sender,
-         System.Security.Cryptography.X509Certificates.X509Certificate certificate,
-         System.Security.Cryptography.X509Certificates.X509Chain chain,
-         System.Net.Security.SslPolicyErrors sslPolicyErrors)
-      {
-         bool isOk = true;
-
-         // If there are errors in the certificate chain, look at each error to determine the cause.
-         if (sslPolicyErrors != System.Net.Security.SslPolicyErrors.None)
-         {
-            foreach (System.Security.Cryptography.X509Certificates.X509ChainStatus t in chain.ChainStatus.Where(t =>
-               t.Status != System.Security.Cryptography.X509Certificates.X509ChainStatusFlags
-                  .RevocationStatusUnknown))
-            {
-               chain.ChainPolicy.RevocationFlag = System.Security.Cryptography.X509Certificates.X509RevocationFlag.EntireChain;
-               chain.ChainPolicy.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.Online;
-               chain.ChainPolicy.UrlRetrievalTimeout = new System.TimeSpan(0, 1, 0);
-               chain.ChainPolicy.VerificationFlags = System.Security.Cryptography.X509Certificates.X509VerificationFlags.AllFlags;
-
-               isOk = chain.Build((System.Security.Cryptography.X509Certificates.X509Certificate2)certificate);
-            }
-         }
-
-         return isOk;
-      }
-#endif
-
-      /// <summary>Validates a given path and add missing slash.</summary>
-      /// <param name="path">Path to validate</param>
-      /// <param name="addEndDelimiter">Add delimiter at the end of the path (optional, default: true)</param>
-      /// <param name="preserveFile">Preserves a given file in the path (optional, default: true)</param>
-      /// <returns>Valid path</returns>
-      public static string ValidatePath(string path, bool addEndDelimiter = true, bool preserveFile = true)
-      {
-         if (!string.IsNullOrEmpty(path))
-         {
-            if (isValidURL(path))
-               return path;
-
-            string pathTemp = !preserveFile && System.IO.File.Exists(path.Trim()) ? System.IO.Path.GetDirectoryName(path.Trim()) : path.Trim();
-
-            string result;
-
-            if ((isWindowsBasedPlatform || isWindowsEditor) && !isMacOSEditor && !isLinuxEditor)
-            {
-               result = pathTemp.Replace('/', '\\');
-
-               if (addEndDelimiter)
-               {
-                  if (!result.CTEndsWith(BaseConstants.PATH_DELIMITER_WINDOWS))
-                  {
-                     result += BaseConstants.PATH_DELIMITER_WINDOWS;
-                  }
-               }
-            }
-            else
-            {
-               result = pathTemp.Replace('\\', '/');
-
-               if (addEndDelimiter)
-               {
-                  if (!result.CTEndsWith(BaseConstants.PATH_DELIMITER_UNIX))
-                  {
-                     result += BaseConstants.PATH_DELIMITER_UNIX;
-                  }
-               }
-            }
-
-            return string.Join(string.Empty, result.Split(System.IO.Path.GetInvalidPathChars()));
-            //return result;
-         }
-
-         return path;
-      }
-
-      /// <summary>Validates a given file.</summary>
-      /// <param name="path">File to validate</param>
-      /// <returns>Valid file path</returns>
-      public static string ValidateFile(string path)
-      {
-         if (!string.IsNullOrEmpty(path))
-         {
-            if (isValidURL(path))
-               return path;
-
-            string result = ValidatePath(path);
-
-            if (result.CTEndsWith(BaseConstants.PATH_DELIMITER_WINDOWS) ||
-                result.CTEndsWith(BaseConstants.PATH_DELIMITER_UNIX))
-            {
-               result = result.Substring(0, result.Length - 1);
-            }
-
-            string fileName;
-            if ((isWindowsBasedPlatform || isWindowsEditor) && !isMacOSEditor && !isLinuxEditor)
-            {
-               fileName = result.Substring(result.CTLastIndexOf(BaseConstants.PATH_DELIMITER_WINDOWS) + 1);
-            }
-            else
-            {
-               fileName = result.Substring(result.CTLastIndexOf(BaseConstants.PATH_DELIMITER_UNIX) + 1);
-            }
-
-            string newName =
-               string.Join(string.Empty,
-                  fileName.Split(System.IO.Path
-                     .GetInvalidFileNameChars())); //.Replace(BaseConstants.PATH_DELIMITER_WINDOWS, string.Empty).Replace(BaseConstants.PATH_DELIMITER_UNIX, string.Empty);
-
-            return result.Substring(0, result.Length - fileName.Length) + newName;
-         }
-
-         return path;
-      }
-
-      /// <summary>
-      /// Checks a given path for invalid characters
-      /// </summary>
-      /// <param name="path">Path to check for invalid characters</param>
-      /// <returns>Returns true if the path contains invalid chars, otherwise it's false.</returns>
-      public static bool PathHasInvalidChars(string path)
-      {
-         return !string.IsNullOrEmpty(path) && path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0;
-      }
-
-      /// <summary>
-      /// Checks a given file for invalid characters
-      /// </summary>
-      /// <param name="file">File to check for invalid characters</param>
-      /// <returns>Returns true if the file contains invalid chars, otherwise it's false.</returns>
-      public static bool FileHasInvalidChars(string file)
-      {
-         return !string.IsNullOrEmpty(file) && file.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) >= 0;
-      }
-
-      /// <summary>
-      /// Find files inside a path.
-      /// </summary>
-      /// <param name="path">Path to find the files</param>
-      /// <param name="isRecursive">Recursive search (default: false, optional)</param>
-      /// <param name="extensions">Extensions for the file search, e.g. "png" (optional)</param>
-      /// <returns>Returns array of the found files inside the path (alphabetically ordered). Zero length array when an error occured.</returns>
-      public static string[] GetFiles(string path, bool isRecursive = false, params string[] extensions)
-      {
-         if (isWebPlatform && !isEditor)
-         {
-            Debug.LogWarning("'GetFiles' is not supported for the current platform!");
-         }
-         else if (isWSABasedPlatform && !isEditor)
-         {
-#if CT_FB_PRO
-#if (UNITY_WSA || UNITY_XBOXONE) && !UNITY_EDITOR && ENABLE_WINMD_SUPPORT
-             Crosstales.FB.FileBrowserWSAImpl fbWsa = new Crosstales.FB.FileBrowserWSAImpl();
-             fbWsa.isBusy = true;
-             UnityEngine.WSA.Application.InvokeOnUIThread(() => { fbWsa.GetFiles(path, isRecursive, extensions); }, false);
-
-             do
-             {
-                 //wait
-             } while (fbWsa.isBusy);
-
-             return fbWsa.Selection.ToArray();
-#endif
-#else
-            Debug.LogWarning($"'GetFiles' under UWP (WSA) is supported in combination with 'File Browser PRO'. For more, please see: {BaseConstants.ASSET_FB}");
-#endif
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(path))
-            {
-               try
-               {
-                  string _path = ValidatePath(path);
-
-                  if (extensions == null || extensions.Length == 0 || extensions.Any(extension => extension.Equals("*") || extension.Equals("*.*")))
-                  {
-#if NET_4_6 || NET_STANDARD_2_0
-                     return System.IO.Directory.EnumerateFiles(_path, "*", isRecursive
-                        ? System.IO.SearchOption.AllDirectories
-                        : System.IO.SearchOption.TopDirectoryOnly).ToArray();
-#else
-                     return System.IO.Directory.GetFiles(_path, "*",
-                        isRecursive
-                           ? System.IO.SearchOption.AllDirectories
-                           : System.IO.SearchOption.TopDirectoryOnly);
-#endif
-                  }
-
-                  System.Collections.Generic.List<string> files = new System.Collections.Generic.List<string>();
-
-                  foreach (string extension in extensions)
-                  {
-                     files.AddRange(System.IO.Directory.EnumerateFiles(_path, $"*.{extension}", isRecursive
-                        ? System.IO.SearchOption.AllDirectories
-                        : System.IO.SearchOption.TopDirectoryOnly));
-                  }
-
-                  return files.OrderBy(q => q).ToArray();
-               }
-               catch (System.Exception ex)
-               {
-                  Debug.LogWarning($"Could not scan the path for files: {ex}");
-               }
-            }
-         }
-
-         return System.Array.Empty<string>();
-      }
-
-      /// <summary>
-      /// Find directories inside.
-      /// </summary>
-      /// <param name="path">Path to find the directories</param>
-      /// <param name="isRecursive">Recursive search (default: false, optional)</param>
-      /// <returns>Returns array of the found directories inside the path. Zero length array when an error occured.</returns>
-      public static string[] GetDirectories(string path, bool isRecursive = false)
-      {
-         if (isWebPlatform && !isEditor)
-         {
-            Debug.LogWarning("'GetDirectories' is not supported for the current platform!");
-         }
-         else if (isWSABasedPlatform && !isEditor)
-         {
-#if CT_FB_PRO
-#if (UNITY_WSA || UNITY_XBOXONE) && !UNITY_EDITOR && ENABLE_WINMD_SUPPORT
-            Crosstales.FB.FileBrowserWSAImpl fbWsa = new Crosstales.FB.FileBrowserWSAImpl();
-            fbWsa.isBusy = true;
-            UnityEngine.WSA.Application.InvokeOnUIThread(() => { fbWsa.GetDirectories(path, isRecursive); }, false);
-
-            do
-            {
-              //wait
-            } while (fbWsa.isBusy);
-
-            return fbWsa.Selection.ToArray();
-#endif
-#else
-            Debug.LogWarning($"'GetDirectories' under UWP (WSA) is supported in combination with 'File Browser PRO'. For more, please see: {BaseConstants.ASSET_FB}");
-#endif
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(path))
-            {
-               try
-               {
-                  string _path = ValidatePath(path);
-#if NET_4_6 || NET_STANDARD_2_0
-                  return System.IO.Directory.EnumerateDirectories(_path, "*", isRecursive
-                     ? System.IO.SearchOption.AllDirectories
-                     : System.IO.SearchOption.TopDirectoryOnly).ToArray();
-#else
-                  return System.IO.Directory.GetDirectories(_path, "*",
-                     isRecursive
-                        ? System.IO.SearchOption.AllDirectories
-                        : System.IO.SearchOption.TopDirectoryOnly);
-#endif
-               }
-               catch (System.Exception ex)
-               {
-                  Debug.LogWarning($"Could not scan the path for directories: {ex}");
-               }
-            }
-         }
-
-         return System.Array.Empty<string>();
-      }
-
-      /// <summary>
-      /// Find all logical drives.
-      /// </summary>
-      /// <returns>Returns array of the found drives. Zero length array when an error occured.</returns>
-      public static string[] GetDrives() //TODO replace with "Util.Helper.GetDrives" in the next version
-      {
-         if (isWebPlatform && !isEditor)
-         {
-            Debug.LogWarning("'GetDrives' is not supported for the current platform!");
-         }
-         else if (isWSABasedPlatform && !isEditor)
-         {
-#if CT_FB_PRO
-#if (UNITY_WSA || UNITY_XBOXONE) && !UNITY_EDITOR && ENABLE_WINMD_SUPPORT
-            Crosstales.FB.FileBrowserWSAImpl fbWsa = new Crosstales.FB.FileBrowserWSAImpl();
-            fbWsa.isBusy = true;
-            UnityEngine.WSA.Application.InvokeOnUIThread(() => { fbWsa.GetDrives(); }, false);
-
-            do
-            {
-              //wait
-            } while (fbWsa.isBusy);
-
-            return fbWsa.Selection.ToArray();
-#endif
-#else
-            Debug.LogWarning($"'GetDrives' under UWP (WSA) is supported in combination with 'File Browser PRO'. For more, please see: {BaseConstants.ASSET_FB}");
-#endif
-         }
-         else
-         {
-#if (!UNITY_WSA && !UNITY_XBOXONE) || UNITY_EDITOR
-            try
-            {
-               return System.IO.Directory.GetLogicalDrives();
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogWarning($"Could not scan the path for directories: {ex}");
-            }
-#endif
-         }
-
-         return System.Array.Empty<string>();
-      }
-
-      /*
-      /// <summary>Validates a given path and add missing slash.</summary>
-      /// <param name="path">Path to validate</param>
-      /// <returns>Valid path</returns>
-      public static string ValidPath(string path)
-      {
-          if (!string.IsNullOrEmpty(path))
-          {
-              string pathTemp = path.Trim();
-              string result = null;
-
-              if (isWindowsPlatform)
-              {
-                  result = pathTemp.Replace('/', '\\');
-
-                  if (!result.EndsWith(BaseConstants.PATH_DELIMITER_WINDOWS))
-                  {
-                      result += BaseConstants.PATH_DELIMITER_WINDOWS;
-                  }
-              }
-              else
-              {
-                  result = pathTemp.Replace('\\', '/');
-
-                  if (!result.EndsWith(BaseConstants.PATH_DELIMITER_UNIX))
-                  {
-                      result += BaseConstants.PATH_DELIMITER_UNIX;
-                  }
-              }
-
-              return result;
-          }
-
-          return path;
-      }
-
-      /// <summary>Validates a given file.</summary>
-      /// <param name="path">File to validate</param>
-      /// <returns>Valid file path</returns>
-      public static string ValidFilePath(string path)
-      {
-          if (!string.IsNullOrEmpty(path))
-          {
-
-              string result = ValidPath(path);
-
-              if (result.EndsWith(BaseConstants.PATH_DELIMITER_WINDOWS) || result.EndsWith(BaseConstants.PATH_DELIMITER_UNIX))
-              {
-                  result = result.Substring(0, result.Length - 1);
-              }
-
-              return result;
-          }
-
-          return path;
-      }
-      */
-
-      /// <summary>Validates a given file.</summary>
-      /// <param name="path">File to validate</param>
-      /// <returns>Valid file path</returns>
-      public static string ValidURLFromFilePath(string path)
-      {
-         if (!string.IsNullOrEmpty(path))
-         {
-            if (!isValidURL(path))
-               return BaseConstants.PREFIX_FILE + System.Uri.EscapeUriString(ValidateFile(path).Replace('\\', '/'));
-
-            return System.Uri.EscapeUriString(ValidateFile(path).Replace('\\', '/'));
-         }
-
-         return path;
-      }
-
-      /// <summary>Cleans a given URL.</summary>
-      /// <param name="url">URL to clean</param>
-      /// <param name="removeProtocol">Remove the protocol, e.g. http:// (default: true, optional).</param>
-      /// <param name="removeWWW">Remove www (default: true, optional).</param>
-      /// <param name="removeSlash">Remove slash at the end (default: true, optional)</param>
-      /// <returns>Clean URL</returns>
-      public static string CleanUrl(string url, bool removeProtocol = true, bool removeWWW = true,
-         bool removeSlash = true)
-      {
-         string result = url?.Trim();
-
-         if (!string.IsNullOrEmpty(url))
-         {
-            if (removeProtocol)
-            {
-               result = result.Substring(result.CTIndexOf("//") + 2);
-            }
-
-            if (removeWWW)
-            {
-               result = result.CTReplace("www.", string.Empty);
-            }
-
-            if (removeSlash && result.CTEndsWith(BaseConstants.PATH_DELIMITER_UNIX))
-            {
-               result = result.Substring(0, result.Length - 1);
-            }
-
-            /*
-               if (urlTemp.StartsWith("http://"))
-               {
-                   result = urlTemp.Substring(7);
-               }
-               else if (urlTemp.StartsWith("https://"))
-               {
-                   result = urlTemp.Substring(8);
-               }
-               else
-               {
-                   result = urlTemp;
-               }
-   
-               if (result.StartsWith("www."))
-               {
-                   result = result.Substring(4);
-               }
-               */
-         }
-
-         return result;
-      }
-
-      /// <summary>Cleans a given text from tags.</summary>
-      /// <param name="text">Text to clean.</param>
-      /// <returns>Clean text without tags.</returns>
-      [System.ObsoleteAttribute("Use the extension method 'CTClearTags' instead")]
-      public static string ClearTags(string text) //TODO remove in the future
-      {
-         return text.CTClearTags();
-      }
-
-      /// <summary>Cleans a given text from multiple spaces.</summary>
-      /// <param name="text">Text to clean.</param>
-      /// <returns>Clean text without multiple spaces.</returns>
-      [System.ObsoleteAttribute("Use the extension method 'CTClearSpaces' instead")]
-      public static string ClearSpaces(string text) //TODO remove in the future
-      {
-         return text.CTClearSpaces();
-      }
-
-      /// <summary>Cleans a given text from line endings.</summary>
-      /// <param name="text">Text to clean.</param>
-      /// <returns>Clean text without line endings.</returns>
-      [System.ObsoleteAttribute("Use the extension method 'CTClearLineEndings' instead")]
-      public static string ClearLineEndings(string text) //TODO remove in the future
-      {
-         return text.CTClearLineEndings();
-      }
-
       /// <summary>Split the given text to lines and return it as list.</summary>
       /// <param name="text">Complete text fragment</param>
       /// <param name="ignoreCommentedLines">Ignore commente lines (default: true, optional)</param>
@@ -900,7 +385,7 @@ namespace Crosstales.Common.Util
          }
          else
          {
-            string[] lines = BaseConstants.REGEX_LINEENDINGS.Split(text);
+            string[] lines = Crosstales.Common.Util.BaseConstants.REGEX_LINEENDINGS.Split(text);
 
             for (int ii = 0; ii < lines.Length; ii++)
             {
@@ -945,9 +430,9 @@ namespace Crosstales.Common.Util
 
       /// <summary>Format byte-value to Human-Readable-Form.</summary>
       /// <param name="bytes">Value in bytes</param>
-      /// <param name="useSI">Use SI-system (default: true, optional)</param>
+      /// <param name="useSI">Use SI-system (default: false, optional)</param>
       /// <returns>Formatted byte-value in Human-Readable-Form.</returns>
-      public static string FormatBytesToHRF(long bytes, bool useSI = true)
+      public static string FormatBytesToHRF(long bytes, bool useSI = false)
       {
          const string ci = "kMGTPE";
          int index = 0;
@@ -1034,7 +519,7 @@ namespace Crosstales.Common.Util
       /// <returns>True if the current platform is supported.</returns>
       public static Color HSVToRGB(float h, float s, float v, float a = 1f)
       {
-         if (s < BaseConstants.FLOAT_TOLERANCE)
+         if (s < Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE)
             return new Color(v, v, v, a);
 
          float _h = h / 60f;
@@ -1059,310 +544,6 @@ namespace Crosstales.Common.Util
             default:
                return new Color(v, p, q, a);
          }
-      }
-
-      /// <summary>Checks if the URL is valid.</summary>
-      /// <param name="url">URL to check</param>
-      /// <returns>True if the URL is valid.</returns>
-      public static bool isValidURL(string url)
-      {
-         return !string.IsNullOrEmpty(url) &&
-                (url.StartsWith(file_prefix, System.StringComparison.OrdinalIgnoreCase) ||
-                 url.StartsWith(BaseConstants.PREFIX_HTTP, System.StringComparison.OrdinalIgnoreCase) ||
-                 url.StartsWith(BaseConstants.PREFIX_HTTPS, System.StringComparison.OrdinalIgnoreCase));
-      }
-
-      /// <summary>Copy or move a directory.</summary>
-      /// <param name="sourcePath">Source directory path</param>
-      /// <param name="destPath">Destination directory path</param>
-      /// <param name="move">Move directory instead of copy (default: false, optional)</param>
-      public static void CopyPath(string sourcePath, string destPath, bool move = false)
-      {
-         if ((isWSABasedPlatform || isWebPlatform) && !isEditor)
-         {
-            Debug.LogWarning("'CopyPath' is not supported for the current platform!");
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(destPath))
-            {
-               try
-               {
-                  if (!System.IO.Directory.Exists(sourcePath))
-                  {
-                     Debug.LogError($"Source directory does not exists: {sourcePath}");
-                  }
-                  else
-                  {
-                     //System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destPath));
-
-                     if (System.IO.Directory.Exists(destPath))
-                     {
-                        if (BaseConstants.DEV_DEBUG)
-                           Debug.LogWarning($"Overwrite destination directory: {destPath}");
-
-                        System.IO.Directory.Delete(destPath, true);
-                     }
-
-                     if (move)
-                     {
-                        System.IO.Directory.Move(sourcePath, destPath);
-                     }
-                     else
-                     {
-                        copyAll(new System.IO.DirectoryInfo(sourcePath), new System.IO.DirectoryInfo(destPath));
-                     }
-                  }
-               }
-               catch (System.Exception ex)
-               {
-                  Debug.LogError($"Could not {(move ? "move" : "copy")} directory: {ex}");
-               }
-            }
-         }
-      }
-
-      /// <summary>Copy or move a file.</summary>
-      /// <param name="sourceFile">Source file path</param>
-      /// <param name="destFile">Destination file path</param>
-      /// <param name="move">Move file instead of copy (default: false, optional)</param>
-      public static void CopyFile(string sourceFile, string destFile, bool move = false)
-      {
-         if ((isWSABasedPlatform || isWebPlatform) && !isEditor)
-         {
-            Debug.LogWarning("'CopyFile' is not supported for the current platform!");
-         }
-         else
-         {
-            if (!string.IsNullOrEmpty(destFile))
-            {
-               try
-               {
-                  if (!System.IO.File.Exists(sourceFile))
-                  {
-                     Debug.LogError($"Source file does not exists: {sourceFile}");
-                  }
-                  else
-                  {
-                     System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destFile));
-
-                     if (System.IO.File.Exists(destFile))
-                     {
-                        if (BaseConstants.DEV_DEBUG)
-                           Debug.LogWarning($"Overwrite destination file: {destFile}");
-
-                        System.IO.File.Delete(destFile);
-                     }
-
-                     if (move)
-                     {
-#if UNITY_STANDALONE || UNITY_EDITOR
-                        System.IO.File.Move(sourceFile, destFile);
-#else
-                        System.IO.File.Copy(sourceFile, destFile);
-                        System.IO.File.Delete(destFile);
-#endif
-                     }
-                     else
-                     {
-                        System.IO.File.Copy(sourceFile, destFile);
-                     }
-                  }
-               }
-               catch (System.Exception ex)
-               {
-                  Debug.LogError($"Could not {(move ? "move" : "copy")} file: {ex}");
-               }
-            }
-         }
-      }
-
-      /// <summary>
-      /// Shows the location of a path (or file) in OS file explorer.
-      /// NOTE: only works on standalone platforms
-      /// </summary>
-      public static void ShowPath(string path)
-      {
-         ShowFile(path);
-      }
-
-      /// <summary>
-      /// Shows the location of a file (or path) in OS file explorer.
-      /// NOTE: only works on standalone platforms
-      /// </summary>
-      public static void ShowFile(string file)
-      {
-         if (isStandalonePlatform || isEditor)
-         {
-#if UNITY_STANDALONE || UNITY_EDITOR
-            string path;
-
-            if (string.IsNullOrEmpty(file) || file.Equals("."))
-            {
-               path = ".";
-            }
-            else if ((isWindowsPlatform || isWindowsEditor) && file.Length < 4)
-            {
-               path = file; //root directory
-            }
-            else
-            {
-               path = ValidatePath(System.IO.Path.GetDirectoryName(file));
-            }
-
-            try
-            {
-               if (System.IO.Directory.Exists(path))
-               {
-#if (ENABLE_IL2CPP && CT_PROC) || (CT_DEVELOP && CT_PROC)
-                  using (CTProcess process = new CTProcess())
-#else
-                  using (System.Diagnostics.Process process = new System.Diagnostics.Process())
-                  //using (CTProcess process = new CTProcess())
-#endif
-                  {
-                     process.StartInfo.Arguments = $"\"{path}\"";
-
-                     if (isWindowsPlatform || isWindowsEditor)
-                     {
-                        process.StartInfo.FileName = "explorer.exe";
-#if (ENABLE_IL2CPP && CT_PROC) || (CT_DEVELOP && CT_PROC)
-                        process.StartInfo.UseCmdExecute = true;
-#endif
-                        process.StartInfo.CreateNoWindow = true;
-                     }
-                     else if (isMacOSPlatform || isMacOSEditor)
-                     {
-                        process.StartInfo.FileName = "open";
-                     }
-                     else
-                     {
-                        process.StartInfo.FileName = "xdg-open";
-                     }
-
-                     process.Start();
-                  }
-               }
-               else
-               {
-                  Debug.LogWarning($"Path to file doesn't exist: {path}");
-               }
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogError($"Could not show file location: {ex}");
-            }
-#endif
-         }
-         else
-         {
-            Debug.LogWarning("'ShowFileLocation' is not supported on the current platform!");
-         }
-      }
-
-      /// <summary>
-      /// Opens a file with the OS default application.
-      /// NOTE: only works for standalone platforms
-      /// </summary>
-      /// <param name="file">File path</param>
-      public static void OpenFile(string file)
-      {
-         if (isStandalonePlatform || isEditor)
-         {
-            try
-            {
-#if UNITY_STANDALONE || UNITY_EDITOR
-               if (System.IO.File.Exists(file))
-               {
-#if ENABLE_IL2CPP && CT_PROC
-                  using (CTProcess process = new CTProcess())
-                  {
-                     process.StartInfo.Arguments = $"\"{file}\"";
-
-                     if (isWindowsPlatform || isWindowsEditor)
-                     {
-                        process.StartInfo.FileName = "explorer.exe";
-                        process.StartInfo.UseCmdExecute = true;
-                        process.StartInfo.CreateNoWindow = true;
-                     }
-                     else if (isMacOSPlatform || isMacOSEditor)
-                     {
-                        process.StartInfo.FileName = "open";
-                     }
-                     else
-                     {
-                        process.StartInfo.FileName = "xdg-open";
-                     }
-
-                     process.Start();
-                  }
-#else
-                  using (System.Diagnostics.Process process = new System.Diagnostics.Process())
-                  {
-                     if (isMacOSPlatform || isMacOSEditor)
-                     {
-                        process.StartInfo.FileName = "open";
-                        process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
-                        process.StartInfo.Arguments = $"-t \"{System.IO.Path.GetFileName(file)}\"";
-                     }
-                     else if (isLinuxPlatform || isLinuxEditor)
-                     {
-                        process.StartInfo.FileName = "xdg-open";
-                        process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(file) + BaseConstants.PATH_DELIMITER_UNIX;
-                        process.StartInfo.Arguments = System.IO.Path.GetFileName(file);
-                     }
-                     else
-                     {
-                        process.StartInfo.FileName = file;
-                     }
-
-                     process.Start();
-                  }
-#endif
-               }
-               else
-               {
-                  Debug.LogWarning($"File doesn't exist: {file}");
-               }
-#endif
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogError($"Could not open file: {ex}");
-            }
-         }
-         else
-         {
-            Debug.LogWarning("'OpenFile' is not supported on the current platform!");
-         }
-      }
-
-      /// <summary>Returns the IP of a given host name.</summary>
-      /// <param name="host">Host name</param>
-      /// <returns>IP of a given host name.</returns>
-      public static string GetIP(string host)
-      {
-         if (!string.IsNullOrEmpty(host))
-         {
-#if !UNITY_WSA && !UNITY_WEBGL && !UNITY_XBOXONE
-            try
-            {
-               return System.Net.Dns.GetHostAddresses(host)[0].ToString();
-            }
-            catch (System.Exception ex)
-            {
-               Debug.LogWarning($"Could not resolve host '{host}': {ex}");
-            }
-#else
-            Debug.LogWarning("'GetIP' doesn't work in WebGL or WSA! Returning original string.");
-#endif
-         }
-         else
-         {
-            Debug.LogWarning("Host name is null or empty - can't resolve to IP!");
-         }
-
-         return host;
       }
 
       /// <summary>Generates a "Lorem Ipsum" based on various parameters.</summary>
@@ -1719,47 +900,6 @@ namespace Crosstales.Common.Util
          return value < 10 ? "0" + value : value.ToString();
       }
 
-      private static void copyAll(System.IO.DirectoryInfo source, System.IO.DirectoryInfo target)
-      {
-         System.IO.Directory.CreateDirectory(target.FullName);
-
-         foreach (System.IO.FileInfo fi in source.GetFiles())
-         {
-            fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
-         }
-
-         // Copy each subdirectory using recursion.
-         foreach (System.IO.DirectoryInfo sourceSubDir in source.GetDirectories())
-         {
-            System.IO.DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(sourceSubDir.Name);
-            copyAll(sourceSubDir, nextTargetSubDir);
-         }
-      }
-
-      private static void openURL(string url)
-      {
-#if !UNITY_EDITOR && UNITY_WEBGL
-         openURLPlugin(url);
-#else
-         Application.OpenURL(url);
-#endif
-      }
-/*
-      private static void openURLJS(string url)
-      {
-         Application.ExternalEval("window.open('" + url + "');");
-      }
-*/
-#if !UNITY_EDITOR && UNITY_WEBGL
-      private static void openURLPlugin(string url)
-      {
-		   ctOpenWindow(url);
-      }
-
-      [System.Runtime.InteropServices.DllImportAttribute("__Internal")]
-      private static extern void ctOpenWindow(string url);
-#endif
-
       #endregion
 
       // StringHelper
@@ -1815,4 +955,4 @@ namespace Crosstales.Common.Util
       */
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

@@ -17,7 +17,7 @@ namespace Crosstales.RTVoice.Tool
       private bool fileInsideAssets = true;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("SampleRate")] [Header("Windows Settings"), Tooltip("Set the sample rate of the WAV files (default: 48000). Note: this works only under Windows standalone."), SerializeField]
-      private Common.Model.Enum.SampleRate sampleRate = Common.Model.Enum.SampleRate._48000Hz;
+      private Crosstales.Common.Model.Enum.SampleRate sampleRate = Crosstales.Common.Model.Enum.SampleRate._48000Hz;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("BitsPerSample")] [HideInInspector, Tooltip("Set the bits per sample of the WAV files (default: 16). Note: this works only under Windows standalone."), SerializeField]
       private int bitsPerSample = 16;
@@ -60,7 +60,7 @@ namespace Crosstales.RTVoice.Tool
       }
 
       /// <summary>Set the sample rate of the WAV files. Note: this works only under Windows standalone.</summary>
-      public Common.Model.Enum.SampleRate SampleRate
+      public Crosstales.Common.Model.Enum.SampleRate SampleRate
       {
          get => sampleRate;
          set => sampleRate = value;
@@ -129,7 +129,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void OnDestroy()
       {
-         if (!Util.Helper.isEditorMode && Speaker.Instance != null)
+         if (Speaker.Instance != null)
          {
             Speaker.Instance.OnSpeakAudioGenerationComplete -= onSpeakAudioGenerationComplete;
             Speaker.Instance.OnVoicesReady -= onVoicesReady;
@@ -166,7 +166,7 @@ namespace Crosstales.RTVoice.Tool
          {
             isGenerate = true;
 
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                generateInEditor();
@@ -187,8 +187,7 @@ namespace Crosstales.RTVoice.Tool
 #if (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN) && !UNITY_EDITOR_OSX && !UNITY_EDITOR_LINUX
       private void convert(string outputFile)
       {
-         string tmpFile = outputFile.Substring(0, outputFile.Length - 4) + "_" + sampleRate +
-                          Speaker.Instance.AudioFileExtension;
+         string tmpFile = outputFile.Substring(0, outputFile.Length - 4) + "_" + sampleRate + Speaker.Instance.AudioFileExtension;
          bool converted = false;
 
          try
@@ -244,7 +243,7 @@ namespace Crosstales.RTVoice.Tool
             {
                float max = getMaxPeak(inputFile);
 
-               if (Mathf.Abs(max) < Common.Util.BaseConstants.FLOAT_TOLERANCE || max > 1f)
+               if (Mathf.Abs(max) < Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE || max > 1f)
                {
                   Debug.LogWarning("File cannot be normalized!", this);
                }
@@ -307,7 +306,7 @@ namespace Crosstales.RTVoice.Tool
          {
             if (textFile != null)
             {
-               System.Collections.Generic.List<string> speeches = Util.Helper.SplitStringToLines(textFile.text);
+               System.Collections.Generic.List<string> speeches = Crosstales.RTVoice.Util.Helper.SplitStringToLines(textFile.text);
 
                foreach (string speech in speeches)
                {
@@ -317,7 +316,7 @@ namespace Crosstales.RTVoice.Tool
 
                      if (args.Length >= 2)
                      {
-                        Model.Wrapper wrapper = prepare(args, speech);
+                        Crosstales.RTVoice.Model.Wrapper wrapper = prepare(args, speech);
                         string uid = Speaker.Instance.Generate(wrapper);
 
                         do
@@ -341,7 +340,7 @@ namespace Crosstales.RTVoice.Tool
             }
          }
 
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("Generate finished!", this);
 
          onComplete();
@@ -349,9 +348,9 @@ namespace Crosstales.RTVoice.Tool
          isGenerate = false;
       }
 
-      private Model.Wrapper prepare(string[] args, string speech)
+      private Crosstales.RTVoice.Model.Wrapper prepare(string[] args, string speech)
       {
-         Model.Wrapper wrapper = new Model.Wrapper { Text = args[0] };
+         Crosstales.RTVoice.Model.Wrapper wrapper = new Crosstales.RTVoice.Model.Wrapper { Text = args[0] };
 
          if (fileInsideAssets)
          {
@@ -417,11 +416,11 @@ namespace Crosstales.RTVoice.Tool
             Generate();
       }
 
-      private void onSpeakAudioGenerationComplete(Model.Wrapper wrapper)
+      private void onSpeakAudioGenerationComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          lastUid = wrapper.Uid;
 
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("Speech generated: " + wrapper, this);
       }
 
@@ -432,10 +431,10 @@ namespace Crosstales.RTVoice.Tool
 
       private void onStart()
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onStart", this);
 
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnStarted?.Invoke();
 
          OnAudioFileGeneratorStart?.Invoke();
@@ -443,10 +442,10 @@ namespace Crosstales.RTVoice.Tool
 
       private void onComplete()
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onComplete", this);
 
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnCompleted?.Invoke();
 
          OnAudioFileGeneratorComplete?.Invoke();
@@ -464,7 +463,7 @@ namespace Crosstales.RTVoice.Tool
          {
             if (textFile != null)
             {
-               System.Collections.Generic.List<string> speeches = Util.Helper.SplitStringToLines(textFile.text);
+               System.Collections.Generic.List<string> speeches = Crosstales.RTVoice.Util.Helper.SplitStringToLines(textFile.text);
 
                foreach (string speech in speeches)
                {
@@ -474,7 +473,7 @@ namespace Crosstales.RTVoice.Tool
 
                      if (args.Length >= 2)
                      {
-                        Model.Wrapper wrapper = prepare(args, speech);
+                        Crosstales.RTVoice.Model.Wrapper wrapper = prepare(args, speech);
                         Speaker.Instance.Generate(wrapper);
 
 #if (UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN) && !UNITY_EDITOR_OSX && !UNITY_EDITOR_LINUX
@@ -507,7 +506,7 @@ namespace Crosstales.RTVoice.Tool
             }
          }
 
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("Generate finished!", this);
 
 #if UNITY_EDITOR
@@ -523,4 +522,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

@@ -27,6 +27,9 @@ namespace Crosstales.Common.Util
       ///<summary>Random change interval per axis (default: true).</summary>
       [Tooltip("Random change interval per axis (default: true).")] public bool RandomChangeIntervalPerAxis = true;
 
+      ///<summary>Random direction per axis (default: true).</summary>
+      [Tooltip("Random direction per axis (default: true).")] public bool RandomDirectionPerAxis = true;
+
       private Transform tf;
       private Vector3 speed;
       private float elapsedTime;
@@ -73,7 +76,7 @@ namespace Crosstales.Common.Util
                {
                   elapsedTimeAxis.x = 0f;
 
-                  speed.x = Random.Range(Mathf.Abs(SpeedMin.x), Mathf.Abs(SpeedMax.x)) * (Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.x = Random.Range(SpeedMin.x, SpeedMax.x) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
                   changeTimeAxis.x = Random.Range(ChangeInterval.x, ChangeInterval.y);
                }
 
@@ -81,7 +84,7 @@ namespace Crosstales.Common.Util
                {
                   elapsedTimeAxis.y = 0f;
 
-                  speed.y = Random.Range(Mathf.Abs(SpeedMin.y), Mathf.Abs(SpeedMax.y)) * (Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.y = Random.Range(SpeedMin.y, SpeedMax.y) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
                   changeTimeAxis.y = Random.Range(ChangeInterval.x, ChangeInterval.y);
                }
 
@@ -89,7 +92,7 @@ namespace Crosstales.Common.Util
                {
                   elapsedTimeAxis.z = 0f;
 
-                  speed.z = Random.Range(Mathf.Abs(SpeedMin.z), Mathf.Abs(SpeedMax.z)) * (Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.z = Random.Range(SpeedMin.z, SpeedMax.z) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
                   changeTimeAxis.z = Random.Range(ChangeInterval.x, ChangeInterval.y);
                }
             }
@@ -101,9 +104,9 @@ namespace Crosstales.Common.Util
                {
                   elapsedTime = 0f;
 
-                  speed.x = Random.Range(Mathf.Abs(SpeedMin.x), Mathf.Abs(SpeedMax.x)) * (Random.Range(0, 2) == 0 ? 1 : -1);
-                  speed.y = Random.Range(Mathf.Abs(SpeedMin.y), Mathf.Abs(SpeedMax.y)) * (Random.Range(0, 2) == 0 ? 1 : -1);
-                  speed.z = Random.Range(Mathf.Abs(SpeedMin.z), Mathf.Abs(SpeedMax.z)) * (Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.x = Random.Range(SpeedMin.x, SpeedMax.x) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.y = Random.Range(SpeedMin.y, SpeedMax.y) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
+                  speed.z = Random.Range(SpeedMin.z, SpeedMax.z) * (!RandomDirectionPerAxis || Random.Range(0, 2) == 0 ? 1 : -1);
                   changeTime = Random.Range(ChangeInterval.x, ChangeInterval.y);
                }
             }
@@ -115,4 +118,4 @@ namespace Crosstales.Common.Util
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

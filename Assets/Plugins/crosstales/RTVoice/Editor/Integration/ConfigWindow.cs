@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorIntegration
 {
@@ -42,7 +41,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       #region EditorWindow methods
 
-      [MenuItem("Tools/" + Util.Constants.ASSET_NAME + "/Configuration...", false, EditorHelper.MENU_ID + 1)]
+      [MenuItem("Tools/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/Configuration...", false, Crosstales.RTVoice.EditorUtil.EditorHelper.MENU_ID + 1)]
       public static void ShowWindow()
       {
          GetWindow(typeof(ConfigWindow));
@@ -56,7 +55,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       private void OnEnable()
       {
-         titleContent = new GUIContent(Util.Constants.ASSET_NAME_SHORT, EditorHelper.Logo_Asset_Small);
+         titleContent = new GUIContent(Crosstales.RTVoice.Util.Constants.ASSET_NAME_SHORT, Crosstales.RTVoice.EditorUtil.EditorHelper.Logo_Asset_Small);
 
          OnStopPlayback += silence;
       }
@@ -84,21 +83,21 @@ namespace Crosstales.RTVoice.EditorIntegration
             {
                showConfiguration();
 
-               EditorHelper.SeparatorUI();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
                GUILayout.BeginHorizontal();
                {
-                  if (GUILayout.Button(new GUIContent(" Save", EditorHelper.Icon_Save, "Saves the configuration settings for this project.")))
+                  if (GUILayout.Button(new GUIContent(" Save", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Save, "Saves the configuration settings for this project.")))
                   {
                      save();
                   }
 
-                  if (GUILayout.Button(new GUIContent(" Reset", EditorHelper.Icon_Reset, "Resets the configuration settings for this project.")))
+                  if (GUILayout.Button(new GUIContent(" Reset", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Reset, "Resets the configuration settings for this project.")))
                   {
                      if (EditorUtility.DisplayDialog("Reset configuration?", "Reset the configuration of " + Util.Constants.ASSET_NAME + "?", "Yes", "No"))
                      {
-                        Util.Config.Reset();
-                        EditorConfig.Reset();
+                        Crosstales.RTVoice.Util.Config.Reset();
+                        Crosstales.RTVoice.EditorUtil.EditorConfig.Reset();
                         save();
                      }
                   }
@@ -157,7 +156,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       private void showPrefabs()
       {
-         EditorHelper.BannerOC();
+         //Crosstales.RTVoice.EditorUtil.EditorHelper.BannerOC();
 
          scrollPosPrefabs = EditorGUILayout.BeginScrollView(scrollPosPrefabs, false, false);
          {
@@ -165,97 +164,97 @@ namespace Crosstales.RTVoice.EditorIntegration
             GUILayout.Label("Available Prefabs", EditorStyles.boldLabel);
 
             GUILayout.Space(6);
-            //EditorHelper.SeparatorUI (6);
+            //Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI (6);
 
-            GUI.enabled = !EditorHelper.isRTVoiceInScene;
+            GUI.enabled = !Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene;
 
-            GUILayout.Label(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
+            GUILayout.Label(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds the '" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
-
-            GUI.enabled = true;
-
-            EditorHelper.SeparatorUI();
-
-            GUI.enabled = !EditorHelper.isGlobalCacheInScene;
-
-            GUILayout.Label(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
-
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a '" + Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds the '" + Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
 
             GUI.enabled = true;
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
+
+            GUI.enabled = !Crosstales.RTVoice.EditorUtil.EditorHelper.isGlobalCacheInScene;
+
+            GUILayout.Label(Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
+
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a '" + Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME + "'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab(Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
+
+            GUI.enabled = true;
+
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
             GUILayout.Label("AudioFileGenerator");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'AudioFileGenerator'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("AudioFileGenerator", $"{EditorConfig.ASSET_PATH}Extras/AudioFileGenerator/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'AudioFileGenerator'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("AudioFileGenerator", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/AudioFileGenerator/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("Paralanguage");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Paralanguage'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("Paralanguage", $"{EditorConfig.ASSET_PATH}Extras/Paralanguage/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'Paralanguage'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("Paralanguage", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/Paralanguage/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("Sequencer");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Sequencer'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("Sequencer", $"{EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'Sequencer'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("Sequencer", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("SpeechText");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SpeechText'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("SpeechText", $"{EditorConfig.ASSET_PATH}Extras/SpeechText/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'SpeechText'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("SpeechText", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/SpeechText/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("TextFileSpeaker");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'TextFileSpeaker'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("TextFileSpeaker", $"{EditorConfig.ASSET_PATH}Extras/TextFileSpeaker/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'TextFileSpeaker'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("TextFileSpeaker", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/TextFileSpeaker/Resources/Prefabs/");
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
             GUILayout.Label("Loudspeaker");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'Loudspeaker'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("Loudspeaker", $"{EditorConfig.ASSET_PATH}Extras/Loudspeaker/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'Loudspeaker'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("Loudspeaker", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/Loudspeaker/Resources/Prefabs/");
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
             GUILayout.Label("VoiceInitializer");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'VoiceInitializer'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("VoiceInitializer", $"{EditorConfig.ASSET_PATH}Extras/VoiceInitializer/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'VoiceInitializer'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("VoiceInitializer", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/VoiceInitializer/Resources/Prefabs/");
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
             GUILayout.Label("PlatformProvider");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'PlatformProvider'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("PlatformProvider", $"{EditorConfig.ASSET_PATH}Extras/PlatformProvider/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'PlatformProvider'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("PlatformProvider", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/PlatformProvider/Resources/Prefabs/");
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
             GUILayout.Label("MaryTTS");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'MaryTTS'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("MaryTTS", $"{EditorConfig.ASSET_PATH}Extras/MaryTTS/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'MaryTTS'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("MaryTTS", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/MaryTTS/Resources/Prefabs/");
 
             GUILayout.Space(6);
 
             GUILayout.Label("SAPI Unity");
 
-            if (GUILayout.Button(new GUIContent(" Add", EditorHelper.Icon_Plus, "Adds a 'SAPI Unity'-prefab to the scene.")))
-               EditorHelper.InstantiatePrefab("SAPI Unity", $"{EditorConfig.ASSET_PATH}Extras/SAPI Unity/Resources/Prefabs/");
+            if (GUILayout.Button(new GUIContent(" Add", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Plus, "Adds a 'SAPI Unity'-prefab to the scene.")))
+               Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("SAPI Unity", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/SAPI Unity/Resources/Prefabs/");
 
             GUILayout.Space(6);
          }
@@ -264,18 +263,18 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       private void showTestDrive()
       {
-         EditorHelper.BannerOC();
+         //Crosstales.RTVoice.EditorUtil.EditorHelper.BannerOC();
 
          GUILayout.Space(3);
          GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
 
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
-            if (EditorHelper.isRTVoiceInScene)
+            if (Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
             {
                if (Speaker.Instance != null && Speaker.Instance.isWorkingInEditor)
                {
-                  if (Speaker.Instance.Voices.Count > 0 && EditorHelper.isRTVoiceInScene)
+                  if (Speaker.Instance.Voices.Count > 0 && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
                   {
                      scrollPosTD = EditorGUILayout.BeginScrollView(scrollPosTD, false, false);
                      {
@@ -287,7 +286,7 @@ namespace Crosstales.RTVoice.EditorIntegration
                            voiceIndex = EditorGUILayout.Popup("Voice", voiceIndex, Speaker.Instance.Voices.CTToString().ToArray());
                            rate = EditorGUILayout.Slider("Rate", rate, 0f, 3f);
 
-                           if (Util.Helper.isWindowsPlatform)
+                           if (Crosstales.RTVoice.Util.Helper.isWindowsPlatform)
                            {
                               pitch = EditorGUILayout.Slider("Pitch", pitch, 0f, 2f);
 
@@ -304,18 +303,18 @@ namespace Crosstales.RTVoice.EditorIntegration
                      EditorGUILayout.EndScrollView();
 
 
-                     EditorHelper.SeparatorUI();
+                     Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
                      if (Speaker.Instance.isSpeaking)
                      {
-                        if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence all active speakers.")))
+                        if (GUILayout.Button(new GUIContent(" Silence", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Silence, "Silence all active speakers.")))
                         {
                            silence();
                         }
                      }
                      else
                      {
-                        if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
+                        if (GUILayout.Button(new GUIContent(" Speak", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
                         {
                            Speaker.Instance.SpeakNative(text, Speaker.Instance.Voices[voiceIndex], rate, pitch, volume);
                            silenced = false;
@@ -326,7 +325,7 @@ namespace Crosstales.RTVoice.EditorIntegration
                   }
                   else
                   {
-                     EditorHelper.NoVoicesUI();
+                     Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
                   }
                }
                else
@@ -336,7 +335,7 @@ namespace Crosstales.RTVoice.EditorIntegration
             }
             else
             {
-               EditorHelper.RTVUnavailable();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.RTVUnavailable();
             }
          }
          else
@@ -349,4 +348,4 @@ namespace Crosstales.RTVoice.EditorIntegration
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

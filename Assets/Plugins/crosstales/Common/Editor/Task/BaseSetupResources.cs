@@ -26,14 +26,14 @@ namespace Crosstales.Common.EditorTask
                {
                   if (System.IO.File.Exists(targetFolder + file.Name))
                   {
-                     if (Util.BaseConstants.DEV_DEBUG)
+                     if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                         Debug.Log($"File exists: {file}");
                   }
                   else
                   {
                      AssetDatabase.MoveAsset(source + file.Name, target + file.Name);
 
-                     if (Util.BaseConstants.DEV_DEBUG)
+                     if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                         Debug.Log($"File moved: {file}");
                   }
                }
@@ -47,16 +47,16 @@ namespace Crosstales.Common.EditorTask
          }
          catch (System.Exception ex)
          {
-            if (Util.BaseConstants.DEV_DEBUG)
+            if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                Debug.LogError($"Could not move all files: {ex}");
          }
          finally
          {
             if (exists)
-               EditorUtil.BaseEditorHelper.RefreshAssetDatabase();
+               Crosstales.Common.EditorUtil.BaseEditorHelper.RefreshAssetDatabase();
          }
       }
    }
 }
 #endif
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

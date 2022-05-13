@@ -4,13 +4,13 @@ using UnityEditor;
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'Paralanguage'-class.</summary>
-   [CustomEditor(typeof(Tool.Paralanguage))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.Paralanguage))]
    [CanEditMultipleObjects]
    public class ParalanguageEditor : Editor
    {
       #region Variables
 
-      private Tool.Paralanguage script;
+      private Crosstales.RTVoice.Tool.Paralanguage script;
 
       #endregion
 
@@ -19,12 +19,12 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.Paralanguage)target;
+         script = (Crosstales.RTVoice.Tool.Paralanguage)target;
       }
 
       private void OnDisable()
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             Speaker.Instance.Silence();
       }
 
@@ -36,24 +36,24 @@ namespace Crosstales.RTVoice.EditorExtension
          {
             if (!string.IsNullOrEmpty(script.Text))
             {
-               if (Speaker.Instance.isTTSAvailable && EditorUtil.EditorHelper.isRTVoiceInScene)
+               if (Speaker.Instance.isTTSAvailable && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
                {
                   //add stuff if needed
                }
                else
                {
-                  EditorUtil.EditorHelper.NoVoicesUI();
+                  Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
                }
             }
             else
             {
-               EditorUtil.EditorHelper.SeparatorUI();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
                EditorGUILayout.HelpBox("Please enter a 'Text'!", MessageType.Warning);
             }
          }
          else
          {
-            EditorUtil.EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
             EditorGUILayout.HelpBox("Script is disabled!", MessageType.Info);
          }
       }
@@ -62,4 +62,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

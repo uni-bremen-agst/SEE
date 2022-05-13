@@ -74,7 +74,7 @@ namespace Crosstales.Common.Util
 
       private void onExited()
       {
-         if (BaseConstants.DEV_DEBUG)
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
             Debug.Log($"onExited: {ExitCode}");
 
          Exited?.Invoke(this, System.EventArgs.Empty);
@@ -174,7 +174,7 @@ namespace Crosstales.Common.Util
 
       public void Dispose()
       {
-         if (BaseConstants.DEV_DEBUG)
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
             Debug.LogWarning("Dispose called!");
 
          if (Handle != System.IntPtr.Zero)
@@ -206,7 +206,7 @@ namespace Crosstales.Common.Util
          string app = StartInfo.FileName;
          string args = StartInfo.Arguments;
 
-         if (BaseConstants.DEV_DEBUG)
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
             Debug.Log($"createProcess: {StartTime}");
 
          //isBusy = true;
@@ -219,7 +219,7 @@ namespace Crosstales.Common.Util
             if ((StartInfo.RedirectStandardOutput || StartInfo.RedirectStandardError || StartInfo.UseCmdExecute) &&
                 !StartInfo.FileName.CTContains("cmd"))
             {
-               app = BaseConstants.CMD_WINDOWS_PATH;
+               app = Crosstales.Common.Util.BaseConstants.CMD_WINDOWS_PATH;
                args = $"/c call \"{StartInfo.FileName}\" {StartInfo.Arguments}";
             }
 
@@ -228,7 +228,7 @@ namespace Crosstales.Common.Util
                string tempStdFile = System.IO.Path.GetTempFileName();
                args += $" > \"{tempStdFile}\"";
 
-               if (BaseConstants.DEV_DEBUG)
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                   Debug.Log($"tempStdFile: {tempStdFile}");
 
                StandardOutput = new System.IO.StreamReader(new System.IO.FileStream(tempStdFile, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite), StartInfo.StandardOutputEncoding);
@@ -244,7 +244,7 @@ namespace Crosstales.Common.Util
                string tempErrFile = System.IO.Path.GetTempFileName();
                args += $" 2> \"{tempErrFile}\"";
 
-               if (BaseConstants.DEV_DEBUG)
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                   Debug.Log($"tempErrFile: {tempErrFile}");
 
                StandardError = new System.IO.StreamReader(new System.IO.FileStream(tempErrFile, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite), StartInfo.StandardOutputEncoding);
@@ -259,7 +259,7 @@ namespace Crosstales.Common.Util
             pSec.nLength = System.Runtime.InteropServices.Marshal.SizeOf(pSec);
             tSec.nLength = System.Runtime.InteropServices.Marshal.SizeOf(tSec);
 
-            if (BaseConstants.DEV_DEBUG)
+            if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                Debug.Log($"application: {app}{System.Environment.NewLine}arguments: {args}");
 
             bool retValue =
@@ -326,7 +326,7 @@ namespace Crosstales.Common.Util
             {
                string reply = streamReader.ReadLine();
 
-               if (BaseConstants.DEV_DEBUG)
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                   Debug.Log($"watchStdOut: {reply}");
 
                OutputDataReceived?.Invoke(this, createMockDataReceivedEventArgs(reply));
@@ -342,7 +342,7 @@ namespace Crosstales.Common.Util
             {
                string reply = streamReader.ReadLine();
 
-               if (BaseConstants.DEV_DEBUG)
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
                   Debug.Log($"watchStdErr: {reply}");
 
                ErrorDataReceived?.Invoke(this, createMockDataReceivedEventArgs(reply));
@@ -736,4 +736,4 @@ namespace Crosstales.Common.Util
    #endregion
 }
 #endif
-// © 2019-2021 crosstales LLC (https://www.crosstales.com)
+// © 2019-2022 crosstales LLC (https://www.crosstales.com)

@@ -242,7 +242,7 @@ namespace Crosstales
       /// <returns>True if the string is an email address.</returns>
       public static bool CTisEmail(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_EMAIL.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_EMAIL.IsMatch(str);
       }
 
       /// <summary>
@@ -253,7 +253,7 @@ namespace Crosstales
       /// <returns>True if the string is a website address.</returns>
       public static bool CTisWebsite(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_URL_WEB.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_URL_WEB.IsMatch(str);
       }
 
       /// <summary>
@@ -264,7 +264,7 @@ namespace Crosstales
       /// <returns>True if the string is a creditcard.</returns>
       public static bool CTisCreditcard(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_CREDITCARD.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_CREDITCARD.IsMatch(str);
       }
 
       /// <summary>
@@ -275,7 +275,7 @@ namespace Crosstales
       /// <returns>True if the string is an IPv4 address.</returns>
       public static bool CTisIPv4(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_IP_ADDRESS.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_IP_ADDRESS.IsMatch(str);
       }
 
       /// <summary>
@@ -286,7 +286,7 @@ namespace Crosstales
       /// <returns>True if the string is alphanumeric.</returns>
       public static bool CTisAlphanumeric(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_ALPHANUMERIC.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_ALPHANUMERIC.IsMatch(str);
       }
 
       /// <summary>
@@ -308,7 +308,7 @@ namespace Crosstales
       /// <returns>True if the string has invalid characters.</returns>
       public static bool CThasInvalidChars(this string str)
       {
-         return str != null && Common.Util.BaseConstants.REGEX_INVALID_CHARS.IsMatch(str);
+         return str != null && Crosstales.Common.Util.BaseConstants.REGEX_INVALID_CHARS.IsMatch(str);
       }
 
       /// <summary>
@@ -584,7 +584,7 @@ namespace Crosstales
       /// <returns>Clean text without tags.</returns>
       public static string CTClearTags(this string str)
       {
-         return str != null ? Common.Util.BaseConstants.REGEX_CLEAN_TAGS.Replace(str, string.Empty).Trim() : null;
+         return str != null ? Crosstales.Common.Util.BaseConstants.REGEX_CLEAN_TAGS.Replace(str, string.Empty).Trim() : null;
       }
 
       /// <summary>
@@ -595,7 +595,7 @@ namespace Crosstales
       /// <returns>Clean text without multiple spaces.</returns>
       public static string CTClearSpaces(this string str)
       {
-         return str != null ? Common.Util.BaseConstants.REGEX_CLEAN_SPACES.Replace(str, " ").Trim() : null;
+         return str != null ? Crosstales.Common.Util.BaseConstants.REGEX_CLEAN_SPACES.Replace(str, " ").Trim() : null;
       }
 
       /// <summary>
@@ -606,7 +606,7 @@ namespace Crosstales
       /// <returns>Clean text without line endings.</returns>
       public static string CTClearLineEndings(this string str)
       {
-         return str != null ? Common.Util.BaseConstants.REGEX_LINEENDINGS.Replace(str, string.Empty).Trim() : null;
+         return str != null ? Crosstales.Common.Util.BaseConstants.REGEX_LINEENDINGS.Replace(str, string.Empty).Trim() : null;
       }
 
       #endregion
@@ -1815,6 +1815,59 @@ namespace Crosstales
       #endregion
 
 
+      #region Component
+
+      /// <summary>
+      /// Extension method for Component.
+      /// Recursively searches all children of a parent Component for specific named GameObjects
+      /// </summary>
+      /// <param name="component">Parent of the current children.</param>
+      /// <param name="name">Name of the GameObject.</param>
+      /// <param name="maxDepth">Maximal depth of the search (default 0, optional).</param>
+      /// <returns>List of GameObjects with the given name or empty list.</returns>
+      public static System.Collections.Generic.List<GameObject> CTFindAll(this Component component, string name, int maxDepth = 0)
+      {
+         if (component == null)
+            throw new System.ArgumentNullException(nameof(component));
+
+         if (name == null)
+            throw new System.ArgumentNullException(nameof(name));
+
+         System.Collections.Generic.List<GameObject> children = new System.Collections.Generic.List<GameObject>();
+         System.Collections.Generic.List<Transform> childrenTf = getAllChildren(component.transform, maxDepth);
+
+         foreach (var child in childrenTf)
+         {
+            children.Add(child.gameObject);
+         }
+
+         return children.Where(child => child.name == name).ToList();
+      }
+
+
+      /// <summary>
+      /// Extension method for Component.
+      /// Recursively searches all children of a parent Component for specific named GameObjects
+      /// </summary>
+      /// <param name="component">Parent of the current children.</param>
+      /// <param name="name">Name of the GameObject.</param>
+      /// <returns>List of GameObjects with the given name or empty list.</returns>
+      public static System.Collections.Generic.List<T> CTFindAll<T>(this Component component, string name) where T : Component
+      {
+         if (component == null)
+            throw new System.ArgumentNullException(nameof(component));
+
+         if (name == null)
+            throw new System.ArgumentNullException(nameof(name));
+
+         T[] children = component.GetComponentsInChildren<T>();
+
+         return children.Where(child => child.name == name).ToList();
+      }
+
+      #endregion
+
+
       #region MonoBehaviour
 
       /// <summary>
@@ -2336,10 +2389,29 @@ namespace Crosstales
          return null;
       }
 
+      private static System.Collections.Generic.List<Transform> getAllChildren(this Transform parent, int maxDepth = 0, System.Collections.Generic.List<Transform> transformList = null, int depth = 0)
+      {
+         if (transformList == null) transformList = new System.Collections.Generic.List<Transform>();
+
+         if (maxDepth != 0)
+            depth++;
+
+         if (depth <= maxDepth)
+         {
+            foreach (Transform child in parent)
+            {
+               transformList.Add(child);
+               child.getAllChildren(maxDepth, transformList, depth);
+            }
+         }
+
+         return transformList;
+      }
+
       private static float bytesToFloat(byte firstByte, byte secondByte)
       {
          // convert two bytes to one short (little endian) and convert it to range from -1 to (just below) 1
-         return (short)((secondByte << 8) | firstByte) / Common.Util.BaseConstants.FLOAT_32768;
+         return (short)((secondByte << 8) | firstByte) / Crosstales.Common.Util.BaseConstants.FLOAT_32768;
       }
 
       #endregion
@@ -2428,4 +2500,4 @@ namespace Crosstales
   */
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

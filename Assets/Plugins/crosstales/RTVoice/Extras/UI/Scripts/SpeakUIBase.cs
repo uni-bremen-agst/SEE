@@ -9,9 +9,9 @@ namespace Crosstales.RTVoice.UI
    {
       #region Variables
 
-      [Header("Configuration")] [Tooltip("Voices for the speech."), SerializeField] private Model.VoiceAlias voices;
+      [Header("Configuration")] [Tooltip("Voices for the speech."), SerializeField] private Crosstales.RTVoice.Model.VoiceAlias voices;
 
-      [Tooltip("Speak mode (default: 'Speak')."), SerializeField] private Model.Enum.SpeakMode mode = Model.Enum.SpeakMode.Speak;
+      [Tooltip("Speak mode (default: 'Speak')."), SerializeField] private Crosstales.RTVoice.Model.Enum.SpeakMode mode = Crosstales.RTVoice.Model.Enum.SpeakMode.Speak;
 
       [Tooltip("Delay in seconds before the speech starts (default: 1.5)."), Range(0f, 10f), SerializeField]
       private float delay = 1.5f;
@@ -43,14 +43,14 @@ namespace Crosstales.RTVoice.UI
       #region Properties
 
       /// <summary>Voices for the speech.</summary>
-      public Model.VoiceAlias Voices
+      public Crosstales.RTVoice.Model.VoiceAlias Voices
       {
          get => voices;
          set => voices = value;
       }
 
       /// <summary>Speak mode.</summary>
-      public Model.Enum.SpeakMode Mode
+      public Crosstales.RTVoice.Model.Enum.SpeakMode Mode
       {
          get => mode;
          set => mode = value;
@@ -133,7 +133,7 @@ namespace Crosstales.RTVoice.UI
          {
             if (uid != null)
             {
-               if (Mode == Model.Enum.SpeakMode.Speak)
+               if (Mode == Crosstales.RTVoice.Model.Enum.SpeakMode.Speak)
                {
                   Speaker.Instance.Silence(uid);
                }
@@ -152,12 +152,12 @@ namespace Crosstales.RTVoice.UI
 
       protected virtual string speak(string text)
       {
-         return Mode == Model.Enum.SpeakMode.Speak
+         return Mode == Crosstales.RTVoice.Model.Enum.SpeakMode.Speak
             ? Speaker.Instance.Speak(text, Source, Voices.Voice, true, Rate, Pitch, Volume)
             : Speaker.Instance.SpeakNative(text, Voices.Voice, Rate, Pitch, Volume);
       }
 
-      protected virtual void onSpeakComplete(Model.Wrapper wrapper)
+      protected virtual void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper.Uid == uid)
          {
@@ -171,4 +171,4 @@ namespace Crosstales.RTVoice.UI
       #endregion
    }
 }
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

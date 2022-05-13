@@ -14,7 +14,7 @@ namespace Crosstales.RTVoice
       #region Variables
 
       [FormerlySerializedAs("CustomProvider")] [Header("Custom Provider"), Tooltip("Custom provider for RT-Voice."), SerializeField]
-      private Provider.BaseCustomVoiceProvider customProvider;
+      private Crosstales.RTVoice.Provider.BaseCustomVoiceProvider customProvider;
 
       [FormerlySerializedAs("CustomMode")] [Tooltip("Enable or disable the custom provider (default: false)."), SerializeField]
       private bool customMode;
@@ -27,11 +27,15 @@ namespace Crosstales.RTVoice
       [Tooltip("eSpeak application data path (default: empty)."), SerializeField] private string eSpeakDataPath = string.Empty;
 
       [FormerlySerializedAs("ESpeakModifier")] [Tooltip("Active modifier for all eSpeak voices (default: none, m1-m6 = male, f1-f4 = female)."), SerializeField]
-      private Model.Enum.ESpeakModifiers eSpeakModifier = Model.Enum.ESpeakModifiers.none;
+      private Crosstales.RTVoice.Model.Enum.ESpeakModifiers eSpeakModifier = Crosstales.RTVoice.Model.Enum.ESpeakModifiers.none;
 
 
       [FormerlySerializedAs("AndroidEngine")] [Header("Android Settings"), Tooltip("Active speech engine under Android (default: empty)."), SerializeField]
       private string androidEngine = string.Empty;
+
+
+      [Header("Windows Settings"), Tooltip("Force 32bit under Windows standalone (default: false)."), SerializeField]
+      private bool windowsForce32bit;
 
 
       [FormerlySerializedAs("AutoClearTags")] [Header("Advanced Settings"), Tooltip("Automatically clear tags from speeches depending on the capabilities of the current TTS-system (default: false)."), SerializeField]
@@ -57,9 +61,9 @@ namespace Crosstales.RTVoice
 
       private float cleanUpTimer;
 
-      private Provider.IVoiceProvider voiceProvider;
-      private Provider.MainVoiceProvider mainVoiceProvider;
-      private Provider.BaseCustomVoiceProvider customVoiceProvider;
+      private Crosstales.RTVoice.Provider.IVoiceProvider voiceProvider;
+      private Crosstales.RTVoice.Provider.MainVoiceProvider mainVoiceProvider;
+      private Crosstales.RTVoice.Provider.BaseCustomVoiceProvider customVoiceProvider;
       private readonly System.Collections.Generic.Dictionary<string, AudioSource> genericSources = new System.Collections.Generic.Dictionary<string, AudioSource>();
       private readonly System.Collections.Generic.Dictionary<string, AudioSource> providedSources = new System.Collections.Generic.Dictionary<string, AudioSource>();
 
@@ -70,13 +74,13 @@ namespace Crosstales.RTVoice
       private static readonly char[] splitCharWords = { ' ' };
       private const float cleanUpTime = 5f; //in seconds
 
-      private System.Threading.Thread deleteWorker;
-
       private static bool loggedVPIsNull;
-
+#if (!UNITY_WSA && !UNITY_XBOXONE && !UNITY_WEBGL) || UNITY_EDITOR
+      private System.Threading.Thread deleteWorker;
+#endif
 #if (UNITY_IOS || UNITY_TVOS) && !UNITY_EDITOR
       private static string currentTextToSpeak;
-      private static Model.Wrapper currentWrapper;
+      private static Crosstales.RTVoice.Model.Wrapper currentWrapper;
       private const float delayPause = 0.5f;
       private static float lastTimePaused = 0;
 #endif
@@ -87,7 +91,7 @@ namespace Crosstales.RTVoice
       #region Properties
 
       /// <summary>Custom provider for RT-Voice.</summary>
-      public Provider.BaseCustomVoiceProvider CustomProvider
+      public Crosstales.RTVoice.Provider.BaseCustomVoiceProvider CustomProvider
       {
          get => customProvider;
          set
@@ -143,21 +147,40 @@ namespace Crosstales.RTVoice
       }
 
       /// <summary>Active modifier for all eSpeak voices.</summary>
-      public Model.Enum.ESpeakModifiers ESpeakModifier
+      public Crosstales.RTVoice.Model.Enum.ESpeakModifiers ESpeakModifier
       {
          get => eSpeakModifier;
          set => eSpeakModifier = value;
       }
 
-      /// <summary>Active speech engine under Android.</summary>
+      /// <summary>
+      /// Active speech engine under Android.
+      /// Note: the default Google Engine is "com.google.android.tts"
+      /// </summary>
       public string AndroidEngine
       {
          get => androidEngine;
          set
          {
-            if (androidEngine == value) return;
+            if (androidEngine == value || !Crosstales.RTVoice.Util.Helper.isAndroidPlatform) return;
 
             androidEngine = value;
+
+            ReloadProvider();
+         }
+      }
+
+      /// <summary>
+      /// Force 32bit under Windows standalone
+      /// </summary>
+      public bool WindowsForce32bit
+      {
+         get => windowsForce32bit;
+         set
+         {
+            if (windowsForce32bit == value || !Crosstales.RTVoice.Util.Helper.isWindowsPlatform) return;
+
+            windowsForce32bit = value;
 
             ReloadProvider();
          }
@@ -290,7 +313,7 @@ namespace Crosstales.RTVoice
 
       /// <summary>Get all available voices from the current TTS-system.</summary>
       /// <returns>All available voices (alphabetically ordered by 'Name') as a list.</returns>
-      public System.Collections.Generic.List<Model.Voice> Voices
+      public System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> Voices
       {
          get
          {
@@ -300,7 +323,7 @@ namespace Crosstales.RTVoice
 
             logVPIsNull();
 
-            return new System.Collections.Generic.List<Model.Voice>();
+            return new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>();
          }
       }
 
@@ -485,7 +508,7 @@ namespace Crosstales.RTVoice
             {
                foreach (string code in voiceProvider.Cultures)
                {
-                  SystemLanguage lang = Util.Helper.ISO639ToLanguage(code);
+                  SystemLanguage lang = Crosstales.RTVoice.Util.Helper.ISO639ToLanguage(code);
 
                   if (!result.Contains(lang))
                      result.Add(lang);
@@ -523,7 +546,8 @@ namespace Crosstales.RTVoice
 
       #region Events
 
-      [Header("Events")] public VoicesReadyEvent OnReady;
+      //[Header("Events")]
+      public VoicesReadyEvent OnReady;
       public SpeakStartEvent OnSpeakStarted;
       public SpeakCompleteEvent OnSpeakCompleted;
       public ProviderChangeEvent OnProviderChanged;
@@ -579,11 +603,11 @@ namespace Crosstales.RTVoice
                deleted = true;
 
                //if (Util.Helper.isWindowsPlatform && Util.Config.AUDIOFILE_AUTOMATIC_DELETE) //only delete files under Windows
-               if (Util.Config.AUDIOFILE_AUTOMATIC_DELETE)
+               if (Crosstales.RTVoice.Util.Config.AUDIOFILE_AUTOMATIC_DELETE)
                   DeleteAudioFiles();
             }
 
-            if (Util.Helper.isLinuxPlatform)
+            if (Crosstales.RTVoice.Util.Helper.isLinuxPlatform)
                eSpeakMode = true;
 
             /*
@@ -652,7 +676,7 @@ namespace Crosstales.RTVoice
 
 #if UNITY_ANDROID || UNITY_EDITOR
          if (voiceProvider is Crosstales.RTVoice.Provider.VoiceProviderAndroid)
-            Provider.VoiceProviderAndroid.ShutdownTTS();
+            Crosstales.RTVoice.Provider.VoiceProviderAndroid.ShutdownTTS();
 #endif
 
          /*
@@ -676,10 +700,10 @@ namespace Crosstales.RTVoice
          }
          */
 
-#if (!UNITY_WSA && !UNITY_XBOXONE) || UNITY_EDITOR
+#if (!UNITY_WSA && !UNITY_XBOXONE && !UNITY_WEBGL) || UNITY_EDITOR
          if (deleteWorker?.IsAlive == true)
          {
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Killing worker", this);
 
             deleteWorker.Abort(); //TODO dangerous - find a better solution!
@@ -691,31 +715,31 @@ namespace Crosstales.RTVoice
 
       private void OnApplicationFocus(bool hasFocus)
       {
-         if (Util.Helper.isMobilePlatform || !Application.runInBackground)
+         if (Crosstales.RTVoice.Util.Helper.isMobilePlatform || !Application.runInBackground)
          {
 #if UNITY_ANDROID || UNITY_IOS
             if (!TouchScreenKeyboard.isSupported || !TouchScreenKeyboard.visible)
             {
 #endif
-               if (silenceOnFocusLost)
+            if (silenceOnFocusLost)
+            {
+               if (!hasFocus)
+                  Silence();
+            }
+            else
+            {
+               if (handleFocus)
                {
-                  if (!hasFocus)
-                     Silence();
-               }
-               else
-               {
-                  if (handleFocus)
+                  if (hasFocus)
                   {
-                     if (hasFocus)
-                     {
-                        UnPause();
-                     }
-                     else
-                     {
-                        Pause();
-                     }
+                     UnPause();
+                  }
+                  else
+                  {
+                     Pause();
                   }
                }
+            }
 #if UNITY_ANDROID || UNITY_IOS
             }
 #endif
@@ -752,7 +776,7 @@ namespace Crosstales.RTVoice
 
          if (Common.Util.BaseHelper.isWindowsPlatform && !ESpeakMode && !CustomMode)
          {
-            if (Mathf.Abs(rate - 1f) > Common.Util.BaseConstants.FLOAT_TOLERANCE)
+            if (Mathf.Abs(rate - 1f) > Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE)
             {
                //relevant?
                if (rate > 1f)
@@ -911,7 +935,7 @@ namespace Crosstales.RTVoice
       /// <param name="gender">Gender of the voice</param>
       /// <param name="culture">Culture of the voice (e.g. "en", optional)</param>
       /// <returns>True if a voice is available for a given gender and culture.</returns>
-      public bool isVoiceForGenderAvailable(Model.Enum.Gender gender, string culture = "")
+      public bool isVoiceForGenderAvailable(Crosstales.RTVoice.Model.Enum.Gender gender, string culture = "")
       {
          return VoicesForGender(gender, culture).Count > 0;
       }
@@ -920,9 +944,9 @@ namespace Crosstales.RTVoice
       /// <param name="gender">Gender of the voice</param>
       /// <param name="language">Language of the voice</param>
       /// <returns>True if a voice is available for a given gender and language.</returns>
-      public bool isVoiceForGenderAvailable(Model.Enum.Gender gender, SystemLanguage language)
+      public bool isVoiceForGenderAvailable(Crosstales.RTVoice.Model.Enum.Gender gender, SystemLanguage language)
       {
-         return isVoiceForGenderAvailable(gender, Util.Helper.LanguageToISO639(language));
+         return isVoiceForGenderAvailable(gender, Crosstales.RTVoice.Util.Helper.LanguageToISO639(language));
       }
 
       /// <summary>Get all available voices for a given gender and optional culture from the current TTS-system.</summary>
@@ -930,20 +954,20 @@ namespace Crosstales.RTVoice
       /// <param name="culture">Culture of the voice (e.g. "en", optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or culture (default: false, optional)</param>
       /// <returns>All available voices (alphabetically ordered by 'Name') for a given gender and culture as a list.</returns>
-      public System.Collections.Generic.List<Model.Voice> VoicesForGender(Model.Enum.Gender gender, string culture = "", bool isFuzzy = false)
+      public System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> VoicesForGender(Crosstales.RTVoice.Model.Enum.Gender gender, string culture = "", bool isFuzzy = false)
       {
-         System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>(Voices.Count);
+         System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>(Voices.Count);
 
          if (string.IsNullOrEmpty(culture))
          {
-            if (Model.Enum.Gender.UNKNOWN == gender)
+            if (Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN == gender)
                return Voices;
 
             voices.AddRange(Voices.Where(voice => voice.Gender == gender));
          }
          else
          {
-            if (Model.Enum.Gender.UNKNOWN == gender)
+            if (Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN == gender)
                return VoicesForCulture(culture, isFuzzy);
 
             voices.AddRange(VoicesForCulture(culture, isFuzzy).Where(voice => voice.Gender == gender));
@@ -960,9 +984,9 @@ namespace Crosstales.RTVoice
       /// <param name="language">Language of the voice</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or language (default: false, optional)</param>
       /// <returns>All available voices (alphabetically ordered by 'Name') for a given gender and language as a list.</returns>
-      public System.Collections.Generic.List<Model.Voice> VoicesForGender(Model.Enum.Gender gender, SystemLanguage language, bool isFuzzy = false)
+      public System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> VoicesForGender(Crosstales.RTVoice.Model.Enum.Gender gender, SystemLanguage language, bool isFuzzy = false)
       {
-         return VoicesForGender(gender, Util.Helper.LanguageToISO639(language), isFuzzy);
+         return VoicesForGender(gender, Crosstales.RTVoice.Util.Helper.LanguageToISO639(language), isFuzzy);
       }
 
       /// <summary>Get a voice from for a given gender, optional culture and optional index from the current TTS-system.</summary>
@@ -972,11 +996,11 @@ namespace Crosstales.RTVoice
       /// <param name="fallbackCulture">Fallback culture of the voice (default "en", optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or culture (default: false, optional)</param>
       /// <returns>Voice for the given gender, culture and index.</returns>
-      public Model.Voice VoiceForGender(Model.Enum.Gender gender, string culture = "", int index = 0, string fallbackCulture = "en", bool isFuzzy = false)
+      public Crosstales.RTVoice.Model.Voice VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender gender, string culture = "", int index = 0, string fallbackCulture = "en", bool isFuzzy = false)
       {
-         Model.Voice result = null;
+         Crosstales.RTVoice.Model.Voice result = null;
 
-         System.Collections.Generic.List<Model.Voice> voices = VoicesForGender(gender, culture, isFuzzy);
+         System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = VoicesForGender(gender, culture, isFuzzy);
 
          if (voices.Count > 0)
          {
@@ -1016,9 +1040,9 @@ namespace Crosstales.RTVoice
       /// <param name="index">Index of the voice (default: 0, optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the gender and/or language (default: false, optional)</param>
       /// <returns>Voice for the given gender, language and index.</returns>
-      public Model.Voice VoiceForGender(Model.Enum.Gender gender, SystemLanguage language, int index = 0, bool isFuzzy = false)
+      public Crosstales.RTVoice.Model.Voice VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender gender, SystemLanguage language, int index = 0, bool isFuzzy = false)
       {
-         return VoiceForGender(gender, Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
+         return VoiceForGender(gender, Crosstales.RTVoice.Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
       }
 
       /// <summary>Is a voice available for a given culture from the current TTS-system?</summary>
@@ -1034,18 +1058,18 @@ namespace Crosstales.RTVoice
       /// <returns>True if a voice is available for a given language.</returns>
       public bool isVoiceForLanguageAvailable(SystemLanguage language)
       {
-         return isVoiceForCultureAvailable(Util.Helper.LanguageToISO639(language));
+         return isVoiceForCultureAvailable(Crosstales.RTVoice.Util.Helper.LanguageToISO639(language));
       }
 
       /// <summary>Get all available voices for a given culture from the current TTS-system.</summary>
       /// <param name="culture">Culture of the voice (e.g. "en")</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the culture (default: false, optional)</param>
       /// <returns>All available voices (alphabetically ordered by 'Name') for a given culture as a list.</returns>
-      public System.Collections.Generic.List<Model.Voice> VoicesForCulture(string culture, bool isFuzzy = false)
+      public System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> VoicesForCulture(string culture, bool isFuzzy = false)
       {
          if (string.IsNullOrEmpty(culture))
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.LogWarning("The given 'culture' is null or empty! Returning all available voices.", this);
 
             return Voices;
@@ -1053,9 +1077,9 @@ namespace Crosstales.RTVoice
 
          string _culture = culture.Trim().Replace(" ", string.Empty).Replace("_", string.Empty).Replace("-", string.Empty);
 #if UNITY_WSA || UNITY_XBOXONE
-         System.Collections.Generic.List<Model.Voice> voices = Voices.Where(s => s.SimplifiedCulture.StartsWith(_culture, System.StringComparison.OrdinalIgnoreCase)).OrderBy(s => s.Name).ToList();
+         System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = Voices.Where(s => s.SimplifiedCulture.StartsWith(_culture, System.StringComparison.OrdinalIgnoreCase)).OrderBy(s => s.Name).ToList();
 #else
-         System.Collections.Generic.List<Model.Voice> voices = Voices.Where(s => s.SimplifiedCulture.StartsWith(_culture, System.StringComparison.InvariantCultureIgnoreCase)).OrderBy(s => s.Name).ToList();
+         System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = Voices.Where(s => s.SimplifiedCulture.StartsWith(_culture, System.StringComparison.InvariantCultureIgnoreCase)).OrderBy(s => s.Name).ToList();
 #endif
          if (voices.Count == 0 && isFuzzy)
          {
@@ -1069,9 +1093,9 @@ namespace Crosstales.RTVoice
       /// <param name="language">Language of the voice</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the language (default: false, optional)</param>
       /// <returns>All available voices (alphabetically ordered by 'Name') for a given language as a list.</returns>
-      public System.Collections.Generic.List<Model.Voice> VoicesForLanguage(SystemLanguage language, bool isFuzzy = false)
+      public System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> VoicesForLanguage(SystemLanguage language, bool isFuzzy = false)
       {
-         return VoicesForCulture(Util.Helper.LanguageToISO639(language), isFuzzy);
+         return VoicesForCulture(Crosstales.RTVoice.Util.Helper.LanguageToISO639(language), isFuzzy);
       }
 
       /// <summary>Get a voice from for a given culture and optional index from the current TTS-system.</summary>
@@ -1080,13 +1104,13 @@ namespace Crosstales.RTVoice
       /// <param name="fallbackCulture">Fallback culture of the voice (default "en", optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the culture (default: false, optional)</param>
       /// <returns>Voice for the given culture and index.</returns>
-      public Model.Voice VoiceForCulture(string culture, int index = 0, string fallbackCulture = "en", bool isFuzzy = false)
+      public Crosstales.RTVoice.Model.Voice VoiceForCulture(string culture, int index = 0, string fallbackCulture = "en", bool isFuzzy = false)
       {
-         Model.Voice result = null;
+         Crosstales.RTVoice.Model.Voice result = null;
 
          if (!string.IsNullOrEmpty(culture))
          {
-            System.Collections.Generic.List<Model.Voice> voices = VoicesForCulture(culture, isFuzzy);
+            System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = VoicesForCulture(culture, isFuzzy);
 
             if (voices.Count > 0)
             {
@@ -1126,9 +1150,9 @@ namespace Crosstales.RTVoice
       /// <param name="index">Index of the voice (default: 0, optional)</param>
       /// <param name="isFuzzy">Always returns voices if there is no match with the language (default: false, optional)</param>
       /// <returns>Voice for the given language and index.</returns>
-      public Model.Voice VoiceForLanguage(SystemLanguage language, int index = 0, bool isFuzzy = false)
+      public Crosstales.RTVoice.Model.Voice VoiceForLanguage(SystemLanguage language, int index = 0, bool isFuzzy = false)
       {
-         return VoiceForCulture(Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
+         return VoiceForCulture(Crosstales.RTVoice.Util.Helper.LanguageToISO639(language), index, "en", isFuzzy);
       }
 
       /// <summary>Is a voice available for a given name from the current TTS-system?</summary>
@@ -1144,13 +1168,13 @@ namespace Crosstales.RTVoice
       /// <param name="_name">Name of the voice (e.g. "Alex")</param>
       /// <param name="isExact">Exact match for the voice name (default: false, optional)</param>
       /// <returns>Voice for the given name or null if not found.</returns>
-      public Model.Voice VoiceForName(string _name, bool isExact = false)
+      public Crosstales.RTVoice.Model.Voice VoiceForName(string _name, bool isExact = false)
       {
-         Model.Voice result = null;
+         Crosstales.RTVoice.Model.Voice result = null;
 
          if (string.IsNullOrEmpty(_name))
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.LogWarning("The given 'name' is null or empty! Returning null.", this);
          }
          else
@@ -1175,12 +1199,12 @@ namespace Crosstales.RTVoice
       /// <param name="volume">Volume of the speaker in percent (1 = 100%, values: 0.01-1, default: 1, optional).</param>
       /// <param name="forceSSML">Force SSML on supported platforms (default: true, optional).</param>
       /// <returns>UID of the speaker.</returns>
-      public string SpeakNative(string text, Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
+      public string SpeakNative(string text, Crosstales.RTVoice.Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
 
-         Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, forceSSML);
+         Crosstales.RTVoice.Model.Wrapper wrapper = new Crosstales.RTVoice.Model.Wrapper(text, voice, rate, pitch, volume, forceSSML);
 
          SpeakNativeWithUID(wrapper);
 
@@ -1189,16 +1213,16 @@ namespace Crosstales.RTVoice
 
       /// <summary>Speaks a text with a given voice (native mode).</summary>
       /// <param name="wrapper">Speak wrapper.</param>
-      public void SpeakNativeWithUID(Model.Wrapper wrapper)
+      public void SpeakNativeWithUID(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakNativeWithUID called: {wrapper}", this);
          if (wrapper != null)
          {
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                speakNativeInEditor(wrapper);
@@ -1250,7 +1274,7 @@ namespace Crosstales.RTVoice
       /// <summary>Speaks a text with a given wrapper (native mode).</summary>
       /// <param name="wrapper">Speak wrapper.</param>
       /// <returns>UID of the speaker.</returns>
-      public string SpeakNative(Model.Wrapper wrapper)
+      public string SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
@@ -1278,12 +1302,12 @@ namespace Crosstales.RTVoice
       /// <param name="outputFile">Saves the generated audio to an output file (without extension, optional).</param>
       /// <param name="forceSSML">Force SSML on supported platforms (default: true, optional).</param>
       /// <returns>UID of the speaker.</returns>
-      public string Speak(string text, AudioSource source = null, Model.Voice voice = null, bool speakImmediately = true, float rate = 1f, float pitch = 1f, float volume = 1f, string outputFile = "", bool forceSSML = true)
+      public string Speak(string text, AudioSource source = null, Crosstales.RTVoice.Model.Voice voice = null, bool speakImmediately = true, float rate = 1f, float pitch = 1f, float volume = 1f, string outputFile = "", bool forceSSML = true)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
 
-         Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, source, speakImmediately, outputFile, forceSSML);
+         Crosstales.RTVoice.Model.Wrapper wrapper = new Crosstales.RTVoice.Model.Wrapper(text, voice, rate, pitch, volume, source, speakImmediately, outputFile, forceSSML);
 
          SpeakWithUID(wrapper);
 
@@ -1292,17 +1316,17 @@ namespace Crosstales.RTVoice
 
       /// <summary>Speaks a text with a given voice.</summary>
       /// <param name="wrapper">Speak wrapper.</param>
-      public void SpeakWithUID(Model.Wrapper wrapper)
+      public void SpeakWithUID(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakWithUID called: {wrapper}", this);
 
          if (wrapper != null)
          {
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                speakNativeInEditor(wrapper);
@@ -1346,19 +1370,19 @@ namespace Crosstales.RTVoice
 
                      if (Caching && GlobalCache.Instance.Clips.ContainsKey(wrapper))
                      {
-                        if (Util.Config.DEBUG)
+                        if (Crosstales.RTVoice.Util.Config.DEBUG)
                            Debug.Log($"Wrapper CACHED: {wrapper}", this);
 
-                        Util.Context.NumberOfCachedSpeeches++;
+                        Crosstales.RTVoice.Util.Context.NumberOfCachedSpeeches++;
 
                         StartCoroutine(voiceProvider.SpeakWithClip(wrapper, GlobalCache.Instance.GetClip(wrapper)));
                      }
                      else
                      {
-                        if (Util.Config.DEBUG)
+                        if (Crosstales.RTVoice.Util.Config.DEBUG)
                            Debug.Log($"Wrapper NOT cached: {wrapper}", this);
 
-                        Util.Context.NumberOfNonCachedSpeeches++;
+                        Crosstales.RTVoice.Util.Context.NumberOfNonCachedSpeeches++;
 
                         StartCoroutine(voiceProvider.Speak(wrapper));
                      }
@@ -1379,7 +1403,7 @@ namespace Crosstales.RTVoice
       /// <summary>Speaks a text with a given wrapper.</summary>
       /// <param name="wrapper">Speak wrapper.</param>
       /// <returns>UID of the speaker.</returns>
-      public string Speak(Model.Wrapper wrapper)
+      public string Speak(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
@@ -1398,12 +1422,12 @@ namespace Crosstales.RTVoice
 
       /// <summary>Speaks and marks a text with a given wrapper.</summary>
       /// <param name="wrapper">Speak wrapper.</param>
-      public void SpeakMarkedWordsWithUID(Model.Wrapper wrapper)
+      public void SpeakMarkedWordsWithUID(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"SpeakMarkedWordsWithUID called: {wrapper}", this);
 
          if (voiceProvider != null)
@@ -1425,7 +1449,7 @@ namespace Crosstales.RTVoice
                   wrapper.SpeakImmediately = true;
 
                   //TODO improve the detection for supported providers
-                  if (!Util.Helper.isMacOSPlatform && !Util.Helper.isWSABasedPlatform && !CustomMode) //prevent "double-speak"
+                  if (!Crosstales.RTVoice.Util.Helper.isMacOSPlatform && !Crosstales.RTVoice.Util.Helper.isWSABasedPlatform && !CustomMode) //prevent "double-speak"
                   {
                      wrapper.Volume = 0f;
                      wrapper.Source.PlayDelayed(0.1f);
@@ -1450,9 +1474,9 @@ namespace Crosstales.RTVoice
       /// <param name="rate">Speech rate of the speaker in percent (1 = 100%, values: 0.01-3, default: 1, optional).</param>
       /// <param name="pitch">Pitch of the speech in percent (1 = 100%, values: 0-2, default: 1, optional).</param>
       /// <param name="forceSSML">Force SSML on supported platforms (default: true, optional).</param>
-      public void SpeakMarkedWordsWithUID(string uid, string text, AudioSource source, Model.Voice voice = null, float rate = 1f, float pitch = 1f, bool forceSSML = true)
+      public void SpeakMarkedWordsWithUID(string uid, string text, AudioSource source, Crosstales.RTVoice.Model.Voice voice = null, float rate = 1f, float pitch = 1f, bool forceSSML = true)
       {
-         SpeakMarkedWordsWithUID(new Model.Wrapper(uid, text, voice, rate, pitch, 0, source, true, "", forceSSML));
+         SpeakMarkedWordsWithUID(new Crosstales.RTVoice.Model.Wrapper(uid, text, voice, rate, pitch, 0, source, true, "", forceSSML));
       }
 
       //      /// <summary>
@@ -1469,14 +1493,14 @@ namespace Crosstales.RTVoice
       /// <summary>Generates an audio file from a given wrapper.</summary>
       /// <param name="wrapper">Speak wrapper.</param>
       /// <returns>UID of the generator.</returns>
-      public string Generate(Model.Wrapper wrapper)
+      public string Generate(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
 
          if (wrapper != null)
          {
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                generateInEditor(wrapper);
@@ -1526,12 +1550,12 @@ namespace Crosstales.RTVoice
       /// <param name="volume">Volume of the speaker in percent (1 = 100%, values: 0.01-1, default: 1, optional).</param>
       /// <param name="forceSSML">Force SSML on supported platforms (default: true, optional).</param>
       /// <returns>UID of the generator.</returns>
-      public string Generate(string text, string outputFile, Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
+      public string Generate(string text, string outputFile, Crosstales.RTVoice.Model.Voice voice = null, float rate = 1f, float pitch = 1f, float volume = 1f, bool forceSSML = true)
       {
          if (this != null && !isActiveAndEnabled)
             return "disabled";
 
-         Model.Wrapper wrapper = new Model.Wrapper(text, voice, rate, pitch, volume, null, false, outputFile, forceSSML);
+         Crosstales.RTVoice.Model.Wrapper wrapper = new Crosstales.RTVoice.Model.Wrapper(text, voice, rate, pitch, volume, null, false, outputFile, forceSSML);
 
          return Generate(wrapper);
       }
@@ -1543,8 +1567,8 @@ namespace Crosstales.RTVoice
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Common.Util.BaseConstants.DEV_DEBUG)
-            Debug.LogWarning($"Silence called: {uid}", this);
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
+            Debug.Log($"Silence called: {uid}", this);
 
          if (voiceProvider != null)
          {
@@ -1585,13 +1609,13 @@ namespace Crosstales.RTVoice
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"Pause called: {uid}", this);
 
          isPaused = true;
 
 #if (UNITY_IOS || UNITY_TVOS) && !UNITY_EDITOR
-         if (voiceProvider.GetType() == typeof(Provider.VoiceProviderIOS))
+         if (voiceProvider?.GetType() == typeof(Provider.VoiceProviderIOS))
          {
             float currentTime = Time.realtimeSinceStartup;
 
@@ -1657,13 +1681,13 @@ namespace Crosstales.RTVoice
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"UnPause called: {uid}", this);
 
          isPaused = false;
 
 #if (UNITY_IOS || UNITY_TVOS) && !UNITY_EDITOR
-         if (voiceProvider.GetType() == typeof(Provider.VoiceProviderIOS))
+         if (voiceProvider?.GetType() == typeof(Provider.VoiceProviderIOS))
          {
             float currentTime = Time.realtimeSinceStartup;
 
@@ -1752,7 +1776,7 @@ namespace Crosstales.RTVoice
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"Mute called: {uid}", this);
 
          isMuted = true;
@@ -1802,7 +1826,7 @@ namespace Crosstales.RTVoice
          if (this != null && !isActiveAndEnabled)
             return;
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.LogWarning($"UnMute called: {uid}", this);
 
          isMuted = false;
@@ -1872,8 +1896,8 @@ namespace Crosstales.RTVoice
       /// <summary>Deletes all generated audio files.</summary>
       public void DeleteAudioFiles()
       {
-#if !UNITY_XBOXONE && !UNITY_WEBGL
-         if (!Util.Helper.isWebPlatform)
+#if (!UNITY_XBOXONE && !UNITY_WEBGL) || UNITY_EDITOR
+         if (!Crosstales.RTVoice.Util.Helper.isWebPlatform)
          {
             //string path = Application.persistentDataPath;
             string path = Application.temporaryCachePath;
@@ -1881,7 +1905,7 @@ namespace Crosstales.RTVoice
 #if !UNITY_WSA || UNITY_EDITOR
             if (deleteWorker?.IsAlive == true)
             {
-               if (Util.Constants.DEV_DEBUG)
+               if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                   Debug.Log("Killing worker", this);
 
                deleteWorker.Abort(); //TODO dangerous - find a better solution!
@@ -1903,8 +1927,8 @@ namespace Crosstales.RTVoice
 
       private void silence()
       {
-         if (Util.Constants.DEV_DEBUG)
-            Debug.LogWarning("Silence called", this);
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
+            Debug.Log("Silence called", this);
 
          if (voiceProvider != null)
          {
@@ -1945,8 +1969,8 @@ namespace Crosstales.RTVoice
          try
          {
             System.Random rnd = new System.Random();
-            string filesToDelete = Util.Constants.AUDIOFILE_PREFIX + "*"; // + AudioFileExtension;
-            string path = Util.Helper.isAndroidPlatform || Util.Helper.isWSABasedPlatform ? Util.Helper.ValidatePath(audioDataPath) : Util.Config.AUDIOFILE_PATH;
+            string filesToDelete = Crosstales.RTVoice.Util.Constants.AUDIOFILE_PREFIX + "*"; // + AudioFileExtension;
+            string path = Crosstales.RTVoice.Util.Helper.isAndroidPlatform || Crosstales.RTVoice.Util.Helper.isWSABasedPlatform ? Crosstales.Common.Util.FileHelper.ValidatePath(audioDataPath) : Crosstales.RTVoice.Util.Config.AUDIOFILE_PATH;
             string[] fileList = System.IO.Directory.GetFiles(path, filesToDelete);
 
             foreach (string file in fileList)
@@ -1954,7 +1978,7 @@ namespace Crosstales.RTVoice
                try
                {
 #if !UNITY_WSA || UNITY_EDITOR
-                  if (Util.Helper.isWindowsPlatform /* && ii % 10 == 0 */) //only for Windows to prevent issues with AV
+                  if (Crosstales.RTVoice.Util.Helper.isWindowsPlatform /* && ii % 10 == 0 */) //only for Windows to prevent issues with AV
                   {
                      System.Threading.Thread.Sleep(rnd.Next(1200, 1800));
                   }
@@ -1963,14 +1987,14 @@ namespace Crosstales.RTVoice
                }
                catch (System.Exception ex)
                {
-                  if (!Util.Helper.isEditor)
+                  if (!Crosstales.RTVoice.Util.Helper.isEditor)
                      Debug.LogWarning($"Could not delete the file '{file}': {ex}", this);
                }
             }
          }
          catch (System.Exception ex)
          {
-            if (!Util.Helper.isEditor)
+            if (!Crosstales.RTVoice.Util.Helper.isEditor)
                Debug.LogWarning($"Could not scan the path for files: {ex}", this);
          }
       }
@@ -2015,41 +2039,43 @@ namespace Crosstales.RTVoice
             subscribeEvents();
             voiceProvider?.Load();
             onProviderChange();
+
+            //Debug.Log("Use internal voice provider.");
          }
       }
 
       private void initOSProvider()
       {
-         if (!Util.Helper.isMacOSEditor && !Util.Helper.isLinuxEditor && Util.Helper.isWindowsPlatform && !eSpeakMode || Util.Helper.isWindowsEditor && Util.Config.ENFORCE_STANDALONE_TTS && !eSpeakMode)
+         if (!Crosstales.RTVoice.Util.Helper.isMacOSEditor && !Crosstales.RTVoice.Util.Helper.isLinuxEditor && Crosstales.RTVoice.Util.Helper.isWindowsPlatform && !eSpeakMode || Crosstales.RTVoice.Util.Helper.isWindowsEditor && Crosstales.RTVoice.Util.Config.ENFORCE_STANDALONE_TTS && !eSpeakMode)
          {
-            enforcedStandaloneTTS = !Util.Helper.isWindowsPlatform && Util.Helper.isWindowsEditor && Util.Config.ENFORCE_STANDALONE_TTS;
+            enforcedStandaloneTTS = !Crosstales.RTVoice.Util.Helper.isWindowsPlatform && Crosstales.RTVoice.Util.Helper.isWindowsEditor && Crosstales.RTVoice.Util.Config.ENFORCE_STANDALONE_TTS;
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            voiceProvider = mainVoiceProvider = Provider.VoiceProviderWindows.Instance;
+            voiceProvider = mainVoiceProvider = Crosstales.RTVoice.Provider.VoiceProviderWindows.Instance;
 #endif
          }
-         else if (!Util.Helper.isWindowsEditor && !Util.Helper.isLinuxEditor && Util.Helper.isMacOSPlatform && !eSpeakMode || Util.Helper.isMacOSEditor && Util.Config.ENFORCE_STANDALONE_TTS && !eSpeakMode)
+         else if (!Crosstales.RTVoice.Util.Helper.isWindowsEditor && !Crosstales.RTVoice.Util.Helper.isLinuxEditor && Crosstales.RTVoice.Util.Helper.isMacOSPlatform && !eSpeakMode || Crosstales.RTVoice.Util.Helper.isMacOSEditor && Crosstales.RTVoice.Util.Config.ENFORCE_STANDALONE_TTS && !eSpeakMode)
          {
-            enforcedStandaloneTTS = !Util.Helper.isMacOSPlatform && Util.Helper.isMacOSEditor && Util.Config.ENFORCE_STANDALONE_TTS;
+            enforcedStandaloneTTS = !Crosstales.RTVoice.Util.Helper.isMacOSPlatform && Crosstales.RTVoice.Util.Helper.isMacOSEditor && Crosstales.RTVoice.Util.Config.ENFORCE_STANDALONE_TTS;
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX //|| CT_DEVELOP
             voiceProvider = mainVoiceProvider = Provider.VoiceProviderMacOS.Instance;
 #endif
          }
 #if UNITY_STANDALONE || UNITY_EDITOR
-         else if (eSpeakMode && Provider.VoiceProviderLinux.isSupported)
+         else if (eSpeakMode && Crosstales.RTVoice.Provider.VoiceProviderLinux.isSupported)
          {
-            voiceProvider = mainVoiceProvider = Provider.VoiceProviderLinux.Instance;
+            voiceProvider = mainVoiceProvider = Crosstales.RTVoice.Provider.VoiceProviderLinux.Instance;
          }
 #endif
-         else if (Util.Helper.isAndroidPlatform)
+         else if (Crosstales.RTVoice.Util.Helper.isAndroidPlatform)
          {
 #if UNITY_ANDROID || UNITY_EDITOR
-            voiceProvider = mainVoiceProvider = Provider.VoiceProviderAndroid.Instance;
+            voiceProvider = mainVoiceProvider = Crosstales.RTVoice.Provider.VoiceProviderAndroid.Instance;
 #endif
          }
-         else if (Util.Helper.isIOSBasedPlatform)
+         else if (Crosstales.RTVoice.Util.Helper.isIOSBasedPlatform)
          {
 #if UNITY_IOS || UNITY_TVOS || UNITY_EDITOR
-            voiceProvider = mainVoiceProvider = Provider.VoiceProviderIOS.Instance;
+            voiceProvider = mainVoiceProvider = Crosstales.RTVoice.Provider.VoiceProviderIOS.Instance;
 #endif
          }
 #if ((UNITY_WSA || UNITY_XBOXONE) && !UNITY_EDITOR) && ENABLE_WINMD_SUPPORT //|| CT_DEVELOP
@@ -2198,7 +2224,7 @@ namespace Crosstales.RTVoice
       {
          areVoicesReady = true;
 
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnReady?.Invoke();
 
          OnVoicesReady?.Invoke();
@@ -2206,15 +2232,15 @@ namespace Crosstales.RTVoice
 
       private void onProviderChange()
       {
-         if (!Util.Helper.isEditorMode)
-            OnProviderChanged?.Invoke(voiceProvider.GetType().ToString());
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
+            OnProviderChanged?.Invoke(voiceProvider?.GetType().ToString());
 
-         OnProviderChange?.Invoke(voiceProvider.GetType().ToString());
+         OnProviderChange?.Invoke(voiceProvider?.GetType().ToString());
       }
 
-      private void onSpeakStart(Model.Wrapper wrapper)
+      private void onSpeakStart(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnSpeakStarted?.Invoke(wrapper?.Uid);
 
          OnSpeakStart?.Invoke(wrapper);
@@ -2222,30 +2248,30 @@ namespace Crosstales.RTVoice
          SpeechCount++;
       }
 
-      private void onSpeakComplete(Model.Wrapper wrapper)
+      private void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if (UNITY_IOS || UNITY_TVOS) && !UNITY_EDITOR
          currentTextToSpeak = null;
          currentWrapper = null;
 #endif
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnSpeakCompleted?.Invoke(wrapper?.Uid);
 
          OnSpeakComplete?.Invoke(wrapper);
 
          SpeechCount--;
          BusyCount--;
-         Util.Context.NumberOfSpeeches++;
+         Crosstales.RTVoice.Util.Context.NumberOfSpeeches++;
 
          //if (wrapper.isNative)
-         Util.Context.TotalSpeechLength += wrapper.SpeechTime;
-         Util.Context.NumberOfCharacters += wrapper.Text.Length;
+         Crosstales.RTVoice.Util.Context.TotalSpeechLength += wrapper.SpeechTime;
+         Crosstales.RTVoice.Util.Context.NumberOfCharacters += wrapper.Text.Length;
       }
 
-      private void onSpeakCurrentWord(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
+      private void onSpeakCurrentWord(Crosstales.RTVoice.Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
       {
 #if (UNITY_IOS || UNITY_TVOS) && !UNITY_EDITOR
-         if (voiceProvider.GetType() == typeof(Provider.VoiceProviderIOS))
+         if (voiceProvider?.GetType() == typeof(Provider.VoiceProviderIOS))
          {
             //currentTextToSpeak = string.Join(" ", speechTextArray, wordIndex + 1, speechTextArray.Length - wordIndex - 1);
             currentTextToSpeak = string.Join(" ", speechTextArray, wordIndex, speechTextArray.Length - wordIndex);
@@ -2256,38 +2282,38 @@ namespace Crosstales.RTVoice
          OnSpeakCurrentWord?.Invoke(wrapper, speechTextArray, wordIndex);
       }
 
-      private void onSpeakCurrentWordString(Model.Wrapper wrapper, string word)
+      private void onSpeakCurrentWordString(Crosstales.RTVoice.Model.Wrapper wrapper, string word)
       {
          OnSpeakCurrentWordString?.Invoke(wrapper, word);
       }
 
-      private void onSpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme)
+      private void onSpeakCurrentPhoneme(Crosstales.RTVoice.Model.Wrapper wrapper, string phoneme)
       {
          OnSpeakCurrentPhoneme?.Invoke(wrapper, phoneme);
       }
 
-      private void onSpeakCurrentViseme(Model.Wrapper wrapper, string viseme)
+      private void onSpeakCurrentViseme(Crosstales.RTVoice.Model.Wrapper wrapper, string viseme)
       {
          OnSpeakCurrentViseme?.Invoke(wrapper, viseme);
       }
 
-      private void onSpeakAudioGenerationStart(Model.Wrapper wrapper)
+      private void onSpeakAudioGenerationStart(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          OnSpeakAudioGenerationStart?.Invoke(wrapper);
       }
 
-      private void onSpeakAudioGenerationComplete(Model.Wrapper wrapper)
+      private void onSpeakAudioGenerationComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          OnSpeakAudioGenerationComplete?.Invoke(wrapper);
 
-         Util.Context.NumberOfAudioFiles++;
-         Util.Context.TotalSpeechLength += wrapper.SpeechTime;
-         Util.Context.NumberOfCharacters += wrapper.Text.Length;
+         Crosstales.RTVoice.Util.Context.NumberOfAudioFiles++;
+         Crosstales.RTVoice.Util.Context.TotalSpeechLength += wrapper.SpeechTime;
+         Crosstales.RTVoice.Util.Context.NumberOfCharacters += wrapper.Text.Length;
       }
 
-      private void onErrorInfo(Model.Wrapper wrapper, string errorInfo)
+      private void onErrorInfo(Crosstales.RTVoice.Model.Wrapper wrapper, string errorInfo)
       {
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             OnError?.Invoke(wrapper?.Uid, errorInfo);
 
          OnErrorInfo?.Invoke(wrapper, errorInfo);
@@ -2300,9 +2326,9 @@ namespace Crosstales.RTVoice
 
 #if UNITY_EDITOR
 
-      private void speakNativeInEditor(Model.Wrapper wrapper)
+      private void speakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
             if (voiceProvider != null)
             {
@@ -2331,9 +2357,9 @@ namespace Crosstales.RTVoice
          //return string.Empty;
       }
 
-      private void generateInEditor(Model.Wrapper wrapper)
+      private void generateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
             if (voiceProvider != null)
             {
@@ -2393,4 +2419,4 @@ namespace Crosstales.RTVoice
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

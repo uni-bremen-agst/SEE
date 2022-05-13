@@ -1,10 +1,10 @@
 //
 //  RTVoiceIOSBridge.mm
-//  Version 2021.3.2
+//  Version 2022.1.0
 //
 //  Acts as a handler for all TTS functions called by RT-Voice on iOS.
 //
-//  © 2016-2021 crosstales LLC (https://www.crosstales.com)
+//  © 2016-2022 crosstales LLC (https://www.crosstales.com)
 //
 #import "RTVoiceIOSBridge.h"
 #import <AVFoundation/AVFoundation.h>

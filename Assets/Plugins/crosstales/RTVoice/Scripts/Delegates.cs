@@ -24,23 +24,23 @@
 
    public delegate void VoicesReady();
 
-   public delegate void SpeakStart(Model.Wrapper wrapper);
+   public delegate void SpeakStart(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-   public delegate void SpeakComplete(Model.Wrapper wrapper);
+   public delegate void SpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-   public delegate void SpeakCurrentWord(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex);
+   public delegate void SpeakCurrentWord(Crosstales.RTVoice.Model.Wrapper wrapper, string[] speechTextArray, int wordIndex);
 
-   public delegate void SpeakCurrentWordString(Model.Wrapper wrapper, string word);
+   public delegate void SpeakCurrentWordString(Crosstales.RTVoice.Model.Wrapper wrapper, string word);
 
-   public delegate void SpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme);
+   public delegate void SpeakCurrentPhoneme(Crosstales.RTVoice.Model.Wrapper wrapper, string phoneme);
 
-   public delegate void SpeakCurrentViseme(Model.Wrapper wrapper, string viseme);
+   public delegate void SpeakCurrentViseme(Crosstales.RTVoice.Model.Wrapper wrapper, string viseme);
 
-   public delegate void SpeakAudioGenerationStart(Model.Wrapper wrapper);
+   public delegate void SpeakAudioGenerationStart(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-   public delegate void SpeakAudioGenerationComplete(Model.Wrapper wrapper);
+   public delegate void SpeakAudioGenerationComplete(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-   public delegate void ErrorInfo(Model.Wrapper wrapper, string info);
+   public delegate void ErrorInfo(Crosstales.RTVoice.Model.Wrapper wrapper, string info);
 
    #endregion
 
@@ -132,4 +132,4 @@
 
    #endregion
 }
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

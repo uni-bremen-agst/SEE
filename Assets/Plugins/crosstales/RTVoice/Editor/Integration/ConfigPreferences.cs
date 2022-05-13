@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR && !UNITY_2019_1_OR_NEWER
 using UnityEditor;
 using UnityEngine;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorIntegration
 {
@@ -19,7 +18,7 @@ namespace Crosstales.RTVoice.EditorIntegration
 
       #region Static methods
 
-      [PreferenceItem(Util.Constants.ASSET_NAME_SHORT)]
+      [PreferenceItem(Crosstales.RTVoice.Util.Constants.ASSET_NAME_SHORT)]
       private static void PreferencesGUI()
       {
          if (cp == null)
@@ -41,14 +40,14 @@ namespace Crosstales.RTVoice.EditorIntegration
             {
                cp.showConfiguration();
 
-               EditorHelper.SeparatorUI();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
-               if (GUILayout.Button(new GUIContent(" Reset", EditorHelper.Icon_Reset, "Resets the configuration settings for this project.")))
+               if (GUILayout.Button(new GUIContent(" Reset", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Reset, "Resets the configuration settings for this project.")))
                {
-                  if (EditorUtility.DisplayDialog("Reset configuration?", "Reset the configuration of " + Util.Constants.ASSET_NAME + "?", "Yes", "No"))
+                  if (EditorUtility.DisplayDialog("Reset configuration?", "Reset the configuration of " + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "?", "Yes", "No"))
                   {
-                     Util.Config.Reset();
-                     EditorConfig.Reset();
+                     Crosstales.RTVoice.Util.Config.Reset();
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.Reset();
                      save();
                   }
                }
@@ -74,4 +73,4 @@ namespace Crosstales.RTVoice.EditorIntegration
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

@@ -1,18 +1,17 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'SpeechText'-class.</summary>
-   [CustomEditor(typeof(Tool.SpeechText))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.SpeechText))]
    [CanEditMultipleObjects]
    public class SpeechTextEditor : Editor
    {
       #region Variables
 
-      private Tool.SpeechText script;
+      private Crosstales.RTVoice.Tool.SpeechText script;
 
       #endregion
 
@@ -21,12 +20,12 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.SpeechText)target;
+         script = (Crosstales.RTVoice.Tool.SpeechText)target;
       }
 
       private void OnDisable()
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
             Speaker.Instance.Silence();
          }
@@ -36,7 +35,7 @@ namespace Crosstales.RTVoice.EditorExtension
       {
          DrawDefaultInspector();
 
-         EditorHelper.SeparatorUI();
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
          if (script.isActiveAndEnabled)
          {
@@ -44,24 +43,24 @@ namespace Crosstales.RTVoice.EditorExtension
             {
                if (script.GenerateAudioFile && !string.IsNullOrEmpty(script.FileName) || !script.GenerateAudioFile)
                {
-                  if (Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
+                  if (Speaker.Instance.isTTSAvailable && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
                   {
                      GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
 
-                     if (Util.Helper.isEditorMode)
+                     if (Crosstales.RTVoice.Util.Helper.isEditorMode)
                      {
                         if (Speaker.Instance.isWorkingInEditor)
                         {
                            if (Speaker.Instance.isSpeaking)
                            {
-                              if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence the active speaker.")))
+                              if (GUILayout.Button(new GUIContent(" Silence", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Silence, "Silence the active speaker.")))
                               {
                                  script.Silence();
                               }
                            }
                            else
                            {
-                              if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
+                              if (GUILayout.Button(new GUIContent(" Speak", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
                               {
                                  script.Speak();
                               }
@@ -72,14 +71,12 @@ namespace Crosstales.RTVoice.EditorExtension
                            EditorGUILayout.HelpBox("Test-Drive is not supported for current TTS-system inside the Unity Editor.", MessageType.Info);
                         }
 
-                        EditorHelper.SeparatorUI();
+                        Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
                         GUILayout.Label("Editor", EditorStyles.boldLabel);
 
-                        if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
-                        {
-                           EditorHelper.RefreshAssetDatabase();
-                        }
+                        if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
+                           Crosstales.RTVoice.EditorUtil.EditorHelper.RefreshAssetDatabase();
                      }
                      else
                      {
@@ -88,7 +85,7 @@ namespace Crosstales.RTVoice.EditorExtension
                   }
                   else
                   {
-                     EditorHelper.NoVoicesUI();
+                     Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
                   }
                }
                else
@@ -111,4 +108,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

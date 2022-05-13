@@ -5,13 +5,13 @@ namespace Crosstales.RTVoice.EditorTask
 {
    /// <summary>Adds the given define symbols to PlayerSettings define symbols.</summary>
    [InitializeOnLoad]
-   public class CompileDefines : Common.EditorTask.BaseCompileDefines
+   public class CompileDefines : Crosstales.Common.EditorTask.BaseCompileDefines
    {
       private const string symbol = "CT_RTV";
 
       static CompileDefines()
       {
-         if (EditorUtil.EditorConfig.COMPILE_DEFINES)
+         if (Crosstales.RTVoice.EditorUtil.EditorConfig.COMPILE_DEFINES)
          {
             addSymbolsToAllTargets(symbol);
          }
@@ -23,4 +23,4 @@ namespace Crosstales.RTVoice.EditorTask
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

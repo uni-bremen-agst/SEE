@@ -15,7 +15,7 @@ namespace Crosstales.RTVoice.Model
       [Tooltip("Description of the voice.")] public string Description;
 
       /// <summary>Gender of the voice.</summary>
-      [Tooltip("Gender of the voice.")] public Enum.Gender Gender;
+      [Tooltip("Gender of the voice.")] public Crosstales.RTVoice.Model.Enum.Gender Gender;
 
       /// <summary>Age of the voice.</summary>
       [Tooltip("Age of the voice.")] public string Age;
@@ -56,7 +56,7 @@ namespace Crosstales.RTVoice.Model
       }
 
       /// <summary>Language of the voice.</summary>
-      public SystemLanguage Language => Util.Helper.ISO639ToLanguage(Culture);
+      public SystemLanguage Language => Crosstales.RTVoice.Util.Helper.ISO639ToLanguage(Culture);
 
       /// <summary>Simplified culture of the voice.</summary>
       [System.Xml.Serialization.XmlIgnoreAttribute]
@@ -92,7 +92,7 @@ namespace Crosstales.RTVoice.Model
       /// <param name="vendor">Vendor of the voice (optional).</param>
       /// <param name="version">Version of the voice (optional).</param>
       /// <param name="sampleRate">Sample rate in Hz of the voice (optional).</param>
-      public Voice(string name, string description, Enum.Gender gender, string age, string culture, string id = "", string vendor = "unknown", string version = "unknown", int sampleRate = 0)
+      public Voice(string name, string description, Crosstales.RTVoice.Model.Enum.Gender gender, string age, string culture, string id = "", string vendor = "unknown", string version = "unknown", int sampleRate = 0)
       {
          Name = name;
          Description = description;
@@ -205,4 +205,4 @@ namespace Crosstales.RTVoice.Model
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

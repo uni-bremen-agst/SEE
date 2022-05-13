@@ -1,4 +1,4 @@
-﻿#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX || CT_DEVELOP
+﻿#if UNITY_STANDALONE_OSX || UNITY_EDITOR
 using UnityEngine;
 using System.Collections;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace Crosstales.RTVoice.Provider
       private const int defaultRate = 175;
 
 #if ENABLE_IL2CPP && CT_PROC
-      private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
+      private System.Collections.Generic.Dictionary<string, Crosstales.Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Crosstales.Common.Util.CTProcess>();
 #endif
 
       private bool isLoading;
@@ -36,9 +36,9 @@ namespace Crosstales.RTVoice.Provider
 
       public override string DefaultVoiceName => "Alex";
 
-      public override bool isWorkingInEditor => Util.Helper.isMacOSEditor;
+      public override bool isWorkingInEditor => Crosstales.RTVoice.Util.Helper.isMacOSEditor;
 
-      public override bool isWorkingInPlaymode => Util.Helper.isMacOSEditor;
+      public override bool isWorkingInPlaymode => Crosstales.RTVoice.Util.Helper.isMacOSEditor;
 
       public override int MaxTextLength => 256000;
 
@@ -46,7 +46,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool isSpeakSupported => true;
 
-      public override bool isPlatformSupported => Util.Helper.isMacOSPlatform;
+      public override bool isPlatformSupported => Crosstales.RTVoice.Util.Helper.isMacOSPlatform;
 
       public override bool isSSMLSupported => false;
 
@@ -67,7 +67,7 @@ namespace Crosstales.RTVoice.Provider
       {
          if (cachedVoices?.Count == 0 || forceReload)
          {
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                getVoicesInEditor();
@@ -88,7 +88,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      public override IEnumerator SpeakNative(Model.Wrapper wrapper)
+      public override IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
@@ -108,7 +108,7 @@ namespace Crosstales.RTVoice.Provider
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
 #if ENABLE_IL2CPP && CT_PROC
-               using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+               using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -119,10 +119,10 @@ namespace Crosstales.RTVoice.Provider
                                 (calculatedRate != defaultRate ? " -r " + calculatedRate : string.Empty) + " \"" +
                                 wrapper.Text.Replace('"', '\'') + '"';
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 
-                  process.StartInfo.FileName = Util.Config.TTS_MACOS;
+                  process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
                   System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
@@ -146,7 +146,7 @@ namespace Crosstales.RTVoice.Provider
                   if (process.ExitCode == 0 || process.ExitCode == -1 || process.ExitCode == 137) //0 = normal ended, -1/137 = killed
 #endif
                   {
-                     if (Util.Config.DEBUG)
+                     if (Crosstales.RTVoice.Util.Config.DEBUG)
                         Debug.Log("Text spoken: " + wrapper.Text);
 
                      onSpeakComplete(wrapper);
@@ -175,7 +175,7 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator Speak(Model.Wrapper wrapper)
+      public override IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
@@ -202,7 +202,7 @@ namespace Crosstales.RTVoice.Provider
                   int calculatedRate = calculateRate(wrapper.Rate);
                   string outputFile = getOutputFile(wrapper.Uid);
 #if ENABLE_IL2CPP && CT_PROC
-                  using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                  using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -217,10 +217,10 @@ namespace Crosstales.RTVoice.Provider
                                    " --data-format=LEI16@22050" +
                                    $" \"{wrapper.Text.Replace('"', '\'')}\"";
 
-                     if (Util.Config.DEBUG)
+                     if (Crosstales.RTVoice.Util.Config.DEBUG)
                         Debug.Log("Process arguments: " + args);
 
-                     process.StartInfo.FileName = Util.Config.TTS_MACOS;
+                     process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
                      process.StartInfo.Arguments = args;
 
                      System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
@@ -241,7 +241,7 @@ namespace Crosstales.RTVoice.Provider
 
                      if (process.ExitCode == 0)
                      {
-                        yield return playAudioFile(wrapper, Util.Constants.PREFIX_FILE + outputFile, outputFile,
+                        yield return playAudioFile(wrapper, Crosstales.RTVoice.Util.Constants.PREFIX_FILE + outputFile, outputFile,
                            AudioFileType);
                      }
                      else
@@ -269,7 +269,7 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator Generate(Model.Wrapper wrapper)
+      public override IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if UNITY_STANDALONE || UNITY_EDITOR
          if (wrapper == null)
@@ -291,7 +291,7 @@ namespace Crosstales.RTVoice.Provider
                int calculatedRate = calculateRate(wrapper.Rate);
                string outputFile = getOutputFile(wrapper.Uid);
 #if ENABLE_IL2CPP && CT_PROC
-               using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+               using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -306,10 +306,10 @@ namespace Crosstales.RTVoice.Provider
                                 " --data-format=LEI16@22050" +
                                 $" \"{wrapper.Text.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 
-                  process.StartInfo.FileName = Util.Config.TTS_MACOS;
+                  process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
                   System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
@@ -395,16 +395,16 @@ namespace Crosstales.RTVoice.Provider
       {
 #if UNITY_STANDALONE || UNITY_EDITOR
 #if ENABLE_IL2CPP && CT_PROC
-         using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+         using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
          {
-            process.StartInfo.FileName = Util.Config.TTS_MACOS;
+            process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
             process.StartInfo.Arguments = "-v ?";
             process.Start();
 
-            System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, Util.Constants.DEFAULT_TTS_KILL_TIME));
+            System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, Crosstales.RTVoice.Util.Constants.DEFAULT_TTS_KILL_TIME));
             worker.Start();
 
             do
@@ -414,8 +414,8 @@ namespace Crosstales.RTVoice.Provider
 
             if (process.ExitCode == 0)
             {
-               System.Collections.Generic.List<Model.Voice> voices =
-                  new System.Collections.Generic.List<Model.Voice>(60);
+               System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices =
+                  new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>(60);
 
                using (System.IO.StreamReader streamReader = process.StandardOutput)
                {
@@ -430,8 +430,8 @@ namespace Crosstales.RTVoice.Provider
                         if (match.Success)
                         {
                            string name = match.Groups[1].ToString();
-                           voices.Add(new Model.Voice(name, match.Groups[3].ToString(),
-                              Util.Helper.AppleVoiceNameToGender(name), "unknown",
+                           voices.Add(new Crosstales.RTVoice.Model.Voice(name, match.Groups[3].ToString(),
+                              Crosstales.RTVoice.Util.Helper.AppleVoiceNameToGender(name), "unknown",
                               match.Groups[2].ToString().Replace('_', '-'), string.Empty, "Apple"));
                         }
                      }
@@ -440,7 +440,7 @@ namespace Crosstales.RTVoice.Provider
 
                cachedVoices = voices.OrderBy(s => s.Name).ToList();
 
-               if (Util.Constants.DEV_DEBUG)
+               if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                   Debug.Log("Voices read: " + cachedVoices.CTDump());
             }
             else
@@ -467,10 +467,10 @@ namespace Crosstales.RTVoice.Provider
       {
          int result =
             Mathf.Clamp(
-               Mathf.Abs(rate - 1f) > Common.Util.BaseConstants.FLOAT_TOLERANCE
+               Mathf.Abs(rate - 1f) > Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE
                   ? (int)(defaultRate * rate)
                   : defaultRate, 1, 3 * defaultRate);
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.Log("calculateRate: " + result + " - " + rate);
          return result;
       }
@@ -481,7 +481,7 @@ namespace Crosstales.RTVoice.Provider
       #region Editor-only methods
 
 #if UNITY_EDITOR
-      public override void GenerateInEditor(Model.Wrapper wrapper)
+      public override void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -500,7 +500,7 @@ namespace Crosstales.RTVoice.Provider
                int calculatedRate = calculateRate(wrapper.Rate);
                string outputFile = getOutputFile(wrapper.Uid);
 #if ENABLE_IL2CPP && CT_PROC
-               using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+               using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -515,10 +515,10 @@ namespace Crosstales.RTVoice.Provider
                                 " --data-format=LEI16@22050" +
                                 $" \"{wrapper.Text.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 
-                  process.StartInfo.FileName = Util.Config.TTS_MACOS;
+                  process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
                   System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
@@ -552,7 +552,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      public override void SpeakNativeInEditor(Model.Wrapper wrapper)
+      public override void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -570,7 +570,7 @@ namespace Crosstales.RTVoice.Provider
                string voiceName = getVoiceName(wrapper);
                int calculatedRate = calculateRate(wrapper.Rate);
 #if ENABLE_IL2CPP && CT_PROC
-               using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+               using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -581,10 +581,10 @@ namespace Crosstales.RTVoice.Provider
                                 (calculatedRate != defaultRate ? " -r " + calculatedRate : string.Empty) + " \"" +
                                 wrapper.Text.Replace('"', '\'') + '"';
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 
-                  process.StartInfo.FileName = Util.Config.TTS_MACOS;
+                  process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
                   process.StartInfo.Arguments = args;
 
                   System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, 0, false, false, false)) { Name = wrapper.Uid };
@@ -610,7 +610,7 @@ namespace Crosstales.RTVoice.Provider
                      ) //0 = normal ended, -1/137 = killed
 #endif
                   {
-                     if (Util.Config.DEBUG)
+                     if (Crosstales.RTVoice.Util.Config.DEBUG)
                         Debug.Log("Text spoken: " + wrapper.Text);
 
                      onSpeakComplete(wrapper);
@@ -634,17 +634,17 @@ namespace Crosstales.RTVoice.Provider
       private void getVoicesInEditor()
       {
 #if ENABLE_IL2CPP && CT_PROC
-         using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+         using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
          using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
          {
-            process.StartInfo.FileName = Util.Config.TTS_MACOS;
+            process.StartInfo.FileName = Crosstales.RTVoice.Util.Config.TTS_MACOS;
             process.StartInfo.Arguments = "-v ?";
 
             try
             {
-               System.Threading.Thread voiceWorker = new System.Threading.Thread(() => startProcess(process, Util.Constants.DEFAULT_TTS_KILL_TIME));
+               System.Threading.Thread voiceWorker = new System.Threading.Thread(() => startProcess(process, Crosstales.RTVoice.Util.Constants.DEFAULT_TTS_KILL_TIME));
                voiceWorker.Start();
 
                do
@@ -652,13 +652,13 @@ namespace Crosstales.RTVoice.Provider
                   System.Threading.Thread.Sleep(50);
                } while (voiceWorker.IsAlive || !process.HasExited);
 
-               if (Util.Constants.DEV_DEBUG)
+               if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                   Debug.Log("Finished after: " + (process.ExitTime - process.StartTime).Seconds);
 
                if (process.ExitCode == 0)
                {
-                  System.Collections.Generic.List<Model.Voice> voices =
-                     new System.Collections.Generic.List<Model.Voice>(100);
+                  System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices =
+                     new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>(100);
 
                   using (System.IO.StreamReader streamReader = process.StandardOutput)
                   {
@@ -673,8 +673,8 @@ namespace Crosstales.RTVoice.Provider
                            if (match.Success)
                            {
                               string name = match.Groups[1].ToString();
-                              voices.Add(new Model.Voice(match.Groups[1].ToString(), match.Groups[3].ToString(),
-                                 Util.Helper.AppleVoiceNameToGender(name), "unknown",
+                              voices.Add(new Crosstales.RTVoice.Model.Voice(match.Groups[1].ToString(), match.Groups[3].ToString(),
+                                 Crosstales.RTVoice.Util.Helper.AppleVoiceNameToGender(name), "unknown",
                                  match.Groups[2].ToString().Replace('_', '-')));
                            }
                         }
@@ -683,7 +683,7 @@ namespace Crosstales.RTVoice.Provider
 
                   cachedVoices = voices.OrderBy(s => s.Name).ToList();
 
-                  if (Util.Constants.DEV_DEBUG)
+                  if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                      Debug.Log("Voices read: " + cachedVoices.CTDump());
                }
                else
@@ -711,4 +711,4 @@ namespace Crosstales.RTVoice.Provider
    }
 }
 #endif
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

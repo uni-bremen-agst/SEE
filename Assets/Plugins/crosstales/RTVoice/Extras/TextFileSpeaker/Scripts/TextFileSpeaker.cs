@@ -14,10 +14,10 @@ namespace Crosstales.RTVoice.Tool
       private TextAsset[] textFiles;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("Voices")] [Tooltip("Voices for the speech."), SerializeField]
-      private Model.VoiceAlias voices;
+      private Crosstales.RTVoice.Model.VoiceAlias voices;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("Mode")] [Tooltip("Speak mode (default: 'Speak')."), SerializeField]
-      private Model.Enum.SpeakMode mode = Model.Enum.SpeakMode.Speak;
+      private Crosstales.RTVoice.Model.Enum.SpeakMode mode = Crosstales.RTVoice.Model.Enum.SpeakMode.Speak;
 
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("Source")] [Header("Optional Settings"), Tooltip("AudioSource for the output (optional)."), SerializeField]
@@ -77,14 +77,14 @@ namespace Crosstales.RTVoice.Tool
       }
 
       /// <summary>Voices for the speech.</summary>
-      public Model.VoiceAlias Voices
+      public Crosstales.RTVoice.Model.VoiceAlias Voices
       {
          get => voices;
          set => voices = value;
       }
 
       /// <summary>Speak mode.</summary>
-      public Model.Enum.SpeakMode Mode
+      public Crosstales.RTVoice.Model.Enum.SpeakMode Mode
       {
          get => mode;
          set => mode = value;
@@ -182,7 +182,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void OnDestroy()
       {
-         if (!Util.Helper.isEditorMode && Speaker.Instance != null)
+         if (Speaker.Instance != null)
          {
             Speaker.Instance.OnVoicesReady -= onVoicesReady;
             Speaker.Instance.OnSpeakStart -= onSpeakStart;
@@ -323,7 +323,7 @@ namespace Crosstales.RTVoice.Tool
       {
          float currentTime = Time.realtimeSinceStartup;
 
-         if (lastSpeaktime + Util.Constants.SPEAK_CALL_SPEED < currentTime)
+         if (lastSpeaktime + Crosstales.RTVoice.Util.Constants.SPEAK_CALL_SPEED < currentTime)
          {
             lastSpeaktime = currentTime;
 
@@ -392,7 +392,7 @@ namespace Crosstales.RTVoice.Tool
       /// <summary>Silence the speech.</summary>
       public void Silence()
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
             Speaker.Instance.Silence();
          }
@@ -438,7 +438,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void play()
       {
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
          {
             if (!played && Speaker.Instance.Voices.Count > 0)
             {
@@ -458,7 +458,7 @@ namespace Crosstales.RTVoice.Tool
 
       private string speak(string text)
       {
-         return mode == Model.Enum.SpeakMode.Speak
+         return mode == Crosstales.RTVoice.Model.Enum.SpeakMode.Speak
             ? Speaker.Instance.Speak(text, source, voices.Voice, true, rate, pitch, volume)
             : Speaker.Instance.SpeakNative(text, voices.Voice, rate, pitch, volume);
       }
@@ -482,18 +482,18 @@ namespace Crosstales.RTVoice.Tool
       {
          if (wrapper.Uid.Equals(uid))
          {
-            if (!Util.Helper.isEditorMode)
+            if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
                OnStarted?.Invoke();
 
             OnTextFileSpeakerStart?.Invoke();
          }
       }
 
-      private void onSpeakComplete(Model.Wrapper wrapper)
+      private void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper.Uid.Equals(uid))
          {
-            if (!Util.Helper.isEditorMode)
+            if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
                OnCompleted?.Invoke();
 
             OnTextFileSpeakerComplete?.Invoke();
@@ -506,4 +506,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

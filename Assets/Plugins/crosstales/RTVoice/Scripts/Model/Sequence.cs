@@ -15,7 +15,7 @@ namespace Crosstales.RTVoice.Model
       private VoiceAlias voices;
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("Mode")] [Tooltip("Speak mode (default: 'Speak')."), SerializeField]
-      private Enum.SpeakMode mode = Enum.SpeakMode.Speak;
+      private Crosstales.RTVoice.Model.Enum.SpeakMode mode = Crosstales.RTVoice.Model.Enum.SpeakMode.Speak;
 
 
       [UnityEngine.Serialization.FormerlySerializedAsAttribute("Source")] [Header("Optional Settings")] [Tooltip("AudioSource for the output (optional)."), SerializeField, System.Xml.Serialization.XmlIgnore]
@@ -52,7 +52,7 @@ namespace Crosstales.RTVoice.Model
       }
 
       /// <summary>Speak mode.</summary>
-      public Model.Enum.SpeakMode Mode
+      public Crosstales.RTVoice.Model.Enum.SpeakMode Mode
       {
          get => mode;
          set => mode = value;
@@ -102,33 +102,33 @@ namespace Crosstales.RTVoice.Model
          System.Text.StringBuilder result = new System.Text.StringBuilder();
 
          result.Append(GetType().Name);
-         result.Append(Util.Constants.TEXT_TOSTRING_START);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_START);
 
          result.Append("Text='");
          result.Append(text);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Voices='");
          result.Append(voices);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Source='");
          result.Append(source);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Rate='");
          result.Append(rate);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Pitch='");
          result.Append(pitch);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Volume='");
          result.Append(volume);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER_END);
 
-         result.Append(Util.Constants.TEXT_TOSTRING_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_END);
 
          return result.ToString();
       }
@@ -143,9 +143,9 @@ namespace Crosstales.RTVoice.Model
          return Text == other.Text &&
                 (Voices == null || Voices.Equals(other.Voices)) &&
                 //Source == o.Source &&
-                System.Math.Abs(Rate - other.Rate) < Util.Constants.FLOAT_TOLERANCE &&
-                System.Math.Abs(Pitch - other.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
-                System.Math.Abs(Volume - other.Volume) < Util.Constants.FLOAT_TOLERANCE;
+                System.Math.Abs(Rate - other.Rate) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE &&
+                System.Math.Abs(Pitch - other.Pitch) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE &&
+                System.Math.Abs(Volume - other.Volume) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE;
       }
 
       public override int GetHashCode()
@@ -166,4 +166,4 @@ namespace Crosstales.RTVoice.Model
       #endregion
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

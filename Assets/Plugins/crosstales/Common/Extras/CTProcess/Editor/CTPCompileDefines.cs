@@ -5,7 +5,7 @@ namespace Crosstales.Common.Util
 {
    /// <summary>Adds "CT_PROC" define symbol to PlayerSettings define symbols.</summary>
    [InitializeOnLoad]
-   public class CTPCompileDefines : Common.EditorTask.BaseCompileDefines
+   public class CTPCompileDefines : Crosstales.Common.EditorTask.BaseCompileDefines
    {
       private const string symbol = "CT_PROC";
 
@@ -16,4 +16,4 @@ namespace Crosstales.Common.Util
    }
 }
 #endif
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

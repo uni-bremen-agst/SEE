@@ -13,11 +13,11 @@ namespace Crosstales.RTVoice.EditorTask
       {
          //UnityEngine.Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-         if (!Util.Config.isLoaded)
+         if (!Crosstales.RTVoice.Util.Config.isLoaded)
          {
-            Util.Config.Load();
+            Crosstales.RTVoice.Util.Config.Load();
 
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                UnityEngine.Debug.Log("Config data loaded");
          }
       }
@@ -26,4 +26,4 @@ namespace Crosstales.RTVoice.EditorTask
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

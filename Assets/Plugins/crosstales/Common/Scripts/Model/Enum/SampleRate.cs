@@ -17,4 +17,4 @@
       //_192000Hz = 192000,
    }
 }
-// © 2019-2021 crosstales LLC (https://www.crosstales.com)
+// © 2019-2022 crosstales LLC (https://www.crosstales.com)

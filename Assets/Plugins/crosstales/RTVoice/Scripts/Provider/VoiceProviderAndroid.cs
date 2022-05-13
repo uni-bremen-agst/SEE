@@ -47,7 +47,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool isSpeakSupported => true;
 
-      public override bool isPlatformSupported => Util.Helper.isAndroidPlatform;
+      public override bool isPlatformSupported => Crosstales.RTVoice.Util.Helper.isAndroidPlatform;
 
       public override bool isSSMLSupported => isSSML;
 
@@ -110,7 +110,7 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator SpeakNative(Model.Wrapper wrapper)
+      public override IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if !UNITY_EDITOR || CT_DEVELOP
          if (wrapper == null)
@@ -147,7 +147,7 @@ namespace Crosstales.RTVoice.Provider
                   yield return wfs;
                } while (!silence && ttsHandler.CallStatic<bool>("isWorking"));
 
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("Text spoken: " + wrapper.Text);
 
                onSpeakComplete(wrapper);
@@ -158,7 +158,7 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator Speak(Model.Wrapper wrapper)
+      public override IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if !UNITY_EDITOR || CT_DEVELOP
          if (wrapper == null)
@@ -203,7 +203,7 @@ namespace Crosstales.RTVoice.Provider
                      yield return wfs;
                   } while (!silence && ttsHandler.CallStatic<bool>("isWorking"));
 
-                  yield return playAudioFile(wrapper, Util.Helper.ValidURLFromFilePath(outputFile), outputFile);
+                  yield return playAudioFile(wrapper, Crosstales.Common.Util.NetworkHelper.ValidURLFromFilePath(outputFile), outputFile);
                }
             }
          }
@@ -212,7 +212,7 @@ namespace Crosstales.RTVoice.Provider
 #endif
       }
 
-      public override IEnumerator Generate(Model.Wrapper wrapper)
+      public override IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
 #if !UNITY_EDITOR || CT_DEVELOP
          if (wrapper == null)
@@ -315,7 +315,7 @@ namespace Crosstales.RTVoice.Provider
 
          if (success)
          {
-            System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>(350);
+            System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>(350);
 
             foreach (string voice in stringVoices)
             {
@@ -323,29 +323,29 @@ namespace Crosstales.RTVoice.Provider
 
                if (!currentVoiceData[0].CTContains("network")) //ignore network-voices
                {
-                  Model.Enum.Gender gender = Model.Enum.Gender.UNKNOWN;
+                  Crosstales.RTVoice.Model.Enum.Gender gender = Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
 
                   if (currentVoiceData[0].CTContains("#male"))
                   {
-                     gender = Model.Enum.Gender.MALE;
+                     gender = Crosstales.RTVoice.Model.Enum.Gender.MALE;
                   }
                   else if (currentVoiceData[0].CTContains("#female"))
                   {
-                     gender = Model.Enum.Gender.FEMALE;
+                     gender = Crosstales.RTVoice.Model.Enum.Gender.FEMALE;
                   }
 
-                  if (gender == Model.Enum.Gender.UNKNOWN)
+                  if (gender == Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN)
                   {
                   }
 
                   string name = currentVoiceData[0];
-                  voices.Add(new Model.Voice(name, "Android voice: " + voice, Util.Helper.AndroidVoiceNameToGender(name), "unknown", currentVoiceData[1]));
+                  voices.Add(new Crosstales.RTVoice.Model.Voice(name, "Android voice: " + voice, Crosstales.RTVoice.Util.Helper.AndroidVoiceNameToGender(name), "unknown", currentVoiceData[1]));
                }
             }
 
             cachedVoices = voices.OrderBy(s => s.Name).ToList();
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Voices read: " + cachedVoices.CTDump());
          }
 
@@ -381,7 +381,7 @@ namespace Crosstales.RTVoice.Provider
 
             cachedEngines = engines.OrderBy(s => s).ToList();
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Engines read: " + cachedEngines.CTDump());
          }
       }
@@ -398,7 +398,7 @@ namespace Crosstales.RTVoice.Provider
          isSSML = ttsHandler.CallStatic<bool>("isSSMLSupported");
       }
 
-      private static string prepareText(Model.Wrapper wrapper)
+      private static string prepareText(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          //TEST
          //wrapper.ForceSSML = false;
@@ -420,7 +420,7 @@ namespace Crosstales.RTVoice.Provider
             {
                sbXML.Append("<prosody volume='");
 
-               sbXML.Append((1 - wrapper.Volume).ToString("-#0%", Util.Helper.BaseCulture));
+               sbXML.Append((1 - wrapper.Volume).ToString("-#0%", Crosstales.RTVoice.Util.Helper.BaseCulture));
 
                sbXML.Append("'>");
             }
@@ -446,12 +446,12 @@ namespace Crosstales.RTVoice.Provider
 
 #if UNITY_EDITOR
 
-      public override void GenerateInEditor(Model.Wrapper wrapper)
+      public override void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Debug.LogError("'GenerateInEditor' is not supported for Android!");
       }
 
-      public override void SpeakNativeInEditor(Model.Wrapper wrapper)
+      public override void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Debug.LogError("'SpeakNativeInEditor' is not supported for Android!");
       }
@@ -462,4 +462,4 @@ namespace Crosstales.RTVoice.Provider
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

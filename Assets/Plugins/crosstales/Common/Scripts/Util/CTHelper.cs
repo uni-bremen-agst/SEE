@@ -11,16 +11,16 @@ namespace Crosstales.Common.Util
       private static void initialize()
       {
          //Debug.Log("initalize");
-         BaseHelper.ApplicationIsPlaying = true;
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = true;
       }
 
       [RuntimeInitializeOnLoadMethod]
       private static void create()
       {
          //Debug.Log("create");
-         BaseHelper.ApplicationIsPlaying = true;
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = true;
 
-         if (!BaseHelper.isEditorMode)
+         if (!Crosstales.Common.Util.BaseHelper.isEditorMode)
          {
             GameObject go = new GameObject("_CTHelper");
             go.AddComponent<CTHelper>();
@@ -33,10 +33,17 @@ namespace Crosstales.Common.Util
          Instance = this;
       }
 
+/*
       private void OnApplicationQuit()
       {
-         //Debug.Log("OnApplicationQuit", this);
-         BaseHelper.ApplicationIsPlaying = false;
+         Debug.Log("OnApplicationQuit", this);
+         //BaseHelper.ApplicationIsPlaying = false;
+      }
+*/
+      private void OnDestroy()
+      {
+         //Debug.Log("OnDestroy", this);
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = false;
       }
    }
 
@@ -51,4 +58,4 @@ namespace Crosstales.Common.Util
    }
 #endif
 }
-// © 2020-2021 crosstales LLC (https://www.crosstales.com)
+// © 2020-2022 crosstales LLC (https://www.crosstales.com)

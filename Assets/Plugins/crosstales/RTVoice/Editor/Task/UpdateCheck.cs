@@ -2,7 +2,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorTask
 {
@@ -28,45 +27,45 @@ namespace Crosstales.RTVoice.EditorTask
       {
          //Debug.Log(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
 
-         if (EditorConfig.UPDATE_CHECK)
+         if (Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK)
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.Log("Updater enabled!");
 
-            string lastDate = EditorPrefs.GetString(EditorConstants.KEY_UPDATE_DATE);
+            string lastDate = EditorPrefs.GetString(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_UPDATE_DATE);
             string date = System.DateTime.Now.ToString("yyyyMMdd"); // every day
             //string date = System.DateTime.Now.ToString("yyyyMMddHHmm"); // every minute (for tests)
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Last check: " + lastDate);
 
             if (!date.Equals(lastDate))
             {
-               if (Util.Helper.isInternetAvailable)
+               if (Crosstales.Common.Util.NetworkHelper.isInternetAvailable)
                {
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Checking for update...");
 
                   //new System.Threading.Thread(() => updateCheck()).Start();
                   updateCheck();
 
-                  EditorPrefs.SetString(EditorConstants.KEY_UPDATE_DATE, date);
+                  EditorPrefs.SetString(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_UPDATE_DATE, date);
                }
                else
                {
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("No Internet available!");
                }
             }
             else
             {
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("No update check needed.");
             }
          }
          else
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.Log("Updater disabled!");
          }
       }
@@ -116,7 +115,7 @@ namespace Crosstales.RTVoice.EditorTask
          {
             case UpdateStatus.UPDATE:
             {
-               int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Update available",
+               int option = EditorUtility.DisplayDialogComplex(Crosstales.RTVoice.Util.Constants.ASSET_NAME + " - Update available",
                   updateText(data),
                   "Yes, let's do it!",
                   "Not right now",
@@ -125,16 +124,16 @@ namespace Crosstales.RTVoice.EditorTask
                switch (option)
                {
                   case 0:
-                     Util.Helper.OpenURL(EditorConstants.ASSET_URL);
-                     //UnityEditorInternal.AssetStore.Open("content/" + EditorConstants.ASSET_ID);
+                     Crosstales.Common.Util.NetworkHelper.OpenURL(Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_URL);
+                     //UnityEditorInternal.AssetStore.Open("content/" + Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_ID);
                      break;
                   case 1:
                      // do nothing!
                      break;
                   default:
-                     EditorConfig.UPDATE_CHECK = false;
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK = false;
 
-                     EditorConfig.Save();
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.Save();
                      break;
                }
 
@@ -142,7 +141,7 @@ namespace Crosstales.RTVoice.EditorTask
             }
             case UpdateStatus.UPDATE_VERSION:
             {
-               int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+               int option = EditorUtility.DisplayDialogComplex(Crosstales.RTVoice.Util.Constants.ASSET_NAME + " - Upgrade needed",
                   updateVersionText(data),
                   "Yes, let's do it!",
                   "Not right now",
@@ -151,15 +150,15 @@ namespace Crosstales.RTVoice.EditorTask
                switch (option)
                {
                   case 0:
-                     Util.Helper.OpenURL(EditorConstants.ASSET_URL);
+                     Crosstales.Common.Util.NetworkHelper.OpenURL(Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_URL);
                      break;
                   case 1:
                      // do nothing!
                      break;
                   default:
-                     EditorConfig.UPDATE_CHECK = false;
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK = false;
 
-                     EditorConfig.Save();
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.Save();
                      break;
                }
 
@@ -167,7 +166,7 @@ namespace Crosstales.RTVoice.EditorTask
             }
             case UpdateStatus.DEPRECATED:
             {
-               int option = EditorUtility.DisplayDialogComplex(Util.Constants.ASSET_NAME + " - Upgrade needed",
+               int option = EditorUtility.DisplayDialogComplex(Crosstales.RTVoice.Util.Constants.ASSET_NAME + " - Upgrade needed",
                   deprecatedText(data),
                   "Learn more",
                   "Not right now",
@@ -176,15 +175,15 @@ namespace Crosstales.RTVoice.EditorTask
                switch (option)
                {
                   case 0:
-                     Util.Helper.OpenURL(Util.Constants.ASSET_AUTHOR_URL);
+                     Crosstales.Common.Util.NetworkHelper.OpenURL(Crosstales.RTVoice.Util.Constants.ASSET_AUTHOR_URL);
                      break;
                   case 1:
                      // do nothing!
                      break;
                   default:
-                     EditorConfig.UPDATE_CHECK = false;
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK = false;
 
-                     EditorConfig.Save();
+                     Crosstales.RTVoice.EditorUtil.EditorConfig.Save();
                      break;
                }
 
@@ -192,7 +191,7 @@ namespace Crosstales.RTVoice.EditorTask
             }
             default:
             {
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("Asset is up-to-date.");
                break;
             }
@@ -206,7 +205,7 @@ namespace Crosstales.RTVoice.EditorTask
          if (data != null)
          {
             sb.Append("Your version:\t");
-            sb.Append(Util.Constants.ASSET_VERSION);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_VERSION);
             sb.Append(System.Environment.NewLine);
             sb.Append("New version:\t");
             sb.Append(data[2]);
@@ -225,7 +224,7 @@ namespace Crosstales.RTVoice.EditorTask
 
          if (data != null)
          {
-            sb.Append(Util.Constants.ASSET_NAME);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_NAME);
             sb.Append(" is deprecated in favor of an newer version!");
             sb.Append(System.Environment.NewLine);
             sb.Append(System.Environment.NewLine);
@@ -241,12 +240,12 @@ namespace Crosstales.RTVoice.EditorTask
 
          if (data != null)
          {
-            sb.Append(Util.Constants.ASSET_NAME);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_NAME);
             sb.Append(" is deprecated!");
             sb.Append(System.Environment.NewLine);
             sb.Append(System.Environment.NewLine);
             sb.AppendLine("Please check the link for more information:");
-            sb.AppendLine(Util.Constants.ASSET_AUTHOR_URL);
+            sb.AppendLine(Crosstales.RTVoice.Util.Constants.ASSET_AUTHOR_URL);
          }
 
          return sb.ToString();
@@ -258,13 +257,13 @@ namespace Crosstales.RTVoice.EditorTask
 
          try
          {
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = Util.Helper.RemoteCertificateValidationCallback;
+            System.Net.ServicePointManager.ServerCertificateValidationCallback = Crosstales.Common.Util.NetworkHelper.RemoteCertificateValidationCallback;
 
-            using (System.Net.WebClient client = new Common.Util.CTWebClient())
+            using (System.Net.WebClient client = new Crosstales.Common.Util.CTWebClient())
             {
-               string content = client.DownloadString(Util.Constants.ASSET_UPDATE_CHECK_URL);
+               string content = client.DownloadString(Crosstales.RTVoice.Util.Constants.ASSET_UPDATE_CHECK_URL);
 
-               foreach (string line in Util.Helper.SplitStringToLines(content).Where(line => line.CTStartsWith(EditorConstants.ASSET_UID.ToString())))
+               foreach (string line in Crosstales.RTVoice.Util.Helper.SplitStringToLines(content).Where(line => line.CTStartsWith(Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_UID.ToString())))
                {
                   data = line.Split(splitChar, System.StringSplitOptions.RemoveEmptyEntries);
 
@@ -295,7 +294,7 @@ namespace Crosstales.RTVoice.EditorTask
          {
             if (int.TryParse(data[1], out int buildNumber))
             {
-               if (buildNumber > Util.Constants.ASSET_BUILD)
+               if (buildNumber > Crosstales.RTVoice.Util.Constants.ASSET_BUILD)
                {
                   status = UpdateStatus.UPDATE;
                }
@@ -314,12 +313,12 @@ namespace Crosstales.RTVoice.EditorTask
                   }
             }
 
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.Log("buildNumber: " + buildNumber);
          }
          else
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.LogWarning("data is null!");
          }
       }
@@ -333,7 +332,7 @@ namespace Crosstales.RTVoice.EditorTask
             sb.AppendLine("Update found!");
             sb.Append(System.Environment.NewLine);
             sb.Append("Your version:\t");
-            sb.Append(Util.Constants.ASSET_VERSION);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_VERSION);
             sb.Append(System.Environment.NewLine);
             sb.Append("New version:\t");
             sb.Append(data[2]);
@@ -351,7 +350,7 @@ namespace Crosstales.RTVoice.EditorTask
 
          if (data != null)
          {
-            sb.Append(Util.Constants.ASSET_NAME);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_NAME);
             sb.Append(" is deprecated in favor of an newer version!");
             sb.Append(System.Environment.NewLine);
             sb.Append(System.Environment.NewLine);
@@ -367,7 +366,7 @@ namespace Crosstales.RTVoice.EditorTask
 
          if (data != null)
          {
-            sb.Append(Util.Constants.ASSET_NAME);
+            sb.Append(Crosstales.RTVoice.Util.Constants.ASSET_NAME);
             sb.Append(" is deprecated!");
             sb.Append(System.Environment.NewLine);
             sb.Append(System.Environment.NewLine);
@@ -391,4 +390,4 @@ namespace Crosstales.RTVoice.EditorTask
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

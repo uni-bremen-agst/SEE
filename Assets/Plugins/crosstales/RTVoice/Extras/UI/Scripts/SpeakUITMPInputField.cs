@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
+//#define RTV_INPUTFIELD_SUPPORT_TEXTMESH_PRO //Uncomment this line if "TextMesh Pro" is used
 namespace Crosstales.RTVoice.UI
 {
    /// <summary>Speaks a TextMesh Pro input field.</summary>
@@ -13,7 +14,7 @@ namespace Crosstales.RTVoice.UI
       public Color TextColor = Color.green;
       public bool ClearTags = true;
 
-#if false || CT_DEVELOP //Change this to "true" is you have TextMesh Pro installed
+#if RTV_INPUTFIELD_SUPPORT_TEXTMESH_PRO || CT_DEVELOP
       public TMPro.TMP_InputField InputComponent;
 
       private Color originalColor;
@@ -78,7 +79,7 @@ namespace Crosstales.RTVoice.UI
          InputComponent.placeholder.color = originalPHColor;
       }
 
-      protected override void onSpeakComplete(Model.Wrapper wrapper)
+      protected override void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper.Uid == uid)
          {
@@ -93,7 +94,7 @@ namespace Crosstales.RTVoice.UI
 #else
       private void Awake()
       {
-         Debug.LogWarning("Is TextMesh Pro installed? If so, please change line 16 of 'SpeakUITMPInputField.cs' to 'true'");
+         Debug.LogWarning("Is 'TextMesh Pro' installed? If so, please uncomment line 4 in 'SpeakUITMPInputField.cs'.");
       }
 
 #if UNITY_EDITOR
@@ -102,7 +103,7 @@ namespace Crosstales.RTVoice.UI
       {
          public override void OnInspectorGUI()
          {
-            UnityEditor.EditorGUILayout.HelpBox("Is TextMesh Pro installed? If so, please change line 16 of 'SpeakUITMPInputField.cs' to 'true'.", UnityEditor.MessageType.Warning);
+            UnityEditor.EditorGUILayout.HelpBox("Is 'TextMesh Pro' installed? If so, please uncomment line 4 in 'SpeakUITMPInputField.cs'.", UnityEditor.MessageType.Warning);
 
             DrawDefaultInspector();
          }
@@ -111,4 +112,4 @@ namespace Crosstales.RTVoice.UI
 #endif
    }
 }
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

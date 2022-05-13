@@ -1,36 +1,35 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorIntegration
 {
    /// <summary>Editor component for the "Hierarchy"-menu.</summary>
    public static class RTVoiceGameObject
    {
-      [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME, false, EditorHelper.GO_ID)]
+      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/" + Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME, false, Crosstales.RTVoice.EditorUtil.EditorHelper.GO_ID)]
       private static void AddRTVoice()
       {
-         EditorHelper.InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
+         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
       }
 
-      [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME, true)]
+      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/" + Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME, true)]
       private static bool AddRTVoiceValidator()
       {
-         return !EditorHelper.isRTVoiceInScene;
+         return !Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene;
       }
 
-      [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/" + Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME, false, EditorHelper.GO_ID + 1)]
+      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/" + Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME, false, Crosstales.RTVoice.EditorUtil.EditorHelper.GO_ID + 1)]
       private static void AddGlobalCache()
       {
-         EditorHelper.InstantiatePrefab(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
+         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab(Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME);
       }
 
-      [MenuItem("GameObject/" + Util.Constants.ASSET_NAME + "/" + Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME, true)]
+      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/" + Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME, true)]
       private static bool AddGlobalCacheValidator()
       {
-         return !EditorHelper.isGlobalCacheInScene;
+         return !Crosstales.RTVoice.EditorUtil.EditorHelper.isGlobalCacheInScene;
       }
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)
