@@ -122,7 +122,7 @@ namespace Dissonance.Integrations.Unity_NFGO
                 using var buffer = WritePacket(packet);
                 netManager.CustomMessagingManager.SendNamedMessage(
                     "DissonanceToServer",
-                    NetworkManager.ServerClientId,
+                    NetworkManager.Singleton.ServerClientId,
                     buffer,
                     reliable ? NetworkDelivery.ReliableSequenced : NetworkDelivery.Unreliable
                 );
