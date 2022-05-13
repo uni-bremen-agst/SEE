@@ -124,7 +124,7 @@ namespace Dissonance.Editor
                     {
                         //Check that the prefab is valid
                         newPrefab = (GameObject)prefab;
-                        if (newPrefab.GetComponent<VoicePlayback>() == null)
+                        if (newPrefab.GetComponent<IVoicePlaybackInternal>() == null)
                         {
                             newPrefab = null;
                             _lastPrefabError.stringValue = "Playback Prefab must contain a VoicePlayback component";

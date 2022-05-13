@@ -66,6 +66,8 @@ namespace Dissonance.Demo
             _inputBuffer = new BufferedSampleProvider(format, 12000);
             _output = new Resampler(new SourceWrapper(_inputBuffer), new ConstantRate());
             _playing = false;
+
+            _output.Prepare(new SessionContext("name", 0));
         }
 
         private class SourceWrapper

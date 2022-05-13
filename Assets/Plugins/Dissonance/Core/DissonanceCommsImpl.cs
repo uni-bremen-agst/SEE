@@ -194,7 +194,7 @@ namespace Dissonance
                 if (_started)
                 {
                     throw Log.CreateUserErrorException(
-                        "Cannot set playback prefab when the component has been started",
+                        "Cannot set playback prefab when the DissonanceComms component has been started",
                         "directly setting the 'PlaybackPrefab' property too late",
                         "https://placeholder-software.co.uk/dissonance/docs/Reference/Components/Dissonance-Comms",
                         "A0796DA8-A0BC-49E4-A1B3-F0AA0F51BAA0"
@@ -207,7 +207,7 @@ namespace Dissonance
                     if (value.GetComponent<IVoicePlayback>() == null)
                     {
                         throw Log.CreateUserErrorException(
-                            "Cannot set playback prefab to a prefab without an implemented of IVoicePlayback",
+                            "Cannot set PlaybackPrefab to a prefab without an implementation of IVoicePlayback",
                             "Setting the 'PlaybackPrefab' property to an incorrect prefab",
                             "https://placeholder-software.co.uk/dissonance/docs/Reference/Components/Dissonance-Comms",
                             "543EB2C1-8911-405B-8BEA-5DBC185DF0C3"
@@ -602,7 +602,7 @@ namespace Dissonance
             {
                 var playback = state.Playback;
                 if (playback != null)
-                    _playbackPool.Put((VoicePlayback)playback);
+                    _playbackPool.Put(playback);
 
                 _playerTrackers.RemovePlayer(state);
 
@@ -637,7 +637,7 @@ namespace Dissonance
             _playerTrackers.AddPlayer(state);
 
             //Now we've set everything up activate the playback
-            playback.gameObject.SetActive(true);
+            ((MonoBehaviour)playback).gameObject.SetActive(true);
 
             if (OnPlayerJoinedSession != null)
                 OnPlayerJoinedSession(state);

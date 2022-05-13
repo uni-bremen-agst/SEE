@@ -3,13 +3,22 @@ using UnityEngine;
 
 namespace Dissonance.Audio.Playback
 {
-    internal interface IVoicePlaybackInternal
+    /// <summary>
+    /// **Do not** use this interface in your scripts - use `IVoicePlayback` instead!
+    /// This is intended for Dissonance internals to control and configure the audio pipeline.
+    /// </summary>
+    public interface IVoicePlaybackInternal
         : IRemoteChannelProvider, IVoicePlayback
     {
         /// <summary>
         /// Get or set if speech from this instance is muted
         /// </summary>
         bool IsMuted { get; set; }
+
+        /// <summary>
+        /// Set the name of the player this playback instance is associated with
+        /// </summary>
+        new string PlayerName { get; set; }
 
         /// <summary>
         /// Reset this player. Clearing all buffered audio data.
@@ -32,9 +41,9 @@ namespace Dissonance.Audio.Playback
         bool AllowPositionalPlayback { get; set; }
 
         /// <summary>
-        /// Get a value indicating if this playback instance is spatializing itself (or if an external spatializer is being used)
+        /// Get/set the codec settings which this pipeline is using
         /// </summary>
-        bool IsApplyingAudioSpatialization { get; }
+        CodecSettings CodecSettings { get; set; }
 
         /// <summary>
         /// Set the transform to use for positional playback
@@ -58,6 +67,11 @@ namespace Dissonance.Audio.Playback
         /// Force resetof playback pipeline, immediately discarding all open/pending voice sessions
         /// </summary>
         void ForceReset();
+
+        /// <summary>
+        /// Perform first time setup
+        /// </summary>
+        void Setup(IPriorityManager priority, IVolumeProvider volume);
     }
 
     public interface IVoicePlayback

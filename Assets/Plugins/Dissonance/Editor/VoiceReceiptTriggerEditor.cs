@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Dissonance.Editor
 {
-    [CustomEditor(typeof (VoiceReceiptTrigger))]
+    [CustomEditor(typeof(VoiceReceiptTrigger), editorForChildClasses: true)]
     public class VoiceReceiptTriggerEditor
         : UnityEditor.Editor
     {

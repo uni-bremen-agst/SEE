@@ -35,7 +35,7 @@ namespace Dissonance.Integrations.Unity_NFGO
         protected override void Update()
         {
             // Check if Dissonance is ready
-            if (IsInitialized && NetworkManager.Singleton != null)
+            if (IsInitialized)
             {
                 // Check if the network is ready
                 var clientActive = NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient;
@@ -122,7 +122,7 @@ namespace Dissonance.Integrations.Unity_NFGO
                 using var buffer = WritePacket(packet);
                 netManager.CustomMessagingManager.SendNamedMessage(
                     "DissonanceToServer",
-                    netManager.ServerClientId,
+                    NetworkManager.ServerClientId,
                     buffer,
                     reliable ? NetworkDelivery.ReliableSequenced : NetworkDelivery.Unreliable
                 );

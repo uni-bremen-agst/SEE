@@ -8,7 +8,7 @@ namespace Dissonance.Editor.Windows.Welcome
     {
         #region constants
         private const float WindowWidth = 300f;
-        private const float WindowHeight = 632f;
+        private const float WindowHeight = 712f;
         private static readonly Vector2 WindowSize = new Vector2(WindowWidth, WindowHeight);
 
         private const string Title = "Welcome To Dissonance";
@@ -31,7 +31,7 @@ namespace Dissonance.Editor.Windows.Welcome
         protected override void DrawContent()
         {
             EditorGUILayout.LabelField("Thankyou for installing Dissonance Voice Chat!", LabelFieldStyle);
-            EditorGUILayout.LabelField(string.Format("Version {0}", DissonanceComms.Version), LabelFieldStyle);
+            EditorGUILayout.LabelField($"Version {DissonanceComms.Version}", LabelFieldStyle);
 
             EditorGUILayout.LabelField("", LabelFieldStyle);
 
@@ -56,14 +56,20 @@ namespace Dissonance.Editor.Windows.Welcome
 
             EditorGUILayout.LabelField("", LabelFieldStyle);
 
-            EditorGUILayout.LabelField("Achieve lower latency microphone input with NatDevice.", LabelFieldStyle);
-            NetworkIntegrationButton("NatDevice Microphone", "https://assetstore.unity.com/packages/slug/176918");
+            EditorGUILayout.LabelField("Lower latency and higher quality microphone input with alternative recording systems.", LabelFieldStyle);
+            NetworkIntegrationButton("FMOD Recording", "https://assetstore.unity.com/packages/slug/213412");
+            NetworkIntegrationButton("NatDevice", "https://assetstore.unity.com/packages/slug/176918");
+
+            EditorGUILayout.LabelField("", LabelFieldStyle);
+
+            EditorGUILayout.LabelField("Audio output through the FMOD API.", LabelFieldStyle);
+            NetworkIntegrationButton("FMOD Playback", "https://assetstore.unity.com/packages/slug/213415");
         }
 
         private static void NetworkIntegrationButton(string name, string url)
         {
             if (GUILayout.Button(name))
-                Application.OpenURL(string.Format("{0}?aid=1100lJDF", url));
+                Application.OpenURL($"{url}?aid=1100lJDF");
         }
     }
 }

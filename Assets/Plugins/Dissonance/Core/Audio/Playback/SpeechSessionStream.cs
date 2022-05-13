@@ -28,6 +28,8 @@ namespace Dissonance.Audio.Playback
         private readonly Queue<SpeechSession> _awaitingActivation;
         private readonly IVolumeProvider _volumeProvider;
 
+        private int? _outputRate;
+
         /// <summary>
         /// The time when the current head of the queue was first attempted to be dequeued
         /// </summary>
@@ -70,6 +72,11 @@ namespace Dissonance.Audio.Playback
             _awaitingActivation = new Queue<SpeechSession>();
         }
 
+        public void SetFixedOutputRate(int? rate)
+        {
+            _outputRate = rate;
+        }
+
         /// <summary>
         ///     Starts a new speech session and adds it to the queue for playback
         /// </summary>
@@ -107,6 +114,7 @@ namespace Dissonance.Audio.Playback
                 var next = _awaitingActivation.Peek();
                 if (next.TargetActivationTime < rNow)
                 {
+                    next.SetOutputSampleRate(_outputRate);
                     next.Prepare(_queueHeadFirstDequeueAttempt.Value);
 
                     _awaitingActivation.Dequeue();

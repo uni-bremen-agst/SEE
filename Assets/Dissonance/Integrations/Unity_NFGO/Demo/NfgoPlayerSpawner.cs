@@ -17,12 +17,6 @@ namespace Dissonance.Integrations.Unity_NFGO.Demo
         private IEnumerator SpawnCo()
         {
             var nm = NetworkManager.Singleton;
-            while (ReferenceEquals(nm, null))
-            {
-                nm = NetworkManager.Singleton;
-                yield return null;
-            }
-
             if (!nm.IsServer)
                 yield break;
 
