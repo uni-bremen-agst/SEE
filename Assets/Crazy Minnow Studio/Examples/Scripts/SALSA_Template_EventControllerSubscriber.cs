@@ -4,6 +4,7 @@ using UnityEngine;
 public class SALSA_Template_EventControllerSubscriber : MonoBehaviour
 {
     public string componentEventName;
+
     private void OnEnable()
     {
         EventController.AnimationStarting += OnAnimationStarting;
@@ -24,7 +25,7 @@ public class SALSA_Template_EventControllerSubscriber : MonoBehaviour
         if (e.eventName == componentEventName)
         {
             // do some stuff...
-            Debug.Log("EventController fired OnAnimationStarting for: " + componentEventName);
+            Debug.Log("EventController fired OnAnimationStarting for: " + componentEventName+ " from sender: " + e.sender.name);
         }
     }
     private void OnAnimationON(object sender, EventController.EventControllerNotificationArgs e)
@@ -32,7 +33,7 @@ public class SALSA_Template_EventControllerSubscriber : MonoBehaviour
         if (e.eventName == componentEventName)
         {
             // do some stuff...
-            Debug.Log("EventController fired OnAnimationON for: " + componentEventName);
+            Debug.Log("EventController fired OnAnimationON for: " + componentEventName + " from sender: " + e.sender.name);
         }
     }
     private void OnAnimationEnding(object sender, EventController.EventControllerNotificationArgs e)
@@ -40,7 +41,7 @@ public class SALSA_Template_EventControllerSubscriber : MonoBehaviour
         if (e.eventName == componentEventName)
         {
             // do some stuff...
-            Debug.Log("EventController fired OnAnimationEnding for: " + componentEventName);
+            Debug.Log("EventController fired OnAnimationEnding for: " + componentEventName + " from sender: " + e.sender.name);
         }
     }
     private void OnAnimationOFF(object sender, EventController.EventControllerNotificationArgs e)
@@ -48,7 +49,7 @@ public class SALSA_Template_EventControllerSubscriber : MonoBehaviour
         if (e.eventName == componentEventName)
         {
             // do some stuff...
-            Debug.Log("EventController fired OnAnimationOFF for: " + componentEventName);
+            Debug.Log("EventController fired OnAnimationOFF for: " + componentEventName + " from sender: " + e.sender.name);
         }
     }
 }
