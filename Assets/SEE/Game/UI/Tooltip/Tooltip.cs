@@ -193,11 +193,5 @@ namespace SEE.Game.UI.Tooltip
                 tooltipGameObject.SetActive(true);
             }
         }
-
-        protected override void StartHoloLens()
-        {
-            //TODO:https://docs.microsoft.com/de-de/windows/mixed-reality/mrtk-unity/features/ux-building-blocks/tooltip
-            base.StartHoloLens();
-        }
     }
 }
