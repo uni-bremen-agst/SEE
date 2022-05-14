@@ -17,7 +17,7 @@ namespace SEE.Game.City
     /// A code city that supports architectural mappings from
     /// implementation nodes onto architecture nodes.
     /// NOTE: It is assumed the implementation and architecture graphs are not edited!
-    /// TODO: In fact, we should disallow this programmatically, too.
+    /// TODO: We should allow changes, but trigger the respective incremental reflexion analysis methods.
     /// </summary>
     public class SEEReflexionCity : SEECity, Observer
     {
@@ -218,8 +218,8 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>
-        /// and logs it to the console.
+        /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
+        /// and handles the changes by modifying this city.
         /// </summary>
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
         public void NewChange(ChangeEvent changeEvent)
