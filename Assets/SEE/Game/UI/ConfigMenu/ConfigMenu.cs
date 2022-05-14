@@ -224,8 +224,7 @@ namespace SEE.Game.UI.ConfigMenu
                 // Place the menu as a whole in front of the 'table'.
                 // FIXME: Do not use absolute positioning. Instead, it may better to use
                 // positioning relative to the table or to the player, since the absolute
-                // position of the table may change in the future (or on other platforms,
-                // like it does on the HoloLens).
+                // position of the table may change in the future (or on other platforms).
                 gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
             }
         }

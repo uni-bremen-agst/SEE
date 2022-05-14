@@ -19,7 +19,6 @@ namespace SEE.Game.UI
     {
         /// <summary>
         /// Name of the canvas on which UI elements are placed.
-        /// Note that for HoloLens, the canvas will be converted to an MRTK canvas.
         /// </summary>
         private const string UI_CANVAS_NAME = "UI Canvas";
 
@@ -59,10 +58,6 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Start()"/> method of this component is executed on the VR platform.
         /// </summary>
         protected virtual void StartVR() => PlatformUnsupported();
-        /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the HoloLens platform.
-        /// </summary>
-        protected virtual void StartHoloLens() => PlatformUnsupported();
 
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the Desktop platform.
@@ -77,11 +72,6 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Update()"/> method of this component is executed on the VR platform.
         /// </summary>
         protected virtual void UpdateVR() { }
-
-        /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
-        /// </summary>
-        protected virtual void UpdateHoloLens() { }
 
         protected void Start()
         {
@@ -106,9 +96,6 @@ namespace SEE.Game.UI
                 case PlayerInputType.VRPlayer: StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
-                case PlayerInputType.HoloLensPlayer: StartHoloLens();
-                    //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended
-                    break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
                 default: PlatformUnsupported();
@@ -126,8 +113,6 @@ namespace SEE.Game.UI
                 case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();
                     break;
                 case PlayerInputType.VRPlayer: UpdateVR();
-                    break;
-                case PlayerInputType.HoloLensPlayer: UpdateHoloLens();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
