@@ -95,6 +95,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The range of colors for the style metric.
         /// </summary>
+        [OdinSerialize]
         public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
         /// <summary>
         /// Describes how metrics are mapped onto the antenna above the blocks.

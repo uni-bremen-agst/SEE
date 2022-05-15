@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace SEE.Game
     /// <summary>
     ///  A discrete range of numberOfColors colors from lower to upper.
     /// </summary>
+    [Serializable]
     public struct ColorRange
     {
         /// <summary>
