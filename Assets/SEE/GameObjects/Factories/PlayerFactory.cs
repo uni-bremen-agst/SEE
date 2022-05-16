@@ -40,18 +40,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Creates and returns a HoloLens player instantiated from prefab Resources/Prefabs/Players/HoloLensPlayer
-        /// with all required components attached to it.
-        /// </summary>
-        /// <returns>a player for the AR environment of HoloLens</returns>
-        public static GameObject CreateHololensPlayer()
-        {
-            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/HoloLensPlayer");
-            player.name = PlayerInputType.HoloLensPlayer.ToString();
-            return player;
-        }
-
-        /// <summary>
         /// Creates and returns a player for touchpads or gamepads instantiated from prefab Resources/Prefabs/Players/InControl
         /// with all required components attached to it.
         /// </summary>

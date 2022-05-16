@@ -116,9 +116,6 @@ namespace SEE.Game.UI.CodeWindow
                 case PlayerInputType.VRPlayer:
                     PlatformUnsupported();
                     break;
-                case PlayerInputType.HoloLensPlayer:
-                    PlatformUnsupported();
-                    break;
                 case PlayerInputType.None: // nothing needs to be done
                     break;
                 default:
