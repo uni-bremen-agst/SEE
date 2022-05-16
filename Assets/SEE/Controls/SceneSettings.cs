@@ -1,8 +1,4 @@
-﻿using Microsoft.MixedReality.Toolkit;
-using Microsoft.MixedReality.Toolkit.UI;
-using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
-using Microsoft.MixedReality.Toolkit.Utilities;
-using OdinSerializer;
+﻿using OdinSerializer;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.Charts.VR;
@@ -24,20 +20,6 @@ namespace SEE.Controls
         // we are running in).
         //----------------------------------------------------------------------------------
 
-        /// <summary>
-        /// The name of the game object where the MixedRealityToolkit is attached to.
-        /// Used only for the Hololens player.
-        /// </summary>
-        private const string MixedRealityToolkitName = "MixedRealityToolkit";
-        /// <summary>
-        /// The name of the game object where the GridObjectCollection is attached to.
-        /// Used only for the Hololens player.
-        /// </summary>
-        private const string CityCollectionName = "CityCollection";
-        /// <summary>
-        /// The name of the game object which represents the app bar for a CodeCity.
-        /// </summary>
-        private const string AppBarName = "HoloLensAppBar";
         /// <summary>
         /// The name of the game object where the ChartManager component and his friends are
         /// attached to. It is used for handling the metric charts.
@@ -64,8 +46,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// The game object representing the ground in the scene. A Unity plane
-        /// should generally be attached to it. Will be deactivated for the Hololens player. In the VR
-        /// environment, the TeleportArea will be attached to it.
+        /// should generally be attached to it. In the VR  environment, the TeleportArea will be attached to it.
         /// </summary>
         [Tooltip("The ground in the scene. This attribute must be set in VR for determining the teleporting area.")]
         [OdinSerialize]
@@ -77,19 +58,8 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
-        [Header("HoloLens specific settings (relevant only for HoloLens players)")]
-        [Tooltip("Which scale shall be used for HoloLens players.")]
-        public ExperienceScale ExperienceScale = ExperienceScale.Seated;
-
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
-
-        [Tooltip("Whether eye gaze should trigger hovering actions, such as node labels.")]
-        public bool EyeGazeHover = true;
-
-        [Range(0, 20)]
-        [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
-        public float EyeStareDelay = 1;
 
         /// <summary>
         /// The name of the game object holding the unique <see cref="SceneSettings"/>
@@ -169,7 +139,7 @@ namespace SEE.Controls
         {
             playerInputType = PlayerSettings.GetInputType();
             Debug.Log($"Player input type: {playerInputType}.\n");
-            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer);
+            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer);
         }
 
         /// <summary>
@@ -229,13 +199,6 @@ namespace SEE.Controls
                         /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = PlayerFactory.CreateVRPlayer();
                         SetupVR(player, Ground);
-                    }
-                    break;
-                case PlayerInputType.HoloLensPlayer:
-                    {
-                        /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
-                        player = PlayerFactory.CreateHololensPlayer();
-                        SetupMixedReality();
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
@@ -318,97 +281,6 @@ namespace SEE.Controls
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Enables mixed reality capabilities in the scene, including the Mixed Reality Toolkit.
-        /// </summary>
-        private void SetupMixedReality()
-        {
-            Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
-                               .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
-
-            // Add a MixedRealityToolkit to the scene
-            PrefabInstantiator.InstantiatePrefab("Prefabs/MixedRealityToolkit").name = MixedRealityToolkitName;
-
-            // Create HoloLensAppBar from prefab
-            PrefabInstantiator.InstantiatePrefab("Prefabs/HoloLensAppBar").name = AppBarName;
-
-            // Add a city collection
-            GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
-            cityCollection.name = CityCollectionName;
-
-            // Hide all decoration to improve performance.
-            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
-
-            {
-                // Set selected experience scale.
-                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = ExperienceScale;
-
-                Debug.Log($"Current HoloLens scale: {ExperienceScale}\n");
-                if (ExperienceScale == ExperienceScale.Seated || ExperienceScale == ExperienceScale.OrientationOnly)
-                {
-                    // Position and scale planes and CodeCities accordingly using CityCollection grid
-                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
-                    {
-                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-
-                        GameObject[] citiesWithContainer = cities.Select(AddCodeCityContainer).ToArray();
-
-                        foreach (GameObject city in citiesWithContainer)
-                        {
-                            SetCityScale(city, cityCollection.transform, CityScalingFactor);
-                            AddInteractions(city);
-                            AppBarCityConfiguration(city);
-                        }
-
-                        SetGridCellWidth(grid, citiesWithContainer);
-                    }
-                }
-            }
-
-            #region Local Methods
-            //Scales the city by factor and pretend it to collection
-            static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
-            {
-                cityWitchContainer.transform.localScale *= cityScaleFactor;
-                // City needs to be parented to collection to be organized by it
-                cityWitchContainer.transform.parent = cityCollectionTransform;
-            }
-
-            //Sets the width of the Grid containing the cities
-            static void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
-            {
-                // To avoid overlaps, set cell width to maximum length of code cities
-                grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
-                grid.UpdateCollection();
-            }
-
-            // Adds AppBar and ObjectManipulator components to City
-            static void AddInteractions(GameObject city)
-            {
-                city.AddComponent<AppBarInteractableObject>();
-                city.AddComponent<ObjectManipulator>();
-            }
-
-            static void AppBarCityConfiguration(GameObject city)
-            {
-                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
-                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
-                                                                 .BoundsControlActivationType.ActivateManually;
-            }
-
-
-            // Creates a Container GameObject for Cities
-            static GameObject AddCodeCityContainer(GameObject city)
-            {
-                GameObject cityContainer = new GameObject { name = city.name + "Container" };
-                cityContainer.transform.position = city.transform.position;
-                city.transform.SetParent(cityContainer.transform);
-                return cityContainer;
-            }
-
-            #endregion
         }
 
         /// <summary>

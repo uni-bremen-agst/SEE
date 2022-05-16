@@ -58,7 +58,6 @@ namespace SEE.Utils
 
         /// <summary>
         /// Inverts the given color.
-        /// This is done similarly to the MRTK's Color.Invert method.
         /// </summary>
         /// <param name="color">The color to invert</param>
         /// <returns>The inverted color.</returns>
