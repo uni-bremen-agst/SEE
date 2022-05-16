@@ -130,6 +130,33 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge = edge;
         }
     }
+    
+    /// <summary>
+    /// Thrown if a propagated edge can't be created because such a propagated edge already exists.
+    /// </summary>
+    public class AlreadyPropagatedException : ArchitectureAnalysisException
+    {
+        /// <summary>
+        /// The edge that was already propagated.
+        /// </summary>
+        public readonly Edge PropagatedEdge;
+
+        /// <summary>
+        /// The edge from which <see cref="PropagatedEdge"/> originates from.
+        /// 
+        /// NOTE: This is the edge that was passed along to the function which is supposed to construct the
+        /// propagated edge. As such, it may not necessarily be accurate.
+        /// </summary>
+        public readonly Edge OriginatingEdge;
+
+        public AlreadyPropagatedException(Edge propagatedEdge, Edge originatingEdge) 
+            : base($"Propagated edge already exists: '{propagatedEdge.ToShortString()}' "
+                   + $"(originated from '{originatingEdge.ToShortString()}')!")
+        {
+            PropagatedEdge = propagatedEdge;
+            OriginatingEdge = originatingEdge;
+        }
+    }
 
     /// <summary>
     /// Thrown if an already explicitly mapped node is mapped somewhere else.
