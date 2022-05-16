@@ -355,6 +355,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // divergent/allowed/implicitlyAllowed to undefined.
                 SetCounter(edge, 0);
                 Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
+                propagationTable.Remove(edge.ID);
                 FullGraph.RemoveEdge(edge);
             }
             else
@@ -805,6 +806,29 @@ namespace SEE.Tools.ReflexionAnalysis
         #region DG Utilities
 
         /// <summary>
+        /// Map from IDs of propagated edges to their originating edge, i.e., the edge they were propagated from.
+        /// </summary>
+        private IDictionary<string, Edge> propagationTable = new Dictionary<string, Edge>();
+
+        /// <summary>
+        /// Returns the edge from which the given <paramref name="propagatedEdge"/> was propagated.
+        ///
+        /// Pre-conditions:
+        /// - Given <paramref name="propagatedEdge"/> is actually a propagated edge.
+        /// - Given <paramref name="propagatedEdge"/> is in the architecture graph.
+        ///
+        /// Post-conditions:
+        /// - Returned edge is in the implementation graph.
+        /// </summary>
+        /// <param name="propagatedEdge">Propagated edge whose originating edge shall be returned</param>
+        /// <returns>Edge from which <paramref name="propagatedEdge"/> was propagated</returns>
+        public Edge GetOriginatingEdge(Edge propagatedEdge)
+        {
+            AssertOrThrow(propagatedEdge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, propagatedEdge));
+            return propagationTable[propagatedEdge.ID];
+        }
+
+        /// <summary>
         /// Adds value to counter of <paramref name="edge"/> and transforms its state.
         /// Notifies if edge state changes.
         /// Precondition: <paramref name="edge"/> is in architecture graph and specified.
@@ -885,12 +909,17 @@ namespace SEE.Tools.ReflexionAnalysis
                         // The edge is a left-over from a previous analysis and should be
                         // removed. Before we actually do that, we need to notify all observers.
                         Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
+                        // No need to delete from propagationTable, as we clear that at the end anyway.
                         toBeRemoved.Add(edge);
                         break;
                     default:
+                        // Also need to clear here, otherwise we're in a bad state.
+                        propagationTable.Clear();
                         throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state encountered!");
                 }
             }
+
+            propagationTable.Clear();
 
             // Removal of edges from architecture must be done outside of the loop
             // because the loop iterates on architecture.Edges().
@@ -1003,16 +1032,16 @@ namespace SEE.Tools.ReflexionAnalysis
             if (architectureDependency == null)
             {
                 // a propagated dependency has not existed yet; we need to create one
-                architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, out allowingEdge);
+                architectureDependency = NewImplDepInArchitecture(archSource, archTarget, implType, implementationDependency, out allowingEdge);
                 AssertOrThrow(architectureDependency.IsInArchitecture(), () => new NotInSubgraphException(Architecture, architectureDependency));
             }
             else
             {
                 // a propagated dependency exists already
                 int implCounter = GetImplCounter(implementationDependency);
-                AssertOrThrow(architectureDependency.Source.IsInArchitecture(), 
+                AssertOrThrow(architectureDependency.Source.IsInArchitecture(),
                               () => new NotInSubgraphException(Architecture, architectureDependency.Source));
-                AssertOrThrow(architectureDependency.Target.IsInArchitecture(), 
+                AssertOrThrow(architectureDependency.Target.IsInArchitecture(),
                               () => new NotInSubgraphException(Architecture, architectureDependency.Target));
                 Lift(architectureDependency.Source, architectureDependency.Target,
                      implType, implCounter, out allowingEdge);
@@ -1157,23 +1186,35 @@ namespace SEE.Tools.ReflexionAnalysis
         /// (1) there is no propagated edge from <paramref name="archSource"/> to <paramref name="archTarget"/>
         /// with the given <paramref name="edgeType"/> yet
         /// (2) <paramref name="archSource"/> and <paramref name="archTarget"/> are in the architecture graph
+        /// (3) <paramref name="originatingEdge"/> is in the implementation graph.
         /// Postcondition: the newly created and returned dependency is contained in
         /// the architecture graph and marked as propagated.
         /// </summary>
         /// <param name="archSource">architecture node that is the source of the propagated edge</param>
         /// <param name="archTarget">architecture node that is the target of the propagated edge</param>
         /// <param name="edgeType">type of the propagated implementation edge</param>
+        /// <param name="originatingEdge">Implementation edge from which the newly created edge will originate</param>
         /// <param name="allowingEdgeOut">the specified architecture dependency allowing the implementation
         /// dependency if there is one; otherwise null; allowingEdgeOut is also null if the implementation
         /// dependency form a self-loop (archSource == archTarget); self-dependencies are implicitly
         /// allowed, but do not necessarily have a specified architecture dependency</param>
         /// <returns>a new propagated dependency in the architecture graph</returns>
-        private Edge NewImplDepInArchitecture(Node archSource, Node archTarget, string edgeType, out Edge allowingEdgeOut)
+        private Edge NewImplDepInArchitecture(Node archSource, Node archTarget, string edgeType, Edge originatingEdge, out Edge allowingEdgeOut)
         {
+            AssertOrThrow(archSource.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archSource));
+            AssertOrThrow(archTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archTarget));
+            AssertOrThrow(originatingEdge.IsInImplementation(), () => new NotInSubgraphException(Implementation, originatingEdge));
+            Edge alreadyPropagated = FullGraph.Edges().FirstOrDefault(x => x.Source == archSource 
+                                                                           && x.Target == archTarget 
+                                                                           && x.Type == edgeType 
+                                                                           && x.IsInArchitecture() && !IsSpecified(x));
+            AssertOrThrow(alreadyPropagated == null, () => new AlreadyPropagatedException(alreadyPropagated, originatingEdge));
+
             const int counter = 1;
             Edge propagatedArchitectureDep = AddEdge(archSource, archTarget, edgeType);
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
+            propagationTable[originatingEdge.ID] = propagatedArchitectureDep;
 
             // propagatedArchitectureDep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
