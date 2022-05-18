@@ -108,7 +108,7 @@ namespace SEE.GO
         /// updated (<see cref="UpdateMesh"/>).
         /// </summary>
         [SerializeField, Min(5)]
-        public int tubularSegments = 50; // default value; based on Holten
+        private int tubularSegments = 50; // default value; based on Holten
 
         /// <summary>
         /// Property of <see cref="tubularSegments"/>. Domain [5, inf]
@@ -133,7 +133,7 @@ namespace SEE.GO
         /// (<see cref="UpdateMesh"/>).
         /// </summary>
         [SerializeField, Min(3)]
-        public int radialSegments = 8; // default value; octagon
+        private int radialSegments = 8; // default value; octagon
 
         /// <summary>
         /// Property of <see cref="radialSegments"/>. Domain: [3, inf]
@@ -149,6 +149,26 @@ namespace SEE.GO
                     radialSegments = max;
                     needsUpdate = true;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tuple of the start color of the gradient and the end color of it.
+        /// Should only be changed via <see cref="GradientColors"/>.
+        /// </summary>
+        [SerializeField]
+        private (Color start, Color end) gradientColors = (Color.red, Color.green);
+
+        /// <summary>
+        /// Tuple of the start color of the gradient and the end color of it.
+        /// </summary>
+        public (Color start, Color end) GradientColors
+        {
+            get => gradientColors;
+            set
+            {
+                gradientColors = value;
+                needsUpdate = true;
             }
         }
 
@@ -198,7 +218,7 @@ namespace SEE.GO
         /// <paramref name="num"/>, the more accurate the approximation.
         /// The poly line can be visualized with a <see cref="LineRenderer"/>.
         /// </summary>
-        /// <param name="num">Number of vertecies in the poly line</param>
+        /// <param name="num">Number of vertices in the poly line</param>
         /// <returns>A poly line approximating <see cref="Spline"/></returns>
         public Vector3[] PolyLine(int num = 100)
         {
@@ -217,11 +237,13 @@ namespace SEE.GO
         /// </summary>
         private void UpdateLineRenderer()
         {
-            if (gameObject.TryGetComponent<LineRenderer>(out var lr))
+            if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                var polyLine = PolyLine(lr.positionCount);
+                Vector3[] polyLine = PolyLine(lr.positionCount);
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
+                lr.startColor = gradientColors.start;
+                lr.endColor = gradientColors.end;
             }
             needsUpdate = false;
         }
@@ -380,7 +402,7 @@ namespace SEE.GO
                 Color[] colors = new Color[uv.Length];
                 for (int i = 0; i < uv.Length; i++)
                 {
-                    colors[i] = Color.Lerp(Color.red, Color.green, uv[i].y);
+                    colors[i] = Color.Lerp(gradientColors.start, gradientColors.end, uv[i].y);
                 }
                 mesh.colors = colors;
             }
@@ -401,7 +423,7 @@ namespace SEE.GO
         /// <returns>A mesh approximating <see cref="Spline"/></returns>
         public Mesh CreateMesh()
         {
-            if (gameObject.TryGetComponent<MeshFilter>(out var filter))
+            if (gameObject.TryGetComponent(out MeshFilter filter))
             {
                 return filter.mesh;
             }

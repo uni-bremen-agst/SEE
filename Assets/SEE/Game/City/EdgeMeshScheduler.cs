@@ -62,8 +62,8 @@ namespace SEE.Game.City
             EdgeLayoutAttributes layoutSettings,
             EdgeSelectionAttributes selectionSettings)
         {
-            layout = Assertions.AssertNotNull(layoutSettings, "layoutSettings");
-            selection = Assertions.AssertNotNull(selectionSettings, "selectionSettings");
+            layout = layoutSettings.AssertNotNull("layoutSettings");
+            selection = selectionSettings.AssertNotNull("selectionSettings");
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace SEE.Game.City
                 GameObject edge = edges.Dequeue();
 
                 // fail-safe
-                if (!edge.TryGetComponent<SEESpline>(out var spline))
+                if (!edge.TryGetComponent(out SEESpline spline))
                 {
                     Debug.LogWarning("Game object without SEESpline component. Ignoring.\n");
                     continue;
