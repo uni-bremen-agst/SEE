@@ -103,7 +103,7 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
-                ipAddress.Value = networkConfig.ServerIPv4Address;
+                ipAddress.Value = networkConfig.ServerIP4Address;
                 ipAddress.Description = "IPv4 address of the server";
                 group.AddProperty(ipAddress);
             }
@@ -185,7 +185,7 @@ namespace SEE.Game.UI.PropertyDialog
                 string ipAddressValue = ipAddress.Value.Trim();
                 if (HasCorrectIPv4AddressSyntax(ipAddressValue))
                 {
-                    networkConfig.ServerIPv4Address = ipAddressValue;
+                    networkConfig.ServerIP4Address = ipAddressValue;
                 }
                 else
                 {
