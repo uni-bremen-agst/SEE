@@ -9,6 +9,7 @@ using System.Threading;
 using Dissonance;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
@@ -828,18 +829,10 @@ namespace SEE.Net
         private const string ServerIP4AddressLabel = "serverIP4Address";
 
         /// <summary>
-        /// Default name of the configuration file (just the filename, not the path).
+        /// Default path of the configuration file (path and filename).
         /// </summary>
-        private const string ConfigFile = "network.cfg";
-
-        /// <summary>
-        /// Default path of the configuration file.
-        /// </summary>
-        /// <returns></returns>
-        private string ConfigPath()
-        {
-            return Filenames.OnCurrentPlatform(Application.streamingAssetsPath + "/" + ConfigFile);
-        }
+        [SerializeField]
+        public DataPath ConfigPath = new DataPath();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
@@ -847,7 +840,7 @@ namespace SEE.Net
         /// </summary>
         public void Save()
         {
-            Save(ConfigPath());
+            Save(ConfigPath.Path);
         }
 
         /// <summary>
@@ -856,7 +849,7 @@ namespace SEE.Net
         /// </summary>
         public void Load()
         {
-            string filename = ConfigPath();
+            string filename = ConfigPath.Path;
             if (File.Exists(filename))
             {
                 Load(filename);
