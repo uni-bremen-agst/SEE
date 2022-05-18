@@ -757,11 +757,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The IPv4 address of the server.
-        /// </summary>
-        public string ServerIPv4Address { set; get; } = "127.0.0.1";
-
-        /// <summary>
         /// The kinds of voice-chats system we support. None means no voice
         /// chat whatsoever.
         /// </summary>
