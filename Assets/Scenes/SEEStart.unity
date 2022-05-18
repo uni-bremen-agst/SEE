@@ -365,6 +365,10 @@ MonoBehaviour:
   internalLoggingEnabled: 1
   minimalSeverity: 2
   VoiceChat: 1
+  ConfigPath:
+    Root: 3
+    relativePath: /network.cfg
+    absolutePath: 
   vivoxChannelName: 
 --- !u!1 &1859932782
 GameObject:
