@@ -332,7 +332,7 @@ namespace SEEEditor
                 InnerNodeAttributes settings = city.InnerNodeSettings;
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                settings.Kind = (InnerNodeKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
+                settings.Shape = (NodeShapes)EditorGUILayout.EnumPopup("Type", settings.Shape);
                 settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
                 settings.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorMetric);
                 settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
@@ -385,7 +385,7 @@ namespace SEEEditor
                 LeafNodeAttributes settings = city.LeafNodeSettings;
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
-                settings.Kind = (LeafNodeKinds)EditorGUILayout.EnumPopup("Type", settings.Kind);
+                settings.Shape = (NodeShapes)EditorGUILayout.EnumPopup("Type", settings.Shape);
                 settings.WidthMetric = EditorGUILayout.TextField("Width", settings.WidthMetric);
                 settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
                 settings.DepthMetric = EditorGUILayout.TextField("Depth", settings.DepthMetric);

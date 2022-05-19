@@ -524,13 +524,13 @@ namespace SEE.Game.City
                 Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
 
                 Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
-                Dictionary<string, InnerNodeKinds> dirsShape = new Dictionary<string, InnerNodeKinds>();
+                Dictionary<string, NodeShapes> dirsShape = new Dictionary<string, NodeShapes>();
 
                 foreach (Node node in graph.Nodes())
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, InnerNodeSettings.Kind);
+                        dirsShape.Add(node.ID, InnerNodeSettings.Shape);
                         dirsLocal.Add(node.ID, false);
                         dirsLayout.Add(node.ID, NodeLayoutSettings.Kind);
                     }

@@ -206,7 +206,7 @@ namespace SEEEditor
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;
             EditorGUILayout.PrefixLabel("Inner nodes");
-            Dictionary<InnerNodeKinds, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
+            Dictionary<NodeShapes, string> shapeKinds = nodeLayout.GetInnerNodeKinds().ToDictionary(kind => kind, kind => kind.ToString());
 
             if (shapeKinds.ContainsKey(seeCity.CoseGraphSettings.InnerNodeShape[node.ID]))
             {
