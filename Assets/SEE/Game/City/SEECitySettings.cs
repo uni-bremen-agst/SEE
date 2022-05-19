@@ -48,9 +48,6 @@ namespace SEE.Game.City
     public enum InnerNodeKinds : byte
     {
         Blocks,
-        Rectangles,
-        Donuts,
-        Circles,
         Empty,
         Cylinders
     }

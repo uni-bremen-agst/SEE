@@ -79,7 +79,7 @@ namespace SEE.Layout
         private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, LayoutSublayoutNode>();
 
         /// <summary>
-        /// abstract see city settings 
+        /// abstract see city settings
         /// </summary>
         public AbstractSEECity settings;
 
@@ -311,12 +311,12 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Calculates the sublayout positions 
+        /// Calculates the sublayout positions
         /// </summary>
         /// <returns>a mapping from iLayoutNode to the calcualted nodeTransform</returns>
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
-            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, NodeFactory.Unit, settings);
+            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, settings);
             innerNodeHeight = layout.InnerNodeHeight;
             if (layout.UsesEdgesAndSublayoutNodes())
             {

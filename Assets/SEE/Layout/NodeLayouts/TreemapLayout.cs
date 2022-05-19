@@ -4,7 +4,6 @@ using SEE.Layout.NodeLayouts.TreeMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 

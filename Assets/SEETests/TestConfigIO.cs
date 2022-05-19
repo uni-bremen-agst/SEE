@@ -658,7 +658,7 @@ namespace SEE.Utils
             city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
             city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
             city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
-            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, InnerNodeKinds>() { { "ID1", InnerNodeKinds.Blocks }, { "ID2", InnerNodeKinds.Circles } };
+            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, InnerNodeKinds>() { { "ID1", InnerNodeKinds.Blocks }, { "ID2", InnerNodeKinds.Cylinders } };
             city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
             city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
@@ -786,7 +786,7 @@ namespace SEE.Utils
 
         private static void WipeOutInnerNodeSettings(AbstractSEECity city)
         {
-            city.InnerNodeSettings.Kind = InnerNodeKinds.Donuts;
+            city.InnerNodeSettings.Kind = InnerNodeKinds.Empty;
             city.InnerNodeSettings.HeightMetric = "X";
             city.InnerNodeSettings.ColorMetric = "X";
             city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);

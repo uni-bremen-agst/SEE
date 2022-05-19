@@ -7,7 +7,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for cubes as visual representations of graph nodes in the scene.
     /// </summary>
-    internal class CubeFactory : InnerNodeFactory
+    internal class CubeFactory : NodeFactory
     {
         /// <summary>
         /// Constructor.

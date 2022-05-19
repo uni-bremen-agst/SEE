@@ -6,7 +6,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for empty plain (vanilla) game objects.
     /// </summary>
-    internal class VanillaFactory : InnerNodeFactory
+    internal class VanillaFactory : NodeFactory
     {
         /// <summary>
         /// Constructor.
@@ -23,8 +23,7 @@ namespace SEE.GO
         /// <returns></returns>
         public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
         {
-            GameObject gameObject = new GameObject();
-            return gameObject;
+            return new GameObject();
         }
 
         public override Vector3 GetSize(GameObject gameObject)

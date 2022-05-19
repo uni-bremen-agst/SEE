@@ -7,7 +7,7 @@ namespace SEE.GO
     /// <summary>
     /// A factory for cylinder game objects.
     /// </summary>
-    internal class CylinderFactory : InnerNodeFactory
+    internal class CylinderFactory : NodeFactory
     {
         /// <summary>
         /// Constructor.
