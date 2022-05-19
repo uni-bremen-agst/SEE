@@ -163,22 +163,20 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Return the model for an inner node kind.
+        /// Returns the model for a node shape.
         /// </summary>
-        /// <param name="innerNodeKind">the inner ndode kind</param>
+        /// <param name="shape">the node shape</param>
         /// <returns>the innernodeKindModel</returns>
-        public static InnerNodeKindsModel GetModel(this NodeShapes innerNodeKind)
+        public static InnerNodeKindsModel GetModel(this NodeShapes shape)
         {
-            switch (innerNodeKind)
+            switch (shape)
             {
                 case NodeShapes.Blocks:
                     return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
-                case NodeShapes.Empty:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: true);
                 case NodeShapes.Cylinders:
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 default:
-                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
+                    throw new NotImplementedException($"Unexpected case {shape}");
             }
         }
     }
