@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Game;
+﻿using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -18,35 +17,26 @@ namespace SEE.GO
             : base(shaderType, colorRange)
         { }
 
-        public override GameObject NewBlock(int style, int renderQueueOffset = 0)
+        /// <summary>
+        /// Adds a <see cref="BoxCollider"/> to <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object receiving the collider</param>
+        protected override void AddCollider(GameObject gameObject)
         {
-            GameObject result = CreateBlock();
-            result.AddComponent<BoxCollider>();
-            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
-            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            return result;
+            gameObject.AddComponent<BoxCollider>();
         }
 
-        private static GameObject CreateBlock()
-        {
-            GameObject gameObject = new GameObject("Cube") { tag = Tags.Node };
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = GetCubeMesh();
-            return gameObject;
-        }
-
-        private static Mesh modelMesh;
-
-        private static Mesh GetCubeMesh()
+        /// <summary>
+        /// Returns a (cached) mesh for a cube.
+        /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
+        /// </summary>
+        /// <returns>mesh for a cube</returns>
+        protected override Mesh GetMesh()
         {
             if (modelMesh != null)
             {
                 return modelMesh;
             }
-            //create the mesh
             modelMesh = new Mesh
             {
                 name = "SEECubeMesh"
@@ -54,25 +44,27 @@ namespace SEE.GO
 
             // See http://ilkinulas.github.io/development/unity/2016/05/06/uv-mapping.html
             const float extent = 0.5f;
+            // The vertices of the mesh. They are organized so that the center of the mesh
+            // conforms to Unity's position of game objects.
             Vector3[] vertices = {
-               /* -extent */ new Vector3(-extent, extent, -extent),        // front left upper corner
-               /* 1 */ new Vector3(-extent, -extent, -extent),           // front left lower corner
-               /* 2 */ new Vector3(extent, extent, -extent),     // front right upper corner
+               /* 0 */ new Vector3(-extent, extent, -extent),        // front left upper corner
+               /* 1 */ new Vector3(-extent, -extent, -extent),       // front left lower corner
+               /* 2 */ new Vector3(extent, extent, -extent),         // front right upper corner
                /* 3 */ new Vector3(extent, -extent, -extent),        // front right lower corner
 
                /* 4 */ new Vector3(-extent, -extent, extent),        // back left lower corner
-               /* 5 */ new Vector3(extent, -extent, extent),     // back right lower corner
-               /* 6 */ new Vector3(-extent, extent, extent),     // back left upper corner
-               /* 7 */ new Vector3(extent, extent, extent),  // back right upper corner
+               /* 5 */ new Vector3(extent, -extent, extent),         // back right lower corner
+               /* 6 */ new Vector3(-extent, extent, extent),         // back left upper corner
+               /* 7 */ new Vector3(extent, extent, extent),          // back right upper corner
 
                /* 8 */ new Vector3(-extent, extent, -extent),        // front left upper corner = vertex 0
-               /* 9 */ new Vector3(extent, extent, -extent),     // front right upper corner = vertex 2
+               /* 9 */ new Vector3(extent, extent, -extent),         // front right upper corner = vertex 2
 
-               /* 1-extent */ new Vector3(-extent, extent, -extent),       // front left upper corner = vertex 0
-               /* 11 */ new Vector3(-extent, extent, extent),    // back left upper corner = vertex 6
+               /* 1-extent */ new Vector3(-extent, extent, -extent), // front left upper corner = vertex 0
+               /* 11 */ new Vector3(-extent, extent, extent),        // back left upper corner = vertex 6
 
-               /* 12 */ new Vector3(extent, extent, -extent),    // front right upper corner = vertex 2
-               /* 13 */ new Vector3(extent, extent, extent), // back right upper corner = vertex 7
+               /* 12 */ new Vector3(extent, extent, -extent),        // front right upper corner = vertex 2
+               /* 13 */ new Vector3(extent, extent, extent),         // back right upper corner = vertex 7
              };
 
             // The triangles forming the cube.

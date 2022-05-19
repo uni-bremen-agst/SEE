@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Game;
+﻿using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -18,16 +17,13 @@ namespace SEE.GO
             : base(shaderType, colorRange)
         { }
 
-        public override GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
+        /// <summary>
+        /// Adds a <see cref="MeshCollider"/> to <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object receiving the collider</param>
+        protected override void AddCollider(GameObject gameObject)
         {
-            GameObject result = CreateCylinder();
-            result.AddComponent<MeshCollider>();
-            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
-            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-            return result;
+            gameObject.AddComponent<MeshCollider>();
         }
 
         // ----------------------------------------------------------------------------------
@@ -45,40 +41,24 @@ namespace SEE.GO
         private const float DEFAULT_RADIUS = 0.5f;
         private const float DEFAULT_HEIGHT = 1.0f;
 
-        private GameObject CreateCylinder()
-        {
-            GameObject gameObject = new GameObject("Cylinder") { tag = Tags.Node };
-            // A MeshFilter is necessary for the gameObject to hold a mesh.
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = GetCylinderMesh();
-            return gameObject;
-        }
-
         /// <summary>
-        /// Model mesh for cylinder to be re-used for all instances of a cylinder.
-        /// It will be ceated in <see cref="GetCylinderMesh(int, int)"/> on demand.
+        /// Returns a (cached) cylinder mesh.
+        /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
-        private static Mesh modelMesh;
-
-        /// <summary>
-        /// Returns a cylinder mesh.
-        /// </summary>
-        /// <param name="radialSegments">the number circle segments of the cylinder
-        /// (e.g., 3 gives you a triangle shape)</param>
-        /// <param name="heightSegments">the number of height segments</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
-        public static Mesh GetCylinderMesh(int radialSegments = DEFAULT_RADIAL_SEGMENTS,
-                                           int heightSegments = DEFAULT_HEIGHT_SEGMENTS)
+        protected override Mesh GetMesh()
         {
             if (modelMesh != null)
             {
                 return modelMesh;
             }
-            //create the mesh
             modelMesh = new Mesh
             {
                 name = "SEECylinderMesh"
             };
+
+            int radialSegments = DEFAULT_RADIAL_SEGMENTS;
+            int heightSegments = DEFAULT_HEIGHT_SEGMENTS;
 
             float radius = DEFAULT_RADIUS;
             float length = DEFAULT_HEIGHT;
