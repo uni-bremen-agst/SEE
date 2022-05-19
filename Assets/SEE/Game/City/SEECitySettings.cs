@@ -39,7 +39,6 @@ namespace SEE.Game.City
     public enum NodeShapes : byte
     {
         Blocks,
-        Empty,
         Cylinders
     }
 

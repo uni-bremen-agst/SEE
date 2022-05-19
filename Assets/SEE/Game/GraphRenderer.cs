@@ -42,9 +42,6 @@ namespace SEE.Game
             ColorRange innerColorRange = this.Settings.InnerNodeSettings.ColorRange;
             switch (this.Settings.InnerNodeSettings.Shape)
             {
-                case NodeShapes.Empty:
-                    innerNodeFactory = new VanillaFactory(ShaderType, innerColorRange);
-                    break;
                 case NodeShapes.Cylinders:
                     innerNodeFactory = new CylinderFactory(ShaderType, innerColorRange);
                     break;
@@ -421,7 +418,7 @@ namespace SEE.Game
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
             {
                 ICollection<GameObject> gameObjects = (from LayoutGameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
-                AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout);
+                AddDecorations(gameObjects, layoutNode.InnerNodeKind);
                 remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
             }
 

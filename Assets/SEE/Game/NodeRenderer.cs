@@ -552,7 +552,7 @@ namespace SEE.Game
         /// <param name="gameNodes">a list with gamenode objects</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
-            AddDecorations(gameNodes, Settings.InnerNodeSettings.Shape, Settings.NodeLayoutSettings.Kind);
+            AddDecorations(gameNodes, Settings.InnerNodeSettings.Shape);
         }
 
         /// <summary>
@@ -561,8 +561,7 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes to be decorated</param>
         /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
         /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
-        private void AddDecorations(ICollection<GameObject> gameNodes, NodeShapes innerNodeKinds,
-                                    NodeLayoutKind nodeLayout)
+        private void AddDecorations(ICollection<GameObject> gameNodes, NodeShapes innerNodeKinds)
         {
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
@@ -592,23 +591,6 @@ namespace SEE.Game
             foreach (GameObject node in leafNodes.Concat(innerNodes))
             {
                 AddGeneralDecorations(node);
-            }
-
-            // Add decorators specific to the shape of inner nodes (circle decorators for circles
-            // and donut decorators for donuts).
-            switch (innerNodeKinds)
-            {
-                case NodeShapes.Empty:
-                    // do nothing
-                    break;
-                case NodeShapes.Cylinders:
-                    break;
-                case NodeShapes.Blocks:
-                    // TODO
-                    break;
-                default:
-                    throw new InvalidOperationException("Unhandled GraphSettings.InnerNodeKinds "
-                                                        + $"{Settings.InnerNodeSettings.Shape}");
             }
         }
 
