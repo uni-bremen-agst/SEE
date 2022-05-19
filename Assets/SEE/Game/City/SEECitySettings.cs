@@ -38,7 +38,8 @@ namespace SEE.Game.City
     /// </summary>
     public enum LeafNodeKinds : byte
     {
-        Blocks
+        Blocks,
+        Cylinders
     }
 
     /// <summary>
