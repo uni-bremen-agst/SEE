@@ -35,6 +35,7 @@ namespace SEE.Game
             leafNodeFactory = this.Settings.LeafNodeSettings.Kind switch
             {
                 LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
+                LeafNodeKinds.Cylinders => new CylinderFactory(ShaderType, leafColorRange),
                 _ => throw new Exception($"Unhandled {nameof(LeafNodeKinds)}")
             };
 
