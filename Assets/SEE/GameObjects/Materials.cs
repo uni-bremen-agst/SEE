@@ -27,7 +27,7 @@ namespace SEE.GO
 
         // Normal materials
         public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
-        public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
+        public const string TransparentMaterialName = "Materials/SEEMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
 
