@@ -1,4 +1,5 @@
 ﻿using SEE.Controls.Interactables;
+using SEE.DataModel;
 using SEE.Game;
 using UnityEngine;
 
@@ -26,9 +27,14 @@ namespace SEE.GO
     /// </summary>
     public abstract class NodeFactory
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="colorRange">the color range of the created objects</param>
         public NodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
         {
-            Materials = new Materials(shaderType, colorRange);
+            materials = new Materials(shaderType, colorRange);
         }
 
         /// <summary>
@@ -46,14 +52,50 @@ namespace SEE.GO
         /// </summary>
         /// <param name="style">specifies an additional visual style parameter of
         /// the object</param>
-        /// <returns>new block representation</returns>
+        /// <returns>new node representation</returns>
         /// <param name="renderQueueOffset">offset in the render queue</param>
-        public abstract GameObject NewBlock(int style = 0, int renderQueueOffset = 0);
+        public virtual GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
+        {
+            GameObject result = CreateBlock();
+            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
+            materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a new game object to represent a node.
+        /// </summary>
+        /// <returns>new game object for a node</returns>
+        private GameObject CreateBlock()
+        {
+            GameObject gameObject = new GameObject() { tag = Tags.Node };
+            AddCollider(gameObject);
+            // A MeshFilter is necessary for the gameObject to hold a mesh.
+            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+            meshFilter.sharedMesh = GetMesh();
+            return gameObject;
+        }
+
+        /// <summary>
+        /// Returns a mesh for a node.
+        /// </summary>
+        /// <returns>mesh for a node</returns>
+        protected abstract Mesh GetMesh();
+
+        /// <summary>
+        /// Adds an appropriate collider to <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object receiving the collider</param>
+        protected abstract void AddCollider(GameObject gameObject);
 
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
         /// </summary>
-        protected Materials Materials;
+        private Materials materials;
+
         /// <summary>
         /// The default height of an inner node in world space Unity unit.
         /// </summary>
@@ -61,21 +103,21 @@ namespace SEE.GO
 
         /// <summary>
         /// Sets the style as the given <paramref name="style"/>
-        /// for <paramref name="block"/>. The value used will be clamped
-        /// in [0, NumberOfStyles()-1].
+        /// for <paramref name="gameNode"/>. The value used will be clamped
+        /// into [0, NumberOfStyles()-1].
         /// </summary>
         /// <param name="style">the index of the requested material</param>
-        public void SetStyle(GameObject block, int style)
+        public void SetStyle(GameObject gameNode, int style)
         {
-            if (block.TryGetComponent(out Renderer renderer))
+            if (gameNode.TryGetComponent(out Renderer renderer))
             {
-                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
-                UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
-                int level = block.GetComponent<NodeRef>().Value.Level;
-                Materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
+                UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>());
+                UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>().Value);
+                int level = gameNode.GetComponent<NodeRef>().Value.Level;
+                materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
             }
 
-            if (block.TryGetComponent(out Outline outline))
+            if (gameNode.TryGetComponent(out Outline outline))
             {
                 outline.UpdateRenderQueue(true);
             }
@@ -88,7 +130,7 @@ namespace SEE.GO
         /// <returns>number of materials offered</returns>
         public uint NumberOfStyles()
         {
-            return Materials.NumberOfMaterials;
+            return materials.NumberOfMaterials;
         }
 
         /// <summary>
@@ -229,5 +271,11 @@ namespace SEE.GO
             Quaternion rotation = Quaternion.Euler(0, degree, 0);
             block.transform.rotation = rotation;
         }
+
+        /// <summary>
+        /// Model mesh for a game object to be re-used for all instances.
+        /// It will be ceated in <see cref="GetMesh()"/> on demand.
+        /// </summary>
+        protected static Mesh modelMesh;
     }
 }
