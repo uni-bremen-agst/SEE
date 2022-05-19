@@ -2,6 +2,7 @@
 using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using static SEE.Utils.Raycasting;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
@@ -77,7 +78,17 @@ namespace SEE.Game
                     // TODO: Make sure this action is still reversible
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
-                    newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
+                    Reflexion analysis = newGameParent.ContainingCity<SEEReflexionCity>().Analysis;
+                    analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
+                    
+                    // Move implementation node to architecture node, sizing it down accordingly.
+                    // TODO: Size it down accordingly
+                    // TODO: Handle children as well, if that's necessary?
+                    Vector3 newPosition = newGameParent.transform.position;
+                    movingObject.transform.position = newPosition;
+                    PutOn(movingObject.transform, newGameParent);
+                    return newGameParent;
+
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
@@ -134,13 +145,12 @@ namespace SEE.Game
         /// <param name="parent">parent</param>
         private static void PutOn(Transform child, GameObject parent)
         {
-            // FIXME: child may not actually fit into parent, in which we should
-            // downscale it until it fits
+            // FIXME: child may not actually fit into parent, in which case we should downscale it until it fits
             Vector3 childCenter = child.position;
-            float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
-            childCenter.y = parentRoof + child.lossyScale.y / 2;
+            float parentRoof = parent.GetRoof();
+            childCenter.y = parentRoof;// + child.lossyScale.y / 2;
             child.position = childCenter;
-            child.SetParent(parent.transform);
+            //child.SetParent(parent.transform);
         }
 
         /// <summary>
