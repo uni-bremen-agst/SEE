@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using SEE.DataModel;
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.GO
@@ -21,13 +22,11 @@ namespace SEE.GO
         {
             GameObject result = CreateCylinder();
             result.AddComponent<MeshCollider>();
-
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
-
             return result;
         }
 
@@ -48,7 +47,8 @@ namespace SEE.GO
 
         private GameObject CreateCylinder()
         {
-            GameObject gameObject = new GameObject();
+            GameObject gameObject = new GameObject("Cylinder") { tag = Tags.Node };
+            // A MeshFilter is necessary for the gameObject to hold a mesh.
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.sharedMesh = GetCylinderMesh();
             return gameObject;
@@ -56,7 +56,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Model mesh for cylinder to be re-used for all instances of a cylinder.
-        /// It will be ceated in GetCylinderMesh() on demand.
+        /// It will be ceated in <see cref="GetCylinderMesh(int, int)"/> on demand.
         /// </summary>
         private static Mesh modelMesh;
 
@@ -77,7 +77,7 @@ namespace SEE.GO
             //create the mesh
             modelMesh = new Mesh
             {
-                name = "CylinderMesh"
+                name = "SEECylinderMesh"
             };
 
             float radius = DEFAULT_RADIUS;
@@ -110,6 +110,10 @@ namespace SEE.GO
 
             // initialize arrays
             Vector3[] vertices = new Vector3[numVertices];
+            // UV is the mapping specifying which part of a two-dimensional texture is to
+            // be mapped onto which triangle of the three-dimensional mesh.
+            // The U coordinate represents the horizontal axis of the 2D texture,
+            // and the V coordinate represents the vertical axis.
             Vector2[] UVs = new Vector2[numUVs];
             int[] tris = new int[trisArrayLength];
 
