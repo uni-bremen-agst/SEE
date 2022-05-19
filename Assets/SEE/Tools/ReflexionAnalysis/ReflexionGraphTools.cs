@@ -162,6 +162,29 @@ namespace SEE.Tools.ReflexionAnalysis
                 return events;
             }
         }
+        
+        /// <summary>
+        /// Name of the edge attribute for the state of a dependency.
+        /// </summary>
+        private const string StateAttribute = "Reflexion.State";
+
+        /// <summary>
+        /// Returns the state of a dependency.
+        /// If no state has been set, <see cref="ReflexionAnalysis.State.Undefined"/> will be returned.
+        /// </summary>
+        /// <param name="edge">a dependency</param>
+        /// <returns>the state of <paramref name="edge"/></returns>
+        public static State State(this Edge edge)
+        {
+            if (edge.TryGetInt(StateAttribute, out int value))
+            {
+                return (State)value;
+            }
+            else
+            {
+                return ReflexionAnalysis.State.Undefined;
+            }
+        }
 
         /// <summary>
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.

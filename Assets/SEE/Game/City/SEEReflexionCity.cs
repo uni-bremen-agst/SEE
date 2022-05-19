@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -10,6 +9,7 @@ using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
+using System;
 
 namespace SEE.Game.City
 {
@@ -161,9 +161,25 @@ namespace SEE.Game.City
             }
         }
 
-        //--------------------------------
-        // Configuration file input/output
-        //--------------------------------
+        internal override void Start()
+        {
+            base.Start();
+
+            foreach (Edge edge in LoadedGraph.Edges())
+            {
+                GameObject edgeObject = GameObject.Find(edge.ID);
+                if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
+                {
+                    spline.GradientColors = GetEdgeGradient(edge.State());
+                }
+                else
+                {
+                    Debug.LogError($"Edge has no associated game object: {edge}\n");
+                }
+            }
+        }
+
+        #region Configuration file input/output
 
         /// <summary>
         /// Label of attribute <see cref="GxlArchitecturePath"/> in the configuration file.
@@ -217,6 +233,24 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
         }
 
+        #endregion
+
+
+        // Returns a fitting color gradient from the first to the second color for the given state.
+        private static (Color, Color) GetEdgeGradient(State state) =>
+            state switch
+            {
+                State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
+                State.Undefined => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
+                State.ImplicitlyAllowed => (Color.green, Color.white),
+                State.AllowedAbsent => (Color.green, Color.white),
+                State.Allowed => (Color.green, Color.white),
+                State.Divergent => (Color.magenta, Color.Lerp(Color.magenta, Color.black, 0.5f)),
+                State.Absent => (Color.red, Color.Lerp(Color.red, Color.black, 0.5f)),
+                State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, 0.5f)),
+                _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state!")
+            };
+
         /// <summary>
         /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
         /// and handles the changes by modifying this city.
@@ -245,21 +279,21 @@ namespace SEE.Game.City
                     break;
             }
 
-            Debug.Log(changeEvent);
-
             Events.Incorporate(changeEvent);
         }
 
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
-            // TODO: This doesn't work for propagated edges. We may have to maintain a map for that.
             GameObject edge = GameObject.Find(edgeChange.Edge.ID);
-            // TODO: Are edges *always* SEESplines?
+            if (edge == null)
+            {
+                // If no such edge can be found, the given edge must be propagated
+                string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
+                edge = edgeId != null ? GameObject.Find(edgeId) : null;
+            }
             if (edge != null && edge.TryGetComponent(out SEESpline spline))
             {
-                // TODO: Introduce possibility to change colors in spline based on NewState.
-                // For now, we simply change the radius to leave a visible change.
-                spline.Radius = 0.001f;
+                spline.GradientColors = GetEdgeGradient(edgeChange.NewState);
             }
             else
             {

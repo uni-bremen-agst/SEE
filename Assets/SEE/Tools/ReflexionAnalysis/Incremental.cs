@@ -92,12 +92,12 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge propagated = GetPropagatedDependency(edge);
             if (propagated != null)
             {
-                if (GetState(propagated) != State.Divergent)
+                if (propagated.State() != State.Divergent)
                 {
                     // A convergence exists that must be handled (i.e. by decreasing the matching specified edge's counter).
                     if (!Lift(propagated.Source, propagated.Target, propagated.Type, -GetImplCounter(edge), out Edge _))
                     {
-                        throw new InvalidOperationException($"Since this edge is {GetState(propagated)} and not "
+                        throw new InvalidOperationException($"Since this edge is {propagated.State()} and not "
                                                             + "Divergent, it must have a matching specified edge.");
                     }
                 }
@@ -161,7 +161,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 noneCovered = false;
                 ChangeSpecifiedDependency(edge, GetImplCounter(coveredEdge));
-                Transition(coveredEdge, GetState(coveredEdge), State.Allowed);
+                Transition(coveredEdge, coveredEdge.State(), State.Allowed);
             }
 
             if (noneCovered)
@@ -212,7 +212,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Architecture, edge));
             AssertOrThrow(IsSpecified(edge), () => new ExpectedSpecifiedEdgeException(edge));
 
-            if (GetState(edge) == State.Convergent)
+            if (edge.State() == State.Convergent)
             {
                 // We need to handle the propagated dependencies covered by this specified edge.
 
@@ -228,7 +228,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                                      .Where(IsCoveredEdge);
                 foreach (Edge coveredEdge in coveredEdges)
                 {
-                    Transition(coveredEdge, GetState(coveredEdge), State.Divergent);
+                    Transition(coveredEdge, coveredEdge.State(), State.Divergent);
                 }
             }
 
@@ -566,7 +566,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
 
@@ -574,7 +574,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
 
@@ -582,7 +582,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
         }
@@ -612,7 +612,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -620,7 +620,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -629,7 +629,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _)
                     || Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -828,7 +828,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="root">Node whose subtree's allowed propagated dependencies shall be returned</param>
         /// <returns>All allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
-        private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
+        private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => e.State() == State.Allowed);
 
         /// <summary>
         /// Returns all divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.
@@ -836,7 +836,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="root">Node whose subtree's divergent propagated dependencies shall be returned</param>
         /// <returns>All divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
-        private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
+        private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => e.State() == State.Divergent);
 
         /// <summary>
         /// Reverts the effect of the mapping indicated by <paramref name="mapsTo"/>.
