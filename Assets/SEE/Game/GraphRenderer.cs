@@ -32,27 +32,27 @@ namespace SEE.Game
             this.Settings = settings;
 
             ColorRange leafColorRange = this.Settings.LeafNodeSettings.ColorRange;
-            leafNodeFactory = this.Settings.LeafNodeSettings.Kind switch
+            leafNodeFactory = this.Settings.LeafNodeSettings.Shape switch
             {
-                LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
-                LeafNodeKinds.Cylinders => new CylinderFactory(ShaderType, leafColorRange),
-                _ => throw new Exception($"Unhandled {nameof(LeafNodeKinds)}")
+                NodeShapes.Blocks => new CubeFactory(ShaderType, leafColorRange),
+                NodeShapes.Cylinders => new CylinderFactory(ShaderType, leafColorRange),
+                _ => throw new Exception($"Unhandled {nameof(NodeShapes)}")
             };
 
             ColorRange innerColorRange = this.Settings.InnerNodeSettings.ColorRange;
-            switch (this.Settings.InnerNodeSettings.Kind)
+            switch (this.Settings.InnerNodeSettings.Shape)
             {
-                case InnerNodeKinds.Empty:
+                case NodeShapes.Empty:
                     innerNodeFactory = new VanillaFactory(ShaderType, innerColorRange);
                     break;
-                case InnerNodeKinds.Cylinders:
+                case NodeShapes.Cylinders:
                     innerNodeFactory = new CylinderFactory(ShaderType, innerColorRange);
                     break;
-                case InnerNodeKinds.Blocks:
+                case NodeShapes.Blocks:
                     innerNodeFactory = new CubeFactory(ShaderType, innerColorRange);
                     break;
                 default:
-                    throw new Exception($"Unhandled {nameof(InnerNodeKinds)}");
+                    throw new Exception($"Unhandled {nameof(NodeShapes)}");
             }
             this.graph = graph;
             if (this.graph != null)

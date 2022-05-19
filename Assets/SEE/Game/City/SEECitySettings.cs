@@ -34,18 +34,9 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// How leaf graph nodes should be depicted.
+    /// How (leaf and inner) graph nodes should be depicted.
     /// </summary>
-    public enum LeafNodeKinds : byte
-    {
-        Blocks,
-        Cylinders
-    }
-
-    /// <summary>
-    /// How inner graph nodes should be depicted.
-    /// </summary>
-    public enum InnerNodeKinds : byte
+    public enum NodeShapes : byte
     {
         Blocks,
         Empty,
@@ -83,6 +74,10 @@ namespace SEE.Game.City
     public abstract class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
+        /// How a node should be drawn.
+        /// </summary>
+        public NodeShapes Shape = NodeShapes.Blocks;
+        /// <summary>
         /// The name of the metric determining the height.
         /// </summary>
         public string HeightMetric = "";
@@ -119,6 +114,7 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            writer.Save(Shape.ToString(), NodeShapeLabel);
             writer.Save(HeightMetric, HeightMetricLabel);
             writer.Save(ColorMetric, StyleMetricLabel);
             ColorRange.Save(writer, ColorRangeLabel);
@@ -142,6 +138,7 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
+                ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
                 ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
                 ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
                 ColorRange.Restore(values, ColorRangeLabel);
@@ -163,7 +160,7 @@ namespace SEE.Game.City
         /// Label in the configuration file for the kind of object drawn for a node.
         /// It must be visible to the subclasses.
         /// </summary>
-        protected const string NodeKindsLabel = "Kind";
+        protected const string NodeShapeLabel = "Shape";
         /// <summary>
         /// Label in the configuration file for a color range.
         /// </summary>
@@ -197,10 +194,6 @@ namespace SEE.Game.City
     public class LeafNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
-        /// How a leaf node should be drawn.
-        /// </summary>
-        public LeafNodeKinds Kind = LeafNodeKinds.Blocks;
-        /// <summary>
         /// Name of the metric defining the width.
         /// </summary>
         public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
@@ -224,7 +217,6 @@ namespace SEE.Game.City
         /// <param name="writer">to be used for writing the settings</param>
         protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
-            writer.Save(Kind.ToString(), NodeKindsLabel);
             writer.Save(WidthMetric, WidthMetricLabel);
             writer.Save(DepthMetric, DepthMetricLabel);
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
@@ -246,7 +238,6 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
                 ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
                 ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
@@ -279,11 +270,6 @@ namespace SEE.Game.City
     public class InnerNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
-        /// How an inner node should be drawn.
-        /// </summary>
-        public InnerNodeKinds Kind = InnerNodeKinds.Blocks;
-
-        /// <summary>
         /// The metric to be put in the inner circle of a Donut chart.
         /// </summary>
         public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
@@ -299,7 +285,6 @@ namespace SEE.Game.City
         /// <param name="writer">to be used for writing the settings</param>
         protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
-            writer.Save(Kind.ToString(), NodeKindsLabel);
             writer.Save(ShowNames, ShowNamesLabel);
             writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
         }
@@ -318,7 +303,6 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
                 ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
                 ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
             }

@@ -84,7 +84,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// key: inner-node ids, value: the inner node kind
         /// </summary>
-        public Dictionary<string, InnerNodeKinds> InnerNodeShape = new Dictionary<string, InnerNodeKinds>();
+        public Dictionary<string, NodeShapes> InnerNodeShape = new Dictionary<string, NodeShapes>();
 
         /// <summary>
         /// the nodetypes

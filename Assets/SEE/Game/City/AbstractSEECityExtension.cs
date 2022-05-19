@@ -134,10 +134,10 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="nodeLayout">the nodelayout</param>
         /// <returns>the inner node kinds</returns>
-        public static List<InnerNodeKinds> GetInnerNodeKinds(this NodeLayoutKind nodeLayout)
+        public static List<NodeShapes> GetInnerNodeKinds(this NodeLayoutKind nodeLayout)
         {
-            List<InnerNodeKinds> values = Enum.GetValues(typeof(InnerNodeKinds)).Cast<InnerNodeKinds>().ToList();
-            List<InnerNodeKinds> list = new List<InnerNodeKinds>();
+            List<NodeShapes> values = Enum.GetValues(typeof(NodeShapes)).Cast<NodeShapes>().ToList();
+            List<NodeShapes> list = new List<NodeShapes>();
 
             list = nodeLayout.GetModel().IsCircular ? values.Where(kind => kind.GetModel().IsCircular).ToList() : values.Where(kind => kind.GetModel().IsRectangular).ToList();
             list.OrderBy(kind => kind.ToString());
@@ -167,15 +167,15 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="innerNodeKind">the inner ndode kind</param>
         /// <returns>the innernodeKindModel</returns>
-        public static InnerNodeKindsModel GetModel(this InnerNodeKinds innerNodeKind)
+        public static InnerNodeKindsModel GetModel(this NodeShapes innerNodeKind)
         {
             switch (innerNodeKind)
             {
-                case InnerNodeKinds.Blocks:
+                case NodeShapes.Blocks:
                     return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
-                case InnerNodeKinds.Empty:
+                case NodeShapes.Empty:
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: true);
-                case InnerNodeKinds.Cylinders:
+                case NodeShapes.Cylinders:
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 default:
                     return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);

@@ -658,7 +658,7 @@ namespace SEE.Utils
             city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
             city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
             city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
-            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, InnerNodeKinds>() { { "ID1", InnerNodeKinds.Blocks }, { "ID2", InnerNodeKinds.Cylinders } };
+            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, NodeShapes>() { { "ID1", NodeShapes.Blocks }, { "ID2", NodeShapes.Cylinders } };
             city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
             city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
@@ -786,7 +786,7 @@ namespace SEE.Utils
 
         private static void WipeOutInnerNodeSettings(AbstractSEECity city)
         {
-            city.InnerNodeSettings.Kind = InnerNodeKinds.Empty;
+            city.InnerNodeSettings.Shape = NodeShapes.Empty;
             city.InnerNodeSettings.HeightMetric = "X";
             city.InnerNodeSettings.ColorMetric = "X";
             city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
@@ -799,7 +799,7 @@ namespace SEE.Utils
 
         private static void AreEqualInnerNodeSettings(InnerNodeAttributes expected, InnerNodeAttributes actual)
         {
-            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.Shape, actual.Shape);
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
@@ -812,7 +812,7 @@ namespace SEE.Utils
 
         private static void WipeOutLeafNodeSettings(AbstractSEECity city)
         {
-            city.LeafNodeSettings.Kind = LeafNodeKinds.Blocks;
+            city.LeafNodeSettings.Shape = NodeShapes.Blocks;
             city.LeafNodeSettings.HeightMetric = "X";
             city.LeafNodeSettings.WidthMetric = "X";
             city.LeafNodeSettings.DepthMetric = "X";
@@ -827,7 +827,7 @@ namespace SEE.Utils
 
         private static void AreEqualLeafNodeSettings(LeafNodeAttributes expected, LeafNodeAttributes actual)
         {
-            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.Shape, actual.Shape);
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
             Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);

@@ -289,9 +289,9 @@ namespace SEE.Game.UI.ConfigMenu
                 // Shape type for leaf nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
-                    .SetAllowedValues(EnumToStr<LeafNodeKinds>())
-                    .SetDefaultValue(leafNodeAttributes.Kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.Kind))
+                    .SetAllowedValues(EnumToStr<NodeShapes>())
+                    .SetDefaultValue(leafNodeAttributes.Shape.ToString())
+                    .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.Shape))
                     .SetComboSelectMode(ComboSelectMode.Restricted)
                     .Build();
 
@@ -374,9 +374,9 @@ namespace SEE.Game.UI.ConfigMenu
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Shape")
-                    .SetAllowedValues(EnumToStr<InnerNodeKinds>())
-                    .SetDefaultValue(innerNodeAttributes.Kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.Kind))
+                    .SetAllowedValues(EnumToStr<NodeShapes>())
+                    .SetDefaultValue(innerNodeAttributes.Shape.ToString())
+                    .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.Shape))
                     .SetComboSelectMode(ComboSelectMode.Restricted)
                     .Build();
 

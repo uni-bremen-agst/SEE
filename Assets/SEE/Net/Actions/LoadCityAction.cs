@@ -74,8 +74,8 @@ namespace SEE.Net
         public float MinimalBlockLength;
         public float MaximalBlockLength;
 
-        public LeafNodeKinds LeafObjects;
-        public InnerNodeKinds InnerNodeObjects;
+        public NodeShapes LeafObjects;
+        public NodeShapes InnerNodeObjects;
 
         public NodeLayoutKind NodeLayout;
         public EdgeLayoutKind EdgeLayout;
