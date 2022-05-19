@@ -477,7 +477,7 @@ namespace SEE.Game
                         // blocks. The height of the blocks remains the original value of the metric
                         // chosen to determine the height, without any kind of transformation.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
-                        Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare) * NodeFactory.Unit;
+                        Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
                         leafNodeFactory.SetSize(gameNode, targetScale);
                     }
                     else
@@ -600,29 +600,6 @@ namespace SEE.Game
             {
                 case InnerNodeKinds.Empty:
                     // do nothing
-                    break;
-                case InnerNodeKinds.Circles:
-                    {
-                        // We want to adjust the size and the line width of the circle line created by the CircleFactory.
-                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(innerNodes);
-                    }
-                    break;
-                case InnerNodeKinds.Rectangles:
-                    {
-                        // We want to adjust the line width of the rectangle line created by the RectangleFactory.
-                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(innerNodes);
-                    }
-                    break;
-                case InnerNodeKinds.Donuts:
-                    {
-                        DonutDecorator decorator = new DonutDecorator(scaler, Settings.InnerNodeSettings.InnerDonutMetric,
-                                                                      Settings.AllInnerNodeIssues().ToArray());
-                        // the circle segments and the inner circle for the donut are added as children by Add();
-                        // that is why we do not add the result to decorations.
-                        decorator.Add(innerNodes);
-                    }
                     break;
                 case InnerNodeKinds.Cylinders:
                     break;

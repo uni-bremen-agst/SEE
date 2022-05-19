@@ -12,7 +12,7 @@ namespace SEE.GO
     /// reduce the number of drawing calls. The material does not have
     /// any reflexions to save computation run-time.
     /// </summary>
-    internal class Materials
+    public class Materials
     {
         /// <summary>
         /// Different types of shaders used to draw the materials.

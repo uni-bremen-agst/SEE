@@ -163,7 +163,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Return the model for a inner node kind
+        /// Return the model for an inner node kind.
         /// </summary>
         /// <param name="innerNodeKind">the inner ndode kind</param>
         /// <returns>the innernodeKindModel</returns>
@@ -173,12 +173,6 @@ namespace SEE.Game.City
             {
                 case InnerNodeKinds.Blocks:
                     return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
-                case InnerNodeKinds.Rectangles:
-                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
-                case InnerNodeKinds.Donuts:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
-                case InnerNodeKinds.Circles:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 case InnerNodeKinds.Empty:
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: true);
                 case InnerNodeKinds.Cylinders:

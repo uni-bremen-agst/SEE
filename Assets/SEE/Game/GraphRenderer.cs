@@ -43,17 +43,10 @@ namespace SEE.Game
             switch (this.Settings.InnerNodeSettings.Kind)
             {
                 case InnerNodeKinds.Empty:
-                case InnerNodeKinds.Donuts:
                     innerNodeFactory = new VanillaFactory(ShaderType, innerColorRange);
-                    break;
-                case InnerNodeKinds.Circles:
-                    innerNodeFactory = new CircleFactory(innerColorRange);
                     break;
                 case InnerNodeKinds.Cylinders:
                     innerNodeFactory = new CylinderFactory(ShaderType, innerColorRange);
-                    break;
-                case InnerNodeKinds.Rectangles:
-                    innerNodeFactory = new RectangleFactory(innerColorRange);
                     break;
                 case InnerNodeKinds.Blocks:
                     innerNodeFactory = new CubeFactory(ShaderType, innerColorRange);
@@ -107,7 +100,7 @@ namespace SEE.Game
         /// <summary>
         /// The factory used to create game nodes for inner graph nodes.
         /// </summary>
-        private readonly InnerNodeFactory innerNodeFactory;
+        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -635,9 +628,9 @@ namespace SEE.Game
         public NodeLayout GetLayout(GameObject parent) =>
             Settings.NodeLayoutSettings.Kind switch
             {
-                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit),
+                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel),
                 NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
