@@ -109,9 +109,9 @@ namespace SEE.Game.UI.PropertyDialog
             }
             {
                 serverPort = dialog.AddComponent<StringProperty>();
-                serverPort.Name = "Server TCP Port";
+                serverPort.Name = "Server UDP Port";
                 serverPort.Value = networkConfig.ServerPort.ToString();
-                serverPort.Description = "Server TCP port for NetCode and Voice Chat";
+                serverPort.Description = "Server UDP port for NetCode and Voice Chat";
                 group.AddProperty(serverPort);
             }
             {

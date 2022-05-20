@@ -49,7 +49,7 @@ namespace SEE.Net
         public int ServerActionPort = 12345;
 
         /// <summary>
-        /// The port where the server listens to NetCode and Dissonance traffic.
+        /// The UDP port where the server listens to NetCode and Dissonance traffic.
         /// Valid range is [0, 65535].
         /// </summary>
         public int ServerPort
