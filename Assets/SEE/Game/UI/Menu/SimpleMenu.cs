@@ -302,7 +302,7 @@ namespace SEE.Game.UI.Menu
         {
             if (entries.Any(x => x.Title == entry.Title))
             {
-                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!\n");
+                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!");
             }
             entries.Add(entry);
             if (HasStarted)
