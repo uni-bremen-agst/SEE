@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,6 +29,8 @@ namespace SEEEditor
 
         public override void OnInspectorGUI()
         {
+            SEE.Net.Network network = target as SEE.Net.Network;
+
             // Infos (all read-only)
             showInfos = EditorGUILayout.BeginFoldoutHeaderGroup(showInfos, "Infos");
             if (showInfos)
@@ -54,6 +57,7 @@ namespace SEEEditor
                     SetProperty("ServerActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
                     SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
                     SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
+                    network.ConfigPath = DataPathEditor.GetDataPath("Metric file", network.ConfigPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
