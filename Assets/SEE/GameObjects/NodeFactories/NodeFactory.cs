@@ -94,7 +94,7 @@ namespace SEE.GO
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
         /// </summary>
-        private Materials materials;
+        private readonly Materials materials;
 
         /// <summary>
         /// The default height of an inner node in world space Unity unit.
