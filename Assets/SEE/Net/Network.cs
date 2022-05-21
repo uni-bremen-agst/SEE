@@ -831,8 +831,13 @@ namespace SEE.Net
         public void Load()
         {
             string filename = ConfigPath.Path;
+#if UNITY_ANDROID
+            if (File.Exists(Application.persistentDataPath + "/NetworkConfig/network.cfg"))
+            {
+#else
             if (File.Exists(filename))
             {
+#endif
                 Load(filename);
             }
         }

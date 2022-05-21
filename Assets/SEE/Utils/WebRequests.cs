@@ -85,5 +85,14 @@ namespace SEE.Utils
                 return true;
             }
         }
+
+        public static DirectoryInfo SafeCreateDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                return null;
+            }
+            return Directory.CreateDirectory(path);
+        }
     }
 }

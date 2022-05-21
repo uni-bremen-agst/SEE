@@ -21,7 +21,12 @@ namespace SEE.Utils
         /// <param name="filename">name of the file where the output is to be written</param>
         public ConfigWriter(string filename)
         {
+#if UNITY_ANDROID
+            WebRequests.SafeCreateDirectory(Application.persistentDataPath + "/NetworkConfig");
+            stream = new StreamWriter(Application.persistentDataPath + "/NetworkConfig/network.cfg");
+#else
             stream = new StreamWriter(filename);
+#endif
         }
 
         /// <summary>
