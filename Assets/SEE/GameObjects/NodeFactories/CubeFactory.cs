@@ -44,51 +44,112 @@ namespace SEE.GO
 
             // See http://ilkinulas.github.io/development/unity/2016/05/06/uv-mapping.html
             const float extent = 0.5f;
-            // The vertices of the mesh. They are organized so that the center of the mesh
-            // conforms to Unity's position of game objects.
-            Vector3[] vertices = {
-               /* 0 */ new Vector3(-extent, extent, -extent),        // front left upper corner
-               /* 1 */ new Vector3(-extent, -extent, -extent),       // front left lower corner
-               /* 2 */ new Vector3(extent, extent, -extent),         // front right upper corner
-               /* 3 */ new Vector3(extent, -extent, -extent),        // front right lower corner
 
-               /* 4 */ new Vector3(-extent, -extent, extent),        // back left lower corner
-               /* 5 */ new Vector3(extent, -extent, extent),         // back right lower corner
-               /* 6 */ new Vector3(-extent, extent, extent),         // back left upper corner
-               /* 7 */ new Vector3(extent, extent, extent),          // back right upper corner
+            const float l = -extent; // left
+            const float r =  extent; // right
+            const float f = -extent; // front
+            const float b =  extent; // back
+            const float d = -extent; // down
+            const float u =  extent; // up
 
-               /* 8 */ new Vector3(-extent, extent, -extent),        // front left upper corner = vertex 0
-               /* 9 */ new Vector3(extent, extent, -extent),         // front right upper corner = vertex 2
+            Vector3[] vertices = new Vector3[24]
+            {
+                // back rectangle
+                /*  0 */ new Vector3(r, d,  b),
+                /*  1 */ new Vector3(l, d,  b),
+                /*  2 */ new Vector3(r, u,  b),
+                /*  3 */ new Vector3(l, u,  b),
 
-               /* 1-extent */ new Vector3(-extent, extent, -extent), // front left upper corner = vertex 0
-               /* 11 */ new Vector3(-extent, extent, extent),        // back left upper corner = vertex 6
+                // front rectangle
+                /*  4 */ new Vector3(r, u, f),
+                /*  5 */ new Vector3(l, u, f),
+                /*  6 */ new Vector3(r, d, f),
+                /*  7 */ new Vector3(l, d, f),
 
-               /* 12 */ new Vector3(extent, extent, -extent),        // front right upper corner = vertex 2
-               /* 13 */ new Vector3(extent, extent, extent),         // back right upper corner = vertex 7
+                // top rectangle
+                /*  8 */ new Vector3(r, u, b),
+                /*  9 */ new Vector3(l, u, b),
+                /* 10 */ new Vector3(r, u, f),
+                /* 11 */ new Vector3(l, u, f),
+
+                // bottom rectangle
+                /* 12 */ new Vector3(r, d, f),
+                /* 13 */ new Vector3(r, d, b),
+                /* 14 */ new Vector3(l, d, b),
+                /* 15 */ new Vector3(l, d, f),
+
+                // left rectangle
+                /* 16 */ new Vector3(l, d, b),
+                /* 17 */ new Vector3(l, u, b),
+                /* 18 */ new Vector3(l, u, f),
+                /* 19 */ new Vector3(l, d, f),
+
+                // right rectangle
+                /* 20 */ new Vector3(r, d, f),
+                /* 21 */ new Vector3(r, u, f),
+                /* 22 */ new Vector3(r, u, b),
+                /* 23 */ new Vector3(r, d, b),
+            };
+
+            Vector3[] normals = new Vector3[24]
+            {
+                /*  0 */ new Vector3(0.0f, 0.0f, 1.0f),
+                /*  1 */ new Vector3(0.0f, 0.0f, 1.0f),
+                /*  2 */ new Vector3(0.0f, 0.0f, 1.0f),
+                /*  3 */ new Vector3(0.0f, 0.0f, 1.0f),
+
+                /*  4 */ new Vector3(0.0f, 0.0f, -1.0f),
+                /*  5 */ new Vector3(0.0f, 0.0f, -1.0f),
+                /*  6 */ new Vector3(0.0f, 0.0f, -1.0f),
+                /*  7 */ new Vector3(0.0f, 0.0f, -1.0f),
+
+                /*  8 */ new Vector3(0.0f, 1.0f, 0.0f),
+                /*  9 */ new Vector3(0.0f, 1.0f, 0.0f),
+                /* 10 */ new Vector3(0.0f, 1.0f, 0.0f),
+                /* 11 */ new Vector3(0.0f, 1.0f, 0.0f),
+
+                /* 12 */ new Vector3(0.0f, -1.0f, 0.0f),
+                /* 13 */ new Vector3(0.0f, -1.0f, 0.0f),
+                /* 14 */ new Vector3(0.0f, -1.0f, 0.0f),
+                /* 15 */ new Vector3(0.0f, -1.0f, 0.0f),
+
+                /* 16 */ new Vector3(-1.0f, 0.0f, 0.0f),
+                /* 17 */ new Vector3(-1.0f, 0.0f, 0.0f),
+                /* 18 */ new Vector3(-1.0f, 0.0f, 0.0f),
+                /* 19 */ new Vector3(-1.0f, 0.0f, 0.0f),
+
+                /* 20 */ new Vector3(1.0f, 0.0f, 0.0f),
+                /* 21 */ new Vector3(1.0f, 0.0f, 0.0f),
+                /* 22 */ new Vector3(1.0f, 0.0f, 0.0f),
+                /* 23 */ new Vector3(1.0f, 0.0f, 0.0f)
              };
 
             // The triangles forming the cube.
             // Unity3D uses clockwise winding order for determining front-facing triangles.
-            int[] triangles = {
-                // front rectangle
-                0, 2, 1,
-			    1, 2, 3,
+            int[] triangles =
+            {
                 // back rectangle
-                4, 5, 6,
-			    5, 7, 6,
+                /* 0 */ 0, /* 1 */ 2, /* 2 */ 3,
+                /* 3 */ 0, /* 4 */ 3, /* 5 */ 1,
+
                 // top rectangle
-                6, 7, 8,
-			    7, 9 ,8,
-                // bottom rectangle
-                1, 3, 4,
-			    3, 5, 4,
+                /* 6 */ 8, /* 7 */ 10, /* 8 */ 11,
+                /* 9 */ 8, /* 10 */ 11, /* 11 */ 9,
+
+                // front rectangle
+                /* 6 */ 4, /* 7 */ 6, /* 8 */ 7,
+                /* 9 */ 7, /* 10 */ 5, /* 11 */ 4,
+
+                /* 18 */ 12, /* 19 */ 13, /* 20 */ 14,
+                /* 21 */ 12, /* 22 */ 14, /* 23 */ 15,
+
                 // left rectangle
-                1, 11, 10,
-			    1, 4, 11,
-                // right rectangle
-                3, 12, 5,
-			    5, 12, 13
-             };
+                /* 24 */ 16, /* 25 */ 17, /* 26 */ 18,
+                /* 27 */ 16, /* 28 */ 18, /* 29 */ 19,
+
+                /* 30 */ 20, /* 31 */ 21, /* 32 */ 22,
+                /* 33 */ 20, /* 34 */ 22, /* 35 */ 23
+            };
 
             // A mesh stores the texture mapping data as UVs. These are basically
             // 2D fold-outs of the actual 3D Mesh, as if you peeled back the skin
@@ -103,32 +164,50 @@ namespace SEE.GO
             // The U co-ordinate relates to the width of the texture, the V co-ordinate to its height.
             // Unity stores UVs in 0-1 space. [0,0] represents the bottom-left corner of the texture,
             // and [1,1] represents the top-right.
-            Vector2[] uvs = {
-               new Vector2(0, 0.66f),
-               new Vector2(0.25f, 0.66f),
-               new Vector2(0, 0.33f),
-               new Vector2(0.25f, 0.33f),
+            Vector2[] uvs =
+            {
+                // back rectangle
+                /* 0 */ new Vector2(0.0f, 0.0f),
+                /* 1 */ new Vector2(1.0f, 0.0f),
+                /* 2 */ new Vector2(0.0f, 1.0f),
+                /* 3 */ new Vector2(1.0f, 1.0f),
 
-               new Vector2(0.5f, 0.66f),
-               new Vector2(0.5f, 0.33f),
-               new Vector2(0.75f, 0.66f),
-               new Vector2(0.75f, 0.33f),
+                // front rectangle
+                /* 4 */ new Vector2(1.0f, 1.0f),
+                /* 5 */ new Vector2(0.0f, 1.0f),
+                /* 6 */ new Vector2(1.0f, 0.0f),
+                /* 7 */ new Vector2(0.0f, 0.0f),
 
-               new Vector2(1, 0.66f),
-               new Vector2(1, 0.33f),
+                // top rectangle
+                /*  8 */ new Vector2(1.0f, 1.0f),
+                /*  9 */ new Vector2(0.0f, 1.0f),
+                /* 10 */ new Vector2(1.0f, 0.0f),
+                /* 11 */ new Vector2(0.0f, 0.0f),
 
-               new Vector2(0.25f, 1),
-               new Vector2(0.5f, 1),
+                // bottom rectangle
+                /* 12 */ new Vector2(0.0f, 0.0f),
+                /* 13 */ new Vector2(0.0f, 1.0f),
+                /* 14 */ new Vector2(1.0f, 1.0f),
+                /* 15 */ new Vector2(1.0f, 0.0f),
 
-               new Vector2(0.25f, 0),
-               new Vector2(0.5f, 0),
-             };
+                // left rectangle
+                /* 16 */ new Vector2(0.0f, 0.0f),
+                /* 17 */ new Vector2(0.0f, 1.0f),
+                /* 18 */ new Vector2(1.0f, 1.0f),
+                /* 19 */ new Vector2(1.0f, 0.0f),
 
-            modelMesh.vertices = vertices;
-            modelMesh.triangles = triangles;
+                // right rectangle
+                /* 20 */ new Vector2(0.0f, 0.0f),
+                /* 21 */ new Vector2(0.0f, 1.0f),
+                /* 22 */ new Vector2(1.0f, 1.0f),
+                /* 23 */ new Vector2(1.0f, 0.0f),
+            };
+
+            modelMesh.SetVertices(vertices);
+            modelMesh.SetNormals(normals);
+            modelMesh.SetIndices(triangles, MeshTopology.Triangles, 0);
             modelMesh.uv = uvs;
             modelMesh.Optimize();
-            modelMesh.RecalculateNormals();
 
             return modelMesh;
         }
