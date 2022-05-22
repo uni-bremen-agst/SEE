@@ -27,7 +27,7 @@ namespace SEE.GO
 
         // Normal materials
         public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
-        public const string TransparentMaterialName = "Materials/SEEMaterial";
+        public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
 
@@ -38,7 +38,7 @@ namespace SEE.GO
         /// <summary>
         /// The type of the shaders of this material instance.
         /// </summary>
-        public readonly ShaderType Type;
+        private readonly ShaderType shaderType;
 
         /// <summary>
         /// The number of different colors and, thus, the number of
@@ -80,7 +80,7 @@ namespace SEE.GO
         /// <param name="colorRange">the color range for the new materials</param>
         public Materials(ShaderType shaderType, ColorRange colorRange)
         {
-            Type = shaderType;
+            this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
             Lower = colorRange.lower;
@@ -146,7 +146,7 @@ namespace SEE.GO
                 // there are no materials for this renderQueueOffset; we need to create these first
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
-                    materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
+                    materials.Add(Init(shaderType, NumberOfMaterials, Lower, Higher, i));
                 }
             }
             return materials[renderQueueOffset][index];
@@ -181,7 +181,78 @@ namespace SEE.GO
                 renderQueue = prefab.renderQueue + renderQueueOffset,
                 color = color
             };
+
+            AddTexture(material);
             return material;
+        }
+
+        /// <summary>
+        /// Adds a texture to <paramref name="material"/>.
+        /// </summary>
+        /// <param name="material">material to which a texture should be added</param>
+        private static void AddTexture(Material material)
+        {
+            if (material.HasProperty("_Texture"))
+            {
+                if (false)
+                {
+                    material.SetTexture("_Texture", NewTexture());
+                }
+                else
+                {
+                    const string TextureName = "Textures/TestTexture";
+                    Texture texture = Resources.Load<Texture>(TextureName);
+                    if (texture == null)
+                    {
+                        Debug.LogError($"No such texture {TextureName}\n");
+                    }
+                    else
+                    {
+                        //Debug.Log($"_Texture: {texture.name}\n");
+                        material.SetTexture("_Texture", texture);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates and returns a new texture.
+        /// Note: This method is currently used only to demonstrate on how to
+        /// create a texture.
+        /// </summary>
+        /// <returns>a new texture</returns>
+        private static Texture NewTexture()
+        {
+            Texture2D result = new Texture2D(512, 512);
+
+            Color visible = new Color(1, 1, 1, 1);
+            Color invisible = new Color(0, 0, 0, 0);
+
+            for (int x = 0; x < result.width; x++)
+            {
+                for (int y = 0; y < result.height; y++)
+                {
+                    if (y % 5 == 0)
+                    {
+                        result.SetPixel(x, y, invisible);
+                    }
+                    else
+                    {
+                        result.SetPixel(x, y, visible);
+                    }
+                }
+            }
+            result.Apply();
+            // SaveTexture(result);
+            return result;
+
+            static void SaveTexture(Texture2D result)
+            {
+                byte[] bytes = result.EncodeToPNG();
+                string path = Application.dataPath + "/Resources/Textures/TestTexture.png";
+                System.IO.File.WriteAllBytes(path, bytes);
+                Debug.Log($"Texture written to {path}.\n");
+            }
         }
 
         /// <summary>
