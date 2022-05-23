@@ -91,6 +91,13 @@ namespace SEE.GO.Decorators
                 {
                     NodeFactory segmentFactory = metricToFactory[section.Metric];
 
+                    // The antenna should be drawn in front of the block, hence, its render
+                    // queue offset must be greater than the one of the block if the object
+                    // is rendered in range RenderQueue.Geometry or lesser if the object is
+                    // rendered in RenderQueue.Transparent (note: RenderQueue.Transparent is rendered
+                    // after Geometry and AlphaTest, in back-to-front order, while the other
+                    // ranges are drawn in front-to-back order.
+                    // FIXME: gameNode.GetRenderQueue() - (int)RenderQueue.Transparent assumes that gameNode is in range Transparent
                     GameObject segment = NewSegment(segmentFactory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
                     segment.name = section.Metric + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
