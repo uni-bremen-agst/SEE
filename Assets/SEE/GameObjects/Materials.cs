@@ -290,19 +290,5 @@ namespace SEE.GO
 
             return New(name, color, renderQueueOffset);
         }
-
-        /// <summary>
-        /// Creates and returns a new material of given <paramref name="shaderType"/> and
-        /// <paramref name="color"/>. This material will be unique and not reused by this
-        /// class!
-        /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the
-        /// material</param>
-        /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, int renderQueueOffset = 0)
-        {
-            return New(shaderType, Color.white, renderQueueOffset);
-        }
     }
 }

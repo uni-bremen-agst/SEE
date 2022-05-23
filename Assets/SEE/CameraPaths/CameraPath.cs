@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.CameraPaths
 {
     /// <summary>
-    /// Represents a camera path with position and rotation of the camera in a series of 
+    /// Represents a camera path with position and rotation of the camera in a series of
     /// points in time.
     /// </summary>
     public class CameraPath : IEnumerable
@@ -57,7 +57,7 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// This factor is one of the parameters for the size of the spheres we draw for
-        /// aggregegated locations in the path. 
+        /// aggregegated locations in the path.
         /// </summary>
         private const float timeFactor = 0.1f;
 
@@ -69,8 +69,8 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Operator[key] yielding the key'th entry in the path. The first
         /// entry has key = 0.
-        /// 
-        /// Precondition: 0 <= key < Count. 
+        ///
+        /// Precondition: 0 <= key < Count.
         /// </summary>
         /// <param name="key">the index of the path entry to be returned</param>
         /// <returns>key'th entry in the path</returns>
@@ -81,7 +81,7 @@ namespace SEE.CameraPaths
         }
 
         /// <summary>
-        /// Adds the data captured about a particular camera position and rotation in a path 
+        /// Adds the data captured about a particular camera position and rotation in a path
         /// at a given point in time.
         /// </summary>
         /// <param name="position">position of the camera</param>
@@ -95,7 +95,7 @@ namespace SEE.CameraPaths
         /// <summary>
         /// Saves the captured path data in a file with given filename. The file will
         /// be overwritten if it exists.
-        /// 
+        ///
         /// The file format is as follows. Each line has exactly minimalColumns entries
         /// seperated by the delimiter. The first three entries form the position
         /// vector, the second three entries the rotation in Euler angles, and the
@@ -125,7 +125,7 @@ namespace SEE.CameraPaths
         }
 
         /// <summary>
-        /// Converts a float value to a string with two digits and a period as a 
+        /// Converts a float value to a string with two digits and a period as a
         /// decimal separator.
         /// </summary>
         /// <param name="value">the value to be converted</param>
@@ -154,13 +154,13 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// Loads the path data from a the file.
-        /// 
+        ///
         /// Precondition: Each line in the file has at least minimalColumns entries
         /// seperated by the delimiter. The first three entries form the position
         /// vector, the second three entries the rotation in Euler angles, and the
-        /// the last entry contains the time. Each value must be a float. There 
+        /// the last entry contains the time. Each value must be a float. There
         /// may be additional columns, which are ignored.
-        /// 
+        ///
         /// May throw any exception that can be thrown by System.IO.File.ReadAllLines.
         /// </summary>
         /// <param name="filename">name of the file containing the path data</param>
@@ -208,7 +208,7 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// Returns an enumerator over all path data entries in the path.
-        /// 
+        ///
         /// Implements interface IEnumerable.
         /// </summary>
         /// <returns>an enumerator over all path data entries in the path</returns>
@@ -218,7 +218,7 @@ namespace SEE.CameraPaths
         }
 
         /// <summary>
-        /// Draws the path in the scene as a sequence of lines along the path locations. At each 
+        /// Draws the path in the scene as a sequence of lines along the path locations. At each
         /// recorded location, the lookout is visualized as a single line towards the direction
         /// of the lookout, whose length is proportional to the time the camera has looked into
         /// this direction. The whole path data is created as a single static root game object tagged
@@ -242,7 +242,7 @@ namespace SEE.CameraPaths
         /// Draws the lookouts along the path as a set of single lines nested within the given
         /// game object. The lookouts are determined through grouping path entries with similar
         /// position and rotation independent of the point in time. Each group is represented
-        /// as a single line starting at the position of the path group and directing into 
+        /// as a single line starting at the position of the path group and directing into
         /// the direction the camera has looked in this path group. The length of this line
         /// is proportional to the sum over all times of the elements of a path group.
         /// </summary>
@@ -273,7 +273,7 @@ namespace SEE.CameraPaths
                     sphere.transform.position = d.position;
                 }
                 */
-                // draw a line towards the look out whose length is proportional to the 
+                // draw a line towards the look out whose length is proportional to the
                 // time the camera has looked into this direction
                 {
                     GameObject direction = new GameObject("direction " + i.ToString());
@@ -292,7 +292,7 @@ namespace SEE.CameraPaths
                     // All path lines have the same material to reduce the number of drawing calls.
                     if (lookoutMaterial == null)
                     {
-                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine);
+                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
                     }
                     line.sharedMaterial = lookoutMaterial;
 
@@ -349,7 +349,7 @@ namespace SEE.CameraPaths
         /// by grouping path entries with similar location and lookout independent of
         /// their points in time. The resulting time is the sum of all times of the
         /// entries within the same group.
-        /// 
+        ///
         /// The order of the resulting aggregated path is arbitrary. It will not be consistent
         /// with the order of the given path.
         /// </summary>
@@ -414,7 +414,7 @@ namespace SEE.CameraPaths
             // corresponding co-ordinates similar enough.
             float allowedDifference = 0.05f;
             // We do not really care about the precise order as we use this order only
-            // for the aggregation. The main concern is that all path entries with 
+            // for the aggregation. The main concern is that all path entries with
             // similar position and rotation are neighbors in the resulting order.
             int positionCompareTo = CompareTo(x.position, y.position, allowedDifference);
             if (positionCompareTo != 0)
@@ -443,7 +443,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine);
+                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
             }
             line.sharedMaterial = pathMaterial;
 
