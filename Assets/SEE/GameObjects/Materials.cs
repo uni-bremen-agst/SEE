@@ -166,27 +166,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Creates and returns a new material. The material is loaded from a resource file with given <paramref name="name"/>.
-        /// </summary>
-        /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
-        /// <param name="color">the color of the new material</param>
-        /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
-        /// <returns>new material</returns>
-        public static Material New(string name, Color color, int renderQueueOffset = 0)
-        {
-            Material prefab = Resources.Load<Material>(name);
-            Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
-            Material material = new Material(prefab)
-            {
-                renderQueue = prefab.renderQueue + renderQueueOffset,
-                color = color
-            };
-
-            AddTexture(material);
-            return material;
-        }
-
-        /// <summary>
         /// Adds a texture to <paramref name="material"/>.
         /// </summary>
         /// <param name="material">material to which a texture should be added</param>
@@ -253,6 +232,27 @@ namespace SEE.GO
                 System.IO.File.WriteAllBytes(path, bytes);
                 Debug.Log($"Texture written to {path}.\n");
             }
+        }
+
+        /// <summary>
+        /// Creates and returns a new material. The material is loaded from a resource file with given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
+        /// <param name="color">the color of the new material</param>
+        /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
+        /// <returns>new material</returns>
+        private static Material New(string name, Color color, int renderQueueOffset)
+        {
+            Material prefab = Resources.Load<Material>(name);
+            Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
+            Material material = new Material(prefab)
+            {
+                renderQueue = prefab.renderQueue + renderQueueOffset,
+                color = color
+            };
+
+            AddTexture(material);
+            return material;
         }
 
         /// <summary>
