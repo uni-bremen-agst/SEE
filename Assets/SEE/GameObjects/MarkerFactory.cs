@@ -122,14 +122,7 @@ namespace SEE.GO
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
-            // The marker should be drawn in front of the block, hence, its render
-            // queue offset must be greater than the one of the block if the object
-            // is rendered in range RenderQueue.Geometry or lesser if the object is
-            // rendered in RenderQueue.Transparent (note: RenderQueue.Transparent is rendered
-            // after Geometry and AlphaTest, in back-to-front order, while the other
-            // ranges are drawn in front-to-back order.
-            // FIXME: gameNode.GetRenderQueue() - (int)RenderQueue.Transparent assumes that gameNode is in range Transparent
-            GameObject beamMarker = NewBeam(factory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
+            GameObject beamMarker = NewBeam(factory, Materials.RenderLater(gameNode));
             beamMarker.tag = Tags.Decoration;
             beamMarker.SetScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);

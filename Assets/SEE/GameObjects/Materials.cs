@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Rendering;
 
 namespace SEE.GO
 {
@@ -25,15 +26,68 @@ namespace SEE.GO
             Invisible        // the object will be invisible
         }
 
-        // Normal materials
-        public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
-        public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
-        public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
-        public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
+        /// <summary>
+        /// Returns the render queue offset to be added if an object is to be rendered earlier.
+        /// Note: Objects in RenderQueue.Geometry (Opaque) are drawn in front-to-back order
+        /// while objects in RenderQueue.Transparent are drawn in back-to-front order.
+        /// For transparent shaders, 1 is returned. For opaque shaders, -1 is returned.
+        /// </summary>
+        /// <param name="shaderType">shader to be used for rendering</param>
+        /// <returns>render queue offset</returns>
+        internal static int RenderEarlierOffset(ShaderType shaderType)
+        {
+            return - RenderLaterOffset(shaderType);
+        }
 
-        // Special materials
-        public const string TransparentMeshParticleSystemMaterialName = "Materials/TransparentMeshParticleMaterial";
-        public const string MeshParticleSystemMaterialName = "Materials/MeshParticleMaterial";
+        /// <summary>
+        /// Returns the render queue offset to be added if an object is to be rendered later.
+        /// Note: Objects in RenderQueue.Geometry (Opaque) are drawn in front-to-back order
+        /// while objects in RenderQueue.Transparent are drawn in back-to-front order.
+        /// For transparent shaders, -1 is returned. For opaque shaders, 1 is returned.
+        /// </summary>
+        /// <param name="shaderType">shader to be used for rendering</param>
+        /// <returns>render queue offset</returns>
+        internal static int RenderLaterOffset(ShaderType shaderType)
+        {
+            return shaderType switch
+            {
+                ShaderType.Opaque => 1,           // front-to-back
+                ShaderType.Transparent => -1,     // back-to-front
+                ShaderType.TransparentLine => -1, // back-to-front
+                ShaderType.Invisible => -1,       // back-to-front
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        /// <summary>
+        /// Returns the render queue position that is renderer later than the index
+        /// of <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">game object to be drawn just before the resulting render queue index</param>
+        /// <returns>render queue index later than the index of <paramref name="gameNode"/></returns>
+        internal static int RenderLater(GameObject gameNode)
+        {
+            int offset = gameNode.GetRenderQueue();
+            // For queues with an index up to and including 2500 (Geometry + 500),
+            // Unity sorts Renderers in these queues using the behavior defined in
+            // OpaqueSortMode.FrontToBack by default.
+            // For queues with an index of 2501 or above, Unity sorts Renderers in
+            // these queues using the behavior defined in TransparencySortMode.Default
+            // by default, which is back-to-front.
+            return (offset <= (int)RenderQueue.Geometry + 500) ?
+                offset + 1 : offset - 1;
+        }
+
+        // Normal materials
+        private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        private const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
+        private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        private const string InvisibleMaterialName = "Materials/InvisibleMaterial";
+
+        /// <summary>
+        /// The name of the shader property for the texture.
+        /// </summary>
+        private const string TexturePropertyName = "_Texture";
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -49,12 +103,17 @@ namespace SEE.GO
         /// <summary>
         /// The color at the lower end of the color spectrum.
         /// </summary>
-        public readonly Color Lower;
+        private readonly Color lowerColor;
 
         /// <summary>
         /// The color at the higher end of the color spectrum.
         /// </summary>
-        public readonly Color Higher;
+        private readonly Color higherColor;
+
+        /// <summary>
+        /// Texture to be added to the material; can be null in which case no texture is added.
+        /// </summary>
+        private readonly Texture texture;
 
         /// <summary>
         /// The different materials. They depend upon two aspects:
@@ -78,15 +137,17 @@ namespace SEE.GO
         /// </summary>
         /// <param name="shaderType">shader type to be used to draw the new materials</param>
         /// <param name="colorRange">the color range for the new materials</param>
-        public Materials(ShaderType shaderType, ColorRange colorRange)
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
+        public Materials(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
         {
             this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
-            Lower = colorRange.lower;
-            Higher = colorRange.upper;
+            lowerColor = colorRange.lower;
+            higherColor = colorRange.upper;
+            this.texture = texture;
             // materials[0] is set up with the given colorRange for the render-queue offset 0.
-            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
+            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, texture, 0) };
         }
 
         /// <summary>
@@ -98,14 +159,15 @@ namespace SEE.GO
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
         /// <param name="lower">the color at the lower end of the color spectrum</param>
         /// <param name="higher">the color at the higher end of the color spectrum</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>materials</returns>
-        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
+        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, Texture texture, int renderQueueOffset)
         {
             Material[] result = new Material[numberOfColors];
             if (numberOfColors == 1)
             {
-                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), renderQueueOffset);
+                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), texture, renderQueueOffset);
             }
             else
             {
@@ -113,7 +175,7 @@ namespace SEE.GO
                 for (int i = 0; i < result.Length; i++)
                 {
                     Color color = Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1));
-                    result[i] = New(shaderType, color, renderQueueOffset);
+                    result[i] = New(shaderType, color, texture, renderQueueOffset);
                 }
             }
             return result;
@@ -146,7 +208,7 @@ namespace SEE.GO
                 // there are no materials for this renderQueueOffset; we need to create these first
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
-                    materials.Add(Init(shaderType, NumberOfMaterials, Lower, Higher, i));
+                    materials.Add(Init(shaderType, NumberOfMaterials, lowerColor, higherColor, texture, i));
                 }
             }
             return materials[renderQueueOffset][index];
@@ -171,11 +233,11 @@ namespace SEE.GO
         /// <param name="material">material to which a texture should be added</param>
         private static void AddTexture(Material material)
         {
-            if (material.HasProperty("_Texture"))
+            if (material.HasProperty(TexturePropertyName))
             {
                 if (false)
                 {
-                    material.SetTexture("_Texture", NewTexture());
+                    material.SetTexture(TexturePropertyName, NewTexture());
                 }
                 else
                 {
@@ -188,9 +250,24 @@ namespace SEE.GO
                     else
                     {
                         //Debug.Log($"_Texture: {texture.name}\n");
-                        material.SetTexture("_Texture", texture);
+                        material.SetTexture(TexturePropertyName, texture);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Adds <paramref name="texture"/> to <paramref name="material"/> as <see cref="TexturePropertyName"/>
+        /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
+        /// is null, nothing happens.
+        /// </summary>
+        /// <param name="material">material to which a texture should be added</param>
+        /// <param name="texture">texture to be added; can be null</param>
+        private static void AddTexture(Material material, Texture texture)
+        {
+            if (texture != null && material.HasProperty(TexturePropertyName))
+            {
+                material.SetTexture(TexturePropertyName, texture);
             }
         }
 
@@ -239,9 +316,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
         /// <param name="color">the color of the new material</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
         /// <returns>new material</returns>
-        private static Material New(string name, Color color, int renderQueueOffset)
+        private static Material New(string name, Color color, Texture texture, int renderQueueOffset)
         {
             Material prefab = Resources.Load<Material>(name);
             Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
@@ -251,7 +329,7 @@ namespace SEE.GO
                 color = color
             };
 
-            AddTexture(material);
+            AddTexture(material, texture);
             return material;
         }
 
@@ -263,9 +341,10 @@ namespace SEE.GO
         /// <param name="shaderType">the type of the shader to be used to create the
         /// material</param>
         /// <param name="color">requested color of the new material</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0)
+        public static Material New(ShaderType shaderType, Color color, Texture texture = null, int renderQueueOffset = 0)
         {
             string name = null;
 
@@ -288,7 +367,7 @@ namespace SEE.GO
                     break;
             }
 
-            return New(name, color, renderQueueOffset);
+            return New(name, color, texture, renderQueueOffset);
         }
     }
 }
