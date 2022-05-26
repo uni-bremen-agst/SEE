@@ -305,6 +305,11 @@ namespace SEE.Game.City
         {
             if (edgeEvent.Change == ChangeType.Addition)
             {
+                if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
+                {
+                    // Maps-To edges must not be drawn, as we will visualize mappings differently.
+                    edgeEvent.Edge.SetToggle(Edge.IsVirtualToggle);
+                }
                 // FIXME: Handle edge addition based on subgraph type, handle MapsTo specially
             }
 
