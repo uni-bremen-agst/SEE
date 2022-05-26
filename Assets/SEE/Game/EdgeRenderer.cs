@@ -282,6 +282,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
+        /// Note that this will skip "virtual" edges, i.e., edges which exist in the underlying graph
+        /// but which shall not be layouted or drawn.
         /// </summary>
         /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
         /// <returns>list of layout edges</returns>
@@ -295,7 +297,7 @@ namespace SEE.Game
             {
                 Node sourceNode = source.ItsNode;
 
-                foreach (Edge edge in sourceNode.Outgoings)
+                foreach (Edge edge in sourceNode.Outgoings.Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                 {
                     Node target = edge.Target;
                     edges.Add(new LayoutGraphEdge<T>(source, map[target], edge));
