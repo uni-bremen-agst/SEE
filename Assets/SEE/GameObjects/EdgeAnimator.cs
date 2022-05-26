@@ -45,6 +45,12 @@ namespace SEE.GO
         /// evaluation step (the part carried out by this function).
         /// </remarks>
         public Action<float> Evaluator;
+        
+        /// <summary>
+        /// Callback which will be triggered when the animation controlled by this
+        /// <see cref="EdgeAnimator"/> has finished playing.
+        /// </summary>
+        public Action OnAnimationFinish;
 
         /// <summary>
         /// The time parameter passed to <see cref="IEvaluator.Eval(float)"/>.
@@ -102,6 +108,7 @@ namespace SEE.GO
                 time = 1; // Fast-forward to end.
                 Evaluator(time);
                 active = false;
+                OnAnimationFinish?.Invoke();
             }
         }
 
