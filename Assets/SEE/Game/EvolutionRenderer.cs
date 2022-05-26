@@ -604,7 +604,7 @@ namespace SEE.Game
                             if (!edgeObject.TryGetComponent(out EdgeAnimator animator))
                             {
                                 animator = edgeObject.AddComponent<EdgeAnimator>();
-                                animator.Evaluator = morphism;
+                                animator.Evaluator = t => morphism.Morph(t);
                             }
                             edgeAnimators[edge.Source] = animator;
                         }

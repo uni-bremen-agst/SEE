@@ -29,30 +29,22 @@ namespace SEE.GO
     public class EdgeAnimator : SerializedMonoBehaviour
     {
         /// <summary>
-        /// This interface serves as an abstraction layer to decouple the
-        /// evaluation process of edge animation (the part carried out by
-        /// <see cref="EdgeAnimator"/>) from the implementation of a single
-        /// evaluation step (the part carried out by implementors of this
-        /// interface).
-        /// </summary>
-        public interface IEvaluator
-        {
-            /// <summary>
-            /// Evaluate the edge animation at time parameter
-            /// <paramref name="t"/>. The domain of <paramref name="t"/> is
-            /// [0, 1] where 0 evaluates to the start of the animation and 1
-            /// to the end. It is not necessary for the animation to be linear
-            /// to the domain of <paramref name="t"/>.
-            /// </summary>
-            /// <param name="t">Time parameter with domain [0, 1]</param>
-            public void Eval(float t);
-        }
-
-        /// <summary>
-        /// Evaluator to be processed in <see cref="Update"/> when
+        /// Evaluates the edge animation at given time parameter t.
+        /// The domain of t is [0, 1] where 0 evaluates to the
+        /// start of the animation and 1 to the end.
+        /// It is not necessary for the animation to be linear
+        /// to the domain of t.
+        ///
+        /// This function will be processed in <see cref="Update"/> when
         /// <see cref="DoAnimation(float)"/> is called.
         /// </summary>
-        public IEvaluator Evaluator;
+        /// <remarks>
+        /// This serves as an abstraction layer to decouple the
+        /// evaluation process of edge animation (the part carried out by
+        /// <see cref="EdgeAnimator"/>) from the implementation of a single
+        /// evaluation step (the part carried out by this function).
+        /// </remarks>
+        public Action<float> Evaluator;
 
         /// <summary>
         /// The time parameter passed to <see cref="IEvaluator.Eval(float)"/>.
@@ -108,7 +100,7 @@ namespace SEE.GO
             if (active)
             {
                 time = 1; // Fast-forward to end.
-                Evaluator.Eval(time);
+                Evaluator(time);
                 active = false;
             }
         }
@@ -133,7 +125,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    Evaluator.Eval(time);
+                    Evaluator(time);
                 }
             }
         }

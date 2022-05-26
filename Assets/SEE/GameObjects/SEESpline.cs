@@ -473,21 +473,19 @@ namespace SEE.GO
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
     ///
-    /// By implementing the <see cref="EdgeAnimator.IEvaluator"/> interface,
-    /// spline morphisms can used by <see cref="EdgeAnimator"/> to run linear
+    /// Spline morphisms can be used by <see cref="EdgeAnimator"/> to run linear
     /// edge animations.
     /// </summary>
-    public class SplineMorphism :
-        SerializedMonoBehaviour, EdgeAnimator.IEvaluator
+    public class SplineMorphism : SerializedMonoBehaviour
     {
         /// <summary>
         /// Origin of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline source;
+        private BSpline Source;
 
         /// <summary>
-        /// Serializable representation of <see cref="source"/>.
+        /// Serializable representation of <see cref="Source"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSource;
@@ -496,10 +494,10 @@ namespace SEE.GO
         /// Target of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline target;
+        private BSpline Target;
 
         /// <summary>
-        /// Serializable representation of <see cref="target"/>.
+        /// Serializable representation of <see cref="Target"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableTarget;
@@ -520,8 +518,8 @@ namespace SEE.GO
         /// <param name="target">Target of the spline morphism</param>
         public void Init(BSpline source, BSpline target)
         {
-            this.source = source;
-            this.target = target;
+            Source = source;
+            Target = target;
             morphism = source.MorphTo(target);
             Morph(0); // Morph to source.
         }
@@ -540,7 +538,7 @@ namespace SEE.GO
         /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Morph(double time)
         {
-            if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
+            if (gameObject.TryGetComponent(out SEESpline spline))
             {
                 spline.Spline = morphism.Eval(time);
             }
@@ -552,28 +550,19 @@ namespace SEE.GO
             return new BSpline(spline.Spline);
         }
 
-        /// <summary>
-        /// Implementation of <see cref="IEvaluator"/> interface.
-        /// </summary>
-        /// <param name="time">time in seconds</param>
-        public void Eval(float time)
-        {
-            Morph(time);
-        }
-
         protected override void OnBeforeSerialize()
         {
             base.OnBeforeSerialize();
-            serializableSource = TinySplineInterop.Serialize(source);
-            serializableTarget = TinySplineInterop.Serialize(target);
+            serializableSource = TinySplineInterop.Serialize(Source);
+            serializableTarget = TinySplineInterop.Serialize(Target);
         }
 
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            source = TinySplineInterop.Deserialize(serializableSource);
-            target = TinySplineInterop.Deserialize(serializableTarget);
-            morphism = source.MorphTo(target);
+            Source = TinySplineInterop.Deserialize(serializableSource);
+            Target = TinySplineInterop.Deserialize(serializableTarget);
+            morphism = Source.MorphTo(Target);
         }
     }
 }
