@@ -94,9 +94,11 @@ namespace SEE.Game
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
+        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
+        /// instead of creating a new one</param>
         /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType)
+        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType, Edge existingEdge = null)
         {
             Node fromNode = from.GetNode();
             if (fromNode == null)
@@ -115,13 +117,15 @@ namespace SEE.Game
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
-            // Creating the edge in the underlying graph
-            Edge edge = new Edge(fromNode, toNode, edgeType);
+            Edge edge = existingEdge;
+            if (edge == null)
+            {
+                // Creating the edge in the underlying graph
+                edge = new Edge(fromNode, toNode, edgeType);
+                fromNode.ItsGraph.AddEdge(edge);
+            }
 
-            Graph graph = fromNode.ItsGraph;
-            graph.AddEdge(edge);
-
-            return DrawEdge(edge);
+            return DrawEdge(edge, from, to);
         }
 
         /// <summary>
