@@ -1,11 +1,15 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using System.Linq;
+using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Utils.Raycasting;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
+using Object = UnityEngine.Object;
 
 namespace SEE.Game
 {
@@ -78,17 +82,57 @@ namespace SEE.Game
                     // TODO: Make sure this action is still reversible
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
-                    Reflexion analysis = newGameParent.ContainingCity<SEEReflexionCity>().Analysis;
+                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
                     analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
-                    
+
                     // Move implementation node to architecture node, sizing it down accordingly.
-                    // TODO: Size it down accordingly
                     // TODO: Handle children as well, if that's necessary?
                     Vector3 newPosition = newGameParent.transform.position;
                     movingObject.transform.position = newPosition;
                     PutOn(movingObject.transform, newGameParent);
+                    // Mapped node should be half its parent's size
+                    movingObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                    // Recalculate edge layout and animate edges due to new node positioning.
+                    // TODO: Iterating over all game edges is currently very costly,
+                    //       consider adding a cached mapping either here or in SceneQueries.
+                    //       Alternatively, we can iterate over game edges instead.
+                    foreach (Edge edge in movingNode.Incomings.Union(movingNode.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                    {
+                        Debug.Log($"Moving edge {edge.ToShortString()}.\n");
+                        GameObject gameEdge = GameObject.Find(edge.ID);
+                        Assert.IsNotNull(gameEdge);
+                        GameObject source = edge.Source == movingNode ? movingObject : edge.Source.RetrieveGameNode();
+                        GameObject target = edge.Target == movingNode ? movingObject : edge.Target.RetrieveGameNode();
+                        GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
+                        if (newEdge.TryGetComponentOrLog(out SEESpline splineTarget) 
+                            && gameEdge.TryGetComponentOrLog(out SEESpline splineSource))
+                        {
+                            // We deactivate the target edge first so it's not visible.
+                            newEdge.SetActive(false);
+                            // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
+                            EdgeAnimator animator = splineSource.gameObject.AddComponent<EdgeAnimator>();
+                            SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
+                            animator.Evaluator = f => morphism.Morph(easeInOutExpo(f));
+                            animator.OnAnimationFinish = () => Object.Destroy(newEdge);
+                            morphism.Init(splineSource.Spline, splineTarget.Spline);
+                            animator.DoAnimation(1f);
+                        }
+                    }
+
                     return newGameParent;
 
+                    // Taken from https://easings.net/#easeInOutExpo
+                    float easeInOutExpo(float x)
+                    {
+                        return (float)
+                            (x == 0 ? 0 : Mathf.Approximately(x, 1)
+                                ? 1
+                                : x < 0.5
+                                    ? Math.Pow(2, 20 * x - 10) / 2
+                                    : (2 - Math.Pow(2, -20 * x + 10)) / 2);
+                    }
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
@@ -148,9 +192,9 @@ namespace SEE.Game
             // FIXME: child may not actually fit into parent, in which case we should downscale it until it fits
             Vector3 childCenter = child.position;
             float parentRoof = parent.GetRoof();
-            childCenter.y = parentRoof;// + child.lossyScale.y / 2;
+            childCenter.y = parentRoof; // + child.lossyScale.y / 2;
             child.position = childCenter;
-            //child.SetParent(parent.transform);
+            child.SetParent(parent.transform);
         }
 
         /// <summary>
