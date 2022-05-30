@@ -348,7 +348,7 @@ namespace SEE.Game.City
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        public void DrawGraph()
+        public virtual void DrawGraph()
         {
             if (loadedGraph == null)
             {

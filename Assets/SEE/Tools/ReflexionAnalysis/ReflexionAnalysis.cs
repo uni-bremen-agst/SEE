@@ -740,6 +740,9 @@ namespace SEE.Tools.ReflexionAnalysis
                 AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
                 AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 AddSubtreeToImplicitMap(source, target);
+                
+                // We'll now also notify our observer's that a "new" mapping edge exists.
+                Notify(new EdgeEvent(mapsTo, ChangeType.Addition, Mapping));
             }
         }
 
