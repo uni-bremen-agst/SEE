@@ -86,53 +86,8 @@ namespace SEE.Game
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
 
-                    // Move implementation node to architecture node, sizing it down accordingly.
-                    // TODO: Handle children as well, if that's necessary?
-                    Vector3 newPosition = newGameParent.transform.position;
-                    movingObject.transform.position = newPosition;
-                    PutOn(movingObject.transform, newGameParent);
-                    // Mapped node should be half its parent's size
-                    movingObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-                    // Recalculate edge layout and animate edges due to new node positioning.
-                    // TODO: Iterating over all game edges is currently very costly,
-                    //       consider adding a cached mapping either here or in SceneQueries.
-                    //       Alternatively, we can iterate over game edges instead.
-                    foreach (Edge edge in movingNode.Incomings.Union(movingNode.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
-                    {
-                        Debug.Log($"Moving edge {edge.ToShortString()}.\n");
-                        GameObject gameEdge = GameObject.Find(edge.ID);
-                        Assert.IsNotNull(gameEdge);
-                        GameObject source = edge.Source == movingNode ? movingObject : edge.Source.RetrieveGameNode();
-                        GameObject target = edge.Target == movingNode ? movingObject : edge.Target.RetrieveGameNode();
-                        GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
-                        if (newEdge.TryGetComponentOrLog(out SEESpline splineTarget) 
-                            && gameEdge.TryGetComponentOrLog(out SEESpline splineSource))
-                        {
-                            // We deactivate the target edge first so it's not visible.
-                            newEdge.SetActive(false);
-                            // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
-                            EdgeAnimator animator = splineSource.gameObject.AddComponent<EdgeAnimator>();
-                            SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                            animator.Evaluator = f => morphism.Morph(easeInOutExpo(f));
-                            animator.OnAnimationFinish = () => Object.Destroy(newEdge);
-                            morphism.Init(splineSource.Spline, splineTarget.Spline);
-                            animator.DoAnimation(1f);
-                        }
-                    }
 
                     return newGameParent;
-
-                    // Taken from https://easings.net/#easeInOutExpo
-                    float easeInOutExpo(float x)
-                    {
-                        return (float)
-                            (x == 0 ? 0 : Mathf.Approximately(x, 1)
-                                ? 1
-                                : x < 0.5
-                                    ? Math.Pow(2, 20 * x - 10) / 2
-                                    : (2 - Math.Pow(2, -20 * x + 10)) / 2);
-                    }
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
@@ -184,10 +139,10 @@ namespace SEE.Game
 
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="child">child</param>
-        /// <param name="parent">parent</param>
-        private static void PutOn(Transform child, GameObject parent)
+        /// </summary>j
+        /// <param name="child">child to be put on <paramref name="parent"/></param>
+        /// <param name="parent">parent the <paramref name="child"/> is put on</param>
+        public static void PutOn(Transform child, GameObject parent)
         {
             // FIXME: child may not actually fit into parent, in which case we should downscale it until it fits
             Vector3 childCenter = child.position;

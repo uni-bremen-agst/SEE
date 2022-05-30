@@ -198,7 +198,7 @@ namespace SEE.Controls.Actions
         /// the appropriate handling function.
         /// </summary>
         /// <param name="changeEvent">additional information about the change in the reflexion model</param>
-        public void NewChange(ChangeEvent changeEvent)
+        public void HandleChange(ChangeEvent changeEvent)
         {
             switch (changeEvent)
             {
