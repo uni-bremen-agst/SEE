@@ -263,8 +263,9 @@ namespace SEE.Game.City
         private static (Color, Color) GetEdgeGradient(State state) =>
             state switch
             {
+                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, 0.9f)),
                 State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
-                State.Undefined => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
+                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
                 State.ImplicitlyAllowed => (Color.green, Color.white),
                 State.AllowedAbsent => (Color.green, Color.white),
                 State.Allowed => (Color.green, Color.white),

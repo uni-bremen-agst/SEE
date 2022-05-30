@@ -2,6 +2,8 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
+using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
 using UnityEngine;
 
@@ -207,6 +209,10 @@ namespace SEE.GO
         {
             if (needsUpdate)
             {
+                if (gameObject.TryGetEdge(out Edge edge) && edge.IsInArchitecture())
+                {
+                    Debug.Log($"Coloring edge {edge.ToShortString()}.\n");
+                }
                 UpdateLineRenderer();
                 UpdateMesh();
                 needsUpdate = false;
