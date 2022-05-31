@@ -6,7 +6,6 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace SEE.GO.Decorators
 {
@@ -90,7 +89,7 @@ namespace SEE.GO.Decorators
                 if (node.TryGetNumeric(section.Metric, out float sectionMetric) && sectionMetric > 0)
                 {
                     NodeFactory segmentFactory = metricToFactory[section.Metric];
-                    GameObject segment = NewSegment(segmentFactory, Materials.RenderLater(gameNode));
+                    GameObject segment = NewSegment(segmentFactory, gameNode.RenderLater());
                     segment.name = section.Metric + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 
