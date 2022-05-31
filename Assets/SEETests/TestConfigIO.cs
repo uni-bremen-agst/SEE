@@ -791,7 +791,6 @@ namespace SEE.Utils
             city.InnerNodeSettings.ColorMetric = "X";
             city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             city.InnerNodeSettings.ShowNames = true;
-            city.InnerNodeSettings.InnerDonutMetric = "X";
             city.InnerNodeSettings.OutlineWidth = 99999;
             WipeOutAntennaSettings(ref city.InnerNodeSettings.AntennaSettings);
             WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
@@ -804,7 +803,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
             Assert.AreEqual(expected.ColorRange, actual.ColorRange);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
-            Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);

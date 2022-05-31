@@ -166,8 +166,6 @@ namespace SEE.Net
             StyleIssue_SUM = city.ErosionSettings.StyleIssue_SUM;
             UniversalIssue_SUM = city.ErosionSettings.UniversalIssue_SUM;
 
-            InnerDonutMetric = city.InnerNodeSettings.InnerDonutMetric;
-
             //InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
 
             MinimalBlockLength = city.LeafNodeSettings.MinimalBlockLength;
@@ -299,8 +297,6 @@ namespace SEE.Net
             city.ErosionSettings.MetricIssue_SUM = MetricIssue_SUM;
             city.ErosionSettings.StyleIssue_SUM = StyleIssue_SUM;
             city.ErosionSettings.UniversalIssue_SUM = UniversalIssue_SUM;
-
-            city.InnerNodeSettings.InnerDonutMetric = InnerDonutMetric;
 
             //city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
 
