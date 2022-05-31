@@ -10,28 +10,31 @@ namespace SEE.GO
     /// </summary>
     internal static class PlaneFactory
     {
+        /// <summary>
+        /// The id of this shader property.
+        /// </summary>
         private static readonly int SpecularHighlights = Shader.PropertyToID("_SpecularHighlights");
+
+        /// <summary>
+        /// The divisor to transform a scale unit of PrimitiveType.Plane into a Unity unit.
+        /// </summary>
         private const float planeMeshFactor = 10.0f;
 
         /// <summary>
         /// Returns a newly created plane at centerPosition with given color, width, depth, and height.
         /// </summary>
-        /// <param name="shader">the shader to draw the plane</param>
         /// <param name="centerPosition">center position of the plane</param>
-        /// <param name="color">color of the plane</param>
         /// <param name="width">width of the plane (x axis)</param>
         /// <param name="depth">depth of the plane (z axis)</param>
         /// <param name="height">height of the plane (y axis)</param>
         /// <returns>new plane</returns>
-        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector3 centerPosition, Color color,
-                                          float width, float depth, float height = 1.0f)
+        public static GameObject NewPlane(Vector3 centerPosition, float width, float depth, float height = 1.0f)
         {
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.tag = Tags.Decoration;
             plane.transform.position = centerPosition;
 
             Renderer planeRenderer = plane.GetComponent<Renderer>();
-            planeRenderer.sharedMaterial = Materials.New(shaderType, color, renderQueueOffset: Materials.RenderEarlierOffset(shaderType));
 
             // Neither casting nor receiving shadows.
             planeRenderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -72,15 +75,15 @@ namespace SEE.GO
         ///    defines the lower end along the y axis</param>
         /// <param name="color">color of the plane</param>
         /// <param name="height">height (thickness) of the plane</param>
-        public static GameObject NewPlane(Materials.ShaderType shaderType, Vector2 leftFrontCorner,
-                                          Vector2 rightBackCorner, float groundLevel, Color color,
+        public static GameObject NewPlane(Vector2 leftFrontCorner,
+                                          Vector2 rightBackCorner, float groundLevel,
                                           float height = 2 * float.Epsilon)
         {
             float width = Distance(leftFrontCorner.x, rightBackCorner.x);
             float depth = Distance(leftFrontCorner.y, rightBackCorner.y);
 
             Vector3 centerPosition = new Vector3(leftFrontCorner.x + width / 2.0f, groundLevel + height / 2.0f, leftFrontCorner.y + depth / 2.0f);
-            return NewPlane(shaderType, centerPosition, color, width, depth, height);
+            return NewPlane(centerPosition, width, depth, height);
         }
 
         /// <summary>
