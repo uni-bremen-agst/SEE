@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
 
@@ -40,7 +41,7 @@ namespace SEE.Game.City
             SolutionPath.Save(writer, SolutionPathLabel);
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
-            writer.Save(SelectedNodeTypes, SelectedNodeTypesLabel);
+            SaveSelectedNodeTypes(writer, SelectedNodeTypes, SelectedNodeTypesLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
             LeafNodeSettings.Save(writer, LeafNodeAttributesLabel);
@@ -50,6 +51,25 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, EdgeSelectionLabel);
             CoseGraphSettings.Save(writer, CoseGraphSettingsLabel);
+        }
+
+        /// <summary>
+        /// Saves all <paramref name="selectedNodeTypes"/> with label <paramref name="selectedNodeTypesLabel"/>
+        /// using <paramref name="writer"/> as a list.
+        /// </summary>
+        /// <param name="writer">writer for the configuration file</param>
+        /// <param name="selectedNodeTypes">node types to be saved</param>
+        /// <param name="selectedNodeTypesLabel">label for <paramref name="selectedNodeTypes"/> in the configuration file</param>
+        private static void SaveSelectedNodeTypes(ConfigWriter writer,
+                                                  Dictionary<string, VisualNodeAttributes> selectedNodeTypes,
+                                                  string selectedNodeTypesLabel)
+        {
+            writer.BeginList(selectedNodeTypesLabel);
+            foreach (var entry in selectedNodeTypes)
+            {
+                entry.Value.Save(writer, "");
+            }
+            writer.EndList();
         }
 
         /// <summary>
@@ -63,7 +83,7 @@ namespace SEE.Game.City
             SolutionPath.Restore(attributes, SolutionPathLabel);
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
-            ConfigIO.Restore(attributes, SelectedNodeTypesLabel, ref SelectedNodeTypes);
+            RestoreSelectedNodeTypes(attributes, SelectedNodeTypesLabel, ref SelectedNodeTypes);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
             LeafNodeSettings.Restore(attributes, LeafNodeAttributesLabel);
@@ -73,6 +93,44 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, EdgeSelectionLabel);
             CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
+        }
+
+        /// <summary>
+        /// Restores <paramref name="selectedNodeTypes"/> from <paramref name="attributes"/> under
+        /// the label <paramref name="selectedNodeTypesLabel"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
+        /// <param name="selectedNodeTypesLabel">label for <paramref name="selectedNodeTypes"/> in <paramref name="attributes"/></param>
+        /// <param name="selectedNodeTypes">dictionary in which to restore the node types (key is the node type name, value
+        /// the restored <see cref="VisualNodeAttributes"/></param>
+        private void RestoreSelectedNodeTypes(Dictionary<string, object> attributes,
+                                              string selectedNodeTypesLabel,
+                                              ref Dictionary<string, VisualNodeAttributes> selectedNodeTypes)
+        {
+            if (attributes.TryGetValue(selectedNodeTypesLabel, out object aList))
+            {
+                /// The <see cref="VisualNodeAttributes"/> are stored as a list; <see cref="SaveSelectedNodeTypes"/>
+                List<object> list = aList as List<object>;
+                if (list == null)
+                {
+                    throw new Exception($"Attribute {selectedNodeTypesLabel} is not a list.");
+                }
+                /// Each element in that list is a dictionary having the attributes of <see cref="VisualNodeAttributes"/>
+                /// as a key-value pair.
+                foreach (object entry in list)
+                {
+                    // The dictionary holding the attributes of LeafNodeAttributes in its key-value pairs.
+                    Dictionary<string, object> value = entry as Dictionary<string, object>;
+                    if (value == null)
+                    {
+                        throw new Exception($"Entry in attribute {selectedNodeTypesLabel} is not a dictionary.");
+                    }
+                    VisualNodeAttributes nodeAttributes = new VisualNodeAttributes("");
+                    nodeAttributes.Restore(value);
+
+                    selectedNodeTypes[nodeAttributes.NodeType] = nodeAttributes;
+                }
+            }
         }
     }
 }
