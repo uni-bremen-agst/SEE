@@ -294,7 +294,7 @@ namespace SEE.Game
 
                 metricMaximum = scaler.GetNormalizedMaximum(colorMetric);
                 metricValue = scaler.GetNormalizedValue(colorMetric, node);
-                Assert.IsTrue(metricValue <= metricMaximum);
+                Assert.IsTrue(metricValue <= metricMaximum, $"not true: {metricValue} <= {metricMaximum} for color metric {colorMetric} of node {node.ID}");
             }
             return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, metricValue / metricMaximum));
         }
@@ -507,7 +507,7 @@ namespace SEE.Game
         private Vector3 GetScaleOfLeaf(Node node)
         {
             Assert.IsTrue(node.IsLeaf());
-            LeafNodeAttributes attribs = Settings.LeafNodeSettings;
+            VisualNodeAttributes attribs = Settings.LeafNodeSettings;
             return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
                                GetMetricValueOfLeaf(node, attribs.HeightMetric),
                                GetMetricValueOfLeaf(node, attribs.DepthMetric));
