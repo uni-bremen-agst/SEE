@@ -119,16 +119,16 @@ namespace SEE.Utils
                     Forward();
                     currentToken = TokenType.LabelSeparator;
                 }
-                else if (input[index] == Open)
+                else if (input[index] == OpenGroup)
                 {
-                    tokenValue = Open.ToString();
+                    tokenValue = OpenGroup.ToString();
                     index++;
                     Forward();
                     currentToken = TokenType.Open;
                 }
-                else if (input[index] == Close)
+                else if (input[index] == CloseGroup)
                 {
-                    tokenValue = Close.ToString();
+                    tokenValue = CloseGroup.ToString();
                     index++;
                     Forward();
                     currentToken = TokenType.Close;
