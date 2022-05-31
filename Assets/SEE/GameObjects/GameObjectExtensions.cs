@@ -191,6 +191,17 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the render queue position that is renderer later than the index
+        /// of <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">game object to be drawn just before the resulting render queue index</param>
+        /// <returns>render queue index later than the index of <paramref name="gameNode"/></returns>
+        internal static int RenderLater(this GameObject gameNode)
+        {
+            return gameNode.GetRenderQueue() + 1;
+        }
+
+        /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
         ///
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
