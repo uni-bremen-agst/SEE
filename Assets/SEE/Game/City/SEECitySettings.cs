@@ -66,16 +66,46 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// Abstract common super class for all settings influencing the visual
-    /// appearance of leaf or inner nodes.
+    /// All settings influencing the visual appearance of leaf or inner nodes.
     /// </summary>
     [Serializable]
-    public abstract class VisualNodeAttributes : VisualAttributes
+    public class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
-        /// How a node should be drawn.
+        /// Constructor.
+        /// </summary>
+        /// <param name="typeName">name of the node type for which these settings are intended</param>
+        public VisualNodeAttributes(string typeName)
+        {
+            NodeType = typeName;
+        }
+
+        /// <summary>
+        /// The name of the node type that is specified. See <see cref="NodeType"/>.
+        /// </summary>
+        [SerializeField]
+        private string nodeType;
+        /// <summary>
+        /// The name of the node type that is specified.
+        /// </summary>
+        public string NodeType { get => nodeType; private set => nodeType = value; }
+        /// <summary>
+        /// How a node should be drawn. Determines the kind of mesh.
         /// </summary>
         public NodeShapes Shape = NodeShapes.Blocks;
+        /// <summary>
+        /// If true, the node should be rendered. Otherwise the node will be ignored when
+        /// the graph is loaded.
+        /// </summary>
+        public bool IsRelevant = true;
+        /// <summary>
+        /// Name of the metric defining the width.
+        /// </summary>
+        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
+        /// <summary>
+        /// Name of the metric defining the depth.
+        /// </summary>
+        public string DepthMetric = NumericAttributeNames.LOC.Name();
         /// <summary>
         /// The name of the metric determining the height.
         /// </summary>
@@ -90,6 +120,16 @@ namespace SEE.Game.City
         [OdinSerialize]
         public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
         /// <summary>
+        /// This parameter determines the minimal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
+        /// </summary>
+        public float MinimalBlockLength = 0.001f; // serialized by Unity
+        /// <summary>
+        /// This parameter determines the maximal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
+        /// </summary>
+        public float MaximalBlockLength = 1.0f; // serialized by Unity
+        /// <summary>
         /// Describes how metrics are mapped onto the antenna above the blocks.
         /// </summary>
         [OdinSerialize]
@@ -99,11 +139,14 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         public LabelAttributes LabelSettings = new LabelAttributes();
-
         /// <summary>
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
         public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+        /// <summary>
+        /// If true, persistent text labels will be added to the node representation.
+        /// </summary>
+        public bool ShowNames = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -113,14 +156,20 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            writer.Save(NodeType, NodeTypeLabel);
             writer.Save(Shape.ToString(), NodeShapeLabel);
+            writer.Save(IsRelevant, IsRelevantLabel);
+            writer.Save(WidthMetric, WidthMetricLabel);
+            writer.Save(DepthMetric, DepthMetricLabel);
             writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
+            writer.Save(ColorMetric, ColorMetricLabel);
             ColorRange.Save(writer, ColorRangeLabel);
+            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
+            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
             AntennaSettings.Save(writer, AntennaSettingsLabel);
             writer.Save(OutlineWidth, OutlineWidthLabel);
-            SaveAdditionalAttributes(writer);
+            writer.Save(ShowNames, ShowNamesLabel);
             writer.EndGroup();
         }
 
@@ -136,170 +185,87 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
-                LabelSettings.Restore(values, LabelSettingsLabel);
-                AntennaSettings.Restore(values, AntennaSettingsLabel);
-                ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
+                Restore(values);
             }
         }
 
         /// <summary>
-        /// Saves the additional attributes of subclasses. The enclosing group
-        /// is already opened. Implementations must not call writer.BeginGroup(label)
-        /// and writer.EndGroup().
+        /// Restores the settings from <paramref name="values"/>.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected abstract void SaveAdditionalAttributes(ConfigWriter writer);
-
-        /// <summary>
-        /// Label in the configuration file for the kind of object drawn for a node.
-        /// It must be visible to the subclasses.
-        /// </summary>
-        protected const string NodeShapeLabel = "Shape";
-        /// <summary>
-        /// Label in the configuration file for a color range.
-        /// </summary>
-        private const string ColorRangeLabel = "ColorRange";
-        /// <summary>
-        /// Label in the configuration file for a node style (color actually).
-        /// </summary>
-        private const string StyleMetricLabel = "StyleMetric";
-        /// <summary>
-        /// Label in the configuration file for a height metric.
-        /// </summary>
-        private const string HeightMetricLabel = "HeightMetric";
-        /// <summary>
-        /// Label in the configuration file for the label settings for leaf and inner nodes.
-        /// </summary>
-        private const string LabelSettingsLabel = "LabelSettings";
-        /// <summary>
-        /// Label in the configuration file for the antenna settings for leaf and inner nodes.
-        /// </summary>
-        private const string AntennaSettingsLabel = "AntennnaSettings";
-        /// <summary>
-        /// Label in the configuration file for the width of the outline for leaf and inner nodes.
-        /// </summary>
-        private const string OutlineWidthLabel = "OutlineWidth";
-    }
-
-    /// <summary>
-    /// The settings of leaf nodes of a specific kind.
-    /// </summary>
-    [Serializable]
-    public class LeafNodeAttributes : VisualNodeAttributes
-    {
-        /// <summary>
-        /// Name of the metric defining the width.
-        /// </summary>
-        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
-        /// <summary>
-        /// Name of the metric defining the depth.
-        /// </summary>
-        public string DepthMetric = NumericAttributeNames.LOC.Name();
-        /// <summary>
-        /// This parameter determines the minimal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
-        /// </summary>
-        public float MinimalBlockLength = 0.001f; // serialized by Unity
-        /// <summary>
-        /// This parameter determines the maximal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
-        /// </summary>
-        public float MaximalBlockLength = 1.0f; // serialized by Unity
-        /// <summary>
-        /// Saves the settings specific to this class in the configuration file.
-        /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected override void SaveAdditionalAttributes(ConfigWriter writer)
+        /// <param name="values">dictionary of attributes from which to retrieve the settings</param>
+        internal virtual void Restore(Dictionary<string, object> values)
         {
-            writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
-            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
+            ConfigIO.Restore(values, NodeTypeLabel, ref nodeType);
+            ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
+            ConfigIO.Restore(values, IsRelevantLabel, ref IsRelevant);
+            ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
+            ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
+            ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
+            ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
+            ColorRange.Restore(values, ColorRangeLabel);
+            ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
+            ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
+            LabelSettings.Restore(values, LabelSettingsLabel);
+            AntennaSettings.Restore(values, AntennaSettingsLabel);
+            ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
+            ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
         }
 
         /// <summary>
-        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
-        /// The latter must be the label under which the settings were grouped, i.e., the same
-        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// Label in the configuration file for <see cref="NodeType"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public override void Restore(Dictionary<string, object> attributes, string label)
-        {
-            base.Restore(attributes, label);
-
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
-                ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
-                ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
-                ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
-            }
-        }
-
+        private const string NodeTypeLabel = "NodeType";
         /// <summary>
-        /// Label in the configuration file for the width metric.
+        /// Label in the configuration file for <see cref="Shape"/>.
+        /// </summary>
+        private const string NodeShapeLabel = "Shape";
+        /// <summary>
+        /// Label in the configuration file for <see cref="IsRelevant"/>.
+        /// </summary>
+        private const string IsRelevantLabel = "IsRelevant";
+        /// <summary>
+        /// Label in the configuration file for <see cref="WidthMetric"/>.
         /// </summary>
         private const string WidthMetricLabel = "WidthMetric";
         /// <summary>
-        /// Label in the configuration file for the depth metric.
+        /// Label in the configuration file for <see cref="DepthMetric"/>.
         /// </summary>
         private const string DepthMetricLabel = "DepthMetric";
         /// <summary>
-        /// Label in the configuration file for the minimal block length of a node.
+        /// Label in the configuration file for a <see cref="HeightMetric"/>.
+        /// </summary>
+        private const string HeightMetricLabel = "HeightMetric";
+        /// <summary>
+        /// Label in the configuration file for a <see cref="ColorMetric"/>
+        /// </summary>
+        private const string ColorMetricLabel = "ColorMetric";
+        /// <summary>
+        /// Label in the configuration file for <see cref="ColorRange"/>.
+        /// </summary>
+        private const string ColorRangeLabel = "ColorRange";
+        /// <summary>
+        /// Label in the configuration file for <see cref="MinimalBlockLength"/>.
         /// </summary>
         private const string MinimalBlockLengthLabel = "MinimalBlockLength";
         /// <summary>
-        /// Label in the configuration file for the maximal block length of a node.
+        /// Label in the configuration file for <see cref="MaximalBlockLength"/>.
         /// </summary>
         private const string MaximalBlockLengthLabel = "MaximalBlockLength";
-    }
-
-    /// <summary>
-    /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
-    /// </summary>
-    [Serializable]
-    public class InnerNodeAttributes : VisualNodeAttributes
-    {
         /// <summary>
-        /// If true, persistent text labels will be added to inner nodes.
+        /// Label in the configuration file for <see cref="LabelSettings"/>.
         /// </summary>
-        public bool ShowNames = false;
-
+        private const string LabelSettingsLabel = "LabelSettings";
         /// <summary>
-        /// Saves the settings specific to this class in the configuration file.
+        /// Label in the configuration file for <see cref="AntennaSettings"/>.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected override void SaveAdditionalAttributes(ConfigWriter writer)
-        {
-            writer.Save(ShowNames, ShowNamesLabel);
-        }
-
+        private const string AntennaSettingsLabel = "AntennnaSettings";
         /// <summary>
-        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
-        /// The latter must be the label under which the settings were grouped, i.e., the same
-        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// Label in the configuration file for <see cref="OutlineWidth"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public override void Restore(Dictionary<string, object> attributes, string label)
-        {
-            base.Restore(attributes, label);
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
-            }
-        }
-
+        private const string OutlineWidthLabel = "OutlineWidth";
+        /// <summary>
+        /// Label in the configuration file for <see cref="ShowNames"/>.
+        /// </summary>
         private const string ShowNamesLabel = "ShowNames";
     }
 

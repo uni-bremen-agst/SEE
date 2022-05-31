@@ -284,7 +284,7 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            LeafNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
+            VisualNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
             {
                 // Shape type for leaf nodes
                 ComboSelectBuilder.Init(controls.transform)
@@ -369,7 +369,7 @@ namespace SEE.Game.UI.ConfigMenu
             GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            InnerNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
+            VisualNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
             {
                 // Shape type for inner nodes
                 ComboSelectBuilder.Init(controls.transform)
