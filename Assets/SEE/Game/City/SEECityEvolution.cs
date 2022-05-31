@@ -55,7 +55,7 @@ namespace SEE.Game.City
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
         [Tooltip("The directory in which the GXL files are located.")]
-        public DataPath GXLDirectory = new DataPath();
+        public DirectoryPath GXLDirectory = new DirectoryPath();
 
         //-----------------------------------------------------
         // Attributes to mark changes

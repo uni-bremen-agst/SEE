@@ -44,7 +44,7 @@ namespace SEE.Game.City
         /// Path to the JLG file containing the runtime trace data.
         /// </summary>
         /// <returns>path of JLG file</returns>
-        public DataPath JLGPath = new DataPath();
+        public FilePath JLGPath = new FilePath();
 
         /// <summary>
         /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the

@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using SEE.Game;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -57,7 +58,7 @@ namespace SEEEditor
                     SetProperty("ServerActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
                     SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
                     SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
-                    network.ConfigPath = DataPathEditor.GetDataPath("Metric file", network.ConfigPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                    network.ConfigPath = DataPathEditor.GetDataPath("Metric file", network.ConfigPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();

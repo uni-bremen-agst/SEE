@@ -470,7 +470,7 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public DataPath LayoutPath = new DataPath();
+        public FilePath LayoutPath = new FilePath();
 
         private const string LayoutPathLabel = "LayoutPath";
 

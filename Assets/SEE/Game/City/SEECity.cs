@@ -218,12 +218,12 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        public DataPath GXLPath = new DataPath();
+        public FilePath GXLPath = new FilePath();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        public DataPath CSVPath = new DataPath();
+        public FilePath CSVPath = new FilePath();
 
         /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.

@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
@@ -14,14 +15,14 @@ namespace SEEEditor
     public class SEEDynCityEditor : SEECityEditor
     {
         /// <summary>
-        /// In addition to the other attributes inherited, the specific attributes of 
+        /// In addition to the other attributes inherited, the specific attributes of
         /// the SEEDynCity instance are shown and set here.
         /// </summary>
         protected override void Attributes()
         {
             base.Attributes();
             SEEDynCity city = target as SEEDynCity;
-            city.DYNPath = DataPathEditor.GetDataPath("DYN file", city.DYNPath, Filenames.ExtensionWithoutPeriod(Filenames.DYNExtension));
+            city.DYNPath = DataPathEditor.GetDataPath("DYN file", city.DYNPath, Filenames.ExtensionWithoutPeriod(Filenames.DYNExtension)) as FilePath;
         }
     }
 }

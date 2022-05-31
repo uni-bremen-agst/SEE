@@ -832,7 +832,7 @@ namespace SEE.Net
         /// Default path of the configuration file (path and filename).
         /// </summary>
         [SerializeField]
-        public DataPath ConfigPath = new DataPath();
+        public FilePath ConfigPath = new FilePath();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.

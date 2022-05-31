@@ -41,20 +41,20 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [OdinSerialize]
-        public DataPath CityPath = new DataPath();
+        public FilePath CityPath = new FilePath();
 
         /// <summary>
         /// The path to project where the source code can be found.
         /// <see cref="ProjectPath"/>.
         /// </summary>
         [OdinSerialize]
-        private DataPath projectPath = new DataPath();
+        private DirectoryPath projectPath = new DirectoryPath();
 
         /// <summary>
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        public DataPath ProjectPath
+        public DirectoryPath ProjectPath
         {
             get => projectPath;
             set
@@ -79,7 +79,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [OdinSerialize]
-        public DataPath SolutionPath = new DataPath();
+        public FilePath SolutionPath = new FilePath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.

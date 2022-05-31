@@ -1,6 +1,6 @@
 ﻿using System;
-using SEE.Game;
 using SEE.Game.City;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -102,8 +102,8 @@ namespace SEE.Net
         // SEECity
         //-----------------------------------------------------------------------
 
-        public DataPath gxlPath;
-        public DataPath csvPath;
+        public FilePath gxlPath;
+        public FilePath csvPath;
 
         //-----------------------------------------------------------------------
         // SEECityEvolution
@@ -115,13 +115,13 @@ namespace SEE.Net
         // SEECityDyn
         //-----------------------------------------------------------------------
 
-        public DataPath dynPath;
+        public FilePath dynPath;
 
         //-----------------------------------------------------------------------
         // SEEJlgCity
         //-----------------------------------------------------------------------
 
-        public DataPath jlgPath;
+        public FilePath jlgPath;
 
         //-----------------------------------------------------------------------
         // SEECityRandom
