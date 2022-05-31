@@ -28,23 +28,25 @@ namespace SEEEditor
         protected void ShowNodeTypes(AbstractSEECity city)
         {
             showNodeTypes = EditorGUILayout.Foldout(showNodeTypes,
-                                                    "Relevant node types", true, EditorStyles.foldoutHeader);
+                                                    "Node types", true, EditorStyles.foldoutHeader);
             if (showNodeTypes)
             {
                 // Make a copy to loop over the dictionary while making changes.
-                Dictionary<string, bool> selection = new Dictionary<string, bool>(city.SelectedNodeTypes);
+                Dictionary<string, VisualNodeAttributes> selection = new Dictionary<string, VisualNodeAttributes>(city.SelectedNodeTypes);
 
                 int countSelected = 0;
-                foreach (KeyValuePair<string, bool> entry in selection)
+                foreach (KeyValuePair<string, VisualNodeAttributes> entry in selection)
                 {
                     // If selection contains the artifial node type, we like to neglect that
                     // and do not show this to the user.
-                    if (!(entry.Key.Equals(Graph.UnknownType)))
+                    string nodeType = entry.Key;
+                    if (nodeType != Graph.UnknownType)
                     {
-                        city.SelectedNodeTypes[entry.Key] = EditorGUILayout.Toggle("  " + entry.Key, entry.Value);
-                        if (city.SelectedNodeTypes[entry.Key])
+                        city.SelectedNodeTypes[nodeType].IsRelevant = EditorGUILayout.Toggle("  " + nodeType, entry.Value.IsRelevant);
+                        if (city.SelectedNodeTypes[nodeType].IsRelevant)
                         {
                             countSelected++;
+                            NodeAttributes(entry.Value);
                         }
                     }
                 }
@@ -60,7 +62,7 @@ namespace SEEEditor
                     {
                         if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
                         {
-                            allTypes = allTypes && city.SelectedNodeTypes[kvp.Key];
+                            allTypes = allTypes && city.SelectedNodeTypes[kvp.Key].IsRelevant;
                         }
                         else
                         {
