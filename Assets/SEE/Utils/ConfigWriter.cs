@@ -61,7 +61,7 @@ namespace SEE.Utils
         private readonly Stack<ContextInfo> context = new Stack<ContextInfo>();
 
         /// <summary>
-        /// Emits given <paramref name="label"/> followed by <see cref="NiceLabelValueSeparator"/> 
+        /// Emits given <paramref name="label"/> followed by <see cref="NiceLabelValueSeparator"/>
         /// to <paramref name="stream"/> preceeded by indentation if label is neither null nor empty.
         /// If it null or empty, nothing but the indentation will be emitted.
         /// </summary>
@@ -71,7 +71,7 @@ namespace SEE.Utils
         {
             Indent();
             if (!string.IsNullOrEmpty(label))
-            {                
+            {
                 stream.Write(label + NiceLabelValueSeparator());
             }
         }
@@ -97,7 +97,6 @@ namespace SEE.Utils
             if (context.Count == 0 || context.Peek() != ContextInfo.InList)
             {
                 SaveLabel(stream, label);
-                
             }
             else
             {
@@ -164,7 +163,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Saves the given <paramref name="collection"/> as a list.
-        /// 
+        ///
         /// Note: If either key or value should better not be saved as a string, you must use
         /// a more specific save operation instead.
         /// </summary>
@@ -187,7 +186,7 @@ namespace SEE.Utils
         /// a pair is a list with two elements: one for the key and one for the value.
         /// The key is saved as a string and the value is saved as a plain literal:
         /// either True or False.
-        /// 
+        ///
         /// Note: This method is more specific than <see cref="Save{K, V}(Dictionary{K, V}, string)"/>
         /// in that the key is not saved as a string but as a boolean literal (no quotes around it).
         /// <param name="dictionary">the dictionary to be saved</param>
@@ -209,7 +208,7 @@ namespace SEE.Utils
         /// Saves the given <paramref name="dictionary"/> as a list of pairs where
         /// a pair is a list with two elements: one for the key and one for the value.
         /// Both are stored as strings.
-        /// 
+        ///
         /// Note: If either key or value should better not be saved as a string, you must use
         /// a more specific save operation instead.
         /// </summary>
@@ -267,8 +266,7 @@ namespace SEE.Utils
         {
             SaveLabel(stream, label);
             context.Push(ContextInfo.InComposite);
-            stream.Write(Open);
-            stream.WriteLine();
+            stream.WriteLine(OpenGroup);
         }
 
         /// <summary>
@@ -284,17 +282,17 @@ namespace SEE.Utils
             }
             else
             {
-                Indent();
-                stream.Write(Close);
-                stream.WriteLine(AttributeSeparator);
                 context.Pop();
+                Indent();
+                stream.Write(CloseGroup);
+                stream.WriteLine(AttributeSeparator);
             }
         }
 
         /// <summary>
         /// Signals the begin of a list data structure, which will be emitted as a
-        /// sequence of values (without individual label). Every other call to any of the 
-        /// <see cref="SaveListItem"/> methods after that is assumed to deliver a value 
+        /// sequence of values (without individual label). Every other call to any of the
+        /// <see cref="SaveListItem"/> methods after that is assumed to deliver a value
         /// belonging to this list -- until <see cref="EndList"/> is called eventually.
         /// </summary>
         /// <param name="label">the label of the list value</param>
@@ -318,10 +316,10 @@ namespace SEE.Utils
             }
             else
             {
+                context.Pop();
                 Indent();
                 stream.Write(CloseList);
                 stream.WriteLine(AttributeSeparator);
-                context.Pop();
             }
         }
 
