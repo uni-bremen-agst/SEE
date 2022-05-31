@@ -40,17 +40,13 @@ namespace SEE.Game
             };
 
             ColorRange innerColorRange = this.Settings.InnerNodeSettings.ColorRange;
-            switch (this.Settings.InnerNodeSettings.Shape)
+            innerNodeFactory = this.Settings.InnerNodeSettings.Shape switch
             {
-                case NodeShapes.Cylinders:
-                    innerNodeFactory = new CylinderFactory(ShaderType, innerColorRange);
-                    break;
-                case NodeShapes.Blocks:
-                    innerNodeFactory = new CubeFactory(ShaderType, innerColorRange);
-                    break;
-                default:
-                    throw new Exception($"Unhandled {nameof(NodeShapes)}");
-            }
+                NodeShapes.Blocks => new CubeFactory(ShaderType, innerColorRange),
+                NodeShapes.Cylinders => new CylinderFactory(ShaderType, innerColorRange),
+                _ => throw new Exception($"Unhandled {nameof(NodeShapes)}")
+            };
+
             this.graph = graph;
             if (this.graph != null)
             {
@@ -655,7 +651,7 @@ namespace SEE.Game
         /// <returns>a new plane</returns>
         public GameObject DrawPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            return PlaneFactory.NewPlane(ShaderType, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel, LevelDistance);
         }
 
         /// <summary>
