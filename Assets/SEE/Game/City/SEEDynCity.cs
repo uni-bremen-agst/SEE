@@ -14,16 +14,16 @@ namespace SEE.Game.City
     public class SEEDynCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
-        /// configuration file, make sure you save and restore it in 
-        /// <see cref="SEEDynCity.Save(ConfigWriter)"/> and 
-        /// <see cref="SEEDynCity.Restore(Dictionary{string,object})"/>, 
+        /// configuration file, make sure you save and restore it in
+        /// <see cref="SEEDynCity.Save(ConfigWriter)"/> and
+        /// <see cref="SEEDynCity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
         /// The path to the DYN file containing the trace data.
         /// </summary>
         /// <returns>path of DYN file</returns>
-        public DataPath DYNPath = new DataPath();
+        public FilePath DYNPath = new FilePath();
 
         /// <summary>
         /// Loads the graph data from the GXL file with GXLPath() and the metrics
@@ -57,7 +57,7 @@ namespace SEE.Game.City
                 callTreeReader.Load();
 
                 // There might already be a child with a Runtime component. If that is the
-                // case, we will re-use it. Otherwise we will create a new child with a 
+                // case, we will re-use it. Otherwise we will create a new child with a
                 // fresh Runtime component.
                 Runtime.Runtime runTime = gameObject.GetComponentInChildren<Runtime.Runtime>();
                 if (runTime == null)
@@ -103,7 +103,7 @@ namespace SEE.Game.City
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            DYNPath.Save(writer, DYNPathLabel);  
+            DYNPath.Save(writer, DYNPathLabel);
         }
 
         /// <summary>

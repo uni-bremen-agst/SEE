@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
@@ -324,10 +325,10 @@ namespace SEEEditor
             showDataFiles = EditorGUILayout.Foldout(showDataFiles, "Data Files", true, EditorStyles.foldoutHeader);
             if (showDataFiles)
             {
-                city.GXLPath = DataPathEditor.GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension));
-                city.CSVPath = DataPathEditor.GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension));
-                city.ProjectPath = DataPathEditor.GetDataPath("Project directory", city.ProjectPath, fileDialogue: false);
-                city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath, Filenames.ExtensionWithoutPeriod(Filenames.SolutionExtension));
+                city.GXLPath = DataPathEditor.GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension)) as FilePath;
+                city.CSVPath = DataPathEditor.GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension)) as FilePath;
+                city.ProjectPath = DataPathEditor.GetDataPath("Project directory", city.ProjectPath, fileDialogue: false) as DirectoryPath;
+                city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath, Filenames.ExtensionWithoutPeriod(Filenames.SolutionExtension)) as FilePath;
             }
         }
 

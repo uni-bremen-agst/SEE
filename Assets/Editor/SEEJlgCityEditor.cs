@@ -22,12 +22,13 @@
 
 #if UNITY_EDITOR
 
+using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
 
 namespace SEEEditor
-{    
+{
         /// <summary>
         /// A custom editor for instances of SEEJlgCity as an extension of the SEECityEditor.
         /// </summary>
@@ -47,7 +48,7 @@ namespace SEEEditor
         {
             base.Attributes();
             SEEJlgCity city = target as SEEJlgCity;
-            city.JLGPath = DataPathEditor.GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension));
+            city.JLGPath = DataPathEditor.GetDataPath("JLG file", city.JLGPath, Filenames.ExtensionWithoutPeriod(Filenames.JLGExtension)) as FilePath;
             AnimationAttributes();
         }
 

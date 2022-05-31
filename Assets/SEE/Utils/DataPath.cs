@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Utils
 {
     /// <summary>
     /// A representation of paths for files and directories containing data
-    /// that can be set absolute in the file system or relative to one of 
+    /// that can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc.
     /// </summary>
     [Serializable]
-    public class DataPath
+    public abstract class DataPath
     {
         /// <summary>
         /// Defines how the path is to be interpreted. If it is absolute,
@@ -28,28 +27,28 @@ namespace SEE.Game
             /// </summary>
             Absolute,
             /// <summary>
-            /// Is is a path relative to the project folder (which is the parent 
+            /// Is is a path relative to the project folder (which is the parent
             /// of the Assets folder). Application.dataPath (excluding "/Assets"
             /// at the end) is the prefix.
             /// </summary>
             ProjectFolder,
             /// <summary>
-            /// Is is a path relative to the Assets folder. Application.dataPath 
+            /// Is is a path relative to the Assets folder. Application.dataPath
             /// is the prefix.
             /// </summary>
             AssetsFolder,
             /// <summary>
-            /// Is is a path relative to the streaming assets. 
+            /// Is is a path relative to the streaming assets.
             /// Application.streamingAssetsPath is the prefix.
             /// </summary>
             StreamingAssets,
             /// <summary>
-            /// Is is a path relative to the folder for persistent data. 
+            /// Is is a path relative to the folder for persistent data.
             /// Application.persistentDataPath is the prefix.
             /// </summary>
             PersistentData,
             /// <summary>
-            /// Is is a path relative to the temporary cache. 
+            /// Is is a path relative to the temporary cache.
             /// Application.temporaryCachePath is the prefix.
             /// </summary>
             TemporaryCache,
@@ -73,8 +72,8 @@ namespace SEE.Game
         /// <summary>
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         /// If none of Unity's path prefixes for standard folders match, <paramref name="path"/> is considered
-        /// an absolute path. Otherwise the <see cref="Root"/> will be set depending on which of Unity's 
-        /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to 
+        /// an absolute path. Otherwise the <see cref="Root"/> will be set depending on which of Unity's
+        /// path prefixes matches (<seealso cref="RootKind"/>) and the relative path will be set to
         /// <paramref name="path"/> excluding the matched prefix.
         /// </summary>
         /// <param name="path">an absolute path</param>
@@ -151,12 +150,12 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// If the <see cref="Root"/> is absolute, the directory enclosing this 
+        /// If the <see cref="Root"/> is absolute, the directory enclosing this
         /// path is returned (may be empty). The directory separator of the
         /// resulting absolute root path is the one that was used for setting the absolute
         /// path. If it was set on a different operating system, it may not be
         /// the one used for the operating system we are currently running on.
-        /// 
+        ///
         /// Otherwise yields Unity's folders as absolute paths depending upon
         /// <paramref name="rootKind"/>; see also <seealso cref="RootKind"/>.
         /// The character / will then be used as directory separator for that path.
@@ -221,10 +220,10 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The stored full path. 
-        /// 
+        /// The stored full path.
+        ///
         /// If the <see cref="Root"/> is absolute, the result is equivalent to <see cref="AbsolutePath"/>.
-        /// 
+        ///
         /// Otherwise the prefix specified by <see cref="Root"/> will be prepended
         /// to <see cref="RelativePath"/>.
         /// The style of this path prefix is always the one of the current operating
@@ -290,12 +289,12 @@ namespace SEE.Game
             writer.Save(Root.ToString(), RootLabel);
             writer.Save(RelativePath, RelativePathLabel);
             writer.Save(AbsolutePath, AbsolutePathLabel);
-            writer.EndGroup();            
+            writer.EndGroup();
         }
 
         /// <summary>
         /// Restores the state of the <see cref="DataPath"/> according to <paramref name="attributes"/>.
-        /// 
+        ///
         /// Looks up the attributes of the data path in <paramref name="attributes"/> using
         /// the key <paramref name="label"/> and sets the internal attributes of this
         /// instance of <see cref="DataPath"/> according the looked up values.
@@ -320,7 +319,7 @@ namespace SEE.Game
                     {
                         AbsolutePath = value;
                     }
-                }                
+                }
                 ConfigIO.RestoreEnum(path, RootLabel, ref Root);
             }
         }

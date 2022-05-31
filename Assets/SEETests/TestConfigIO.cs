@@ -606,7 +606,7 @@ namespace SEE.Utils
         private void WipeOutSEEDynCityAttributes(SEEDynCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.DYNPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.dyn");
+            city.DYNPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.dyn");
         }
 
         /// <summary>
@@ -617,7 +617,7 @@ namespace SEE.Utils
         private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.JLGPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+            city.JLGPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
         }
 
         /// <summary>

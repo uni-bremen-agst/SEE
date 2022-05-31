@@ -24,27 +24,27 @@ namespace SEE.Game.City
         /// <summary>
         /// The path to the GXL file containing the implementation graph data.
         /// </summary>
-        public DataPath GxlImplementationPath = new DataPath();
+        public FilePath GxlImplementationPath = new FilePath();
 
         /// <summary>
         /// The path to the GXL file containing the architecture graph data.
         /// </summary>
-        public DataPath GxlArchitecturePath = new DataPath();
+        public FilePath GxlArchitecturePath = new FilePath();
 
         /// <summary>
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
-        public DataPath GxlMappingPath = new DataPath();
+        public FilePath GxlMappingPath = new FilePath();
 
         /// <summary>
         /// The path to the CSV file containing the implementation metric data.
         /// </summary>
-        public DataPath CsvImplementationPath = new DataPath();
+        public FilePath CsvImplementationPath = new FilePath();
 
         /// <summary>
         /// The path to the CSV file containing the architecture metric data.
         /// </summary>
-        public DataPath CsvArchitecturePath = new DataPath();
+        public FilePath CsvArchitecturePath = new FilePath();
 
         /// <summary>
         /// Name of this code city.

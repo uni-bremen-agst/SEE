@@ -108,7 +108,7 @@ namespace SEEEditor
             showGeneralAttributes = EditorGUILayout.Foldout(showGeneralAttributes, "General", true, EditorStyles.foldoutHeader);
             if (showGeneralAttributes)
             {
-                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension));
+                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
@@ -260,7 +260,7 @@ namespace SEEEditor
                 Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
 
                 settings.Kind = (NodeLayoutKind)EditorGUILayout.EnumPopup("Node layout", settings.Kind);
-                settings.LayoutPath = GetDataPath("Layout file", city.NodeLayoutSettings.LayoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension));
+                settings.LayoutPath = GetDataPath("Layout file", city.NodeLayoutSettings.LayoutPath, Filenames.ExtensionWithoutPeriod(Filenames.GVLExtension)) as FilePath;
             }
         }
 

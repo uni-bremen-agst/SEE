@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR
 
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Utils;
 using SEE.Game.City;
 using UnityEditor;
 using UnityEngine;
+using SEE.Game;
 
 namespace SEEEditor
 {
@@ -101,7 +102,7 @@ namespace SEEEditor
         protected void Attributes()
         {
             SEECityEvolution city = target as SEECityEvolution;
-            city.GXLDirectory = DataPathEditor.GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false);
+            city.GXLDirectory = DataPathEditor.GetDataPath("GXL directory", city.GXLDirectory, fileDialogue: false) as DirectoryPath;
         }
     }
 }
