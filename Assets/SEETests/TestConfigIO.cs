@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
@@ -270,6 +271,15 @@ namespace SEE.Utils
             SEECity savedCity = NewVanillaSEECity<SEECity>();
             savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
             savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
+            VisualNodeAttributes function = new VisualNodeAttributes("Function")
+            {
+                IsRelevant = true
+            };
+            VisualNodeAttributes file = new VisualNodeAttributes("File")
+            {
+                IsRelevant = false
+            };
+            savedCity.SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>() { { function.NodeType, function }, { file.NodeType, file } };
             savedCity.Save(filename);
 
             // Create a new city with all its default values and then
@@ -496,8 +506,8 @@ namespace SEE.Utils
         private static void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
             AreEqualSharedAttributes(expected, actual);
-            AreEqualLeafNodeSettings(expected.LeafNodeSettings, actual.LeafNodeSettings);
-            AreEqualInnerNodeSettings(expected.InnerNodeSettings, actual.InnerNodeSettings);
+            AreEqualNodeSettings(expected.LeafNodeSettings, actual.LeafNodeSettings);
+            AreEqualNodeSettings(expected.InnerNodeSettings, actual.InnerNodeSettings);
             AreEqualNodeLayoutSettings(expected.NodeLayoutSettings, actual.NodeLayoutSettings);
             AreEqualEdgeLayoutSettings(expected.EdgeLayoutSettings, actual.EdgeLayoutSettings);
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
@@ -635,8 +645,8 @@ namespace SEE.Utils
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
             WipeOutSharedAttributes(city);
-            WipeOutLeafNodeSettings(city);
-            WipeOutInnerNodeSettings(city);
+            WipeOutNodeSettings(city.LeafNodeSettings);
+            WipeOutNodeSettings(city.InnerNodeSettings);
             WipeOutNodeLayoutSettings(city);
             WipeOutEdgeLayoutSettings(city);
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
@@ -784,58 +794,38 @@ namespace SEE.Utils
             AreEqual(expected.LayoutPath, actual.LayoutPath);
         }
 
-        private static void WipeOutInnerNodeSettings(AbstractSEECity city)
+        private static void WipeOutNodeSettings(VisualNodeAttributes settings)
         {
-            city.InnerNodeSettings.Shape = NodeShapes.Cylinders;
-            city.InnerNodeSettings.HeightMetric = "X";
-            city.InnerNodeSettings.ColorMetric = "X";
-            city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
-            city.InnerNodeSettings.ShowNames = true;
-            city.InnerNodeSettings.OutlineWidth = 99999;
-            WipeOutAntennaSettings(ref city.InnerNodeSettings.AntennaSettings);
-            WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
+            settings.Shape = NodeShapes.Blocks;
+            settings.IsRelevant = false;
+            settings.HeightMetric = "X";
+            settings.WidthMetric = "X";
+            settings.DepthMetric = "X";
+            settings.ColorMetric = "X";
+            settings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
+            settings.MinimalBlockLength = 90000;
+            settings.MaximalBlockLength = 1000000;
+            settings.OutlineWidth = 99999;
+            WipeOutAntennaSettings(ref settings.AntennaSettings);
+            WipeOutLabelSettings(ref settings.LabelSettings);
+            settings.ShowNames = true;
         }
 
-        private static void AreEqualInnerNodeSettings(InnerNodeAttributes expected, InnerNodeAttributes actual)
+        private static void AreEqualNodeSettings(VisualNodeAttributes expected, VisualNodeAttributes actual)
         {
             Assert.AreEqual(expected.Shape, actual.Shape);
-            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
-            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
-            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
-            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
-            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
-            AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            AreEqual(expected.LabelSettings, actual.LabelSettings);
-        }
-
-        private static void WipeOutLeafNodeSettings(AbstractSEECity city)
-        {
-            city.LeafNodeSettings.Shape = NodeShapes.Blocks;
-            city.LeafNodeSettings.HeightMetric = "X";
-            city.LeafNodeSettings.WidthMetric = "X";
-            city.LeafNodeSettings.DepthMetric = "X";
-            city.LeafNodeSettings.ColorMetric = "X";
-            city.LeafNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
-            city.LeafNodeSettings.MinimalBlockLength = 90000;
-            city.LeafNodeSettings.MaximalBlockLength = 1000000;
-            city.LeafNodeSettings.OutlineWidth = 99999;
-            WipeOutAntennaSettings(ref city.LeafNodeSettings.AntennaSettings);
-            WipeOutLabelSettings(ref city.LeafNodeSettings.LabelSettings);
-        }
-
-        private static void AreEqualLeafNodeSettings(LeafNodeAttributes expected, LeafNodeAttributes actual)
-        {
-            Assert.AreEqual(expected.Shape, actual.Shape);
+            Assert.AreEqual(expected.IsRelevant, actual.IsRelevant);
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
             Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
             Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
-            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
+            AreEqual(expected.ColorRange, actual.ColorRange);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
+            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
         }
 
         private static void WipeOutAntennaSettings(ref AntennaAttributes antennaAttributes)
@@ -859,7 +849,7 @@ namespace SEE.Utils
         {
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
-            city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
+            city.SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
             city.CityPath.Set("C:/MyAbsoluteDirectory/config.cfg");
             city.ProjectPath.Set("C:/MyAbsoluteDirectory");
             city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
@@ -871,12 +861,28 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
-            CollectionAssert.AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
+            AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
             AreEqual(expected.CityPath, actual.CityPath);
             AreEqual(expected.ProjectPath, actual.ProjectPath);
             AreEqual(expected.SolutionPath, actual.SolutionPath);
             Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
             Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
+        }
+
+        private static void AreEquivalent(Dictionary<string, VisualNodeAttributes> expected, Dictionary<string, VisualNodeAttributes> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            foreach (var entry in expected)
+            {
+                if (actual.TryGetValue(entry.Key, out VisualNodeAttributes entryInActual))
+                {
+                    AreEqualNodeSettings(entry.Value, entryInActual);
+                }
+                else
+                {
+                    Assert.Fail($"{entry.Key} not contained in actual");
+                }
+            }
         }
 
         /// <summary>
