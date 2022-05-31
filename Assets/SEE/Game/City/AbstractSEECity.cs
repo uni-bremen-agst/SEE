@@ -89,10 +89,10 @@ namespace SEE.Game.City
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
-        /// they should be visualized or not.
+        /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        public Dictionary<string, bool> SelectedNodeTypes = new Dictionary<string, bool>();
+        public Dictionary<string, VisualNodeAttributes> SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -108,12 +108,12 @@ namespace SEE.Game.City
         /// <summary>
         /// The attributes of the leaf nodes.
         /// </summary>
-        public LeafNodeAttributes LeafNodeSettings = new LeafNodeAttributes();
+        public VisualNodeAttributes LeafNodeSettings = new VisualNodeAttributes("LeafNode");
 
         /// <summary>
         /// The attributes of the inner nodes.
         /// </summary>
-        public InnerNodeAttributes InnerNodeSettings = new InnerNodeAttributes();
+        public VisualNodeAttributes InnerNodeSettings = new VisualNodeAttributes("InnerNode");
 
         /// <summary>
         /// The node layout settings.
@@ -280,7 +280,7 @@ namespace SEE.Game.City
         /// <summary>
         /// True if all node types in nodeTypes are relevant.
         /// </summary>
-        private bool AllNodeTypesAreRelevant => SelectedNodeTypes.Values.All(relevant => relevant);
+        private bool AllNodeTypesAreRelevant => SelectedNodeTypes.Values.All(nodeAttributes => nodeAttributes.IsRelevant);
 
         /// <summary>
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
@@ -307,7 +307,7 @@ namespace SEE.Game.City
                 // nodeTypes contains the node types of the previously loaded graph.
                 // Node types in nodeTypes not in newTypes will disappear
                 // because we are iterating only over newTypes.
-                Dictionary<string, bool> newNodeTypes = new Dictionary<string, bool>();
+                Dictionary<string, VisualNodeAttributes> newNodeTypes = new Dictionary<string, VisualNodeAttributes>();
                 foreach (string type in newTypes)
                 {
                     if (SelectedNodeTypes.ContainsKey(type))
@@ -317,8 +317,8 @@ namespace SEE.Game.City
                     }
                     else
                     {
-                        // default is true: a node type is selected initially
-                        newNodeTypes[type] = true;
+                        // new node type not yet seen; use the defaults
+                        newNodeTypes[type] = new VisualNodeAttributes(type);
                     }
                 }
                 SelectedNodeTypes = newNodeTypes;
@@ -341,7 +341,7 @@ namespace SEE.Game.City
             }
             else
             {
-                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value)
+                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value.IsRelevant)
                   .Select(pair => pair.Key).ToList();
                 return graph.SubgraphByNodeType(matches);
             }
@@ -548,8 +548,8 @@ namespace SEE.Game.City
                     CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value)
-                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value.IsRelevant)
+                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
     }
