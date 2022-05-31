@@ -3,6 +3,7 @@
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
+using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -25,16 +26,6 @@ namespace SEEEditor
         /// Whether the foldout for the general attributes of the city should be expanded.
         /// </summary>
         private bool showGeneralAttributes = false;
-
-        /// <summary>
-        /// Whether the leaf node attribute foldout should be expanded.
-        /// </summary>
-        private bool showLeafAttributes = false;
-
-        /// <summary>
-        /// Whether the inner node attribute foldout should be expanded.
-        /// </summary>
-        private bool showInnerAttributes = false;
 
         /// <summary>
         /// Whether the erosion attribute foldout should be expanded.
@@ -67,38 +58,20 @@ namespace SEEEditor
         protected bool showGraphListing = false;
 
         /// <summary>
-        /// Whether the foldout for antenna attributes of leaf nodes should be expanded.
+        /// Whether the foldout for antenna attributes of leaf or inner nodes should be expanded.
         /// </summary>
-        protected bool showLeafAntennaAttributes = false;
+        protected bool showAntennaAttributes = false;
 
         /// <summary>
-        /// Whether the foldout for antenna attributes of inner nodes should be expanded.
+        /// Whether the foldout for label attributes of leaf or inner nodes should be expanded.
         /// </summary>
-        protected bool showInnerAntennaAttributes = false;
-
-        /// <summary>
-        /// Whether the foldout for label attributes of leaf nodes should be expanded.
-        /// </summary>
-        protected bool showLeafLabelAttributes = false;
-
-        /// <summary>
-        /// Whether the foldout for label attributes of inner nodes should be expanded.
-        /// </summary>
-        protected bool showInnerLabelAttributes = false;
+        protected bool showLabelAttributes = false;
 
         public override void OnInspectorGUI()
         {
             city = target as AbstractSEECity;
 
             GlobalAttributes();
-
-            EditorGUILayout.Separator();
-
-            LeafNodeAttributes();
-
-            EditorGUILayout.Separator();
-
-            InnerNodeAttributes();
 
             EditorGUILayout.Separator();
 
@@ -319,29 +292,50 @@ namespace SEEEditor
             }
         }
 
-        /// <summary>
-        /// Renders the GUI for inner node attributes.
-        /// </summary>
-        private void InnerNodeAttributes()
+        protected void NodeAttributes(VisualNodeAttributes settings)
         {
-            showInnerAttributes = EditorGUILayout.Foldout(showInnerAttributes, "Attributes of inner nodes", true, EditorStyles.foldoutHeader);
-            if (showInnerAttributes)
+            EditorGUI.indentLevel++;
+
+            settings.Shape = (NodeShapes)EditorGUILayout.EnumPopup("Shape", settings.Shape);
+            settings.IsRelevant = EditorGUILayout.Toggle("Relevant", settings.IsRelevant);
+            settings.WidthMetric = EditorGUILayout.TextField("Width", settings.WidthMetric);
+            settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
+            settings.DepthMetric = EditorGUILayout.TextField("Depth", settings.DepthMetric);
+            settings.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorMetric);
+            settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
+            settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
+            settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
+            settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
+            settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
+
+            //const string antennaSettingsProperty = "AntennaSettings.AntennaSections";
+            //SerializedProperty sections = settings.FindProperty(antennaSettingsProperty);
+            //if (sections != null)
+            //{
+
+            //}
+            //else
+            //{
+            //    Debug.LogError($"The instance of {city.GetType().FullName} does not have an attribute {antennaSettingsProperty}.\n");
+            //}
+
+            //AntennaAttributes(ref showLeafAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, sections);
+            AntennaAttributes(settings.AntennaSettings);
+            LabelSettings(ref showLabelAttributes, ref settings.LabelSettings);
+            settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
+            settings.ShowNames = EditorGUILayout.Toggle("Show names", settings.ShowNames);
+
+            EditorGUI.indentLevel--;
+        }
+
+        private void AntennaAttributes(AntennaAttributes antennaSettings)
+        {
+            showAntennaAttributes = EditorGUILayout.Foldout(showAntennaAttributes, "Antenna", true, EditorStyles.foldoutHeader);
+            if (showAntennaAttributes)
             {
                 EditorGUI.indentLevel++;
-
-                InnerNodeAttributes settings = city.InnerNodeSettings;
-                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
-
-                settings.Shape = (NodeShapes)EditorGUILayout.EnumPopup("Type", settings.Shape);
-                settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
-                settings.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorMetric);
-                settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
-                settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
-                settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                AntennaAttributes(ref showInnerAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "InnerNodeSettings.AntennaSettings.AntennaSections");
-                LabelSettings(ref showInnerLabelAttributes, ref settings.LabelSettings);
-                settings.ShowNames = EditorGUILayout.Toggle("Persistent names", settings.ShowNames);
-                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
+                antennaSettings.AntennaWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", antennaSettings.AntennaWidth));
+                //EditorGUILayout.PropertyField(sections, new GUIContent("Antenna sections"), true);
                 EditorGUI.indentLevel--;
             }
         }
@@ -352,53 +346,14 @@ namespace SEEEditor
         /// <param name="showAntennaAttributes">whether the fold out for the antenna settings should be shown</param>
         /// <param name="antennaWidth">the width of the antenna</param>
         /// <param name="antennaSettingsProperty">the path of the antenna settings to be set by this dialog part relative to the edited city</param>
-        private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, string antennaSettingsProperty)
+        private void AntennaAttributes(ref bool showAntennaAttributes, ref float antennaWidth, SerializedProperty sections)
         {
             showAntennaAttributes = EditorGUILayout.Foldout(showAntennaAttributes, "Antenna", true, EditorStyles.foldoutHeader);
             if (showAntennaAttributes)
             {
                 EditorGUI.indentLevel++;
                 antennaWidth = Mathf.Max(0, EditorGUILayout.FloatField("Width", antennaWidth));
-                SerializedProperty sections = serializedObject.FindProperty(antennaSettingsProperty);
-                if (sections != null)
-                {
-                    EditorGUILayout.PropertyField(sections, new GUIContent("Antenna sections"), true);
-                }
-                else
-                {
-                    Debug.LogError($"The instance of {city.GetType().FullName} does not have an attribute {antennaSettingsProperty}.\n");
-                }
-                EditorGUI.indentLevel--;
-            }
-        }
-
-        /// <summary>
-        /// Renders the GUI for attributes of leaf nodes.
-        /// </summary>
-        private void LeafNodeAttributes()
-        {
-            showLeafAttributes = EditorGUILayout.Foldout(showLeafAttributes, "Attributes of leaf nodes", true, EditorStyles.foldoutHeader);
-            if (showLeafAttributes)
-            {
-                EditorGUI.indentLevel++;
-
-                LeafNodeAttributes settings = city.LeafNodeSettings;
-                Assert.IsTrue(settings.GetType().IsClass); // Note: This may change to a struct, which may force us to use 'ref' above.
-
-                settings.Shape = (NodeShapes)EditorGUILayout.EnumPopup("Type", settings.Shape);
-                settings.WidthMetric = EditorGUILayout.TextField("Width", settings.WidthMetric);
-                settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
-                settings.DepthMetric = EditorGUILayout.TextField("Depth", settings.DepthMetric);
-                settings.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorMetric);
-                settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
-                settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
-                settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
-                settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
-                settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
-                AntennaAttributes(ref showLeafAntennaAttributes, ref settings.AntennaSettings.AntennaWidth, "LeafNodeSettings.AntennaSettings.AntennaSections");
-                LabelSettings(ref showLeafLabelAttributes, ref settings.LabelSettings);
-                settings.OutlineWidth = EditorGUILayout.FloatField("Outline width", settings.OutlineWidth);
-
+                EditorGUILayout.PropertyField(sections, new GUIContent("Antenna sections"), true);
                 EditorGUI.indentLevel--;
             }
         }
