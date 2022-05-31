@@ -122,7 +122,7 @@ namespace SEE.GO
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
-            GameObject beamMarker = NewBeam(factory, Materials.RenderLater(gameNode));
+            GameObject beamMarker = NewBeam(factory, gameNode.RenderLater());
             beamMarker.tag = Tags.Decoration;
             beamMarker.SetScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);
