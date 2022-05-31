@@ -414,7 +414,6 @@ namespace SEE.Game.City
             nodeMetrics.AddRange(AllInnerNodeMetrics());
             nodeMetrics.AddRange(AllLeafIssues());
             nodeMetrics.AddRange(AllInnerNodeIssues());
-            nodeMetrics.Add(InnerNodeSettings.InnerDonutMetric);
             return new HashSet<string>(nodeMetrics).ToList();
         }
 

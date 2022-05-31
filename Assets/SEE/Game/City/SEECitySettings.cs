@@ -269,11 +269,6 @@ namespace SEE.Game.City
     public class InnerNodeAttributes : VisualNodeAttributes
     {
         /// <summary>
-        /// The metric to be put in the inner circle of a Donut chart.
-        /// </summary>
-        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
-
-        /// <summary>
         /// If true, persistent text labels will be added to inner nodes.
         /// </summary>
         public bool ShowNames = false;
@@ -285,7 +280,6 @@ namespace SEE.Game.City
         protected override void SaveAdditionalAttributes(ConfigWriter writer)
         {
             writer.Save(ShowNames, ShowNamesLabel);
-            writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
         }
 
         /// <summary>
@@ -303,11 +297,9 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
-                ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
             }
         }
 
-        private const string InnerDonutMetricLabel = "InnerDonutMetric";
         private const string ShowNamesLabel = "ShowNames";
     }
 
