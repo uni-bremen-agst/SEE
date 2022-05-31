@@ -23,71 +23,25 @@ namespace SEE.GO
             Opaque,          // fully drawn with no transparency
             Transparent,     // transparency is available
             TransparentLine, // for lines with transparency
-            Invisible        // the object will be invisible
         }
 
         /// <summary>
-        /// Returns the render queue offset to be added if an object is to be rendered earlier.
-        /// Note: Objects in RenderQueue.Geometry (Opaque) are drawn in front-to-back order
-        /// while objects in RenderQueue.Transparent are drawn in back-to-front order.
-        /// For transparent shaders, 1 is returned. For opaque shaders, -1 is returned.
+        /// Name of the material for opaque objects (located in folder Resources).
         /// </summary>
-        /// <param name="shaderType">shader to be used for rendering</param>
-        /// <returns>render queue offset</returns>
-        internal static int RenderEarlierOffset(ShaderType shaderType)
-        {
-            return - RenderLaterOffset(shaderType);
-        }
-
-        /// <summary>
-        /// Returns the render queue offset to be added if an object is to be rendered later.
-        /// Note: Objects in RenderQueue.Geometry (Opaque) are drawn in front-to-back order
-        /// while objects in RenderQueue.Transparent are drawn in back-to-front order.
-        /// For transparent shaders, -1 is returned. For opaque shaders, 1 is returned.
-        /// </summary>
-        /// <param name="shaderType">shader to be used for rendering</param>
-        /// <returns>render queue offset</returns>
-        internal static int RenderLaterOffset(ShaderType shaderType)
-        {
-            return shaderType switch
-            {
-                ShaderType.Opaque => 1,           // front-to-back
-                ShaderType.Transparent => -1,     // back-to-front
-                ShaderType.TransparentLine => -1, // back-to-front
-                ShaderType.Invisible => -1,       // back-to-front
-                _ => throw new NotImplementedException()
-            };
-        }
-
-        /// <summary>
-        /// Returns the render queue position that is renderer later than the index
-        /// of <paramref name="gameNode"/>.
-        /// </summary>
-        /// <param name="gameNode">game object to be drawn just before the resulting render queue index</param>
-        /// <returns>render queue index later than the index of <paramref name="gameNode"/></returns>
-        internal static int RenderLater(GameObject gameNode)
-        {
-            int offset = gameNode.GetRenderQueue();
-            // For queues with an index up to and including 2500 (Geometry + 500),
-            // Unity sorts Renderers in these queues using the behavior defined in
-            // OpaqueSortMode.FrontToBack by default.
-            // For queues with an index of 2501 or above, Unity sorts Renderers in
-            // these queues using the behavior defined in TransparencySortMode.Default
-            // by default, which is back-to-front.
-            return (offset <= (int)RenderQueue.Geometry + 500) ?
-                offset + 1 : offset - 1;
-        }
-
-        // Normal materials
         private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        /// <summary>
+        /// Name of the material for transparent objects (located in folder Resources).
+        /// </summary>
         private const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
+        /// <summary>
+        /// Name of the material for transparent lines (located in folder Resources).
+        /// </summary>
         private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
-        private const string InvisibleMaterialName = "Materials/InvisibleMaterial";
 
         /// <summary>
-        /// The name of the shader property for the texture.
+        /// The id of the shader property for the texture.
         /// </summary>
-        private const string TexturePropertyName = "_Texture";
+        private static readonly int TexturePropertyID = Shader.PropertyToID("_Texture");
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -233,11 +187,11 @@ namespace SEE.GO
         /// <param name="material">material to which a texture should be added</param>
         private static void AddTexture(Material material)
         {
-            if (material.HasProperty(TexturePropertyName))
+            if (material.HasProperty(TexturePropertyID))
             {
                 if (false)
                 {
-                    material.SetTexture(TexturePropertyName, NewTexture());
+                    material.SetTexture(TexturePropertyID, NewTexture());
                 }
                 else
                 {
@@ -250,7 +204,7 @@ namespace SEE.GO
                     else
                     {
                         //Debug.Log($"_Texture: {texture.name}\n");
-                        material.SetTexture(TexturePropertyName, texture);
+                        material.SetTexture(TexturePropertyID, texture);
                     }
                 }
             }
@@ -265,9 +219,9 @@ namespace SEE.GO
         /// <param name="texture">texture to be added; can be null</param>
         private static void AddTexture(Material material, Texture texture)
         {
-            if (texture != null && material.HasProperty(TexturePropertyName))
+            if (texture != null && material.HasProperty(TexturePropertyID))
             {
-                material.SetTexture(TexturePropertyName, texture);
+                material.SetTexture(TexturePropertyID, texture);
             }
         }
 
@@ -358,9 +312,6 @@ namespace SEE.GO
                     break;
                 case ShaderType.TransparentLine:
                     name = TransparentLineMaterialName;
-                    break;
-                case ShaderType.Invisible:
-                    name = InvisibleMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();
