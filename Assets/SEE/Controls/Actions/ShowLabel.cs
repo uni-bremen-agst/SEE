@@ -205,9 +205,7 @@ namespace SEE.Controls.Actions
         /// <returns>true iff labels are enabled for this kind of node</returns>
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
-            // For leaves, we don't want to display labels if code is already shown for the node.
-            return node.IsLeaf() && city.LeafNodeSettings.LabelSettings.Show
-                || node.IsInnerNode() && city.InnerNodeSettings.LabelSettings.Show;
+            return city.SelectedNodeTypes.TryGetValue(node.Type, out VisualNodeAttributes visual) && visual.LabelSettings.Show;
         }
 
         /// <summary>
