@@ -36,14 +36,49 @@ namespace SEE.Game.City
         protected const string DataButtonsGroup = "DataButtonsGroup";
 
         /// <summary>
+        /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoad = 1;
+
+        /// <summary>
+        /// The order of the Draw button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderDraw = DataButtonsGroupOrderLoad + 1;
+
+        /// <summary>
+        /// The order of the Save button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSave = DataButtonsGroupOrderDraw + 1;
+
+        /// <summary>
+        /// The order of the Save-Layout button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
+
+        /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.
         /// </summary>
         protected const string ResetButtonsGroup = "ResetButtonsGroup";
 
         /// <summary>
+        /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
+        /// </summary>
+        protected const float ResetButtonsGroupOrderReset = 1;
+
+        /// <summary>
         /// The name of the group for the Inspector buttons managing the configuration file.
         /// </summary>
         protected const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupLoad = 1;
+
+        /// <summary>
+        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
 
         /// <summary>
         /// Name of the Inspector foldout group for the metric setttings.
@@ -197,7 +232,8 @@ namespace SEE.Game.City
         /// Saves the settings of this code city to <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup)]
+        [PropertyOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
@@ -207,7 +243,8 @@ namespace SEE.Game.City
         /// Loads the settings of this code city from <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup)]
+        [PropertyOrder(ConfigurationButtonsGroupLoad)]
         public void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
@@ -252,6 +289,9 @@ namespace SEE.Game.City
         /// Resets everything that is specific to a given graph. Here:
         /// all game objects created for this city.
         /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
@@ -260,8 +300,9 @@ namespace SEE.Game.City
         /// <summary>
         /// Resets the selected node types to be visualized.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset node types")]
-        [HorizontalGroup(ResetButtonsGroup)]
+        [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
         public void ResetSelectedNodeTypes()
         {
             SelectedNodeTypes.Clear();

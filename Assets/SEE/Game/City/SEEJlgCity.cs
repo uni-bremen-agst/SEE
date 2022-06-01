@@ -53,7 +53,8 @@ namespace SEE.Game.City
         /// JLG tracing data.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
             base.LoadData();

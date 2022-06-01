@@ -298,7 +298,8 @@ namespace SEE.Game.City
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
             if (string.IsNullOrEmpty(GXLPath.Path))
@@ -320,7 +321,8 @@ namespace SEE.Game.City
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
         public virtual void SaveData()
         {
             if (string.IsNullOrEmpty(GXLPath.Path))
@@ -355,8 +357,9 @@ namespace SEE.Game.City
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
             if (loadedGraph == null)
@@ -405,7 +408,8 @@ namespace SEE.Game.City
         /// the file is saved in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
@@ -424,8 +428,9 @@ namespace SEE.Game.City
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset all")]
-        [HorizontalGroup(ResetButtonsGroup)]
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
