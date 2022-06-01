@@ -133,7 +133,8 @@ namespace SEE.Game
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            List<string> nodeMetrics = Settings.AllDefaultMetrics();
+
+            HashSet<string> nodeMetrics = Graph.AllMetrics(graphs);
 
             if (Settings.ZScoreScale)
             {
