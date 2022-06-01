@@ -207,11 +207,6 @@ namespace SEE.Net
                 maxRevisionsToLoad = ((SEECityEvolution)city).MaxRevisionsToLoad;
             }
 
-            if (city.GetType() == typeof(SEEDynCity))
-            {
-                dynPath = ((SEEDynCity)city).DYNPath;
-            }
-
             if (city.GetType() == typeof(SEEJlgCity))
             {
                 jlgPath = ((SEEJlgCity)city).JLGPath;
@@ -254,12 +249,6 @@ namespace SEE.Net
             {
                 city = gameObject.GetComponent<SEECityEvolution>();
                 ((SEECityEvolution)city).MaxRevisionsToLoad = maxRevisionsToLoad;
-            }
-
-            if (t == typeof(SEEDynCity))
-            {
-                city = gameObject.GetComponent<SEEDynCity>();
-                ((SEEDynCity)city).DYNPath = dynPath;
             }
 
             if (t == typeof(SEEJlgCity))
@@ -330,10 +319,6 @@ namespace SEE.Net
             if (t == typeof(SEECity))
             {
                 ((SEECity)city).LoadAndDrawGraph();
-            }
-            else if (t == typeof(SEEDynCity))
-            {
-                ((SEEDynCity)city).LoadAndDrawGraph();
             }
             else if (t == typeof(SEECityRandom))
             {
