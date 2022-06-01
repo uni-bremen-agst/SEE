@@ -294,7 +294,11 @@ namespace SEE.Game
 
                 metricMaximum = scaler.GetNormalizedMaximum(colorMetric);
                 metricValue = scaler.GetNormalizedValue(colorMetric, node);
-                Assert.IsTrue(metricValue <= metricMaximum, $"not true: {metricValue} <= {metricMaximum} for color metric {colorMetric} of node {node.ID}");
+                if (metricValue > metricMaximum)
+                {
+                    Debug.LogError($"not true: {metricValue} <= {metricMaximum} for color metric {colorMetric} of node {node.ID}.\n");
+                    return Mathf.RoundToInt(metricMaximum);
+                }
             }
             return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, metricValue / metricMaximum));
         }
