@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -21,8 +22,34 @@ namespace SEE.Game.City
     /// is the representation of a graph including the settings that have lead
     /// to its visualization.
     /// </summary>
-    public abstract partial class AbstractSEECity : SerializedMonoBehaviour
+    [Serializable]
+    public abstract partial class AbstractSEECity : Sirenix.OdinInspector.SerializedMonoBehaviour
     {
+        /// <summary>
+        /// Name of the Inspector foldout group for the data setttings.
+        /// </summary>
+        protected const string DataFoldoutGroup = "Data";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the data.
+        /// </summary>
+        protected const string DataButtonsGroup = "DataButtonsGroup";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons resettting the data.
+        /// </summary>
+        protected const string ResetButtonsGroup = "ResetButtonsGroup";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the configuration file.
+        /// </summary>
+        protected const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
+        protected const string MetricFoldoutGroup = "Metric settings";
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -40,35 +67,36 @@ namespace SEE.Game.City
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        [OdinSerialize]
-        public FilePath CityPath = new FilePath();
+        [SerializeField, ShowInInspector, Tooltip("Path of configuration file."), FoldoutGroup(DataFoldoutGroup)]
+        public FilePath ConfigurationPath = new FilePath();
 
         /// <summary>
         /// The path to project where the source code can be found.
-        /// <see cref="ProjectPath"/>.
+        /// <see cref="SourceCodeDirectory"/>.
         /// </summary>
-        [OdinSerialize]
-        private DirectoryPath projectPath = new DirectoryPath();
+        [SerializeField, HideInInspector]
+        private DirectoryPath sourceCodeDirectory = new DirectoryPath();
 
         /// <summary>
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        public DirectoryPath ProjectPath
+        [SerializeField, ShowInInspector, FoldoutGroup(DataFoldoutGroup)]
+        public DirectoryPath SourceCodeDirectory
         {
-            get => projectPath;
+            get => sourceCodeDirectory;
             set
             {
-                if (projectPath != value)
+                if (sourceCodeDirectory != value)
                 {
-                    projectPath = value;
+                    sourceCodeDirectory = value;
                     ProjectPathChanged();
                 }
             }
         }
 
         /// <summary>
-        /// Will be called whenever a new value is assigned to <see cref="ProjectPath"/>.
+        /// Will be called whenever a new value is assigned to <see cref="SourceCodeDirectory"/>.
         /// This gives our subclasses a chance to update their graphs.
         /// </summary>
         protected abstract void ProjectPathChanged();
@@ -78,66 +106,79 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [OdinSerialize]
+        [SerializeField, ShowInInspector, Tooltip("Path of VS solution file."), FoldoutGroup(DataFoldoutGroup)]
         public FilePath SolutionPath = new FilePath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [OdinSerialize]
+        [OdinSerialize, ShowInInspector, Tooltip("Edge types of hierarchical edges.")]
         public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes(); // serialized by Odin
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not and if so, how.
         /// </summary>
-        [NonSerialized, OdinSerialize]
+        [OdinSerialize, ShowInInspector, Tooltip("Visual attributes of nodes.")]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
         public Dictionary<string, VisualNodeAttributes> SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
         /// The attributes of the leaf nodes.
         /// </summary>
+        [HideInInspector]
+        [Obsolete]
         public VisualNodeAttributes LeafNodeSettings = new VisualNodeAttributes("LeafNode");
 
         /// <summary>
         /// The attributes of the inner nodes.
         /// </summary>
+        [HideInInspector]
+        [Obsolete]
         public VisualNodeAttributes InnerNodeSettings = new VisualNodeAttributes("InnerNode");
 
         /// <summary>
         /// The node layout settings.
         /// </summary>
+        [OdinSerialize, ShowInInspector, Tooltip("Settings for the node layout.")]
         public NodeLayoutAttributes NodeLayoutSettings = new NodeLayoutAttributes();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
+        [OdinSerialize, ShowInInspector, Tooltip("Settings for the edge layout.")]
         public EdgeLayoutAttributes EdgeLayoutSettings = new EdgeLayoutAttributes();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
+        [OdinSerialize, ShowInInspector, Tooltip("Settings for the selection of edges.")]
         public EdgeSelectionAttributes EdgeSelectionSettings = new EdgeSelectionAttributes();
 
         /// <summary>
         /// The cose graph settings.
         /// </summary>
+        [HideInInspector]
+        [Obsolete]
         public CoseGraphAttributes CoseGraphSettings = new CoseGraphAttributes(); // FIXME put into CitySettings.cs
 
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
+        [OdinSerialize, ShowInInspector, Tooltip("Settings for the visualization of software erosions.")]
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
@@ -153,19 +194,23 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Saves the settings of this code city to <see cref="CityPath"/>.
+        /// Saves the settings of this code city to <see cref="ConfigurationPath"/>.
         /// </summary>
-        public void Save()
+        [Button(ButtonSizes.Small)]
+        [HorizontalGroup(ConfigurationButtonsGroup)]
+        public void SaveConfiguration()
         {
-            Save(CityPath.Path);
+            Save(ConfigurationPath.Path);
         }
 
         /// <summary>
-        /// Loads the settings of this code city from <see cref="CityPath"/>.
+        /// Loads the settings of this code city from <see cref="ConfigurationPath"/>.
         /// </summary>
-        public void Load()
+        [Button(ButtonSizes.Small)]
+        [HorizontalGroup(ConfigurationButtonsGroup)]
+        public void LoadConfiguration()
         {
-            Load(CityPath.Path);
+            Load(ConfigurationPath.Path);
         }
 
         /// <summary>
@@ -215,6 +260,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Resets the selected node types to be visualized.
         /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset node types")]
+        [HorizontalGroup(ResetButtonsGroup)]
         public void ResetSelectedNodeTypes()
         {
             SelectedNodeTypes.Clear();
@@ -482,7 +529,7 @@ namespace SEE.Game.City
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty graph path.\n");
-                Graph graph = new Graph(ProjectPath.Path);
+                Graph graph = new Graph(SourceCodeDirectory.Path);
                 return graph;
             }
 
@@ -490,7 +537,7 @@ namespace SEE.Game.City
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
-                                                           basePath: ProjectPath.Path,
+                                                           basePath: SourceCodeDirectory.Path,
                                                            rootID: rootName ?? filename,
                                                            logger: new SEELogger());
                 graphCreator.Load();
@@ -506,7 +553,7 @@ namespace SEE.Game.City
             else
             {
                 Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
-                return new Graph(ProjectPath.Path);
+                return new Graph(SourceCodeDirectory.Path);
             }
         }
 

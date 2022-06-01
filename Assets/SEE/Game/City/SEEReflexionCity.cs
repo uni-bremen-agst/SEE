@@ -104,7 +104,7 @@ namespace SEE.Game.City
                     /// The mapping graph may contain nodes and edges from the implementation. Possibly, their
                     /// <see cref="GraphElement.AbsolutePlatformPath()"/> will be retrieved. That is why we
                     /// will set the base path to <see cref="ProjectPath.Path"/>.
-                    MappingGraph = new Graph(ProjectPath.Path);
+                    MappingGraph = new Graph(SourceCodeDirectory.Path);
                 }
                 else
                 {

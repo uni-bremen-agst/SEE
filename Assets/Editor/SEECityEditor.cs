@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
@@ -16,7 +15,7 @@ namespace SEEEditor
     /// <summary>
     /// A custom editor for instances of SEECity.
     /// </summary>
-    [CustomEditor(typeof(SEECity))]
+    //[CustomEditor(typeof(SEECity))]
     [CanEditMultipleObjects]
     public class SEECityEditor : StoredSEECityEditor
     {
@@ -327,7 +326,7 @@ namespace SEEEditor
             {
                 city.GXLPath = DataPathEditor.GetDataPath("GXL file", city.GXLPath, Filenames.ExtensionWithoutPeriod(Filenames.GXLExtension)) as FilePath;
                 city.CSVPath = DataPathEditor.GetDataPath("Metric file", city.CSVPath, Filenames.ExtensionWithoutPeriod(Filenames.CSVExtension)) as FilePath;
-                city.ProjectPath = DataPathEditor.GetDataPath("Project directory", city.ProjectPath, fileDialogue: false) as DirectoryPath;
+                city.SourceCodeDirectory = DataPathEditor.GetDataPath("Project directory", city.SourceCodeDirectory, fileDialogue: false) as DirectoryPath;
                 city.SolutionPath = DataPathEditor.GetDataPath("Solution file", city.SolutionPath, Filenames.ExtensionWithoutPeriod(Filenames.SolutionExtension)) as FilePath;
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -36,8 +37,8 @@ namespace SEE.Game.City
         /// <param name="writer">writer for the configuration file</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            CityPath.Save(writer, CityPathLabel);
-            ProjectPath.Save(writer, ProjectPathLabel);
+            ConfigurationPath.Save(writer, CityPathLabel);
+            SourceCodeDirectory.Save(writer, ProjectPathLabel);
             SolutionPath.Save(writer, SolutionPathLabel);
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
@@ -65,9 +66,19 @@ namespace SEE.Game.City
                                                   string selectedNodeTypesLabel)
         {
             writer.BeginList(selectedNodeTypesLabel);
-            foreach (var entry in selectedNodeTypes)
+            try
             {
-                entry.Value.Save(writer, "");
+                if (selectedNodeTypes != null)
+                {
+                    foreach (var entry in selectedNodeTypes)
+                    {
+                        entry.Value.Save(writer, "");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
             writer.EndList();
         }
@@ -78,8 +89,8 @@ namespace SEE.Game.City
         /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            CityPath.Restore(attributes, CityPathLabel);
-            ProjectPath.Restore(attributes, ProjectPathLabel);
+            ConfigurationPath.Restore(attributes, CityPathLabel);
+            SourceCodeDirectory.Restore(attributes, ProjectPathLabel);
             SolutionPath.Restore(attributes, SolutionPathLabel);
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
