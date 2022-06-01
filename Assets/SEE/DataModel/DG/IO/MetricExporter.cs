@@ -11,8 +11,8 @@ namespace SEE.DataModel.DG.IO
     public class MetricExporter : MetricsIO
     {
         /// <summary>
-        /// Saves all node metrics of given <paramref name="graph"/> to a file named 
-        /// <paramref name="filename"/> in CSV format where <paramref name="separator"/> 
+        /// Saves all node metrics of given <paramref name="graph"/> to a file named
+        /// <paramref name="filename"/> in CSV format where <paramref name="separator"/>
         /// is used to separate columns.
         /// </summary>
         /// <param name="graph">the graph whose node metrics are to be stored</param>
@@ -20,8 +20,8 @@ namespace SEE.DataModel.DG.IO
         /// <param name="separator">the separator inbetween columns</param>
         public static void Save(Graph graph, string filename, char separator = ';')
         {
-            List<string> intAttributes = graph.AllIntNodeAttributes();
-            List<string> floatAttributes = graph.AllFloatNodeAttributes();
+            ICollection<string> intAttributes = graph.AllIntNodeAttributes();
+            ICollection<string> floatAttributes = graph.AllFloatNodeAttributes();
 
             if (intAttributes.Count + floatAttributes.Count > 0)
             {
@@ -48,9 +48,9 @@ namespace SEE.DataModel.DG.IO
         /// <param name="floatAttributes">float attribute names</param>
         /// <param name="separator">the character used to separate columns</param>
         private static void WriteHeader
-            (StreamWriter outputFile, 
-            List<string> intAttributes, 
-            List<string> floatAttributes, 
+            (StreamWriter outputFile,
+            ICollection<string> intAttributes,
+            ICollection<string> floatAttributes,
             char separator)
         {
             StringBuilder sb = new StringBuilder();
@@ -74,7 +74,7 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Writes the attribute values of <paramref name="node"/> for all <paramref name="intAttributes"/> 
+        /// Writes the attribute values of <paramref name="node"/> for all <paramref name="intAttributes"/>
         /// and <paramref name="floatAttributes"/>. If <paramref name="node"/> does not have a value
         /// for any of these, 0 will be written.
         /// </summary>
@@ -83,7 +83,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="intAttributes">integer attribute names</param>
         /// <param name="floatAttributes">float attribute names</param>
         /// <param name="separator">the character used to separate columns</param>
-        private static void WriteAttributes(StreamWriter outputFile, Node node, List<string> intAttributes, List<string> floatAttributes, char separator)
+        private static void WriteAttributes(StreamWriter outputFile, Node node, ICollection<string> intAttributes, ICollection<string> floatAttributes, char separator)
         {
             StringBuilder sb = new StringBuilder();
             // The ID must be in the first column.

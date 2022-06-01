@@ -264,7 +264,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupPages()
         {
-            List<string> metricNames = city.AllExistingMetrics();
+            ICollection<string> metricNames = city.AllExistingMetrics();
             SetupLeafNodesPage(metricNames);
             SetupInnerNodesPage(metricNames);
             SetupNodesLayoutPage();
@@ -278,7 +278,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         /// <param name="metricNames">the names of the metrics that can be selected
         /// for these visual attributes</param>
-        private void SetupLeafNodesPage(List<string> metricNames)
+        private void SetupLeafNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Leaf nodes", TabButtonState.InitialActive);
             GameObject page = CreateAndInsertPage("Leaf nodes");
@@ -363,7 +363,7 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         /// <param name="metricNames">the names of the metrics that can be selected
         /// for these visual attributes</param>
-        private void SetupInnerNodesPage(List<string> metricNames)
+        private void SetupInnerNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Inner nodes");
             GameObject page = CreateAndInsertPage("Inner nodes");

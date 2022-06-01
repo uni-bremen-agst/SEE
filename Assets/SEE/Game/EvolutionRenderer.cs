@@ -1505,11 +1505,11 @@ namespace SEE.Game
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        internal List<string> AllExistingMetrics()
+        internal ISet<string> AllExistingMetrics()
         {
             if (currentCity == null || currentCity.Graph == null)
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
             else
             {

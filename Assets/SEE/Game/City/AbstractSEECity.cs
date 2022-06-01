@@ -496,7 +496,7 @@ namespace SEE.Game.City
         /// A metric name occurs only once.
         /// </summary>
         /// <returns>all node metric names</returns>
-        public List<string> AllDefaultMetrics()
+        private List<string> AllDefaultMetrics()
         {
             List<string> nodeMetrics = new List<string>(AllLeafMetrics());
             nodeMetrics.AddRange(AllInnerNodeMetrics());
@@ -511,7 +511,7 @@ namespace SEE.Game.City
         /// metric.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        public abstract List<string> AllExistingMetrics();
+        public abstract ISet<string> AllExistingMetrics();
 
         /// <summary>
         /// Yields a mapping of all node attribute names that define erosion issues
