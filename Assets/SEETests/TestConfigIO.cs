@@ -850,8 +850,8 @@ namespace SEE.Utils
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
             city.SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
-            city.CityPath.Set("C:/MyAbsoluteDirectory/config.cfg");
-            city.ProjectPath.Set("C:/MyAbsoluteDirectory");
+            city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
+            city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
             city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
             city.ZScoreScale = !city.ZScoreScale;
             city.ScaleOnlyLeafMetrics = !city.ScaleOnlyLeafMetrics;
@@ -862,8 +862,8 @@ namespace SEE.Utils
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
             AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
-            AreEqual(expected.CityPath, actual.CityPath);
-            AreEqual(expected.ProjectPath, actual.ProjectPath);
+            AreEqual(expected.ConfigurationPath, actual.ConfigurationPath);
+            AreEqual(expected.SourceCodeDirectory, actual.SourceCodeDirectory);
             AreEqual(expected.SolutionPath, actual.SolutionPath);
             Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
             Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
