@@ -447,11 +447,11 @@ namespace SEE.Game.City
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        public override List<string> AllExistingMetrics()
+        public override ISet<string> AllExistingMetrics()
         {
             if (loadedGraph == null)
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
             else
             {
