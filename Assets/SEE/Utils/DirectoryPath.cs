@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 
 namespace SEE.Utils
 {
@@ -24,6 +25,24 @@ namespace SEE.Utils
         /// <param name="path">path from which to derive the kind of root and relative/absolute path</param>
         public DirectoryPath(string path) : base(path)
         {
+        }
+
+        /// <summary>
+        /// The stored full path.
+        ///
+        /// If the <see cref="Root"/> is absolute, the result is equivalent to <see cref="AbsolutePath"/>.
+        ///
+        /// Otherwise the prefix specified by <see cref="Root"/> will be prepended
+        /// to <see cref="RelativePath"/>.
+        /// The style of this path prefix is always the one of the current operating
+        /// system we are running on, that is, the directory separator will be \
+        /// on Windows and / on all other platforms.
+        /// </summary>
+        [ShowInInspector, FolderPath(AbsolutePath = true)]
+        public override string Path
+        {
+            get => Get();
+            set => Set(value);
         }
     }
 }

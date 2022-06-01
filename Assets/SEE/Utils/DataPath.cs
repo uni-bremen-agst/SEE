@@ -191,7 +191,7 @@ namespace SEE.Utils
         /// (or also Unity style), independent from the operating system we are currently
         /// running on.
         /// </summary>
-        [SerializeField] private string relativePath = "";
+        [SerializeField, HideInInspector] private string relativePath = "";
 
         /// <summary>
         /// The path relative to the <see cref="Root"/>. The directory separator will be /.
@@ -206,7 +206,7 @@ namespace SEE.Utils
         /// <summary>
         /// The internal representation of property <see cref="AbsolutePath"/>.
         /// </summary>
-        [SerializeField] private string absolutePath = "";
+        [SerializeField, HideInInspector] private string absolutePath = "";
         /// <summary>
         /// The absolute path. Retrieve this value only if <see cref="Root"/> is the absolute path.
         /// The directory separator used here is the exactly the same how it was set in the
@@ -230,36 +230,35 @@ namespace SEE.Utils
         /// system we are running on, that is, the directory separator will be \
         /// on Windows and / on all other platforms.
         /// </summary>
-        public string Path
+        public abstract string Path { get; set; }
+
+        protected string Get()
         {
-            get
+            if (Root == RootKind.Absolute)
             {
-                if (Root == RootKind.Absolute)
+                if (string.IsNullOrEmpty(absolutePath))
                 {
-                    if (string.IsNullOrEmpty(absolutePath))
-                    {
-                        return "";
-                    }
-                    else
-                    {
-                        return absolutePath;
-                    }
+                    return "";
                 }
                 else
                 {
-                    // Path is relative to root.
-                    if (string.IsNullOrEmpty(relativePath))
-                    {
-                        return Filenames.OnCurrentPlatform(RootPath);
-                    }
-                    else if (!relativePath.StartsWith("/"))
-                    {
-                        return Filenames.OnCurrentPlatform(RootPath + "/" + relativePath);
-                    }
-                    else
-                    {
-                        return Filenames.OnCurrentPlatform(RootPath + relativePath);
-                    }
+                    return absolutePath;
+                }
+            }
+            else
+            {
+                // Path is relative to root.
+                if (string.IsNullOrEmpty(relativePath))
+                {
+                    return Filenames.OnCurrentPlatform(RootPath);
+                }
+                else if (!relativePath.StartsWith("/"))
+                {
+                    return Filenames.OnCurrentPlatform(RootPath + "/" + relativePath);
+                }
+                else
+                {
+                    return Filenames.OnCurrentPlatform(RootPath + relativePath);
                 }
             }
         }
