@@ -243,7 +243,7 @@ namespace SEE.Game.UI.ConfigMenu
                 city.Reset();
                 cityLoadButton.gameObject.SetActive(true);
             });
-            CreateActionButton("Save Graph", city.Save);
+            CreateActionButton("Save Graph", city.SaveConfiguration);
             CreateActionButton("Draw", () =>
             {
                 city.DrawGraph();
@@ -591,7 +591,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Settings file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Settings file")
-                .SetPathInstance(city.CityPath)
+                .SetPathInstance(city.ConfigurationPath)
                 .Build();
 
             // LOD culling

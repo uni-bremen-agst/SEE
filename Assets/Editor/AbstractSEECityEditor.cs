@@ -108,15 +108,15 @@ namespace SEEEditor
             showGeneralAttributes = EditorGUILayout.Foldout(showGeneralAttributes, "General", true, EditorStyles.foldoutHeader);
             if (showGeneralAttributes)
             {
-                city.CityPath = DataPathEditor.GetDataPath("Settings file", city.CityPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
+                city.ConfigurationPath = DataPathEditor.GetDataPath("Settings file", city.ConfigurationPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Load", GUILayout.Width(50)))
                 {
-                    city.Load();
+                    city.LoadConfiguration();
                 }
                 if (GUILayout.Button("Save", GUILayout.Width(50)))
                 {
-                    city.Save();
+                    city.SaveConfiguration();
                 }
                 GUILayout.EndHorizontal();
 

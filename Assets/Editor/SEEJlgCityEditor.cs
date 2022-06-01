@@ -22,7 +22,6 @@
 
 #if UNITY_EDITOR
 
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
@@ -32,7 +31,7 @@ namespace SEEEditor
         /// <summary>
         /// A custom editor for instances of SEEJlgCity as an extension of the SEECityEditor.
         /// </summary>
-        [CustomEditor(typeof(SEEJlgCity))]
+        //[CustomEditor(typeof(SEEJlgCity))]
         [CanEditMultipleObjects]
         public class SEEJlgCityEditor : SEECityEditor
         {

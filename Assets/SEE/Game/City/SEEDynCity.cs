@@ -3,6 +3,7 @@ using System.IO;
 using SEE.DataModel;
 using SEE.DataModel.Runtime.IO;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -23,6 +24,7 @@ namespace SEE.Game.City
         /// The path to the DYN file containing the trace data.
         /// </summary>
         /// <returns>path of DYN file</returns>
+        [SerializeField, ShowInInspector, Tooltip("Path of DYN file"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath DYNPath = new FilePath();
 
         /// <summary>
@@ -30,6 +32,8 @@ namespace SEE.Game.City
         /// from the CSV file with CSVPath(). Afterwards, DrawGraph() can be used
         /// to actually render the graph data.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [HorizontalGroup(DataButtonsGroup)]
         public override void LoadData()
         {
             base.LoadData();

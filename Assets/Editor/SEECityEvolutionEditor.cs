@@ -13,7 +13,7 @@ namespace SEEEditor
     /// A custom editor for instances of SEECityEvolution as an extension
     /// of the AbstractSEECityEditor.
     /// </summary>
-    [CustomEditor(typeof(SEECityEvolution))]
+    //[CustomEditor(typeof(SEECityEvolution))]
     [CanEditMultipleObjects]
     public class SEECityEvolutionEditor : StoredSEECityEditor
     {

@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
 using SEE.Game.City;
 using SEE.Utils;
 using UnityEditor;
@@ -10,7 +9,7 @@ namespace SEEEditor
     /// <summary>
     /// A custom editor for instances of SEEDynCity as an extension of the SEECityEditor.
     /// </summary>
-    [CustomEditor(typeof(SEEDynCity))]
+    //[CustomEditor(typeof(SEEDynCity))]
     [CanEditMultipleObjects]
     public class SEEDynCityEditor : SEECityEditor
     {

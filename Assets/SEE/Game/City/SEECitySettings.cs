@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OdinSerializer;
 using SEE.DataModel.DG;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -69,6 +70,7 @@ namespace SEE.Game.City
     /// All settings influencing the visual appearance of leaf or inner nodes.
     /// </summary>
     [Serializable]
+    [InlineProperty]
     public class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
@@ -81,26 +83,38 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Default constructor providing no value for <see cref="NodeType"/>.
+        /// Note: Used by Sirenix Inspector.
+        /// </summary>
+        public VisualNodeAttributes()
+        {
+        }
+
+        /// <summary>
         /// The name of the node type that is specified. See <see cref="NodeType"/>.
         /// </summary>
-        [SerializeField]
-        private string nodeType;
+        [SerializeField, HideInInspector]
+        private string nodeType = string.Empty;
         /// <summary>
         /// The name of the node type that is specified.
         /// </summary>
+        [HideInInspector]
         public string NodeType { get => nodeType; private set => nodeType = value; }
         /// <summary>
         /// How a node should be drawn. Determines the kind of mesh.
         /// </summary>
+        [ShowInInspector]
         public NodeShapes Shape = NodeShapes.Blocks;
         /// <summary>
         /// If true, the node should be rendered. Otherwise the node will be ignored when
         /// the graph is loaded.
         /// </summary>
+        [ShowInInspector]
         public bool IsRelevant = true;
         /// <summary>
         /// Name of the metric defining the width.
         /// </summary>
+        [ShowInInspector]
         public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
         /// <summary>
         /// Name of the metric defining the depth.
@@ -109,11 +123,11 @@ namespace SEE.Game.City
         /// <summary>
         /// The name of the metric determining the height.
         /// </summary>
-        public string HeightMetric = "";
+        public string HeightMetric = string.Empty;
         /// <summary>
         /// The name of the metric determining the style (color) of a node.
         /// </summary>
-        public string ColorMetric = "";
+        public string ColorMetric = string.Empty;
         /// <summary>
         /// The range of colors for the style metric.
         /// </summary>
