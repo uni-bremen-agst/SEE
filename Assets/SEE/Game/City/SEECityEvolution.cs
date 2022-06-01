@@ -152,7 +152,8 @@ namespace SEE.Game.City
         /// loaded, that graph will be destroyed.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public void LoadData()
         {
             if (firstGraph != null)
@@ -174,8 +175,9 @@ namespace SEE.Game.City
         /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
         /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Reset all")]
-        [HorizontalGroup(ResetButtonsGroup)]
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -188,8 +190,9 @@ namespace SEE.Game.City
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        [Button(ButtonSizes.Small)]
-        [HorizontalGroup(DataButtonsGroup)]
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
             if (firstGraph)
