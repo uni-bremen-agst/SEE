@@ -77,6 +77,16 @@ namespace SEE.Game.City
         /// More specifically, these are intended to be handled after <see cref="DrawGraph"/> has been called.
         /// </summary>
         private readonly Queue<ChangeEvent> UnhandledEvents = new Queue<ChangeEvent>();
+        
+        /// <summary>
+        /// Duration of any animation (edge movement, color change...) in seconds.
+        /// </summary>
+        private const float ANIMATION_DURATION = 2.0f;
+
+        /// <summary>
+        /// Ease function of any animation (edge movement, color change...).
+        /// </summary>
+        private const Ease ANIMATION_EASE = Ease.InOutExpo;
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -323,7 +333,18 @@ namespace SEE.Game.City
 
             if (edge != null && edge.TryGetComponent(out SEESpline spline))
             {
-                spline.GradientColors = GetEdgeGradient(edgeChange.NewState);
+                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
+                // Animate color change for nicer visuals.
+                // We need two tweens for this, one for each end of the gradient.
+                Tween startTween = DOTween.To(() => spline.GradientColors.start, 
+                                                c => spline.GradientColors = (c, spline.GradientColors.end), 
+                                                newColors.start, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                Tween endTween = DOTween.To(() => spline.GradientColors.end, 
+                                              c => spline.GradientColors = (spline.GradientColors.start, c), 
+                                              newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
+                startTween.Play();
+                endTween.Play();
             }
             else
             {
@@ -363,11 +384,13 @@ namespace SEE.Game.City
 
             // Move implementation node to architecture node, sizing it down accordingly.
             // TODO: Handle children as well, if that's necessary?
+            Vector3 oldPosition = implGameNode.transform.position;
             Vector3 newPosition = archGameNode.transform.position;
             implGameNode.transform.position = newPosition;
             GameNodeMover.PutOn(implGameNode.transform, archGameNode);
+            newPosition = implGameNode.transform.position;
             // Mapped node should be half its parent's size
-            implGameNode.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            implGameNode.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), ANIMATION_DURATION);
 
             // Recalculate edge layout and animate edges due to new node positioning.
             // TODO: Iterating over all game edges is currently very costly,
@@ -380,12 +403,16 @@ namespace SEE.Game.City
                 GameObject source = edge.Source == implNode ? implGameNode : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == implNode ? implGameNode : edge.Target.RetrieveGameNode();
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
-                AnimateEdgeSpline(gameEdge, newEdge);
+                AddEdgeSplineAnimation(gameEdge, newEdge);
             }
+            
+            // Movement of the node should be animated as well. For this, we have to reset its position first.
+            implGameNode.transform.position = oldPosition;
+            implGameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
 
             #region Local Methods
 
-            static void AnimateEdgeSpline(GameObject sourceEdge, GameObject targetEdge)
+            static void AddEdgeSplineAnimation(GameObject sourceEdge, GameObject targetEdge)
             {
                 if (targetEdge.TryGetComponentOrLog(out SEESpline splineTarget)
                     && sourceEdge.TryGetComponentOrLog(out SEESpline splineSource))
@@ -394,10 +421,8 @@ namespace SEE.Game.City
                     targetEdge.SetActive(false);
                     // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
                     SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                    morphism.CreateTween(splineSource.Spline, splineTarget.Spline, 1f)
-                            .SetEase(Ease.InOutExpo)
-                            .OnComplete(() => Destroy(targetEdge))
-                            .Play();
+                    morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
+                            .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
                 }
             }
 
