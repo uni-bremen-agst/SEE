@@ -37,6 +37,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
+using static SEE.Game.GraphRenderer;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -1271,7 +1272,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             IList<Node> parents = to.Ascendants();
-            Node notInArch = parents.FirstOrDefault(x => !x.IsInArchitecture());
+            Node notInArch = parents.FirstOrDefault(x => !x.IsInArchitecture() && !x.HasSupertypeOf(RootType));
             AssertOrThrow(notInArch == null, () => new NotInSubgraphException(Architecture, notInArch));
             Node cursor = from;
             AssertOrThrow(cursor.IsInArchitecture(), () => new NotInSubgraphException(Architecture, cursor));
