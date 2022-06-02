@@ -2,6 +2,7 @@
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
@@ -478,9 +479,10 @@ namespace SEE.GO
     /// <see cref="Init(BSpline, BSpline)"/> with desired source and target
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
-    ///
-    /// Spline morphisms can be used by <see cref="EdgeAnimator"/> to run linear
-    /// edge animations.
+    /// 
+    /// <see cref="CreateTween"/> can be used to create a <see cref="Tween"/>
+    /// object with which the morphism can be played as an animation.
+    /// The animation can be controlled using the tween object.
     /// </summary>
     public class SplineMorphism : SerializedMonoBehaviour
     {
@@ -515,12 +517,29 @@ namespace SEE.GO
         private Morphism morphism;
 
         /// <summary>
+        /// Creates a new <see cref="Tween"/> which can play the spline morphism from <paramref name="source"/>
+        /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="source">Origin of the spline morphism</param>
+        /// <param name="target">Target of the spline morphism</param>
+        /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01</param>
+        /// <remarks>
+        /// Note that the returned tween can be modified (e.g., to apply an ease function)
+        /// and that <c>Play()</c> has to be called to actually start the animation.
+        /// </remarks>
+        public Tween CreateTween(BSpline source, BSpline target, float duration)
+        {
+            Init(source, target);
+            return DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+        }
+
+        /// <summary>
         /// Initializes the spline morphism.
         ///
         /// Postcondition: <see cref="SEESpline"/> is morphed to
         /// <paramref name="source"/>.
         /// </summary>
-        /// <param name="source">Origin of the spline morphsim</param>
+        /// <param name="source">Origin of the spline morphism</param>
         /// <param name="target">Target of the spline morphism</param>
         public void Init(BSpline source, BSpline target)
         {
@@ -550,7 +569,7 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogWarning("gameObject without SEESpline component.\n");
+                Debug.LogWarning($"GameObject '{gameObject.name}' without SEESpline component.\n");
             }
             // Protect internal state of `spline'.
             return new BSpline(spline.Spline);
