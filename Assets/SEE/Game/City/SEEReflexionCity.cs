@@ -10,9 +10,8 @@ using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 using System;
-using System.Collections;
+using DG.Tweening;
 using UnityEngine.Assertions;
-using Object = UnityEngine.Object;
 
 namespace SEE.Game.City
 {
@@ -386,17 +385,6 @@ namespace SEE.Game.City
 
             #region Local Methods
 
-            // Taken from https://easings.net/#easeInOutExpo
-            static float easeInOutExpo(float x) =>
-                (float)
-                (x == 0
-                    ? 0
-                    : Mathf.Approximately(x, 1)
-                        ? 1
-                        : x < 0.5
-                            ? Math.Pow(2, 20 * x - 10) / 2
-                            : (2 - Math.Pow(2, -20 * x + 10)) / 2);
-
             static void AnimateEdgeSpline(GameObject sourceEdge, GameObject targetEdge)
             {
                 if (targetEdge.TryGetComponentOrLog(out SEESpline splineTarget)
@@ -405,12 +393,11 @@ namespace SEE.Game.City
                     // We deactivate the target edge first so it's not visible.
                     targetEdge.SetActive(false);
                     // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
-                    EdgeAnimator animator = splineSource.gameObject.AddComponent<EdgeAnimator>();
                     SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                    animator.Evaluator = f => morphism.Morph(easeInOutExpo(f));
-                    animator.OnAnimationFinish = () => Destroy(targetEdge);
-                    morphism.Init(splineSource.Spline, splineTarget.Spline);
-                    animator.DoAnimation(1f);
+                    morphism.CreateTween(splineSource.Spline, splineTarget.Spline, 1f)
+                            .SetEase(Ease.InOutExpo)
+                            .OnComplete(() => Destroy(targetEdge))
+                            .Play();
                 }
             }
 
