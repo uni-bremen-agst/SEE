@@ -559,7 +559,7 @@ namespace SEE.GO
         /// morphism result and can be used by the caller for further
         /// calculations.
         /// </summary>
-        /// <param name="time">Time parameter in seconds; clamped to domain [0, 1]</param>
+        /// <param name="time">Time parameter; clamped to domain [0, 1]</param>
         /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Morph(double time)
         {
