@@ -91,7 +91,7 @@ namespace SEE.GO.Decorators
                 {
                     NodeFactory segmentFactory = metricToFactory[section.Metric];
 
-                    GameObject segment = NewSegment(segmentFactory, gameNode.GetRenderQueue() - (int)RenderQueue.Transparent);
+                    GameObject segment = NewSegment(segmentFactory);
                     segment.name = section.Metric + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 
@@ -167,9 +167,9 @@ namespace SEE.GO.Decorators
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new segment</returns>
-        private static GameObject NewSegment(NodeFactory factory, int renderQueueOffset)
+        private static GameObject NewSegment(NodeFactory factory)
         {
-            return factory.NewBlock(0, renderQueueOffset);
+            return factory.NewBlock();
         }
     }
 }

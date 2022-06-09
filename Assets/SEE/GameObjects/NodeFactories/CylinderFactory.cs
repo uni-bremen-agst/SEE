@@ -17,14 +17,14 @@ namespace SEE.GO
             : base(shaderType, colorRange)
         { }
 
-        public override GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
+        public override GameObject NewBlock(int style = 0)
         {
             GameObject result = CreateCylinder();
             result.AddComponent<MeshCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
+            Materials.SetSharedMaterial(renderer, index: style);
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 

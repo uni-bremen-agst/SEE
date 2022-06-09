@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            SetOutlineColorAndAlpha(isInitiator);
+            SetOutlineColor(isInitiator);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
         {
             if (!Interactable.IsHovered && !Interactable.IsSelected)
             {
-                ResetOutlineColorAndAlpha(isInitiator);
+                ResetOutlineColor();
             }
         }
 

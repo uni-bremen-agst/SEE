@@ -23,35 +23,18 @@ namespace SEE.Controls.Actions
         protected Outline outline;
 
         /// <summary>
-        /// The AlphaEnforcer that ensures that the selected game object always has the correct
-        /// alpha value.
-        /// </summary>
-        protected AlphaEnforcer enforcer;
-
-        /// <summary>
         /// Color of the initial outline before being activated.
         /// </summary>
         protected Color initialOutlineColor = Color.black;
 
         /// <summary>
-        /// Alpha value of the node before being activated.
-        /// </summary>
-        protected float initialAlpha = 1f;
-
-        /// <summary>
-        /// Initializes this component by creating an outline and AlphaEnforcer, if necessary.
+        /// Initializes this component by creating an outline, if necessary.
         /// </summary>
         protected virtual void Start()
         {
             if (!TryGetComponent(out outline))
             {
                 outline = Outline.Create(gameObject, initialOutlineColor);
-            }
-
-            if (!TryGetComponent(out enforcer))
-            {
-                enforcer = gameObject.AddComponent<AlphaEnforcer>();
-                enforcer.TargetAlpha = initialAlpha;
             }
         }
 
@@ -87,63 +70,6 @@ namespace SEE.Controls.Actions
         protected void ResetOutlineColor()
         {
             outline.OutlineColor = initialOutlineColor;
-        }
-
-        /// <summary>
-        /// If <paramref name="isInitiator"/> is true, saves <see cref="enforcer.TargetAlpha"/>
-        /// in <see cref="initialAlpha"/> and sets it to 1 (no transparency). If <paramref name="isInitiator"/>
-        /// is false, nothing happens.
-        /// </summary>
-        /// <param name="isInitiator">true if the caller is the initiator, that is, the one
-        /// triggering this action, rather than just a proxy propagating an action
-        /// through the network to other connected clients</param>
-        protected void SetAlpha(bool isInitiator)
-        {
-            if (isInitiator)
-            {
-                initialAlpha = enforcer.TargetAlpha;
-                enforcer.TargetAlpha = 1f;
-            }
-        }
-
-        /// <summary>
-        /// If <paramref name="isInitiator"/> is true, resets <see cref="enforcer.TargetAlpha"/>
-        /// to <see cref="initialAlpha"/>. If <paramref name="isInitiator"/> is false, nothing happens.
-        /// </summary>
-        /// <param name="isInitiator">true if the caller is the initiator, that is, the one
-        /// triggering this action, rather than just a proxy propagating an action
-        /// through the network to other connected clients</param>
-        protected void ResetAlpha(bool isInitiator)
-        {
-            if (isInitiator)
-            {
-                enforcer.TargetAlpha = initialAlpha;
-            }
-        }
-
-        /// <summary>
-        /// Calls <see cref="SetInitialAndNewOutlineColor(isInitiator)"/> and
-        /// <see cref="SetAlpha(isInitiator)"/>.
-        /// </summary>
-        /// <param name="isInitiator">true if the caller is the initiator, that is, the one
-        /// triggering this action, rather than just a proxy propagating an action
-        /// through the network to other connected clients</param>
-        protected void SetOutlineColorAndAlpha(bool isInitiator)
-        {
-            SetInitialAndNewOutlineColor(isInitiator);
-            SetAlpha(isInitiator);
-        }
-
-        /// <summary>
-        /// Calls <see cref="ResetOutlineColor()"/> and <see cref="ResetAlpha(isInitiator)"/>.
-        /// </summary>
-        /// <param name="isInitiator">true if the caller is the initiator, that is, the one
-        /// triggering this action, rather than just a proxy propagating an action
-        /// through the network to other connected clients</param>
-        protected void ResetOutlineColorAndAlpha(bool isInitiator)
-        {
-            ResetOutlineColor();
-            ResetAlpha(isInitiator);
         }
 
         /// <summary>
