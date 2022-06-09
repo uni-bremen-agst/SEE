@@ -192,7 +192,7 @@ namespace SEE.Controls
                 case PlayerInputType.DesktopPlayer:
                     // position and rotation of the local desktop player are set
                     // elsewhere by the player spawner. That is why we can return
-                    // this local player immedidately.
+                    // this local player immediately.
                     return LocalPlayerForDesktop();
                 case PlayerInputType.VRPlayer:
                     {

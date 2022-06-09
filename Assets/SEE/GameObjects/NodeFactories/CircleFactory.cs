@@ -30,7 +30,7 @@ namespace SEE.GO
         /// </summary>
         private const float defaultRadius = 0.5f;
 
-        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
+        public override GameObject NewBlock(int index = 0)
         {
             GameObject result = new GameObject();
             AttachCircleLine(result, defaultRadius, Unit * defaultLineWidth, material.color);
