@@ -236,6 +236,84 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Test for empty <see cref="ColorMap"/>.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapZeroElements()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        /// <summary>
+        /// Test for <see cref="ColorMap"/> with only one element.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapOneElement()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            saved["metricX"] = Color.white;
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        /// <summary>
+        /// Test for <see cref="ColorMap"/> with two elements.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapTwoElements()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            saved["metricX"] = Color.white;
+            saved["metricY"] = Color.black;
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        private void AreEqualMetricColorMap(ColorMap saved, ColorMap loaded)
+        {
+            Assert.AreEqual(saved.Count, loaded.Count);
+            foreach (var entry in saved)
+            {
+                Assert.AreEqual(entry.Value, loaded[entry.Key]);
+            }
+        }
+
+        /// <summary>
         /// Test for <see cref="AntennaAttributes"/>.
         /// </summary>
         [Test]
@@ -279,7 +357,7 @@ namespace SEE.Utils
             {
                 IsRelevant = false
             };
-            savedCity.SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>() { { function.NodeType, function }, { file.NodeType, file } };
+            savedCity.NodeTypes = new Dictionary<string, VisualNodeAttributes>() { { function.NodeType, function }, { file.NodeType, file } };
             savedCity.Save(filename);
 
             // Create a new city with all its default values and then
@@ -756,8 +834,8 @@ namespace SEE.Utils
             settings.HeightMetric = "X";
             settings.WidthMetric = "X";
             settings.DepthMetric = "X";
-            settings.ColorMetric = "X";
-            settings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
+            settings.ColorProperty.ColorMetric = "X";
+            settings.ColorProperty.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;
             settings.OutlineWidth = 99999;
@@ -773,8 +851,8 @@ namespace SEE.Utils
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
             Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
-            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
-            AreEqual(expected.ColorRange, actual.ColorRange);
+            Assert.AreEqual(expected.ColorProperty.ColorMetric, actual.ColorProperty.ColorMetric);
+            AreEqual(expected.ColorProperty.ColorRange, actual.ColorProperty.ColorRange);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
@@ -804,7 +882,7 @@ namespace SEE.Utils
         {
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
-            city.SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
+            city.NodeTypes = new Dictionary<string, VisualNodeAttributes>();
             city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
             city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
             city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
@@ -816,7 +894,7 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
-            AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
+            AreEquivalent(expected.NodeTypes, actual.NodeTypes);
             AreEqual(expected.ConfigurationPath, actual.ConfigurationPath);
             AreEqual(expected.SourceCodeDirectory, actual.SourceCodeDirectory);
             AreEqual(expected.SolutionPath, actual.SolutionPath);
