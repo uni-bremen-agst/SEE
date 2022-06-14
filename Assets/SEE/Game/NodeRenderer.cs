@@ -51,10 +51,10 @@ namespace SEE.Game
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             // That is why we put them at the highest necessary rendering queue offset.
             int renderQueueOffset = node.ItsGraph.MaxDepth;
-            GameObject result = leafNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
+            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustScaleOfLeaf(result);
-            leafAntennaDecorator.AddAntenna(result);
+            // FIXME leafAntennaDecorator.AddAntenna(result);
             return result;
         }
 
@@ -78,10 +78,10 @@ namespace SEE.Game
             // render queue should be. We are assuming that the nodes are stacked on each
             // other according to the node hierarchy. Leaves are on top of all other nodes.
             int renderQueueOffset = node.Level;
-            GameObject result = innerNodeFactory.NewBlock(SelectStyle(node), renderQueueOffset);
+            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), renderQueueOffset);
             SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
-            innerAntennaDecorator.AddAntenna(result);
+            // FIXME innerAntennaDecorator.AddAntenna(result);
             return result;
         }
 
@@ -167,13 +167,13 @@ namespace SEE.Game
             gameNode.GetComponent<MeshFilter>().mesh = leafNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
-            Vector3 groundPosition = innerNodeFactory.Ground(gameNode);
+            Vector3 groundPosition = nodeTypeToFactory[node.Type].Ground(gameNode);
 
             // gameNode must be re-sized according to the metrics of the leaf node
-            innerNodeFactory.SetSize(gameNode, leafNode.transform.lossyScale);
+            nodeTypeToFactory[node.Type].SetSize(gameNode, leafNode.transform.lossyScale);
 
             // Finally, because the height has changed, we need to adjust the position.
-            innerNodeFactory.SetGroundPosition(gameNode, groundPosition);
+            nodeTypeToFactory[node.Type].SetGroundPosition(gameNode, groundPosition);
 
             // If newMesh is modified, call the following (just for the record, not necessary here).
             // Required by almost every shader to calculate brightness levels correctly:
@@ -208,15 +208,15 @@ namespace SEE.Game
             gameNode.GetComponent<MeshFilter>().mesh = innerNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
-            Vector3 groundPosition = leafNodeFactory.Ground(gameNode);
+            Vector3 groundPosition = nodeTypeToFactory[node.Type].Ground(gameNode);
             /// We maintain the depth and width of gameNode, but adjust its height
             /// according to the metric that determines the height of inner nodes.
             /// The call to <see cref="CreateInnerGameNode"/> has set the height
             /// of <see cref="innerNode"/> accordingly.
-            leafNodeFactory.SetHeight(gameNode, innerNode.transform.lossyScale.y);
+            nodeTypeToFactory[node.Type].SetHeight(gameNode, innerNode.transform.lossyScale.y);
 
             // Finally, because the height has changed, we need to adjust the position.
-            leafNodeFactory.SetGroundPosition(gameNode, groundPosition);
+            nodeTypeToFactory[node.Type].SetGroundPosition(gameNode, groundPosition);
 
             // innerNode is no longer needed; we have its mesh that is all we needed.
             // It can be dismissed.
@@ -272,7 +272,7 @@ namespace SEE.Game
         private int SelectStyle(Node node)
         {
             bool isLeaf = node.IsLeaf();
-            NodeFactory nodeFactory = isLeaf ? leafNodeFactory : innerNodeFactory;
+            NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
             uint numberOfStyles = nodeFactory.NumberOfStyles();
             string colorMetric = isLeaf ? Settings.LeafNodeSettings.ColorProperty.ColorMetric
                                         : Settings.InnerNodeSettings.ColorProperty.ColorMetric;
@@ -315,14 +315,7 @@ namespace SEE.Game
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.Roof(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.Roof(gameNode);
-                }
+                return nodeTypeToFactory[node.Type].Roof(gameNode);
             }
             else
             {
@@ -342,14 +335,7 @@ namespace SEE.Game
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
-                if (node.IsLeaf())
-                {
-                    return leafNodeFactory.GetSize(gameNode);
-                }
-                else
-                {
-                    return innerNodeFactory.GetSize(gameNode);
-                }
+                return nodeTypeToFactory[node.Type].GetSize(gameNode);
             }
             else
             {
@@ -373,7 +359,7 @@ namespace SEE.Game
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 float value = GetMetricValueOfLeaf(nodeRef.Value, Settings.InnerNodeSettings.HeightMetric);
-                innerNodeFactory.SetHeight(gameNode, value);
+                nodeTypeToFactory[nodeRef.Value.Type].SetHeight(gameNode, value);
             }
             else
             {
@@ -395,13 +381,13 @@ namespace SEE.Game
                 int style = SelectStyle(node);
                 if (node.IsLeaf())
                 {
-                    leafNodeFactory.SetStyle(gameNode, style);
+                    nodeTypeToFactory[node.Type].SetStyle(gameNode, style);
                 }
                 else
                 {
                     // TODO: for some reason, the material is selected twice. Once here and once
                     // somewhere earlier (I believe in NewBlock somewhere).
-                    innerNodeFactory.SetStyle(gameNode, style);
+                    nodeTypeToFactory[node.Type].SetStyle(gameNode, style);
                 }
             }
             else
@@ -421,14 +407,15 @@ namespace SEE.Game
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
-                if (node.IsLeaf())
-                {
-                    leafAntennaDecorator.AddAntenna(gameNode);
-                }
-                else
-                {
-                    innerAntennaDecorator.AddAntenna(gameNode);
-                }
+                // FIXME: AddAnntenna
+                //if (node.IsLeaf())
+                //{
+                //    leafAntennaDecorator.AddAntenna(gameNode);
+                //}
+                //else
+                //{
+                //    innerAntennaDecorator.AddAntenna(gameNode);
+                //}
             }
             else
             {
@@ -482,11 +469,11 @@ namespace SEE.Game
                         // chosen to determine the height, without any kind of transformation.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
                         Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
-                        leafNodeFactory.SetSize(gameNode, targetScale);
+                        nodeTypeToFactory[node.Type].SetSize(gameNode, targetScale);
                     }
                     else
                     {
-                        leafNodeFactory.SetSize(gameNode, scale);
+                        nodeTypeToFactory[node.Type].SetSize(gameNode, scale);
                     }
                 }
                 else
@@ -575,13 +562,13 @@ namespace SEE.Game
             {
                 //FIXME: This should instead check whether each node has non-aggregated metrics available,
                 // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
-                ErosionIssues issueDecorator = new ErosionIssues(Settings.InnerIssueMap(), innerNodeFactory,
+                ErosionIssues issueDecorator = new ErosionIssues(Settings.InnerIssueMap(),
                                                                  scaler, Settings.ErosionSettings.ErosionScalingFactor);
                 issueDecorator.Add(innerNodes);
             }
             if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(), leafNodeFactory,
+                ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(),
                                                                  scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
             }
@@ -589,7 +576,7 @@ namespace SEE.Game
             // Add text labels for all inner nodes
             if (Settings.InnerNodeSettings.ShowNames)
             {
-                AddLabels(innerNodes, innerNodeFactory);
+                AddLabels(innerNodes);
             }
 
             foreach (GameObject node in leafNodes.Concat(innerNodes))
@@ -626,7 +613,7 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
-        private static void AddLabels(IEnumerable<GameObject> gameNodes, NodeFactory innerNodeFactory)
+        private static void AddLabels(IEnumerable<GameObject> gameNodes)
         {
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
@@ -634,7 +621,7 @@ namespace SEE.Game
                 Node theNode = node.GetNode();
                 if (!theNode.IsRoot())
                 {
-                    Vector3 size = innerNodeFactory.GetSize(node);
+                    Vector3 size = node.transform.lossyScale;
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to 30% of the length.
                     GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
