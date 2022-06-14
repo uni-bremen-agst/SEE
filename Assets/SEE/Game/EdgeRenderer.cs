@@ -62,8 +62,8 @@ namespace SEE.Game
                 }
             }
 
-            Assert.IsNotNull(fromLayoutNode, $"source node {edge.Source.ID} does not have a layout node.\n");
-            Assert.IsNotNull(toLayoutNode, $"target node {edge.Target.ID} does not have a layout node.\n");
+            Assert.IsNotNull(fromLayoutNode, $"Source node {edge.Source.ID} does not have a layout node.\n");
+            Assert.IsNotNull(toLayoutNode, $"Target node {edge.Target.ID} does not have a layout node.\n");
             // The single layout edge between source and target. We want the layout only for this edge.
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
                 { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
@@ -94,9 +94,11 @@ namespace SEE.Game
         /// <param name="from">source of the new edge</param>
         /// <param name="to">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
+        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
+        /// instead of creating a new one</param>
         /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType)
+        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType, Edge existingEdge = null)
         {
             Node fromNode = from.GetNode();
             if (fromNode == null)
@@ -115,13 +117,15 @@ namespace SEE.Game
                 throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
             }
 
-            // Creating the edge in the underlying graph
-            Edge edge = new Edge(fromNode, toNode, edgeType);
+            Edge edge = existingEdge;
+            if (edge == null)
+            {
+                // Creating the edge in the underlying graph
+                edge = new Edge(fromNode, toNode, edgeType);
+                fromNode.ItsGraph.AddEdge(edge);
+            }
 
-            Graph graph = fromNode.ItsGraph;
-            graph.AddEdge(edge);
-
-            return DrawEdge(edge);
+            return DrawEdge(edge, from, to);
         }
 
         /// <summary>
@@ -278,6 +282,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
+        /// Note that this will skip "virtual" edges, i.e., edges which exist in the underlying graph
+        /// but which shall not be layouted or drawn.
         /// </summary>
         /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
         /// <returns>list of layout edges</returns>
@@ -291,7 +297,7 @@ namespace SEE.Game
             {
                 Node sourceNode = source.ItsNode;
 
-                foreach (Edge edge in sourceNode.Outgoings)
+                foreach (Edge edge in sourceNode.Outgoings.Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                 {
                     Node target = edge.Target;
                     edges.Add(new LayoutGraphEdge<T>(source, map[target], edge));

@@ -828,6 +828,7 @@ namespace SEE.Game
         /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// Any game objects in <paramref name="gameNodes"/> with an invalid node reference will be skipped.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
@@ -843,8 +844,12 @@ namespace SEE.Game
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                NodeFactory factory = nodeTypeToFactory[node.Type];
-                result.Add(new LayoutGameNode(toLayoutNode, gameObject, factory));
+                if (node == null)
+                {
+                    Debug.LogWarning($"Node {gameObject} has an invalid node reference and will be skipped!\n");
+                    continue;
+                }
+                result.Add(new LayoutGameNode(toLayoutNode, gameObject, nodeTypeToFactory[node.Type]));
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
             return result;

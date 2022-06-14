@@ -11,6 +11,8 @@ using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 using System;
 using Sirenix.OdinInspector;
+using DG.Tweening;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
@@ -58,6 +60,28 @@ namespace SEE.Game.City
         /// Note that this list is constructed by using <see cref="ReflexionGraphTools.Incorporate"/>.
         /// </summary>
         private readonly List<ChangeEvent> Events = new List<ChangeEvent>();
+
+        // TODO: Is this assumption (cities' child count > 0 <=> city drawn) alright to make?
+        /// <summary>
+        /// Returns true if this city has been drawn in the scene.
+        /// </summary>
+        private bool CityDrawn => gameObject.transform.childCount > 0;
+
+        /// <summary>
+        /// A queue of <see cref="ChangeEvent"/>s which were received from the analysis, but not yet handled.
+        /// More specifically, these are intended to be handled after <see cref="DrawGraph"/> has been called.
+        /// </summary>
+        private readonly Queue<ChangeEvent> UnhandledEvents = new Queue<ChangeEvent>();
+
+        /// <summary>
+        /// Duration of any animation (edge movement, color change...) in seconds.
+        /// </summary>
+        private const float ANIMATION_DURATION = 2.0f;
+
+        /// <summary>
+        /// Ease function of any animation (edge movement, color change...).
+        /// </summary>
+        private const Ease ANIMATION_EASE = Ease.InOutExpo;
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -135,6 +159,25 @@ namespace SEE.Game.City
             #endregion
         }
 
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public override void DrawGraph()
+        {
+            base.DrawGraph();
+            while (UnhandledEvents.Count > 0)
+            {
+                HandleChange(UnhandledEvents.Dequeue());
+            }
+        }
+
+        /// <summary>
+        /// Saves implementation, architecture, and mapping graphs as GXL.
+        /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderSave)]
@@ -230,8 +273,9 @@ namespace SEE.Game.City
         private static (Color, Color) GetEdgeGradient(State state) =>
             state switch
             {
+                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, 0.9f)),
                 State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
-                State.Undefined => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
+                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
                 State.ImplicitlyAllowed => (Color.green, Color.white),
                 State.AllowedAbsent => (Color.green, Color.white),
                 State.Allowed => (Color.green, Color.white),
@@ -246,8 +290,14 @@ namespace SEE.Game.City
         /// and handles the changes by modifying this city.
         /// </summary>
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
-        public void NewChange(ChangeEvent changeEvent)
+        public void HandleChange(ChangeEvent changeEvent)
         {
+            if (!CityDrawn)
+            {
+                UnhandledEvents.Enqueue(changeEvent);
+                return;
+            }
+
             // TODO: Make sure these actions don't interfere with reversible actions.
             // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
             switch (changeEvent)
@@ -281,9 +331,21 @@ namespace SEE.Game.City
                 string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
                 edge = edgeId != null ? GameObject.Find(edgeId) : null;
             }
+
             if (edge != null && edge.TryGetComponent(out SEESpline spline))
             {
-                spline.GradientColors = GetEdgeGradient(edgeChange.NewState);
+                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
+                // Animate color change for nicer visuals.
+                // We need two tweens for this, one for each end of the gradient.
+                Tween startTween = DOTween.To(() => spline.GradientColors.start,
+                                                c => spline.GradientColors = (c, spline.GradientColors.end),
+                                                newColors.start, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                Tween endTween = DOTween.To(() => spline.GradientColors.end,
+                                              c => spline.GradientColors = (spline.GradientColors.start, c),
+                                              newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
+                startTween.Play();
+                endTween.Play();
             }
             else
             {
@@ -295,13 +357,77 @@ namespace SEE.Game.City
         {
             if (edgeEvent.Change == ChangeType.Addition)
             {
-                // FIXME: Handle edge addition based on subgraph type, handle MapsTo specially
+                if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
+                {
+                    // Maps-To edges must not be drawn, as we will visualize mappings differently.
+                    edgeEvent.Edge.SetToggle(Edge.IsVirtualToggle);
+
+                    Edge mapsToEdge = edgeEvent.Edge;
+                    HandleNewMapping(mapsToEdge);
+                }
+                else
+                {
+                    // FIXME: Handle edge additions other than new mapping
+                }
             }
 
             if (edgeEvent.Change == ChangeType.Removal)
             {
                 // FIXME: Handle edge removal
             }
+        }
+
+        private static void HandleNewMapping(Edge mapsToEdge)
+        {
+            Node implNode = mapsToEdge.Source;
+            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
+            GameObject implGameNode = implNode.RetrieveGameNode();
+
+            // Move implementation node to architecture node, sizing it down accordingly.
+            // TODO: Handle children as well, if that's necessary?
+            Vector3 oldPosition = implGameNode.transform.position;
+            Vector3 newPosition = archGameNode.transform.position;
+            implGameNode.transform.position = newPosition;
+            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
+            newPosition = implGameNode.transform.position;
+            // Mapped node should be half its parent's size
+            implGameNode.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), ANIMATION_DURATION);
+
+            // Recalculate edge layout and animate edges due to new node positioning.
+            // TODO: Iterating over all game edges is currently very costly,
+            //       consider adding a cached mapping either here or in SceneQueries.
+            //       Alternatively, we can iterate over game edges instead.
+            foreach (Edge edge in implNode.Incomings.Union(implNode.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            {
+                GameObject gameEdge = GameObject.Find(edge.ID);
+                Assert.IsNotNull(gameEdge);
+                GameObject source = edge.Source == implNode ? implGameNode : edge.Source.RetrieveGameNode();
+                GameObject target = edge.Target == implNode ? implGameNode : edge.Target.RetrieveGameNode();
+                GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
+                AddEdgeSplineAnimation(gameEdge, newEdge);
+            }
+
+            // Movement of the node should be animated as well. For this, we have to reset its position first.
+            implGameNode.transform.position = oldPosition;
+            implGameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
+
+            #region Local Methods
+
+            static void AddEdgeSplineAnimation(GameObject sourceEdge, GameObject targetEdge)
+            {
+                if (targetEdge.TryGetComponentOrLog(out SEESpline splineTarget)
+                    && sourceEdge.TryGetComponentOrLog(out SEESpline splineSource))
+                {
+                    // We deactivate the target edge first so it's not visible.
+                    targetEdge.SetActive(false);
+                    // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
+                    SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
+                    morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
+                            .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
+                }
+            }
+
+            #endregion
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)

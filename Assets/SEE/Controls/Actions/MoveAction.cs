@@ -327,7 +327,9 @@ namespace SEE.Controls.Actions
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                                               - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
                     if (parent != null)
                     {
                         // The move has come to a successful end.
@@ -341,8 +343,6 @@ namespace SEE.Controls.Actions
                     {
                         // An attempt was made to move the hovered object outside of the city.
                         // We need to reset it to its original position. And then we start from scratch.
-                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
-                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
                         hit.HoveredObject.position = originalPosition;
                         new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
                         // The following assignment will override hit.interactableObject; that is why we

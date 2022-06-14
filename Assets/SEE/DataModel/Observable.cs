@@ -40,7 +40,7 @@ namespace SEE.DataModel
         {
             foreach (Observer observer in observers)
             {
-                observer.NewChange(change);
+                observer.HandleChange(change);
             }
         }
     }

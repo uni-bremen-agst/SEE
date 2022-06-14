@@ -360,7 +360,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public void DrawGraph()
+        public virtual void DrawGraph()
         {
             if (loadedGraph == null)
             {
