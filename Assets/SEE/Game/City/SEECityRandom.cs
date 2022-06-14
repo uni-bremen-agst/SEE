@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Tools;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -11,6 +12,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Manages settings for generating random graphs.
     /// </summary>
+    [Serializable]
     public class SEECityRandom : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -22,11 +24,13 @@ namespace SEE.Game.City
         /// <summary>
         /// Constraints for the random generation of leaf nodes.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Constraints for the random generation of leaf nodes")]
         public Constraint LeafConstraint = new Constraint("Class", 300, "calls", 0.01f);
 
         /// <summary>
         /// Constraints for the random generation of inner nodes.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Constraints for the random generation of inner nodes")]
         public Constraint InnerNodeConstraint = new Constraint("Package", 50, "uses", 0.005f);
 
         /// <summary>
@@ -36,7 +40,7 @@ namespace SEE.Game.City
         /// can be serialized by Unity. It cannot be a generic <see cref="IList{T}"/>.
         /// The serialization is used in <see cref="SEEEditor.SEECityRandomEditor"/>.
         /// </summary>
-        [SerializeField]
+        [SerializeField, ShowInInspector, Tooltip("The leaf node attributes and their constraints for the random generation of their values")]
         public List<RandomAttributeDescriptor> LeafAttributes = Defaults();
 
         /// <summary>
@@ -87,6 +91,9 @@ namespace SEE.Game.City
         /// Generates the graph randomly according <see cref="LeafConstraint"/>,
         /// <see cref="InnerNodeConstraint"/>, and <see cref="LeafAttributes"/>.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
             // generate graph randomly
