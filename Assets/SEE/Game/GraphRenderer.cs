@@ -164,15 +164,6 @@ namespace SEE.Game
         /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
         /// </summary>
         private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
-        /// <summary>
-        /// The factory used to create blocks for leaves.
-        /// </summary>
-        private readonly NodeFactory leafNodeFactory;
-
-        /// <summary>
-        /// The factory used to create game nodes for inner graph nodes.
-        /// </summary>
-        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -183,16 +174,6 @@ namespace SEE.Game
         /// A mapping from Node to ILayoutNode.
         /// </summary>
         private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-
-        /// <summary>
-        /// Used to create antennas for leaf nodes.
-        /// </summary>
-        private AntennaDecorator leafAntennaDecorator;
-
-        /// <summary>
-        /// Used to create antennas for inner nodes.
-        /// </summary>
-        private AntennaDecorator innerAntennaDecorator;
 
         /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
@@ -239,6 +220,8 @@ namespace SEE.Game
         private void SetAntennaDecorators()
         {
             HashSet<string> antennaMetrics = GetAntennaMetrics();
+
+            // FIXME: Continue here. Create anntenna decorators.
 
             //leafAntennaDecorator = new AntennaDecorator(scaler);
             //innerAntennaDecorator = new AntennaDecorator(scaler);
@@ -815,7 +798,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory, to_layout_node);
+            return ToLayoutNodes(gameObjects, to_layout_node);
         }
 
         /// <summary>
@@ -833,11 +816,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactory, innerNodeFactory, to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, to_layout_node));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactory, innerNodeFactory, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, to_layout_node));
 
             return layoutNodes;
         }
@@ -851,10 +834,8 @@ namespace SEE.Game
         /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private static ICollection<LayoutGameNode> ToLayoutNodes
+        private ICollection<LayoutGameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes,
-             NodeFactory leafNodeFactory,
-             NodeFactory innerNodeFactory,
              Dictionary<Node, ILayoutNode> toLayoutNode)
         {
             IList<LayoutGameNode> result = new List<LayoutGameNode>(gameNodes.Count);
@@ -862,7 +843,7 @@ namespace SEE.Game
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                NodeFactory factory = node.IsLeaf() ? leafNodeFactory : innerNodeFactory;
+                NodeFactory factory = nodeTypeToFactory[node.Type];
                 result.Add(new LayoutGameNode(toLayoutNode, gameObject, factory));
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
@@ -948,11 +929,9 @@ namespace SEE.Game
 
                 foreach (GameObject go in gameNodes)
                 {
-                    Node node = go.GetComponent<NodeRef>().Value;
-
-                    Vector3 extent = node.IsLeaf() ? leafNodeFactory.GetSize(go) / 2.0f : innerNodeFactory.GetSize(go) / 2.0f;
-                    // Note: position denotes the center of the object
-                    Vector3 position = node.IsLeaf() ? leafNodeFactory.GetCenterPosition(go) : innerNodeFactory.GetCenterPosition(go);
+                    Vector3 extent = go.transform.lossyScale / 2.0f;
+                    // Note: position denotes the center of the object in world space
+                    Vector3 position = go.transform.position;
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;

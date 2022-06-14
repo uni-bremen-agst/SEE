@@ -22,7 +22,7 @@ namespace SEE.Game
         {
             from ??= edge.Source.RetrieveGameNode();
             to ??= edge.Target.RetrieveGameNode();
-            
+
             // Save edge layout so that we can restore it if we need to select a default layout.
             EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
             if (savedEdgeLayout == EdgeLayoutKind.None)
@@ -42,7 +42,7 @@ namespace SEE.Game
             AddAscendants(to, gameNodes);
             Dictionary<Node, ILayoutNode> nodeToLayoutNode = new Dictionary<Node, ILayoutNode>();
             // The layout nodes corresponding to those game nodes.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactory, innerNodeFactory, nodeToLayoutNode);
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, nodeToLayoutNode);
 
             LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
