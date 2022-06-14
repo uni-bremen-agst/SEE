@@ -1,10 +1,12 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using DG.Tweening;
+using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using static SEE.Utils.Raycasting;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Game
 {
@@ -59,7 +61,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
         /// <returns>the game object that is the new parent or null</returns>
-        public static GameObject FinalizePosition(GameObject movingObject)
+        public static GameObject FinalizePosition(GameObject movingObject, Vector3 oldPosition)
         {
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
@@ -77,7 +79,13 @@ namespace SEE.Game
                     // TODO: Make sure this action is still reversible
                     ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
                                                                 + $"onto '{newGraphParent.SourceName}'.");
-                    newGameParent.ContainingCity<SEEReflexionCity>().Analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
+                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
+
+                    // We'll return the node to its old position here -- actual movement happens in SEEReflexionCity.
+                    movingObject.transform.position = oldPosition;
+                    return newGameParent;
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
@@ -123,22 +131,20 @@ namespace SEE.Game
             }
             else
             {
-                throw new System.Exception($"No parent found with name {parentName}.");
+                throw new Exception($"No parent found with name {parentName}.");
             }
         }
 
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
         /// </summary>
-        /// <param name="child">child</param>
-        /// <param name="parent">parent</param>
-        private static void PutOn(Transform child, GameObject parent)
+        /// <param name="child">child to be put on <paramref name="parent"/></param>
+        /// <param name="parent">parent the <paramref name="child"/> is put on</param>
+        public static void PutOn(Transform child, GameObject parent)
         {
-            // FIXME: child may not actually fit into parent, in which we should
-            // downscale it until it fits
             Vector3 childCenter = child.position;
-            float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
-            childCenter.y = parentRoof + child.lossyScale.y / 2;
+            float parentRoof = parent.GetRoof();
+            childCenter.y = parentRoof;
             child.position = childCenter;
             child.SetParent(parent.transform);
         }

@@ -37,6 +37,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
+using static SEE.Game.GraphRenderer;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -89,7 +90,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// i.e., is a specified edge; this is the initial state of a specified
         /// architecture dependency; only for architecture dependencies
         /// </summary>
-        Specified = 7
+        Specified = 7,
+        
+        /// <summary>
+        /// Tags an implementation edge that has not yet been mapped; only for implementation dependencies.
+        /// </summary>
+        Unmapped = 8
     }
 
     /// <summary>
@@ -126,9 +132,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// This does not really run the reflexion analysis. Use
         /// method Run() to start the analysis.
         /// </remarks>
-        public Reflexion(Graph implementation,
-                         Graph architecture,
-                         Graph mapping,
+        public Reflexion(Graph implementation, Graph architecture, Graph mapping,
                          bool allowDependenciesToParents = true)
         {
             FullGraph = Assemble(architecture, implementation, mapping, "Reflexion Graph");
@@ -520,6 +524,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
                     ChangePropagatedDependency(propagatedEdge, counter);
                 }
+                Transition(propagatedEdge, propagatedEdge.State(), State.Unmapped);
             }
         }
 
@@ -531,7 +536,7 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// </summary>
         /// <param name="implementationDependency">an implementation dependency whose corresponding propagated
-        /// dependency in the architecture graph is to be decreased and lifted</param>
+        /// dependency in the architecture graph is to be increased and lifted</param>
         /// <param name="from">architecture node = MapsTo(implementationDependency.Source)</param>
         /// <param name="to">architecture node = MapsTo(implementationDependency.Target)</param>
         /// <remarks>
@@ -740,6 +745,9 @@ namespace SEE.Tools.ReflexionAnalysis
                 AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
                 AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 AddSubtreeToImplicitMap(source, target);
+                
+                // We'll now also notify our observer's that a "new" mapping edge exists.
+                Notify(new EdgeEvent(mapsTo, ChangeType.Addition, Mapping));
             }
         }
 
@@ -850,11 +858,23 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Resets architecture markings.
+        /// Resets architecture markings and implementation states.
         /// </summary>
         private void Reset()
         {
             ResetArchitecture();
+            ResetImplementation();
+        }
+
+        /// <summary>
+        /// Sets the state of all implementation dependencies to 'unmapped'.
+        /// </summary>
+        private void ResetImplementation()
+        {
+            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInImplementation()))
+            {
+                Transition(edge, edge.State(), State.Unmapped);
+            }
         }
 
         /// <summary>
@@ -874,7 +894,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     case State.Undefined:
                     case State.Specified:
                         SetCounter(edge, 0); // Note: architecture edges have a counter
-                        SetState(edge, State.Specified); // initial state must be State.specified
+                        Transition(edge, state, State.Specified); // initial state must be State.specified
                         break;
                     case State.Absent:
                     case State.Convergent:
@@ -1008,7 +1028,7 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge architectureDependency = GetPropagatedDependency(archSource, archTarget, implType);
             AssertOrThrow(architectureDependency == null || architectureDependency.IsInArchitecture(),
                           () => new NotInSubgraphException(Architecture, architectureDependency));
-            Edge allowingEdge = null;
+            Edge allowingEdge;
             if (architectureDependency == null)
             {
                 // a propagated dependency has not existed yet; we need to create one
@@ -1252,7 +1272,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
             IList<Node> parents = to.Ascendants();
-            Node notInArch = parents.FirstOrDefault(x => !x.IsInArchitecture());
+            Node notInArch = parents.FirstOrDefault(x => !x.IsInArchitecture() && !x.HasSupertypeOf(RootType));
             AssertOrThrow(notInArch == null, () => new NotInSubgraphException(Architecture, notInArch));
             Node cursor = from;
             AssertOrThrow(cursor.IsInArchitecture(), () => new NotInSubgraphException(Architecture, cursor));

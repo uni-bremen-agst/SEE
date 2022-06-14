@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
@@ -309,11 +310,23 @@ namespace SEE.Tools.ReflexionAnalysis
                 throw new ArgumentException("All three sub-graphs must be loaded before generating "
                                             + "the full graph.");
             }
+            
+            // Add artificial roots if graph has more than one root node, to physically differentiate the two.
+            AddArtificialRoot(ArchitectureGraph);
+            AddArtificialRoot(ImplementationGraph);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
             ArchitectureGraph.MarkGraphNodesIn(Architecture);
             ImplementationGraph.MarkGraphNodesIn(Implementation);
+            
+            // We need to set all Maps_To edges as virtual so they don't get drawn.
+            // (Mapping is indicated by moving the implementation node, not by a separate edge.)
+            foreach (Edge mapsTo in MappingGraph.Edges())
+            {
+                Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
+                mapsTo.SetToggle(Edge.IsVirtualToggle);
+            }
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;
@@ -360,6 +373,28 @@ namespace SEE.Tools.ReflexionAnalysis
             // Returns the intersection of the edge IDs of the two graphs.
             IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
                 => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
+
+            void AddArtificialRoot(Graph graph)
+            {
+                // TODO: Somewhat duplicated from GraphRenderer.AddRootIfNecessary.
+                ICollection<Node> roots = graph.GetRoots();
+
+                if (roots.Count > 1)
+                {
+                    Node artificialRoot = new Node
+                    {
+                        ID = graph.Name + "#ROOT",
+                        SourceName = graph.Name,
+                        Type = GraphRenderer.RootType
+                    };
+                    graph.AddNode(artificialRoot);
+                    foreach (Node root in roots)
+                    {
+                        artificialRoot.AddChild(root);
+                    }
+                }
+            }
+            
 
             #endregion
         }
