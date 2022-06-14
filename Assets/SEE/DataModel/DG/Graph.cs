@@ -385,6 +385,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns the names of all node types of this graph
+        /// </summary>
+        /// <returns>node types of this graph</returns>
+        internal HashSet<string> AllNodeTypes()
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (Node node in Nodes())
+            {
+                result.Add(node.Type);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// The number of nodes of the graph.
         /// </summary>
         public int NodeCount => nodes.Count;
