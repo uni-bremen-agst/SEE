@@ -170,12 +170,12 @@ namespace SEEEditor
 
             if (toggle)
             {
-                ShowSublayoutEnum(seeCity.CoseGraphSettings.InnerNodeLayout[root.ID], root, childrenAreLeaves, parentNodeLayouts);
+                ShowSublayoutEnum(root, childrenAreLeaves, parentNodeLayouts);
             }
             else
             {
                 EditorGUI.BeginDisabledGroup(true);
-                ShowSublayoutEnum(NodeLayoutKind.CompoundSpringEmbedder, root, childrenAreLeaves, new List<NodeLayoutKind>());
+                ShowSublayoutEnum(root, childrenAreLeaves, new List<NodeLayoutKind>());
                 EditorGUI.EndDisabledGroup();
             }
 
@@ -223,10 +223,9 @@ namespace SEEEditor
         /// <summary>
         /// Dropdown for the sublayout kinds
         /// </summary>
-        /// <param name="nodeLayout"></param>
         /// <param name="root"></param>
         /// <param name="childrenAreLeaves"></param>
-        private void ShowSublayoutEnum(NodeLayoutKind nodeLayout, GraphElement root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
+        private void ShowSublayoutEnum(GraphElement root, bool childrenAreLeaves, List<NodeLayoutKind> parentNodeLayouts)
         {
             GUILayoutOption[] guiOptions = { GUILayout.ExpandWidth(false), GUILayout.Width(200) };
             EditorGUIUtility.labelWidth = 80;

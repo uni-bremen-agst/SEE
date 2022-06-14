@@ -301,10 +301,10 @@ namespace SEEEditor
             settings.WidthMetric = EditorGUILayout.TextField("Width", settings.WidthMetric);
             settings.HeightMetric = EditorGUILayout.TextField("Height", settings.HeightMetric);
             settings.DepthMetric = EditorGUILayout.TextField("Depth", settings.DepthMetric);
-            settings.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorMetric);
-            settings.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorRange.lower);
-            settings.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorRange.upper);
-            settings.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorRange.NumberOfColors, 1, 15);
+            settings.ColorProperty.ColorMetric = EditorGUILayout.TextField("Color", settings.ColorProperty.ColorMetric);
+            settings.ColorProperty.ColorRange.lower = EditorGUILayout.ColorField("Lower color", settings.ColorProperty.ColorRange.lower);
+            settings.ColorProperty.ColorRange.upper = EditorGUILayout.ColorField("Upper color", settings.ColorProperty.ColorRange.upper);
+            settings.ColorProperty.ColorRange.NumberOfColors = (uint)EditorGUILayout.IntSlider("# Colors", (int)settings.ColorProperty.ColorRange.NumberOfColors, 1, 15);
             settings.MinimalBlockLength = Mathf.Max(0, EditorGUILayout.FloatField("Minimal lengths", settings.MinimalBlockLength));
             settings.MaximalBlockLength = EditorGUILayout.FloatField("Maximal lengths", settings.MaximalBlockLength);
 

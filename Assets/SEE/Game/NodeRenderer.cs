@@ -274,8 +274,8 @@ namespace SEE.Game
             bool isLeaf = node.IsLeaf();
             NodeFactory nodeFactory = isLeaf ? leafNodeFactory : innerNodeFactory;
             uint numberOfStyles = nodeFactory.NumberOfStyles();
-            string colorMetric = isLeaf ? Settings.LeafNodeSettings.ColorMetric
-                                        : Settings.InnerNodeSettings.ColorMetric;
+            string colorMetric = isLeaf ? Settings.LeafNodeSettings.ColorProperty.ColorMetric
+                                        : Settings.InnerNodeSettings.ColorProperty.ColorMetric;
 
             float metricMaximum;
             if (Utils.FloatUtils.TryGetFloat(colorMetric, out float metricValue))

@@ -323,23 +323,23 @@ namespace SEE.Game.UI.ConfigMenu
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Color")
                     .SetAllowedValues(metricNames)
-                    .SetDefaultValue(leafNodeAttributes.ColorMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.ColorMetric = s)
+                    .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorMetric)
+                    .SetOnChangeHandler(s => leafNodeAttributes.ColorProperty.ColorMetric = s)
                     .Build();
 
                 // Lower color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Lower color")
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.lower)
-                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.lower = c)
+                    .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.lower)
+                    .SetOnChangeHandler(c => leafNodeAttributes.ColorProperty.ColorRange.lower = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Upper color")
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.upper)
-                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.upper = c)
+                    .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.upper)
+                    .SetOnChangeHandler(c => leafNodeAttributes.ColorProperty.ColorRange.upper = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
@@ -347,8 +347,8 @@ namespace SEE.Game.UI.ConfigMenu
                 SliderBuilder.Init(controls.transform)
                     .SetLabel("# Colors")
                     .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => leafNodeAttributes.ColorRange.NumberOfColors =
+                    .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.NumberOfColors)
+                    .SetOnChangeHandler(f => leafNodeAttributes.ColorProperty.ColorRange.NumberOfColors =
                                             (uint)Math.Round(f))
                     .SetRange((0, 15))
                     .Build();
@@ -392,23 +392,23 @@ namespace SEE.Game.UI.ConfigMenu
                 ComboSelectBuilder.Init(controls.transform)
                     .SetLabel("Color")
                     .SetAllowedValues(metricNames)
-                    .SetDefaultValue(innerNodeAttributes.ColorMetric)
-                    .SetOnChangeHandler(s => innerNodeAttributes.ColorMetric = s)
+                    .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorMetric)
+                    .SetOnChangeHandler(s => innerNodeAttributes.ColorProperty.ColorMetric = s)
                     .Build();
 
                 // Lower color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Lower color")
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.lower)
-                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.lower = c)
+                    .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.lower)
+                    .SetOnChangeHandler(c => innerNodeAttributes.ColorProperty.ColorRange.lower = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
                 // Upper color
                 ColorPickerBuilder.Init(controls.transform)
                     .SetLabel("Upper color")
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.upper)
-                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.upper = c)
+                    .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.upper)
+                    .SetOnChangeHandler(c => innerNodeAttributes.ColorProperty.ColorRange.upper = c)
                     .SetColorPickerControl(colorPickerControl)
                     .Build();
 
@@ -416,8 +416,8 @@ namespace SEE.Game.UI.ConfigMenu
                 SliderBuilder.Init(controls.transform)
                     .SetLabel("# Colors")
                     .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => innerNodeAttributes.ColorRange.NumberOfColors =
+                    .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.NumberOfColors)
+                    .SetOnChangeHandler(f => innerNodeAttributes.ColorProperty.ColorRange.NumberOfColors =
                                             (uint)Math.Round(f))
                     .SetRange((0, 15))
                     .Build();
