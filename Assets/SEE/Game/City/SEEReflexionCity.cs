@@ -10,6 +10,7 @@ using SEE.Tools.ReflexionAnalysis;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 using System;
+using Sirenix.OdinInspector;
 
 namespace SEE.Game.City
 {
@@ -22,28 +23,21 @@ namespace SEE.Game.City
     public class SEEReflexionCity : SEECity, Observer
     {
         /// <summary>
-        /// The path to the GXL file containing the implementation graph data.
-        /// </summary>
-        public FilePath GxlImplementationPath = new FilePath();
-
-        /// <summary>
         /// The path to the GXL file containing the architecture graph data.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the architecture"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath GxlArchitecturePath = new FilePath();
 
         /// <summary>
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the mapping from the implementation onto the architecture"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath GxlMappingPath = new FilePath();
-
-        /// <summary>
-        /// The path to the CSV file containing the implementation metric data.
-        /// </summary>
-        public FilePath CsvImplementationPath = new FilePath();
 
         /// <summary>
         /// The path to the CSV file containing the architecture metric data.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of CSV file for the metrics of the architecture"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath CsvArchitecturePath = new FilePath();
 
         /// <summary>
@@ -56,6 +50,7 @@ namespace SEE.Game.City
         /// (such as mappings, hierarchies, and so on), <b>do not modify
         /// the underlying Graph directly!</b>
         /// </summary>
+        [HideInInspector, NonSerialized]
         public Reflexion Analysis;
 
         /// <summary>
@@ -71,13 +66,16 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
             if (string.IsNullOrEmpty(GxlArchitecturePath.Path))
             {
                 Debug.LogError("Architecture graph path is empty.\n");
             }
-            else if (string.IsNullOrEmpty(GxlImplementationPath.RootPath))
+            else if (string.IsNullOrEmpty(GXLPath.RootPath))
             {
                 Debug.LogError("Implementation graph path is empty.\n");
             }
@@ -96,7 +94,7 @@ namespace SEE.Game.City
             async UniTaskVoid LoadAllGraphs()
             {
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
-                Graph ImplementationGraph = LoadGraph(GxlImplementationPath.Path, "");
+                Graph ImplementationGraph = LoadGraph(GXLPath.Path, "");
                 Graph MappingGraph;
                 if (string.IsNullOrEmpty(GxlMappingPath.Path))
                 {
@@ -137,11 +135,14 @@ namespace SEE.Game.City
             #endregion
         }
 
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
         public override void SaveData()
         {
             IList<string> NoPathGraphs = new[]
             {
-                GxlArchitecturePath.Path, GxlImplementationPath.Path, GxlMappingPath.Path
+                GxlArchitecturePath.Path, GXLPath.Path, GxlMappingPath.Path
             }.Where(string.IsNullOrEmpty).ToList();
             if (NoPathGraphs.Count > 0)
             {
@@ -154,8 +155,8 @@ namespace SEE.Game.City
                 (Graph implementation, Graph architecture, Graph mapping) = LoadedGraph.Disassemble();
                 GraphWriter.Save(GxlArchitecturePath.Path, architecture, hierarchicalType);
                 Debug.Log($"Architecture graph saved at {GxlArchitecturePath.Path}.\n");
-                GraphWriter.Save(GxlImplementationPath.Path, implementation, hierarchicalType);
-                Debug.Log($"Implementation graph saved at {GxlImplementationPath.Path}.\n");
+                GraphWriter.Save(GXLPath.Path, implementation, hierarchicalType);
+                Debug.Log($"Implementation graph saved at {GXLPath.Path}.\n");
                 GraphWriter.Save(GxlMappingPath.Path, mapping, hierarchicalType);
                 Debug.Log($"Mapping graph saved at {GxlMappingPath.Path}.\n");
             }
@@ -187,11 +188,6 @@ namespace SEE.Game.City
         private const string GxlArchitectureLabel = "ArchitectureGXL";
 
         /// <summary>
-        /// Label of attribute <see cref="GxlImplementationPath"/> in the configuration file.
-        /// </summary>
-        private const string GxlImplementationLabel = "ImplementationGXL";
-
-        /// <summary>
         /// Label of attribute <see cref="GxlMappingPath"/> in the configuration file.
         /// </summary>
         private const string GxlMappingLabel = "MappingGXL";
@@ -202,11 +198,6 @@ namespace SEE.Game.City
         private const string CsvArchitectureLabel = "ArchitectureCSV";
 
         /// <summary>
-        /// Label of attribute <see cref="CsvImplementationPath"/> in the configuration file.
-        /// </summary>
-        private const string CsvImplementationLabel = "ImplementationCSV";
-
-        /// <summary>
         /// Label of attribute <see cref="CityName"/> in the configuration file.
         /// </summary>
         private const string CityNameLabel = "CityName";
@@ -215,10 +206,8 @@ namespace SEE.Game.City
         {
             base.Save(writer);
             GxlArchitecturePath.Save(writer, GxlArchitectureLabel);
-            GxlImplementationPath.Save(writer, GxlImplementationLabel);
             GxlMappingPath.Save(writer, GxlMappingLabel);
             CsvArchitecturePath.Save(writer, CsvArchitectureLabel);
-            CsvImplementationPath.Save(writer, CsvImplementationLabel);
             writer.Save(CityName, CityNameLabel);
         }
 
@@ -226,17 +215,18 @@ namespace SEE.Game.City
         {
             base.Restore(attributes);
             GxlArchitecturePath.Restore(attributes, GxlArchitectureLabel);
-            GxlImplementationPath.Restore(attributes, GxlImplementationLabel);
             GxlMappingPath.Restore(attributes, GxlMappingLabel);
             CsvArchitecturePath.Restore(attributes, CsvArchitectureLabel);
-            CsvImplementationPath.Restore(attributes, CsvImplementationLabel);
             ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
         }
 
         #endregion
 
-
-        // Returns a fitting color gradient from the first to the second color for the given state.
+        /// <summary>
+        /// Returns a fitting color gradient from the first to the second color for the given state.
+        /// </summary>
+        /// <param name="state">state for which to yield a color gradient</param>
+        /// <returns>color gradient</returns>
         private static (Color, Color) GetEdgeGradient(State state) =>
             state switch
             {
