@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using OdinSerializer;
 using SEE.DataModel.DG;
@@ -71,6 +72,7 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [InlineProperty]
+    [HideReferenceObjectPicker]
     public class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
@@ -82,12 +84,9 @@ namespace SEE.Game.City
             NodeType = typeName;
         }
 
-        /// <summary>
-        /// Default constructor providing no value for <see cref="NodeType"/>.
-        /// Note: Used by Sirenix Inspector.
-        /// </summary>
         public VisualNodeAttributes()
         {
+            NodeType = "A Node Type";
         }
 
         /// <summary>
@@ -100,6 +99,7 @@ namespace SEE.Game.City
         /// </summary>
         [HideInInspector]
         public string NodeType { get => nodeType; private set => nodeType = value; }
+
         /// <summary>
         /// How a node should be drawn. Determines the kind of mesh.
         /// </summary>
@@ -125,14 +125,9 @@ namespace SEE.Game.City
         /// </summary>
         public string HeightMetric = string.Empty;
         /// <summary>
-        /// The name of the metric determining the style (color) of a node.
+        /// How the color of a node should be determined.
         /// </summary>
-        public string ColorMetric = string.Empty;
-        /// <summary>
-        /// The range of colors for the style metric.
-        /// </summary>
-        [OdinSerialize]
-        public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
+        public ColorProperty ColorProperty = new ColorProperty();
         /// <summary>
         /// This parameter determines the minimal width, breadth, and height of each block
         /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
@@ -176,8 +171,7 @@ namespace SEE.Game.City
             writer.Save(WidthMetric, WidthMetricLabel);
             writer.Save(DepthMetric, DepthMetricLabel);
             writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(ColorMetric, ColorMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
+            ColorProperty.Save(writer, ColorPropertyLabel);
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
@@ -215,8 +209,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
             ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
             ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
-            ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
-            ColorRange.Restore(values, ColorRangeLabel);
+            ColorProperty.Restore(values, ColorPropertyLabel);
             ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
             LabelSettings.Restore(values, LabelSettingsLabel);
@@ -250,13 +243,9 @@ namespace SEE.Game.City
         /// </summary>
         private const string HeightMetricLabel = "HeightMetric";
         /// <summary>
-        /// Label in the configuration file for a <see cref="ColorMetric"/>
+        /// Label in the configuration file for a <see cref="ColorProperty"/>.
         /// </summary>
-        private const string ColorMetricLabel = "ColorMetric";
-        /// <summary>
-        /// Label in the configuration file for <see cref="ColorRange"/>.
-        /// </summary>
-        private const string ColorRangeLabel = "ColorRange";
+        private const string ColorPropertyLabel = "ColorProperty";
         /// <summary>
         /// Label in the configuration file for <see cref="MinimalBlockLength"/>.
         /// </summary>
@@ -281,6 +270,99 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="ShowNames"/>.
         /// </summary>
         private const string ShowNamesLabel = "ShowNames";
+    }
+
+    /// <summary>
+    /// Specifies for a node what the color is used for: either the node type
+    /// or a node metric.
+    /// </summary>
+    [Serializable]
+    public class ColorProperty : ConfigIO.PersistentConfigItem
+    {
+        /// <summary>
+        /// Whether color is used to represent the node type or a metric.
+        /// </summary>
+        [EnumToggleButtons]
+        public PropertyKind Property = PropertyKind.Type;
+
+        /// <summary>
+        /// The color used to represent the type of a node.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
+        /// </summary>
+        public Color TypeColor = Color.white;
+
+        /// <summary>
+        /// The name of the metric determining the style (color) of a node. The
+        /// actual color is found in a <see cref="ColorMap"/> for the metrics.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
+        /// </summary>
+        [ShowIf("Property", PropertyKind.Metric)]
+        public string ColorMetric = string.Empty;
+        /// <summary>
+        /// The range of colors for the style metric.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
+        /// </summary>
+        [OdinSerialize]
+        [ShowIf("Property", PropertyKind.Metric)]
+        [Obsolete]
+        public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
+        /// The latter must be the label under which the settings were grouped, i.e., the same
+        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                ConfigIO.RestoreEnum(values, PropertyLabel, ref Property);
+                ConfigIO.Restore(values, TypeColorLabel, ref TypeColor);
+                ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
+                ColorRange.Restore(values, ColorRangeLabel);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Saves the settings in the configuration file using <paramref name="writer"/>
+        /// under the given <paramref name="label"/>.
+        /// </summary>
+        /// <param name="writer">writer to be used to save the settings</param>
+        /// <param name="label">label under which to save the settings</param>
+        public void Save(ConfigWriter writer, string label = "")
+        {
+            writer.BeginGroup(label);
+            writer.Save(Property.ToString(), PropertyLabel);
+            writer.Save(TypeColor, TypeColorLabel);
+            writer.Save(ColorMetric, ColorMetricLabel);
+            ColorRange.Save(writer, ColorRangeLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Label in the configuration file for a <see cref="Property"/>
+        /// </summary>
+        private const string PropertyLabel = "Property";
+        /// <summary>
+        /// Label in the configuration file for <see cref="TypeColor"/>.
+        /// </summary>
+        private const string TypeColorLabel = "TypeColor";
+        /// <summary>
+        /// Label in the configuration file for a <see cref="ColorMetric"/>
+        /// </summary>
+        private const string ColorMetricLabel = "ColorMetric";
+        /// <summary>
+        /// Label in the configuration file for <see cref="ColorRange"/>.
+        /// </summary>
+        private const string ColorRangeLabel = "ColorRange";
     }
 
     /// <summary>
@@ -364,17 +446,210 @@ namespace SEE.Game.City
         }
     }
 
+    [Serializable]
+    public enum PropertyKind
+    {
+        Type,
+        Metric
+    }
+
+    [Serializable]
+    public struct Property : ConfigIO.PersistentConfigItem
+    {
+        [HideLabel, HorizontalGroup("Property", Width = 0.2f)]
+        [EnumToggleButtons]
+        public PropertyKind Kind;
+        [HorizontalGroup("Property", Width = 0.8f, LabelWidth = 40)]
+        [ShowIf("Kind", PropertyKind.Metric)]
+        //ValueDropdown("Names", SortDropdownItems = true)]
+        public string Name;
+
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save(ConfigWriter writer, string label = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// The label of <see cref="Name"/> in the configuration file.
+        /// </summary>
+        private const string NameLabel = "name";
+
+        /// <summary>
+        /// The label of <see cref="Kind"/> in the configuration file.
+        /// </summary>
+        private const string KindLabel = "kind";
+    }
+
+    /// <summary>
+    /// Specifies which color is used to render a named property.
+    /// </summary>
+    [Serializable]
+    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, Color>>
+    {
+        /// <summary>
+        /// Mapping of property name onto color.
+        /// </summary>
+        [OdinSerialize, ShowInInspector]
+        [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
+        private Dictionary<string, Color> map = new Dictionary<string, Color>();
+
+        /// <summary>
+        /// Operator [].
+        /// </summary>
+        /// <param name="name">name of the property for which to retrieve the color</param>
+        /// <returns>retrieved color for <paramref name="name"/></returns>
+        public Color this[string name]
+        {
+            get { return map[name]; }
+            set { map[name] = value; }
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
+        /// otherwise <c>false</c>. If <c>true</c> is returned, <paramref name="color"/> will have
+        /// the color <paramref name="name"/> is mapped onto. Otherwise <paramref name="color"/>
+        /// is undefined.
+        /// </summary>
+        /// <param name="name">the property's name whose color is requested</param>
+        /// <param name="color">the color <paramref name="name"/> is mapped onto; defined only
+        /// if <c>true</c> is returned</param>
+        /// <returns><c>true</c> if <paramref name="name"/> is contained</returns>
+        public bool TryGetValue(string name, out Color color)
+        {
+            return map.TryGetValue(name, out color);
+        }
+
+        /// <summary>
+        /// The number of elements in the map.
+        /// </summary>
+        public int Count
+        {
+            get => map.Count;
+        }
+
+        /// <summary>
+        /// Enumerator for all entries of the map.
+        /// </summary>
+        /// <returns>enumerator</returns>
+        public IEnumerator<KeyValuePair<string, Color>> GetEnumerator()
+        {
+            return map.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Enumerator for all entries of the map.
+        /// </summary>
+        /// <returns>enumerator</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Saves this <see cref="ColorMap"/> as a list of groups (metric name, color)
+        /// using <paramref name="writer"/> under the given <paramref name="label"/>.
+        /// Each pair is saved as a list
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings</param>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginList(label);
+            foreach (var item in map)
+            {
+                writer.BeginGroup();
+                writer.Save(item.Key, NameLabel);
+                writer.Save(item.Value, ColorLabel);
+                writer.EndGroup();
+            }
+            writer.EndList();
+        }
+
+        /// <summary>
+        /// Restores the values of this <see cref="ColorMap"/> from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        /// <returns>true if at least one attribute was successfully restored</returns>
+        public bool Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object list))
+            {
+                bool result = false;
+                foreach (object item in list as List<object>)
+                {
+                    // Each item in the list is a dictionary holding the pair of (name, color).
+                    Dictionary<string, object> dict = item as Dictionary<string, object>;
+                    // name
+                    string name = null;
+                    if (!ConfigIO.Restore(dict, NameLabel, ref name))
+                    {
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {NameLabel}\n");
+                        continue;
+                    }
+                    // color
+                    Color color = Color.white;
+                    if (!ConfigIO.Restore(dict, ColorLabel, ref color))
+                    {
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {ColorLabel}\n");
+                        continue;
+                    }
+                    map[name] = color;
+                    result = true;
+                }
+                return result;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The label of the name of the property in the configuration file.
+        /// </summary>
+        private const string NameLabel = "name";
+
+        /// <summary>
+        /// The label of the color of the property in the configuration file.
+        /// </summary>
+        private const string ColorLabel = "color";
+    }
+
     /// <summary>
     /// Specifies how metrics are to be rendered as an antenna above the blocks.
     /// </summary>
     [Serializable]
-    public class AntennaAttributes : ConfigIO.PersistentConfigItem
+    [HideReferenceObjectPicker]
+    public sealed class AntennaAttributes : ConfigIO.PersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
         public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
+
+        /// <summary>
+        /// This parameter determines the sections of the antenna, that is, the
+        /// order of the antenna segments and which properties they depict.
+        /// </summary>
+        [SerializeField]
+        [ListDrawerSettings(CustomAddFunction = "AddProperty")]
+        public List<Property> AntennaSegments = new List<Property>();
+
+        private Property AddProperty()
+        {
+            Debug.Log("AddProperty\n");
+            Property result = new Property();
+            result.Kind = PropertyKind.Metric;
+            result.Name = "Metric.Mine";
+            return result;
+        }
 
         /// <summary>
         /// The width of an antenna.

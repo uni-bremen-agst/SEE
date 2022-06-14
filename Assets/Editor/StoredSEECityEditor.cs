@@ -32,7 +32,7 @@ namespace SEEEditor
             if (showNodeTypes)
             {
                 // Make a copy to loop over the dictionary while making changes.
-                Dictionary<string, VisualNodeAttributes> selection = new Dictionary<string, VisualNodeAttributes>(city.SelectedNodeTypes);
+                Dictionary<string, VisualNodeAttributes> selection = new Dictionary<string, VisualNodeAttributes>(city.NodeTypes);
 
                 int countSelected = 0;
                 foreach (KeyValuePair<string, VisualNodeAttributes> entry in selection)
@@ -42,8 +42,8 @@ namespace SEEEditor
                     string nodeType = entry.Key;
                     if (nodeType != Graph.UnknownType)
                     {
-                        city.SelectedNodeTypes[nodeType].IsRelevant = EditorGUILayout.Toggle("  " + nodeType, entry.Value.IsRelevant);
-                        if (city.SelectedNodeTypes[nodeType].IsRelevant)
+                        city.NodeTypes[nodeType].IsRelevant = EditorGUILayout.Toggle("  " + nodeType, entry.Value.IsRelevant);
+                        if (city.NodeTypes[nodeType].IsRelevant)
                         {
                             countSelected++;
                             NodeAttributes(entry.Value);
@@ -60,9 +60,9 @@ namespace SEEEditor
                     bool allTypes = true;
                     foreach (KeyValuePair<string, bool> kvp in city.CoseGraphSettings.LoadedForNodeTypes)
                     {
-                        if (city.SelectedNodeTypes.ContainsKey(kvp.Key))
+                        if (city.NodeTypes.ContainsKey(kvp.Key))
                         {
-                            allTypes = allTypes && city.SelectedNodeTypes[kvp.Key].IsRelevant;
+                            allTypes = allTypes && city.NodeTypes[kvp.Key].IsRelevant;
                         }
                         else
                         {

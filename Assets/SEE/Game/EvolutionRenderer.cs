@@ -49,11 +49,15 @@ namespace SEE.Game
     public partial class EvolutionRenderer : MonoBehaviour
     {
         /// <summary>
-        /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
-        /// at Awake() time.
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
+        /// This method is expected to be called before attemption to draw any graph.
         /// </summary>
-        private void Awake()
+        /// <param name="graphs">series of graphs to be visualized</param>
+        public void SetGraphEvolution(List<Graph> graphs)
         {
+            this.graphs = graphs;
             if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
             {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
@@ -62,8 +66,7 @@ namespace SEE.Game
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(cityEvolution, null);
-                Assert.IsNotNull(graphRenderer);
+                graphRenderer = new GraphRenderer(cityEvolution, graphs);
                 edgesAreDrawn = graphRenderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
@@ -81,6 +84,7 @@ namespace SEE.Game
                 Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
                 enabled = false;
             }
+            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -1165,18 +1169,6 @@ namespace SEE.Game
                 shownGraphHasChangedEvent.Invoke();
                 isAutoplayReverse = value;
             }
-        }
-
-        /// <summary>
-        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
-        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
-        /// that can be called next.
-        /// </summary>
-        /// <param name="graphs">series of graphs to be visualized</param>
-        public void SetGraphEvolution(List<Graph> graphs)
-        {
-            this.graphs = graphs;
-            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>

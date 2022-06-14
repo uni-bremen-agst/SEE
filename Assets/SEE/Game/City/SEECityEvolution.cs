@@ -109,11 +109,12 @@ namespace SEE.Game.City
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
-        protected EvolutionRenderer CreateEvolutionRenderer()
+        protected EvolutionRenderer CreateEvolutionRenderer(List<Graph> graphs)
         {
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
+                result.SetGraphEvolution(graphs);
             }
             return result;
         }
@@ -198,7 +199,7 @@ namespace SEE.Game.City
             if (firstGraph)
             {
                 GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
-                graphRenderer.DrawGraph(gameObject);
+                graphRenderer.DrawGraph(firstGraph, gameObject);
             }
             else
             {
@@ -254,9 +255,8 @@ namespace SEE.Game.City
             Reset();
             base.Start();
 
-            evolutionRenderer = CreateEvolutionRenderer();
             List<Graph> graphs = LoadDataSeries();
-            evolutionRenderer.SetGraphEvolution(graphs);
+            evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
             if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))

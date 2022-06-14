@@ -378,7 +378,7 @@ namespace SEE.Game.City
                     graphRenderer = new GraphRenderer(this, visualizedSubGraph);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(gameObject);
+                    graphRenderer.DrawGraph(visualizedSubGraph, gameObject);
                 }
             }
         }

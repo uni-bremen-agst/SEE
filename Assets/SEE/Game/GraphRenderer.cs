@@ -22,36 +22,111 @@ namespace SEE.Game
     public partial class GraphRenderer
     {
         /// <summary>
-        /// Constructor. If the <paramref name="graph"/> is null, you need to call
-        /// SetScaler() before you can call Draw().
+        /// Constructor.
         /// </summary>
         /// <param name="settings">the settings for the visualization</param>
         /// <param name="graph">the graph to be rendered</param>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graph"/> is null</exception>
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
+            if (graph == null)
+            {
+                throw new ArgumentNullException("Graph must not be null");
+            }
+            SetGraph(settings, new List<Graph> { graph });
+        }
+
+        public GraphRenderer(AbstractSEECity settings, IList<Graph> graphs)
+        {
+            if (graphs == null || graphs.Count == 0)
+            {
+                throw new ArgumentNullException("No graph given");
+            }
+            SetGraph(settings, graphs);
+        }
+
+        /// <summary>
+        /// Initializes the rendering of the <paramref name="graph"/>. Must be used
+        /// if the constructor of <see cref="GraphRenderer"/> was used without a graph.
+        /// </summary>
+        /// <param name="graph">the graph to be rendered; must not be null</param>
+        private void SetGraph(AbstractSEECity settings, IList<Graph> graphs)
+        {
             this.Settings = settings;
-
-            ColorRange leafColorRange = this.Settings.LeafNodeSettings.ColorRange;
-            leafNodeFactory = this.Settings.LeafNodeSettings.Shape switch
+            this.graphs = graphs;
+            SetScaler(graphs);
+            foreach (Graph graph in graphs)
             {
-                NodeShapes.Blocks => new CubeFactory(ShaderType, leafColorRange),
-                NodeShapes.Cylinders => new CylinderFactory(ShaderType, leafColorRange),
-                _ => throw new Exception($"Unhandled {nameof(NodeShapes)}")
-            };
-
-            ColorRange innerColorRange = this.Settings.InnerNodeSettings.ColorRange;
-            innerNodeFactory = this.Settings.InnerNodeSettings.Shape switch
-            {
-                NodeShapes.Blocks => new CubeFactory(ShaderType, innerColorRange),
-                NodeShapes.Cylinders => new CylinderFactory(ShaderType, innerColorRange),
-                _ => throw new Exception($"Unhandled {nameof(NodeShapes)}")
-            };
-
-            this.graph = graph;
-            if (this.graph != null)
-            {
-                SetScaler(graph);
                 graph.SortHierarchyByName();
+            }
+            SetNodeFactories(graphs);
+        }
+
+        private ISet<string> AllNodeTypes()
+        {
+            ISet<string> nodeTypes = new HashSet<string>();
+            foreach (Graph graph in graphs)
+            {
+                nodeTypes.UnionWith(graph.AllNodeTypes());
+            }
+            return nodeTypes;
+        }
+
+        private void SetNodeFactories(IList<Graph> graphs)
+        {
+            foreach (string nodeType in AllNodeTypes())
+            {
+                if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
+                {
+                    nodeTypeToFactory[nodeType] = GetNodeFactory(nodeType, value);
+                }
+                else
+                {
+                    nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+                }
+            }
+
+            NodeFactory GetDefaultNodeFactory()
+            {
+                return new CubeFactory(ShaderType, DefaultColorRange());
+            }
+
+            static ColorRange DefaultColorRange()
+            {
+                return new ColorRange(Color.white, Color.black, 10);
+            }
+
+            NodeFactory GetNodeFactory(string nodeType, VisualNodeAttributes value)
+            {
+                ColorRange colorRange = GetColorRange(nodeType, value.ColorProperty);
+
+                return value.Shape switch
+                {
+                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
+                    NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
+                    _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
+                };
+            }
+
+            ColorRange GetColorRange(string nodeType, ColorProperty colorProperty)
+            {
+                switch (colorProperty.Property)
+                {
+                    case PropertyKind.Type:
+                        return new ColorRange(colorProperty.TypeColor, colorProperty.TypeColor, 1);
+                    case PropertyKind.Metric:
+                        if (Settings.MetricToColor.TryGetValue(colorProperty.ColorMetric, out Color color))
+                        {
+                            // FIXME: other value for lower color
+                            return new ColorRange(Color.white, color, 10);
+                        }
+                        else
+                        {
+                            return DefaultColorRange();
+                        }
+                    default:
+                        throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
+                }
             }
         }
 
@@ -76,15 +151,19 @@ namespace SEE.Game
         public const string RootType = "ROOTTYPE";
 
         /// <summary>
-        /// The graph to be rendered.
+        /// The graphs to be rendered.
         /// </summary>
-        private readonly Graph graph;
+        private IList<Graph> graphs;
 
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly AbstractSEECity Settings;
+        public AbstractSEECity Settings;
 
+        /// <summary>
+        /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
+        /// </summary>
+        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
         /// <summary>
         /// The factory used to create blocks for leaves.
         /// </summary>
@@ -116,10 +195,10 @@ namespace SEE.Game
         private AntennaDecorator innerAntennaDecorator;
 
         /// <summary>
-        /// True if edges are actually drawn, that is, if the user has selected an
+        /// True if edges are to be actually drawn, that is, if the user has selected an
         /// edge layout different from <see cref="EdgeLayoutKind.None"/>.
         /// </summary>
-        /// <returns>True if edges are actually drawn.</returns>
+        /// <returns>True if edges are to be actually drawn.</returns>
         public bool AreEdgesDrawn()
         {
             return Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
@@ -133,7 +212,6 @@ namespace SEE.Game
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-
             HashSet<string> nodeMetrics = Graph.AllMetrics(graphs);
 
             if (Settings.ZScoreScale)
@@ -144,9 +222,29 @@ namespace SEE.Game
             {
                 scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
-            leafAntennaDecorator = new AntennaDecorator(scaler, Settings.LeafNodeSettings.AntennaSettings);
-            innerAntennaDecorator = new AntennaDecorator(scaler, Settings.InnerNodeSettings.AntennaSettings);
+            // FIXME: This call should be moved somewhere else.
+            SetAntennaDecorators();
         }
+
+        private HashSet<string> GetAntennaMetrics()
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (VisualNodeAttributes nodeAttributes in Settings.NodeTypes.Values.Where(n => n.IsRelevant))
+            {
+                result.UnionWith(nodeAttributes.AntennaSettings.AntennaSections.Select(a => a.Metric));
+            }
+            return result;
+        }
+
+        private void SetAntennaDecorators()
+        {
+            HashSet<string> antennaMetrics = GetAntennaMetrics();
+
+            //leafAntennaDecorator = new AntennaDecorator(scaler);
+            //innerAntennaDecorator = new AntennaDecorator(scaler);
+        }
+
+        private IDictionary<string, AntennaDecorator> antennaDecorators = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
@@ -154,7 +252,7 @@ namespace SEE.Game
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graph">graph whose node metrics are to be scaled</param>
-        public void SetScaler(Graph graph)
+        private void SetScaler(Graph graph)
         {
             SetScaler(new List<Graph> { graph });
         }
@@ -177,10 +275,11 @@ namespace SEE.Game
 
         /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
-        ///  to the user's choice in the settings.
+        /// to the user's choice in the settings.
         /// </summary>
+        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        public void DrawGraph(GameObject parent)
+        public void DrawGraph(Graph graph, GameObject parent)
         {
             // all nodes of the graph
             List<Node> nodes = graph.Nodes();
