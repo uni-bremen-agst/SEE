@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions
         /// <returns>true iff labels are enabled for this kind of node</returns>
         private static bool LabelsEnabled(AbstractSEECity city, Node node)
         {
-            return city.SelectedNodeTypes.TryGetValue(node.Type, out VisualNodeAttributes visual) && visual.LabelSettings.Show;
+            return city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes visual) && visual.LabelSettings.Show;
         }
 
         /// <summary>

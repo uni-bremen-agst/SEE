@@ -25,66 +25,6 @@ namespace SEE.Game.City
     [Serializable]
     public abstract partial class AbstractSEECity : Sirenix.OdinInspector.SerializedMonoBehaviour
     {
-        /// <summary>
-        /// Name of the Inspector foldout group for the data setttings.
-        /// </summary>
-        protected const string DataFoldoutGroup = "Data";
-
-        /// <summary>
-        /// The name of the group for the Inspector buttons managing the data.
-        /// </summary>
-        protected const string DataButtonsGroup = "DataButtonsGroup";
-
-        /// <summary>
-        /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
-        /// </summary>
-        protected const float DataButtonsGroupOrderLoad = 1;
-
-        /// <summary>
-        /// The order of the Draw button in the button group <see cref="DataButtonsGroup"/>.
-        /// </summary>
-        protected const float DataButtonsGroupOrderDraw = DataButtonsGroupOrderLoad + 1;
-
-        /// <summary>
-        /// The order of the Save button in the button group <see cref="DataButtonsGroup"/>.
-        /// </summary>
-        protected const float DataButtonsGroupOrderSave = DataButtonsGroupOrderDraw + 1;
-
-        /// <summary>
-        /// The order of the Save-Layout button in the button group <see cref="DataButtonsGroup"/>.
-        /// </summary>
-        protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
-
-        /// <summary>
-        /// The name of the group for the Inspector buttons resettting the data.
-        /// </summary>
-        protected const string ResetButtonsGroup = "ResetButtonsGroup";
-
-        /// <summary>
-        /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
-        /// </summary>
-        protected const float ResetButtonsGroupOrderReset = 1;
-
-        /// <summary>
-        /// The name of the group for the Inspector buttons managing the configuration file.
-        /// </summary>
-        protected const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
-
-        /// <summary>
-        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
-        /// </summary>
-        protected const float ConfigurationButtonsGroupLoad = 1;
-
-        /// <summary>
-        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
-        /// </summary>
-        protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
-
-        /// <summary>
-        /// Name of the Inspector foldout group for the metric setttings.
-        /// </summary>
-        protected const string MetricFoldoutGroup = "Metric settings";
-
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -117,6 +57,8 @@ namespace SEE.Game.City
         /// is needed to show the source code of nodes and edges.
         /// </summary>
         [SerializeField, ShowInInspector, FoldoutGroup(DataFoldoutGroup)]
+        [PropertyTooltip("Directory where the source code is located")]
+        [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
         {
             get => sourceCodeDirectory;
@@ -155,8 +97,15 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [OdinSerialize, ShowInInspector, Tooltip("Visual attributes of nodes.")]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
-        public Dictionary<string, VisualNodeAttributes> SelectedNodeTypes = new Dictionary<string, VisualNodeAttributes>();
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout, IsReadOnly = true)]
+        public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
+
+        /// <summary>
+        /// A mapping of node metric names onto colors.
+        /// FIXME: Must be saved in configuration file.
+        /// </summary>
+        [OdinSerialize, ShowInInspector, Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup)]
+        public ColorMap MetricToColor = new ColorMap();
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -305,7 +254,7 @@ namespace SEE.Game.City
         [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
         public void ResetSelectedNodeTypes()
         {
-            SelectedNodeTypes.Clear();
+            NodeTypes.Clear();
         }
 
         /// <summary>
@@ -368,48 +317,59 @@ namespace SEE.Game.City
         /// <summary>
         /// True if all node types in nodeTypes are relevant.
         /// </summary>
-        private bool AllNodeTypesAreRelevant => SelectedNodeTypes.Values.All(nodeAttributes => nodeAttributes.IsRelevant);
+        private bool AllNodeTypesAreRelevant => NodeTypes.Values.All(nodeAttributes => nodeAttributes.IsRelevant);
 
         /// <summary>
         /// If <paramref name="graph"/> is null, nothing happens. Otherwise:
-        /// Inspects the node types that occur in the graph and updates <see cref="SelectedNodeTypes"/>.
+        /// Inspects the node types that occur in the graph and updates <see cref="NodeTypes"/>.
         /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
-        /// a node type that existed in <see cref="SelectedNodeTypes"/> before, that node type's
-        /// selection information will be re-used. If <see cref="SelectedNodeTypes"/> contains a node
-        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="SelectedNodeTypes"/>.
+        /// a node type that existed in <see cref="NodeTypes"/> before, that node type's
+        /// selection information will be re-used. If <see cref="NodeTypes"/> contains a node
+        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="NodeTypes"/>.
         ///
         /// The node types can be retrieved and also be marked as irrelevant later via property
-        /// <see cref="SelectedNodeTypes"/>.
+        /// <see cref="NodeTypes"/>.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
             {
-                // The node types in the newly loaded graph.
-                HashSet<string> newTypes = new HashSet<string>();
-                foreach (Node node in graph.Nodes())
-                {
-                    newTypes.Add(node.Type);
-                }
-                // nodeTypes contains the node types of the previously loaded graph.
-                // Node types in nodeTypes not in newTypes will disappear
-                // because we are iterating only over newTypes.
+                /// <see cref="NodeTypes"/> contains the node types of the previously loaded graph.
+                /// Node types in <see cref="NodeTypes"/> not in the graph will disappear
+                /// because we are iterating only over those.
                 Dictionary<string, VisualNodeAttributes> newNodeTypes = new Dictionary<string, VisualNodeAttributes>();
-                foreach (string type in newTypes)
+                foreach (string type in graph.AllNodeTypes())
                 {
-                    if (SelectedNodeTypes.ContainsKey(type))
+                    // preserve existing node types and create new entry for types not yet seen
+                    if (NodeTypes.TryGetValue(type, out VisualNodeAttributes value))
                     {
-                        // preserve existing node types
-                        newNodeTypes[type] = SelectedNodeTypes[type];
+                        newNodeTypes[type] = value;
                     }
                     else
                     {
-                        // new node type not yet seen; use the defaults
                         newNodeTypes[type] = new VisualNodeAttributes(type);
                     }
                 }
-                SelectedNodeTypes = newNodeTypes;
+                NodeTypes = newNodeTypes;
+
+                // TO BE DECIDED: The following code will list all available metrics.
+                // That may be convenient for a user. However, a GXL file may have
+                // hundreds of metrics. And then all would be listed in the inspector.
+                /// Update <see cref="MetricToColor"/>.
+                //ColorMap newMetricToColor = new ColorMap();
+                //foreach (string metric in graph.AllNumericNodeAttributes())
+                //{
+                //    if (MetricToColor.TryGetValue(metric, out Color color))
+                //    {
+                //        newMetricToColor[metric] = color;
+                //    }
+                //    else
+                //    {
+                //        newMetricToColor[metric] = Color.white;
+                //    }
+                //}
+                //MetricToColor = newMetricToColor;
             }
         }
 
@@ -429,29 +389,10 @@ namespace SEE.Game.City
             }
             else
             {
-                ICollection<string> matches = SelectedNodeTypes.Where(pair => pair.Value.IsRelevant)
+                ICollection<string> matches = NodeTypes.Where(pair => pair.Value.IsRelevant)
                   .Select(pair => pair.Key).ToList();
                 return graph.SubgraphByNodeType(matches);
             }
-        }
-
-        /// <summary>
-        /// All metrics used for visual attributes of a leaf node (WidthMetric, HeightMetric,
-        /// DepthMetric, and LeafStyleMetric plus the antenna metrics).
-        /// Note: A metric name occurs only once (i.e., duplicate names are removed).
-        /// </summary>
-        /// <returns>all metrics used for visual attributes of a leaf node</returns>
-        public ICollection<string> AllLeafMetrics()
-        {
-            List<string> result = new List<string>(4)
-            {
-                LeafNodeSettings.WidthMetric,
-                LeafNodeSettings.HeightMetric,
-                LeafNodeSettings.DepthMetric,
-                LeafNodeSettings.ColorMetric
-            };
-            result.AddRange(LeafNodeSettings.AntennaSettings.AntennaSections.Select(section => section.Metric));
-            return new HashSet<string>(result);
         }
 
         /// <summary>
@@ -488,24 +429,6 @@ namespace SEE.Game.City
                };
 
         /// <summary>
-        /// Returns the names of all node metrics that are known by default.
-        /// They may or may not exist in the underlying graph.
-        /// More precisely, the resulting list consists of the following metrics:
-        /// WidthMetric, HeightMetric, DepthMetric, LeafStyleMetric, AllLeafIssues(),
-        /// AllInnerNodeIssues(), and InnerDonutMetric.
-        /// A metric name occurs only once.
-        /// </summary>
-        /// <returns>all node metric names</returns>
-        private List<string> AllDefaultMetrics()
-        {
-            List<string> nodeMetrics = new List<string>(AllLeafMetrics());
-            nodeMetrics.AddRange(AllInnerNodeMetrics());
-            nodeMetrics.AddRange(AllLeafIssues());
-            nodeMetrics.AddRange(AllInnerNodeIssues());
-            return new HashSet<string>(nodeMetrics).ToList();
-        }
-
-        /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
         /// graph, that is, there is at least one node in the graph that has this
         /// metric.
@@ -540,23 +463,6 @@ namespace SEE.Game.City
         public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
             LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SUM_EXTENSION, x.Value))
                           .ToDictionary(x => x.Key, x => x.Value);
-
-        /// <summary>
-        /// All metrics used for visual attributes of inner nodes (InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric plus the antenna metrics).
-        /// Note: A metric name occurs only once (i.e., duplicate names are removed).
-        /// </summary>
-        /// <returns>all metrics used for visual attributes of an inner node</returns>
-        public ICollection<string> AllInnerNodeMetrics()
-        {
-            List<string> result = new List<string>
-            {
-                InnerNodeSettings.ColorMetric,
-                InnerNodeSettings.HeightMetric
-            };
-            result.AddRange(InnerNodeSettings.AntennaSettings.AntennaSections.Select(section => section.Metric));
-            return new HashSet<string>(result);
-        }
 
         /// <summary>
         /// Loads and returns the graph data from the GXL file with given <paramref name="filename"/>.
@@ -636,9 +542,73 @@ namespace SEE.Game.City
                     CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
                 }
 
-                CoseGraphSettings.LoadedForNodeTypes = SelectedNodeTypes.Where(type => type.Value.IsRelevant)
+                CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
                                                                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
+
+        //----------------------------------------------------------------
+        // Odin Inspector Attributes
+        //----------------------------------------------------------------
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the data setttings.
+        /// </summary>
+        protected const string DataFoldoutGroup = "Data";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the data.
+        /// </summary>
+        protected const string DataButtonsGroup = "DataButtonsGroup";
+
+        /// <summary>
+        /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoad = 1;
+
+        /// <summary>
+        /// The order of the Draw button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderDraw = DataButtonsGroupOrderLoad + 1;
+
+        /// <summary>
+        /// The order of the Save button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSave = DataButtonsGroupOrderDraw + 1;
+
+        /// <summary>
+        /// The order of the Save-Layout button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons resettting the data.
+        /// </summary>
+        protected const string ResetButtonsGroup = "ResetButtonsGroup";
+
+        /// <summary>
+        /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
+        /// </summary>
+        protected const float ResetButtonsGroupOrderReset = 1;
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons managing the configuration file.
+        /// </summary>
+        protected const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupLoad = 1;
+
+        /// <summary>
+        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the metric setttings.
+        /// </summary>
+        protected const string MetricFoldoutGroup = "Metric settings";
     }
 }
