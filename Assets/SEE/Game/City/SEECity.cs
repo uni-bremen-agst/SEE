@@ -132,39 +132,6 @@ namespace SEE.Game.City
             {
                 Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
             }
-            RemoveTransparency();
-        }
-
-        /// <summary>
-        /// All game objects representing a graph node or edge in the current scene will be made
-        /// opaque (no transparency).
-        /// </summary>
-        private static void RemoveTransparency()
-        {
-            // Remove transparency of all nodes and edges
-            // FIXME: This may clash with the AlphaEnforcer component.
-            foreach (NodeRef nodeRef in FindObjectsOfType<NodeRef>())
-            {
-                MeshRenderer meshRenderer = nodeRef.gameObject.GetComponent<MeshRenderer>();
-                if (meshRenderer)
-                {
-                    Material material = meshRenderer.material;
-                    Color color = material.GetColor(ColorProperty);
-                    color.a = 1.0f;
-                    material.SetColor(ColorProperty, color);
-                }
-            }
-            foreach (EdgeRef edgeRef in FindObjectsOfType<EdgeRef>())
-            {
-                LineRenderer lineRenderer = edgeRef.gameObject.GetComponent<LineRenderer>();
-                if (lineRenderer)
-                {
-                    Material material = lineRenderer.material;
-                    Color color = material.GetColor(ColorProperty);
-                    color.a = 1.0f;
-                    material.SetColor(ColorProperty, color);
-                }
-            }
         }
 
         /// <summary>

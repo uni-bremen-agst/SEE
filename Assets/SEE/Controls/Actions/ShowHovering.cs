@@ -19,27 +19,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The animation sequence to be played while the gameObject is being hovered over.
-        /// </summary>
-        private Sequence hoverAnimation;
-
-        /// <summary>
-        /// Initializes this component by creating an outline and AlphaEnforcer as
-        /// well as a <see cref="hoverAnimation"/>.
-        /// </summary>
-        protected override void Start()
-        {
-            base.Start();
-            hoverAnimation = DOTween.Sequence();
-            // The following animation is equivalent to SetAlpha() when played forward and equivalent to
-            // ResetAlpha() when played backward.
-            hoverAnimation.Append(DOTween.To(() => enforcer.TargetAlpha, x => enforcer.TargetAlpha = x, 1f, 0.5f));
-            hoverAnimation.SetAutoKill(false);
-            hoverAnimation.SetLink(gameObject, LinkBehaviour.KillOnDestroy);
-            hoverAnimation.Pause();
-        }
-
-        /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
         /// created. Depending upon <paramref name="isInitiator"/> one of two different
         /// colors will be used for the outline.
@@ -52,11 +31,6 @@ namespace SEE.Controls.Actions
             if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
                 SetInitialAndNewOutlineColor(isInitiator);
-                if (isInitiator)
-                {
-                    // Replaces SetAlpha().
-                    hoverAnimation.PlayForward();
-                }
             }
         }
 
@@ -73,11 +47,6 @@ namespace SEE.Controls.Actions
             if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
                 ResetOutlineColor();
-                if (isInitiator)
-                {
-                    // Replaces ResetAlpha().
-                    hoverAnimation.PlayBackwards();
-                }
             }
         }
 
@@ -86,11 +55,6 @@ namespace SEE.Controls.Actions
             if (Interactable.IsHovered && !Interactable.IsGrabbed)
             {
                 SetOutlineColor(isInitiator);
-                if (isInitiator)
-                {
-                    // Replaces SetAlpha().
-                    hoverAnimation.PlayForward();
-                }
             }
         }
 
@@ -99,11 +63,6 @@ namespace SEE.Controls.Actions
             if (Interactable.IsHovered && !Interactable.IsSelected)
             {
                 SetOutlineColor(isInitiator);
-                if (isInitiator)
-                {
-                    // Replaces SetAlpha().
-                    hoverAnimation.PlayForward();
-                }
             }
         }
 

@@ -176,9 +176,9 @@ namespace SEE.GO
         /// <param name="renderer">renderer whose shared material is to be set</param>
         /// <param name="renderQueueOffset">the offset in the render queue</param>
         /// <param name="index">the index of the material</param>
-        public void SetSharedMaterial(Renderer renderer, int renderQueueOffset, int index)
+        public void SetSharedMaterial(Renderer renderer, int index)
         {
-            renderer.sharedMaterial = Get(renderQueueOffset, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
+            renderer.sharedMaterial = Get(0, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
         }
 
         /// <summary>

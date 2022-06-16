@@ -7,6 +7,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.cakeslice.outline-effect": {
+      "version": "https://github.com/cakeslice/Outline-Effect.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "3f5fc0c5be962957b11caf0b0772ca013ef27f02"
+    },
     "com.cysharp.unitask": {
       "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
       "depth": 0,

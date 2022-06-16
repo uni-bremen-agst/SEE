@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls.Actions;
 using SEE.Controls.Interactables;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -45,13 +44,7 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         private GameObject CreateLeafGameNode(Node node)
         {
-            // The deeper the node in the node hierarchy (quantified by a node's level), the
-            // later it should be drawn, or in other words, the higher its offset in the
-            // render queue should be. We are assuming that the nodes are stacked on each
-            // other according to the node hierarchy. Leaves are on top of all other nodes.
-            // That is why we put them at the highest necessary rendering queue offset.
-            int renderQueueOffset = node.ItsGraph.MaxDepth;
-            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), renderQueueOffset);
+            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node));
             SetGeneralNodeAttributes(node, result);
             AdjustScaleOfLeaf(result);
             // FIXME leafAntennaDecorator.AddAntenna(result);
@@ -73,12 +66,7 @@ namespace SEE.Game
         /// <returns>new game object for the inner node</returns>
         private GameObject CreateInnerGameNode(Node node)
         {
-            // The deeper the node in the node hierarchy (quantified by a node's level), the
-            // later it should be drawn, or in other words, the higher its offset in the
-            // render queue should be. We are assuming that the nodes are stacked on each
-            // other according to the node hierarchy. Leaves are on top of all other nodes.
-            int renderQueueOffset = node.Level;
-            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), renderQueueOffset);
+            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node));
             SetGeneralNodeAttributes(node, result);
             AdjustHeightOfInnerNode(result);
             // FIXME innerAntennaDecorator.AddAntenna(result);
@@ -590,19 +578,14 @@ namespace SEE.Game
         /// These general decorations currently consist of:
         /// <ul>
         /// <li>Outlines around the node</li>
-        /// <li>An AlphaEnforcer ensuring the node always has the correct alpha value</li>
         /// </ul>
         /// </summary>
         protected virtual void AddGeneralDecorations(GameObject node)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
             //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
-            // At the same time, we want to apply transparency to make it easier to tell which nodes are behind
-            // other nodes, and to show when a node is being highlighted by making it opaque.
-            //TODO: Make transparency value configurable
             Outline.Create(node, Color.black,
                            node.IsLeaf() ? Settings.LeafNodeSettings.OutlineWidth : Settings.InnerNodeSettings.OutlineWidth);
-            node.AddComponent<AlphaEnforcer>().TargetAlpha = 0.9f;
         }
 
         /// <summary>

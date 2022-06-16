@@ -54,11 +54,11 @@ namespace SEE.GO
         /// the object</param>
         /// <returns>new node representation</returns>
         /// <param name="renderQueueOffset">offset in the render queue</param>
-        public virtual GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
+        public virtual GameObject NewBlock(int style = 0)
         {
             GameObject result = CreateBlock();
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
+            materials.SetSharedMaterial(renderer, index: style);
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
@@ -113,13 +113,7 @@ namespace SEE.GO
             {
                 UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>().Value);
-                int level = gameNode.GetComponent<NodeRef>().Value.Level;
-                materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
-            }
-
-            if (gameNode.TryGetComponent(out Outline outline))
-            {
-                outline.UpdateRenderQueue(true);
+                materials.SetSharedMaterial(renderer, index: style);
             }
         }
 
