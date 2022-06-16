@@ -21,7 +21,6 @@ namespace SEE.GO
         public enum ShaderType
         {
             Opaque,          // fully drawn with no transparency
-            Transparent,     // transparency is available
             TransparentLine, // for lines with transparency
         }
 
@@ -29,10 +28,6 @@ namespace SEE.GO
         /// Name of the material for opaque objects (located in folder Resources).
         /// </summary>
         private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
-        /// <summary>
-        /// Name of the material for transparent objects (located in folder Resources).
-        /// </summary>
-        private const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
         /// <summary>
         /// Name of the material for transparent lines (located in folder Resources).
         /// </summary>
@@ -306,9 +301,6 @@ namespace SEE.GO
             {
                 case ShaderType.Opaque:
                     name = OpaqueMaterialName;
-                    break;
-                case ShaderType.Transparent:
-                    name = TransparentMaterialName;
                     break;
                 case ShaderType.TransparentLine:
                     name = TransparentLineMaterialName;

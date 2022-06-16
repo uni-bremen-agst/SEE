@@ -4,7 +4,6 @@ using DG.Tweening;
 using SEE.DataModel;
 using SEE.Game;
 using UnityEngine;
-using UnityEngine.Rendering;
 using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
 
@@ -30,9 +29,9 @@ namespace SEE.GO
         public MarkerFactory(float markerWidth, float markerHeight,
                              Color additionColor, Color changeColor, Color deletionColor)
         {
-            additionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(additionColor, additionColor, 1));
-            changeMarkerFactory = new CylinderFactory(Transparent, new ColorRange(changeColor, changeColor, 1));
-            deletionMarkerFactory = new CylinderFactory(Transparent, new ColorRange(deletionColor, deletionColor, 1));
+            additionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(additionColor, additionColor, 1));
+            changeMarkerFactory = new CylinderFactory(Opaque, new ColorRange(changeColor, changeColor, 1));
+            deletionMarkerFactory = new CylinderFactory(Opaque, new ColorRange(deletionColor, deletionColor, 1));
 
             if (markerHeight < 0)
             {
