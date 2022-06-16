@@ -20,11 +20,6 @@ namespace SEE.GO.Menu
         private SelectionMenu ModeMenu;
 
         /// <summary>
-        /// The UI object representing the  mobile menu the user chooses the action state from.
-        /// </summary>
-        private SimpleMenu MobileMenu;
-
-        /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
         private ActionStateIndicator Indicator;
