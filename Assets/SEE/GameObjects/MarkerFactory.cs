@@ -122,7 +122,7 @@ namespace SEE.GO
         /// <returns>the resulting beam marker</returns>
         private GameObject MarkByBeam(GameObject gameNode, NodeFactory factory)
         {
-            GameObject beamMarker = NewBeam(factory, gameNode.RenderLater());
+            GameObject beamMarker = NewBeam(factory);
             beamMarker.tag = Tags.Decoration;
             beamMarker.SetScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);
@@ -139,9 +139,9 @@ namespace SEE.GO
         /// <param name="factory">the factory to create the beam marker</param>
         /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new beam marker</returns>
-        private GameObject NewBeam(NodeFactory factory, int renderQueueOffset)
+        private GameObject NewBeam(NodeFactory factory)
         {
-            GameObject result = factory.NewBlock(0, renderQueueOffset);
+            GameObject result = factory.NewBlock();
             AddEmissionAndAnimation(result);
             return result;
         }

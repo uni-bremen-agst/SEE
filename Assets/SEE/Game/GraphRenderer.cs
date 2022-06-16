@@ -4,8 +4,8 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO.Decorators;
 using SEE.GO;
+using SEE.GO.Decorators;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
@@ -133,7 +133,7 @@ namespace SEE.Game
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType ShaderType = Materials.ShaderType.Transparent;
+        private const Materials.ShaderType ShaderType = Materials.ShaderType.Opaque;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -482,7 +482,7 @@ namespace SEE.Game
                 // If node is a root, it will be added to parent as a child.
                 // Otherwise, node is a child of another game node.
                 AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
-                Portal.SetPortal(root, entry.Value, Portal.IncludeDescendants.ONLY_SELF);
+                Portal.SetPortal(root, entry.Value);
             }
         }
 
@@ -662,7 +662,6 @@ namespace SEE.Game
         /// <paramref name="root"/></param>
         private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<LayoutGameNode> layoutNodes)
         {
-            return;
             // FIXME: temporarily disabled because the current implementation of the
             // custom shader for culling all city objects falling off the plane assumes
             // that there is exactly one root node of the graph.

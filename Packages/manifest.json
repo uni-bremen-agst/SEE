@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.cakeslice.outline-effect": "https://github.com/cakeslice/Outline-Effect.git",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
     "com.unity.collab-proxy": "1.15.16",
     "com.unity.formats.fbx": "4.1.2",
