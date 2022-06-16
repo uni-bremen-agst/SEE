@@ -21,7 +21,7 @@ namespace SEE.GO
         /// Returns a new empty plain game object with an ordinary Renderer component.
         /// </summary>
         /// <returns></returns>
-        public override GameObject NewBlock(int index = 0, int renderQueueOffset = 0)
+        public override GameObject NewBlock(int index = 0)
         {
             GameObject gameObject = new GameObject();
             return gameObject;
