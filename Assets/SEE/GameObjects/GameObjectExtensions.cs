@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OdinSerializer.Utilities;
+using Sirenix.Serialization.Utilities;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using Sirenix.Utilities;
 
 namespace SEE.GO
 {

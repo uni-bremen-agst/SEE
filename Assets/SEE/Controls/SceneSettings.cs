@@ -1,12 +1,9 @@
-﻿using OdinSerializer;
-using SEE.DataModel;
+﻿using Sirenix.Serialization;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
