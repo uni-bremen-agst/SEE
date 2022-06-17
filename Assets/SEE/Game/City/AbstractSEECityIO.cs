@@ -29,6 +29,7 @@ namespace SEE.Game.City
         private const string ZScoreScaleLabel = "ZScoreScale";
         private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
         private const string EdgeSelectionLabel = "EdgeSelection";
+        private const string MetricToColorLabel = "MetricToColor";
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
@@ -43,6 +44,7 @@ namespace SEE.Game.City
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
             SaveNodeTypes(writer, NodeTypes, NodeTypesLabel);
+            MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
             LeafNodeSettings.Save(writer, LeafNodeAttributesLabel);
@@ -55,6 +57,31 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Restores all attributes of this AbstractSEECity instance from the given <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            ConfigurationPath.Restore(attributes, CityPathLabel);
+            SourceCodeDirectory.Restore(attributes, ProjectPathLabel);
+            SolutionPath.Restore(attributes, SolutionPathLabel);
+            ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
+            ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
+            RestoreNodeTypes(attributes, NodeTypesLabel, ref NodeTypes);
+            MetricToColor.Restore(attributes, MetricToColorLabel);
+            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
+            ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
+            LeafNodeSettings.Restore(attributes, LeafNodeAttributesLabel);
+            InnerNodeSettings.Restore(attributes, InnerNodeAttributesLabel);
+            ErosionSettings.Restore(attributes, ErosionMetricsLabel);
+            NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
+            EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
+            EdgeSelectionSettings.Restore(attributes, EdgeSelectionLabel);
+            CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
+        }
+
+
+        /// <summary>
         /// Saves all <paramref name="nodeTypes"/> with label <paramref name="nodeTypesLabel"/>
         /// using <paramref name="writer"/> as a list.
         /// </summary>
@@ -62,8 +89,8 @@ namespace SEE.Game.City
         /// <param name="nodeTypes">node types to be saved</param>
         /// <param name="nodeTypesLabel">label for <paramref name="nodeTypes"/> in the configuration file</param>
         private static void SaveNodeTypes(ConfigWriter writer,
-                                                  IDictionary<string, VisualNodeAttributes> nodeTypes,
-                                                  string nodeTypesLabel)
+                                          IDictionary<string, VisualNodeAttributes> nodeTypes,
+                                          string nodeTypesLabel)
         {
             writer.BeginList(nodeTypesLabel);
             try
@@ -84,29 +111,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Restores all attributes of this AbstractSEECity instance from the given <paramref name="attributes"/>.
-        /// </summary>
-        /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
-        protected virtual void Restore(Dictionary<string, object> attributes)
-        {
-            ConfigurationPath.Restore(attributes, CityPathLabel);
-            SourceCodeDirectory.Restore(attributes, ProjectPathLabel);
-            SolutionPath.Restore(attributes, SolutionPathLabel);
-            ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
-            ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
-            RestoredNodeTypes(attributes, NodeTypesLabel, ref NodeTypes);
-            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
-            ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
-            LeafNodeSettings.Restore(attributes, LeafNodeAttributesLabel);
-            InnerNodeSettings.Restore(attributes, InnerNodeAttributesLabel);
-            ErosionSettings.Restore(attributes, ErosionMetricsLabel);
-            NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
-            EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
-            EdgeSelectionSettings.Restore(attributes, EdgeSelectionLabel);
-            CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
-        }
-
-        /// <summary>
         /// Restores <paramref name="nodeTypes"/> from <paramref name="attributes"/> under
         /// the label <paramref name="nodeTypesLabel"/>.
         /// </summary>
@@ -114,9 +118,9 @@ namespace SEE.Game.City
         /// <param name="nodeTypesLabel">label for <paramref name="nodeTypes"/> in <paramref name="attributes"/></param>
         /// <param name="nodeTypes">dictionary in which to restore the node types (key is the node type name, value
         /// the restored <see cref="VisualNodeAttributes"/></param>
-        private void RestoredNodeTypes(Dictionary<string, object> attributes,
-                                              string nodeTypesLabel,
-                                              ref Dictionary<string, VisualNodeAttributes> nodeTypes)
+        private void RestoreNodeTypes(Dictionary<string, object> attributes,
+                                      string nodeTypesLabel,
+                                      ref Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             if (attributes.TryGetValue(nodeTypesLabel, out object aList))
             {
