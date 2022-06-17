@@ -187,7 +187,7 @@ namespace SEE.Utils
         /// The key is saved as a string and the value is saved as a plain literal:
         /// either True or False.
         ///
-        /// Note: This method is more specific than <see cref="Save{K, V}(Dictionary{K, V}, string)"/>
+        /// Note: This method is more specific than <see cref="SaveAsStrings{K, V}(Dictionary{K, V}, string)"/>
         /// in that the key is not saved as a string but as a boolean literal (no quotes around it).
         /// <param name="dictionary">the dictionary to be saved</param>
         /// <param name="label">the label to be added in front of the value</param>
@@ -216,7 +216,7 @@ namespace SEE.Utils
         /// <typeparam name="V">type of the value of <paramref name="dictionary"/></typeparam>
         /// <param name="dictionary">the dictionary to be saved</param>
         /// <param name="label">the label to be added in front of the value</param>
-        internal void Save<K,V>(Dictionary<K,V> dictionary, string label = "")
+        internal void SaveAsStrings<K,V>(Dictionary<K,V> dictionary, string label = "")
         {
             BeginList(label);
             foreach (var item in dictionary)
