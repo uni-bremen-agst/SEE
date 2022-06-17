@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using OdinSerializer;
+using Sirenix.Serialization;
 using SEE.DataModel.DG;
 using SEE.Utils;
 using Sirenix.OdinInspector;
@@ -432,29 +432,41 @@ namespace SEE.Game.City
         }
     }
 
+    /// <summary>
+    /// To what kind of concept a property refers to.
+    /// </summary>
     [Serializable]
     public enum PropertyKind
     {
+        /// <summary>
+        /// Refers to a node type.
+        /// </summary>
         Type,
+        /// <summary>
+        /// Refers to a node metric.
+        /// </summary>
         Metric
     }
 
     /// <summary>
+    /// A mapping of property names (e.g., name of node types) onto <see cref="ColorRange"/>.
+    /// This concrete instantiation is needed because Unity cannot serialize generic types.
+    /// </summary>
+    [Serializable]
+    public class ColorRangeMapping : Dictionary<string, ColorRange> { }
+
+    /// <summary>
     /// Specifies which color is used to render a named property.
     /// </summary>
-    //[Serializable]
-    [HideReferenceObjectPicker]
-    public class ColorMap : Sirenix.OdinInspector.SerializedUnityObject, ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
+    [Serializable]
+    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
     {
         /// <summary>
         /// Mapping of property name onto color.
         /// </summary>
-        [OdinSerialize]
+        [SerializeField]
         [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
-        public readonly Dictionary<string, ColorRange> map = new Dictionary<string, ColorRange>();
-
-        [OdinSerialize]
-        public readonly Dictionary<string, ColorRange> MyMap = new Dictionary<string, ColorRange>();
+        private ColorRangeMapping map = new ColorRangeMapping();
 
         /// <summary>
         /// Operator [].
@@ -560,7 +572,6 @@ namespace SEE.Game.City
                     map[name] = color;
                     result = true;
                 }
-                Debug.Log($"Restored {map.Count} entries of color map.\n");
                 return result;
             }
             else

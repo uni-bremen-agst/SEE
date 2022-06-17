@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OdinSerializer;
+using Sirenix.Serialization;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
@@ -31,11 +31,6 @@ namespace SEE.Game.City
         /// <see cref="Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
-
-        private void Awake()
-        {
-            MetricToColor = new ColorMap();
-        }
 
         /// <summary>
         /// The screen relative height to use for culling a game node [0-1].
@@ -108,25 +103,21 @@ namespace SEE.Game.City
         /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
-        [OdinSerialize, Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
-        private ColorMap metricToColor;
-
-        public ColorMap MetricToColor
-        { get => metricToColor;
-          set => metricToColor = value;
-        }
+        [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
+        [NonSerialized, OdinSerialize]
+        public ColorMap MetricToColor = new ColorMap();
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        [SerializeField, Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
+        [Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
         /// </summary>
-        [SerializeField, Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
+        [Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
@@ -146,19 +137,19 @@ namespace SEE.Game.City
         /// <summary>
         /// The node layout settings.
         /// </summary>
-        [OdinSerialize, Tooltip("Settings for the node layout.")]
+        [Tooltip("Settings for the node layout.")]
         public NodeLayoutAttributes NodeLayoutSettings = new NodeLayoutAttributes();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
-        [OdinSerialize, Tooltip("Settings for the edge layout.")]
+        [Tooltip("Settings for the edge layout.")]
         public EdgeLayoutAttributes EdgeLayoutSettings = new EdgeLayoutAttributes();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
-        [OdinSerialize, Tooltip("Settings for the selection of edges.")]
+        [Tooltip("Settings for the selection of edges.")]
         public EdgeSelectionAttributes EdgeSelectionSettings = new EdgeSelectionAttributes();
 
         /// <summary>
@@ -171,7 +162,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
-        [OdinSerialize, Tooltip("Settings for the visualization of software erosions.")]
+        [Tooltip("Settings for the visualization of software erosions.")]
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
