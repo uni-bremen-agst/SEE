@@ -267,7 +267,8 @@ namespace SEE.Utils
             const string label = "metricMap";
 
             ColorMap saved = new ColorMap();
-            saved["metricX"] = Color.white;
+            ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
+            saved["metricX"] = colorRange;
             {
                 using ConfigWriter writer = new ConfigWriter(filename);
                 saved.Save(writer, label);
@@ -280,6 +281,15 @@ namespace SEE.Utils
             AreEqualMetricColorMap(saved, loaded);
         }
 
+        private static ColorRange NewColorRange(Color lower, Color upper, uint numberOfColors)
+        {
+            ColorRange colorRange = new ColorRange();
+            colorRange.Lower = lower;
+            colorRange.Upper = upper;
+            colorRange.NumberOfColors = numberOfColors;
+            return colorRange;
+        }
+
         /// <summary>
         /// Test for <see cref="ColorMap"/> with two elements.
         /// </summary>
@@ -290,8 +300,8 @@ namespace SEE.Utils
             const string label = "metricMap";
 
             ColorMap saved = new ColorMap();
-            saved["metricX"] = Color.white;
-            saved["metricY"] = Color.black;
+            saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
+            saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
             {
                 using ConfigWriter writer = new ConfigWriter(filename);
                 saved.Save(writer, label);
@@ -581,8 +591,8 @@ namespace SEE.Utils
         /// <param name="actual">actual color range</param>
         private static void AreEqual(ColorRange expected, ColorRange actual)
         {
-            AreEqual(expected.lower, actual.lower);
-            AreEqual(expected.upper, actual.upper);
+            AreEqual(expected.Lower, actual.Lower);
+            AreEqual(expected.Upper, actual.Upper);
             Assert.AreEqual(expected.NumberOfColors, actual.NumberOfColors);
         }
 
@@ -835,7 +845,6 @@ namespace SEE.Utils
             settings.WidthMetric = "X";
             settings.DepthMetric = "X";
             settings.ColorProperty.ColorMetric = "X";
-            settings.ColorProperty.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;
             settings.OutlineWidth = 99999;
@@ -852,7 +861,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
             Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
             Assert.AreEqual(expected.ColorProperty.ColorMetric, actual.ColorProperty.ColorMetric);
-            AreEqual(expected.ColorProperty.ColorRange, actual.ColorProperty.ColorRange);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
