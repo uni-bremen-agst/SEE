@@ -1,5 +1,4 @@
-﻿using OdinSerializer;
-using SEE.Utils;
+﻿using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -7,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace SEE.GO
 {
@@ -479,7 +479,7 @@ namespace SEE.GO
     /// <see cref="Init(BSpline, BSpline)"/> with desired source and target
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
-    /// 
+    ///
     /// <see cref="CreateTween"/> can be used to create a <see cref="Tween"/>
     /// object with which the morphism can be played as an animation.
     /// The animation can be controlled using the tween object.

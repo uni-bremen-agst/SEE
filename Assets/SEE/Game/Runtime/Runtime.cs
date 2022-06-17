@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using OdinSerializer;
+using Sirenix.Serialization;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.Runtime;
 using SEE.GO;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace SEE.Game.Runtime
 {
@@ -82,7 +83,7 @@ namespace SEE.Game.Runtime
                         // We retrieve the linkname because that contains the encoding of the signature
                         // of a method specifying its parameters and return type.
                         // FIXME: This makes assumptions about the information content of a linkname
-                        // that may not necessarily hold. 
+                        // that may not necessarily hold.
                         if (nodeRef.Value.TryGetString(Node.LinknameAttribute, out string linkname))
                         {
                             gameObjectsWithTag[j].GetComponentInChildren<MeshRenderer>().material.color = Color.black;
@@ -107,7 +108,7 @@ namespace SEE.Game.Runtime
 
         /// <summary>
         /// Checks for user input and updates simulation accordingly.
-        /// 
+        ///
         /// Key Return => toggle simulation
         /// Key +      => one step forward
         /// Key -      => one step backward

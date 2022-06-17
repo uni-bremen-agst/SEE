@@ -1,4 +1,4 @@
-﻿using OdinSerializer;
+﻿using Sirenix.OdinInspector;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections;
