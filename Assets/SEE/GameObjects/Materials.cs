@@ -92,11 +92,11 @@ namespace SEE.GO
             this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
-            lowerColor = colorRange.lower;
-            higherColor = colorRange.upper;
+            lowerColor = colorRange.Lower;
+            higherColor = colorRange.Upper;
             this.texture = texture;
             // materials[0] is set up with the given colorRange for the render-queue offset 0.
-            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, texture, 0) };
+            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture, 0) };
         }
 
         /// <summary>
