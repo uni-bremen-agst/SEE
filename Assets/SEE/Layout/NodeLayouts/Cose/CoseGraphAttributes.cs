@@ -130,8 +130,8 @@ namespace SEE.Layout.NodeLayouts.Cose
             writer.Save(RepulsionStrength, RepulsionStrengthLabel);
             writer.Save(MultiLevelScaling, MultiLevelScalingLabel);
             writer.Save(ListInnerNodeToggle, ListInnerNodeToggleLabel);
-            writer.Save(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
-            writer.Save(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
+            writer.SaveAsStrings(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
+            writer.SaveAsStrings(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
             writer.Save(LoadedForNodeTypes, LoadedForNodeTypesLabel);
             writer.Save(UseCalculationParameter, UseCalculationParameterLabel);
             writer.Save(UseIterativeCalculation, UseIterativeCalculationLabel);
