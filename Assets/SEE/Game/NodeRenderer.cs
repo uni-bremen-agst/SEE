@@ -259,36 +259,56 @@ namespace SEE.Game
         /// <returns>style index</returns>
         private int SelectStyle(Node node)
         {
-            bool isLeaf = node.IsLeaf();
-            NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
-            uint numberOfStyles = nodeFactory.NumberOfStyles();
-            string colorMetric = isLeaf ? Settings.LeafNodeSettings.ColorProperty.ColorMetric
-                                        : Settings.InnerNodeSettings.ColorProperty.ColorMetric;
-
-            float metricMaximum;
-            if (Utils.FloatUtils.TryGetFloat(colorMetric, out float metricValue))
+            if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes value))
             {
-                // The colorMetric name is actually a constant number.
-                metricMaximum = numberOfStyles;
-                metricValue = Mathf.Clamp(metricValue, 0.0f, metricMaximum);
+                switch (value.ColorProperty.Property)
+                {
+                    case PropertyKind.Metric:
+                        return NodeMetricToColor(node, value.ColorProperty.ColorMetric);
+                    case PropertyKind.Type:
+                        /// Node factories using the node type for determining the color have only one color.
+                        /// <seealso cref="SetNodeFactories"/>
+                        return 0;
+                    default:
+                        throw new NotImplementedException($"Unhandled {typeof(PropertyKind)} {value.ColorProperty.Property}");
+                }
             }
             else
             {
-                if (!node.TryGetNumeric(colorMetric, out float _))
-                {
-                    Debug.LogWarning($"Value of color metric {colorMetric} for node {node.ID} is undefined.\n");
-                    return 0;
-                }
-
-                metricMaximum = scaler.GetNormalizedMaximum(colorMetric);
-                metricValue = scaler.GetNormalizedValue(colorMetric, node);
-                if (metricValue > metricMaximum)
-                {
-                    Debug.LogError($"not true: {metricValue} <= {metricMaximum} for color metric {colorMetric} of node {node.ID}.\n");
-                    return Mathf.RoundToInt(metricMaximum);
-                }
+                Debug.LogError($"No color specification for node {node.ID} of type {node.Type}.\n");
+                return 0;
             }
-            return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, metricValue / metricMaximum));
+
+            int NodeMetricToColor(Node node, string colorMetric)
+            {
+                NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
+                uint numberOfStyles = nodeFactory.NumberOfStyles();
+
+                float metricMaximum;
+                if (Utils.FloatUtils.TryGetFloat(colorMetric, out float metricValue))
+                {
+                    // The colorMetric name is actually a constant number.
+                    metricMaximum = numberOfStyles;
+                    metricValue = Mathf.Clamp(metricValue, 0.0f, metricMaximum);
+                }
+                else
+                {
+                    if (!node.TryGetNumeric(colorMetric, out float _))
+                    {
+                        Debug.LogWarning($"Value of color metric {colorMetric} for node {node.ID} is undefined.\n");
+                        return 0;
+                    }
+
+                    metricMaximum = scaler.GetNormalizedMaximum(colorMetric);
+                    metricValue = scaler.GetNormalizedValue(colorMetric, node);
+                    if (metricValue > metricMaximum)
+                    {
+                        Debug.LogError($"not true: {metricValue} <= {metricMaximum} for color metric {colorMetric} of node {node.ID}.\n");
+                        return Mathf.RoundToInt(metricMaximum);
+                    }
+                }
+                return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, metricValue / metricMaximum));
+            }
         }
 
         /// <summary>

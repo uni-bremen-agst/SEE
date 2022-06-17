@@ -28,9 +28,14 @@ namespace SEE.Game.City
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
-        /// <see cref="AbstractSEECity.Restore"/>,
+        /// <see cref="Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
+
+        private void Awake()
+        {
+            MetricToColor = new ColorMap();
+        }
 
         /// <summary>
         /// The screen relative height to use for culling a game node [0-1].
@@ -42,7 +47,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of configuration file."), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of configuration file."), FoldoutGroup(DataFoldoutGroup)]
         public FilePath ConfigurationPath = new FilePath();
 
         /// <summary>
@@ -56,7 +61,7 @@ namespace SEE.Game.City
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [SerializeField, ShowInInspector, FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, FoldoutGroup(DataFoldoutGroup)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
@@ -83,41 +88,45 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of VS solution file."), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of VS solution file."), FoldoutGroup(DataFoldoutGroup)]
         public FilePath SolutionPath = new FilePath();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Edge types of hierarchical edges.")]
+        [OdinSerialize, Tooltip("Edge types of hierarchical edges.")]
         public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes(); // serialized by Odin
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not and if so, how.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Visual attributes of nodes.")]
+        [OdinSerialize, Tooltip("Visual attributes of nodes.")]
         [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout, IsReadOnly = true)]
         public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
 
         /// <summary>
         /// A mapping of node metric names onto colors.
-        /// FIXME: Must be saved in configuration file.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup)]
-        public ColorMap MetricToColor = new ColorMap();
+        [OdinSerialize, Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
+        private ColorMap metricToColor;
+
+        public ColorMap MetricToColor
+        { get => metricToColor;
+          set => metricToColor = value;
+        }
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
+        [SerializeField, Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
+        [SerializeField, Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
@@ -137,19 +146,19 @@ namespace SEE.Game.City
         /// <summary>
         /// The node layout settings.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Settings for the node layout.")]
+        [OdinSerialize, Tooltip("Settings for the node layout.")]
         public NodeLayoutAttributes NodeLayoutSettings = new NodeLayoutAttributes();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Settings for the edge layout.")]
+        [OdinSerialize, Tooltip("Settings for the edge layout.")]
         public EdgeLayoutAttributes EdgeLayoutSettings = new EdgeLayoutAttributes();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Settings for the selection of edges.")]
+        [OdinSerialize, Tooltip("Settings for the selection of edges.")]
         public EdgeSelectionAttributes EdgeSelectionSettings = new EdgeSelectionAttributes();
 
         /// <summary>
@@ -162,7 +171,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
-        [OdinSerialize, ShowInInspector, Tooltip("Settings for the visualization of software erosions.")]
+        [OdinSerialize, Tooltip("Settings for the visualization of software erosions.")]
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>

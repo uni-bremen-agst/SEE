@@ -78,10 +78,11 @@ namespace SEE.Game
             {
                 if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
                 {
-                    nodeTypeToFactory[nodeType] = GetNodeFactory(nodeType, value);
+                    nodeTypeToFactory[nodeType] = GetNodeFactory(value);
                 }
                 else
                 {
+                    Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
                     nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
                 }
             }
@@ -96,9 +97,9 @@ namespace SEE.Game
                 return new ColorRange(Color.white, Color.black, 10);
             }
 
-            NodeFactory GetNodeFactory(string nodeType, VisualNodeAttributes value)
+            NodeFactory GetNodeFactory(VisualNodeAttributes value)
             {
-                ColorRange colorRange = GetColorRange(nodeType, value.ColorProperty);
+                ColorRange colorRange = GetColorRange(value.ColorProperty);
 
                 return value.Shape switch
                 {
@@ -108,20 +109,20 @@ namespace SEE.Game
                 };
             }
 
-            ColorRange GetColorRange(string nodeType, ColorProperty colorProperty)
+            ColorRange GetColorRange(ColorProperty colorProperty)
             {
                 switch (colorProperty.Property)
                 {
                     case PropertyKind.Type:
                         return new ColorRange(colorProperty.TypeColor, colorProperty.TypeColor, 1);
                     case PropertyKind.Metric:
-                        if (Settings.MetricToColor.TryGetValue(colorProperty.ColorMetric, out Color color))
+                        if (Settings.MetricToColor.TryGetValue(colorProperty.ColorMetric, out ColorRange color))
                         {
-                            // FIXME: other value for lower color
-                            return new ColorRange(Color.white, color, 10);
+                            return color;
                         }
                         else
                         {
+                            Debug.LogWarning($"No specification of color for node metric {colorProperty.ColorMetric}. Using a default.\n");
                             return DefaultColorRange();
                         }
                     default:

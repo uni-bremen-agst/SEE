@@ -103,18 +103,15 @@ namespace SEE.Game.City
         /// <summary>
         /// How a node should be drawn. Determines the kind of mesh.
         /// </summary>
-        [ShowInInspector]
         public NodeShapes Shape = NodeShapes.Blocks;
         /// <summary>
         /// If true, the node should be rendered. Otherwise the node will be ignored when
         /// the graph is loaded.
         /// </summary>
-        [ShowInInspector]
         public bool IsRelevant = true;
         /// <summary>
         /// Name of the metric defining the width.
         /// </summary>
-        [ShowInInspector]
         public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
         /// <summary>
         /// Name of the metric defining the depth.
@@ -127,6 +124,8 @@ namespace SEE.Game.City
         /// <summary>
         /// How the color of a node should be determined.
         /// </summary>
+        [OdinSerialize]
+        [HideReferenceObjectPicker]
         public ColorProperty ColorProperty = new ColorProperty();
         /// <summary>
         /// This parameter determines the minimal width, breadth, and height of each block
@@ -289,6 +288,7 @@ namespace SEE.Game.City
         /// The color used to represent the type of a node.
         /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
         /// </summary>
+        [ShowIf("Property", PropertyKind.Type)]
         public Color TypeColor = Color.white;
 
         /// <summary>
@@ -298,14 +298,6 @@ namespace SEE.Game.City
         /// </summary>
         [ShowIf("Property", PropertyKind.Metric)]
         public string ColorMetric = string.Empty;
-        /// <summary>
-        /// The range of colors for the style metric.
-        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
-        /// </summary>
-        [OdinSerialize]
-        [ShowIf("Property", PropertyKind.Metric)]
-        [Obsolete]
-        public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
 
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
@@ -322,7 +314,6 @@ namespace SEE.Game.City
                 ConfigIO.RestoreEnum(values, PropertyLabel, ref Property);
                 ConfigIO.Restore(values, TypeColorLabel, ref TypeColor);
                 ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
                 return true;
             }
             else
@@ -343,7 +334,6 @@ namespace SEE.Game.City
             writer.Save(Property.ToString(), PropertyLabel);
             writer.Save(TypeColor, TypeColorLabel);
             writer.Save(ColorMetric, ColorMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
             writer.EndGroup();
         }
 
@@ -359,10 +349,6 @@ namespace SEE.Game.City
         /// Label in the configuration file for a <see cref="ColorMetric"/>
         /// </summary>
         private const string ColorMetricLabel = "ColorMetric";
-        /// <summary>
-        /// Label in the configuration file for <see cref="ColorRange"/>.
-        /// </summary>
-        private const string ColorRangeLabel = "ColorRange";
     }
 
     /// <summary>
@@ -453,57 +439,29 @@ namespace SEE.Game.City
         Metric
     }
 
-    [Serializable]
-    public struct Property : ConfigIO.PersistentConfigItem
-    {
-        [HideLabel, HorizontalGroup("Property", Width = 0.2f)]
-        [EnumToggleButtons]
-        public PropertyKind Kind;
-        [HorizontalGroup("Property", Width = 0.8f, LabelWidth = 40)]
-        [ShowIf("Kind", PropertyKind.Metric)]
-        //ValueDropdown("Names", SortDropdownItems = true)]
-        public string Name;
-
-        public bool Restore(Dictionary<string, object> attributes, string label = "")
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Save(ConfigWriter writer, string label = "")
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The label of <see cref="Name"/> in the configuration file.
-        /// </summary>
-        private const string NameLabel = "name";
-
-        /// <summary>
-        /// The label of <see cref="Kind"/> in the configuration file.
-        /// </summary>
-        private const string KindLabel = "kind";
-    }
-
     /// <summary>
     /// Specifies which color is used to render a named property.
     /// </summary>
-    [Serializable]
-    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, Color>>
+    //[Serializable]
+    [HideReferenceObjectPicker]
+    public class ColorMap : Sirenix.OdinInspector.SerializedUnityObject, ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
     {
         /// <summary>
         /// Mapping of property name onto color.
         /// </summary>
-        [OdinSerialize, ShowInInspector]
+        [OdinSerialize]
         [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
-        private Dictionary<string, Color> map = new Dictionary<string, Color>();
+        public readonly Dictionary<string, ColorRange> map = new Dictionary<string, ColorRange>();
+
+        [OdinSerialize]
+        public readonly Dictionary<string, ColorRange> MyMap = new Dictionary<string, ColorRange>();
 
         /// <summary>
         /// Operator [].
         /// </summary>
         /// <param name="name">name of the property for which to retrieve the color</param>
         /// <returns>retrieved color for <paramref name="name"/></returns>
-        public Color this[string name]
+        public ColorRange this[string name]
         {
             get { return map[name]; }
             set { map[name] = value; }
@@ -519,7 +477,7 @@ namespace SEE.Game.City
         /// <param name="color">the color <paramref name="name"/> is mapped onto; defined only
         /// if <c>true</c> is returned</param>
         /// <returns><c>true</c> if <paramref name="name"/> is contained</returns>
-        public bool TryGetValue(string name, out Color color)
+        public bool TryGetValue(string name, out ColorRange color)
         {
             return map.TryGetValue(name, out color);
         }
@@ -536,7 +494,7 @@ namespace SEE.Game.City
         /// Enumerator for all entries of the map.
         /// </summary>
         /// <returns>enumerator</returns>
-        public IEnumerator<KeyValuePair<string, Color>> GetEnumerator()
+        public IEnumerator<KeyValuePair<string, ColorRange>> GetEnumerator()
         {
             return map.GetEnumerator();
         }
@@ -564,7 +522,7 @@ namespace SEE.Game.City
             {
                 writer.BeginGroup();
                 writer.Save(item.Key, NameLabel);
-                writer.Save(item.Value, ColorLabel);
+                item.Value.Save(writer, ColorLabel);
                 writer.EndGroup();
             }
             writer.EndList();
@@ -593,8 +551,8 @@ namespace SEE.Game.City
                         continue;
                     }
                     // color
-                    Color color = Color.white;
-                    if (!ConfigIO.Restore(dict, ColorLabel, ref color))
+                    ColorRange color = new ColorRange();
+                    if (!color.Restore(dict, ColorLabel))
                     {
                         Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {ColorLabel}\n");
                         continue;
@@ -602,6 +560,7 @@ namespace SEE.Game.City
                     map[name] = color;
                     result = true;
                 }
+                Debug.Log($"Restored {map.Count} entries of color map.\n");
                 return result;
             }
             else
@@ -638,18 +597,18 @@ namespace SEE.Game.City
         /// This parameter determines the sections of the antenna, that is, the
         /// order of the antenna segments and which properties they depict.
         /// </summary>
-        [SerializeField]
-        [ListDrawerSettings(CustomAddFunction = "AddProperty")]
-        public List<Property> AntennaSegments = new List<Property>();
+        //[SerializeField]
+        //[ListDrawerSettings(CustomAddFunction = "AddProperty")]
+        //public List<Property> AntennaSegments = new List<Property>();
 
-        private Property AddProperty()
-        {
-            Debug.Log("AddProperty\n");
-            Property result = new Property();
-            result.Kind = PropertyKind.Metric;
-            result.Name = "Metric.Mine";
-            return result;
-        }
+        //private Property AddProperty()
+        //{
+        //    Debug.Log("AddProperty\n");
+        //    Property result = new Property();
+        //    result.Kind = PropertyKind.Metric;
+        //    result.Name = "Metric.Mine";
+        //    return result;
+        //}
 
         /// <summary>
         /// The width of an antenna.
