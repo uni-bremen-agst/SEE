@@ -11,7 +11,7 @@ namespace SEE.Controls
     public class MobilePlayerMovement :PlayerMovement
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 1f;
+        public float Speed = 0.8f;
 
         /// <summary>
         /// Handles the camera movement
@@ -126,8 +126,8 @@ namespace SEE.Controls
         private void HandleRotation()
         {
             // Taking the joystick inputs
-            float xMovementInput = joystickRight.Horizontal;
-            float yMovementInput = joystickRight.Vertical;
+            float xMovementInput = joystickRight.Horizontal * Speed;
+            float yMovementInput = joystickRight.Vertical * Speed;
 
             // rotation of the camera - repeat sets the value back to 0 after hitting 360 degrees 
             cameraState.pitch = Mathf.Repeat(cameraState.pitch - yMovementInput, 360f);
