@@ -1,0 +1,8 @@
+Comment: Error while executing global connection shutdown delegates for [TCP-E-S] [2003:f5:ff01:eb48:78b4:4eb1:864:761c]:55555 -> [2003:f5:ff01:eb48:78b4:4eb1:864:761c]:52486 (MyQaBjzHIUiXIVdFkz9LWQ). Ensure any shutdown exceptions are caught in your own code.
+
+Base Exception Type: System.NullReferenceException: Object reference not set to an instance of an object
+  at SEE.Net.Server+<>c.<Initialize>b__15_1 (NetworkCommsDotNet.Connections.Connection c) [0x00000] in C:\Users\roman\OneDrive\Desktop\SEE\Assets\SEE\Net\Server.cs:84 
+  at NetworkCommsDotNet.Connections.Connection.CloseConnection (System.Boolean closeDueToError, System.Int32 logLocation) [0x00229] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 
+
+Stack Trace:   at SEE.Net.Server+<>c.<Initialize>b__15_1 (NetworkCommsDotNet.Connections.Connection c) [0x00000] in C:\Users\roman\OneDrive\Desktop\SEE\Assets\SEE\Net\Server.cs:84 
+  at NetworkCommsDotNet.Connections.Connection.CloseConnection (System.Boolean closeDueToError, System.Int32 logLocation) [0x00229] in <cb31c347b8f54d1cba65a12b31b5dfce>:0 

@@ -86,8 +86,8 @@ namespace SEE.Controls.Actions
 
             zoomModifier = (firstTouch.deltaPosition - secondTouch.deltaPosition).magnitude * 0.005f;
 
-            //Checking whether the two touches move closer or further apart
-            if (touchesPrevPosDifference < touchesCurPosDifference)
+            // Checking whether the two touches move closer or further apart. When the two touch inputs move closer, the player zooms out.
+            if (touchesPrevPosDifference > touchesCurPosDifference)
             {
                 zoomModifier = -zoomModifier;
             }
