@@ -503,6 +503,14 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Resets this <see cref="CodeMap"/> to an empty mapping.
+        /// </summary>
+        public void Clear()
+        {
+            map.Clear();
+        }
+
+        /// <summary>
         /// Enumerator for all entries of the map.
         /// </summary>
         /// <returns>enumerator</returns>

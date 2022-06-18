@@ -145,11 +145,6 @@ namespace SEE.Net
             rotation = city.transform.rotation;
             scale = city.transform.lossyScale;
 
-            //WidthMetric = city.leafNodeAttributes.widthMetric;
-            //HeightMetric = city.leafNodeAttributes.heightMetric;
-            //DepthMetric = city.leafNodeAttributes.depthMetric;
-            //LeafStyleMetric = city.leafNodeAttributes.styleMetric;
-
             ArchitectureIssue = city.ErosionSettings.ArchitectureIssue;
             CloneIssue = city.ErosionSettings.CloneIssue;
             CycleIssue = city.ErosionSettings.CycleIssue;
@@ -165,14 +160,6 @@ namespace SEE.Net
             MetricIssue_SUM = city.ErosionSettings.MetricIssue_SUM;
             StyleIssue_SUM = city.ErosionSettings.StyleIssue_SUM;
             UniversalIssue_SUM = city.ErosionSettings.UniversalIssue_SUM;
-
-            //InnerNodeStyleMetric = city.innerNodeAttributes.styleMetric;
-
-            MinimalBlockLength = city.LeafNodeSettings.MinimalBlockLength;
-            MaximalBlockLength = city.LeafNodeSettings.MaximalBlockLength;
-
-            //LeafObjects = city.nodeLayoutSettings.leafKind;
-            //InnerNodeObjects = city.nodeLayoutSettings.innerKind;
 
             NodeLayout = city.NodeLayoutSettings.Kind;
             EdgeLayout = city.EdgeLayoutSettings.Kind;
@@ -266,11 +253,6 @@ namespace SEE.Net
 
             Assert.IsNotNull(city);
 
-            //city.leafNodeAttributes.widthMetric = WidthMetric;
-            //city.leafNodeAttributes.heightMetric = HeightMetric;
-            //city.leafNodeAttributes.depthMetric = DepthMetric;
-            //city.leafNodeAttributes.styleMetric = LeafStyleMetric;
-
             city.ErosionSettings.ArchitectureIssue = ArchitectureIssue;
             city.ErosionSettings.CloneIssue = CloneIssue;
             city.ErosionSettings.CycleIssue = CycleIssue;
@@ -286,14 +268,6 @@ namespace SEE.Net
             city.ErosionSettings.MetricIssue_SUM = MetricIssue_SUM;
             city.ErosionSettings.StyleIssue_SUM = StyleIssue_SUM;
             city.ErosionSettings.UniversalIssue_SUM = UniversalIssue_SUM;
-
-            //city.innerNodeAttributes.styleMetric = InnerNodeStyleMetric;
-
-            city.LeafNodeSettings.MinimalBlockLength = MinimalBlockLength;
-            city.LeafNodeSettings.MaximalBlockLength = MaximalBlockLength;
-
-            //city.nodeLayoutSettings.leafKind = LeafObjects;
-            //city.nodeLayoutSettings.innerKind = InnerNodeObjects;
 
             city.NodeLayoutSettings.Kind = NodeLayout;
             city.EdgeLayoutSettings.Kind = EdgeLayout;

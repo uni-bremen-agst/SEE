@@ -17,8 +17,6 @@ namespace SEE.Game.City
         private const string HierarchicalEdgesLabel = "HierarchicalEdges";
         private const string NodeTypesLabel = "NodeTypes";
         private const string CoseGraphSettingsLabel = "CoseGraph";
-        private const string LeafNodeAttributesLabel = "LeafNodes";
-        private const string InnerNodeAttributesLabel = "InnerNodes";
         private const string ErosionMetricsLabel = "ErosionIssues";
         private const string NodeLayoutSettingsLabel = "NodeLayout";
         private const string EdgeLayoutSettingsLabel = "EdgeLayout";
@@ -47,8 +45,6 @@ namespace SEE.Game.City
             MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
-            LeafNodeSettings.Save(writer, LeafNodeAttributesLabel);
-            InnerNodeSettings.Save(writer, InnerNodeAttributesLabel);
             ErosionSettings.Save(writer, ErosionMetricsLabel);
             NodeLayoutSettings.Save(writer, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
@@ -71,8 +67,6 @@ namespace SEE.Game.City
             MetricToColor.Restore(attributes, MetricToColorLabel);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
-            LeafNodeSettings.Restore(attributes, LeafNodeAttributesLabel);
-            InnerNodeSettings.Restore(attributes, InnerNodeAttributesLabel);
             ErosionSettings.Restore(attributes, ErosionMetricsLabel);
             NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);

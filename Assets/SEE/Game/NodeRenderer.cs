@@ -366,8 +366,9 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
-                float value = GetMetricValueOfLeaf(nodeRef.Value, Settings.InnerNodeSettings.HeightMetric);
-                nodeTypeToFactory[nodeRef.Value.Type].SetHeight(gameNode, value);
+                Node node = nodeRef.Value;
+                float value = GetMetricValueOfLeaf(node, Settings.NodeTypes[node.Type].HeightMetric);
+                nodeTypeToFactory[node.Type].SetHeight(gameNode, value);
             }
             else
             {
@@ -506,7 +507,7 @@ namespace SEE.Game
         private Vector3 GetScaleOfLeaf(Node node)
         {
             Assert.IsTrue(node.IsLeaf());
-            VisualNodeAttributes attribs = Settings.LeafNodeSettings;
+            VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
             return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
                                GetMetricValueOfLeaf(node, attribs.HeightMetric),
                                GetMetricValueOfLeaf(node, attribs.DepthMetric));
@@ -527,9 +528,10 @@ namespace SEE.Game
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
         private float GetMetricValueOfLeaf(Node node, string metricName)
         {
+            VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
             return Mathf.Clamp(scaler.GetMetricValue(node, metricName),
-                        Settings.LeafNodeSettings.MinimalBlockLength,
-                        Settings.LeafNodeSettings.MaximalBlockLength);
+                               attribs.MinimalBlockLength,
+                               attribs.MaximalBlockLength);
         }
 
 
@@ -545,22 +547,10 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds decoration for the given list of <paramref name="gameNodes"/> with the global settings
-        /// for inner node kinds and nodelayout.
-        /// </summary>
-        /// <param name="gameNodes">a list with gamenode objects</param>
-        protected void AddDecorations(ICollection<GameObject> gameNodes)
-        {
-            AddDecorations(gameNodes, Settings.InnerNodeSettings.Shape);
-        }
-
-        /// <summary>
         /// Draws the decorations of the given game nodes.
         /// </summary>
         /// <param name="gameNodes">game nodes to be decorated</param>
-        /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
-        /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
-        private void AddDecorations(ICollection<GameObject> gameNodes, NodeShapes innerNodeKinds)
+        protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
@@ -581,11 +571,7 @@ namespace SEE.Game
                 issueDecorator.Add(leafNodes);
             }
 
-            // Add text labels for all inner nodes
-            if (Settings.InnerNodeSettings.ShowNames)
-            {
-                AddLabels(innerNodes);
-            }
+            AddLabels(innerNodes);
 
             foreach (GameObject node in leafNodes.Concat(innerNodes))
             {
@@ -603,9 +589,8 @@ namespace SEE.Game
         protected virtual void AddGeneralDecorations(GameObject node)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
-            //TODO: Make color of outline configurable (including total transparency) for inner/leaf node!
-            Outline.Create(node, Color.black,
-                           node.IsLeaf() ? Settings.LeafNodeSettings.OutlineWidth : Settings.InnerNodeSettings.OutlineWidth);
+            VisualNodeAttributes attribs = Settings.NodeTypes[node.GetNode().Type];
+            Outline.Create(node, Color.black, attribs.OutlineWidth);
         }
 
         /// <summary>
@@ -616,13 +601,13 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         /// <param name="innerNodeFactory">inner node factory</param>
         /// <returns>the game objects created for the text labels</returns>
-        private static void AddLabels(IEnumerable<GameObject> gameNodes)
+        private void AddLabels(IEnumerable<GameObject> gameNodes)
         {
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
                 Node theNode = node.GetNode();
-                if (!theNode.IsRoot())
+                if (!theNode.IsRoot() && Settings.NodeTypes[theNode.Type].ShowNames)
                 {
                     Vector3 size = node.transform.lossyScale;
                     float length = Mathf.Min(size.x, size.z);

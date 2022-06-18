@@ -121,20 +121,6 @@ namespace SEE.Game.City
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
-        /// The attributes of the leaf nodes.
-        /// </summary>
-        [HideInInspector]
-        [Obsolete]
-        public VisualNodeAttributes LeafNodeSettings = new VisualNodeAttributes("LeafNode");
-
-        /// <summary>
-        /// The attributes of the inner nodes.
-        /// </summary>
-        [HideInInspector]
-        [Obsolete]
-        public VisualNodeAttributes InnerNodeSettings = new VisualNodeAttributes("InnerNode");
-
-        /// <summary>
         /// The node layout settings.
         /// </summary>
         [Tooltip("Settings for the node layout.")]
@@ -523,7 +509,7 @@ namespace SEE.Game.City
                 {
                     if (!node.IsLeaf())
                     {
-                        dirsShape.Add(node.ID, InnerNodeSettings.Shape);
+                        dirsShape.Add(node.ID, NodeTypes[node.Type].Shape);
                         dirsLocal.Add(node.ID, false);
                         dirsLayout.Add(node.ID, NodeLayoutSettings.Kind);
                     }

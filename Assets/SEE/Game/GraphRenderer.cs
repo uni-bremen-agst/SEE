@@ -498,7 +498,7 @@ namespace SEE.Game
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
             {
                 ICollection<GameObject> gameObjects = (from LayoutGameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
-                AddDecorations(gameObjects, layoutNode.InnerNodeKind);
+                AddDecorations(gameObjects);
                 remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
             }
 
