@@ -357,8 +357,9 @@ namespace SEE.Utils
             string filename = "seecity.cfg";
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
-            savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
-            savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
+            // FIXME: We need tests for the antenna settings
+            //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
+            //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
             VisualNodeAttributes function = new VisualNodeAttributes("Function")
             {
                 IsRelevant = true
@@ -560,13 +561,45 @@ namespace SEE.Utils
         private static void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
             AreEqualSharedAttributes(expected, actual);
-            AreEqualNodeSettings(expected.LeafNodeSettings, actual.LeafNodeSettings);
-            AreEqualNodeSettings(expected.InnerNodeSettings, actual.InnerNodeSettings);
+            Assert.AreEqual(expected.NodeTypes.Count, actual.NodeTypes.Count);
+            AreEqualNodeTypes(expected, actual);
+            AreEqualMetricToColor(expected, actual);
             AreEqualNodeLayoutSettings(expected.NodeLayoutSettings, actual.NodeLayoutSettings);
             AreEqualEdgeLayoutSettings(expected.EdgeLayoutSettings, actual.EdgeLayoutSettings);
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="AbstractSEECity.MetricToColor"/> attributes of <paramref name="expected"/>
+        /// and equal <paramref name="actual"/>.
+        /// </summary>
+        /// <param name="expected">expected value</param>
+        /// <param name="actual">actual value</param>
+        private static void AreEqualMetricToColor(AbstractSEECity expected, AbstractSEECity actual)
+        {
+            Assert.AreEqual(expected.MetricToColor.Count, actual.MetricToColor.Count);
+            foreach (var entry in expected.MetricToColor)
+            {
+                ColorRange actualColorRange = actual.MetricToColor[entry.Key];
+                AreEqual(entry.Value, actualColorRange);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="AbstractSEECity.NodeTypes"/> of <paramref name="expected"/>
+        /// and equal <paramref name="actual"/>.
+        /// </summary>
+        /// <param name="expected">expected value</param>
+        /// <param name="actual">actual value</param>
+        private static void AreEqualNodeTypes(AbstractSEECity expected, AbstractSEECity actual)
+        {
+            foreach (var entry in expected.NodeTypes)
+            {
+                Assert.IsTrue(actual.NodeTypes.TryGetValue(entry.Key, out VisualNodeAttributes actualSetting));
+                AreEqualNodeSettings(entry.Value, actualSetting);
+            }
         }
 
         /// <summary>
@@ -688,13 +721,35 @@ namespace SEE.Utils
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
             WipeOutSharedAttributes(city);
-            WipeOutNodeSettings(city.LeafNodeSettings);
-            WipeOutNodeSettings(city.InnerNodeSettings);
+            WipeOutNodeTypes(city);
+            WipeOutMetricToColor(city);
             WipeOutNodeLayoutSettings(city);
             WipeOutEdgeLayoutSettings(city);
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+        }
+
+        /// <summary>
+        /// Resets the <see cref="AbstractSEECity.MetricToColor"/> of <paramref name="city"/>
+        /// to an empty mapping.
+        /// </summary>
+        /// <param name="city">the city whose <see cref="AbstractSEECity.MetricToColor"/> is to be wiped out</param>
+        private static void WipeOutMetricToColor(AbstractSEECity city)
+        {
+            city.MetricToColor.Clear();
+        }
+
+        /// <summary>
+        /// Wipes out <see cref="AbstractSEECity.NodeTypes"/> of <paramref name="city"/>.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutNodeTypes(AbstractSEECity city)
+        {
+            foreach (var settings in city.NodeTypes.Values)
+            {
+                WipeOutNodeSettings(settings);
+            }
         }
 
         private static void WipeOutCoseGraphSettings(AbstractSEECity city)

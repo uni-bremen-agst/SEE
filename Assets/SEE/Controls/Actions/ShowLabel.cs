@@ -227,7 +227,6 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            bool isLeaf = node.IsLeaf();
             if (!LabelsEnabled(city, node))
             {
                 return; // If labels are disabled, we don't need to do anything
@@ -256,7 +255,7 @@ namespace SEE.Controls.Actions
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
                 startLabelPosition,
-                (isLeaf ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).FontSize,
+                city.NodeTypes[node.Type].LabelSettings.FontSize,
                 lift: true,
                 textColor: Color.black.ColorWithAlpha(0f));
             nodeLabel.name = $"Label {shownText}";
@@ -314,7 +313,7 @@ namespace SEE.Controls.Actions
             const float endAlpha = 1f;  // Alpha value the text and line will have at the end of the animation.
             const float lineStartAlpha = endAlpha * 0.5f;  // Alpha value the start of the line should have.
             Vector3 endLabelPosition = nodeLabel.transform.position;
-            endLabelPosition.y += (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).Distance;
+            endLabelPosition.y += city.NodeTypes[node.Type].LabelSettings.Distance;
             // Due to the line not using world space, we need to transform its position accordingly.
             Vector3 endLinePosition = edge.transform.InverseTransformPoint(endLabelPosition);
             float labelTextExtent = nodeLabel.GetComponent<TextMeshPro>().textBounds.extents.y;
@@ -425,7 +424,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
+            return city.NodeTypes[node.Type].LabelSettings.AnimationDuration;
         }
 
         /// <summary>
