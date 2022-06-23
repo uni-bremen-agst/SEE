@@ -391,7 +391,8 @@ namespace SEE.Game.City
             GameNodeMover.PutOn(implGameNode.transform, archGameNode);
             newPosition = implGameNode.transform.position;
             // Mapped node should be half its parent's size
-            implGameNode.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), ANIMATION_DURATION);
+            Vector3 oldScale = implGameNode.transform.localScale;
+            implGameNode.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
             // Recalculate edge layout and animate edges due to new node positioning.
             // TODO: Iterating over all game edges is currently very costly,
@@ -409,7 +410,9 @@ namespace SEE.Game.City
 
             // Movement of the node should be animated as well. For this, we have to reset its position first.
             implGameNode.transform.position = oldPosition;
+            implGameNode.transform.localScale = oldScale;
             implGameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
+            implGameNode.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), ANIMATION_DURATION);
 
             #region Local Methods
 
