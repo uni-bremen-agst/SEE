@@ -21,78 +21,78 @@ namespace SEE.GO
             cubeMesh = new Mesh();
 
             // x-, x+, y-, y+, z-, z+
-            Vector3[] vertices = new Vector3[24]
+            Vector3[] vertices =
             {
-                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f, 0.5f),
                 new Vector3(-0.5f, -0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3(-0.5f, 0.5f, -0.5f),
+                new Vector3(-0.5f, 0.5f, 0.5f),
 
-                new Vector3( 0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f, -0.5f),
+                new Vector3(0.5f, -0.5f, -0.5f),
+                new Vector3(0.5f, -0.5f, 0.5f),
+                new Vector3(0.5f, 0.5f, 0.5f),
+                new Vector3(0.5f, 0.5f, -0.5f),
 
-                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3(0.5f, -0.5f, -0.5f),
                 new Vector3(-0.5f, -0.5f, -0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
-                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3(-0.5f, -0.5f, 0.5f),
+                new Vector3(0.5f, -0.5f, 0.5f),
 
-                new Vector3(-0.5f,  0.5f, -0.5f),
-                new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3(-0.5f, 0.5f, -0.5f),
+                new Vector3(0.5f, 0.5f, -0.5f),
+                new Vector3(0.5f, 0.5f, 0.5f),
+                new Vector3(-0.5f, 0.5f, 0.5f),
 
                 new Vector3(-0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f, -0.5f),
+                new Vector3(0.5f, -0.5f, -0.5f),
+                new Vector3(0.5f, 0.5f, -0.5f),
+                new Vector3(-0.5f, 0.5f, -0.5f),
 
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f)
+                new Vector3(0.5f, -0.5f, 0.5f),
+                new Vector3(-0.5f, -0.5f, 0.5f),
+                new Vector3(-0.5f, 0.5f, 0.5f),
+                new Vector3(0.5f, 0.5f, 0.5f)
             };
 
-            Vector3[] normals = new Vector3[24]
+            Vector3[] normals =
             {
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
-                new Vector3(-1.0f,  0.0f,  0.0f),
+                new Vector3(-1.0f, 0.0f, 0.0f),
+                new Vector3(-1.0f, 0.0f, 0.0f),
+                new Vector3(-1.0f, 0.0f, 0.0f),
+                new Vector3(-1.0f, 0.0f, 0.0f),
 
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
-                new Vector3( 1.0f,  0.0f,  0.0f),
+                new Vector3(1.0f, 0.0f, 0.0f),
+                new Vector3(1.0f, 0.0f, 0.0f),
+                new Vector3(1.0f, 0.0f, 0.0f),
+                new Vector3(1.0f, 0.0f, 0.0f),
 
-                new Vector3( 0.0f, -1.0f,  0.0f),
-                new Vector3( 0.0f, -1.0f,  0.0f),
-                new Vector3( 0.0f, -1.0f,  0.0f),
-                new Vector3( 0.0f, -1.0f,  0.0f),
+                new Vector3(0.0f, -1.0f, 0.0f),
+                new Vector3(0.0f, -1.0f, 0.0f),
+                new Vector3(0.0f, -1.0f, 0.0f),
+                new Vector3(0.0f, -1.0f, 0.0f),
 
-                new Vector3( 0.0f,  1.0f,  0.0f),
-                new Vector3( 0.0f,  1.0f,  0.0f),
-                new Vector3( 0.0f,  1.0f,  0.0f),
-                new Vector3( 0.0f,  1.0f,  0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f),
+                new Vector3(0.0f, 1.0f, 0.0f),
 
-                new Vector3( 0.0f,  0.0f, -1.0f),
-                new Vector3( 0.0f,  0.0f, -1.0f),
-                new Vector3( 0.0f,  0.0f, -1.0f),
-                new Vector3( 0.0f,  0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
 
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f),
-                new Vector3( 0.0f,  0.0f,  1.0f)
+                new Vector3(0.0f, 0.0f, 1.0f),
+                new Vector3(0.0f, 0.0f, 1.0f),
+                new Vector3(0.0f, 0.0f, 1.0f),
+                new Vector3(0.0f, 0.0f, 1.0f)
             };
 
             // Note: Winding order in unity is clockwise
-            int[] indices = new int[36]
+            int[] indices =
             {
-                 0,  3,  2,  2,  1,  0,
-                 4,  7,  6,  6,  5,  4,
-                 8, 11, 10, 10,  9,  8,
+                0, 3, 2, 2, 1, 0,
+                4, 7, 6, 6, 5, 4,
+                8, 11, 10, 10, 9, 8,
                 12, 15, 14, 14, 13, 12,
                 16, 19, 18, 18, 17, 16,
                 20, 23, 22, 22, 21, 20
@@ -103,7 +103,7 @@ namespace SEE.GO
             cubeMesh.SetIndices(indices, MeshTopology.Triangles, 0);
         }
 
-        public override GameObject NewBlock(int style, int renderQueueOffset = 0)
+        public override GameObject NewBlock(int style)
         {
             GameObject result = new GameObject("Cube") { tag = Tags.Node };
 
@@ -111,7 +111,7 @@ namespace SEE.GO
             result.AddComponent<BoxCollider>();
 
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
+            Materials.SetSharedMaterial(renderer, index: style);
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
@@ -120,4 +120,3 @@ namespace SEE.GO
         }
     }
 }
-

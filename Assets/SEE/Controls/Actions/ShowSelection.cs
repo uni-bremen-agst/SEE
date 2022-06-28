@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
         {
             if (!Interactable.IsGrabbed)
             {
-                SetOutlineColorAndAlpha(isInitiator);
+                SetOutlineColor(isInitiator);
             }
         }
 
@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
         {
             if (!Interactable.IsHovered && !Interactable.IsGrabbed)
             {
-                ResetOutlineColorAndAlpha(isInitiator);
+                ResetOutlineColor();
             }
         }
 
@@ -89,7 +89,7 @@ namespace SEE.Controls.Actions
         {
             if (Interactable.IsSelected)
             {
-                ResetOutlineColorAndAlpha(isInitiator);
+                ResetOutlineColor();
             }
         }
     }
