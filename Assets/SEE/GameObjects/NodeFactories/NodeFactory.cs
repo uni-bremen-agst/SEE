@@ -41,7 +41,7 @@ namespace SEE.GO
         /// the object</param>
         /// <returns>new block representation</returns>
         /// <param name="renderQueueOffset">offset in the render queue</param>
-        public abstract GameObject NewBlock(int style = 0, int renderQueueOffset = 0);
+        public abstract GameObject NewBlock(int style = 0);
 
         /// <summary>
         /// The number of styles offered. A style index must be in the range

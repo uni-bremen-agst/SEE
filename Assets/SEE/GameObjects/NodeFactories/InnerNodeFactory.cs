@@ -51,13 +51,7 @@ namespace SEE.GO
             {
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>());
                 UnityEngine.Assertions.Assert.IsNotNull(block.GetComponent<NodeRef>().Value);
-                int level = block.GetComponent<NodeRef>().Value.Level;
-                Materials.SetSharedMaterial(renderer, renderQueueOffset: level, index: style);
-            }
-
-            if (block.TryGetComponent(out Outline outline))
-            {
-                outline.UpdateRenderQueue(true);
+                Materials.SetSharedMaterial(renderer, index: style);
             }
         }
     }
