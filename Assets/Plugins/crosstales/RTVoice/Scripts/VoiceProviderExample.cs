@@ -152,6 +152,16 @@ namespace Crosstales.RTVoice
          }
       }
 
+      public override int MaxSimultaneousSpeeches
+      {
+         get
+         {
+            // SKELETON CODE - replace with your own code!
+            // DEFINE: Maximal number of simultaneous speeches (0 = unlimited) for this provider
+            return 0;
+         }
+      }
+
       #endregion
 
 

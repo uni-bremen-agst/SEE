@@ -5,7 +5,7 @@ namespace Crosstales.Common.Util
    /// <summary>Helper-class for XML.</summary>
    public abstract class XmlHelper
    {
-      /// <summary>Serialize an object to an XML-file.</summary>
+      /// <summary>Serialize an object to a XML-file.</summary>
       /// <param name="obj">Object to serialize.</param>
       /// <param name="filename">File name of the XML.</param>
       public static void SerializeToFile<T>(T obj, string filename)
@@ -24,6 +24,46 @@ namespace Crosstales.Common.Util
          {
             Debug.LogError($"Could not serialize the object to a file: {ex}");
          }
+      }
+
+      /// <summary>Serialize an object to a XML-string.</summary>
+      /// <param name="obj">Object to serialize.</param>
+      /// <returns>Object as XML-string</returns>
+      public static string SerializeToString<T>(T obj)
+      {
+         if (null == obj)
+            throw new System.ArgumentNullException(nameof(obj));
+
+         byte[] result = SerializeToByteArray(obj);
+
+         return result != null ? System.Text.Encoding.UTF8.GetString(result) : string.Empty;
+      }
+
+      /// <summary>Serialize an object to a XML byte-array.</summary>
+      /// <param name="obj">Object to serialize.</param>
+      /// <returns>Object as byte-array</returns>
+      public static byte[] SerializeToByteArray<T>(T obj)
+      {
+         if (null == obj)
+            throw new System.ArgumentNullException(nameof(obj));
+
+         try
+         {
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+
+            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(obj.GetType());
+            System.Xml.XmlTextWriter xmlTextWriter = new System.Xml.XmlTextWriter(ms, System.Text.Encoding.UTF8);
+            xs.Serialize(xmlTextWriter, obj);
+
+            ms = (System.IO.MemoryStream)xmlTextWriter.BaseStream;
+            return ms.ToArray();
+         }
+         catch (System.Exception ex)
+         {
+            Debug.LogError($"Could not serialize the object to a byte-array: {ex}");
+         }
+
+         return null;
       }
 
       /// <summary>Deserialize a XML-file to an object.</summary>
@@ -47,7 +87,7 @@ namespace Crosstales.Common.Util
                }
                else
                {
-                  return DeserializeFromString<T>(System.IO.File.ReadAllText(filename), skipBOM);
+                  return DeserializeFromString<T>(data, skipBOM);
                }
             }
             else
@@ -61,33 +101,6 @@ namespace Crosstales.Common.Util
          }
 
          return default;
-      }
-
-      /// <summary>Serialize an object to an XML-string.</summary>
-      /// <param name="obj">Object to serialize.</param>
-      /// <returns>Object as XML-string</returns>
-      public static string SerializeToString<T>(T obj)
-      {
-         if (null == obj)
-            throw new System.ArgumentNullException(nameof(obj));
-
-         try
-         {
-            System.IO.MemoryStream ms = new System.IO.MemoryStream();
-
-            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(obj.GetType());
-            System.Xml.XmlTextWriter xmlTextWriter = new System.Xml.XmlTextWriter(ms, System.Text.Encoding.UTF8);
-            xs.Serialize(xmlTextWriter, obj);
-
-            ms = (System.IO.MemoryStream)xmlTextWriter.BaseStream;
-            return System.Text.Encoding.UTF8.GetString(ms.ToArray());
-         }
-         catch (System.Exception ex)
-         {
-            Debug.LogError($"Could not serialize the object to a string: {ex}");
-         }
-
-         return string.Empty;
       }
 
       /// <summary>Deserialize a XML-string to an object.</summary>
@@ -114,6 +127,29 @@ namespace Crosstales.Common.Util
          catch (System.Exception ex)
          {
             Debug.LogError($"Could not deserialize the object from a string: {ex}");
+         }
+
+         return default;
+      }
+
+      /// <summary>Deserialize a XML byte-array to an object.</summary>
+      /// <param name="data">XML of the object</param>
+      /// <returns>Object</returns>
+      public static T DeserializeFromByteArray<T>(byte[] data)
+      {
+         if (data == null)
+            throw new System.ArgumentNullException(nameof(data));
+
+         try
+         {
+            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(typeof(T));
+            System.IO.MemoryStream ms = new System.IO.MemoryStream(data);
+
+            return (T)xs.Deserialize(ms);
+         }
+         catch (System.Exception ex)
+         {
+            Debug.LogError($"Could not deserialize the object from a byte-array: {ex}");
          }
 
          return default;

@@ -32,7 +32,7 @@ Assets\Dialogue System\Third Party Support\RTVoice Support.unitypackage
 
 
 # Google Cloud
-Version: 1.4.2
+Version: 1.5.2
 https://assetstore.unity.com/packages/slug/115170?aid=1011lNGT
 
 

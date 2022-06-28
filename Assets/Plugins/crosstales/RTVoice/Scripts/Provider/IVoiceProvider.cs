@@ -72,6 +72,10 @@ namespace Crosstales.RTVoice.Provider
       /// <returns>All available cultures (alphabetically ordered by 'Culture') as a list.</returns>
       System.Collections.Generic.List<string> Cultures { get; }
 
+      /// <summary>Maximal number of simultaneous speeches (0 = unlimited).</summary>
+      /// <returns>The maximal number of simultaneous speeches.</returns>
+      int MaxSimultaneousSpeeches { get; }
+
       #endregion
 
 

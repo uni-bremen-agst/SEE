@@ -191,11 +191,11 @@ namespace Crosstales.Common.Util
             {
                if (Crosstales.Common.Util.BaseHelper.isWSABasedPlatform && !Crosstales.Common.Util.BaseHelper.isEditor)
                {
-#if CT_FB_PRO
+#if !CT_FB_PRO
 #if (UNITY_WSA || UNITY_XBOXONE) && !UNITY_EDITOR && ENABLE_WINMD_SUPPORT
                   Crosstales.FB.FileBrowserWSAImpl fbWsa = new Crosstales.FB.FileBrowserWSAImpl();
                   fbWsa.isBusy = true;
-                  UnityEngine.WSA.Application.InvokeOnUIThread(() => { fbWsa.GetFilesForName(path, isRecursive, extensions); }, false);
+                  UnityEngine.WSA.Application.InvokeOnUIThread(() => { fbWsa.GetFilesForName(path, isRecursive, filenames); }, false);
 
                   do
                   {
@@ -351,7 +351,7 @@ namespace Crosstales.Common.Util
       /// Find all logical drives.
       /// </summary>
       /// <returns>Returns array of the found drives. Zero length array when an error occured.</returns>
-      public static string[] GetDrives() //TODO replace with "Util.Helper.GetDrives" in the next version
+      public static string[] GetDrives()
       {
          if (Crosstales.Common.Util.BaseHelper.isWebPlatform && !Crosstales.Common.Util.BaseHelper.isEditor)
          {

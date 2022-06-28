@@ -69,13 +69,13 @@ namespace Crosstales.RTVoice.EditorIntegration
 
             Crosstales.RTVoice.Util.Config.AUDIOFILE_AUTOMATIC_DELETE = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Audio Auto-Delete", "Enable or disable auto-delete of the generated audio files (default: " + Crosstales.RTVoice.Util.Constants.DEFAULT_AUDIOFILE_AUTOMATIC_DELETE + ")."), Crosstales.RTVoice.Util.Config.AUDIOFILE_AUTOMATIC_DELETE);
 
-            Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_AUTOLOAD = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Prefab Auto-Load", "Enable or disable auto-loading of the prefabs to the scene (default: " + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_PREFAB_AUTOLOAD + ")."), Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_AUTOLOAD);
+            //Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_AUTOLOAD = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Prefab Auto-Load", "Enable or disable auto-loading of the prefabs to the scene (default: " + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_PREFAB_AUTOLOAD + ")."), Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_AUTOLOAD);
 
             Crosstales.RTVoice.Util.Config.DEBUG = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Debug", "Enable or disable debug logs (default: " + Crosstales.RTVoice.Util.Constants.DEFAULT_DEBUG + ")."), Crosstales.RTVoice.Util.Config.DEBUG);
 
             Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Update Check", "Enable or disable the update-checks for the asset (default: " + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_UPDATE_CHECK + ")"), Crosstales.RTVoice.EditorUtil.EditorConfig.UPDATE_CHECK);
 
-            Crosstales.RTVoice.EditorUtil.EditorConfig.COMPILE_DEFINES = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Compile Defines", "Enable or disable adding compile define 'CT_RTV' for the asset (default: " + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_COMPILE_DEFINES + ")"), Crosstales.RTVoice.EditorUtil.EditorConfig.COMPILE_DEFINES);
+            //Crosstales.RTVoice.EditorUtil.EditorConfig.COMPILE_DEFINES = UnityEditor.EditorGUILayout.Toggle(new UnityEngine.GUIContent("Compile Defines", "Enable or disable adding compile define 'CT_RTV' for the asset (default: " + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_COMPILE_DEFINES + ")"), Crosstales.RTVoice.EditorUtil.EditorConfig.COMPILE_DEFINES);
 
             Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 

@@ -14,7 +14,7 @@ namespace Crosstales.RTVoice.Provider
       private static bool isInitialized;
       private static AndroidJavaObject ttsHandler;
 
-      private static bool isSSML;
+      private static bool isSSML; //>M (API level 23) = true
 
       private readonly WaitForSeconds wfs = new WaitForSeconds(0.1f);
 
@@ -61,6 +61,8 @@ namespace Crosstales.RTVoice.Provider
 
       /// <summary> Returns all installed TTS engines on Android.</summary>
       public System.Collections.Generic.List<string> Engines => cachedEngines;
+
+      public override int MaxSimultaneousSpeeches => 0;
 
       #endregion
 

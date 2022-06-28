@@ -47,6 +47,8 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool hasVoicesInEditor => false;
 
+      public override int MaxSimultaneousSpeeches => 0;
+
       #endregion
 
 
