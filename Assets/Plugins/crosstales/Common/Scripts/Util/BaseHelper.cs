@@ -11,7 +11,8 @@ namespace Crosstales.Common.Util
    {
       #region Variables
 
-      public static readonly System.Globalization.CultureInfo BaseCulture = new System.Globalization.CultureInfo("en-US"); //TODO set with current user locale?
+      //public static readonly System.Globalization.CultureInfo BaseCulture = new System.Globalization.CultureInfo("en-US");
+      public static readonly System.Globalization.CultureInfo BaseCulture = new System.Globalization.CultureInfo(LanguageToISO639(Application.systemLanguage));
 
       protected static readonly System.Random rnd = new System.Random();
 
@@ -466,14 +467,6 @@ namespace Crosstales.Common.Util
          value *= System.Math.Sign(bytes);
 
          return $"{(value / 1024f):N2} {ci[index]}iB";
-      }
-
-      /// <summary>Format seconds to Human-Readable-Form.</summary>
-      /// <param name="seconds">Value in seconds</param>
-      /// <returns>Formatted seconds in Human-Readable-Form.</returns>
-      public static string FormatSecondsToHourMinSec(double seconds) //TODO remove later
-      {
-         return FormatSecondsToHRF(seconds);
       }
 
       /// <summary>Format seconds to Human-Readable-Form.</summary>

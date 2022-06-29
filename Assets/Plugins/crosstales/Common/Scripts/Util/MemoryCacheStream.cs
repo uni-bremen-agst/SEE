@@ -70,7 +70,6 @@ namespace Crosstales.Common.Util
                throw new System.ArgumentOutOfRangeException(nameof(value), "Non-negative number required.");
             }
 
-            //writePosition = readPosition = value; //TODO only readPosition?
             readPosition = value;
          }
       }

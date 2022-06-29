@@ -146,6 +146,8 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
+      public abstract int MaxSimultaneousSpeeches { get; }
+
       public virtual void Silence()
       {
          silence = true;
@@ -268,7 +270,7 @@ namespace Crosstales.RTVoice.Provider
             }
             else
             {
-               process.WaitForExit(); //TODO good idea?
+               process.WaitForExit();
             }
          }
          catch (System.Threading.ThreadAbortException)

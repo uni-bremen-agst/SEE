@@ -206,7 +206,7 @@ namespace Crosstales.Common.Util
 
       private static void openURL(string url)
       {
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if !UNITY_EDITOR && UNITY_WEBGL && CT_OPENWINDOW
          openURLPlugin(url);
 #else
          Application.OpenURL(url);
@@ -218,7 +218,7 @@ namespace Crosstales.Common.Util
          Application.ExternalEval("window.open('" + url + "');");
       }
 */
-#if !UNITY_EDITOR && UNITY_WEBGL
+#if !UNITY_EDITOR && UNITY_WEBGL && CT_OPENWINDOW
       private static void openURLPlugin(string url)
       {
 		   ctOpenWindow(url);

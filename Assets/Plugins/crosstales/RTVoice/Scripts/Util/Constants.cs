@@ -14,16 +14,16 @@ namespace Crosstales.RTVoice.Util
       public const string ASSET_NAME_SHORT = "RTV PRO";
 
       /// <summary>Version of the asset.</summary>
-      public const string ASSET_VERSION = "2022.1.0";
+      public const string ASSET_VERSION = "2022.1.2";
 
       /// <summary>Build number of the asset.</summary>
-      public const int ASSET_BUILD = 20220324;
+      public const int ASSET_BUILD = 20220530;
 
       /// <summary>Create date of the asset (YYYY, MM, DD).</summary>
       public static readonly System.DateTime ASSET_CREATED = new System.DateTime(2015, 4, 29);
 
       /// <summary>Change date of the asset (YYYY, MM, DD).</summary>
-      public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2022, 3, 24);
+      public static readonly System.DateTime ASSET_CHANGED = new System.DateTime(2022, 5, 30);
 
       /// <summary>URL of the PRO asset in UAS.</summary>
       public const string ASSET_PRO_URL = "https://assetstore.unity.com/packages/slug/41068?aid=1011lNGT";

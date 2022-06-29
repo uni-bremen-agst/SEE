@@ -217,8 +217,7 @@ namespace Crosstales.RTVoice.EditorTask
          return sb.ToString();
       }
 
-
-      private static string updateVersionText(string[] data) //TODO remove in the future
+      private static string updateVersionText(string[] data)
       {
          System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
@@ -344,7 +343,7 @@ namespace Crosstales.RTVoice.EditorTask
          return sb.ToString();
       }
 
-      private static string updateVersionTextForEditor(string[] data) //TODO remove in the future
+      private static string updateVersionTextForEditor(string[] data)
       {
          System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
