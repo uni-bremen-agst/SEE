@@ -286,7 +286,7 @@ namespace SEE.Tools.ReflexionAnalysis
         public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => markRootNode || node.Type != GraphRenderer.RootType)
+                                                           .Where(node => markRootNode || node.HasToggle(GraphRenderer.RootToggle))
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
@@ -312,8 +312,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            AddArtificialRoot(ArchitectureGraph);
-            AddArtificialRoot(ImplementationGraph);
+            GraphRenderer.AddRootIfNecessary(ArchitectureGraph);
+            GraphRenderer.AddRootIfNecessary(ImplementationGraph);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
@@ -373,27 +373,6 @@ namespace SEE.Tools.ReflexionAnalysis
             // Returns the intersection of the edge IDs of the two graphs.
             IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
                 => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-
-            void AddArtificialRoot(Graph graph)
-            {
-                // TODO: Somewhat duplicated from GraphRenderer.AddRootIfNecessary.
-                ICollection<Node> roots = graph.GetRoots();
-
-                if (roots.Count > 1)
-                {
-                    Node artificialRoot = new Node
-                    {
-                        ID = graph.Name + "#ROOT",
-                        SourceName = graph.Name,
-                        Type = GraphRenderer.RootType
-                    };
-                    graph.AddNode(artificialRoot);
-                    foreach (Node root in roots)
-                    {
-                        artificialRoot.AddChild(root);
-                    }
-                }
-            }
             
 
             #endregion

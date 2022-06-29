@@ -20,8 +20,20 @@
         <string>343fe43c-761b-4446-a01d-8d52174aefff</string>
       </attr>
     </node>
-    <node id="N6">
+    <node id="NX">
       <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>inner1</string>
+      </attr>
+    </node>
+    <node id="NY">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>inner2</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Package"/>
       <attr name="Source.Name">
         <string>h3</string>
       </attr>
@@ -51,6 +63,12 @@
       <type xlink:href="Belongs_To"/>
     </edge>
     <edge id="E7" from="N6" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EX" from="NX" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EY" from="NY" to="N6">
       <type xlink:href="Belongs_To"/>
     </edge>
   </graph>
