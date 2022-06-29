@@ -1,5 +1,16 @@
 ﻿# RT-Voice PRO - Release notes
 
+## 2022.1.2 - 30.05.2022
+* Fixes for import of packages
+
+## 2022.1.1 - 28.05.2022
+* Providers updated (field "MaxSimultaneousSpeeches" added)
+* "Google Cloud Speech" provider updated for latest version
+* Automatic installation of packages improved
+* Editor-folders moved to Scripts
+* GetHashCode-method improved
+* Updated to Common 2022.1.2
+
 ## 2022.1.0 - 24.03.2022
 * Speaker: "Force 32bit" for Windows added
 * Editor integration improved

@@ -17,6 +17,7 @@ namespace Crosstales.RTVoice.Provider
       private static bool isPaused;
       private static string[] speechTextArray;
       private static int wordIndex;
+      private static bool isLoading;
 
       #endregion
 
@@ -58,6 +59,8 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool hasVoicesInEditor => false;
 
+      public override int MaxSimultaneousSpeeches => 1;
+
       #endregion
 
 
@@ -94,6 +97,7 @@ namespace Crosstales.RTVoice.Provider
             Debug.LogWarning($"Voice-string contains wrong number of elements: {voices.Length}");
          }
 
+         isLoading = false;
          Instance.onVoicesReady();
 
          //NativeMethods.FreeMemory();
@@ -121,8 +125,8 @@ namespace Crosstales.RTVoice.Provider
       /// <summary>Called every time a new word is spoken.</summary>
       public static void WordSpoken(string word)
       {
-         //if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
-         Debug.Log($"Word spoken: {word}"); //TODO test word from iOS!
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
+            Debug.Log($"Word spoken: {word}");
 
          if (wrapperNative != null)
          {
@@ -144,7 +148,11 @@ namespace Crosstales.RTVoice.Provider
 #if !UNITY_EDITOR || CT_DEVELOP
          if (cachediOSVoices?.Count == 0 || forceReload)
          {
-            NativeMethods.RTVGetVoices();
+            if (!isLoading)
+            {
+               isLoading = true;
+               NativeMethods.RTVGetVoices();
+            }
          }
          else
          {

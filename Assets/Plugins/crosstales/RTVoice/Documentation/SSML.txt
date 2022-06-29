@@ -1,7 +1,7 @@
 ﻿# RT-Voice PRO - SSML
 
 Works with Windows, WSA (UWP), Android, MaryTTS, eSpeak, AWS Polly, Azure and Google Cloud.
-
+Note: some SSML-features may not work, depending on the provider.
 
 ## Examples
 
@@ -102,4 +102,6 @@ time="500ms" /> <say-as interpret-as="hms12"> 4:00pm </say-as> today.
 ## More information
 * [SSML](https://www.w3.org/TR/speech-synthesis/)
 * [Reference Microsoft](https://docs.microsoft.com/en-us/cortana/reference/ssml)
+* [Reference Azure](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup)
 * [Reference AWS Polly](https://docs.aws.amazon.com/polly/latest/dg/supportedtags.html)
+* [Reference Google Cloud](https://cloud.google.com/text-to-speech/docs/ssml)

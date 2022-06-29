@@ -158,6 +158,8 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
+      public abstract int MaxSimultaneousSpeeches { get; }
+
       public virtual void Silence()
       {
          silence = true;
@@ -320,6 +322,7 @@ namespace Crosstales.RTVoice.Provider
       {
          if (wrapper != null && wrapper.Source != null)
          {
+            //Debug.LogWarning("LOCAL: " + isLocalFile + " - " + outputFile);
             if (!isLocalFile || isLocalFile && (System.IO.File.Exists(outputFile) && new System.IO.FileInfo(outputFile).Length > 1024))
             {
                if (Crosstales.RTVoice.Util.Helper.isStandalonePlatform && type == AudioType.MPEG)

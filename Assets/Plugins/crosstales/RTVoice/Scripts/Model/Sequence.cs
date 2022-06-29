@@ -150,6 +150,11 @@ namespace Crosstales.RTVoice.Model
 
       public override int GetHashCode()
       {
+         return base.GetHashCode();
+      }
+/*
+      public override int GetHashCode()
+      {
          int hash = 0;
 
          if (Text != null)
@@ -162,7 +167,7 @@ namespace Crosstales.RTVoice.Model
 
          return hash;
       }
-
+*/
       #endregion
    }
 }

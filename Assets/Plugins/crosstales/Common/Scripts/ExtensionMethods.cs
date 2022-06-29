@@ -786,7 +786,7 @@ namespace Crosstales
       /// </summary>
       /// <param name="array">Array-instance to ToString.</param>
       /// <returns>String array with all entries (via ToString).</returns>
-      public static string[] CTToString<T>(this T[] array)
+      public static string[] CTToStringArray<T>(this T[] array)
       {
          if (array == null) // || array.Length <= 0)
             throw new System.ArgumentNullException(nameof(array));
