@@ -42,34 +42,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="node">leaf node</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
-        private GameObject CreateLeafGameNode(Node node)
+        private GameObject CreateGameNode(Node node)
         {
-            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node));
+            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
-            AdjustScaleOfLeaf(result);
             // FIXME leafAntennaDecorator.AddAntenna(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new game object for an inner node using innerNodeFactory.
-        /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style and height of the resulting game
-        /// object are adjusted according to the selected InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
-        /// are not changed.
-        ///
-        /// Precondition: <paramref name="node"/> must be an inner node of the node
-        /// hierarchy.
-        /// </summary>
-        /// <param name="node">graph node for which to create the game node</param>
-        /// <returns>new game object for the inner node</returns>
-        private GameObject CreateInnerGameNode(Node node)
-        {
-            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node));
-            SetGeneralNodeAttributes(node, result);
-            AdjustHeightOfInnerNode(result);
-            // FIXME innerAntennaDecorator.AddAntenna(result);
             return result;
         }
 
@@ -94,48 +71,17 @@ namespace SEE.Game
 
         /// <summary>
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
-        /// The exact kind of representation depends upon the leaf-node factory. The node is
-        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
-        /// Its style is determined by LeafNodeStyleMetric (linear interpolation of a color gradient).
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         /// LOD is added and the resulting node is prepared for interaction.
-        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
         /// </summary>
-        /// <param name="node">leaf node</param>
+        /// <param name="node">graph node to be represented</param>
         /// <param name="city">the game object representing the city in which to draw this node;
-        /// it has the settings attached and the information about the scale, position, and
-        /// portal of the city</param>
+        /// it has the information about how to draw the node and portal of the city</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
-        public GameObject DrawLeafNode(Node node, GameObject city = null)
+        public GameObject DrawNode(Node node, GameObject city = null)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
-
-            GameObject result = CreateLeafGameNode(node);
-            FinishGameNode(result, city);
-            return result;
-        }
-
-        /// <summary>
-        /// Creates a new game object for an inner node using innerNodeFactory.
-        /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style and height of the resulting game
-        /// object are adjusted according to the selected InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
-        /// are not changed. In addition, level of details are added as well
-        /// as all components needed for interaction with this game object.
-        /// LOD is added and the resulting node is prepared for interaction.
-        ///
-        /// Precondition: <paramref name="node"/> must be an inner node of the node
-        /// hierarchy.
-        /// </summary>
-        /// <param name="node">graph node for which to create the game node</param>
-        /// <param name="city">the game object representing the city in which to draw this node;
-        /// it has the settings attached and the information about the scale, position, and
-        /// portal of the city</param>
-        /// <returns>new game object for the inner node</returns>
-        public GameObject DrawInnerNode(Node node, GameObject city = null)
-        {
-            GameObject result = CreateInnerGameNode(node);
+            GameObject result = CreateGameNode(node);
             FinishGameNode(result, city);
             return result;
         }
@@ -147,11 +93,12 @@ namespace SEE.Game
         /// Postcondition: <paramref name="gameNode"/> is a leaf node.
         /// </summary>
         /// <param name="gameNode">node to be drawn as leaf node</param>
+        [Obsolete]
         public void RedrawAsLeafNode(GameObject gameNode)
         {
             // We create a new leaf node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject leafNode = CreateLeafGameNode(node);
+            GameObject leafNode = CreateGameNode(node);
             gameNode.GetComponent<MeshFilter>().mesh = leafNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
@@ -188,11 +135,12 @@ namespace SEE.Game
         /// Postcondition: <paramref name="gameNode"/> is an inner node.
         /// </summary>
         /// <param name="gameNode">node to be drawn as inner node</param>
+        [Obsolete]
         public void RedrawAsInnerNode(GameObject gameNode)
         {
             // We create a new inner node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject innerNode = CreateInnerGameNode(node);
+            GameObject innerNode = CreateGameNode(node);
             gameNode.GetComponent<MeshFilter>().mesh = innerNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
@@ -352,31 +300,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adjusts the height (y axis) of the given <paramref name="gameNode"/> according
-        /// to the InnerNodeHeightMetric.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must denote an inner node created
-        /// by <see cref="innerNodeFactory"/> and must have a <see cref="NodeRef"/>
-        /// attached to it.
-        /// </summary>
-        /// <param name="gameNode">inner node whose height is to be set</param>
-        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> has no
-        /// <see cref="NodeRef"/> attached to it</exception>
-        private void AdjustHeightOfInnerNode(GameObject gameNode)
-        {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
-            {
-                Node node = nodeRef.Value;
-                float value = GetMetricValueOfLeaf(node, Settings.NodeTypes[node.Type].HeightMetric);
-                nodeTypeToFactory[node.Type].SetHeight(gameNode, value);
-            }
-            else
-            {
-                throw new Exception($"Game object {gameNode.name} does not have a graph node attached to it.");
-            }
-        }
-
-        /// <summary>
         /// Adjusts the style of the given <paramref name="gameNode"/> according
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
         /// chosen to determine style.
@@ -432,6 +355,36 @@ namespace SEE.Game
             }
         }
 
+        private float[] SelectMetrics(Node node)
+        {
+            Vector3 scale = GetScale(node);
+            if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+            {
+                // FIXME: This is ugly. The graph renderer should not need to care what
+                // kind of layout was applied.
+
+                // Treemaps can represent a metric by the area of a rectangle. Hence,
+                // they can represent only a single metric in the x/z plane.
+                // Let M be the metric selected to be represented by the treemap.
+                // Here, we choose the width metric (as selected by the user) to be M.
+                // That is, M mapped onto the rectangle area.
+                // The area of a rectangle is the product of the lengths of its two sides.
+                // That is why we need to take the square root of M for the lengths, because
+                // sqrt(M) * sqrt(M) = M. If we were instead using M as width and depth of the
+                // rectangle, the area would be M^2, which would skew the visual impression
+                // in the eye of the beholder. Nodes with larger values of M would have a
+                // disproportionally larger area.
+
+                // The input to the treemap layout are rectangles with equally sized lengths,
+                // in other words, squares. This determines only the ground area of the input
+                // blocks. The height of the blocks remains the original value of the metric
+                // chosen to determine the height, without any kind of transformation.
+                float widthOfSquare = Mathf.Sqrt(scale.x);
+                scale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
+            }
+            return new float[] { scale.x, scale.y, scale.z };
+        }
+
         /// <summary>
         /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
         /// to the metric values of the <paramref name="node"/> attached to
@@ -442,6 +395,7 @@ namespace SEE.Game
         /// and has the width, height, and depth metrics set and is a leaf.
         /// </summary>
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
+        [Obsolete]
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
             Assert.IsNull(gameNode.transform.parent);
@@ -452,7 +406,7 @@ namespace SEE.Game
                 if (node.IsLeaf())
                 {
                     // Scaled metric values for the three dimensions.
-                    Vector3 scale = GetScaleOfLeaf(node);
+                    Vector3 scale = GetScale(node);
 
                     // Scale according to the metrics.
                     if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
@@ -498,19 +452,17 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the scale of the given <paramref name="node"/> as requested by the user's
-        /// settings, i.e., what the use specified for the width, height, and depth of leaf nodes.
+        /// settings, i.e., what the use specified for the width, height, and depth of a node.
         ///
-        /// Precondition: <paramref name="node"/> is a leaf.
         /// </summary>
-        /// <param name="node">leaf node whose scale is requested</param>
+        /// <param name="node">node whose scale is requested</param>
         /// <returns>requested absolute scale in world space</returns>
-        private Vector3 GetScaleOfLeaf(Node node)
+        private Vector3 GetScale(Node node)
         {
-            Assert.IsTrue(node.IsLeaf());
             VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
-            return new Vector3(GetMetricValueOfLeaf(node, attribs.WidthMetric),
-                               GetMetricValueOfLeaf(node, attribs.HeightMetric),
-                               GetMetricValueOfLeaf(node, attribs.DepthMetric));
+            return new Vector3(GetMetricValue(node, attribs.WidthMetric),
+                               GetMetricValue(node, attribs.HeightMetric),
+                               GetMetricValue(node, attribs.DepthMetric));
         }
 
         /// <summary>
@@ -526,15 +478,13 @@ namespace SEE.Game
         /// <param name="node">leaf node whose metric is to be returned</param>
         /// <param name="metricName">the name of a leaf node metric or a number</param>
         /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
-        private float GetMetricValueOfLeaf(Node node, string metricName)
+        private float GetMetricValue(Node node, string metricName)
         {
             VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
             return Mathf.Clamp(scaler.GetMetricValue(node, metricName),
                                attribs.MinimalBlockLength,
                                attribs.MaximalBlockLength);
         }
-
-
 
         /// <summary>
         /// Adds decoration for the given <paramref name="gameNode"/> with the global settings

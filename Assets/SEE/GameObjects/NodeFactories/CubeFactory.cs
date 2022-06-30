@@ -30,8 +30,9 @@ namespace SEE.GO
         /// Returns a (cached) mesh for a cube.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
+        /// <param name="metrics">this parameter will be ignored</param>
         /// <returns>mesh for a cube</returns>
-        protected override Mesh GetMesh()
+        protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)
             {

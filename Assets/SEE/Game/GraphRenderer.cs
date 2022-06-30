@@ -294,7 +294,7 @@ namespace SEE.Game
                     artificialRoot = AddRootIfNecessary(graph);
                     if (artificialRoot != null)
                     {
-                        nodeMap[artificialRoot] = DrawInnerNode(artificialRoot);
+                        nodeMap[artificialRoot] = DrawNode(artificialRoot);
                     }
                     gameNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
                     RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
@@ -360,7 +360,7 @@ namespace SEE.Game
                         artificialRoot = AddRootIfNecessary(graph);
                         if (artificialRoot != null)
                         {
-                            nodeMap[artificialRoot] = DrawInnerNode(artificialRoot);
+                            nodeMap[artificialRoot] = DrawNode(artificialRoot);
                             Debug.Log("Artificial unique root was added.\n");
                         }
                     }
@@ -891,7 +891,7 @@ namespace SEE.Game
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    result[node] = DrawLeafNode(node);
+                    result[node] = DrawNode(node);
                 }
             }
             return result;
@@ -910,7 +910,7 @@ namespace SEE.Game
                 // We add only inner nodes.
                 if (!node.IsLeaf())
                 {
-                    GameObject innerGameObject = DrawInnerNode(node);
+                    GameObject innerGameObject = DrawNode(node);
                     nodeMap[node] = innerGameObject;
                 }
             }

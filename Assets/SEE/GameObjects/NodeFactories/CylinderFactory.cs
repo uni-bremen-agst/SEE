@@ -45,8 +45,9 @@ namespace SEE.GO
         /// Returns a (cached) cylinder mesh.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
+        /// <param name="metrics">this parameter will be ignored</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
-        protected override Mesh GetMesh()
+        protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)
             {
@@ -63,7 +64,7 @@ namespace SEE.GO
             float radius = DEFAULT_RADIUS;
             float length = DEFAULT_HEIGHT;
 
-            //sanity check
+            // sanity check
             if (radialSegments < MIN_RADIAL_SEGMENTS)
             {
                 radialSegments = MIN_RADIAL_SEGMENTS;
