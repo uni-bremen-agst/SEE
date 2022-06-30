@@ -174,19 +174,7 @@ namespace SEE.Game.Evolution
             {
                 // There is no game node with the given node ID, hence, we need to
                 // create a new one.
-                if (node.IsLeaf())
-                {
-                    /// <see cref="DrawLeafNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>
-                    /// and will also set the scale and style of gameNode.
-                    gameNode = graphRenderer.DrawLeafNode(node, city);
-                }
-                else
-                {
-                    /// <see cref="DrawInnerNode"/> will attach <see cref="node"/> to <see cref="gameNode"/>.
-                    gameNode = graphRenderer.DrawInnerNode(node, city);
-                    // Note: The scale of inner nodes will be adjusted later when
-                    // we have the layout.
-                }
+                gameNode = graphRenderer.DrawNode(node, city);
                 // Add the newly created gameNode to the cache.
                 nodes[node.ID] = gameNode;
                 return null;

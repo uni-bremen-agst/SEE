@@ -1,6 +1,6 @@
-﻿using SEE.Controls.Interactables;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.Game;
+using System;
 using UnityEngine;
 
 namespace SEE.GO
@@ -49,14 +49,21 @@ namespace SEE.GO
         /// This parameter can be used for the rendering of transparent objects,
         /// where the inner nodes must be rendered before the leaves to ensure
         /// correct sorting.
+        ///
+        /// Parameter <paramref name="metrics"/> specifies the lengths of the returned
+        /// object. If <c>null</c>, the default lengths are used. What a "length"
+        /// constitutes, depends upon the kind of shape (mesh) used for the object
+        /// and may be decided by subclasses of this <see cref="NodeFactory"/>.
+        /// For instance, for a cube, the dimensions are its widths, height, and
+        /// depth.
         /// </summary>
         /// <param name="style">specifies an additional visual style parameter of
         /// the object</param>
         /// <returns>new node representation</returns>
-        /// <param name="renderQueueOffset">offset in the render queue</param>
-        public virtual GameObject NewBlock(int style = 0)
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        public virtual GameObject NewBlock(int style = 0, float[] metrics = null)
         {
-            GameObject result = CreateBlock();
+            GameObject result = CreateBlock(metrics);
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             materials.SetSharedMaterial(renderer, index: style);
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
@@ -68,28 +75,60 @@ namespace SEE.GO
         /// <summary>
         /// Returns a new game object to represent a node.
         /// </summary>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         /// <returns>new game object for a node</returns>
-        private GameObject CreateBlock()
+        private GameObject CreateBlock(float[] metrics)
         {
             GameObject gameObject = new GameObject() { tag = Tags.Node };
-            AddCollider(gameObject);
             // A MeshFilter is necessary for the gameObject to hold a mesh.
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = GetMesh();
+            meshFilter.sharedMesh = GetMesh(metrics);
+            SetDimensions(gameObject, metrics);
+            AddCollider(gameObject);
             return gameObject;
         }
 
         /// <summary>
         /// Returns a mesh for a node.
         /// </summary>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         /// <returns>mesh for a node</returns>
-        protected abstract Mesh GetMesh();
+        protected abstract Mesh GetMesh(float[] metrics);
 
         /// <summary>
         /// Adds an appropriate collider to <paramref name="gameObject"/>.
         /// </summary>
         /// <param name="gameObject">the game object receiving the collider</param>
         protected abstract void AddCollider(GameObject gameObject);
+
+        /// <summary>
+        /// Sets the dimensions of <paramref name="gameObject"/>.
+        ///
+        /// The default behaviour is (if <paramref name="metrics"/> is different from
+        /// <c>null</c>) to set the width of <paramref name="gameObject"/> to
+        /// the first entry of <paramref name="metrics"/>, the depth to the second entry,
+        /// and the height to the third entry. That requires that <paramref name="metrics"/>
+        /// has at least three entries. If <paramref name="metrics"/> is <c>null</c>,
+        /// nothing happens.
+        ///
+        /// Note: This method may be overridden by subclasses.
+        /// </summary>
+        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        protected virtual void SetDimensions(GameObject gameObject, float[] metrics)
+        {
+            if (metrics != null)
+            {
+                if (metrics.Length < 3)
+                {
+                    throw new Exception("At least three dimensions must be given.");
+                }
+                else
+                {
+                    SetSize(gameObject, new Vector3(metrics[0], metrics[1], metrics[2]));
+                }
+            }
+        }
 
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
