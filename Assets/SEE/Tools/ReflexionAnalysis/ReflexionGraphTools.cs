@@ -303,7 +303,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name)
+        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name, 
+                                     out Node ArchitectureRoot, out Node ImplementationRoot)
         {
             if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
             {
@@ -312,8 +313,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            GraphRenderer.AddRootIfNecessary(ArchitectureGraph);
-            GraphRenderer.AddRootIfNecessary(ImplementationGraph);
+            ArchitectureRoot = GraphRenderer.AddRootIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
+            ImplementationRoot = GraphRenderer.AddRootIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it

@@ -135,7 +135,7 @@ namespace SEE.Tools.ReflexionAnalysis
         public Reflexion(Graph implementation, Graph architecture, Graph mapping,
                          bool allowDependenciesToParents = true)
         {
-            FullGraph = Assemble(architecture, implementation, mapping, "Reflexion Graph");
+            FullGraph = Assemble(architecture, implementation, mapping, "Reflexion Graph", out _, out _);
             AllowDependenciesToParents = allowDependenciesToParents;
         }
 
@@ -523,8 +523,13 @@ namespace SEE.Tools.ReflexionAnalysis
                     }
 
                     ChangePropagatedDependency(propagatedEdge, counter);
+                    if (GetCounter(propagatedEdge) > 0)
+                    {
+                        Transition(propagatedEdge, propagatedEdge.State(), State.Unmapped);
+                    }
+                    // Edge has been removed. We shall not call `Transition` in this case,
+                    // because the edge no longer exists.
                 }
-                Transition(propagatedEdge, propagatedEdge.State(), State.Unmapped);
             }
         }
 
