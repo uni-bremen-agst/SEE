@@ -65,6 +65,7 @@ namespace SEE.Game
         {
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
+            Node movingNode = movingNodeRef.Value;
 
             RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
 
@@ -72,7 +73,6 @@ namespace SEE.Game
             {
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
-                Node movingNode = movingNodeRef.Value;
                 // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
@@ -91,6 +91,7 @@ namespace SEE.Game
                 {
                     ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
                                                                  + "architecture, not the other way around.");
+                    return null;
                 }
                 else
                 {
@@ -107,9 +108,19 @@ namespace SEE.Game
                     return newGameParent;
                 }
             }
-
-            // Attempt to move the node outside of any node in the node hierarchy.
-            return null;
+            else
+            {
+                // Attempt to move the node outside of any node in the node hierarchy.
+                if (movingNode.IsInImplementation() && movingNode.IsInMapping())
+                {
+                    // If the node was already mapped, we'll unmap it again.
+                    ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{movingNode.SourceName}'.");
+                    SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.DeleteFromMapping(movingNode);
+                }
+                return null;
+            }
         }
 
         /// <summary>

@@ -332,23 +332,14 @@ namespace SEE.Controls.Actions
                     GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
                     if (parent != null)
                     {
-                        // The move has come to a successful end.
+                        // The node has been re-parented.
                         new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
                         memento.SetNewParent(parent);
-                        memento.SetNewPosition(hit.HoveredObject.position);
-                        currentState = ReversibleAction.Progress.Completed;
-                        result = true;
                     }
-                    else
-                    {
-                        // An attempt was made to move the hovered object outside of the city.
-                        // We need to reset it to its original position. And then we start from scratch.
-                        hit.HoveredObject.position = originalPosition;
-                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
-                        // The following assignment will override hit.interactableObject; that is why we
-                        // stored its value in interactableObjectToBeUngrabbed above.
-                        hit = new Hit();
-                    }
+                    
+                    memento.SetNewPosition(hit.HoveredObject.position);
+                    currentState = ReversibleAction.Progress.Completed;
+                    result = true;
 
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
