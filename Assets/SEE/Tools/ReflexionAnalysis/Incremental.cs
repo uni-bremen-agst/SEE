@@ -264,7 +264,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 // Existing mapping is only allowed if it can be overridden
                 AssertOrThrow(overrideMapping, () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
-                DeleteFromMapping(from, MapsTo(from));
+                DeleteFromMapping(from);
             }
 
             // all nodes that should be mapped onto 'to', too, as a consequence of
@@ -298,12 +298,11 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(edge.IsInMapping() && FullGraph.ContainsEdge(edge),
                           () => new NotInSubgraphException(Mapping, edge));
-            DeleteFromMapping(edge.Source, edge.Target);
+            DeleteMapsTo(edge);
         }
 
         /// <summary>
-        /// Removes the Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
-        /// from the mapping graph.
+        /// Removes the Maps_To edge starting from <paramref name="from"/> from the mapping graph.
         /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
         /// must be contained in the mapping graph, <paramref name="from"/> is contained in implementation graph
         /// and <paramref name="to"/> is contained in the architecture graph.
@@ -312,23 +311,19 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
-        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
-        /// to be removed from the mapping graph </param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
-        public void DeleteFromMapping(Node from, Node to)
+        public void DeleteFromMapping(Node from)
         {
             AssertOrThrow(from.IsInImplementation() && FullGraph.ContainsNode(from),
                           () => new NotInSubgraphException(Implementation, from));
-            AssertOrThrow(to.IsInArchitecture() && FullGraph.ContainsNode(to),
-                          () => new NotInSubgraphException(Architecture, to));
 
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
-            Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
+            Edge mapsToEdge = from.Outgoings.SingleOrDefault(x => x.IsInMapping());
             if (mapsToEdge == null)
             {
-                throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
+                throw new NotExplicitlyMappedException(from);
             }
 
             // Deletes the unique Maps_To edge.
@@ -750,11 +745,11 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else if (edge.IsInMapping())
             {
-                DeleteFromMapping(edge.Source, edge.Target);
+                DeleteFromMapping(edge);
             }
             else
             {
-                throw new NotSupportedException("Given edge must be either in architecture, implementation, or mapping graph!");
+                throw new NotSupportedException("Given edge must be in reflexion graph!");
             }
         }
 

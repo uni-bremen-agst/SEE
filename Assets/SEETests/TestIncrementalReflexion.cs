@@ -323,7 +323,7 @@ namespace SEE.Tools.Architecture
             ResetEvents();
 
             // unmap i1
-            reflexion.DeleteFromMapping(i1, a1);
+            reflexion.DeleteFromMapping(i1);
             AssertUnmapped(i1, a1);
             AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
             Assert.That(IsUnpropagated(a1, a2, call));
@@ -702,7 +702,7 @@ namespace SEE.Tools.Architecture
             // incremental unmapping
             //----------------------
             ResetEvents();
-            reflexion.DeleteFromMapping(i[10], a[2]);
+            reflexion.DeleteFromMapping(i[10]);
             AssertUnmapped(i[10], a[2]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Removal);
@@ -712,7 +712,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[8], a[8], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[2], a[9]);
+            reflexion.DeleteFromMapping(i[2]);
             AssertUnmapped(i[2], a[9]);
             AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Addition);
             Assert.That(IsPropagated(a[1], a[3], call));
@@ -728,7 +728,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAllowed(a[1], a[1], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[14], a[4]);
+            reflexion.DeleteFromMapping(i[14]);
             AssertUnmapped(i[14], a[4]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
@@ -736,7 +736,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[1], a[1]);
+            reflexion.DeleteFromMapping(i[1]);
             AssertUnmapped(i[1], a[1]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Removal);
@@ -747,7 +747,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[1], a[3], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[15], a[5]);
+            reflexion.DeleteFromMapping(i[15]);
             AssertUnmapped(i[15], a[5]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
@@ -755,7 +755,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[3], a[3]);
+            reflexion.DeleteFromMapping(i[3]);
             AssertUnmapped(i[3], a[3]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
@@ -764,14 +764,14 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[3], a[7], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[16], a[6]);
+            reflexion.DeleteFromMapping(i[16]);
             AssertUnmapped(i[16], a[6]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
             AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[17], a[6]);
+            reflexion.DeleteFromMapping(i[17]);
             AssertUnmapped(i[17], a[6]);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
             AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
