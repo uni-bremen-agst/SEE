@@ -12,6 +12,7 @@ using UnityEngine;
 using System;
 using Sirenix.OdinInspector;
 using DG.Tweening;
+using SEE.Game.UI.Notification;
 using UnityEngine.Assertions;
 
 namespace SEE.Game.City
@@ -52,8 +53,28 @@ namespace SEE.Game.City
         /// (such as mappings, hierarchies, and so on), <b>do not modify
         /// the underlying Graph directly!</b>
         /// </summary>
-        [HideInInspector, NonSerialized]
+        [NonSerialized]
         public Reflexion Analysis;
+
+        /// <summary>
+        /// Root node of the implementation subgraph.
+        /// </summary>
+        private Node implementationRoot;
+
+        /// <summary>
+        /// Root node of the architecture subgraph.
+        /// </summary>
+        private Node architectureRoot;
+
+        /// <summary>
+        /// Root node of the implementation subgraph.
+        /// </summary>
+        public Node ImplementationRoot => implementationRoot;
+        
+        /// <summary>
+        /// Root node of the architecture subgraph.
+        /// </summary>
+        public Node ArchitectureRoot => architectureRoot;
 
         /// <summary>
         /// List of <see cref="ChangeEvent"/>s received from the reflexion <see cref="Analysis"/>.
@@ -147,7 +168,7 @@ namespace SEE.Game.City
 
                 await UniTask.WhenAll(tasks);
 
-                LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
+                LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName, out architectureRoot, out implementationRoot);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Events.Clear();
                 Analysis = new Reflexion(LoadedGraph);
@@ -349,7 +370,8 @@ namespace SEE.Game.City
             }
             else
             {
-                Debug.LogError($"Couldn't find edge {edgeChange.Edge}!");
+                Debug.LogError($"Couldn't find edge {edgeChange.Edge}, whose state changed "
+                               + $"from {edgeChange.OldState} to {edgeChange.NewState}!");
             }
         }
 
@@ -359,11 +381,7 @@ namespace SEE.Game.City
             {
                 if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
                 {
-                    // Maps-To edges must not be drawn, as we will visualize mappings differently.
-                    edgeEvent.Edge.SetToggle(Edge.IsVirtualToggle);
-
-                    Edge mapsToEdge = edgeEvent.Edge;
-                    HandleNewMapping(mapsToEdge);
+                    HandleNewMapping(edgeEvent.Edge);
                 }
                 else
                 {
@@ -373,46 +391,43 @@ namespace SEE.Game.City
 
             if (edgeEvent.Change == ChangeType.Removal)
             {
-                // FIXME: Handle edge removal
+                if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
+                {
+                    HandleRemovedMapping(edgeEvent.Edge);
+                }
             }
         }
 
-        private static void HandleNewMapping(Edge mapsToEdge)
+        private static void AnimateNodeMovement(GameObject gameNode, Vector3 newPosition, Vector3 targetScale)
         {
-            Node implNode = mapsToEdge.Source;
-            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
-            GameObject implGameNode = implNode.RetrieveGameNode();
-
-            // Move implementation node to architecture node, sizing it down accordingly.
-            // TODO: Handle children as well, if that's necessary?
-            Vector3 oldPosition = implGameNode.transform.position;
-            Vector3 newPosition = archGameNode.transform.position;
-            implGameNode.transform.position = newPosition;
-            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
-            newPosition = implGameNode.transform.position;
+            // We remember the old position and move the node to the new position so that 
+            // edge layouts can be correctly calculated.
+            Vector3 oldPosition = gameNode.transform.position;
+            gameNode.transform.position = newPosition;
             // Mapped node should be half its parent's size
-            Vector3 oldScale = implGameNode.transform.localScale;
-            implGameNode.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            Vector3 oldScale = gameNode.transform.localScale;
+            gameNode.transform.localScale = targetScale;
+            Node node = gameNode.GetNode();
 
             // Recalculate edge layout and animate edges due to new node positioning.
             // TODO: Iterating over all game edges is currently very costly,
             //       consider adding a cached mapping either here or in SceneQueries.
             //       Alternatively, we can iterate over game edges instead.
-            foreach (Edge edge in implNode.Incomings.Union(implNode.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
                 GameObject gameEdge = GameObject.Find(edge.ID);
                 Assert.IsNotNull(gameEdge);
-                GameObject source = edge.Source == implNode ? implGameNode : edge.Source.RetrieveGameNode();
-                GameObject target = edge.Target == implNode ? implGameNode : edge.Target.RetrieveGameNode();
+                GameObject source = edge.Source == node ? gameNode : edge.Source.RetrieveGameNode();
+                GameObject target = edge.Target == node ? gameNode : edge.Target.RetrieveGameNode();
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
                 AddEdgeSplineAnimation(gameEdge, newEdge);
             }
 
             // Movement of the node should be animated as well. For this, we have to reset its position first.
-            implGameNode.transform.position = oldPosition;
-            implGameNode.transform.localScale = oldScale;
-            implGameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
-            implGameNode.transform.DOScale(new Vector3(0.5f, 0.5f, 0.5f), ANIMATION_DURATION);
+            gameNode.transform.position = oldPosition;
+            gameNode.transform.localScale = oldScale;
+            gameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
+            gameNode.transform.DOScale(targetScale, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
 
             #region Local Methods
 
@@ -431,6 +446,54 @@ namespace SEE.Game.City
             }
 
             #endregion
+        }
+
+        private static void HandleRemovedMapping(Edge mapsToEdge)
+        {
+            ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
+            Node implNode = mapsToEdge.Source;
+            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
+            GameObject implGameNode = implNode.RetrieveGameNode();
+            
+            // We have to basically reverse what happened in HandleNewMapping.
+            // For the new position, we simply drop the node where the user dragged it to,
+            // even if that leaves the node "drifting in space".
+            // Since the node is already at its new position, we first have to put it at its old position
+            // by repeating the steps from HandleNewMapping here.
+            Vector3 newPosition = implGameNode.transform.position;
+            Vector3 oldPosition = archGameNode.transform.position;
+            
+            implGameNode.transform.position = oldPosition;
+            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
+            oldPosition = implGameNode.transform.position;
+            implGameNode.transform.position = oldPosition;
+            
+            AnimateNodeMovement(implGameNode, newPosition, Vector3.one);
+        }
+
+        private static void HandleNewMapping(Edge mapsToEdge)
+        {
+            ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
+                                                        + $"onto '{mapsToEdge.Target.ToShortString()}'.");
+            // Maps-To edges must not be drawn, as we will visualize mappings differently.
+            mapsToEdge.SetToggle(Edge.IsVirtualToggle);
+
+            Node implNode = mapsToEdge.Source;
+            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
+            GameObject implGameNode = implNode.RetrieveGameNode();
+
+            // Move implementation node to architecture node, sizing it down accordingly.
+            Vector3 oldPosition = implGameNode.transform.position;
+            Vector3 newPosition = archGameNode.transform.position;
+            
+            // This might be kind of confusing, but we need to move the node to the new position
+            // first so that `GameNodeMover.PutOn` works correctly, then move it back to the old
+            // position so that the animation works correctly.
+            implGameNode.transform.position = newPosition;
+            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
+            newPosition = implGameNode.transform.position;
+            implGameNode.transform.position = oldPosition;
+            AnimateNodeMovement(implGameNode, newPosition, new Vector3(0.5f, 0.5f, 0.5f));
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)

@@ -77,8 +77,6 @@ namespace SEE.Game
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
                     // TODO: Make sure this action is still reversible
-                    ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
-                                                                + $"onto '{newGraphParent.SourceName}'.");
                     SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
@@ -114,10 +112,14 @@ namespace SEE.Game
                 if (movingNode.IsInImplementation() && movingNode.IsInMapping())
                 {
                     // If the node was already mapped, we'll unmap it again.
-                    ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{movingNode.SourceName}'.");
                     SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.DeleteFromMapping(movingNode);
+                    
+                    // We'll also change its parent so it becomes a root node in the implementation city.
+                    // The user will have to drop it on another node to re-parent it.
+                    movingNode.Parent = reflexionCity.ImplementationRoot;
+                    return movingNode.Parent.RetrieveGameNode();
                 }
                 return null;
             }
