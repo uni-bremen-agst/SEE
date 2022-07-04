@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.GO.NodeFactories;
 using SEE.Layout;
 using UnityEngine;
 

@@ -76,6 +76,8 @@ namespace SEE.GO.NodeFactories
                 name = "SEESpiderMesh"
             };
             mesh.vertices = vertices3D;
+            // It is recommended to assign a triangle array after assigning the
+            // vertex array, in order to avoid out of bounds errors.
             mesh.triangles = Triangulator.Triangulate(vertices2D);
 
             return mesh;

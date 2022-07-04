@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.NodeFactories;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
@@ -44,7 +45,8 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         private GameObject CreateGameNode(Node node)
         {
-            GameObject result = nodeTypeToFactory[node.Type].NewBlock(SelectStyle(node), SelectMetrics(node));
+            NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
+            GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
             // FIXME leafAntennaDecorator.AddAntenna(result);
             return result;
@@ -355,8 +357,39 @@ namespace SEE.Game
             }
         }
 
+        /// <summary>
+        /// Returns the selected metrics for <paramref name="node"/> that are to be
+        /// used to influence visual attributes.
+        /// </summary>
+        /// <param name="node">graph node whose metrics are to be selected</param>
+        /// <returns>selected metrics of <paramref name="node"/></returns>
         private float[] SelectMetrics(Node node)
         {
+            if (Settings.NodeTypes[node.Type].Shape == NodeShapes.Spiders)
+            {
+                // FIXME: Not all nodes have necessarily the same set of metrics.
+                // If one does not have a particular numeric attributes, but others
+                // have, that value should be 0. The metric vectors of all nodes
+                // should have the same number of elements and same order so that
+                // the length of the shapes are truly comparable.
+                IList<float> metrics = new List<float>();
+                // FIXME: There may be attributes that are not metrics, e.g., Source.Line.
+                // We need a user setting that decides which attributes to use.
+                foreach (string metricName in node.FloatAttributes.Keys)
+                {
+                    metrics.Add(scaler.GetMetricValue(node, metricName));
+                }
+                foreach (string metricName in node.IntAttributes.Keys)
+                {
+                    metrics.Add(scaler.GetMetricValue(node, metricName));
+                }
+                // There should be at least three values.
+                for (int i = metrics.Count; i < 3; ++i)
+                {
+                    metrics.Add(0);
+                }
+                return metrics.ToArray();
+            }
             Vector3 scale = GetScale(node);
             if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
             {
