@@ -163,7 +163,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 return events;
             }
         }
-        
+
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
@@ -258,7 +258,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
         public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
-        
+
         /// <summary>
         /// Returns true if <paramref name="edge"/> is in the reflexion graph.
         /// </summary>
@@ -310,16 +310,16 @@ namespace SEE.Tools.ReflexionAnalysis
                 throw new ArgumentException("All three sub-graphs must be loaded before generating "
                                             + "the full graph.");
             }
-            
+
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            GraphRenderer.AddRootIfNecessary(ArchitectureGraph);
-            GraphRenderer.AddRootIfNecessary(ImplementationGraph);
+            GraphRenderer.AddGraphRootNodeIfNecessary(ArchitectureGraph);
+            GraphRenderer.AddGraphRootNodeIfNecessary(ImplementationGraph);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
             ArchitectureGraph.MarkGraphNodesIn(Architecture);
             ImplementationGraph.MarkGraphNodesIn(Implementation);
-            
+
             // We need to set all Maps_To edges as virtual so they don't get drawn.
             // (Mapping is indicated by moving the implementation node, not by a separate edge.)
             foreach (Edge mapsTo in MappingGraph.Edges())
@@ -373,7 +373,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // Returns the intersection of the edge IDs of the two graphs.
             IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
                 => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-            
+
 
             #endregion
         }
