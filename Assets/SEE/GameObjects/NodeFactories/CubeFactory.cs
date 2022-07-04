@@ -1,7 +1,7 @@
 ﻿using SEE.Game;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.NodeFactories
 {
     /// <summary>
     /// A factory for cubes as visual representations of graph nodes in the scene.

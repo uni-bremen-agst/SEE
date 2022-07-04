@@ -3,7 +3,7 @@ using SEE.Game;
 using System;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.NodeFactories
 {
     /// <summary>
     /// A factory for visual representations of graph nodes in the scene.
@@ -113,7 +113,7 @@ namespace SEE.GO
         ///
         /// Note: This method may be overridden by subclasses.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">the game object whose dimensions are to be set</param>
         /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         protected virtual void SetDimensions(GameObject gameObject, float[] metrics)
         {
@@ -175,19 +175,7 @@ namespace SEE.GO
         /// <returns>size of the block</returns>
         public virtual Vector3 GetSize(GameObject block)
         {
-            // Nodes represented by cubes have a renderer from which we can derive the
-            // extent.
-            Renderer renderer = block.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                // This is the axis-aligned bounding box fully enclosing the object in world space.
-                return renderer.bounds.size;
-            }
-            else
-            {
-                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", block.name, block.tag);
-                return Vector3.one;
-            }
+            return block.transform.lossyScale;
         }
 
         /// <summary>
