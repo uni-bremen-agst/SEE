@@ -1874,9 +1874,34 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 4|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1906,11 +1931,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1926,11 +1951,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1942,11 +1967,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1958,11 +1983,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1996,62 +2021,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    nodeType: LeafNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_Of_Parameters
-    DepthMetric: Metric.Maximum_Nesting
-    HeightMetric: Metric.LOC
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 5
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
-  InnerNodeSettings:
-    nodeType: InnerNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 1
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
@@ -10561,51 +10530,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: 
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -10631,18 +10555,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: AntennaWidth
       Entry: 4
       Data: 0.1
@@ -10651,7 +10563,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 9|SEE.Game.LabelAttributes, SEE
+      Data: 8|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -10687,7 +10599,7 @@ MonoBehaviour:
       Data: Package
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Package
@@ -10708,7 +10620,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 11|SEE.Game.City.ColorProperty, SEE
+      Data: 10|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -10733,51 +10645,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: 
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -10789,23 +10656,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 12|SEE.Game.City.AntennaAttributes, SEE
+      Data: 11|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 12|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -10824,7 +10678,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 15|SEE.Game.LabelAttributes, SEE
+      Data: 13|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -10860,7 +10714,7 @@ MonoBehaviour:
       Data: Cluster
     - Name: $v
       Entry: 7
-      Data: 16|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Cluster
@@ -10881,7 +10735,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 15|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -10906,51 +10760,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: 
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -10962,23 +10771,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 16|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 17|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -10997,7 +10793,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 21|SEE.Game.LabelAttributes, SEE
+      Data: 18|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -11033,7 +10829,7 @@ MonoBehaviour:
       Data: Architecture_Layer
     - Name: $v
       Entry: 7
-      Data: 22|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Architecture_Layer
@@ -11054,7 +10850,7 @@ MonoBehaviour:
       Data: 
     - Name: ColorProperty
       Entry: 7
-      Data: 23|SEE.Game.City.ColorProperty, SEE
+      Data: 20|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 0
@@ -11079,51 +10875,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: 
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -11135,23 +10886,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 24|SEE.Game.City.AntennaAttributes, SEE
+      Data: 21|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 22|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -11170,7 +10908,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 27|SEE.Game.LabelAttributes, SEE
+      Data: 23|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -11200,13 +10938,38 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 24|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 25|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 26|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 28|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 27|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -11236,11 +10999,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 28|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 29|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -11256,11 +11019,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 30|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -11272,11 +11035,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -11288,11 +11051,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -11326,62 +11089,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    nodeType: LeafNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: Metric.LOC
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.01
-    MaximalBlockLength: 5
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
-  InnerNodeSettings:
-    nodeType: InnerNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 1
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 1
     LayoutPath:
@@ -11866,6 +11573,7 @@ Transform:
   m_Children:
   - {fileID: 1315344127}
   - {fileID: 1535691044}
+  - {fileID: 1885742587}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -16111,9 +15819,34 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 4|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -16143,11 +15876,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -16163,11 +15896,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -16179,11 +15912,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -16195,11 +15928,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -16233,62 +15966,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    nodeType: LeafNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: 
-    DepthMetric: 
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.01
-    MaximalBlockLength: 5
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
-  InnerNodeSettings:
-    nodeType: InnerNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 1
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 7
     LayoutPath:
@@ -16906,7 +16583,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1535691038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17047,51 +16724,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Level
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -17117,18 +16749,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: AntennaWidth
       Entry: 4
       Data: 0.1
@@ -17137,7 +16757,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 9|SEE.Game.LabelAttributes, SEE
+      Data: 8|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -17173,7 +16793,7 @@ MonoBehaviour:
       Data: Method
     - Name: $v
       Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Method
@@ -17194,7 +16814,7 @@ MonoBehaviour:
       Data: Metric.Lines.LOC
     - Name: ColorProperty
       Entry: 7
-      Data: 11|SEE.Game.City.ColorProperty, SEE
+      Data: 10|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -17219,51 +16839,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Lines.LOC
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -17275,23 +16850,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 12|SEE.Game.City.AntennaAttributes, SEE
+      Data: 11|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 12|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -17310,7 +16872,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 15|SEE.Game.LabelAttributes, SEE
+      Data: 13|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -17346,7 +16908,7 @@ MonoBehaviour:
       Data: Member
     - Name: $v
       Entry: 7
-      Data: 16|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 14|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Member
@@ -17367,7 +16929,7 @@ MonoBehaviour:
       Data: Source.Declaration_Start
     - Name: ColorProperty
       Entry: 7
-      Data: 17|SEE.Game.City.ColorProperty, SEE
+      Data: 15|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -17392,51 +16954,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: Source.Declaration_Start
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -17448,23 +16965,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 18|SEE.Game.City.AntennaAttributes, SEE
+      Data: 16|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 20|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 17|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -17483,7 +16987,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 21|SEE.Game.LabelAttributes, SEE
+      Data: 18|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -17519,7 +17023,7 @@ MonoBehaviour:
       Data: Namespace
     - Name: $v
       Entry: 7
-      Data: 22|SEE.Game.City.VisualNodeAttributes, SEE
+      Data: 19|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: nodeType
       Entry: 1
       Data: Namespace
@@ -17540,7 +17044,7 @@ MonoBehaviour:
       Data: 0.0001
     - Name: ColorProperty
       Entry: 7
-      Data: 23|SEE.Game.City.ColorProperty, SEE
+      Data: 20|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
       Data: 1
@@ -17565,51 +17069,6 @@ MonoBehaviour:
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Level
-    - Name: ColorRange
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -17621,23 +17080,10 @@ MonoBehaviour:
       Data: 1
     - Name: AntennaSettings
       Entry: 7
-      Data: 24|SEE.Game.City.AntennaAttributes, SEE
+      Data: 21|SEE.Game.City.AntennaAttributes, SEE
     - Name: AntennaSections
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: AntennaSegments
-      Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[SEE.Game.City.Property, SEE]],
+      Data: 22|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
         mscorlib
     - Name: 
       Entry: 12
@@ -17656,7 +17102,7 @@ MonoBehaviour:
       Data: 
     - Name: LabelSettings
       Entry: 7
-      Data: 27|SEE.Game.LabelAttributes, SEE
+      Data: 23|SEE.Game.LabelAttributes, SEE
     - Name: Show
       Entry: 5
       Data: true
@@ -17690,9 +17136,34 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 24|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 25|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 26|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 28|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 27|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -17722,11 +17193,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 28|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 29|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -17742,11 +17213,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 30|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -17758,11 +17229,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -17774,11 +17245,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 30
+      Data: 29
     - Name: 
       Entry: 12
       Data: 0
@@ -17812,68 +17283,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    nodeType: LeafNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_Of_Calling_Routines
-    DepthMetric: Metric.Number_Of_Called_Routines
-    HeightMetric: Metric.Lines.LOC
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.01
-    MaximalBlockLength: 0.5
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Lines.Comment
-        Color: {r: 0, g: 0, b: 0, a: 1}
-      - Metric: Metric.Lines.Fixme
-        Color: {r: 0.9254902, g: 0.4901961, b: 0.3254902, a: 1}
-      - Metric: Metric.Halstead.Volume
-        Color: {r: 0.3254902, g: 0.8627451, b: 0.9254902, a: 1}
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
-  InnerNodeSettings:
-    nodeType: InnerNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 1
-    AntennaSettings:
-      AntennaSections: []
-      AntennaSegments: []
-      AntennaWidth: 0.1
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
@@ -18906,9 +18315,34 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 4|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 4|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -18938,11 +18372,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -18958,11 +18392,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -18974,11 +18408,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -18990,11 +18424,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 6
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -19028,74 +18462,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 0
-  LeafNodeSettings:
-    nodeType: LeafNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_Of_Calling_Routines
-    DepthMetric: Metric.Number_Of_Called_Routines
-    HeightMetric: Metric.Lines.LOC
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 5
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Vcs2See.Commit.Lines_Added
-        Color: {r: 0.1333333, g: 0.5294118, b: 0.3490196, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Edited
-        Color: {r: 0.9137255, g: 0.7568628, b: 0.3058824, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Deleted
-        Color: {r: 0.9137255, g: 0.4156863, b: 0.3058824, a: 1}
-      AntennaSegments: []
-      AntennaWidth: 0.015
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
-  InnerNodeSettings:
-    nodeType: InnerNode
-    Shape: 0
-    IsRelevant: 1
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    HeightMetric: 0.0001
-    ColorProperty:
-      Property: 0
-      TypeColor: {r: 1, g: 1, b: 1, a: 1}
-      ColorMetric: 
-      ColorRange:
-        lower: {r: 1, g: 1, b: 1, a: 1}
-        upper: {r: 1, g: 0, b: 0, a: 1}
-        NumberOfColors: 10
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 1
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Vcs2See.Commit.Lines_Added
-        Color: {r: 0.1333333, g: 0.5294118, b: 0.3490196, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Edited
-        Color: {r: 0.9137255, g: 0.7568628, b: 0.3058824, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Deleted
-        Color: {r: 0.9137255, g: 0.4156863, b: 0.3058824, a: 1}
-      AntennaSegments: []
-      AntennaWidth: 0.015
-    LabelSettings:
-      Show: 1
-      Distance: 0.2
-      FontSize: 0.4
-      AnimationDuration: 0.5
-    OutlineWidth: 1
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
@@ -20249,6 +19615,785 @@ Transform:
   m_Father: {fileID: 1644099394}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1885742586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1885742587}
+  - component: {fileID: 1885742593}
+  - component: {fileID: 1885742592}
+  - component: {fileID: 1885742591}
+  - component: {fileID: 1885742590}
+  - component: {fileID: 1885742589}
+  - component: {fileID: 1885742588}
+  m_Layer: 0
+  m_Name: Random
+  m_TagString: Code City
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1885742587
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.20466027, y: 0.51, z: 0.0009090911}
+  m_LocalScale: {x: 0.43452287, y: 0.0002, z: 0.90909094}
+  m_Children: []
+  m_Father: {fileID: 863466805}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1885742588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f60d2c87bfa2964d933dee0c2b9342e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: SourceCodeDirectory
+      Entry: 7
+      Data: 0|SEE.Utils.DirectoryPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 2
+    - Name: relativePath
+      Entry: 1
+      Data: 
+    - Name: absolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: HierarchicalEdges
+      Entry: 7
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 4
+    - Name: 
+      Entry: 1
+      Data: Enclosing
+    - Name: 
+      Entry: 1
+      Data: Belongs_To
+    - Name: 
+      Entry: 1
+      Data: Part_Of
+    - Name: 
+      Entry: 1
+      Data: Defined_In
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NodeTypes
+      Entry: 7
+      Data: 2|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.VisualNodeAttributes,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Class
+    - Name: $v
+      Entry: 7
+      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: nodeType
+      Entry: 1
+      Data: Class
+    - Name: Shape
+      Entry: 3
+      Data: 2
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: WidthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: DepthMetric
+      Entry: 1
+      Data: Metric.Number_of_Tokens
+    - Name: HeightMetric
+      Entry: 1
+      Data: 0.0001
+    - Name: ColorProperty
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 1
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorMetric
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 6|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 7|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 8|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Package
+    - Name: $v
+      Entry: 7
+      Data: 9|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: nodeType
+      Entry: 1
+      Data: Package
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: WidthMetric
+      Entry: 1
+      Data: 0.0001
+    - Name: DepthMetric
+      Entry: 1
+      Data: 0.0001
+    - Name: HeightMetric
+      Entry: 1
+      Data: 0.0001
+    - Name: ColorProperty
+      Entry: 7
+      Data: 10|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 1
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorMetric
+      Entry: 1
+      Data: Metric.Level
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.0001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 11|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 12|System.Collections.Generic.List`1[[SEE.Game.City.AntennaSection, SEE]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 13|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 14|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 15|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 3
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Level
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.7670739
+    - Name: 
+      Entry: 4
+      Data: 0.9339623
+    - Name: 
+      Entry: 4
+      Data: 0.4890085
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: CoseGraphSettings
+      Entry: 7
+      Data: 16|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+    - Name: EdgeLength
+      Entry: 3
+      Data: 20
+    - Name: UseSmartIdealEdgeCalculation
+      Entry: 5
+      Data: false
+    - Name: UseSmartMultilevelScaling
+      Entry: 5
+      Data: false
+    - Name: PerLevelIdealEdgeLengthFactor
+      Entry: 4
+      Data: 0.1
+    - Name: UseSmartRepulsionRangeCalculation
+      Entry: 5
+      Data: false
+    - Name: GravityStrength
+      Entry: 4
+      Data: 0.8
+    - Name: CompoundGravityStrength
+      Entry: 4
+      Data: 1.5
+    - Name: RepulsionStrength
+      Entry: 4
+      Data: 50
+    - Name: MultiLevelScaling
+      Entry: 5
+      Data: false
+    - Name: ListInnerNodeToggle
+      Entry: 7
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 18|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeLayout
+      Entry: 7
+      Data: 19|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: InnerNodeShape
+      Entry: 7
+      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+        SEE]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LoadedForNodeTypes
+      Entry: 7
+      Data: 21|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+        mscorlib]], mscorlib
+    - Name: comparer
+      Entry: 9
+      Data: 18
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: UseCalculationParameter
+      Entry: 5
+      Data: true
+    - Name: UseIterativeCalculation
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+  LODCulling: 0.001
+  ConfigurationPath:
+    Root: 1
+    relativePath: /Data/GXL/similar-clones/similar-clones.cfg
+    absolutePath: 
+  sourceCodeDirectory:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  SolutionPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  ZScoreScale: 0
+  ScaleOnlyLeafMetrics: 1
+  NodeLayoutSettings:
+    Kind: 0
+    LayoutPath:
+      Root: 2
+      relativePath: 
+      absolutePath: 
+  EdgeLayoutSettings:
+    Kind: 0
+    EdgeWidth: 0.01
+    EdgesAboveBlocks: 1
+    Tension: 0.85
+    RDP: 0.0001
+  EdgeSelectionSettings:
+    TubularSegments: 50
+    Radius: 0.005
+    RadialSegments: 8
+    AreSelectable: 0
+  ErosionSettings:
+    ShowInnerErosions: 0
+    ShowLeafErosions: 0
+    LoadDashboardMetrics: 0
+    IssuesAddedFromVersion: 
+    OverrideMetrics: 1
+    ErosionScalingFactor: 1.5
+    ShowIssuesInCodeWindow: 0
+    ArchitectureIssue: Metric.Architecture_Violations
+    CloneIssue: Metric.Clone
+    CycleIssue: Metric.Cycle
+    Dead_CodeIssue: Metric.Dead_Code
+    MetricIssue: Metric.Metric
+    StyleIssue: Metric.Style
+    UniversalIssue: Metric.Universal
+    ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
+    CloneIssue_SUM: Metric.Clone_SUM
+    CycleIssue_SUM: Metric.Cycle_SUM
+    Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
+    MetricIssue_SUM: Metric.Metric_SUM
+    StyleIssue_SUM: Metric.Style_SUM
+    UniversalIssue_SUM: Metric.Universal_SUM
+  GXLPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  CSVPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  LeafConstraint:
+    NodeType: Class
+    EdgeType: calls
+    NodeNumber: 300
+    EdgeDensity: 0.01
+  InnerNodeConstraint:
+    NodeType: Package
+    EdgeType: uses
+    NodeNumber: 50
+    EdgeDensity: 0.005
+  LeafAttributes:
+  - Name: Metric.Number_of_Tokens
+    Mean: 100
+    StandardDeviation: 70
+  - Name: Metric.Clone_Rate
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.LOC
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Complexity
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Architecture_Violations
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Clone
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Cycle
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Dead_Code
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Metric
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Style
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.Universal
+    Mean: 10
+    StandardDeviation: 3
+  - Name: Metric.IssuesTotal
+    Mean: 10
+    StandardDeviation: 3
+--- !u!114 &1885742589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1885742590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleFactor: 1
+  HeightOffset: 0.0030822158
+--- !u!65 &1885742591
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1885742592
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 3ce1607272ebf6f409222542a2548d9a, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1885742593
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885742586}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1887670312
 GameObject:
   m_ObjectHideFlags: 0
