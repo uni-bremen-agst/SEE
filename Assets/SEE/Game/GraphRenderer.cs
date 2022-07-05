@@ -107,6 +107,7 @@ namespace SEE.Game
                     NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
                     NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
                     NodeShapes.Spiders => new SpiderFactory(ShaderType, colorRange),
+                    NodeShapes.Polygons => new PolygonFactory(ShaderType, colorRange),
                     _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
                 };
             }

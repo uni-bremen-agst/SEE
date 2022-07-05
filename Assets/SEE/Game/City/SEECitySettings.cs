@@ -42,7 +42,8 @@ namespace SEE.Game.City
     {
         Blocks,
         Cylinders,
-        Spiders
+        Spiders,
+        Polygons
     }
 
     /// <summary>

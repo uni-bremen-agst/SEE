@@ -1,5 +1,4 @@
 ﻿using SEE.Game;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -153,16 +152,6 @@ namespace SEE.GO.NodeFactories
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns all <paramref name="metrics"/> except for the height metric (index 1).
-        /// </summary>
-        /// <param name="metrics">the metric values to be put onto the spider axes</param>
-        /// <returns>all <paramref name="metrics"/> but the height metric at index 1</returns>
-        private static IEnumerable<float> AllButHeight(float[] metrics)
-        {
-            return metrics.Where((value, index) => index != 1);
         }
     }
 }
