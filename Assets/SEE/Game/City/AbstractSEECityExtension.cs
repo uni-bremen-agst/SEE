@@ -177,6 +177,8 @@ namespace SEE.Game.City
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 case NodeShapes.Spiders:
                     return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
+                case NodeShapes.Polygons:
+                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
                 default:
                     throw new NotImplementedException($"Unexpected case {shape}");
             }
