@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.GO.NodeFactories
 {
@@ -15,7 +14,7 @@ namespace SEE.GO.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="shaderType">shader to be used for rendering the materials the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
         public PolygonFactory(Materials.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
@@ -45,6 +44,9 @@ namespace SEE.GO.NodeFactories
             SetSize(gameObject, new Vector3(metrics[0] / 2, metrics[1], metrics[0] / 2));
         }
 
+        /// <summary>
+        /// The radius of the unit circle upon which to place the vertices of the polygon.
+        /// </summary>
         private const float targetRadius = 0.5f;
 
         protected override Mesh GetMesh(float[] metrics)
