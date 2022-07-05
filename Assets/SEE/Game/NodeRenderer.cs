@@ -366,7 +366,8 @@ namespace SEE.Game
         private float[] SelectMetrics(Node node)
         {
             if (Settings.NodeTypes[node.Type].Shape == NodeShapes.Spiders
-                || Settings.NodeTypes[node.Type].Shape == NodeShapes.Polygons)
+                || Settings.NodeTypes[node.Type].Shape == NodeShapes.Polygons
+                || Settings.NodeTypes[node.Type].Shape == NodeShapes.Bars)
             {
                 // FIXME: Not all nodes have necessarily the same set of metrics.
                 // If one does not have a particular numeric attributes, but others
