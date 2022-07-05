@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.GO.NodeFactories
 {
@@ -37,33 +38,24 @@ namespace SEE.GO.NodeFactories
         /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         protected override void SetDimensions(GameObject gameObject, float[] metrics)
         {
-            // FIXME
-            float max = Enumerable.Max(AllButHeight(metrics));
-            SetSize(gameObject, new Vector3(max / 2, metrics[1], max / 2));
+            // We want to be able to compare the axes across different nodes,
+            // hence, we need the same point of reference. In case of cubes, the
+            // reference is the width metric. Hence, we use that here, too, for
+            // reasons of consistency.
+            SetSize(gameObject, new Vector3(metrics[0] / 2, metrics[1], metrics[0] / 2));
         }
+
+        private const float targetRadius = 0.5f;
 
         protected override Mesh GetMesh(float[] metrics)
         {
-            metrics = new float[]
-            {
-                1.487793f,
-                1.0f, // height
-                5.241667f,
-                2.002344f,
-                4.271945f,
-                7.815320f,
-                5.452837f,
-                6.012328f,
-                7.506031f,
-                3.599992f,
-                1.636063f
-            };
-
             // https://math.stackexchange.com/questions/1930607/maximum-area-enclosure-given-side-lengths
 
-            CheckPreconditions(metrics);
+            float[] allButHeight = AllButHeight(metrics).ToArray();
 
-            Vector2[] vertices = MetricsToVertices(metrics);
+            CheckPreconditions(allButHeight);
+
+            Vector2[] vertices = MetricsToVertices(allButHeight, out float radius);
             Vector2[] vertices2D = new Vector2[vertices.Length];
             Vector3[] vertices3D = new Vector3[vertices.Length];
             for (int v = 0; v < vertices.Length; v++)
@@ -90,21 +82,21 @@ namespace SEE.GO.NodeFactories
             {
                 if (metrics.Length >= 4)
                 {
-                    double max_length = metrics[0];
-                    double sum_length = metrics[0];
+                    double maxLength = metrics[0];
+                    double sumLength = metrics[0];
 
                     for (int i = 1; i < metrics.Length; i++)
                     {
-                        sum_length += metrics[i];
-                        if (max_length < metrics[i])
+                        sumLength += metrics[i];
+                        if (maxLength < metrics[i])
                         {
-                            max_length = metrics[i];
+                            maxLength = metrics[i];
                         }
                     }
 
-                    if (max_length > sum_length - max_length)
+                    if (maxLength > sumLength - maxLength)
                     {
-                        throw new Exception("Not a valid polygon; one of the line segments is too long.");
+                        throw new Exception($"Not a valid polygon; one of the line segments is too long ({maxLength} <= {sumLength} - {maxLength}).");
                     }
                 }
                 else
@@ -114,47 +106,25 @@ namespace SEE.GO.NodeFactories
             }
         }
 
-        private Vector2[] MetricsToVertices(float[] metrics)
+        private Vector2[] MetricsToVertices(float[] metrics, out float radius)
         {
-            const float targetRadius = 0.5f;
-
-            float[] allButHeight = AllButHeight(metrics).ToArray();
-            Vector2[] result = new Vector2[allButHeight.Length];
-
-            float radius = FindRadius(allButHeight, 0.0001f, out uint i);
+            Vector2[] result = new Vector2[metrics.Length];
+            radius = FindRadius(metrics, 0.0001f, out uint i);
             Debug.Log($"radius = {radius:F6} using {i} iterations.\n");
 
-            // Scale circle to diameter = 2 * targetRadius = 1
-            float scaleFactor = targetRadius / radius;
-
-            radius = targetRadius;
-            for (int v = 0; v < allButHeight.Length; ++v)
+            // We start at 12 o'clock.
+            float radian = Mathf.PI / 2;
+            for (int j = 0; j < metrics.Length; ++j)
             {
-                allButHeight[v] *= scaleFactor;
+                Vector2 vertexOnCircle = new Vector2(targetRadius * Mathf.Cos(radian),
+                                                     targetRadius * Mathf.Sin(radian));
+                result[j] = vertexOnCircle;
+                // Note: Radians rotate counter clockwise with increasing values.
+                // We want to traverse the circle clockwise, however.
+                radian -= Theta(metrics[j], radius);
             }
-
-            float phi = -0.5f * Theta(allButHeight[0], radius);
-
-            float x0 = /* radius + */radius * Mathf.Cos(phi);
-            float y0 = /* radius + */ -radius * Mathf.Sin(phi);
-
-            for (int j = 0; j < allButHeight.Length; j++)
-            {
-                float x = x0 - radius * Mathf.Cos(phi);
-                float y = y0 + radius * Mathf.Sin(phi);
-                result[j] = new Vector2(x, y);
-                phi += Theta(allButHeight[j], radius);
-                //Debug.Log($"({x:F6}, {y:F6})\n");
-            }
-
             return result;
         }
-
-        //private static float DeltaTheta(float L, float r)
-        //{
-        //    float r2 = r * r;
-        //    return -2.0f * L / (r2 * Mathf.Sqrt(4.0f - L * L / r2));
-        //}
 
         /// <summary>
         /// Theta(l, r) is the angle between the r-length edges in the isosceles triangle.
