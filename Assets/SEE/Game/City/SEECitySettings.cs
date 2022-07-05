@@ -43,7 +43,8 @@ namespace SEE.Game.City
         Blocks,
         Cylinders,
         Spiders,
-        Polygons
+        Polygons,
+        Bars
     }
 
     /// <summary>

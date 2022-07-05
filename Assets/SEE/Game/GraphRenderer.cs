@@ -104,10 +104,11 @@ namespace SEE.Game
 
                 return value.Shape switch
                 {
-                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
                     NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
+                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
                     NodeShapes.Spiders => new SpiderFactory(ShaderType, colorRange),
                     NodeShapes.Polygons => new PolygonFactory(ShaderType, colorRange),
+                    NodeShapes.Bars => new BarsFactory(ShaderType, colorRange),
                     _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
                 };
             }
