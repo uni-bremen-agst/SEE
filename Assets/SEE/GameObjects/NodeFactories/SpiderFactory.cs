@@ -104,7 +104,7 @@ namespace SEE.GO.NodeFactories
             // A step on the circle unit (expressed as radian) so that all axes
             // of the spider charts fit.
             // Axes are equidistant in the spider chart.
-            // We want to traverse the circle counter clockwise that is why
+            // We want to traverse the circle clockwise that is why
             // the radian step should be negative.
             float radianStep = -2 * Mathf.PI / radialSegments;
 
