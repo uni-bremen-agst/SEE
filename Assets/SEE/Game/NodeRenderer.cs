@@ -377,14 +377,9 @@ namespace SEE.Game
                 IList<float> metrics = new List<float>();
                 // FIXME: There may be attributes that are not metrics, e.g., Source.Line.
                 // We need a user setting that decides which attributes to use.
-                foreach (string metricName in node.FloatAttributes.Keys)
-                {
-                    metrics.Add(scaler.GetMetricValue(node, metricName));
-                }
-                foreach (string metricName in node.IntAttributes.Keys)
-                {
-                    metrics.Add(scaler.GetMetricValue(node, metricName));
-                }
+                AddMetrics(node, metrics, node.FloatAttributes.Keys);
+                AddMetrics(node, metrics, node.IntAttributes.Keys);
+
                 // There should be at least three values.
                 for (int i = metrics.Count; i < 3; ++i)
                 {
@@ -418,6 +413,17 @@ namespace SEE.Game
                 scale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
             }
             return new float[] { scale.x, scale.y, scale.z };
+
+            void AddMetrics(Node node, IList<float> metrics, ICollection<string> metricNames)
+            {
+                HashSet<string> relevantMetrics = new HashSet<string>(metricNames);
+                string colorMetric = Settings.NodeTypes[node.Type].ColorProperty.ColorMetric;
+                relevantMetrics.Remove(colorMetric);
+                foreach (string metricName in relevantMetrics)
+                {
+                    metrics.Add(scaler.GetMetricValue(node, metricName));
+                }
+            }
         }
 
         /// <summary>
