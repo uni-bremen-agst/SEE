@@ -3391,6 +3391,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1071528346688116, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1087644615075602, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_Name
       value: DemoWorld
@@ -19745,10 +19749,10 @@ MonoBehaviour:
       Data: true
     - Name: WidthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: Metric.Semicolon
     - Name: DepthMetric
       Entry: 1
-      Data: Metric.Number_of_Tokens
+      Data: Metric.Semicolon
     - Name: HeightMetric
       Entry: 1
       Data: 0.0001
@@ -19987,10 +19991,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -20005,13 +20009,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
       Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -20020,7 +20024,7 @@ MonoBehaviour:
       Data: 
     - Name: NumberOfColors
       Entry: 3
-      Data: 10
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -20270,42 +20274,45 @@ MonoBehaviour:
     NodeNumber: 50
     EdgeDensity: 0.005
   LeafAttributes:
-  - Name: Metric.Number_of_Tokens
-    Mean: 100
-    StandardDeviation: 70
   - Name: Metric.Clone_Rate
+    Mean: 20
+    StandardDeviation: 15
+  - Name: Metric.While
+    Mean: 5
+    StandardDeviation: 1
+  - Name: Metric.For
+    Mean: 8
+    StandardDeviation: 2
+  - Name: Metric.Do
+    Mean: 1
+    StandardDeviation: 1
+  - Name: Metric.If
+    Mean: 15
+    StandardDeviation: 5
+  - Name: Metric.Else
+    Mean: 7
+    StandardDeviation: 3
+  - Name: Metric.Switch
+    Mean: 3
+    StandardDeviation: 3
+  - Name: Metric.Assign
+    Mean: 50
+    StandardDeviation: 25
+  - Name: Metric.Return
     Mean: 10
     StandardDeviation: 3
-  - Name: Metric.LOC
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Complexity
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Architecture_Violations
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Clone
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Cycle
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Dead_Code
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Metric
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Style
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.Universal
-    Mean: 10
-    StandardDeviation: 3
-  - Name: Metric.IssuesTotal
-    Mean: 10
-    StandardDeviation: 3
+  - Name: Metric.Throw
+    Mean: 6
+    StandardDeviation: 2
+  - Name: Metric.Id
+    Mean: 80
+    StandardDeviation: 40
+  - Name: Metric.Literal
+    Mean: 20
+    StandardDeviation: 5
+  - Name: Metric.Semicolon
+    Mean: 200
+    StandardDeviation: 40
 --- !u!114 &1885742589
 MonoBehaviour:
   m_ObjectHideFlags: 0
