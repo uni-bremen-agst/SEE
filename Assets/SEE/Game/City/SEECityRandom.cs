@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.GO;
 using SEE.Tools;
 using SEE.Utils;
 using Sirenix.OdinInspector;
@@ -99,6 +100,71 @@ namespace SEE.Game.City
             // generate graph randomly
             RandomGraphs randomGraphs = new RandomGraphs();
             LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
+        }
+
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        private void AddCloneEdges()
+        {
+            float threshold = 0.2f;
+
+            // FIXME: To be removed after the VISSOFT paper submission.
+            if (LoadedGraph != null)
+            {
+                ISet<string> metrics = LoadedGraph.AllNumericNodeAttributes();
+                ZScoreScale zscore = new ZScoreScale(new List<Graph> { LoadedGraph }, metrics, true);
+                IList<Node> nodes = LoadedGraph.Nodes();
+                int numberOfEdgesAdded = 0;
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if (nodes[i].IsLeaf())
+                    {
+                        for (int j = i + 1; j < nodes.Count; j++)
+                        {
+                            if (nodes[j].IsLeaf())
+                            {
+                                float distance = Distance(metrics, zscore, nodes[i], nodes[j]);
+                                Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
+                                if (distance <= threshold)
+                                {
+                                    LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone"));
+                                    numberOfEdgesAdded++;
+                                }
+                            }
+                        }
+                    }
+                }
+                Debug.Log($"Added {numberOfEdgesAdded} clone edges.\n");
+            }
+
+            float Distance(ISet<string> metrics, ZScoreScale zscore, Node left, Node right)
+            {
+                return Euclidean(GetMetrics(metrics, zscore, left), GetMetrics(metrics, zscore, right));
+            }
+
+            float[] GetMetrics(ISet<string> metrics, ZScoreScale zscore, Node node)
+            {
+                float[] result = new float[metrics.Count];
+                int i = 0;
+                foreach (string metric in metrics)
+                {
+                    result[i] = zscore.GetMetricValue(node, metric);
+                    i++;
+                }
+                return result;
+            }
+
+            float Euclidean(float[] leftVector, float[] rightVector)
+            {
+                float result = 0;
+                for (int i = 0; i < leftVector.Length; i++)
+                {
+                    float diff = leftVector[i] - rightVector[i];
+                    result += diff * diff;
+                }
+                return Mathf.Sqrt(result);
+            }
         }
 
         //----------------------------------------------------------------------------
