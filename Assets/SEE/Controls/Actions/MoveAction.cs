@@ -32,13 +32,17 @@ namespace SEE.Controls.Actions
                 ConnectedEdges = new List<(SEESpline, bool)>();
                 
                 // We want to animate the edges attached to the moving node, so we cache them here.
-                foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                // TODO: Why can this be null?
+                if (node.Value != null)
                 {
-                    GameObject gameEdge = GameObject.Find(edge.ID);
-                    Assert.IsNotNull(gameEdge);
-                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                    foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                     {
-                        ConnectedEdges.Add((spline, node.Value == edge.Source));
+                        GameObject gameEdge = GameObject.Find(edge.ID);
+                        Assert.IsNotNull(gameEdge);
+                        if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                        {
+                            ConnectedEdges.Add((spline, node.Value == edge.Source));
+                        }
                     }
                 }
             }
@@ -306,7 +310,7 @@ namespace SEE.Controls.Actions
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
-                    Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                    Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
                         Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
@@ -321,7 +325,7 @@ namespace SEE.Controls.Actions
                     Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    Vector3 endPoint = hit.HoveredObject.position;
                     gizmo.SetPositions(startPoint, endPoint);
 
                     SetHitObjectColor(hit.node);
