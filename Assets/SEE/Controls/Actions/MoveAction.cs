@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -22,10 +25,22 @@ namespace SEE.Controls.Actions
             internal Hit(Transform hoveredObject)
             {
                 CityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
-                this.HoveredObject = hoveredObject;
+                HoveredObject = hoveredObject;
                 InteractableObject = hoveredObject.GetComponent<InteractableObject>();
                 Plane = new Plane(Vector3.up, CityRootNode.position);
                 node = hoveredObject.GetComponent<NodeRef>();
+                ConnectedEdges = new List<(SEESpline, bool)>();
+                
+                // We want to animate the edges attached to the moving node, so we cache them here.
+                foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                {
+                    GameObject gameEdge = GameObject.Find(edge.ID);
+                    Assert.IsNotNull(gameEdge);
+                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                    {
+                        ConnectedEdges.Add((spline, node.Value == edge.Source));
+                    }
+                }
             }
 
             /// <summary>
@@ -44,6 +59,13 @@ namespace SEE.Controls.Actions
             /// The interactable component attached to <see cref="HoveredObject"/>.
             /// </summary>
             internal InteractableObject InteractableObject;
+
+            /// <summary>
+            /// Map from connected edges represented as <see cref="SEESpline"/>s to a boolean
+            /// representing whether <see cref="node"/> is the source for this edge (otherwise, it's the target).
+            /// </summary>
+            internal IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
+
             internal Plane Plane;
             internal NodeRef node;
         }
@@ -62,7 +84,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool moving = false;
 
-        private Hit hit = new Hit();
+        private Hit hit;
         private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
         private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
@@ -303,6 +325,20 @@ namespace SEE.Controls.Actions
                     gizmo.SetPositions(startPoint, endPoint);
 
                     SetHitObjectColor(hit.node);
+                    
+                    // We will also "stick" the connected edges to the moved node during its movement.
+                    // In order to do this, we need to modify the splines of each one.
+                    foreach ((SEESpline spline, bool nodeIsSource) edge in hit.ConnectedEdges)
+                    {
+                        if (edge.nodeIsSource)
+                        {
+                            edge.spline.UpdateStartPosition(hit.HoveredObject.transform.position);
+                        }
+                        else
+                        {
+                            edge.spline.UpdateEndPosition(hit.HoveredObject.transform.position);
+                        }
+                    }
 
                     synchronize = true;
                 }
