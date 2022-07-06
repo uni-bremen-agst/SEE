@@ -221,6 +221,29 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Changes the last control point of the spline represented by this object to <paramref name="newPosition"/>.
+        /// </summary>
+        /// <param name="newPosition">The new position the last control point of this spline should have</param>
+        public void UpdateEndPosition(Vector3 newPosition) => UpdateControlPoint(spline.NumControlPoints - 1, newPosition);
+        
+        /// <summary>
+        /// Changes the first control point of the spline represented by this object to <paramref name="newPosition"/>.
+        /// </summary>
+        /// <param name="newPosition">The new position the first control point of this spline should have</param>
+        public void UpdateStartPosition(Vector3 newPosition) => UpdateControlPoint(0, newPosition);
+
+        /// <summary>
+        /// Changes the control point at <paramref name="index"/> to the given <paramref name="newControlPoint"/>.
+        /// </summary>
+        /// <param name="index">Index of the control point which is to be changed</param>
+        /// <param name="newControlPoint">New value for the control point at <paramref name="index"/></param>
+        private void UpdateControlPoint(uint index, Vector3 newControlPoint)
+        {
+            spline.SetControlPointVec3At(index, new Vec3(newControlPoint.x, newControlPoint.y, newControlPoint.z));
+            needsUpdate = true;
+        }
+
+        /// <summary>
         /// Approximates <see cref="Spline"/> as poly line. The greater
         /// <paramref name="num"/>, the more accurate the approximation.
         /// The poly line can be visualized with a <see cref="LineRenderer"/>.
