@@ -107,7 +107,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         private void AddCloneEdges()
         {
-            float threshold = 0.2f;
+            float threshold = 2.25f;
 
             // FIXME: To be removed after the VISSOFT paper submission.
             if (LoadedGraph != null)
@@ -116,6 +116,9 @@ namespace SEE.Game.City
                 ZScoreScale zscore = new ZScoreScale(new List<Graph> { LoadedGraph }, metrics, true);
                 IList<Node> nodes = LoadedGraph.Nodes();
                 int numberOfEdgesAdded = 0;
+                int numberOfComparisons = 0;
+                float minimumDistance = float.MaxValue;
+
                 for (int i = 0; i < nodes.Count; i++)
                 {
                     if (nodes[i].IsLeaf())
@@ -124,8 +127,13 @@ namespace SEE.Game.City
                         {
                             if (nodes[j].IsLeaf())
                             {
+                                numberOfComparisons++;
                                 float distance = Distance(metrics, zscore, nodes[i], nodes[j]);
-                                Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
+                                if (distance < minimumDistance)
+                                {
+                                    minimumDistance = distance;
+                                }
+                                //Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
                                 if (distance <= threshold)
                                 {
                                     LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone"));
@@ -135,7 +143,7 @@ namespace SEE.Game.City
                         }
                     }
                 }
-                Debug.Log($"Added {numberOfEdgesAdded} clone edges.\n");
+                Debug.Log($"Added {numberOfEdgesAdded} clone edges for {numberOfComparisons} comparisons. Minimum distance = {minimumDistance}.\n");
             }
 
             float Distance(ISet<string> metrics, ZScoreScale zscore, Node left, Node right)
