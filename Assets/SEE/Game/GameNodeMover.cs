@@ -150,13 +150,18 @@ namespace SEE.Game
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
-        public static void PutOn(Transform child, GameObject parent)
+        /// <param name="setParent">Whether <paramref name="parent"/> should become a parent
+        /// of <paramref name="child"/></param>
+        public static void PutOn(Transform child, GameObject parent, bool setParent = true)
         {
             Vector3 childCenter = child.position;
             float parentRoof = parent.GetRoof();
-            childCenter.y = parentRoof;
+            childCenter.y = parentRoof + child.lossyScale.y / 2.0f;
             child.position = childCenter;
-            child.SetParent(parent.transform);
+            if (setParent)
+            {
+                child.SetParent(parent.transform);
+            }
         }
 
         /// <summary>
