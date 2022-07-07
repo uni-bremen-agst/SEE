@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using RootMotion.FinalIK;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -310,6 +312,8 @@ namespace SEE.Controls.Actions
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
+                    // FIXME: This works for the initial local scale of a node, but not after resizing—why?
+                    Debug.Log($"planeHitPoint: {planeHitPoint}, dragStartOffset: {dragStartOffset}, dragCanonicalOffset: {dragCanonicalOffset}\nLossy: {hit.HoveredObject.lossyScale}");
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
@@ -328,7 +332,13 @@ namespace SEE.Controls.Actions
                     Vector3 endPoint = hit.HoveredObject.position;
                     gizmo.SetPositions(startPoint, endPoint);
 
-                    SetHitObjectColor(hit.node);
+                    ResetHitObjectColor();
+                    RaycastLowestNode(out RaycastHit? raycastHit, out Node _, hit.node);
+                    if (raycastHit.HasValue)
+                    {
+                        GameNodeMover.PutOn(hit.HoveredObject.transform, raycastHit.Value.collider.gameObject, false);
+                        SetHitObjectColor(raycastHit.Value);
+                    }
                     
                     // We will also "stick" the connected edges to the moved node during its movement.
                     // In order to do this, we need to modify the splines of each one.
@@ -403,19 +413,13 @@ namespace SEE.Controls.Actions
 
             #region Local Functions
 
-            void SetHitObjectColor(NodeRef movingNode)
+            void SetHitObjectColor(RaycastHit raycastHit)
             {
-                ResetHitObjectColor();
-
-                RaycastLowestNode(out RaycastHit? raycastHit, out Node _, movingNode);
-                if (raycastHit != null)
-                {
-                    hitObjectMaterial = raycastHit.Value.collider.GetComponent<Renderer>().material;
-                    // We persist hoveredObjectColor in case we want to use something different than simple
-                    // inversion in the future, such as a constant color (we would then need the original color).
-                    hitObjectColor = hitObjectMaterial.color;
-                    hitObjectMaterial.color = hitObjectColor.Invert();
-                }
+                hitObjectMaterial = raycastHit.collider.GetComponent<Renderer>().material;
+                // We persist hoveredObjectColor in case we want to use something different than simple
+                // inversion in the future, such as a constant color (we would then need the original color).
+                hitObjectColor = hitObjectMaterial.color;
+                hitObjectMaterial.color = hitObjectColor.Invert();
             }
 
             void ResetHitObjectColor()

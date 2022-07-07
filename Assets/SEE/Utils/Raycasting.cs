@@ -222,14 +222,7 @@ namespace SEE.Utils
         {
             Ray ray = UserPointsTo();
             bool result = plane.Raycast(ray, out float enter);
-            if (result)
-            {
-                hit = ray.GetPoint(enter);
-            }
-            else
-            {
-                hit = Vector3.positiveInfinity;
-            }
+            hit = result ? ray.GetPoint(enter) : Vector3.positiveInfinity;
             return result;
         }
 
