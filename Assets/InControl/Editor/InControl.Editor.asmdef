@@ -1,7 +1,11 @@
 {
     "name": "InControl.Editor",
     "references": [
-        "InControl"
+        "InControl",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

@@ -3,7 +3,11 @@
 	"references": [
 		"Unity.TextMeshPro",
 		"DOTween.Modules",
-		"DOTweenPro.Scripts"
+		"DOTweenPro.Scripts",
+		"UnityEditor.UI",
+		"UnityEngine.UI",
+		"UnityEditor.TestRunner",
+		"UnityEngine.TestRunner"
 	],
 	"includePlatforms": [
 		"Editor"
