@@ -278,6 +278,62 @@ namespace SEE.Game
             }
             // FIXME: The two following statements can be merged into one.
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
+
+            // Generate clone classes.
+            HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
+            HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
+            foreach (var item in nodeMap)
+            {
+                // Skip node if already assigned.
+                if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
+
+                // Create clone class.
+                HashSet<Node> cloneClass = new HashSet<Node>();
+                cloneClass.Add(item.Key);
+                alreadyAssignedToCloneClass.Add(item.Key);
+                CollectOutgoings(item.Key.Outgoings);
+                CollectIncommings(item.Key.Incomings);
+                cloneClasses.Add(cloneClass);
+
+                void CollectOutgoings(ISet<Edge> outgoings)
+                {
+                    foreach (var e in outgoings)
+                    {
+                        if (!cloneClass.Contains(e.Target))
+                        {
+                            cloneClass.Add(e.Target);
+                            alreadyAssignedToCloneClass.Add(e.Target);
+                            CollectOutgoings(e.Target.Outgoings);
+                            CollectIncommings(e.Target.Incomings);
+                        }
+                    }
+                }
+                void CollectIncommings(ISet<Edge> incommings)
+                {
+                    foreach (var e in incommings)
+                    {
+                        if (!cloneClass.Contains(e.Source))
+                        {
+                            cloneClass.Add(e.Source);
+                            alreadyAssignedToCloneClass.Add(e.Source);
+                            CollectIncommings(e.Source.Incomings);
+                            CollectOutgoings(e.Source.Outgoings);
+                        }
+                    }
+                }
+            }
+
+            // Set materials of clone classes.
+            //int matIdx = 1;
+            //foreach (var cc in cloneClasses)
+            //{
+            //    Material material = Resources.Load("Materials/LSHComic/" + matIdx++, typeof(Material)) as Material;
+            //    foreach (var node in cc)
+            //    {
+            //        nodeMap[node].GetComponent<Renderer>().material = material;
+            //    }
+            //}
+
             DrawInnerNodes(nodeMap, nodes);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
