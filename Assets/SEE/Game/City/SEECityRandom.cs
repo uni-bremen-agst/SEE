@@ -107,7 +107,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         private void AddCloneEdges()
         {
-            float threshold = 2.25f;
+            float threshold = 2.75f;
 
             // FIXME: To be removed after the VISSOFT paper submission.
             if (LoadedGraph != null)
@@ -118,11 +118,15 @@ namespace SEE.Game.City
                 int numberOfEdgesAdded = 0;
                 int numberOfComparisons = 0;
                 float minimumDistance = float.MaxValue;
+                int numberOfClones = 0;
+                int numberOfLeaves = 0;
 
                 for (int i = 0; i < nodes.Count; i++)
                 {
                     if (nodes[i].IsLeaf())
                     {
+                        numberOfLeaves++;
+                        bool isClone = false;
                         for (int j = i + 1; j < nodes.Count; j++)
                         {
                             if (nodes[j].IsLeaf())
@@ -138,12 +142,18 @@ namespace SEE.Game.City
                                 {
                                     LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone"));
                                     numberOfEdgesAdded++;
+                                    isClone = true;
                                 }
                             }
+                        }
+                        if (isClone)
+                        {
+                            numberOfClones++;
                         }
                     }
                 }
                 Debug.Log($"Added {numberOfEdgesAdded} clone edges for {numberOfComparisons} comparisons. Minimum distance = {minimumDistance}.\n");
+                Debug.Log($"Clone rate  {numberOfClones}/{numberOfLeaves} =  {(float)numberOfClones / numberOfLeaves}.\n");
             }
 
             float Distance(ISet<string> metrics, ZScoreScale zscore, Node left, Node right)
