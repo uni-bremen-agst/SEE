@@ -1,9 +1,13 @@
-﻿using SEE.Controls;
+﻿using System;
+using System.Collections.Generic;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace SEE.Utils
 {
@@ -14,7 +18,7 @@ namespace SEE.Utils
     {
         None, // Neither a node nor an edge was hit.
         Node, // A node was hit.
-        Edge  // An edge was hit.
+        Edge // An edge was hit.
     }
 
     /// <summary>
@@ -25,7 +29,24 @@ namespace SEE.Utils
         /// <summary>
         /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
         /// </summary>
-        private const int RAYCAST_BUFFER_SIZE = 500;
+        private const uint RAYCAST_BUFFER_SIZE = 500;
+
+        /// <summary>
+        /// Layer number for game objects representing UI components.
+        /// </summary>
+        private const uint UI_LAYER = 5;
+
+        /// <summary>
+        /// Names of game objects which are on the <see cref="UI_LAYER"/>,
+        /// but won't "count" as UI components, e.g., when checking whether
+        /// the user is currently hovering over any UI components.
+        /// </summary>
+        private static readonly ISet<string> ignoredUINames =
+            new HashSet<string>
+            {
+                // TODO @koschke: Is it alright to let clicks on this "fall through" to below game objects?
+                "ChatBox" // ignored because otherwise it'd obscure half the screen.
+            };
 
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.
@@ -176,7 +197,18 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            InputSystemUIInputModule inputModule = EventSystem.current.currentInputModule as InputSystemUIInputModule;
+            if (inputModule == null)
+            {
+                Debug.LogError("Could not find input system UI module! Falling back to old detection for now.");
+                return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            }
+            else
+            {
+                GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
+                return lastGameObject != null && lastGameObject.layer == UI_LAYER
+                                              && !ignoredUINames.Contains(lastGameObject.name);
+            }
         }
 
         /// <summary>
@@ -240,8 +272,9 @@ namespace SEE.Utils
         {
             // FIXME: We need to an interaction for VR, too.
             Camera mainCamera = MainCamera.Camera;
-            return mainCamera != null ? mainCamera.ScreenPointToRay(Input.mousePosition)
-                                      : new Ray(origin: Vector3.zero, direction: Vector3.zero);
+            return mainCamera != null
+                ? mainCamera.ScreenPointToRay(Input.mousePosition)
+                : new Ray(origin: Vector3.zero, direction: Vector3.zero);
         }
     }
 }
