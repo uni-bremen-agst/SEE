@@ -80,9 +80,6 @@ namespace SEE.Game
                     SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
-
-                    // We'll return the node to its old position here -- actual movement happens in SEEReflexionCity.
-                    movingObject.transform.position = oldPosition;
                     return newGameParent;
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
