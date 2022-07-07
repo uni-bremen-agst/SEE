@@ -19972,8 +19972,12 @@ MonoBehaviour:
       Entry: 7
       Data: 15|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 16|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 2
@@ -20096,7 +20100,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 16|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 17|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -20126,11 +20130,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 18|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 18|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 19|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -20146,11 +20150,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 19|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 18
+      Data: 19
     - Name: 
       Entry: 12
       Data: 0
@@ -20162,11 +20166,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 21|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 18
+      Data: 19
     - Name: 
       Entry: 12
       Data: 0
@@ -20178,11 +20182,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 21|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 22|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 18
+      Data: 19
     - Name: 
       Entry: 12
       Data: 0
@@ -20224,7 +20228,7 @@ MonoBehaviour:
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 1
-    EdgeWidth: 0.001
+    EdgeWidth: 0.002
     EdgesAboveBlocks: 1
     Tension: 0.85
     RDP: 0.0001
@@ -20266,12 +20270,12 @@ MonoBehaviour:
   LeafConstraint:
     NodeType: Class
     EdgeType: calls
-    NodeNumber: 300
+    NodeNumber: 90
     EdgeDensity: 0
   InnerNodeConstraint:
     NodeType: Package
     EdgeType: uses
-    NodeNumber: 50
+    NodeNumber: 8
     EdgeDensity: 0
   LeafAttributes:
   - Name: Metric.Clone_Rate
@@ -20338,7 +20342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030822158
+  HeightOffset: 0.0030857325
 --- !u!65 &1885742591
 BoxCollider:
   m_ObjectHideFlags: 0
