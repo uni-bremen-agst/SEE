@@ -284,10 +284,10 @@ namespace SEE.Game
             HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
             foreach (var item in nodeMap)
             {
-                // Skip node if already assigned.
+                // Skip node if it already assigned.
                 if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
 
-                // Create clone class.
+                // Find all nodes of the clone class of `item'.
                 HashSet<Node> cloneClass = new HashSet<Node>();
                 cloneClass.Add(item.Key);
                 alreadyAssignedToCloneClass.Add(item.Key);
@@ -324,15 +324,19 @@ namespace SEE.Game
             }
 
             // Set materials of clone classes.
-            //int matIdx = 1;
-            //foreach (var cc in cloneClasses)
-            //{
-            //    Material material = Resources.Load("Materials/LSHComic/" + matIdx++, typeof(Material)) as Material;
-            //    foreach (var node in cc)
-            //    {
-            //        nodeMap[node].GetComponent<Renderer>().material = material;
-            //    }
-            //}
+            // NOTE: This is a very dirty hack!!!
+            if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
+            {
+                int matIdx = 1;
+                foreach (var cc in cloneClasses)
+                {
+                    Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
+                    foreach (var node in cc)
+                    {
+                        nodeMap[node].GetComponent<Renderer>().material = material;
+                    }
+                }
+            }
 
             DrawInnerNodes(nodeMap, nodes);
             // the layout to be applied
