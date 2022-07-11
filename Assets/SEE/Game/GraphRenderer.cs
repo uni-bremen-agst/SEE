@@ -276,66 +276,13 @@ namespace SEE.Game
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            // FIXME: The two following statements can be merged into one.
+            // FIXME: The two following calls DrawLeafNodes and DrawInnerNodes can be merged into one.
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
 
-            // Generate clone classes.
-            HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
-            HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
-            foreach (var item in nodeMap)
+            // FIXME-IWSC: Remove this call after the publication.
+            if (false)
             {
-                // Skip node if it already assigned.
-                if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
-
-                // Find all nodes of the clone class of `item'.
-                HashSet<Node> cloneClass = new HashSet<Node>();
-                cloneClass.Add(item.Key);
-                alreadyAssignedToCloneClass.Add(item.Key);
-                CollectOutgoings(item.Key.Outgoings);
-                CollectIncommings(item.Key.Incomings);
-                cloneClasses.Add(cloneClass);
-
-                void CollectOutgoings(ISet<Edge> outgoings)
-                {
-                    foreach (var e in outgoings)
-                    {
-                        if (!cloneClass.Contains(e.Target))
-                        {
-                            cloneClass.Add(e.Target);
-                            alreadyAssignedToCloneClass.Add(e.Target);
-                            CollectOutgoings(e.Target.Outgoings);
-                            CollectIncommings(e.Target.Incomings);
-                        }
-                    }
-                }
-                void CollectIncommings(ISet<Edge> incommings)
-                {
-                    foreach (var e in incommings)
-                    {
-                        if (!cloneClass.Contains(e.Source))
-                        {
-                            cloneClass.Add(e.Source);
-                            alreadyAssignedToCloneClass.Add(e.Source);
-                            CollectIncommings(e.Source.Incomings);
-                            CollectOutgoings(e.Source.Outgoings);
-                        }
-                    }
-                }
-            }
-
-            // Set materials of clone classes.
-            // NOTE: This is a very dirty hack!!!
-            if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
-            {
-                int matIdx = 1;
-                foreach (var cc in cloneClasses)
-                {
-                    Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
-                    foreach (var node in cc)
-                    {
-                        nodeMap[node].GetComponent<Renderer>().material = material;
-                    }
-                }
+                GenerateAndVisualizeCloneClasses(nodes, nodeMap);
             }
 
             DrawInnerNodes(nodeMap, nodes);
@@ -417,6 +364,72 @@ namespace SEE.Game
                 else
                 {
                     return null;
+                }
+            }
+
+            // FIXME-IWSC
+            // This method exists only to create the texture-based visualization of clones for the IWSC paper.
+            // It will be either become well integrated or removed later.
+            //[Obsolete]
+            void GenerateAndVisualizeCloneClasses(List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
+            {
+                // Generate clone classes.
+                HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
+                HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
+                foreach (var item in nodeMap)
+                {
+                    // Skip node if it already assigned.
+                    if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
+
+                    // Find all nodes of the clone class of `item'.
+                    HashSet<Node> cloneClass = new HashSet<Node>();
+                    cloneClass.Add(item.Key);
+                    alreadyAssignedToCloneClass.Add(item.Key);
+                    CollectOutgoings(item.Key.Outgoings);
+                    CollectIncommings(item.Key.Incomings);
+                    cloneClasses.Add(cloneClass);
+
+                    void CollectOutgoings(ISet<Edge> outgoings)
+                    {
+                        foreach (var e in outgoings)
+                        {
+                            if (!cloneClass.Contains(e.Target))
+                            {
+                                cloneClass.Add(e.Target);
+                                alreadyAssignedToCloneClass.Add(e.Target);
+                                CollectOutgoings(e.Target.Outgoings);
+                                CollectIncommings(e.Target.Incomings);
+                            }
+                        }
+                    }
+                    void CollectIncommings(ISet<Edge> incommings)
+                    {
+                        foreach (var e in incommings)
+                        {
+                            if (!cloneClass.Contains(e.Source))
+                            {
+                                cloneClass.Add(e.Source);
+                                alreadyAssignedToCloneClass.Add(e.Source);
+                                CollectIncommings(e.Source.Incomings);
+                                CollectOutgoings(e.Source.Outgoings);
+                            }
+                        }
+                    }
+                }
+
+                // Set materials of clone classes.
+                // NOTE: This is a very dirty hack!!!
+                if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
+                {
+                    int matIdx = 1;
+                    foreach (var cc in cloneClasses)
+                    {
+                        Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
+                        foreach (Node node in cc)
+                        {
+                            nodeMap[node].GetComponent<Renderer>().material = material;
+                        }
+                    }
                 }
             }
         }
