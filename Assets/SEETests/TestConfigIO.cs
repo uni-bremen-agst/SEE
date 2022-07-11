@@ -509,6 +509,8 @@ namespace SEE.Utils
                     {
                         Assert.AreEqual(outer.Mean, inner.Mean);
                         Assert.AreEqual(outer.StandardDeviation, inner.StandardDeviation);
+                        Assert.AreEqual(outer.Minimum, inner.Minimum);
+                        Assert.AreEqual(outer.Maximum, inner.Maximum);
                         found = true;
                         break;
                     }

@@ -20,11 +20,18 @@ namespace SEE.Tools
         public RandomAttributeDescriptor()
         { }
 
-        public RandomAttributeDescriptor(string name, float mean, float standardDeviation)
+        public RandomAttributeDescriptor
+            (string name,
+            float mean,
+            float standardDeviation,
+            float minimum = 0,
+            float maximum = float.PositiveInfinity)
         {
             Name = name;
             Mean = mean;
             StandardDeviation = standardDeviation;
+            Minimum = minimum;
+            Maximum = maximum;
         }
         [SerializeField]
         public string Name;
@@ -32,10 +39,14 @@ namespace SEE.Tools
         public float Mean;
         [SerializeField]
         public float StandardDeviation;
+        public float Minimum = 0;
+        public float Maximum = float.PositiveInfinity;
 
         private const string NameLabel = "Name";
         private const string MeanLabel = "Mean";
         private const string StandardDeviationLabel = "StandardDeviation";
+        private const string MinimumLabel = "Minimum";
+        private const string MaximumLabel = "Maximum";
 
         /// <summary>
         /// <see cref="ConfigIO.PersistentConfigItem.Save()"/>
@@ -46,6 +57,8 @@ namespace SEE.Tools
             writer.Save(Name, NameLabel);
             writer.Save(Mean, MeanLabel);
             writer.Save(StandardDeviation, StandardDeviationLabel);
+            writer.Save(Minimum, MinimumLabel);
+            writer.Save(Maximum, MaximumLabel);
             writer.EndGroup();
         }
 
@@ -76,6 +89,8 @@ namespace SEE.Tools
             bool result = ConfigIO.Restore(values, NameLabel, ref Name);
             result = ConfigIO.Restore(values, MeanLabel, ref Mean) || result;
             result = ConfigIO.Restore(values, StandardDeviationLabel, ref StandardDeviation) || result;
+            result = ConfigIO.Restore(values, MinimumLabel, ref Minimum) || result;
+            result = ConfigIO.Restore(values, MaximumLabel, ref Maximum) || result;
             return result;
         }
     }
@@ -291,7 +306,9 @@ namespace SEE.Tools
             {
                 foreach (RandomAttributeDescriptor attr in attributes)
                 {
-                    node.SetFloat(attr.Name, RandomGaussian(random, attr.Mean, attr.StandardDeviation));
+                    node.SetFloat(attr.Name,
+                                  Mathf.Clamp(RandomGaussian(random, attr.Mean, attr.StandardDeviation),
+                                  attr.Minimum, attr.Maximum));
                 }
             }
         }
