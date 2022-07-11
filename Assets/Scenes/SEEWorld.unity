@@ -3399,6 +3399,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DemoWorld
       objectReference: {fileID: 0}
+    - target: {fileID: 1087644615075602, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1138170603376596, guid: 7e7e1770b238e724caee49f153d1b3d6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -10023,7 +10027,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &753629210
 Transform:
   m_ObjectHideFlags: 0
@@ -19743,7 +19747,7 @@ MonoBehaviour:
       Data: Class
     - Name: Shape
       Entry: 3
-      Data: 2
+      Data: 0
     - Name: IsRelevant
       Entry: 5
       Data: true
@@ -19972,12 +19976,8 @@ MonoBehaviour:
       Entry: 7
       Data: 15|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
-      Entry: 7
-      Data: 16|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 3
     - Name: 
       Entry: 12
       Data: 2
@@ -20100,7 +20100,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 17|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 16|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -20130,11 +20130,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 18|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 17|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 19|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 18|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -20150,11 +20150,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 19|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 19
+      Data: 18
     - Name: 
       Entry: 12
       Data: 0
@@ -20166,11 +20166,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 21|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 19
+      Data: 18
     - Name: 
       Entry: 12
       Data: 0
@@ -20182,11 +20182,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 22|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 21|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 19
+      Data: 18
     - Name: 
       Entry: 12
       Data: 0
@@ -20223,12 +20223,12 @@ MonoBehaviour:
   NodeLayoutSettings:
     Kind: 0
     LayoutPath:
-      Root: 2
-      relativePath: 
+      Root: 1
+      relativePath: /Data/GXL/similar-clones/similar-clones.gvl
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 1
-    EdgeWidth: 0.002
+    EdgeWidth: 0.005
     EdgesAboveBlocks: 1
     Tension: 0.85
     RDP: 0.0001
@@ -20260,8 +20260,8 @@ MonoBehaviour:
     StyleIssue_SUM: Metric.Style_SUM
     UniversalIssue_SUM: Metric.Universal_SUM
   GXLPath:
-    Root: 2
-    relativePath: 
+    Root: 1
+    relativePath: /Data/GXL/similar-clones/similar-clones.gxl
     absolutePath: 
   CSVPath:
     Root: 2
@@ -20279,44 +20279,70 @@ MonoBehaviour:
     EdgeDensity: 0
   LeafAttributes:
   - Name: Metric.Clone_Rate
-    Mean: 20
-    StandardDeviation: 15
+    Mean: 0.3
+    StandardDeviation: 0.2
+    Minimum: 0
+    Maximum: 1
   - Name: Metric.While
     Mean: 5
     StandardDeviation: 1
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.For
     Mean: 8
     StandardDeviation: 2
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Do
     Mean: 1
     StandardDeviation: 1
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.If
     Mean: 15
     StandardDeviation: 5
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Else
     Mean: 7
     StandardDeviation: 3
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Switch
     Mean: 3
     StandardDeviation: 3
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Assign
     Mean: 50
     StandardDeviation: 25
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Return
     Mean: 10
     StandardDeviation: 3
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Throw
     Mean: 6
     StandardDeviation: 2
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Id
     Mean: 80
     StandardDeviation: 40
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Literal
     Mean: 20
     StandardDeviation: 5
+    Minimum: 0.0001
+    Maximum: Infinity
   - Name: Metric.Semicolon
     Mean: 200
     StandardDeviation: 40
+    Minimum: 0.0001
+    Maximum: Infinity
 --- !u!114 &1885742589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20342,7 +20368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0030857325
+  HeightOffset: 0.003084302
 --- !u!65 &1885742591
 BoxCollider:
   m_ObjectHideFlags: 0
