@@ -137,10 +137,11 @@ namespace SEE.Game.City
                                 {
                                     minimumDistance = distance;
                                 }
-                                //Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
                                 if (distance <= threshold)
                                 {
-                                    LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone"));
+                                    //Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
+                                    Debug.Log($"{nodes[i].ID};{nodes[j].ID};{distance}\n");
+                                    LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone-" + distance));
                                     numberOfEdgesAdded++;
                                     isClone = true;
                                 }
