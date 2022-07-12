@@ -20,7 +20,7 @@ namespace SEE.GO.NodeFactories
         /// <param name="points">the set of points of a closed polygon for
         /// which triangles are to be created completely covering the area
         /// of the polygon</param>
-        /// <returns>list of triangles</returns>
+        /// <returns>list of triangles (indices into <paramref name="points"/>></returns>
         public static int[] Triangulate(Vector2[] points)
         {
             List<int> indices = new List<int>();
@@ -74,14 +74,11 @@ namespace SEE.GO.NodeFactories
 
                 if (Snip(points, u, v, w, nv, vertices))
                 {
-                    int a, b, c, s, t;
-                    a = vertices[u];
-                    b = vertices[v];
-                    c = vertices[w];
-                    indices.Add(a);
-                    indices.Add(b);
-                    indices.Add(c);
+                    indices.Add(vertices[u]);
+                    indices.Add(vertices[v]);
+                    indices.Add(vertices[w]);
                     m++;
+                    int s, t;
                     for (s = v, t = v + 1; t < nv; s++, t++)
                     {
                         vertices[s] = vertices[t];
@@ -113,13 +110,25 @@ namespace SEE.GO.NodeFactories
             return (area * 0.5f);
         }
 
-        private static bool Snip(Vector2[] points, int u, int v, int w, int n, int[] V)
+        /// <summary>
+        /// Return whether the triangle defined by the given vertex indices needs to be snipped.
+        /// </summary>
+        /// <param name="points">the set of points of a closed polygon for
+        /// which triangles are to be created completely covering the area
+        /// of the polygon</param>
+        /// <param name="u">first vertex index of triangle (index for <paramref name="points"/>)</param>
+        /// <param name="v">second vertex index of triangle (index for <paramref name="points"/>)</param>
+        /// <param name="w">third vertex index of triangle (index for <paramref name="points"/>)</param>
+        /// <param name="n">number of points</param>
+        /// <param name="vertices">vertex indices of triangls into <paramref name="points"/></param>
+        /// <returns>true if the triangle defined by the given vertex indices needs to be snipped</returns>
+        private static bool Snip(Vector2[] points, int u, int v, int w, int n, int[] vertices)
         {
             int p;
-            Vector2 A = points[V[u]];
-            Vector2 B = points[V[v]];
-            Vector2 C = points[V[w]];
-            if (Mathf.Epsilon > (((B.x - A.x) * (C.y - A.y)) - ((B.y - A.y) * (C.x - A.x))))
+            Vector2 a = points[vertices[u]];
+            Vector2 b = points[vertices[v]];
+            Vector2 c = points[vertices[w]];
+            if (Mathf.Epsilon > (((b.x - a.x) * (c.y - a.y)) - ((b.y - a.y) * (c.x - a.x))))
             {
                 return false;
             }
@@ -129,8 +138,7 @@ namespace SEE.GO.NodeFactories
                 {
                     continue;
                 }
-                Vector2 P = points[V[p]];
-                if (InsideTriangle(A, B, C, P))
+                if (InsideTriangle(a, b, c, points[vertices[p]]))
                 {
                     return false;
                 }
@@ -138,21 +146,33 @@ namespace SEE.GO.NodeFactories
             return true;
         }
 
-        private static bool InsideTriangle(Vector2 A, Vector2 B, Vector2 C, Vector2 P)
+        /// <summary>
+        /// Returns whether <paramref name="point"/> is enclosed in the triangle formed by
+        /// <paramref name="a"/>, <paramref name="b"/>, and <paramref name="c"/>.
+        /// </summary>
+        /// <param name="a">first point of a triangle</param>
+        /// <param name="b">second point of a triangle</param>
+        /// <param name="c">third point of a triangle</param>
+        /// <param name="point">a point to be checked</param>
+        /// <returns>true if <paramref name="point"/> is enclosed in the triangle</returns>
+        private static bool InsideTriangle(Vector2 a, Vector2 b, Vector2 c, Vector2 point)
         {
-            float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-            float cCROSSap, bCROSScp, aCROSSbp;
+            float ax = c.x - b.x;
+            float ay = c.y - b.y;
+            float bx = a.x - c.x;
+            float by = a.y - c.y;
+            float cx = b.x - a.x;
+            float cy = b.y - a.y;
+            float apx = point.x - a.x;
+            float apy = point.y - a.y;
+            float bpx = point.x - b.x;
+            float bpy = point.y - b.y;
+            float cpx = point.x - c.x;
+            float cpy = point.y - c.y;
 
-            ax = C.x - B.x; ay = C.y - B.y;
-            bx = A.x - C.x; by = A.y - C.y;
-            cx = B.x - A.x; cy = B.y - A.y;
-            apx = P.x - A.x; apy = P.y - A.y;
-            bpx = P.x - B.x; bpy = P.y - B.y;
-            cpx = P.x - C.x; cpy = P.y - C.y;
-
-            aCROSSbp = ax * bpy - ay * bpx;
-            cCROSSap = cx * apy - cy * apx;
-            bCROSScp = bx * cpy - by * cpx;
+            float aCROSSbp = ax * bpy - ay * bpx;
+            float cCROSSap = cx * apy - cy * apx;
+            float bCROSScp = bx * cpy - by * cpx;
 
             return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
         }
