@@ -57,16 +57,8 @@ namespace SEE.GO.NodeFactories
 
             CheckPreconditions(allButHeight);
 
-            Vector2[] vertices = MetricsToVertices(allButHeight, out float radius);
-            Vector2[] vertices2D = new Vector2[vertices.Length];
-            Vector3[] vertices3D = new Vector3[vertices.Length];
-            for (int v = 0; v < vertices.Length; v++)
-            {
-                Vector3 vertex = vertices[v];
-                vertices2D[v] = new Vector2(vertex.x, vertex.y);
-                vertices3D[v] = new Vector3(vertex.x, 0, vertex.y);
-            }
-            // TODO: The mesh is currently only two-dimensional.
+            Add3D(MetricsToVertices(allButHeight), null, out Vector3[] vertices3D, out int[] triangles3D);
+
             Mesh mesh = new Mesh
             {
                 name = "SEESPolygonMesh"
@@ -74,7 +66,7 @@ namespace SEE.GO.NodeFactories
             mesh.vertices = vertices3D;
             // It is recommended to assign a triangle array after assigning the
             // vertex array, in order to avoid out of bounds errors.
-            mesh.triangles = Triangulator.Triangulate(vertices2D);
+            mesh.triangles = triangles3D;
 
             return mesh;
 
@@ -108,11 +100,11 @@ namespace SEE.GO.NodeFactories
             }
         }
 
-        private Vector2[] MetricsToVertices(float[] metrics, out float radius)
+        private Vector2[] MetricsToVertices(float[] metrics)
         {
             Vector2[] result = new Vector2[metrics.Length];
-            radius = FindRadius(metrics, 0.0001f, out uint i);
-            Debug.Log($"radius = {radius:F6} using {i} iterations.\n");
+            float radius = FindRadius(metrics, 0.0001f, out uint i);
+            //Debug.Log($"radius = {radius:F6} using {i} iterations.\n");
 
             // We start at 12 o'clock.
             float radian = Mathf.PI / 2;

@@ -310,5 +310,84 @@ namespace SEE.GO.NodeFactories
         {
             return metrics.Where((value, index) => index != 1);
         }
+
+        protected static void Add3D(Vector2[] groundAreaVertices, int[] groundAreaTriangles, out Vector3[] vertices3D, out int[] triangles3D)
+        {
+            // The triangle indices for the 2D vertices of the ground area.
+            if (groundAreaTriangles == null)
+            {
+                groundAreaTriangles = Triangulator.Triangulate(groundAreaVertices);
+            }
+
+            vertices3D = new Vector3[2 * groundAreaVertices.Length];
+            for (int i = 0; i < groundAreaVertices.Length; i++)
+            {
+                Vector3 vertex = groundAreaVertices[i];
+                // Roof
+                vertices3D[i] = new Vector3(vertex.x, 0.5f, vertex.y);
+                // Ground
+                vertices3D[i + groundAreaVertices.Length] = new Vector3(vertex.x, -0.5f, vertex.y);
+            }
+
+            // We need triangles for the roof and ground and triangles for each side (height) of the
+            // object, where each side is a rectangle requiring two triangles.
+            triangles3D = new int[2 * groundAreaTriangles.Length + 2 * 3 * groundAreaVertices.Length];
+            Debug.Log($"#triangles for roof and ground: {2 * groundAreaTriangles.Length} for sides: {2 * 3 * groundAreaVertices.Length}. Total: {triangles3D.Length}.\n");
+
+            int nextTriangleIndex = 0;
+            // Triangles for the roof.
+            for (; nextTriangleIndex < groundAreaTriangles.Length; nextTriangleIndex++)
+            {
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[nextTriangleIndex];
+            }
+            // Triangles for the ground.
+            for (int i = 0; i < groundAreaTriangles.Length; i += 3)
+            {
+                // We need to invert the order of the triangle vertices because
+                // Unity uses clockwise winding order for determining front-facing triangles
+                // and here we are forming the ground area.
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i + 2] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i + 1] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+            }
+            // Triangles for the sides
+            for (int i = 0; i < groundAreaVertices.Length - 1; i++)
+            {
+                //Debug.Log($"nextTriangleIndex={nextTriangleIndex} i={i}\n");
+                // First triangle of the rectangle
+                triangles3D[nextTriangleIndex] = i;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length + 1;
+                nextTriangleIndex++;
+
+                // Second triangle of the rectangle
+                triangles3D[nextTriangleIndex] = i;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length + 1;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + 1;
+                nextTriangleIndex++;
+            }
+            // The final rectangle (special case because we are connecting the last
+            // vertices with the first vertices.
+            // First triangle.
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1 + groundAreaVertices.Length;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length;
+            nextTriangleIndex++;
+            // Second triangle.
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = 0;
+        }
     }
 }
