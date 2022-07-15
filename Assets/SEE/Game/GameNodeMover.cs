@@ -123,6 +123,7 @@ namespace SEE.Game
                     // If the node was already mapped, we'll unmap it again.
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.DeleteFromMapping(movingNode);
+                    
                     return movingObject.transform.parent.gameObject;
                 }
                 return null;

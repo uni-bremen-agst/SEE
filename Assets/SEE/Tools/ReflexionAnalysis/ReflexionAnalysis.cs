@@ -326,13 +326,10 @@ namespace SEE.Tools.ReflexionAnalysis
             // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
             if (newValue <= 0)
             {
-                // TODO(koschke): Why was this needed — do we still need this code fragment?
-                /*
-                if (GetState(edge) == State.divergent)
+                if (edge.State() == State.Divergent)
                 {
-                    Transition(edge, State.divergent, State.undefined);
+                    Transition(edge, State.Divergent, State.Undefined);
                 }
-                */
                 // We can drop this edge; it is no longer needed. Because the edge is
                 // dropped and all observers are informed about the removal of this
                 // edge, we do not need to inform them about its state change from
