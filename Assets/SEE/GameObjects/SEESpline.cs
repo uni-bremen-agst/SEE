@@ -540,6 +540,12 @@ namespace SEE.GO
         private Morphism morphism;
 
         /// <summary>
+        /// The tween which can play the spline morphism from <see cref="Source"/>
+        /// to <see cref="Target"/>, created by <see cref="CreateTween"/>.
+        /// </summary>
+        public Tween tween;
+
+        /// <summary>
         /// Creates a new <see cref="Tween"/> which can play the spline morphism from <paramref name="source"/>
         /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
@@ -553,7 +559,17 @@ namespace SEE.GO
         public Tween CreateTween(BSpline source, BSpline target, float duration)
         {
             Init(source, target);
-            return DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+            return tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+        }
+
+        /// <summary>
+        /// Changes the target of the morphism to <paramref name="newTarget"/>.
+        /// </summary>
+        /// <param name="newTarget">The new target of this morphism.</param>
+        public void ChangeTarget(BSpline newTarget)
+        {
+            Target = newTarget;
+            morphism = Source.MorphTo(Target);
         }
 
         /// <summary>
