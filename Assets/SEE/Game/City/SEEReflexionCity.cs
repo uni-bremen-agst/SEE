@@ -70,7 +70,7 @@ namespace SEE.Game.City
         /// Root node of the implementation subgraph.
         /// </summary>
         public Node ImplementationRoot => implementationRoot;
-        
+
         /// <summary>
         /// Root node of the architecture subgraph.
         /// </summary>
@@ -345,6 +345,7 @@ namespace SEE.Game.City
 
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
+            Debug.Log(edgeChange);
             GameObject edge = GameObject.Find(edgeChange.Edge.ID);
             if (edge == null)
             {
@@ -359,11 +360,11 @@ namespace SEE.Game.City
                 // Animate color change for nicer visuals.
                 // We need two tweens for this, one for each end of the gradient.
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
-                                                c => spline.GradientColors = (c, spline.GradientColors.end),
-                                                newColors.start, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                                              c => spline.GradientColors = (c, spline.GradientColors.end),
+                                              newColors.start, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
-                                              c => spline.GradientColors = (spline.GradientColors.start, c),
-                                              newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                                            c => spline.GradientColors = (spline.GradientColors.start, c),
+                                            newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
                 // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
                 startTween.Play();
                 endTween.Play();
@@ -452,23 +453,9 @@ namespace SEE.Game.City
         {
             ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
             Node implNode = mapsToEdge.Source;
-            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
             GameObject implGameNode = implNode.RetrieveGameNode();
-            
-            // We have to basically reverse what happened in HandleNewMapping.
-            // For the new position, we simply drop the node where the user dragged it to,
-            // even if that leaves the node "drifting in space".
-            // Since the node is already at its new position, we first have to put it at its old position
-            // by repeating the steps from HandleNewMapping here.
-            Vector3 newPosition = implGameNode.transform.position;
-            Vector3 oldPosition = archGameNode.transform.position;
-            
-            implGameNode.transform.position = oldPosition;
-            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
-            oldPosition = implGameNode.transform.position;
-            implGameNode.transform.position = oldPosition;
-            
-            AnimateNodeMovement(implGameNode, newPosition, Vector3.one);
+
+            AnimateNodeMovement(implGameNode, implGameNode.transform.position, implGameNode.transform.localScale);
         }
 
         private static void HandleNewMapping(Edge mapsToEdge)
@@ -482,18 +469,15 @@ namespace SEE.Game.City
             GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
             GameObject implGameNode = implNode.RetrieveGameNode();
 
-            // Move implementation node to architecture node, sizing it down accordingly.
             Vector3 oldPosition = implGameNode.transform.position;
-            Vector3 newPosition = archGameNode.transform.position;
-            
-            // This might be kind of confusing, but we need to move the node to the new position
-            // first so that `GameNodeMover.PutOn` works correctly, then move it back to the old
-            // position so that the animation works correctly.
-            implGameNode.transform.position = newPosition;
-            GameNodeMover.PutOn(implGameNode.transform, archGameNode);
-            newPosition = implGameNode.transform.position;
+
+            // TODO: Rather than returning the old scale from PutOn, lossyScale should be used.
+            Vector3 oldScale = GameNodeMover.PutOn(implGameNode.transform, archGameNode, scaleDown: true, topPadding: 0.3f);
+            Vector3 newPosition = implGameNode.transform.position;
+            Vector3 newScale = implGameNode.transform.localScale;
             implGameNode.transform.position = oldPosition;
-            AnimateNodeMovement(implGameNode, newPosition, new Vector3(0.5f, 0.5f, 0.5f));
+            implGameNode.transform.localScale = oldScale;
+            AnimateNodeMovement(implGameNode, newPosition, newScale);
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)

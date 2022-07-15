@@ -44,7 +44,6 @@ namespace SEE.Utils
         private static readonly ISet<string> ignoredUINames =
             new HashSet<string>
             {
-                // TODO @koschke: Is it alright to let clicks on this "fall through" to below game objects?
                 "ChatBox" // ignored because otherwise it'd obscure half the screen.
             };
 

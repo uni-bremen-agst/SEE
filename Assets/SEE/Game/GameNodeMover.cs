@@ -5,6 +5,7 @@ using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
 using static SEE.Utils.Raycasting;
 
@@ -18,21 +19,26 @@ namespace SEE.Game
         /// <summary>
         /// The speed by which to move a selected object.
         /// </summary>
-        private static float MovingSpeed = 1.0f;
+        private const float MOVING_SPEED = 1.0f;
+
+        /// <summary>
+        /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
+        /// </summary>
+        public const float SCALING_FACTOR = 0.5f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
         /// camera. The radius sphere of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MovingSpeed"/>.
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
         ///
         /// This method is expected to be called at every Update().
         /// </summary>
         /// <param name="movingObject">the object to be moved.</param>
         public static void MoveTo(GameObject movingObject)
         {
-            float step = MovingSpeed * Time.deltaTime;
+            float step = MOVING_SPEED * Time.deltaTime;
             // FIXME regarding 'target': currently, the tip of the ray is of a fixed distance from
             // the ray starting position into the ray direction. it would be better if we did a
             // raycast into the scene, see what we hit and use that as the tip. the result feels
@@ -108,15 +114,16 @@ namespace SEE.Game
                 // Attempt to move the node outside of any node in the node hierarchy.
                 if (movingNode.IsInImplementation() && movingNode.IsInMapping())
                 {
-                    // If the node was already mapped, we'll unmap it again.
                     SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
+                    
+                    // We'll change its parent so it becomes a root node in the implementation city.
+                    // The user will have to drop it on another node to re-parent it.
+                    movingObject.transform.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
+                    
+                    // If the node was already mapped, we'll unmap it again.
                     Reflexion analysis = reflexionCity.Analysis;
                     analysis.DeleteFromMapping(movingNode);
-                    
-                    // We'll also change its parent so it becomes a root node in the implementation city.
-                    // The user will have to drop it on another node to re-parent it.
-                    movingNode.Parent = reflexionCity.ImplementationRoot;
-                    return movingNode.Parent.RetrieveGameNode();
+                    return movingObject.transform.parent.gameObject;
                 }
                 return null;
             }
@@ -135,7 +142,7 @@ namespace SEE.Game
             if (parent != null)
             {
                 child.transform.position = position;
-                PutOn(child.transform, parent);
+                PutOn(child.transform, parent, parent.transform.position.XZ());
                 child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
                 child.transform.SetParent(parent.transform);
             }
@@ -146,22 +153,39 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
+        /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
+        /// assuming <paramref name="scaleDown"/> is true.
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
-        /// <param name="setParent">Whether <paramref name="parent"/> should become a parent
-        /// of <paramref name="child"/></param>
-        public static void PutOn(Transform child, GameObject parent, bool setParent = true)
+        /// <param name="targetXZ">XZ coordinates <paramref name="child"/> should be placed at
+        /// (will be center of <paramref name="parent"/> if not given)</param>
+        /// <param name="topPadding">Additional amount of empty space that should be between <paramref name="parent"/>
+        /// and <paramref name="child"/>, given as a percentage of the parent's height</param>
+        /// <param name="setParent">Whether <paramref name="parent"/> should become a parent of
+        /// <paramref name="child"/></param>
+        /// <param name="scaleDown">Whether <paramref name="child"/> should be scaled down to fit into
+        /// <paramref name="parent"/></param>
+        /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
+        /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
+        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, float topPadding = 0,
+                                 bool setParent = true, bool scaleDown = false)
         {
-            Vector3 childCenter = child.position;
-            float parentRoof = parent.GetRoof();
-            childCenter.y = parentRoof + child.lossyScale.y / 2.0f;
-            child.position = childCenter;
             if (setParent)
             {
                 child.SetParent(parent.transform);
             }
+            Vector3 oldScale = child.localScale;
+            if (scaleDown)
+            {
+                child.localScale = new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR);
+            }
+            
+            targetXZ ??= child.position.XZ();
+            float parentRoof = parent.GetRoof();
+            Vector3 targetPosition = new Vector3(targetXZ.Value.x, parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, targetXZ.Value.y);
+            child.position = targetPosition;
+            return oldScale;
         }
 
         /// <summary>
@@ -169,7 +193,7 @@ namespace SEE.Game
         /// camera. The radius of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
         ///
         /// This method is expected to be called at every Update().
         ///
@@ -181,7 +205,7 @@ namespace SEE.Game
         /// <param name="lockZ">whether the movement should be locked on this axis</param>
         public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
         {
-            float step = MovingSpeed * Time.deltaTime;
+            float step = MOVING_SPEED * Time.deltaTime;
             Vector3 target = TipOfRayPosition(movingObject);
             Vector3 movingObjectPos = movingObject.transform.position;
 

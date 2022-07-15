@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using RootMotion.FinalIK;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Net;
 using SEE.Utils;
+using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Utils.Raycasting;
@@ -302,6 +305,27 @@ namespace SEE.Controls.Actions
                     Transform draggedObject = SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode;
                     hit = new Hit(draggedObject);
                     memento = new Memento(draggedObject);
+                    
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
+                    {
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
+                        }
+                        else
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
+                        }
+
+                        if (!hitEdge.connectedSpline.TryGetComponent(out SplineMorphism morphism))
+                        {
+                            morphism = hitEdge.connectedSpline.gameObject.AddComponent<SplineMorphism>();
+                        }
+
+                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, 0.5f).SetEase(Ease.InOutExpo).Play();
+                    }
 
                     hit.InteractableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
@@ -312,8 +336,7 @@ namespace SEE.Controls.Actions
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
-                    // FIXME: This works for the initial local scale of a node, but not after resizing—why?
-                    Debug.Log($"planeHitPoint: {planeHitPoint}, dragStartOffset: {dragStartOffset}, dragCanonicalOffset: {dragCanonicalOffset}\nLossy: {hit.HoveredObject.lossyScale}");
+                    // FIXME: Doesn't work in certain perspectives, particular when looking at the horizon. 
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
@@ -326,32 +349,54 @@ namespace SEE.Controls.Actions
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
 
-                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+                    RaycastLowestNode(out RaycastHit? raycastHit, out Node _, hit.node);
+                    // TODO: Adjust for snapping
+                    Vector3 newPosition = raycastHit?.point ?? dragStartTransformPosition + totalDragOffsetFromStart;
+                    ResetHitObjectColor();
+                    Positioner.Set(hit.HoveredObject, newPosition);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.HoveredObject.position;
                     gizmo.SetPositions(startPoint, endPoint);
 
-                    ResetHitObjectColor();
-                    RaycastLowestNode(out RaycastHit? raycastHit, out Node _, hit.node);
                     if (raycastHit.HasValue)
                     {
-                        GameNodeMover.PutOn(hit.HoveredObject.transform, raycastHit.Value.collider.gameObject, false);
+                        GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: false);
                         SetHitObjectColor(raycastHit.Value);
                     }
                     
                     // We will also "stick" the connected edges to the moved node during its movement.
                     // In order to do this, we need to modify the splines of each one.
-                    foreach ((SEESpline spline, bool nodeIsSource) edge in hit.ConnectedEdges)
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
                     {
-                        if (edge.nodeIsSource)
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
                         {
-                            edge.spline.UpdateStartPosition(hit.HoveredObject.transform.position);
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
                         }
                         else
                         {
-                            edge.spline.UpdateEndPosition(hit.HoveredObject.transform.position);
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
                         }
+                        SplineMorphism morphism = hitEdge.connectedSpline.gameObject.GetComponent<SplineMorphism>();
+                        if (morphism.tween.IsPlaying())
+                        {
+                            morphism.ChangeTarget(spline);
+                        }
+                        else
+                        {
+                            hitEdge.connectedSpline.Spline = spline;
+                        }
+                        
+                        // if (hitEdge.nodeIsSource)
+                        // {
+                        //     hitEdge.connectedSpline.UpdateStartPosition(hit.HoveredObject.transform.position);
+                        // }
+                        // else
+                        // {
+                        //     hitEdge.connectedSpline.UpdateEndPosition(hit.HoveredObject.transform.position);
+                        // }
                     }
 
                     synchronize = true;
