@@ -326,10 +326,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
             if (newValue <= 0)
             {
-                if (edge.State() == State.Divergent)
-                {
-                    Transition(edge, State.Divergent, State.Unmapped);
-                }
+                Transition(edge, edge.State(), State.Unmapped);
                 // We can drop this edge; it is no longer needed.
                 SetCounter(edge, 0);
                 Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
