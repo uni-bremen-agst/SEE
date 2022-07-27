@@ -79,9 +79,9 @@ namespace SEE.Game
             {
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
-                // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
+                    // Reflexion analysis: Dropping implementation node on architecture node
                     // TODO: Make sure this action is still reversible
                     SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
                     Reflexion analysis = reflexionCity.Analysis;
@@ -94,20 +94,25 @@ namespace SEE.Game
                                                                  + "architecture, not the other way around.");
                     return null;
                 }
-                else
+                // The new position of the movingNode in world space.
+                Vector3 newPosition = raycastHit.Value.point;
+                movingObject.transform.position = newPosition;
+                PutOn(movingObject.transform, newGameParent);
+                if (movingNode.Parent != newGraphParent)
                 {
-                    // The new position of the movingNode in world space.
-                    Vector3 newPosition = raycastHit.Value.point;
-                    movingObject.transform.position = newPosition;
-                    PutOn(movingObject.transform, newGameParent);
-                    if (movingNode.Parent != newGraphParent)
-                    {
-                        movingNode.Reparent(newGraphParent);
-                        movingObject.transform.SetParent(newGameParent.transform);
-                    }
-
-                    return newGameParent;
+                    movingNode.Reparent(newGraphParent);
+                    movingObject.transform.SetParent(newGameParent.transform);
                 }
+                
+                if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
+                {
+                    // We are moving an already mapped node back to its implementation city, so we should unmap it.
+                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.DeleteFromMapping(movingNode);
+                }
+
+                return newGameParent;
             }
             else
             {
