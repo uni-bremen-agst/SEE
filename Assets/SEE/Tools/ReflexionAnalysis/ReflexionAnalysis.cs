@@ -328,12 +328,9 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (edge.State() == State.Divergent)
                 {
-                    Transition(edge, State.Divergent, State.Undefined);
+                    Transition(edge, State.Divergent, State.Unmapped);
                 }
-                // We can drop this edge; it is no longer needed. Because the edge is
-                // dropped and all observers are informed about the removal of this
-                // edge, we do not need to inform them about its state change from
-                // divergent/allowed/implicitlyAllowed to undefined.
+                // We can drop this edge; it is no longer needed.
                 SetCounter(edge, 0);
                 Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
                 propagationTable.Remove(edge.ID);
