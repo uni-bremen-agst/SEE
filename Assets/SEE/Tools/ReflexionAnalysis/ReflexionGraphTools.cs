@@ -13,27 +13,33 @@ namespace SEE.Tools.ReflexionAnalysis
     /// <summary>
     /// Type of a reflexion subgraph.
     /// </summary>
+    [Flags]
     public enum ReflexionSubgraph
     {
         /// <summary>
+        /// No reflexion subgraph.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// The implementation graph.
         /// </summary>
-        Implementation,
+        Implementation = 1 << 0,
 
         /// <summary>
         /// The architecture graph.
         /// </summary>
-        Architecture,
+        Architecture = 1 << 1,
 
         /// <summary>
         /// The mapping graph.
         /// </summary>
-        Mapping,
+        Mapping = 1 << 2,
 
         /// <summary>
         /// The full reflexion graph.
         /// </summary>
-        FullReflexion
+        FullReflexion = 1 << 3
     }
 
     /// <summary>
@@ -163,7 +169,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 return events;
             }
         }
-        
+
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
@@ -193,13 +199,25 @@ namespace SEE.Tools.ReflexionAnalysis
         public const string MapsToType = "Maps_To";
 
         /// <summary>
+        /// Returns all subgraphs this <paramref name="element"/> is in.
+        /// Use <c>Enum.HasFlag</c> to check the resulting value.
+        /// </summary>
+        public static ReflexionSubgraph GetSubgraph(this GraphElement element) =>
+            Enum.GetValues(typeof(ReflexionSubgraph))
+                .Cast<ReflexionSubgraph>()
+                .Where(element.IsIn)
+                .Aggregate(None, (acc, x) => acc & x);
+
+        /// <summary>
         /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
         /// </summary>
         /// <param name="subgraph">Subgraph whose containment of this <paramref name="element"/> will be checked</param>
         /// <returns>
         /// Whether this <paramref name="element"/> is contained in the given <paramref name="subgraph"/> type.
         /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the given <paramref name="subgraph"/> is unknown
+        /// </exception>
         public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
         {
             switch (subgraph)
@@ -213,7 +231,10 @@ namespace SEE.Tools.ReflexionAnalysis
                            || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping));
                 case FullReflexion:
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
-                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+                case None:
+                    return !element.IsInReflexion();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
         }
 
@@ -237,6 +258,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     element.SetToggle(Architecture.GetLabel());
                     break;
                 case Mapping:
+                case None:
                 case FullReflexion:
                     throw new InvalidOperationException("Can't explicitly assign graph element to "
                                                         + $"'{subgraph}' (only implicitly)!");
@@ -258,7 +280,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
         public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
-        
+
         /// <summary>
         /// Returns true if <paramref name="edge"/> is in the reflexion graph.
         /// </summary>
@@ -303,7 +325,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name, 
+        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name,
                                      out Node ArchitectureRoot, out Node ImplementationRoot)
         {
             if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
@@ -311,7 +333,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 throw new ArgumentException("All three sub-graphs must be loaded before generating "
                                             + "the full graph.");
             }
-            
+
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
             ArchitectureRoot = GraphRenderer.AddRootIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
             ImplementationRoot = GraphRenderer.AddRootIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
@@ -320,7 +342,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // automatically belongs to it
             ArchitectureGraph.MarkGraphNodesIn(Architecture);
             ImplementationGraph.MarkGraphNodesIn(Implementation);
-            
+
             // We need to set all Maps_To edges as virtual so they don't get drawn.
             // (Mapping is indicated by moving the implementation node, not by a separate edge.)
             foreach (Edge mapsTo in MappingGraph.Edges())
@@ -374,7 +396,6 @@ namespace SEE.Tools.ReflexionAnalysis
             // Returns the intersection of the edge IDs of the two graphs.
             IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
                 => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-            
 
             #endregion
         }
