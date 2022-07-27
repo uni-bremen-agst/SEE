@@ -210,10 +210,6 @@ namespace SEE.GO
         {
             if (needsUpdate)
             {
-                if (gameObject.TryGetEdge(out Edge edge) && edge.IsInArchitecture())
-                {
-                    Debug.Log($"Coloring edge {edge.ToShortString()}.\n");
-                }
                 UpdateLineRenderer();
                 UpdateMesh();
                 needsUpdate = false;
