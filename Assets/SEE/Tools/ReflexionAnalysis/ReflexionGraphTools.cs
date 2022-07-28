@@ -335,8 +335,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            ArchitectureRoot = GraphRenderer.AddRootIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
-            ImplementationRoot = GraphRenderer.AddRootIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
+            ArchitectureRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
+            ImplementationRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it

@@ -1,7 +1,7 @@
 ﻿using SEE.Game;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.NodeFactories
 {
     /// <summary>
     /// A factory for cylinder game objects.
@@ -45,8 +45,9 @@ namespace SEE.GO
         /// Returns a (cached) cylinder mesh.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
+        /// <param name="metrics">this parameter will be ignored</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
-        protected override Mesh GetMesh()
+        protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)
             {
@@ -63,7 +64,7 @@ namespace SEE.GO
             float radius = DEFAULT_RADIUS;
             float length = DEFAULT_HEIGHT;
 
-            //sanity check
+            // sanity check
             if (radialSegments < MIN_RADIAL_SEGMENTS)
             {
                 radialSegments = MIN_RADIAL_SEGMENTS;
@@ -226,11 +227,11 @@ namespace SEE.GO
 
             Vector4[] tangents = new Vector4[vertexCount];
 
-            for (long a = 0; a < triangleCount; a += 3)
+            for (long triangle = 0; triangle < triangleCount; triangle += 3)
             {
-                long i1 = triangles[a + 0];
-                long i2 = triangles[a + 1];
-                long i3 = triangles[a + 2];
+                long i1 = triangles[triangle + 0];
+                long i2 = triangles[triangle + 1];
+                long i3 = triangles[triangle + 2];
 
                 Vector3 v1 = vertices[i1];
                 Vector3 v2 = vertices[i2];
@@ -266,19 +267,19 @@ namespace SEE.GO
                 tan2[i3] += tdir;
             }
 
-            for (long a = 0; a < vertexCount; ++a)
+            for (int vertex = 0; vertex < vertexCount; ++vertex)
             {
-                Vector3 n = normals[a];
-                Vector3 t = tan1[a];
+                Vector3 normal = normals[vertex];
+                Vector3 tangent = tan1[vertex];
 
                 //Vector3 tmp = (t - n * Vector3.Dot(n, t)).normalized;
                 //tangents[a] = new Vector4(tmp.x, tmp.y, tmp.z);
-                Vector3.OrthoNormalize(ref n, ref t);
-                tangents[a].x = t.x;
-                tangents[a].y = t.y;
-                tangents[a].z = t.z;
+                Vector3.OrthoNormalize(ref normal, ref tangent);
+                tangents[vertex].x = tangent.x;
+                tangents[vertex].y = tangent.y;
+                tangents[vertex].z = tangent.z;
 
-                tangents[a].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[a]) < 0.0f) ? -1.0f : 1.0f;
+                tangents[vertex].w = (Vector3.Dot(Vector3.Cross(normal, tangent), tan2[vertex]) < 0.0f) ? -1.0f : 1.0f;
             }
 
             mesh.tangents = tangents;
