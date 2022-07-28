@@ -2,6 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GO.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;

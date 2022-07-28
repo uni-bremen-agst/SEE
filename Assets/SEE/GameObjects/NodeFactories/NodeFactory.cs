@@ -1,9 +1,11 @@
-﻿using SEE.Controls.Interactables;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.Game;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.NodeFactories
 {
     /// <summary>
     /// A factory for visual representations of graph nodes in the scene.
@@ -49,14 +51,21 @@ namespace SEE.GO
         /// This parameter can be used for the rendering of transparent objects,
         /// where the inner nodes must be rendered before the leaves to ensure
         /// correct sorting.
+        ///
+        /// Parameter <paramref name="metrics"/> specifies the lengths of the returned
+        /// object. If <c>null</c>, the default lengths are used. What a "length"
+        /// constitutes, depends upon the kind of shape (mesh) used for the object
+        /// and may be decided by subclasses of this <see cref="NodeFactory"/>.
+        /// For instance, for a cube, the dimensions are its widths, height, and
+        /// depth.
         /// </summary>
         /// <param name="style">specifies an additional visual style parameter of
         /// the object</param>
         /// <returns>new node representation</returns>
-        /// <param name="renderQueueOffset">offset in the render queue</param>
-        public virtual GameObject NewBlock(int style = 0)
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        public virtual GameObject NewBlock(int style = 0, float[] metrics = null)
         {
-            GameObject result = CreateBlock();
+            GameObject result = CreateBlock(metrics);
             MeshRenderer renderer = result.AddComponent<MeshRenderer>();
             materials.SetSharedMaterial(renderer, index: style);
             renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
@@ -68,28 +77,60 @@ namespace SEE.GO
         /// <summary>
         /// Returns a new game object to represent a node.
         /// </summary>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         /// <returns>new game object for a node</returns>
-        private GameObject CreateBlock()
+        private GameObject CreateBlock(float[] metrics)
         {
             GameObject gameObject = new GameObject() { tag = Tags.Node };
-            AddCollider(gameObject);
             // A MeshFilter is necessary for the gameObject to hold a mesh.
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = GetMesh();
+            meshFilter.sharedMesh = GetMesh(metrics);
+            SetDimensions(gameObject, metrics);
+            AddCollider(gameObject);
             return gameObject;
         }
 
         /// <summary>
         /// Returns a mesh for a node.
         /// </summary>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         /// <returns>mesh for a node</returns>
-        protected abstract Mesh GetMesh();
+        protected abstract Mesh GetMesh(float[] metrics);
 
         /// <summary>
         /// Adds an appropriate collider to <paramref name="gameObject"/>.
         /// </summary>
         /// <param name="gameObject">the game object receiving the collider</param>
         protected abstract void AddCollider(GameObject gameObject);
+
+        /// <summary>
+        /// Sets the dimensions of <paramref name="gameObject"/>.
+        ///
+        /// The default behaviour is (if <paramref name="metrics"/> is different from
+        /// <c>null</c>) to set the width of <paramref name="gameObject"/> to
+        /// the first entry of <paramref name="metrics"/>, the depth to the second entry,
+        /// and the height to the third entry. That requires that <paramref name="metrics"/>
+        /// has at least three entries. If <paramref name="metrics"/> is <c>null</c>,
+        /// nothing happens.
+        ///
+        /// Note: This method may be overridden by subclasses.
+        /// </summary>
+        /// <param name="gameObject">the game object whose dimensions are to be set</param>
+        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        protected virtual void SetDimensions(GameObject gameObject, float[] metrics)
+        {
+            if (metrics != null)
+            {
+                if (metrics.Length < 3)
+                {
+                    throw new Exception("At least three dimensions must be given.");
+                }
+                else
+                {
+                    SetSize(gameObject, new Vector3(metrics[0], metrics[1], metrics[2]));
+                }
+            }
+        }
 
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
@@ -136,19 +177,7 @@ namespace SEE.GO
         /// <returns>size of the block</returns>
         public virtual Vector3 GetSize(GameObject block)
         {
-            // Nodes represented by cubes have a renderer from which we can derive the
-            // extent.
-            Renderer renderer = block.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                // This is the axis-aligned bounding box fully enclosing the object in world space.
-                return renderer.bounds.size;
-            }
-            else
-            {
-                Debug.LogErrorFormat("Node {0} (tag: {1}) without renderer.\n", block.name, block.tag);
-                return Vector3.one;
-            }
+            return block.transform.lossyScale;
         }
 
         /// <summary>
@@ -271,5 +300,94 @@ namespace SEE.GO
         /// It will be ceated in <see cref="GetMesh()"/> on demand.
         /// </summary>
         protected static Mesh modelMesh;
+
+        /// <summary>
+        /// Returns all <paramref name="metrics"/> except for the height metric (index 1).
+        /// </summary>
+        /// <param name="metrics">the metric values to be put onto the spider axes</param>
+        /// <returns>all <paramref name="metrics"/> but the height metric at index 1</returns>
+        protected static IEnumerable<float> AllButHeight(float[] metrics)
+        {
+            return metrics.Where((value, index) => index != 1);
+        }
+
+        protected static void Add3D(Vector2[] groundAreaVertices, int[] groundAreaTriangles, out Vector3[] vertices3D, out int[] triangles3D)
+        {
+            // The triangle indices for the 2D vertices of the ground area.
+            if (groundAreaTriangles == null)
+            {
+                groundAreaTriangles = Triangulator.Triangulate(groundAreaVertices);
+            }
+
+            vertices3D = new Vector3[2 * groundAreaVertices.Length];
+            for (int i = 0; i < groundAreaVertices.Length; i++)
+            {
+                Vector3 vertex = groundAreaVertices[i];
+                // Roof
+                vertices3D[i] = new Vector3(vertex.x, 0.5f, vertex.y);
+                // Ground
+                vertices3D[i + groundAreaVertices.Length] = new Vector3(vertex.x, -0.5f, vertex.y);
+            }
+
+            // We need triangles for the roof and ground and triangles for each side (height) of the
+            // object, where each side is a rectangle requiring two triangles.
+            triangles3D = new int[2 * groundAreaTriangles.Length + 2 * 3 * groundAreaVertices.Length];
+            Debug.Log($"#triangles for roof and ground: {2 * groundAreaTriangles.Length} for sides: {2 * 3 * groundAreaVertices.Length}. Total: {triangles3D.Length}.\n");
+
+            int nextTriangleIndex = 0;
+            // Triangles for the roof.
+            for (; nextTriangleIndex < groundAreaTriangles.Length; nextTriangleIndex++)
+            {
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[nextTriangleIndex];
+            }
+            // Triangles for the ground.
+            for (int i = 0; i < groundAreaTriangles.Length; i += 3)
+            {
+                // We need to invert the order of the triangle vertices because
+                // Unity uses clockwise winding order for determining front-facing triangles
+                // and here we are forming the ground area.
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i + 2] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i + 1] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = groundAreaTriangles[i] + groundAreaVertices.Length;
+                nextTriangleIndex++;
+            }
+            // Triangles for the sides
+            for (int i = 0; i < groundAreaVertices.Length - 1; i++)
+            {
+                //Debug.Log($"nextTriangleIndex={nextTriangleIndex} i={i}\n");
+                // First triangle of the rectangle
+                triangles3D[nextTriangleIndex] = i;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length + 1;
+                nextTriangleIndex++;
+
+                // Second triangle of the rectangle
+                triangles3D[nextTriangleIndex] = i;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + groundAreaVertices.Length + 1;
+                nextTriangleIndex++;
+                triangles3D[nextTriangleIndex] = i + 1;
+                nextTriangleIndex++;
+            }
+            // The final rectangle (special case because we are connecting the last
+            // vertices with the first vertices.
+            // First triangle.
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1 + groundAreaVertices.Length;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length;
+            nextTriangleIndex++;
+            // Second triangle.
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length - 1;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = groundAreaVertices.Length;
+            nextTriangleIndex++;
+            triangles3D[nextTriangleIndex] = 0;
+        }
     }
 }

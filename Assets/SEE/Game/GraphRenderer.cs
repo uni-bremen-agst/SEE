@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
+using SEE.GO.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
@@ -103,8 +104,11 @@ namespace SEE.Game
 
                 return value.Shape switch
                 {
-                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
                     NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
+                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
+                    NodeShapes.Spiders => new SpiderFactory(ShaderType, colorRange),
+                    NodeShapes.Polygons => new PolygonFactory(ShaderType, colorRange),
+                    NodeShapes.Bars => new BarsFactory(ShaderType, colorRange),
                     _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
                 };
             }
@@ -272,137 +276,65 @@ namespace SEE.Game
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            // game objects for the leaves
+            // FIXME: The two following calls DrawLeafNodes and DrawInnerNodes can be merged into one.
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
+
+            // FIXME-IWSC: Remove this call after the publication.
+            if (false)
+            {
+                GenerateAndVisualizeCloneClasses(nodes, nodeMap);
+            }
+
+            DrawInnerNodes(nodeMap, nodes);
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
 
+            // If we have multiple roots, we need to add a unique one.
+            AddGameRootNodeIfNecessary(graph, nodeMap);
+
+            // The representation of the nodes for the layout.
+            ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
+
+            // 1) Calculate the layout.
+            Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
+            // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+            // (GameNode implements ILayoutNode).
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
+            // 2) Apply the calculated layout to the game objects.
+            nodeLayout.Apply(layoutNodes);
+            p.End();
+            Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
+
+            // Fit layoutNodes into parent.
+            Fit(parent, layoutNodes);
+
             // a mapping of graph nodes onto the game objects by which they are represented
-            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
-            ICollection<LayoutGameNode> gameNodes = new List<LayoutGameNode>();
-            // the artificial unique graph root we add if the graph has more than one root
-            Node artificialRoot = null;
-            // the plane upon which the game objects will be placed
-            GameObject plane;
+            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeMap.Values;
 
-            Performance p;
-            if (Settings.NodeLayoutSettings.Kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
-            {
-                try
-                {
-                    ICollection<SublayoutNode> sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-                    artificialRoot = AddRootIfNecessary(graph);
-                    if (artificialRoot != null)
-                    {
-                        nodeMap[artificialRoot] = DrawInnerNode(artificialRoot);
-                    }
-                    gameNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
-                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
+            // The plane upon which the game objects will be placed.
+            // We add the plane surrounding all game objects for nodes
+            GameObject plane = DrawPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
+            AddToParent(plane, parent);
+            Stack(plane, layoutNodes);
 
-                    List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
-                    foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
-                    {
-                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, graph, Settings);
-                        sublayout.Layout();
-                    }
+            CreateGameNodeHierarchy(nodeMap, parent);
 
-                    p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} (with sublayouts)");
-                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
-                    // (GameNode implements ILayoutNode).
-                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
-                    if (nodeLayout.UsesEdgesAndSublayoutNodes())
-                    {
-                        // FIXME: Could graph.ConnectingEdges(nodes) be replaced by graph.Edges()?
-                        // The input graph is already a subset graph if not all data of the GXL file
-                        // are to be drawn.
-                        nodeLayout.Apply(layoutNodes, graph.ConnectingEdges(nodes), sublayoutLayoutNodes);
-                    }
-                    p.End();
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            AddDecorations(nodeToGameObject);
 
-                    Fit(parent, layoutNodes);
+            // We always need one unique root game node in the scene. If the layout is hierarchical and
+            // the original graph had multiple roots, a unique root was added above. If the layout was
+            // not hierarchical, we can only now add a unique root because non-hierarchical layouts
+            // expect a list of nodes instead of a hierarchy of nodes.
+            //if (!nodeLayout.IsHierarchical() && layoutNodes.Count > 1)
+            //{
+            //    // If we have multiple roots, we need to add a unique one.
+            //    GameObject artificalRoot = AddGameRootNodeIfNecessary(graph, nodeMap);
+            //    // We need a game node for this root in the scene, too.
 
-                    nodeToGameObject = nodeMap.Values;
 
-                    // add the plane surrounding all game objects for nodes
-                    ComputeBoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                    plane = DrawPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-                    AddToParent(plane, parent);
-                    Stack(plane, layoutNodes);
-
-                    CreateGameNodeHierarchy(nodeMap, parent);
-                    InteractionDecorator.PrepareForInteraction(nodeToGameObject);
-
-                    // add the decorations, too
-                    if (sublayoutLayoutNodes.Count <= 0)
-                    {
-                        AddDecorations(nodeToGameObject);
-                    }
-                    else
-                    {
-                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes);
-                    }
-                }
-                finally
-                {
-                    // If we added an artificial root node to the graph, we must remove it again
-                    // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
-                }
-            }
-            else
-            {
-                try
-                {
-                    if (nodeLayout.IsHierarchical())
-                    {
-                        // for a hierarchical layout, we need to add the game objects for inner nodes
-                        DrawInnerNodes(nodeMap, nodes);
-                        artificialRoot = AddRootIfNecessary(graph);
-                        if (artificialRoot != null)
-                        {
-                            nodeMap[artificialRoot] = DrawInnerNode(artificialRoot);
-                            Debug.Log("Artificial unique root was added.\n");
-                        }
-                    }
-
-                    // calculate and apply the node layout
-                    gameNodes = ToLayoutNodes(nodeMap.Values);
-                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
-
-                    // 1) Calculate the layout
-                    p = Performance.Begin("node layout " + Settings.NodeLayoutSettings.Kind + " for " + gameNodes.Count + " nodes");
-                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
-                    // (GameNode implements ILayoutNode).
-                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
-                    nodeLayout.Apply(layoutNodes);
-                    p.End();
-                    Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
-
-                    // 2) Apply the calculated layout to the game objects
-
-                    // fit layoutNodes into parent
-                    Fit(parent, layoutNodes);
-
-                    nodeToGameObject = nodeMap.Values;
-
-                    // add the plane surrounding all game objects for nodes
-                    plane = DrawPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-                    AddToParent(plane, parent);
-                    Stack(plane, layoutNodes);
-
-                    CreateGameNodeHierarchy(nodeMap, parent);
-
-                    // Decorations must be applied after the blocks have been placed, so that
-                    // we also know their positions.
-                    AddDecorations(nodeToGameObject);
-                }
-                finally
-                {
-                    // If we added an artificial root node to the graph, we must remove it again
-                    // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificialRoot, graph, nodeMap, gameNodes);
-                }
-            }
+            //}
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
@@ -418,6 +350,87 @@ namespace SEE.Game
             if (parent.TryGetComponent(out Plane portalPlane))
             {
                 portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
+            }
+
+            GameObject AddGameRootNodeIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
+            {
+                Node artificialRoot = AddGraphRootNodeIfNecessary(graph);
+                if (artificialRoot != null)
+                {
+                    nodeMap[artificialRoot] = DrawNode(artificialRoot);
+                    Debug.Log("Artificial unique root was added.\n");
+                    return nodeMap[artificialRoot];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            // FIXME-IWSC
+            // This method exists only to create the texture-based visualization of clones for the IWSC paper.
+            // It will be either become well integrated or removed later.
+            //[Obsolete]
+            void GenerateAndVisualizeCloneClasses(List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
+            {
+                // Generate clone classes.
+                HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
+                HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
+                foreach (var item in nodeMap)
+                {
+                    // Skip node if it already assigned.
+                    if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
+
+                    // Find all nodes of the clone class of `item'.
+                    HashSet<Node> cloneClass = new HashSet<Node>();
+                    cloneClass.Add(item.Key);
+                    alreadyAssignedToCloneClass.Add(item.Key);
+                    CollectOutgoings(item.Key.Outgoings);
+                    CollectIncommings(item.Key.Incomings);
+                    cloneClasses.Add(cloneClass);
+
+                    void CollectOutgoings(ISet<Edge> outgoings)
+                    {
+                        foreach (var e in outgoings)
+                        {
+                            if (!cloneClass.Contains(e.Target))
+                            {
+                                cloneClass.Add(e.Target);
+                                alreadyAssignedToCloneClass.Add(e.Target);
+                                CollectOutgoings(e.Target.Outgoings);
+                                CollectIncommings(e.Target.Incomings);
+                            }
+                        }
+                    }
+                    void CollectIncommings(ISet<Edge> incommings)
+                    {
+                        foreach (var e in incommings)
+                        {
+                            if (!cloneClass.Contains(e.Source))
+                            {
+                                cloneClass.Add(e.Source);
+                                alreadyAssignedToCloneClass.Add(e.Source);
+                                CollectIncommings(e.Source.Incomings);
+                                CollectOutgoings(e.Source.Outgoings);
+                            }
+                        }
+                    }
+                }
+
+                // Set materials of clone classes.
+                // NOTE: This is a very dirty hack!!!
+                if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
+                {
+                    int matIdx = 1;
+                    foreach (var cc in cloneClasses)
+                    {
+                        Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
+                        foreach (Node node in cc)
+                        {
+                            nodeMap[node].GetComponent<Renderer>().material = material;
+                        }
+                    }
+                }
             }
         }
 
@@ -623,7 +636,7 @@ namespace SEE.Game
         /// <param name="graph">graph where a unique root node should be added</param>
         /// <returns>the new artificial root or null if <paramref name="graph"/> has
         /// already a single root</returns>
-        public static Node AddRootIfNecessary(Graph graph)
+        public static Node AddGraphRootNodeIfNecessary(Graph graph)
         {
             // Note: Because this method is called only when a hierarchical layout is to
             // be applied (and then both leaves and inner nodes were added to nodeMap), we
@@ -650,50 +663,6 @@ namespace SEE.Game
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// If <paramref name="root"/> is null, nothing happens. Otherwise <paramref name="root"/> will
-        /// be removed from <paramref name="graph"/> and <paramref name="nodeMap"/>. The value of
-        /// <paramref name="root"/> will be null afterward.
-        /// Note: This method is the counterpart to AddRootIfNecessary.
-        /// </summary>
-        /// <param name="root">artificial root node to be removed (created by AddRootIfNecessary) or null;
-        /// will be null afterward</param>
-        /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
-        /// <param name="nodeMap">mapping of nodes onto game objects from which to remove
-        /// <paramref name="root"/></param>
-        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<LayoutGameNode> layoutNodes)
-        {
-            // FIXME: temporarily disabled because the current implementation of the
-            // custom shader for culling all city objects falling off the plane assumes
-            // that there is exactly one root node of the graph.
-
-            //if (root is object)
-            //{
-            //    if (layoutNodes != null)
-            //    {
-            //        // Remove from layout
-            //        GameNode toBeRemoved = null;
-            //        foreach (GameNode layoutNode in layoutNodes)
-            //        {
-            //            if (layoutNode.ID.Equals(root.ID))
-            //            {
-            //                toBeRemoved = layoutNode;
-            //                break;
-            //            }
-            //        }
-            //        if (toBeRemoved != null)
-            //        {
-            //            layoutNodes.Remove(toBeRemoved);
-            //        }
-            //    }
-            //    GameObject go = nodeMap[root];
-            //    nodeMap.Remove(root);
-            //    graph.RemoveNode(root);
-            //    Destroyer.DestroyGameObject(go);
-            //    root = null;
-            //}
         }
 
         /// <summary>
@@ -891,7 +860,7 @@ namespace SEE.Game
                 // We add only leaves.
                 if (node.IsLeaf())
                 {
-                    result[node] = DrawLeafNode(node);
+                    result[node] = DrawNode(node);
                 }
             }
             return result;
@@ -905,13 +874,16 @@ namespace SEE.Game
         /// <param name="nodes">list of nodes for which to create blocks</param>
         protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
         {
+            foreach (var nodeType in nodeTypeToFactory.Keys)
+            {
+                Debug.Log($"{nodeType} => {nodeTypeToFactory[nodeType]}\n");
+            }
             foreach (Node node in nodes)
             {
                 // We add only inner nodes.
                 if (!node.IsLeaf())
                 {
-                    GameObject innerGameObject = DrawInnerNode(node);
-                    nodeMap[node] = innerGameObject;
+                    nodeMap[node] = DrawNode(node);
                 }
             }
         }

@@ -194,6 +194,25 @@ namespace SEE.DataModel.DG
             }
         }
 
+        /// <summary>
+        /// Returns the values of all numeric (int and float) attributes of this node.
+        /// </summary>
+        /// <returns>all numeric attribute values</returns>
+        public float[] AllNumerics()
+        {
+            float[] floats = FloatAttributes.Values.ToArray();
+            int[] ints = IntAttributes.Values.ToArray();
+            float[] result = new float[floats.Length + ints.Length];
+            floats.CopyTo(result, 0);
+            int i = floats.Length;
+            foreach (int value in ints)
+            {
+                result[i] = value;
+                ++i;
+            }
+            return result;
+        }
+
         //----------------------------------
         // General
         //----------------------------------
