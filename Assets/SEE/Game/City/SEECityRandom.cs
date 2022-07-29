@@ -102,9 +102,16 @@ namespace SEE.Game.City
             LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
         }
 
+        /// <summary>
+        /// Adds clone edges for nodes whose Euclidean distance is below a threshold.
+        ///
+        /// Note: This method was used for our VISSOFT 2022 publication and should be
+        /// removed when the research for it is done.
+        /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [Obsolete("Remove after VISSOFT publication")]
         private void AddCloneEdges()
         {
             float threshold = 2.75f;
