@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -255,7 +256,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// architecture graph.</exception>
         /// <exception cref="AlreadyExplicitlyMappedException">When <paramref name="from"/> is already explicitly
         /// mapped to an architecture node and <paramref name="overrideMapping"/> is false.</exception>
-        public void AddToMapping(Node from, Node to, bool overrideMapping = false)
+        public Edge AddToMapping(Node from, Node to, bool overrideMapping = false)
         {
             AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
@@ -264,6 +265,11 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 // Existing mapping is only allowed if it can be overridden
                 AssertOrThrow(overrideMapping, () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
+                if (MapsTo(from) == to)
+                {
+                    // We don't need to do anything more, since the node is already mapped to the target.
+                    return from.FromTo(MapsTo(from), MapsToType).Single();
+                }
                 DeleteFromMapping(from);
             }
 
@@ -283,6 +289,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // adjust implicit mapping
             ChangeMap(subtree, to);
             Map(subtree, to);
+            return from.FromTo(MapsTo(from), MapsToType).Single();
         }
 
         /// <summary>
@@ -311,17 +318,21 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
+        /// <param name="ignoreUnmapped">Whether to do nothing when the given node is not explicitly mapped.
+        /// If <c>false</c>, this will throw an exception instead.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
-        public void DeleteFromMapping(Node from)
+        /// <exception cref="NotExplicitlyMappedException">When <paramref name="ignoreUnmapped"/> is false
+        /// and the given node is not explicitly mapped.</exception>
+        public void DeleteFromMapping(Node from, bool ignoreUnmapped = false)
         {
             AssertOrThrow(from.IsInImplementation() && FullGraph.ContainsNode(from),
                           () => new NotInSubgraphException(Implementation, from));
 
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
             Edge mapsToEdge = from.Outgoings.SingleOrDefault(x => x.IsInMapping());
-            if (mapsToEdge == null)
+            if (mapsToEdge == null && !ignoreUnmapped)
             {
                 throw new NotExplicitlyMappedException(from);
             }
