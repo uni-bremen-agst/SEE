@@ -220,6 +220,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </exception>
         public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
         {
+            if (element == null)
+            {
+                return false;
+            }
             switch (subgraph)
             {
                 case Implementation:
