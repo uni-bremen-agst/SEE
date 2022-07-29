@@ -100,11 +100,18 @@ namespace SEE.GO.NodeFactories
             }
         }
 
+        /// <summary>
+        /// Returns the vertices of a circular closed polygon, such that the
+        /// length of each side i of the polygon is <paramref name="metrics"/>[i]
+        /// and all vertices are on the same circle. The first side of the polygon
+        /// is at 12 o'clock and all others are allocated clockwise.
+        /// </summary>
+        /// <param name="metrics">metrics determining the lengths of the polygon's sides</param>
+        /// <returns>vertices of the polygon</returns>
         private Vector2[] MetricsToVertices(float[] metrics)
         {
             Vector2[] result = new Vector2[metrics.Length];
-            float radius = FindRadius(metrics, 0.0001f, out uint i);
-            //Debug.Log($"radius = {radius:F6} using {i} iterations.\n");
+            float radius = FindRadius(metrics, 0.001f);
 
             // We start at 12 o'clock.
             float radian = Mathf.PI / 2;
@@ -136,7 +143,18 @@ namespace SEE.GO.NodeFactories
             return 2.0f * Mathf.Asin(0.5f * length / radius);
         }
 
-        private static float FindRadius(float[] lengths, float epsilon, out uint numberOfIterations)
+        /// <summary>
+        /// Yields the radius of a circle such that all vertices of a polygon whose
+        /// sides have the given <paramref name="lengths"/> are on the circle, more
+        /// precisely, are not farther away from the circle than <paramref name="epsilon"/>.
+        ///
+        /// Note that this circle is found iteratively by interval nesting.
+        /// </summary>
+        /// <param name="lengths">the lengths of the sides of the polygon</param>
+        /// <param name="epsilon">the maximum distance between a vertex of the polygon
+        /// and the circle</param>
+        /// <returns>radius of the circle</returns>
+        private static float FindRadius(float[] lengths, float epsilon)
         {
             // Each of the n (n = lengths.Count) line segments (lengths) essentially forms an isosceles
             // triangle with the center of the common circle. Two of the sides are of length r, the
@@ -170,7 +188,7 @@ namespace SEE.GO.NodeFactories
             // Resulting radius of the circle on which the vertices are placed.
             float radius;
 
-            numberOfIterations = 0;
+            uint numberOfIterations = 0;
             while (true)
             {
                 // The sum over all current theta angles.
@@ -200,6 +218,8 @@ namespace SEE.GO.NodeFactories
                     minRadius = radius;
                 }
             }
+
+            // Debug.Log($"radius = {radius:F6} using {numberOfIterations} iterations.\n");
 
             return radius;
         }
