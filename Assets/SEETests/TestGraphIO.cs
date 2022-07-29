@@ -83,8 +83,8 @@ namespace SEE.DataModel.DG.IO
             Constraint innerNodesConstraint = new Constraint("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new List<RandomAttributeDescriptor>()
             {
-                new RandomAttributeDescriptor("Metric.LOC", 200, 50),
-                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f),
+                new RandomAttributeDescriptor("Metric.LOC", 200, 50, -10, 100),
+                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
             };
             string basename = "random";
 

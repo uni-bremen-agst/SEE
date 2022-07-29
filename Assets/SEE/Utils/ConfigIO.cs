@@ -51,11 +51,11 @@ namespace SEE.Utils
         /// <summary>
         /// The opening token for a composite attribute value.
         /// </summary>
-        protected const char Open = '{';
+        protected const char OpenGroup = '{';
         /// <summary>
         /// The closing token for a composite attribute value.
         /// </summary>
-        protected const char Close = '}';
+        protected const char CloseGroup = '}';
         /// <summary>
         /// The opening token for a list attribute value.
         /// </summary>

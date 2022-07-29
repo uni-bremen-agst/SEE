@@ -1,5 +1,5 @@
-﻿using OdinSerializer;
-using SEE.GO;
+﻿using SEE.GO;
+using Sirenix.Serialization;
 using UnityEngine;
 
 namespace SEE.Controls

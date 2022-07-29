@@ -82,7 +82,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Sign function 
+        /// Sign function
         /// </summary>
         /// <param name="value">the value </param>
         /// <returns>the sign of the given value</returns>
@@ -110,18 +110,18 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="unit">the leafNode unit</param>
         /// <param name="settings">the abstract see city settings</param>
         /// <returns>a node layout object</returns>
-        public static NodeLayout GetNodelayout(NodeLayoutKind nodeLayout, float groundLevel, float unit, AbstractSEECity settings)
+        public static NodeLayout GetNodelayout(NodeLayoutKind nodeLayout, float groundLevel, AbstractSEECity settings)
         {
             switch (nodeLayout)
             {
                 case NodeLayoutKind.Manhattan:
-                    return new ManhattanLayout(groundLevel, unit);
+                    return new ManhattanLayout(groundLevel);
                 case NodeLayoutKind.RectanglePacking:
-                    return new RectanglePackingNodeLayout(groundLevel, unit);
+                    return new RectanglePackingNodeLayout(groundLevel);
                 case NodeLayoutKind.EvoStreets:
-                    return new EvoStreetsNodeLayout(groundLevel, unit);
+                    return new EvoStreetsNodeLayout(groundLevel);
                 case NodeLayoutKind.Treemap:
-                    return new TreemapLayout(groundLevel, 1000.0f * unit, 1000.0f * unit);
+                    return new TreemapLayout(groundLevel, 1000.0f, 1000.0f);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayoutKind.CirclePacking:

@@ -1,10 +1,13 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using DG.Tweening;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
-using static SEE.Game.City.SEEReflexionCity;
 using static SEE.Utils.Raycasting;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Game
 {
@@ -16,21 +19,26 @@ namespace SEE.Game
         /// <summary>
         /// The speed by which to move a selected object.
         /// </summary>
-        private static float MovingSpeed = 1.0f;
+        private const float MOVING_SPEED = 1.0f;
+
+        /// <summary>
+        /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
+        /// </summary>
+        public const float SCALING_FACTOR = 0.5f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
         /// camera. The radius sphere of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MovingSpeed"/>.
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
         ///
         /// This method is expected to be called at every Update().
         /// </summary>
         /// <param name="movingObject">the object to be moved.</param>
         public static void MoveTo(GameObject movingObject)
         {
-            float step = MovingSpeed * Time.deltaTime;
+            float step = MOVING_SPEED * Time.deltaTime;
             // FIXME regarding 'target': currently, the tip of the ray is of a fixed distance from
             // the ray starting position into the ray direction. it would be better if we did a
             // raycast into the scene, see what we hit and use that as the tip. the result feels
@@ -59,10 +67,11 @@ namespace SEE.Game
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
         /// <returns>the game object that is the new parent or null</returns>
-        public static GameObject FinalizePosition(GameObject movingObject)
+        public static GameObject FinalizePosition(GameObject movingObject, Vector3 oldPosition)
         {
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
+            Node movingNode = movingNodeRef.Value;
 
             RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
 
@@ -70,36 +79,60 @@ namespace SEE.Game
             {
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
-                Node movingNode = movingNodeRef.Value;
-                // Reflexion analysis: Dropping implementation node on architecture node
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
-                    ShowNotification.Info("Reflexion Analysis", $"Mapping node '{movingNode.SourceName}' "
-                                                                + $"onto '{newGraphParent.SourceName}'.");
-                    Map(movingNode, newGraphParent);
+                    // Reflexion analysis: Dropping implementation node on architecture node
+                    // TODO: Make sure this action is still reversible
+                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.AddToMapping(movingNode, newGraphParent, overrideMapping: true);
+                    return newGameParent;
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
                     ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
                                                                  + "architecture, not the other way around.");
+                    return null;
                 }
-                else
+                // The new position of the movingNode in world space.
+                Vector3 newPosition = raycastHit.Value.point;
+                movingObject.transform.position = newPosition;
+                PutOn(movingObject.transform, newGameParent);
+                if (movingNode.Parent != newGraphParent)
                 {
-                    // The new position of the movingNode in world space.
-                    Vector3 newPosition = raycastHit.Value.point;
-                    movingObject.transform.position = newPosition;
-                    PutOn(movingObject.transform, newGameParent);
-                    if (movingNode.Parent != newGraphParent)
-                    {
-                        movingNode.Reparent(newGraphParent);
-                        movingObject.transform.SetParent(newGameParent.transform);
-                    }
-                    return newGameParent;
+                    movingNode.Reparent(newGraphParent);
+                    movingObject.transform.SetParent(newGameParent.transform);
                 }
-            }
+                
+                if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
+                {
+                    // We are moving an already mapped node back to its implementation city, so we should unmap it.
+                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.DeleteFromMapping(movingNode);
+                }
 
-            // Attempt to move the node outside of any node in the node hierarchy.
-            return null;
+                return newGameParent;
+            }
+            else
+            {
+                // Attempt to move the node outside of any node in the node hierarchy.
+                if (movingNode.IsInImplementation() && movingNode.IsInMapping())
+                {
+                    SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
+                    
+                    // We'll change its parent so it becomes a root node in the implementation city.
+                    // The user will have to drop it on another node to re-parent it.
+                    movingObject.transform.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
+                    
+                    // If the node was already mapped, we'll unmap it again.
+                    Reflexion analysis = reflexionCity.Analysis;
+                    analysis.DeleteFromMapping(movingNode);
+                    
+                    return movingObject.transform.parent.gameObject;
+                }
+                return null;
+            }
         }
 
         /// <summary>
@@ -115,30 +148,50 @@ namespace SEE.Game
             if (parent != null)
             {
                 child.transform.position = position;
-                PutOn(child.transform, parent);
+                PutOn(child.transform, parent, parent.transform.position.XZ());
                 child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
                 child.transform.SetParent(parent.transform);
             }
             else
             {
-                throw new System.Exception($"No parent found with name {parentName}.");
+                throw new Exception($"No parent found with name {parentName}.");
             }
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of <paramref name="parent"/>.
+        /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
+        /// assuming <paramref name="scaleDown"/> is true.
         /// </summary>
-        /// <param name="child">child</param>
-        /// <param name="parent">parent</param>
-        private static void PutOn(Transform child, GameObject parent)
+        /// <param name="child">child to be put on <paramref name="parent"/></param>
+        /// <param name="parent">parent the <paramref name="child"/> is put on</param>
+        /// <param name="targetXZ">XZ coordinates <paramref name="child"/> should be placed at
+        /// (will be center of <paramref name="parent"/> if not given)</param>
+        /// <param name="topPadding">Additional amount of empty space that should be between <paramref name="parent"/>
+        /// and <paramref name="child"/>, given as a percentage of the parent's height</param>
+        /// <param name="setParent">Whether <paramref name="parent"/> should become a parent of
+        /// <paramref name="child"/></param>
+        /// <param name="scaleDown">Whether <paramref name="child"/> should be scaled down to fit into
+        /// <paramref name="parent"/></param>
+        /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
+        /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
+        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, float topPadding = 0,
+                                 bool setParent = true, bool scaleDown = false)
         {
-            // FIXME: child may not actually fit into parent, in which we should
-            // downscale it until it fits
-            Vector3 childCenter = child.position;
-            float parentRoof = parent.transform.position.y + parent.transform.lossyScale.y / 2;
-            childCenter.y = parentRoof + child.lossyScale.y / 2;
-            child.position = childCenter;
-            child.SetParent(parent.transform);
+            if (setParent)
+            {
+                child.SetParent(parent.transform);
+            }
+            Vector3 oldScale = child.localScale;
+            if (scaleDown)
+            {
+                child.localScale = new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR);
+            }
+            
+            targetXZ ??= child.position.XZ();
+            float parentRoof = parent.GetRoof();
+            Vector3 targetPosition = new Vector3(targetXZ.Value.x, parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, targetXZ.Value.y);
+            child.position = targetPosition;
+            return oldScale;
         }
 
         /// <summary>
@@ -146,7 +199,7 @@ namespace SEE.Game
         /// camera. The radius of this sphere is the original distance
         /// from the <paramref name="movingObject"/> to the camera. The point
         /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defind by <see cref="MovingSpeed"/>.
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
         ///
         /// This method is expected to be called at every Update().
         ///
@@ -158,7 +211,7 @@ namespace SEE.Game
         /// <param name="lockZ">whether the movement should be locked on this axis</param>
         public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
         {
-            float step = MovingSpeed * Time.deltaTime;
+            float step = MOVING_SPEED * Time.deltaTime;
             Vector3 target = TipOfRayPosition(movingObject);
             Vector3 movingObjectPos = movingObject.transform.position;
 
@@ -166,14 +219,17 @@ namespace SEE.Game
             {
                 target.x = movingObjectPos.x;
             }
+
             if (!lockY)
             {
                 target.y = movingObjectPos.y;
             }
+
             if (!lockZ)
             {
                 target.z = movingObjectPos.z;
             }
+
             movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
         }
 

@@ -1,8 +1,9 @@
-﻿using OdinSerializer.Utilities;
+﻿using Sirenix.Serialization.Utilities;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using Sirenix.Utilities;
 
 namespace SEE.Game.UI
 {

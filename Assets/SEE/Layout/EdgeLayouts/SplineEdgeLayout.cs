@@ -105,7 +105,7 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="minOffset">the minimal y offset for the point in between <paramref name="start"/>
         /// and <paramref name="end"/> through which the spline should pass</param>
         /// <returns>points of the spline</returns>
-        private TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, bool above, float minOffset)
+        public static TinySpline.BSpline CreateSpline(Vector3 start, Vector3 end, bool above, float minOffset)
         {
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).

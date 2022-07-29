@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using OdinSerializer;
+using Sirenix.Serialization;
 using SEE.DataModel.DG;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -34,24 +36,15 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// How leaf graph nodes should be depicted.
+    /// How (leaf and inner) graph nodes should be depicted.
     /// </summary>
-    public enum LeafNodeKinds : byte
-    {
-        Blocks
-    }
-
-    /// <summary>
-    /// How inner graph nodes should be depicted.
-    /// </summary>
-    public enum InnerNodeKinds : byte
+    public enum NodeShapes : byte
     {
         Blocks,
-        Rectangles,
-        Donuts,
-        Circles,
-        Empty,
-        Cylinders
+        Cylinders,
+        Spiders,
+        Polygons,
+        Bars
     }
 
     /// <summary>
@@ -78,25 +71,75 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// Abstract common super class for all settings influencing the visual
-    /// appearance of leaf or inner nodes.
+    /// All settings influencing the visual appearance of leaf or inner nodes.
     /// </summary>
     [Serializable]
-    public abstract class VisualNodeAttributes : VisualAttributes
+    [InlineProperty]
+    [HideReferenceObjectPicker]
+    public class VisualNodeAttributes : VisualAttributes
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="typeName">name of the node type for which these settings are intended</param>
+        public VisualNodeAttributes(string typeName)
+        {
+            NodeType = typeName;
+        }
+
+        public VisualNodeAttributes()
+        {
+            NodeType = "A Node Type";
+        }
+
+        /// <summary>
+        /// The name of the node type that is specified. See <see cref="NodeType"/>.
+        /// </summary>
+        [SerializeField, HideInInspector]
+        private string nodeType = string.Empty;
+        /// <summary>
+        /// The name of the node type that is specified.
+        /// </summary>
+        [HideInInspector]
+        public string NodeType { get => nodeType; private set => nodeType = value; }
+
+        /// <summary>
+        /// How a node should be drawn. Determines the kind of mesh.
+        /// </summary>
+        public NodeShapes Shape = NodeShapes.Blocks;
+        /// <summary>
+        /// If true, the node should be rendered. Otherwise the node will be ignored when
+        /// the graph is loaded.
+        /// </summary>
+        public bool IsRelevant = true;
+        /// <summary>
+        /// Name of the metric defining the width.
+        /// </summary>
+        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
+        /// <summary>
+        /// Name of the metric defining the depth.
+        /// </summary>
+        public string DepthMetric = NumericAttributeNames.LOC.Name();
         /// <summary>
         /// The name of the metric determining the height.
         /// </summary>
-        public string HeightMetric = "";
+        public string HeightMetric = string.Empty;
         /// <summary>
-        /// The name of the metric determining the style (color) of a node.
-        /// </summary>
-        public string ColorMetric = "";
-        /// <summary>
-        /// The range of colors for the style metric.
+        /// How the color of a node should be determined.
         /// </summary>
         [OdinSerialize]
-        public ColorRange ColorRange = new ColorRange(Color.white, Color.red, 10);
+        [HideReferenceObjectPicker]
+        public ColorProperty ColorProperty = new ColorProperty();
+        /// <summary>
+        /// This parameter determines the minimal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
+        /// </summary>
+        public float MinimalBlockLength = 0.001f; // serialized by Unity
+        /// <summary>
+        /// This parameter determines the maximal width, breadth, and height of each block
+        /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
+        /// </summary>
+        public float MaximalBlockLength = 1.0f; // serialized by Unity
         /// <summary>
         /// Describes how metrics are mapped onto the antenna above the blocks.
         /// </summary>
@@ -107,11 +150,14 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         public LabelAttributes LabelSettings = new LabelAttributes();
-
         /// <summary>
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
         public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
+        /// <summary>
+        /// If true, persistent text labels will be added to the node representation.
+        /// </summary>
+        public bool ShowNames = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -121,13 +167,19 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            writer.Save(NodeType, NodeTypeLabel);
+            writer.Save(Shape.ToString(), NodeShapeLabel);
+            writer.Save(IsRelevant, IsRelevantLabel);
+            writer.Save(WidthMetric, WidthMetricLabel);
+            writer.Save(DepthMetric, DepthMetricLabel);
             writer.Save(HeightMetric, HeightMetricLabel);
-            writer.Save(ColorMetric, StyleMetricLabel);
-            ColorRange.Save(writer, ColorRangeLabel);
+            ColorProperty.Save(writer, ColorPropertyLabel);
+            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
+            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
             LabelSettings.Save(writer, LabelSettingsLabel);
             AntennaSettings.Save(writer, AntennaSettingsLabel);
             writer.Save(OutlineWidth, OutlineWidthLabel);
-            SaveAdditionalAttributes(writer);
+            writer.Save(ShowNames, ShowNamesLabel);
             writer.EndGroup();
         }
 
@@ -143,168 +195,112 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
-                ConfigIO.Restore(values, StyleMetricLabel, ref ColorMetric);
-                ColorRange.Restore(values, ColorRangeLabel);
-                LabelSettings.Restore(values, LabelSettingsLabel);
-                AntennaSettings.Restore(values, AntennaSettingsLabel);
-                ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
+                Restore(values);
             }
         }
 
         /// <summary>
-        /// Saves the additional attributes of subclasses. The enclosing group
-        /// is already opened. Implementations must not call writer.BeginGroup(label)
-        /// and writer.EndGroup().
+        /// Restores the settings from <paramref name="values"/>.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected abstract void SaveAdditionalAttributes(ConfigWriter writer);
-
-        /// <summary>
-        /// Label in the configuration file for the kind of object drawn for a node.
-        /// It must be visible to the subclasses.
-        /// </summary>
-        protected const string NodeKindsLabel = "Kind";
-        /// <summary>
-        /// Label in the configuration file for a color range.
-        /// </summary>
-        private const string ColorRangeLabel = "ColorRange";
-        /// <summary>
-        /// Label in the configuration file for a node style (color actually).
-        /// </summary>
-        private const string StyleMetricLabel = "StyleMetric";
-        /// <summary>
-        /// Label in the configuration file for a height metric.
-        /// </summary>
-        private const string HeightMetricLabel = "HeightMetric";
-        /// <summary>
-        /// Label in the configuration file for the label settings for leaf and inner nodes.
-        /// </summary>
-        private const string LabelSettingsLabel = "LabelSettings";
-        /// <summary>
-        /// Label in the configuration file for the antenna settings for leaf and inner nodes.
-        /// </summary>
-        private const string AntennaSettingsLabel = "AntennnaSettings";
-        /// <summary>
-        /// Label in the configuration file for the width of the outline for leaf and inner nodes.
-        /// </summary>
-        private const string OutlineWidthLabel = "OutlineWidth";
-    }
-
-    /// <summary>
-    /// The settings of leaf nodes of a specific kind.
-    /// </summary>
-    [Serializable]
-    public class LeafNodeAttributes : VisualNodeAttributes
-    {
-        /// <summary>
-        /// How a leaf node should be drawn.
-        /// </summary>
-        public LeafNodeKinds Kind = LeafNodeKinds.Blocks;
-        /// <summary>
-        /// Name of the metric defining the width.
-        /// </summary>
-        public string WidthMetric = NumericAttributeNames.Number_Of_Tokens.Name();
-        /// <summary>
-        /// Name of the metric defining the depth.
-        /// </summary>
-        public string DepthMetric = NumericAttributeNames.LOC.Name();
-        /// <summary>
-        /// This parameter determines the minimal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
-        /// </summary>
-        public float MinimalBlockLength = 0.001f; // serialized by Unity
-        /// <summary>
-        /// This parameter determines the maximal width, breadth, and height of each block
-        /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
-        /// </summary>
-        public float MaximalBlockLength = 1.0f; // serialized by Unity
-        /// <summary>
-        /// Saves the settings specific to this class in the configuration file.
-        /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected override void SaveAdditionalAttributes(ConfigWriter writer)
+        /// <param name="values">dictionary of attributes from which to retrieve the settings</param>
+        internal virtual void Restore(Dictionary<string, object> values)
         {
-            writer.Save(Kind.ToString(), NodeKindsLabel);
-            writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
-            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
+            ConfigIO.Restore(values, NodeTypeLabel, ref nodeType);
+            ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
+            ConfigIO.Restore(values, IsRelevantLabel, ref IsRelevant);
+            ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
+            ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
+            ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
+            ColorProperty.Restore(values, ColorPropertyLabel);
+            ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
+            ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
+            LabelSettings.Restore(values, LabelSettingsLabel);
+            AntennaSettings.Restore(values, AntennaSettingsLabel);
+            ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
+            ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
         }
 
         /// <summary>
-        /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
-        /// The latter must be the label under which the settings were grouped, i.e., the same
-        /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
+        /// Label in the configuration file for <see cref="NodeType"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public override void Restore(Dictionary<string, object> attributes, string label)
-        {
-            base.Restore(attributes, label);
-
-            if (attributes.TryGetValue(label, out object dictionary))
-            {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
-                ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
-                ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
-                ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
-                ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
-            }
-        }
-
+        private const string NodeTypeLabel = "NodeType";
         /// <summary>
-        /// Label in the configuration file for the width metric.
+        /// Label in the configuration file for <see cref="Shape"/>.
+        /// </summary>
+        private const string NodeShapeLabel = "Shape";
+        /// <summary>
+        /// Label in the configuration file for <see cref="IsRelevant"/>.
+        /// </summary>
+        private const string IsRelevantLabel = "IsRelevant";
+        /// <summary>
+        /// Label in the configuration file for <see cref="WidthMetric"/>.
         /// </summary>
         private const string WidthMetricLabel = "WidthMetric";
         /// <summary>
-        /// Label in the configuration file for the depth metric.
+        /// Label in the configuration file for <see cref="DepthMetric"/>.
         /// </summary>
         private const string DepthMetricLabel = "DepthMetric";
         /// <summary>
-        /// Label in the configuration file for the minimal block length of a node.
+        /// Label in the configuration file for a <see cref="HeightMetric"/>.
+        /// </summary>
+        private const string HeightMetricLabel = "HeightMetric";
+        /// <summary>
+        /// Label in the configuration file for a <see cref="ColorProperty"/>.
+        /// </summary>
+        private const string ColorPropertyLabel = "ColorProperty";
+        /// <summary>
+        /// Label in the configuration file for <see cref="MinimalBlockLength"/>.
         /// </summary>
         private const string MinimalBlockLengthLabel = "MinimalBlockLength";
         /// <summary>
-        /// Label in the configuration file for the maximal block length of a node.
+        /// Label in the configuration file for <see cref="MaximalBlockLength"/>.
         /// </summary>
         private const string MaximalBlockLengthLabel = "MaximalBlockLength";
+        /// <summary>
+        /// Label in the configuration file for <see cref="LabelSettings"/>.
+        /// </summary>
+        private const string LabelSettingsLabel = "LabelSettings";
+        /// <summary>
+        /// Label in the configuration file for <see cref="AntennaSettings"/>.
+        /// </summary>
+        private const string AntennaSettingsLabel = "AntennnaSettings";
+        /// <summary>
+        /// Label in the configuration file for <see cref="OutlineWidth"/>.
+        /// </summary>
+        private const string OutlineWidthLabel = "OutlineWidth";
+        /// <summary>
+        /// Label in the configuration file for <see cref="ShowNames"/>.
+        /// </summary>
+        private const string ShowNamesLabel = "ShowNames";
     }
 
     /// <summary>
-    /// The setting for inner nodes of a specific kind. They may be unique per <see cref="Node.NodeDomain"/>.
+    /// Specifies for a node what the color is used for: either the node type
+    /// or a node metric.
     /// </summary>
     [Serializable]
-    public class InnerNodeAttributes : VisualNodeAttributes
+    public class ColorProperty : ConfigIO.PersistentConfigItem
     {
         /// <summary>
-        /// How an inner node should be drawn.
+        /// Whether color is used to represent the node type or a metric.
         /// </summary>
-        public InnerNodeKinds Kind = InnerNodeKinds.Blocks;
+        [EnumToggleButtons]
+        public PropertyKind Property = PropertyKind.Type;
 
         /// <summary>
-        /// The metric to be put in the inner circle of a Donut chart.
+        /// The color used to represent the type of a node.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
         /// </summary>
-        public string InnerDonutMetric = NumericAttributeNames.IssuesTotal.Name(); // serialized by Unity
+        [ShowIf("Property", PropertyKind.Type)]
+        public Color TypeColor = Color.white;
 
         /// <summary>
-        /// If true, persistent text labels will be added to inner nodes.
+        /// The name of the metric determining the style (color) of a node. The
+        /// actual color is found in a <see cref="ColorMap"/> for the metrics.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
         /// </summary>
-        public bool ShowNames = false;
-
-        /// <summary>
-        /// Saves the settings specific to this class in the configuration file.
-        /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        protected override void SaveAdditionalAttributes(ConfigWriter writer)
-        {
-            writer.Save(Kind.ToString(), NodeKindsLabel);
-            writer.Save(ShowNames, ShowNamesLabel);
-            writer.Save(InnerDonutMetric, InnerDonutMetricLabel);
-        }
+        [ShowIf("Property", PropertyKind.Metric)]
+        public string ColorMetric = string.Empty;
 
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/> under the key <paramref name="label"/>.
@@ -313,21 +309,49 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        public override void Restore(Dictionary<string, object> attributes, string label)
+        public bool Restore(Dictionary<string, object> attributes, string label = "")
         {
-            base.Restore(attributes, label);
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.RestoreEnum(values, NodeKindsLabel, ref Kind);
-                ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
-                ConfigIO.Restore(values, InnerDonutMetricLabel, ref InnerDonutMetric);
+                ConfigIO.RestoreEnum(values, PropertyLabel, ref Property);
+                ConfigIO.Restore(values, TypeColorLabel, ref TypeColor);
+                ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        private const string InnerDonutMetricLabel = "InnerDonutMetric";
-        private const string ShowNamesLabel = "ShowNames";
+        /// <summary>
+        /// Saves the settings in the configuration file using <paramref name="writer"/>
+        /// under the given <paramref name="label"/>.
+        /// </summary>
+        /// <param name="writer">writer to be used to save the settings</param>
+        /// <param name="label">label under which to save the settings</param>
+        public void Save(ConfigWriter writer, string label = "")
+        {
+            writer.BeginGroup(label);
+            writer.Save(Property.ToString(), PropertyLabel);
+            writer.Save(TypeColor, TypeColorLabel);
+            writer.Save(ColorMetric, ColorMetricLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Label in the configuration file for a <see cref="Property"/>
+        /// </summary>
+        private const string PropertyLabel = "Property";
+        /// <summary>
+        /// Label in the configuration file for <see cref="TypeColor"/>.
+        /// </summary>
+        private const string TypeColorLabel = "TypeColor";
+        /// <summary>
+        /// Label in the configuration file for a <see cref="ColorMetric"/>
+        /// </summary>
+        private const string ColorMetricLabel = "ColorMetric";
     }
 
     /// <summary>
@@ -412,16 +436,201 @@ namespace SEE.Game.City
     }
 
     /// <summary>
+    /// To what kind of concept a property refers to.
+    /// </summary>
+    [Serializable]
+    public enum PropertyKind
+    {
+        /// <summary>
+        /// Refers to a node type.
+        /// </summary>
+        Type,
+        /// <summary>
+        /// Refers to a node metric.
+        /// </summary>
+        Metric
+    }
+
+    /// <summary>
+    /// A mapping of property names (e.g., name of node types) onto <see cref="ColorRange"/>.
+    /// This concrete instantiation is needed because Unity cannot serialize generic types.
+    /// </summary>
+    [Serializable]
+    public class ColorRangeMapping : Dictionary<string, ColorRange> { }
+
+    /// <summary>
+    /// Specifies which color is used to render a named property.
+    /// </summary>
+    [Serializable]
+    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
+    {
+        /// <summary>
+        /// Mapping of property name onto color.
+        /// </summary>
+        [SerializeField]
+        [DictionaryDrawerSettings(KeyLabel = "Name", ValueLabel = "Color")]
+        private ColorRangeMapping map = new ColorRangeMapping();
+
+        /// <summary>
+        /// Operator [].
+        /// </summary>
+        /// <param name="name">name of the property for which to retrieve the color</param>
+        /// <returns>retrieved color for <paramref name="name"/></returns>
+        public ColorRange this[string name]
+        {
+            get { return map[name]; }
+            set { map[name] = value; }
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if <paramref name="name"/> is contained in this <see cref="ColorMap"/>
+        /// otherwise <c>false</c>. If <c>true</c> is returned, <paramref name="color"/> will have
+        /// the color <paramref name="name"/> is mapped onto. Otherwise <paramref name="color"/>
+        /// is undefined.
+        /// </summary>
+        /// <param name="name">the property's name whose color is requested</param>
+        /// <param name="color">the color <paramref name="name"/> is mapped onto; defined only
+        /// if <c>true</c> is returned</param>
+        /// <returns><c>true</c> if <paramref name="name"/> is contained</returns>
+        public bool TryGetValue(string name, out ColorRange color)
+        {
+            return map.TryGetValue(name, out color);
+        }
+
+        /// <summary>
+        /// The number of elements in the map.
+        /// </summary>
+        public int Count
+        {
+            get => map.Count;
+        }
+
+        /// <summary>
+        /// Resets this <see cref="CodeMap"/> to an empty mapping.
+        /// </summary>
+        public void Clear()
+        {
+            map.Clear();
+        }
+
+        /// <summary>
+        /// Enumerator for all entries of the map.
+        /// </summary>
+        /// <returns>enumerator</returns>
+        public IEnumerator<KeyValuePair<string, ColorRange>> GetEnumerator()
+        {
+            return map.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Enumerator for all entries of the map.
+        /// </summary>
+        /// <returns>enumerator</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Saves this <see cref="ColorMap"/> as a list of groups (metric name, color)
+        /// using <paramref name="writer"/> under the given <paramref name="label"/>.
+        /// Each pair is saved as a list
+        /// </summary>
+        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="label">the outer label grouping the settings</param>
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginList(label);
+            foreach (var item in map)
+            {
+                writer.BeginGroup();
+                writer.Save(item.Key, NameLabel);
+                item.Value.Save(writer, ColorLabel);
+                writer.EndGroup();
+            }
+            writer.EndList();
+        }
+
+        /// <summary>
+        /// Restores the values of this <see cref="ColorMap"/> from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
+        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
+        /// <returns>true if at least one attribute was successfully restored</returns>
+        public bool Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object list))
+            {
+                bool result = false;
+                foreach (object item in list as List<object>)
+                {
+                    // Each item in the list is a dictionary holding the pair of (name, color).
+                    Dictionary<string, object> dict = item as Dictionary<string, object>;
+                    // name
+                    string name = null;
+                    if (!ConfigIO.Restore(dict, NameLabel, ref name))
+                    {
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {NameLabel}\n");
+                        continue;
+                    }
+                    // color
+                    ColorRange color = new ColorRange();
+                    if (!color.Restore(dict, ColorLabel))
+                    {
+                        Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {ColorLabel}\n");
+                        continue;
+                    }
+                    map[name] = color;
+                    result = true;
+                }
+                return result;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The label of the name of the property in the configuration file.
+        /// </summary>
+        private const string NameLabel = "name";
+
+        /// <summary>
+        /// The label of the color of the property in the configuration file.
+        /// </summary>
+        private const string ColorLabel = "color";
+    }
+
+    /// <summary>
     /// Specifies how metrics are to be rendered as an antenna above the blocks.
     /// </summary>
     [Serializable]
-    public class AntennaAttributes : ConfigIO.PersistentConfigItem
+    [HideReferenceObjectPicker]
+    public sealed class AntennaAttributes : ConfigIO.PersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
         public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
+
+        /// <summary>
+        /// This parameter determines the sections of the antenna, that is, the
+        /// order of the antenna segments and which properties they depict.
+        /// </summary>
+        //[SerializeField]
+        //[ListDrawerSettings(CustomAddFunction = "AddProperty")]
+        //public List<Property> AntennaSegments = new List<Property>();
+
+        //private Property AddProperty()
+        //{
+        //    Debug.Log("AddProperty\n");
+        //    Property result = new Property();
+        //    result.Kind = PropertyKind.Metric;
+        //    result.Name = "Metric.Mine";
+        //    return result;
+        //}
 
         /// <summary>
         /// The width of an antenna.
@@ -531,7 +740,7 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public DataPath LayoutPath = new DataPath();
+        public FilePath LayoutPath = new FilePath();
 
         private const string LayoutPathLabel = "LayoutPath";
 

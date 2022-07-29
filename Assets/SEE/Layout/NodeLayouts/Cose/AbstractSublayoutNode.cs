@@ -40,7 +40,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// the kind of the inner nodes
         /// </summary>
-        public InnerNodeKinds InnerNodeKind { get; }
+        public NodeShapes InnerNodeKind { get; }
 
         /// <summary>
         /// the node Layout
@@ -53,7 +53,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="node">the root node</param>
         /// <param name="innerNodeKinds">the kind of the inner nodes</param>
         /// <param name="nodeLayouts">the node Layout</param>
-        public AbstractSublayoutNode(T node, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayouts)
+        public AbstractSublayoutNode(T node, NodeShapes innerNodeKinds, NodeLayoutKind nodeLayouts)
         {
             Node = node;
             InnerNodeKind = innerNodeKinds;

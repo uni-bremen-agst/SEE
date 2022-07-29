@@ -277,7 +277,7 @@ namespace SEE.Game
         /// <param name="node">the node to be retrieved</param>
         /// <returns>the game object representing the given <paramref name="node"/></returns>
         /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(Node node)
+        public static GameObject RetrieveGameNode(this Node node)
         {
             return RetrieveGameNode(node.ID);
         }

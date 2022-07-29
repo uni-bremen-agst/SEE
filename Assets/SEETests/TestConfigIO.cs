@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
@@ -235,6 +236,94 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Test for empty <see cref="ColorMap"/>.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapZeroElements()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        /// <summary>
+        /// Test for <see cref="ColorMap"/> with only one element.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapOneElement()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            ColorRange colorRange = NewColorRange(Color.green, Color.cyan, 5);
+            saved["metricX"] = colorRange;
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        private static ColorRange NewColorRange(Color lower, Color upper, uint numberOfColors)
+        {
+            ColorRange colorRange = new ColorRange();
+            colorRange.Lower = lower;
+            colorRange.Upper = upper;
+            colorRange.NumberOfColors = numberOfColors;
+            return colorRange;
+        }
+
+        /// <summary>
+        /// Test for <see cref="ColorMap"/> with two elements.
+        /// </summary>
+        [Test]
+        public void TestMetricColorMapTwoElements()
+        {
+            const string filename = "metricmap.cfg";
+            const string label = "metricMap";
+
+            ColorMap saved = new ColorMap();
+            saved["metricX"] = NewColorRange(Color.white, Color.grey, 10);
+            saved["metricY"] = NewColorRange(Color.grey, Color.black, 3);
+            {
+                using ConfigWriter writer = new ConfigWriter(filename);
+                saved.Save(writer, label);
+            }
+            ColorMap loaded = new ColorMap();
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                loaded.Restore(stream.Read(), label);
+            }
+            AreEqualMetricColorMap(saved, loaded);
+        }
+
+        private void AreEqualMetricColorMap(ColorMap saved, ColorMap loaded)
+        {
+            Assert.AreEqual(saved.Count, loaded.Count);
+            foreach (var entry in saved)
+            {
+                Assert.AreEqual(entry.Value, loaded[entry.Key]);
+            }
+        }
+
+        /// <summary>
         /// Test for <see cref="AntennaAttributes"/>.
         /// </summary>
         [Test]
@@ -268,8 +357,18 @@ namespace SEE.Utils
             string filename = "seecity.cfg";
             // First save a new city with all its default values.
             SEECity savedCity = NewVanillaSEECity<SEECity>();
-            savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
-            savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
+            // FIXME: We need tests for the antenna settings
+            //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
+            //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
+            VisualNodeAttributes function = new VisualNodeAttributes("Function")
+            {
+                IsRelevant = true
+            };
+            VisualNodeAttributes file = new VisualNodeAttributes("File")
+            {
+                IsRelevant = false
+            };
+            savedCity.NodeTypes = new Dictionary<string, VisualNodeAttributes>() { { function.NodeType, function }, { file.NodeType, file } };
             savedCity.Save(filename);
 
             // Create a new city with all its default values and then
@@ -325,28 +424,6 @@ namespace SEE.Utils
             loadedCity.Load(filename);
 
             SEERandomCityAttributesAreEqual(savedCity, loadedCity);
-        }
-
-        /// <summary>
-        /// Test for SEEDynCity.
-        /// </summary>
-        [Test]
-        public void TestSEEDynCity()
-        {
-            string filename = "seedyncity.cfg";
-            // First save a new city with all its default values.
-            SEEDynCity savedCity = NewVanillaSEECity<SEEDynCity>();
-            savedCity.Save(filename);
-
-            // Create a new city with all its default values and then
-            // wipe out all its attributes to see whether they are correctly
-            // restored from the saved configuration file.
-            SEEDynCity loadedCity = NewVanillaSEECity<SEEDynCity>();
-            WipeOutSEEDynCityAttributes(loadedCity);
-            // Load the saved attributes from the configuration file.
-            loadedCity.Load(filename);
-
-            SEEDynCityAttributesAreEqual(savedCity, loadedCity);
         }
 
         /// <summary>
@@ -408,18 +485,6 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
-        private static void SEEDynCityAttributesAreEqual(SEEDynCity expected, SEEDynCity actual)
-        {
-            SEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.DYNPath, actual.DYNPath);
-        }
-
-        /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and
-        /// <paramref name="actual"/> are equal.
-        /// </summary>
-        /// <param name="expected">expected settings</param>
-        /// <param name="actual">actual settings</param>
         private static void SEEJlgCityAttributesAreEqual(SEEJlgCity expected, SEEJlgCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
@@ -444,6 +509,8 @@ namespace SEE.Utils
                     {
                         Assert.AreEqual(outer.Mean, inner.Mean);
                         Assert.AreEqual(outer.StandardDeviation, inner.StandardDeviation);
+                        Assert.AreEqual(outer.Minimum, inner.Minimum);
+                        Assert.AreEqual(outer.Maximum, inner.Maximum);
                         found = true;
                         break;
                     }
@@ -496,13 +563,45 @@ namespace SEE.Utils
         private static void AbstractSEECityAttributesAreEqual(AbstractSEECity expected, AbstractSEECity actual)
         {
             AreEqualSharedAttributes(expected, actual);
-            AreEqualLeafNodeSettings(expected.LeafNodeSettings, actual.LeafNodeSettings);
-            AreEqualInnerNodeSettings(expected.InnerNodeSettings, actual.InnerNodeSettings);
+            Assert.AreEqual(expected.NodeTypes.Count, actual.NodeTypes.Count);
+            AreEqualNodeTypes(expected, actual);
+            AreEqualMetricToColor(expected, actual);
             AreEqualNodeLayoutSettings(expected.NodeLayoutSettings, actual.NodeLayoutSettings);
             AreEqualEdgeLayoutSettings(expected.EdgeLayoutSettings, actual.EdgeLayoutSettings);
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
             AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="AbstractSEECity.MetricToColor"/> attributes of <paramref name="expected"/>
+        /// and equal <paramref name="actual"/>.
+        /// </summary>
+        /// <param name="expected">expected value</param>
+        /// <param name="actual">actual value</param>
+        private static void AreEqualMetricToColor(AbstractSEECity expected, AbstractSEECity actual)
+        {
+            Assert.AreEqual(expected.MetricToColor.Count, actual.MetricToColor.Count);
+            foreach (var entry in expected.MetricToColor)
+            {
+                ColorRange actualColorRange = actual.MetricToColor[entry.Key];
+                AreEqual(entry.Value, actualColorRange);
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="AbstractSEECity.NodeTypes"/> of <paramref name="expected"/>
+        /// and equal <paramref name="actual"/>.
+        /// </summary>
+        /// <param name="expected">expected value</param>
+        /// <param name="actual">actual value</param>
+        private static void AreEqualNodeTypes(AbstractSEECity expected, AbstractSEECity actual)
+        {
+            foreach (var entry in expected.NodeTypes)
+            {
+                Assert.IsTrue(actual.NodeTypes.TryGetValue(entry.Key, out VisualNodeAttributes actualSetting));
+                AreEqualNodeSettings(entry.Value, actualSetting);
+            }
         }
 
         /// <summary>
@@ -527,8 +626,8 @@ namespace SEE.Utils
         /// <param name="actual">actual color range</param>
         private static void AreEqual(ColorRange expected, ColorRange actual)
         {
-            AreEqual(expected.lower, actual.lower);
-            AreEqual(expected.upper, actual.upper);
+            AreEqual(expected.Lower, actual.Lower);
+            AreEqual(expected.Upper, actual.Upper);
             Assert.AreEqual(expected.NumberOfColors, actual.NumberOfColors);
         }
 
@@ -593,21 +692,10 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private void WipeOutSEEDynCityAttributes(SEEDynCity city)
-        {
-            WipeOutSEECityAttributes(city);
-            city.DYNPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.dyn");
-        }
-
-        /// <summary>
-        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
-        /// different from their default values.
-        /// </summary>
-        /// <param name="city">the city whose attributes are to be re-assigned</param>
         private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.JLGPath = new DataPath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
+            city.JLGPath = new FilePath("C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg");
         }
 
         /// <summary>
@@ -635,13 +723,35 @@ namespace SEE.Utils
         private static void WipeOutAbstractSEECityAttributes(AbstractSEECity city)
         {
             WipeOutSharedAttributes(city);
-            WipeOutLeafNodeSettings(city);
-            WipeOutInnerNodeSettings(city);
+            WipeOutNodeTypes(city);
+            WipeOutMetricToColor(city);
             WipeOutNodeLayoutSettings(city);
             WipeOutEdgeLayoutSettings(city);
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
             WipeOutCoseGraphSettings(city);
+        }
+
+        /// <summary>
+        /// Resets the <see cref="AbstractSEECity.MetricToColor"/> of <paramref name="city"/>
+        /// to an empty mapping.
+        /// </summary>
+        /// <param name="city">the city whose <see cref="AbstractSEECity.MetricToColor"/> is to be wiped out</param>
+        private static void WipeOutMetricToColor(AbstractSEECity city)
+        {
+            city.MetricToColor.Clear();
+        }
+
+        /// <summary>
+        /// Wipes out <see cref="AbstractSEECity.NodeTypes"/> of <paramref name="city"/>.
+        /// </summary>
+        /// <param name="city">the city whose attributes are to be re-assigned</param>
+        private static void WipeOutNodeTypes(AbstractSEECity city)
+        {
+            foreach (var settings in city.NodeTypes.Values)
+            {
+                WipeOutNodeSettings(settings);
+            }
         }
 
         private static void WipeOutCoseGraphSettings(AbstractSEECity city)
@@ -658,7 +768,7 @@ namespace SEE.Utils
             city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
             city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
             city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
-            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, InnerNodeKinds>() { { "ID1", InnerNodeKinds.Blocks }, { "ID2", InnerNodeKinds.Circles } };
+            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, NodeShapes>() { { "ID1", NodeShapes.Blocks }, { "ID2", NodeShapes.Cylinders } };
             city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
             city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
             city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
@@ -784,60 +894,36 @@ namespace SEE.Utils
             AreEqual(expected.LayoutPath, actual.LayoutPath);
         }
 
-        private static void WipeOutInnerNodeSettings(AbstractSEECity city)
+        private static void WipeOutNodeSettings(VisualNodeAttributes settings)
         {
-            city.InnerNodeSettings.Kind = InnerNodeKinds.Donuts;
-            city.InnerNodeSettings.HeightMetric = "X";
-            city.InnerNodeSettings.ColorMetric = "X";
-            city.InnerNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
-            city.InnerNodeSettings.ShowNames = true;
-            city.InnerNodeSettings.InnerDonutMetric = "X";
-            city.InnerNodeSettings.OutlineWidth = 99999;
-            WipeOutAntennaSettings(ref city.InnerNodeSettings.AntennaSettings);
-            WipeOutLabelSettings(ref city.InnerNodeSettings.LabelSettings);
+            settings.Shape = NodeShapes.Blocks;
+            settings.IsRelevant = false;
+            settings.HeightMetric = "X";
+            settings.WidthMetric = "X";
+            settings.DepthMetric = "X";
+            settings.ColorProperty.ColorMetric = "X";
+            settings.MinimalBlockLength = 90000;
+            settings.MaximalBlockLength = 1000000;
+            settings.OutlineWidth = 99999;
+            WipeOutAntennaSettings(ref settings.AntennaSettings);
+            WipeOutLabelSettings(ref settings.LabelSettings);
+            settings.ShowNames = true;
         }
 
-        private static void AreEqualInnerNodeSettings(InnerNodeAttributes expected, InnerNodeAttributes actual)
+        private static void AreEqualNodeSettings(VisualNodeAttributes expected, VisualNodeAttributes actual)
         {
-            Assert.AreEqual(expected.Kind, actual.Kind);
-            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
-            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
-            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
-            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
-            Assert.AreEqual(expected.InnerDonutMetric, actual.InnerDonutMetric);
-            Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
-            AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
-            AreEqual(expected.LabelSettings, actual.LabelSettings);
-        }
-
-        private static void WipeOutLeafNodeSettings(AbstractSEECity city)
-        {
-            city.LeafNodeSettings.Kind = LeafNodeKinds.Blocks;
-            city.LeafNodeSettings.HeightMetric = "X";
-            city.LeafNodeSettings.WidthMetric = "X";
-            city.LeafNodeSettings.DepthMetric = "X";
-            city.LeafNodeSettings.ColorMetric = "X";
-            city.LeafNodeSettings.ColorRange = new ColorRange(Color.clear, Color.clear, 2);
-            city.LeafNodeSettings.MinimalBlockLength = 90000;
-            city.LeafNodeSettings.MaximalBlockLength = 1000000;
-            city.LeafNodeSettings.OutlineWidth = 99999;
-            WipeOutAntennaSettings(ref city.LeafNodeSettings.AntennaSettings);
-            WipeOutLabelSettings(ref city.LeafNodeSettings.LabelSettings);
-        }
-
-        private static void AreEqualLeafNodeSettings(LeafNodeAttributes expected, LeafNodeAttributes actual)
-        {
-            Assert.AreEqual(expected.Kind, actual.Kind);
+            Assert.AreEqual(expected.Shape, actual.Shape);
+            Assert.AreEqual(expected.IsRelevant, actual.IsRelevant);
             Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
             Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
             Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
-            Assert.AreEqual(expected.ColorMetric, actual.ColorMetric);
-            Assert.AreEqual(expected.ColorRange, actual.ColorRange);
+            Assert.AreEqual(expected.ColorProperty.ColorMetric, actual.ColorProperty.ColorMetric);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
             Assert.AreEqual(expected.OutlineWidth, actual.OutlineWidth);
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
+            Assert.AreEqual(expected.ShowNames, actual.ShowNames);
         }
 
         private static void WipeOutAntennaSettings(ref AntennaAttributes antennaAttributes)
@@ -861,9 +947,9 @@ namespace SEE.Utils
         {
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
-            city.SelectedNodeTypes = new Dictionary<string, bool>() { { "Routine", true }, { "Class", false } };
-            city.CityPath.Set("C:/MyAbsoluteDirectory/config.cfg");
-            city.ProjectPath.Set("C:/MyAbsoluteDirectory");
+            city.NodeTypes = new Dictionary<string, VisualNodeAttributes>();
+            city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
+            city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
             city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
             city.ZScoreScale = !city.ZScoreScale;
             city.ScaleOnlyLeafMetrics = !city.ScaleOnlyLeafMetrics;
@@ -873,12 +959,28 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.LODCulling, actual.LODCulling);
             CollectionAssert.AreEquivalent(expected.HierarchicalEdges, actual.HierarchicalEdges);
-            CollectionAssert.AreEquivalent(expected.SelectedNodeTypes, actual.SelectedNodeTypes);
-            AreEqual(expected.CityPath, actual.CityPath);
-            AreEqual(expected.ProjectPath, actual.ProjectPath);
+            AreEquivalent(expected.NodeTypes, actual.NodeTypes);
+            AreEqual(expected.ConfigurationPath, actual.ConfigurationPath);
+            AreEqual(expected.SourceCodeDirectory, actual.SourceCodeDirectory);
             AreEqual(expected.SolutionPath, actual.SolutionPath);
             Assert.AreEqual(expected.ZScoreScale, actual.ZScoreScale);
             Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
+        }
+
+        private static void AreEquivalent(Dictionary<string, VisualNodeAttributes> expected, Dictionary<string, VisualNodeAttributes> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            foreach (var entry in expected)
+            {
+                if (actual.TryGetValue(entry.Key, out VisualNodeAttributes entryInActual))
+                {
+                    AreEqualNodeSettings(entry.Value, entryInActual);
+                }
+                else
+                {
+                    Assert.Fail($"{entry.Key} not contained in actual");
+                }
+            }
         }
 
         /// <summary>

@@ -1,7 +1,9 @@
 {
     "name": "InControl.Examples",
     "references": [
-        "InControl"
+        "InControl",
+        "UnityEngine.UI",
+        "UnityEditor.UI"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

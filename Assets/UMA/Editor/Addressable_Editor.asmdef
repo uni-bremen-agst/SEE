@@ -3,7 +3,11 @@
     "references": [
         "Unity.Addressables.Editor",
         "Unity.ResourceManager",
-        ""
+        "",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

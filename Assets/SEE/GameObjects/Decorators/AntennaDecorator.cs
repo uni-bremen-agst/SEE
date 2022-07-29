@@ -2,11 +2,11 @@
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GO.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace SEE.GO.Decorators
 {
@@ -89,9 +89,7 @@ namespace SEE.GO.Decorators
             {
                 if (node.TryGetNumeric(section.Metric, out float sectionMetric) && sectionMetric > 0)
                 {
-                    NodeFactory segmentFactory = metricToFactory[section.Metric];
-
-                    GameObject segment = NewSegment(segmentFactory);
+                    GameObject segment = NewSegment(metricToFactory[section.Metric]);
                     segment.name = section.Metric + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 
@@ -155,7 +153,7 @@ namespace SEE.GO.Decorators
             Dictionary<string, CylinderFactory> result = new Dictionary<string, CylinderFactory>(antennaAttributes.AntennaSections.Count);
             foreach (AntennaSection section in antennaAttributes.AntennaSections)
             {
-                result[section.Metric] = new CylinderFactory(Materials.ShaderType.Transparent, new ColorRange(section.Color, section.Color, 1));
+                result[section.Metric] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
             }
             return result;
         }

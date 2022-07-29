@@ -2,7 +2,11 @@
     "name": "SteamVR_Input_Editor",
     "references": [
         "SteamVR",
-        "Unity.XR.OpenVR"
+        "Unity.XR.OpenVR",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

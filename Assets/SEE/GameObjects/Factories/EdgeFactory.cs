@@ -112,7 +112,7 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-        public ICollection<GameObject> DrawEdges<T>(ICollection<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
+        public ICollection<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
         where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
@@ -165,7 +165,7 @@ namespace SEE.GO
         /// <param name="nodes">source and target nodes of the <paramref name="edges"/></param>
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
-        public ICollection<GameObject> CalculateNewEdges<T>(ICollection<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
+        public ICollection<GameObject> CalculateNewEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
         where T: ILayoutNode, IHierarchyNode<ILayoutNode>
         {
             List<GameObject> result = new List<GameObject>(edges.Count);
@@ -174,11 +174,7 @@ namespace SEE.GO
                 return result;
             }
             layout.Create(nodes, edges);
-            foreach (LayoutGraphEdge<T> layoutEdge in edges)
-            {
-                GameObject gameEdge = NewGameEdge(layoutEdge);
-                result.Add(gameEdge);
-            }
+            result.AddRange(edges.Select(NewGameEdge));
             return result;
         }
     }
