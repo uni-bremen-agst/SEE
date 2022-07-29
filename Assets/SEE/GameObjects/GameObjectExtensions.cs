@@ -173,36 +173,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the render-queue offset of given <paramref name="gameObject"/>.
-        ///
-        /// Precondition: <paramref name="gameObject"/> must have a renderer attached
-        /// to it; otherwise 0 will be returned.
-        /// </summary>
-        /// <param name="gameObject">objects whose render-queue is requested</param>
-        /// <returns>render-queue offset</returns>
-        public static int GetRenderQueue(this GameObject gameObject)
-        {
-            if (gameObject.TryGetComponent(out Renderer renderer))
-            {
-                return renderer.sharedMaterial.renderQueue;
-            }
-
-            Debug.LogWarning($"GetRenderQueue: Game object {gameObject.name} has no renderer.\n");
-            return 0;
-        }
-
-        /// <summary>
-        /// Returns the render queue position that is renderer later than the index
-        /// of <paramref name="gameNode"/>.
-        /// </summary>
-        /// <param name="gameNode">game object to be drawn just before the resulting render queue index</param>
-        /// <returns>render queue index later than the index of <paramref name="gameNode"/></returns>
-        internal static int RenderLater(this GameObject gameNode)
-        {
-            return gameNode.GetRenderQueue() + 1;
-        }
-
-        /// <summary>
         /// Sets the color for this <paramref name="gameObject"/> to given <paramref name="color"/>.
         ///
         /// Precondition: <paramref name="gameObject"/> has a renderer whose material has a color attribute.
