@@ -53,7 +53,7 @@ namespace SEE.GO.NodeFactories
             float zOffset = -allButHeight.Max() / 2;
 
             // Four vertices per bar.
-            Vector3[] vertices = new Vector3[numberOfBars * 4];
+            Vector2[] vertices = new Vector2[numberOfBars * 4];
             // Two rectangles per bar; three indices per triangle.
             int[] triangles = new int[numberOfBars * 2 * 3];
 
@@ -62,11 +62,11 @@ namespace SEE.GO.NodeFactories
             for (int i = 0; i < numberOfBars; i++)
             {
                 int v = 4 * i;
-                vertices[v] = new Vector3(xOffset + leftCorner, 0, zOffset);
-                vertices[v + 1] = new Vector3(xOffset + leftCorner, 0, zOffset + allButHeight[i]);
+                vertices[v] = new Vector2(xOffset + leftCorner, zOffset);
+                vertices[v + 1] = new Vector2(xOffset + leftCorner, zOffset + allButHeight[i]);
                 leftCorner += widthOfBar;
-                vertices[v + 2] = new Vector3(xOffset + leftCorner, 0, zOffset + allButHeight[i]);
-                vertices[v + 3] = new Vector3(xOffset + leftCorner, 0, zOffset);
+                vertices[v + 2] = new Vector2(xOffset + leftCorner, zOffset + allButHeight[i]);
+                vertices[v + 3] = new Vector2(xOffset + leftCorner, zOffset);
 
                 // Unity uses clockwise winding order for determining front-facing triangles.
                 // first triangle
@@ -80,15 +80,16 @@ namespace SEE.GO.NodeFactories
                 triangles[nextTriangleIndex++] = v + 3;
 
             }
-            // TODO: The mesh is currently only two-dimensional.
+
+            Add3D(vertices, triangles, out Vector3[] vertices3D, out int[] triangles3D);
             Mesh mesh = new Mesh
             {
                 name = "SEEBarMesh"
             };
-            mesh.vertices = vertices;
+            mesh.vertices = vertices3D;
             // It is recommended to assign a triangle array after assigning the
             // vertex array, in order to avoid out of bounds errors.
-            mesh.triangles = triangles;
+            mesh.triangles = triangles3D;
 
             return mesh;
         }
