@@ -95,14 +95,24 @@ namespace SEE.Game.City
         private readonly Queue<ChangeEvent> UnhandledEvents = new Queue<ChangeEvent>();
 
         /// <summary>
+        /// All tweens which control edges' colors on reflexion changes.
+        /// </summary>
+        private readonly Dictionary<string, ICollection<Tween>> edgeTweens = new Dictionary<string, ICollection<Tween>>();
+        
+        /// <summary>
+        /// All tweens which control nodes' movement and scale on reflexion changes.
+        /// </summary>
+        private readonly Dictionary<string, ICollection<Tween>> nodeTweens = new Dictionary<string, ICollection<Tween>>();
+
+        /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
         /// </summary>
-        private const float ANIMATION_DURATION = 2.0f;
+        private const float ANIMATION_DURATION = 0.5f;
 
         /// <summary>
         /// Ease function of any animation (edge movement, color change...).
         /// </summary>
-        private const Ease ANIMATION_EASE = Ease.InOutExpo;
+        private const Ease ANIMATION_EASE = Ease.OutExpo;
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -321,6 +331,8 @@ namespace SEE.Game.City
 
             // TODO: Make sure these actions don't interfere with reversible actions.
             // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
+            // TODO: Handle these asynchronously
+            
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:
@@ -365,9 +377,13 @@ namespace SEE.Game.City
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
+                
+                // If there are existing tweens, remove them.
+                ICollection<Tween> tweens = CleanTweens(edgeTweens, edgeChange.Edge.ID);
+                
                 // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
-                startTween.Play();
-                endTween.Play();
+                tweens.Add(startTween.Play());
+                tweens.Add(endTween.Play());
             }
             else
             {
@@ -399,15 +415,16 @@ namespace SEE.Game.City
             }
         }
 
-        private static void AnimateNodeMovement(GameObject gameNode, Vector3 newPosition, Vector3 targetScale)
+        // If parameters are not given, the current values will be used.
+        private void AnimateNodeMovement(GameObject gameNode, float? newYPosition = null, Vector3? targetScale = null)
         {
             // We remember the old position and move the node to the new position so that 
             // edge layouts can be correctly calculated.
             Vector3 oldPosition = gameNode.transform.position;
-            gameNode.transform.position = newPosition;
+            gameNode.transform.position = gameNode.transform.position.WithXYZ(y: newYPosition);
             // Mapped node should be half its parent's size
             Vector3 oldScale = gameNode.transform.localScale;
-            gameNode.transform.localScale = targetScale;
+            gameNode.transform.localScale = targetScale ?? oldScale;
             Node node = gameNode.GetNode();
 
             // Recalculate edge layout and animate edges due to new node positioning.
@@ -424,11 +441,27 @@ namespace SEE.Game.City
                 AddEdgeSplineAnimation(gameEdge, newEdge);
             }
 
+            if (newYPosition == null && targetScale == null)
+            {
+                // Nothing remains to be done. Killing any still running tweens would be counterproductive.
+                return;
+            }
+            
+            // Clean out old tweens from an animation that may still be ongoing.
+            ICollection<Tween> tweens = CleanTweens(nodeTweens, node.ID);
+
             // Movement of the node should be animated as well. For this, we have to reset its position first.
             gameNode.transform.position = oldPosition;
             gameNode.transform.localScale = oldScale;
-            gameNode.transform.DOMove(newPosition, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
-            gameNode.transform.DOScale(targetScale, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play();
+            if (newYPosition.HasValue)
+            {
+                tweens.Add(gameNode.transform.DOMoveY(newYPosition.Value, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play());
+            }
+
+            if (targetScale.HasValue)
+            {
+                tweens.Add(gameNode.transform.DOScale(targetScale.Value, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play());
+            }
 
             #region Local Methods
 
@@ -440,25 +473,36 @@ namespace SEE.Game.City
                     // We deactivate the target edge first so it's not visible.
                     targetEdge.SetActive(false);
                     // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
-                    SplineMorphism morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                    morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
-                            .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
+                    if (!splineSource.gameObject.TryGetComponent(out SplineMorphism morphism))
+                    {
+                        morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
+                    }
+
+                    if (morphism.IsActive())
+                    {
+                        // A tween already exists, we simply need to change its target.
+                        morphism.ChangeTarget(splineTarget.Spline);
+                    }
+                    else
+                    {
+                        morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
+                                .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
+                    }
                 }
             }
 
             #endregion
         }
 
-        private static void HandleRemovedMapping(Edge mapsToEdge)
+        private void HandleRemovedMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
-
-            AnimateNodeMovement(implGameNode, implGameNode.transform.position, implGameNode.transform.localScale);
+            AnimateNodeMovement(implGameNode);
         }
 
-        private static void HandleNewMapping(Edge mapsToEdge)
+        private void HandleNewMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
                                                         + $"onto '{mapsToEdge.Target.ToShortString()}'.");
@@ -477,7 +521,7 @@ namespace SEE.Game.City
             Vector3 newScale = implGameNode.transform.localScale;
             implGameNode.transform.position = oldPosition;
             implGameNode.transform.localScale = oldScale;
-            AnimateNodeMovement(implGameNode, newPosition, newScale);
+            AnimateNodeMovement(implGameNode, newPosition.y, newScale);
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
@@ -493,6 +537,43 @@ namespace SEE.Game.City
         private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
         {
             // FIXME: Handle event
+        }
+
+        /// <summary>
+        /// Goes through all tweens in the <paramref name="tweenDictionary"/> under the given
+        /// <paramref name="cleanKey"/>, kills them if they're still active, and clears them all out of the dictionary.
+        /// </summary>
+        /// <param name="tweenDictionary">The dictionary in which <paramref name="cleanKey"/> shall be "cleaned".</param>
+        /// <param name="cleanKey">The key whose tweens shall be killed and removed.</param>
+        /// <param name="complete">Whether to set the tween to its target value before killing it</param>
+        /// <typeparam name="T">Type of the key in <paramref name="tweenDictionary"/>.</typeparam>
+        /// <returns>The newly created empty list within <paramref name="tweenDictionary"/>.</returns>
+        private static ICollection<Tween> CleanTweens<T>(IDictionary<T, ICollection<Tween>> tweenDictionary, T cleanKey, bool complete = false)
+        {
+            // Clean out old tweens while killing them
+            if (tweenDictionary.ContainsKey(cleanKey))
+            {
+                foreach (Tween tween in tweenDictionary[cleanKey])
+                {
+                    if (tween.IsActive())
+                    {
+                        tween.Kill(complete);
+                    }
+                }
+            }
+            return tweenDictionary[cleanKey] = new List<Tween>();
+        }
+
+        public void KillNodeTweens(Node node, bool complete = true)
+        {
+            Debug.Log($"Killing tweens for {node.ID}");
+            CleanTweens(nodeTweens, node.ID, complete);
+            
+            // We will also kill any connected edge tweens.
+            foreach (Edge edge in node.Incomings.Concat(node.Outgoings))
+            {
+                CleanTweens(edgeTweens, edge.ID, complete);
+            }
         }
     }
 }
