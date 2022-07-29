@@ -4,7 +4,6 @@ using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Rendering;
 
 namespace SEE.GO
 {
