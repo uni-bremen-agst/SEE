@@ -311,6 +311,26 @@ namespace SEE.GO.NodeFactories
             return metrics.Where((value, index) => index != 1);
         }
 
+        /// <summary>
+        /// Yields the <paramref name="vertices3D"/> and <paramref name="triangles3D"/> for a
+        /// three-dimensional mesh whose ground area (x/z plane) is defined by
+        /// <paramref name="groundAreaVertices"/>.
+        ///
+        /// The mesh will have the ground area and roof area specified by <paramref name="groundAreaVertices"/>.
+        /// The corresponding vertices of the ground and roof area will be conntected by rectangles.
+        ///
+        /// If <param name="groundAreaTriangles"> is <c>null</c>, the triangles for the roof and ground
+        /// will be calculated using a triangulation algorithm. If <param name="groundAreaTriangles">
+        /// is not <c>null</c>, those triangles will be used for the roof and ground areas.
+        ///
+        /// The vertices and triangles for the resulting mesh are returned in <paramref name="vertices3D"/>
+        /// and <paramref name="triangles3D"/>, respectively.
+        /// </summary>
+        /// <param name="groundAreaVertices">the vertices forming the ground area</param>
+        /// <param name="groundAreaTriangles">existing triangles for the ground area; if <c>null</c>, this
+        /// method will create those triangles</param>
+        /// <param name="vertices3D">the resulting 3D vertices for the mesh</param>
+        /// <param name="triangles3D">the resulting 3D triangles for the mesh</param>
         protected static void Add3D(Vector2[] groundAreaVertices, int[] groundAreaTriangles, out Vector3[] vertices3D, out int[] triangles3D)
         {
             // The triangle indices for the 2D vertices of the ground area.
