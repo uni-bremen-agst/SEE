@@ -60,9 +60,13 @@ namespace SEE.Game
             {
                 graph.SortHierarchyByName();
             }
-            SetNodeFactories(graphs);
+            SetNodeFactories();
         }
 
+        /// <summary>
+        /// Returns the name of the node types for all <see cref="graphs"/>.
+        /// </summary>
+        /// <returns>node types for all <see cref="graphs"/></returns>
         private ISet<string> AllNodeTypes()
         {
             ISet<string> nodeTypes = new HashSet<string>();
@@ -73,7 +77,10 @@ namespace SEE.Game
             return nodeTypes;
         }
 
-        private void SetNodeFactories(IList<Graph> graphs)
+        /// <summary>
+        /// Sets the node factories for <see cref="nodeTypeToFactory"/> for all node types in <see cref="graphs"/>.
+        /// </summary>
+        private void SetNodeFactories()
         {
             foreach (string nodeType in AllNodeTypes())
             {
@@ -88,16 +95,19 @@ namespace SEE.Game
                 }
             }
 
+            // The default node factory that we use if the we cannot find a setting for a given node type.
             NodeFactory GetDefaultNodeFactory()
             {
                 return new CubeFactory(ShaderType, DefaultColorRange());
             }
 
+            // The default color range that we use if the we cannot find a setting for a given node type.
             static ColorRange DefaultColorRange()
             {
                 return new ColorRange(Color.white, Color.black, 10);
             }
 
+            // The appropriate node factory for value.Shape.
             NodeFactory GetNodeFactory(VisualNodeAttributes value)
             {
                 ColorRange colorRange = GetColorRange(value.ColorProperty);
@@ -113,6 +123,8 @@ namespace SEE.Game
                 };
             }
 
+            // The color range for the tiven colorProperty depending upon whether the property
+            // used to determine the color range is PropertyKind.Type or PropertyKind.Metric.
             ColorRange GetColorRange(ColorProperty colorProperty)
             {
                 switch (colorProperty.Property)
