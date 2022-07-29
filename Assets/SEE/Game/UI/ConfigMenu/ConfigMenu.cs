@@ -243,7 +243,7 @@ namespace SEE.Game.UI.ConfigMenu
                 city.Reset();
                 cityLoadButton.gameObject.SetActive(true);
             });
-            CreateActionButton("Save Graph", city.Save);
+            CreateActionButton("Save Graph", city.SaveConfiguration);
             CreateActionButton("Draw", () =>
             {
                 city.DrawGraph();
@@ -264,7 +264,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupPages()
         {
-            List<string> metricNames = city.AllExistingMetrics();
+            ICollection<string> metricNames = city.AllExistingMetrics();
             SetupLeafNodesPage(metricNames);
             SetupInnerNodesPage(metricNames);
             SetupNodesLayoutPage();
@@ -278,83 +278,86 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         /// <param name="metricNames">the names of the metrics that can be selected
         /// for these visual attributes</param>
-        private void SetupLeafNodesPage(List<string> metricNames)
+        private void SetupLeafNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Leaf nodes", TabButtonState.InitialActive);
             GameObject page = CreateAndInsertPage("Leaf nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            LeafNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
-            {
-                // Shape type for leaf nodes
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Shape")
-                    .SetAllowedValues(EnumToStr<LeafNodeKinds>())
-                    .SetDefaultValue(leafNodeAttributes.Kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.Kind))
-                    .SetComboSelectMode(ComboSelectMode.Restricted)
-                    .Build();
+            // FIXME: We now have these settings for each node type. The following
+            // must be adjusted accordingly.
 
-                // Width metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Width")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(leafNodeAttributes.WidthMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.WidthMetric = s)
-                    .Build();
+            //VisualNodeAttributes leafNodeAttributes = city.LeafNodeSettings;
+            //{
+            //    // Shape type for leaf nodes
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Shape")
+            //        .SetAllowedValues(EnumToStr<NodeShapes>())
+            //        .SetDefaultValue(leafNodeAttributes.Shape.ToString())
+            //        .SetOnChangeHandler(s => Enum.TryParse(s, out leafNodeAttributes.Shape))
+            //        .SetComboSelectMode(ComboSelectMode.Restricted)
+            //        .Build();
 
-                // Height metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Height")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(leafNodeAttributes.HeightMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.HeightMetric = s)
-                    .Build();
+            //    // Width metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Width")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(leafNodeAttributes.WidthMetric)
+            //        .SetOnChangeHandler(s => leafNodeAttributes.WidthMetric = s)
+            //        .Build();
 
-                // Height metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Depth")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(leafNodeAttributes.DepthMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.DepthMetric = s)
-                    .Build();
+            //    // Height metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Height")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(leafNodeAttributes.HeightMetric)
+            //        .SetOnChangeHandler(s => leafNodeAttributes.HeightMetric = s)
+            //        .Build();
 
-                // Leaf style metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Color")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(leafNodeAttributes.ColorMetric)
-                    .SetOnChangeHandler(s => leafNodeAttributes.ColorMetric = s)
-                    .Build();
+            //    // Height metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Depth")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(leafNodeAttributes.DepthMetric)
+            //        .SetOnChangeHandler(s => leafNodeAttributes.DepthMetric = s)
+            //        .Build();
 
-                // Lower color
-                ColorPickerBuilder.Init(controls.transform)
-                    .SetLabel("Lower color")
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.lower)
-                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.lower = c)
-                    .SetColorPickerControl(colorPickerControl)
-                    .Build();
+            //    // Leaf style metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Color")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorMetric)
+            //        .SetOnChangeHandler(s => leafNodeAttributes.ColorProperty.ColorMetric = s)
+            //        .Build();
 
-                // Upper color
-                ColorPickerBuilder.Init(controls.transform)
-                    .SetLabel("Upper color")
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.upper)
-                    .SetOnChangeHandler(c => leafNodeAttributes.ColorRange.upper = c)
-                    .SetColorPickerControl(colorPickerControl)
-                    .Build();
+            //    // Lower color
+            //    ColorPickerBuilder.Init(controls.transform)
+            //        .SetLabel("Lower color")
+            //        .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.lower)
+            //        .SetOnChangeHandler(c => leafNodeAttributes.ColorProperty.ColorRange.lower = c)
+            //        .SetColorPickerControl(colorPickerControl)
+            //        .Build();
 
-                // Number of colors
-                SliderBuilder.Init(controls.transform)
-                    .SetLabel("# Colors")
-                    .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(leafNodeAttributes.ColorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => leafNodeAttributes.ColorRange.NumberOfColors =
-                                            (uint)Math.Round(f))
-                    .SetRange((0, 15))
-                    .Build();
+            //    // Upper color
+            //    ColorPickerBuilder.Init(controls.transform)
+            //        .SetLabel("Upper color")
+            //        .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.upper)
+            //        .SetOnChangeHandler(c => leafNodeAttributes.ColorProperty.ColorRange.upper = c)
+            //        .SetColorPickerControl(colorPickerControl)
+            //        .Build();
 
-                CreateLabelSettingsInputs(controls, leafNodeAttributes.LabelSettings);
-            }
+            //    // Number of colors
+            //    SliderBuilder.Init(controls.transform)
+            //        .SetLabel("# Colors")
+            //        .SetMode(SliderMode.Integer)
+            //        .SetDefaultValue(leafNodeAttributes.ColorProperty.ColorRange.NumberOfColors)
+            //        .SetOnChangeHandler(f => leafNodeAttributes.ColorProperty.ColorRange.NumberOfColors =
+            //                                (uint)Math.Round(f))
+            //        .SetRange((0, 15))
+            //        .Build();
+
+            //    CreateLabelSettingsInputs(controls, leafNodeAttributes.LabelSettings);
+            //}
         }
 
         /// <summary>
@@ -363,67 +366,70 @@ namespace SEE.Game.UI.ConfigMenu
         /// </summary>
         /// <param name="metricNames">the names of the metrics that can be selected
         /// for these visual attributes</param>
-        private void SetupInnerNodesPage(List<string> metricNames)
+        private void SetupInnerNodesPage(ICollection<string> metricNames)
         {
             CreateAndInsertTabButton("Inner nodes");
             GameObject page = CreateAndInsertPage("Inner nodes");
             Transform controls = page.transform.Find("ControlsViewport/ControlsContent");
 
-            InnerNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
-            {
-                // Shape type for inner nodes
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Shape")
-                    .SetAllowedValues(EnumToStr<InnerNodeKinds>())
-                    .SetDefaultValue(innerNodeAttributes.Kind.ToString())
-                    .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.Kind))
-                    .SetComboSelectMode(ComboSelectMode.Restricted)
-                    .Build();
+            // FIXME: We now have these settings for each node type. The following
+            // must be adjusted accordingly.
 
-                // Height metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Height")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(innerNodeAttributes.HeightMetric)
-                    .SetOnChangeHandler(s => innerNodeAttributes.HeightMetric = s)
-                    .Build();
+            //VisualNodeAttributes innerNodeAttributes = city.InnerNodeSettings;
+            //{
+            //    // Shape type for inner nodes
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Shape")
+            //        .SetAllowedValues(EnumToStr<NodeShapes>())
+            //        .SetDefaultValue(innerNodeAttributes.Shape.ToString())
+            //        .SetOnChangeHandler(s => Enum.TryParse(s, out innerNodeAttributes.Shape))
+            //        .SetComboSelectMode(ComboSelectMode.Restricted)
+            //        .Build();
 
-                // Leaf style metric
-                ComboSelectBuilder.Init(controls.transform)
-                    .SetLabel("Color")
-                    .SetAllowedValues(metricNames)
-                    .SetDefaultValue(innerNodeAttributes.ColorMetric)
-                    .SetOnChangeHandler(s => innerNodeAttributes.ColorMetric = s)
-                    .Build();
+            //    // Height metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Height")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(innerNodeAttributes.HeightMetric)
+            //        .SetOnChangeHandler(s => innerNodeAttributes.HeightMetric = s)
+            //        .Build();
 
-                // Lower color
-                ColorPickerBuilder.Init(controls.transform)
-                    .SetLabel("Lower color")
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.lower)
-                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.lower = c)
-                    .SetColorPickerControl(colorPickerControl)
-                    .Build();
+            //    // Leaf style metric
+            //    ComboSelectBuilder.Init(controls.transform)
+            //        .SetLabel("Color")
+            //        .SetAllowedValues(metricNames)
+            //        .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorMetric)
+            //        .SetOnChangeHandler(s => innerNodeAttributes.ColorProperty.ColorMetric = s)
+            //        .Build();
 
-                // Upper color
-                ColorPickerBuilder.Init(controls.transform)
-                    .SetLabel("Upper color")
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.upper)
-                    .SetOnChangeHandler(c => innerNodeAttributes.ColorRange.upper = c)
-                    .SetColorPickerControl(colorPickerControl)
-                    .Build();
+            //    // Lower color
+            //    ColorPickerBuilder.Init(controls.transform)
+            //        .SetLabel("Lower color")
+            //        .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.lower)
+            //        .SetOnChangeHandler(c => innerNodeAttributes.ColorProperty.ColorRange.lower = c)
+            //        .SetColorPickerControl(colorPickerControl)
+            //        .Build();
 
-                // Number of colors
-                SliderBuilder.Init(controls.transform)
-                    .SetLabel("# Colors")
-                    .SetMode(SliderMode.Integer)
-                    .SetDefaultValue(innerNodeAttributes.ColorRange.NumberOfColors)
-                    .SetOnChangeHandler(f => innerNodeAttributes.ColorRange.NumberOfColors =
-                                            (uint)Math.Round(f))
-                    .SetRange((0, 15))
-                    .Build();
+            //    // Upper color
+            //    ColorPickerBuilder.Init(controls.transform)
+            //        .SetLabel("Upper color")
+            //        .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.upper)
+            //        .SetOnChangeHandler(c => innerNodeAttributes.ColorProperty.ColorRange.upper = c)
+            //        .SetColorPickerControl(colorPickerControl)
+            //        .Build();
 
-                CreateLabelSettingsInputs(controls, innerNodeAttributes.LabelSettings);
-            }
+            //    // Number of colors
+            //    SliderBuilder.Init(controls.transform)
+            //        .SetLabel("# Colors")
+            //        .SetMode(SliderMode.Integer)
+            //        .SetDefaultValue(innerNodeAttributes.ColorProperty.ColorRange.NumberOfColors)
+            //        .SetOnChangeHandler(f => innerNodeAttributes.ColorProperty.ColorRange.NumberOfColors =
+            //                                (uint)Math.Round(f))
+            //        .SetRange((0, 15))
+            //        .Build();
+
+            //    CreateLabelSettingsInputs(controls, innerNodeAttributes.LabelSettings);
+            //}
         }
 
         private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
@@ -591,7 +597,7 @@ namespace SEE.Game.UI.ConfigMenu
             // Settings file
             FilePickerBuilder.Init(controls.transform)
                 .SetLabel("Settings file")
-                .SetPathInstance(city.CityPath)
+                .SetPathInstance(city.ConfigurationPath)
                 .Build();
 
             // LOD culling

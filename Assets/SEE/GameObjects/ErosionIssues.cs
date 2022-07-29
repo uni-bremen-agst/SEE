@@ -14,14 +14,12 @@ namespace SEE.GO
         /// Constructor.
         /// </summary>
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
-        /// <param name="innerNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="erosionScalingFactor">the factor by which the erosion icons shall be scaled</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             NodeFactory innerNodeFactory, IScale scaler, float erosionScalingFactor)
+                             IScale scaler, float erosionScalingFactor)
         {
             this.issueMap = issueMap;
-            this.innerNodeFactory = innerNodeFactory;
             this.scaler = scaler;
             this.erosionScalingFactor = erosionScalingFactor;
         }
@@ -35,11 +33,6 @@ namespace SEE.GO
         /// The settings that determine the relevant metrics for the erosion issues.
         /// </summary>
         private readonly Dictionary<string, IconFactory.Erosion> issueMap;
-
-        /// <summary>
-        /// The factory that created the game nodes that are to be decorated.
-        /// </summary>
-        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scaling to be applied on the metrics for the erosion issues.
@@ -111,7 +104,7 @@ namespace SEE.GO
                     // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
 
                     // Now scale the sprite into the corridor [0, maxSpriteWidth]
-                    scale *= Mathf.Lerp(0, innerNodeFactory.GetSize(gameNode.gameObject).x, scale.x);
+                    scale *= Mathf.Lerp(0, gameNode.gameObject.transform.lossyScale.x, scale.x);
 
                     // Finally, scale sprite by the configured scaling factor
                     scale *= erosionScalingFactor;
@@ -127,7 +120,7 @@ namespace SEE.GO
             // ascending order of their widths.
             {
                 Vector3 currentRoof = GetRoof(gameNode);
-                currentRoof += Vector3.up * innerNodeFactory.GetSize(gameNode.gameObject).x / 6;
+                currentRoof += Vector3.up * gameNode.gameObject.transform.lossyScale.x / 6;
                 sprites.Sort(Comparer<GameObject>.Create((left, right) =>
                                                              GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)

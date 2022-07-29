@@ -22,25 +22,25 @@ namespace SEE.Layout.EdgeLayouts
             name = "Straight";
         }
 
-        /// Adds way points to each edge in the given list of <paramref name="edges"/> 
+        /// Adds way points to each edge in the given list of <paramref name="edges"/>
         /// along a leveled up line straight from its source to each target.
         /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
         /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"\>
         /// are used to determine the height at which to draw the edges so that they
         /// do not pass through any other node and, hence, should include every node that
         /// may be in between sources and targets of any edge in <paramref name="edges"/>.
-        /// </summary> 
+        /// </summary>
         /// <param name="nodes">nodes whose edges are to be drawn (ignored)</param>
         /// <param name="edges">edges for which to add way points</param>
         public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
         {
             MinMaxBlockY(nodes, out float minBlockY, out float maxBlockY, out float maxHeight);
 
-            // The offset of the edges above or below the ground chosen relative 
+            // The offset of the edges above or below the ground chosen relative
             // to the height of the largest block.
-            // We are using a value relative to the highest node so that edges 
+            // We are using a value relative to the highest node so that edges
             // are farther away from the blocks for cities with large blocks and
-            // closer to blocks for cities with small blocks. This may help to 
+            // closer to blocks for cities with small blocks. This may help to
             // better read the edges.
             // This offset is used to draw the line somewhat below
             // or above the house (depending on the orientation).
@@ -48,7 +48,6 @@ namespace SEE.Layout.EdgeLayouts
             // The level at which edges are drawn.
             float edgeLevel = edgesAboveBlocks ? maxBlockY + offset : minBlockY - offset;
 
-            Debug.LogFormat($"offset={offset} edgeLevel={edgeLevel} maxHeight={maxHeight}\n");
             foreach (ILayoutEdge<T> edge in edges)
             {
                 ILayoutNode source = edge.Source;

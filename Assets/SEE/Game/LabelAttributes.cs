@@ -1,4 +1,6 @@
 ﻿using SEE.Utils;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 
 namespace SEE.Game
@@ -6,6 +8,8 @@ namespace SEE.Game
     /// <summary>
     /// Setting for labels to be shown above game nodes.
     /// </summary>
+    [Serializable]
+    [HideReferenceObjectPicker]
     public class LabelAttributes
     {
         /// <summary>

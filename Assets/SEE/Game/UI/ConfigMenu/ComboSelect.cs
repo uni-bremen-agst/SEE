@@ -23,6 +23,7 @@
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -110,9 +111,9 @@ namespace SEE.Game.UI.ConfigMenu
         /// <summary>
         /// The values (options) of this input.
         /// </summary>
-        public List<string> Values
+        public ICollection<string> Values
         {
-            set => valuesUpdates.Enqueue(value);
+            set => valuesUpdates.Enqueue(value.ToList());
         }
 
         /// <summary>
@@ -247,7 +248,7 @@ namespace SEE.Game.UI.ConfigMenu
             return this;
         }
 
-        public ComboSelectBuilder SetAllowedValues(List<string> allowedValues)
+        public ComboSelectBuilder SetAllowedValues(ICollection<string> allowedValues)
         {
             Instance.Values = allowedValues;
             return this;

@@ -15,11 +15,10 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        public EvoStreetsNodeLayout(float groundLevel, float Unit)
-        : base(groundLevel)
+        public EvoStreetsNodeLayout(float groundLevel)
+            : base(groundLevel)
         {
             name = "EvoStreets";
-            streetHeight *= Unit;
         }
 
         /// <summary>

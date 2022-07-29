@@ -186,10 +186,11 @@ namespace SEE.Net
                         IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
                         if (Network.LoadCityOnStart)
                         {
-                            foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
-                            {
-                                new LoadCityAction(city).Execute(recipient);
-                            }
+                            // TODO: Here we would tranfer all local cities to the connecting client.
+                            //foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
+                            //{
+                            //    new LoadCityAction(city).Execute(recipient);
+                            //}
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {

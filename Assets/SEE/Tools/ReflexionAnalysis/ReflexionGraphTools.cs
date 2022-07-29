@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
@@ -12,27 +13,33 @@ namespace SEE.Tools.ReflexionAnalysis
     /// <summary>
     /// Type of a reflexion subgraph.
     /// </summary>
+    [Flags]
     public enum ReflexionSubgraph
     {
         /// <summary>
+        /// No reflexion subgraph.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// The implementation graph.
         /// </summary>
-        Implementation,
+        Implementation = 1 << 0,
 
         /// <summary>
         /// The architecture graph.
         /// </summary>
-        Architecture,
+        Architecture = 1 << 1,
 
         /// <summary>
         /// The mapping graph.
         /// </summary>
-        Mapping,
+        Mapping = 1 << 2,
 
         /// <summary>
         /// The full reflexion graph.
         /// </summary>
-        FullReflexion
+        FullReflexion = 1 << 3
     }
 
     /// <summary>
@@ -164,9 +171,42 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Name of the edge attribute for the state of a dependency.
+        /// </summary>
+        private const string StateAttribute = "Reflexion.State";
+
+        /// <summary>
+        /// Returns the state of a dependency.
+        /// If no state has been set, <see cref="ReflexionAnalysis.State.Undefined"/> will be returned.
+        /// </summary>
+        /// <param name="edge">a dependency</param>
+        /// <returns>the state of <paramref name="edge"/></returns>
+        public static State State(this Edge edge)
+        {
+            if (edge.TryGetInt(StateAttribute, out int value))
+            {
+                return (State)value;
+            }
+            else
+            {
+                return ReflexionAnalysis.State.Undefined;
+            }
+        }
+
+        /// <summary>
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
         /// </summary>
         public const string MapsToType = "Maps_To";
+
+        /// <summary>
+        /// Returns all subgraphs this <paramref name="element"/> is in.
+        /// Use <c>Enum.HasFlag</c> to check the resulting value.
+        /// </summary>
+        public static ReflexionSubgraph GetSubgraph(this GraphElement element) =>
+            Enum.GetValues(typeof(ReflexionSubgraph))
+                .Cast<ReflexionSubgraph>()
+                .Where(element.IsIn)
+                .Aggregate(None, (acc, x) => acc & x);
 
         /// <summary>
         /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
@@ -175,7 +215,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>
         /// Whether this <paramref name="element"/> is contained in the given <paramref name="subgraph"/> type.
         /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If the given <paramref name="subgraph"/> is unknown
+        /// </exception>
         public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
         {
             switch (subgraph)
@@ -185,11 +227,14 @@ namespace SEE.Tools.ReflexionAnalysis
                     return element.HasToggle(subgraph.GetLabel());
                 case Mapping:
                     // Either a "Maps_To" edge or a node connected to such an edge
-                    return element is Edge edge && edge.HasSupertypeOf(MapsToType)
-                           || element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping);
-                case ReflexionSubgraph.FullReflexion:
+                    return (element is Edge edge && edge.HasSupertypeOf(MapsToType))
+                           || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping));
+                case FullReflexion:
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
-                default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
+                case None:
+                    return !element.IsInReflexion();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
             }
         }
 
@@ -213,7 +258,8 @@ namespace SEE.Tools.ReflexionAnalysis
                     element.SetToggle(Architecture.GetLabel());
                     break;
                 case Mapping:
-                case ReflexionSubgraph.FullReflexion:
+                case None:
+                case FullReflexion:
                     throw new InvalidOperationException("Can't explicitly assign graph element to "
                                                         + $"'{subgraph}' (only implicitly)!");
                 default: throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
@@ -234,6 +280,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns true if <paramref name="edge"/> is in the mapping graph.
         /// </summary>
         public static bool IsInMapping(this GraphElement element) => element.IsIn(Mapping);
+
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is in the reflexion graph.
+        /// </summary>
+        public static bool IsInReflexion(this GraphElement element) => element.IsIn(FullReflexion);
 
         /// <summary>
         /// Marks the <paramref name="element"/> as being in the architecture graph.
@@ -257,7 +308,7 @@ namespace SEE.Tools.ReflexionAnalysis
         public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => markRootNode || node.Type != GraphRenderer.RootType)
+                                                           .Where(node => markRootNode || node.HasToggle(GraphRenderer.RootToggle))
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
@@ -274,7 +325,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name)
+        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name,
+                                     out Node ArchitectureRoot, out Node ImplementationRoot)
         {
             if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
             {
@@ -282,10 +334,22 @@ namespace SEE.Tools.ReflexionAnalysis
                                             + "the full graph.");
             }
 
+            // Add artificial roots if graph has more than one root node, to physically differentiate the two.
+            ArchitectureRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
+            ImplementationRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
+
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
             ArchitectureGraph.MarkGraphNodesIn(Architecture);
             ImplementationGraph.MarkGraphNodesIn(Implementation);
+
+            // We need to set all Maps_To edges as virtual so they don't get drawn.
+            // (Mapping is indicated by moving the implementation node, not by a separate edge.)
+            foreach (Edge mapsTo in MappingGraph.Edges())
+            {
+                Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
+                mapsTo.SetToggle(Edge.IsVirtualToggle);
+            }
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
             ImplementationGraph.Name = Name;

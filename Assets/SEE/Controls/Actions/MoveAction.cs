@@ -1,9 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using DG.Tweening;
+using RootMotion.FinalIK;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Net;
 using SEE.Utils;
+using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Utils.Raycasting;
@@ -22,10 +30,26 @@ namespace SEE.Controls.Actions
             internal Hit(Transform hoveredObject)
             {
                 CityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
-                this.HoveredObject = hoveredObject;
+                HoveredObject = hoveredObject;
                 InteractableObject = hoveredObject.GetComponent<InteractableObject>();
                 Plane = new Plane(Vector3.up, CityRootNode.position);
                 node = hoveredObject.GetComponent<NodeRef>();
+                ConnectedEdges = new List<(SEESpline, bool)>();
+                
+                // We want to animate the edges attached to the moving node, so we cache them here.
+                // TODO: Why can this be null?
+                if (node.Value != null)
+                {
+                    foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                    {
+                        GameObject gameEdge = GameObject.Find(edge.ID);
+                        Assert.IsNotNull(gameEdge);
+                        if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                        {
+                            ConnectedEdges.Add((spline, node.Value == edge.Source));
+                        }
+                    }
+                }
             }
 
             /// <summary>
@@ -44,6 +68,13 @@ namespace SEE.Controls.Actions
             /// The interactable component attached to <see cref="HoveredObject"/>.
             /// </summary>
             internal InteractableObject InteractableObject;
+
+            /// <summary>
+            /// Map from connected edges represented as <see cref="SEESpline"/>s to a boolean
+            /// representing whether <see cref="node"/> is the source for this edge (otherwise, it's the target).
+            /// </summary>
+            internal IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
+
             internal Plane Plane;
             internal NodeRef node;
         }
@@ -62,7 +93,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool moving = false;
 
-        private Hit hit = new Hit();
+        private Hit hit;
         private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
         private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
@@ -274,6 +305,27 @@ namespace SEE.Controls.Actions
                     Transform draggedObject = SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode;
                     hit = new Hit(draggedObject);
                     memento = new Memento(draggedObject);
+                    
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
+                    {
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
+                        }
+                        else
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
+                        }
+
+                        if (!hitEdge.connectedSpline.TryGetComponent(out SplineMorphism morphism))
+                        {
+                            morphism = hitEdge.connectedSpline.gameObject.AddComponent<SplineMorphism>();
+                        }
+
+                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, 0.5f).SetEase(Ease.InOutExpo).Play();
+                    }
 
                     hit.InteractableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
@@ -284,7 +336,8 @@ namespace SEE.Controls.Actions
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
-                    Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                    // FIXME: Doesn't work in certain perspectives, particular when looking at the horizon. 
+                    Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
                         Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
@@ -296,13 +349,55 @@ namespace SEE.Controls.Actions
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
 
-                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+                    RaycastLowestNode(out RaycastHit? raycastHit, out Node _, hit.node);
+                    // TODO: Adjust for snapping
+                    Vector3 newPosition = raycastHit?.point ?? dragStartTransformPosition + totalDragOffsetFromStart;
+                    ResetHitObjectColor();
+                    Positioner.Set(hit.HoveredObject, newPosition);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    Vector3 endPoint = hit.HoveredObject.position;
                     gizmo.SetPositions(startPoint, endPoint);
 
-                    SetHitObjectColor(hit.node);
+                    if (raycastHit.HasValue)
+                    {
+                        GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: false);
+                        SetHitObjectColor(raycastHit.Value);
+                    }
+                    
+                    // We will also "stick" the connected edges to the moved node during its movement.
+                    // In order to do this, we need to modify the splines of each one.
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
+                    {
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
+                        }
+                        else
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
+                        }
+                        SplineMorphism morphism = hitEdge.connectedSpline.gameObject.GetComponent<SplineMorphism>();
+                        if (morphism.tween.IsPlaying())
+                        {
+                            morphism.ChangeTarget(spline);
+                        }
+                        else
+                        {
+                            hitEdge.connectedSpline.Spline = spline;
+                        }
+                        
+                        // if (hitEdge.nodeIsSource)
+                        // {
+                        //     hitEdge.connectedSpline.UpdateStartPosition(hit.HoveredObject.transform.position);
+                        // }
+                        // else
+                        // {
+                        //     hitEdge.connectedSpline.UpdateEndPosition(hit.HoveredObject.transform.position);
+                        // }
+                    }
 
                     synchronize = true;
                 }
@@ -327,28 +422,19 @@ namespace SEE.Controls.Actions
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                                               - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
                     if (parent != null)
                     {
-                        // The move has come to a successful end.
+                        // The node has been re-parented.
                         new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
                         memento.SetNewParent(parent);
-                        memento.SetNewPosition(hit.HoveredObject.position);
-                        currentState = ReversibleAction.Progress.Completed;
-                        result = true;
                     }
-                    else
-                    {
-                        // An attempt was made to move the hovered object outside of the city.
-                        // We need to reset it to its original position. And then we start from scratch.
-                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
-                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                        hit.HoveredObject.position = originalPosition;
-                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
-                        // The following assignment will override hit.interactableObject; that is why we
-                        // stored its value in interactableObjectToBeUngrabbed above.
-                        hit = new Hit();
-                    }
+                    
+                    memento.SetNewPosition(hit.HoveredObject.position);
+                    currentState = ReversibleAction.Progress.Completed;
+                    result = true;
 
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
@@ -372,19 +458,13 @@ namespace SEE.Controls.Actions
 
             #region Local Functions
 
-            void SetHitObjectColor(NodeRef movingNode)
+            void SetHitObjectColor(RaycastHit raycastHit)
             {
-                ResetHitObjectColor();
-
-                RaycastLowestNode(out RaycastHit? raycastHit, out Node _, movingNode);
-                if (raycastHit != null)
-                {
-                    hitObjectMaterial = raycastHit.Value.collider.GetComponent<Renderer>().material;
-                    // We persist hoveredObjectColor in case we want to use something different than simple
-                    // inversion in the future, such as a constant color (we would then need the original color).
-                    hitObjectColor = hitObjectMaterial.color;
-                    hitObjectMaterial.color = hitObjectColor.Invert();
-                }
+                hitObjectMaterial = raycastHit.collider.GetComponent<Renderer>().material;
+                // We persist hoveredObjectColor in case we want to use something different than simple
+                // inversion in the future, such as a constant color (we would then need the original color).
+                hitObjectColor = hitObjectMaterial.color;
+                hitObjectMaterial.color = hitObjectColor.Invert();
             }
 
             void ResetHitObjectColor()

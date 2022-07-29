@@ -17,12 +17,14 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -31,6 +33,7 @@ namespace SEE.Game.City
     /// A SEECityEvolution combines all necessary components for the animations
     /// of an evolving SEECity.
     /// </summary>
+    [Serializable]
     public class SEECityEvolution : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -40,8 +43,14 @@ namespace SEE.Game.City
         /// respectively. You should also extend the test cases in TestConfigIO.
 
         /// <summary>
+        /// Name of the Inspector foldout group for the specific evolution setttings.
+        /// </summary>
+        private const string EvolutionFoldoutGroup = "Evolution settings";
+
+        /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(EvolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
@@ -54,8 +63,8 @@ namespace SEE.Game.City
         /// <summary>
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
-        [Tooltip("The directory in which the GXL files are located.")]
-        public DataPath GXLDirectory = new DataPath();
+        [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup)]
+        public DirectoryPath GXLDirectory = new DirectoryPath();
 
         //-----------------------------------------------------
         // Attributes to mark changes
@@ -64,42 +73,48 @@ namespace SEE.Game.City
         /// <summary>
         /// The height of posts used as markers for new and deleted elements.
         /// </summary>
-        [Tooltip("The height of posts used as markers for new and deleted elements (>=0).")]
+        [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
         public float MarkerHeight = 0.2f;
 
         /// <summary>
         /// The width (x and z lengths) of posts used as markers for new and deleted elements.
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
         public float MarkerWidth = 0.01f;
 
         /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector
         /// </summary>
         [Tooltip("The color of the beam for newly created nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
         public Color AdditionBeamColor = Color.green;
 
         /// <summary>
         /// Changed nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for changed nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
         public Color ChangeBeamColor = Color.yellow;
 
         /// <summary>
         /// Deleted nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for deleted nodes.")]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
-        protected EvolutionRenderer CreateEvolutionRenderer()
+        protected EvolutionRenderer CreateEvolutionRenderer(List<Graph> graphs)
         {
             if (!gameObject.TryGetComponent(out EvolutionRenderer result))
             {
                 result = gameObject.AddComponent<EvolutionRenderer>();
+                result.SetGraphEvolution(graphs);
             }
             return result;
         }
@@ -111,19 +126,85 @@ namespace SEE.Game.City
         /// </summary>
         protected override void ProjectPathChanged()
         {
-            evolutionRenderer?.ProjectPathChanged(ProjectPath.Path);
+            evolutionRenderer?.ProjectPathChanged(SourceCodeDirectory.Path);
         }
 
         /// <summary>
         /// Loads the graph data from the GXL files and the metrics from the CSV files contained
         /// in the directory with path PathPrefix and the metrics.
         /// </summary>
-        private List<Graph> LoadData()
+        private List<Graph> LoadDataSeries()
         {
             GraphsReader graphsReader = new GraphsReader();
             // Load all GXL graphs and CSV files in directory PathPrefix but not more than maxRevisionsToLoad many.
-            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: ProjectPath.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
+            graphsReader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, MaxRevisionsToLoad);
             return graphsReader.graphs;
+        }
+
+        /// <summary>
+        /// The first graph of the graph series. It is used only to let the user see
+        /// his/her settings in action. It will be destroyed when the game starts.
+        /// </summary>
+        [NonSerialized]
+        private Graph firstGraph;
+
+        /// <summary>
+        /// Loads the first graph of the graph series. If a graph was already
+        /// loaded, that graph will be destroyed.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        public void LoadData()
+        {
+            if (firstGraph != null)
+            {
+                Reset();
+            }
+            firstGraph = LoadFirstGraph();
+            if (firstGraph != null)
+            {
+                Debug.Log($"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
+            }
+            else
+            {
+                Debug.LogWarning("Could not load graph.\n");
+            }
+        }
+
+        /// <summary>
+        /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
+        /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Delete the underlying graph.
+            firstGraph?.Destroy();
+            firstGraph = null;
+        }
+
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public void DrawGraph()
+        {
+            if (firstGraph)
+            {
+                GraphRenderer graphRenderer = new GraphRenderer(this, firstGraph);
+                graphRenderer.DrawGraph(firstGraph, gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("No graph loaded yet.\n");
+            }
         }
 
         /// <summary>
@@ -141,7 +222,7 @@ namespace SEE.Game.City
         public Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
-            reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: ProjectPath.Path, rootName: GXLDirectory.Path, 1);
+            reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
             List<Graph> graphs = reader.graphs;
             if (graphs.Count == 0)
             {
@@ -150,6 +231,7 @@ namespace SEE.Game.City
             else
             {
                 Graph graph = graphs.First();
+                InspectSchema(graph);
                 graph = RelevantGraph(graph);
                 return graph;
             }
@@ -170,11 +252,11 @@ namespace SEE.Game.City
         /// </summary>
         override internal void Start()
         {
+            Reset();
             base.Start();
 
-            evolutionRenderer = CreateEvolutionRenderer();
-            List<Graph> graphs = LoadData();
-            evolutionRenderer.SetGraphEvolution(graphs);
+            List<Graph> graphs = LoadDataSeries();
+            evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
             if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))
@@ -218,7 +300,7 @@ namespace SEE.Game.City
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        public override List<string> AllExistingMetrics()
+        public override ISet<string> AllExistingMetrics()
         {
             return evolutionRenderer.AllExistingMetrics();
         }

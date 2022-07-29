@@ -1,6 +1,6 @@
-﻿using OdinSerializer;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using System;
+using Sirenix.OdinInspector;
 
 namespace SEE.GO
 {

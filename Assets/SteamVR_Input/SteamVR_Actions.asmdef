@@ -2,7 +2,9 @@
     "name": "SteamVR_Actions",
     "rootNamespace": "",
     "references": [
-        "GUID:1fbf338ef6b952a448262a7ff7df5fe4"
+        "GUID:1fbf338ef6b952a448262a7ff7df5fe4",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21"
     ],
     "includePlatforms": [],
     "excludePlatforms": [
