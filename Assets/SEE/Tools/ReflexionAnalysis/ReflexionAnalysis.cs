@@ -1078,7 +1078,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="node"></param>
         /// <returns>the architecture node upon which node is mapped or null</returns>
-        private Node MapsTo(Node node)
+        public Node MapsTo(Node node)
         {
             AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
             return implicitMapsToTable.TryGetValue(node.ID, out Node target) ? target : null;

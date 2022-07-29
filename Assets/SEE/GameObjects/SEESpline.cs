@@ -569,6 +569,12 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Whether the <paramref name="tween"/> belonging to this morphism is active.
+        /// If no tween exists, <c>false</c> will be returned.
+        /// </summary>
+        public bool IsActive() => tween?.IsActive() ?? false;
+
+        /// <summary>
         /// Initializes the spline morphism.
         ///
         /// Postcondition: <see cref="SEESpline"/> is morphed to

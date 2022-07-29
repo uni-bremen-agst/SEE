@@ -2,14 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using JetBrains.Annotations;
 using RootMotion.FinalIK;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
 using SEE.Net;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -85,6 +88,8 @@ namespace SEE.Controls.Actions
         private const float FullCircleDegree = 360.0f;
         private const float SnapStepCount = 8;
         private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
+        private const float MIN_SPLINE_OFFSET = 0.05f;
+        private const float SPLINE_ANIMATION_DURATION = 0.5f;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
@@ -255,6 +260,21 @@ namespace SEE.Controls.Actions
         private Material hitObjectMaterial;
 
         /// <summary>
+        /// Reflexion city belonging to the dragged node, if it does belong to one.
+        /// </summary>
+        private SEEReflexionCity reflexionCity;
+        
+        /// <summary>
+        /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
+        /// </summary>
+        private Edge temporaryMapsTo;
+
+        /// <summary>
+        /// Original parent of the dragged node before temporarily changing it.
+        /// </summary>
+        private Transform originalParent;
+
+        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -290,6 +310,14 @@ namespace SEE.Controls.Actions
                     // TODO(torben): this should be in SelectAction.cs
                     InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true);
                 }
+                
+                if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                { 
+                    // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                    hit.HoveredObject.SetParent(originalParent);
+                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                    temporaryMapsTo = null;
+                }
 
                 ResetHitObjectColor();
             }
@@ -312,11 +340,11 @@ namespace SEE.Controls.Actions
                         BSpline spline;
                         if (hitEdge.nodeIsSource)
                         {
-                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, MIN_SPLINE_OFFSET);
                         }
                         else
                         {
-                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
 
                         if (!hitEdge.connectedSpline.TryGetComponent(out SplineMorphism morphism))
@@ -324,7 +352,7 @@ namespace SEE.Controls.Actions
                             morphism = hitEdge.connectedSpline.gameObject.AddComponent<SplineMorphism>();
                         }
 
-                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, 0.5f).SetEase(Ease.InOutExpo).Play();
+                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, SPLINE_ANIMATION_DURATION).SetEase(Ease.InOutExpo).Play();
                     }
 
                     hit.InteractableObject.SetGrab(true, true);
@@ -332,11 +360,19 @@ namespace SEE.Controls.Actions
                     dragStartTransformPosition = hit.HoveredObject.position;
                     dragStartOffset = planeHitPoint - hit.HoveredObject.position;
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
+                    originalParent = hit.HoveredObject;
+                    
+                    // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
+                    if (hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture())
+                    {
+                        reflexionCity = hit.HoveredObject.gameObject.ContainingCity<SEEReflexionCity>();
+                        reflexionCity.KillNodeTweens(hit.node.Value);
+                    }
                 }
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
-                    // FIXME: Doesn't work in certain perspectives, particular when looking at the horizon. 
+                    // FIXME: Doesn't work in certain perspectives, particularly when looking at the horizon. 
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
@@ -349,7 +385,7 @@ namespace SEE.Controls.Actions
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
 
-                    RaycastLowestNode(out RaycastHit? raycastHit, out Node _, hit.node);
+                    RaycastLowestNode(out RaycastHit? raycastHit, out Node newParentNode, hit.node);
                     // TODO: Adjust for snapping
                     Vector3 newPosition = raycastHit?.point ?? dragStartTransformPosition + totalDragOffsetFromStart;
                     ResetHitObjectColor();
@@ -361,8 +397,41 @@ namespace SEE.Controls.Actions
 
                     if (raycastHit.HasValue)
                     {
-                        GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: false);
+                        GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: true);
                         SetHitObjectColor(raycastHit.Value);
+                        if (reflexionCity != null)
+                        {
+                            if (hit.node.Value.IsInImplementation() && newParentNode.IsInArchitecture())
+                            {
+                                // If we are in a reflexion city, we will simply
+                                // trigger the incremental reflexion analysis here.
+                                // That way, the relevant code is in one place (SEEReflexionCity)
+                                // and edges will be colored on hover (#451).
+                                temporaryMapsTo = reflexionCity.Analysis.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
+                            }
+                            else if (temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                            { 
+                                // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                                hit.HoveredObject.SetParent(raycastHit.Value.collider.transform);
+                                reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                                temporaryMapsTo = null;
+                            } 
+                            else if (hit.node.Value.IsInImplementation() && newParentNode.IsInImplementation())
+                            {
+                                // Both are in implementation, so we'll just need to adjust the scaling.
+                                // No need to delete any Maps-To edge, because temporaryMapsTo == null or is deleted.
+                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, targetXZ: hit.HoveredObject.position.XZ(), scaleDown: true);
+                            }
+                        }
+                    }
+                    else if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                    { 
+                        // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                        // We'll change its parent so it becomes a root node in the implementation city.
+                        // The user will have to drop it on another node to re-parent it.
+                        hit.HoveredObject.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
+                        reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                        temporaryMapsTo = null;
                     }
                     
                     // We will also "stick" the connected edges to the moved node during its movement.
@@ -373,14 +442,14 @@ namespace SEE.Controls.Actions
                         BSpline spline;
                         if (hitEdge.nodeIsSource)
                         {
-                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, 0.05f);
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, MIN_SPLINE_OFFSET);
                         }
                         else
                         {
-                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, 0.05f);
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
                         SplineMorphism morphism = hitEdge.connectedSpline.gameObject.GetComponent<SplineMorphism>();
-                        if (morphism.tween.IsPlaying())
+                        if (morphism.tween.IsActive() && morphism.tween.IsPlaying())
                         {
                             morphism.ChangeTarget(spline);
                         }
@@ -388,15 +457,6 @@ namespace SEE.Controls.Actions
                         {
                             hitEdge.connectedSpline.Spline = spline;
                         }
-                        
-                        // if (hitEdge.nodeIsSource)
-                        // {
-                        //     hitEdge.connectedSpline.UpdateStartPosition(hit.HoveredObject.transform.position);
-                        // }
-                        // else
-                        // {
-                        //     hitEdge.connectedSpline.UpdateEndPosition(hit.HoveredObject.transform.position);
-                        // }
                     }
 
                     synchronize = true;
@@ -418,8 +478,8 @@ namespace SEE.Controls.Actions
             }
             else if (moving)
             {
-                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
+                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
