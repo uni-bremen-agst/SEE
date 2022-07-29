@@ -8,7 +8,7 @@ namespace SEE.Tools
 {
     /// <summary>
     /// A descriptor defining the name of an attribute and the normal distribution
-    /// (mean, standard deviation) from which to draw its values randomly.
+    /// (mean, standard deviation, minimum, maximum) from which to draw its values randomly.
     ///
     /// Note: This class must be serializable. The names of the attributes must
     /// be consistent with the string literals used to retrieved them in
@@ -20,6 +20,14 @@ namespace SEE.Tools
         public RandomAttributeDescriptor()
         { }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">name of the attribute</param>
+        /// <param name="mean">mean of the distribution of the attribute's value range</param>
+        /// <param name="standardDeviation">standard deviation of the distribution of the attribute's value range</param>
+        /// <param name="minimum">minimum of the attribute's value range</param>
+        /// <param name="maximum">maximum of the attribute's value range</param>
         public RandomAttributeDescriptor
             (string name,
             float mean,
@@ -33,19 +41,49 @@ namespace SEE.Tools
             Minimum = minimum;
             Maximum = maximum;
         }
+        /// <summary>
+        /// Name of the attribute.
+        /// </summary>
         [SerializeField]
         public string Name;
+        /// <summary>
+        /// The mean of the distribution of the attribute's value range.
+        /// </summary>
         [SerializeField]
         public float Mean;
+        /// <summary>
+        /// The standard deviation of the distribution of the attribute's value range.
+        /// </summary>
         [SerializeField]
         public float StandardDeviation;
+        /// <summary>
+        /// The minimum of the attribute's value range.
+        /// </summary>
         public float Minimum = 0;
+        /// <summary>
+        /// The maximum of the attribute's value range.
+        /// </summary>
         public float Maximum = float.PositiveInfinity;
 
+        /// <summary>
+        /// Label of <see cref="Name"/> in the configuration file.
+        /// </summary>
         private const string NameLabel = "Name";
+        /// <summary>
+        /// Label of <see cref="Mean"/> in the configuration file.
+        /// </summary>
         private const string MeanLabel = "Mean";
+        /// <summary>
+        /// Label of <see cref="StandardDeviation"/> in the configuration file.
+        /// </summary>
         private const string StandardDeviationLabel = "StandardDeviation";
+        /// <summary>
+        /// Label of <see cref="Minimum"/> in the configuration file.
+        /// </summary>
         private const string MinimumLabel = "Minimum";
+        /// <summary>
+        /// Label of <see cref="Maximum"/> in the configuration file.
+        /// </summary>
         private const string MaximumLabel = "Maximum";
 
         /// <summary>
