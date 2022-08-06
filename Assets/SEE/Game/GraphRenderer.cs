@@ -886,10 +886,6 @@ namespace SEE.Game
         /// <param name="nodes">list of nodes for which to create blocks</param>
         protected void DrawInnerNodes(Dictionary<Node, GameObject> nodeMap, IList<Node> nodes)
         {
-            foreach (var nodeType in nodeTypeToFactory.Keys)
-            {
-                Debug.Log($"{nodeType} => {nodeTypeToFactory[nodeType]}\n");
-            }
             foreach (Node node in nodes)
             {
                 // We add only inner nodes.
