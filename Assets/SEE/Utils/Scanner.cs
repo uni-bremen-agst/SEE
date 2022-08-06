@@ -66,7 +66,7 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Moves <see cref="index"/> forward to next character in <see cref="input"/> that 
+            /// Moves <see cref="index"/> forward to next character in <see cref="input"/> that
             /// is not white space.
             /// </summary>
             private void Forward()
@@ -194,13 +194,21 @@ namespace SEE.Utils
                         index++;
                     }
                     Forward();
-                    if (tokenValue.ToLower() == "true")
+                    string lowerTokenValue = tokenValue.ToLower();
+                    if (lowerTokenValue == "true")
                     {
                         currentToken = TokenType.True;
                     }
-                    else if (tokenValue.ToLower() == "false")
+                    else if (lowerTokenValue == "false")
                     {
                         currentToken = TokenType.False;
+                    }
+                    else if (lowerTokenValue == "infinity")
+                    {
+                        currentToken = TokenType.Float;
+                        // Note: NegativeInfinity is emitted as "-Infinity". Because "-"
+                        // is not a letter, we will not be scanning it here. It will be
+                        // handled in a different branch.
                     }
                     else
                     {
@@ -227,6 +235,7 @@ namespace SEE.Utils
                     }
                     else if (TryParseFloat(value, out float _))
                     {
+                        // Note: This handles also the case of -Infinity.
                         tokenValue = value;
                         index = endIndex;
                         currentToken = TokenType.Float;
