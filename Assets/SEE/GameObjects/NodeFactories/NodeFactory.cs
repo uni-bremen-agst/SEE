@@ -352,7 +352,6 @@ namespace SEE.GO.NodeFactories
             // We need triangles for the roof and ground and triangles for each side (height) of the
             // object, where each side is a rectangle requiring two triangles.
             triangles3D = new int[2 * groundAreaTriangles.Length + 2 * 3 * groundAreaVertices.Length];
-            Debug.Log($"#triangles for roof and ground: {2 * groundAreaTriangles.Length} for sides: {2 * 3 * groundAreaVertices.Length}. Total: {triangles3D.Length}.\n");
 
             int nextTriangleIndex = 0;
             // Triangles for the roof.
