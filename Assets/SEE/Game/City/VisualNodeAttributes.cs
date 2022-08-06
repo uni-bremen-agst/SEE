@@ -49,20 +49,92 @@ namespace SEE.Game.City
         /// </summary>
         public NodeShapes Shape = NodeShapes.Blocks;
 
-        public List<string> Metrics = new List<string>();
+        private const string DefaultLengthMetricValue = "0.001";
 
         /// <summary>
-        /// The name or value of the metric determining the height.
+        /// A mapping of node metric names onto colors. The first three metrics
+        /// are generally used to determine the width, height, and depth of visual
+        /// node representations.
         /// </summary>
-        public string HeightMetric = "0.01";
+        [Tooltip("Maps metric names onto lengths of the shape."), HideReferenceObjectPicker]
+        [NonSerialized, OdinSerialize]
+        public IList<string> MetricToLength = new List<string>() { DefaultLengthMetricValue, DefaultLengthMetricValue, DefaultLengthMetricValue };
+
         /// <summary>
-        /// Name or value of the metric defining the width.
+        /// The index of the metric for the width within <see cref="MetricToLength"/>.
+        /// Corresponds to the x axis of Unity's 3D co-ordinates.
         /// </summary>
-        public string WidthMetric = "0.01";
+        public const int WidthMetricIndex = 0;
+
         /// <summary>
-        /// Name or value of the metric defining the depth.
+        /// The name or value of the metric determining the width,
+        /// i.e., <see cref="MetricToLength"/>[<see cref="WidthMetricIndex"/>].
         /// </summary>
-        public string DepthMetric = "0.01";
+        public string WidthMetric
+        {
+            get
+            {
+                if (WidthMetricIndex < MetricToLength.Count)
+                {
+                    return MetricToLength[WidthMetricIndex];
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException($"MetricToLength: {WidthMetricIndex} >= {MetricToLength.Count}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The index of the metric for the height within <see cref="MetricToLength"/>.
+        /// Corresponds to the y axis of Unity's 3D co-ordinates.
+        /// </summary>
+        public const int HeightMetricIndex = 1;
+
+        /// <summary>
+        /// The name or value of the metric determining the height,
+        /// i.e., <see cref="MetricToLength"/>[<see cref="HeightMetricIndex"/>].
+        /// </summary>
+        public string HeightMetric
+        {
+            get
+            {
+                if (HeightMetricIndex < MetricToLength.Count)
+                {
+                    return MetricToLength[HeightMetricIndex];
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException($"MetricToLength: {HeightMetricIndex} >= {MetricToLength.Count}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The index of the metric for the depth within <see cref="MetricToLength"/>.
+        /// Corresponds to the z axis of Unity's 3D co-ordinates.
+        /// </summary>
+        public const int DepthMetricIndex = 2;
+
+        /// <summary>
+        /// The name or value of the metric determining the depth,
+        /// i.e., <see cref="MetricToLength"/>[<see cref="DepthMetricIndex"/>].
+        /// </summary>
+        public string DepthMetric
+        {
+            get
+            {
+                if (DepthMetricIndex < MetricToLength.Count)
+                {
+                    return MetricToLength[DepthMetricIndex];
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException($"MetricToLength: {DepthMetricIndex} >= {MetricToLength.Count}");
+                }
+            }
+        }
+
         /// <summary>
         /// How the color of a node should be determined.
         /// </summary>
@@ -109,9 +181,7 @@ namespace SEE.Game.City
             writer.Save(NodeType, NodeTypeLabel);
             writer.Save(Shape.ToString(), NodeShapeLabel);
             writer.Save(IsRelevant, IsRelevantLabel);
-            writer.Save(WidthMetric, WidthMetricLabel);
-            writer.Save(DepthMetric, DepthMetricLabel);
-            writer.Save(HeightMetric, HeightMetricLabel);
+            writer.Save(MetricToLength, MetricToLengthLabel);
             ColorProperty.Save(writer, ColorPropertyLabel);
             writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
             writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
@@ -147,9 +217,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, NodeTypeLabel, ref nodeType);
             ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
             ConfigIO.Restore(values, IsRelevantLabel, ref IsRelevant);
-            ConfigIO.Restore(values, WidthMetricLabel, ref WidthMetric);
-            ConfigIO.Restore(values, DepthMetricLabel, ref DepthMetric);
-            ConfigIO.Restore(values, HeightMetricLabel, ref HeightMetric);
+            ConfigIO.RestoreStringList(values, MetricToLengthLabel, ref MetricToLength);
             ColorProperty.Restore(values, ColorPropertyLabel);
             ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
             ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
@@ -172,17 +240,9 @@ namespace SEE.Game.City
         /// </summary>
         private const string IsRelevantLabel = "IsRelevant";
         /// <summary>
-        /// Label in the configuration file for <see cref="WidthMetric"/>.
+        /// Label in the configuration file for <see cref="MetricToLength"/>.
         /// </summary>
-        private const string WidthMetricLabel = "WidthMetric";
-        /// <summary>
-        /// Label in the configuration file for <see cref="DepthMetric"/>.
-        /// </summary>
-        private const string DepthMetricLabel = "DepthMetric";
-        /// <summary>
-        /// Label in the configuration file for a <see cref="HeightMetric"/>.
-        /// </summary>
-        private const string HeightMetricLabel = "HeightMetric";
+        private const string MetricToLengthLabel = "MetricToLength";
         /// <summary>
         /// Label in the configuration file for a <see cref="ColorProperty"/>.
         /// </summary>
