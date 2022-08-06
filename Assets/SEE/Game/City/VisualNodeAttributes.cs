@@ -49,6 +49,11 @@ namespace SEE.Game.City
         /// </summary>
         public NodeShapes Shape = NodeShapes.Blocks;
 
+        /// <summary>
+        /// The default value for any length metric as a string. It will be used for the
+        /// width, depth, and height. <seealso cref="MetricToLength"/>
+        /// Using this default value means that no metric name is used but a fixed value.
+        /// </summary>
         private const string DefaultLengthMetricValue = "0.001";
 
         /// <summary>
