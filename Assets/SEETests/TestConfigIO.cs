@@ -85,6 +85,29 @@ namespace SEE.Utils
         }
 
         [Test]
+        public void TestConfigParseInfinity()
+        {
+            const float value = float.PositiveInfinity;
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "label", value }
+            };
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"));
+        }
+
+        [Test]
+        public void TestConfigParseNegativeInfinity()
+        {
+            const float value = float.NegativeInfinity;
+            Dictionary<string, object> expected = new Dictionary<string, object>()
+            {
+                { "label", value }
+            };
+            Debug.Log($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r");
+            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"));
+        }
+
+        [Test]
         public void TestConfigParseString1()
         {
             Dictionary<string, object> expected = new Dictionary<string, object>()
@@ -898,9 +921,7 @@ namespace SEE.Utils
         {
             settings.Shape = NodeShapes.Blocks;
             settings.IsRelevant = false;
-            settings.HeightMetric = "X";
-            settings.WidthMetric = "X";
-            settings.DepthMetric = "X";
+            settings.MetricToLength = new List<string> { "0.001", "Metric.LOC" };
             settings.ColorProperty.ColorMetric = "X";
             settings.MinimalBlockLength = 90000;
             settings.MaximalBlockLength = 1000000;
@@ -914,9 +935,7 @@ namespace SEE.Utils
         {
             Assert.AreEqual(expected.Shape, actual.Shape);
             Assert.AreEqual(expected.IsRelevant, actual.IsRelevant);
-            Assert.AreEqual(expected.HeightMetric, actual.HeightMetric);
-            Assert.AreEqual(expected.WidthMetric, actual.WidthMetric);
-            Assert.AreEqual(expected.DepthMetric, actual.DepthMetric);
+            AreEqual(expected.MetricToLength, actual.MetricToLength);
             Assert.AreEqual(expected.ColorProperty.ColorMetric, actual.ColorProperty.ColorMetric);
             Assert.AreEqual(expected.MinimalBlockLength, actual.MinimalBlockLength);
             Assert.AreEqual(expected.MaximalBlockLength, actual.MaximalBlockLength);
@@ -924,6 +943,15 @@ namespace SEE.Utils
             AreEqualAntennaSettings(expected.AntennaSettings, actual.AntennaSettings);
             AreEqual(expected.LabelSettings, actual.LabelSettings);
             Assert.AreEqual(expected.ShowNames, actual.ShowNames);
+        }
+
+        private static void AreEqual(IList<string> expected, IList<string> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            for (int i = 0; i < expected.Count; i++)
+            {
+                Assert.AreEqual(expected[i], actual[i]);
+            }
         }
 
         private static void WipeOutAntennaSettings(ref AntennaAttributes antennaAttributes)
