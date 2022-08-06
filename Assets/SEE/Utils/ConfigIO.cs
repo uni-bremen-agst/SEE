@@ -24,7 +24,7 @@ namespace SEE.Utils
             /// If label is neither empty nor null, <paramref name="attributes"/>[<paramref name="label"/>]
             /// is looked up. If it does not exist, nothing else happens and false is returned. If it
             /// exists, the data available in <paramref name="attributes"/>[<paramref name="label"/>] will
-            /// be used to restore the attributes of this instance. If at least one such attribute was 
+            /// be used to restore the attributes of this instance. If at least one such attribute was
             /// restored, true is returned; otherwise false is returned.
             /// If the label is empty or null, <paramref name="attributes"/> direclty is assumed to hold the
             /// data to restore the attributes of this instance.
@@ -83,13 +83,13 @@ namespace SEE.Utils
         protected const string AlphaLabel = "Alpha";
 
         /// <summary>
-        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// receives the looked up value.
-        /// 
+        ///
         /// Note: For types <typeparamref name="T"/> that are enums, use <see cref="RestoreEnum()"/>
-        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use 
+        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use
         /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of <paramref name="value"/></typeparam>
@@ -119,15 +119,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Looks up the list <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// Looks up the list <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// will be cleared and all its elements will be restored from the looked up values.
         /// To restore a single element e, e.Restore(item, "") will be called where 'item' is a single
         /// data element of the list looked up by <paramref name="label"/>.
-        /// 
+        ///
         /// Note: For types <typeparamref name="T"/> that are enums, use <see cref="RestoreEnum()"/>
-        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use 
+        /// instead. For Color, use <see cref="Restore(Dictionary{string, object}, string, ref Color)"/>. For int, use
         /// <see cref="Restore(Dictionary{string, object}, string, ref int)"/>.
         /// </summary>
         /// <typeparam name="T">the type of elements of the list <paramref name="value"/></typeparam>
@@ -143,7 +143,7 @@ namespace SEE.Utils
                 value.Clear();
                 try
                 {
-                    IList items = (IList)v;                    
+                    IList items = (IList)v;
                     foreach (object item in items)
                     {
                         Dictionary<string, object> dict = (Dictionary<string, object>)item;
@@ -165,11 +165,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// receives the looked up value.
-        /// 
+        ///
         /// Note: This method is intended for int values. If you would use the generic method
         /// <see cref="Restore{T}(Dictionary{string, object}, string, ref T)"/> instead, you
         /// would run into a conversion error from int64 (long) to int32 (int).
@@ -188,15 +188,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// Looks up the <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// receives the looked up value. Note that only those parts of the color (red, green, blue,
         /// alpha) will be updated in <paramref name="value"/> that are actually found in <paramref name="attributes"/>;
         /// all others remain unchanged.
-        /// 
+        ///
         /// Note: This method is intended specifically for Color. For enums use <see cref="RestoreEnum()"/>
-        /// and for all other types, use <see cref="Restore{T}()"/> instead. 
+        /// and for all other types, use <see cref="Restore{T}()"/> instead.
         /// </summary>
         /// <param name="attributes">where to look up the <paramref name="label"/></param>
         /// <param name="label">the label to look up</param>
@@ -261,11 +261,45 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Restores a collection of strings retrieved from <paramref name="attributes"/> under
+        /// the given <paramref name="label"/>.
+        /// </summary>
+        /// <param name="attributes">where to look up the <paramref name="label"/></param>
+        /// <param name="label">the label to look up</param>
+        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists</param>
+        /// <returns>true if the <paramref name="label"/> was found</returns>
+        internal static bool RestoreStringList(Dictionary<string, object> attributes, string label, ref IList<string> value)
+        {
+            if (attributes.TryGetValue(label, out object storedValue))
+            {
+                List<object> values = storedValue as List<object>;
+                if (values == null)
+                {
+                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: List<string>. Actual type: {storedValue.GetType()}");
+                }
+                else
+                {
+                    value = new List<string>();
+                    foreach (object item in values)
+                    {
+                        value.Add((string)item);
+                    }
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref Dictionary<string, bool> value)
         {
             if (attributes.TryGetValue(label, out object list))
             {
-                // The original dictionary was flattened as a list of pairs where each 
+                // The original dictionary was flattened as a list of pairs where each
                 // pair is represented as a list of two elements: the first one is the key
                 // and the second one is the value of the original dictionary.
                 List<object> values = list as List<object>;
@@ -306,11 +340,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Looks up the enum <paramref name="value"/> in <paramref name="attributes"/> using the 
+        /// Looks up the enum <paramref name="value"/> in <paramref name="attributes"/> using the
         /// key <paramref name="label"/>. If no such enum <paramref name="label"/> exists, false
         /// is returned and <paramref name="value"/> remains unchanged. Otherwise <paramref name="value"/>
         /// receives the looked up enum value.
-        /// 
+        ///
         /// Note: This method is intended for enums <typeparamref name="E"/>; for other types, use <see cref="Restore()"/>
         /// instead. For Color, use <see cref="RestoreColor()"/>.
         /// </summary>
@@ -366,7 +400,7 @@ namespace SEE.Utils
             {
                 if (attributes.TryGetValue(label, out object list))
                 {
-                    // The original dictionary was flattened as a list of pairs where each 
+                    // The original dictionary was flattened as a list of pairs where each
                     // pair is represented as a list of two elements: the first one is the key
                     // and the second one is the value of the original dictionary.
                     List<object> values = list as List<object>;
