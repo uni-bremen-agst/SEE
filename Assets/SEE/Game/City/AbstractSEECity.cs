@@ -23,7 +23,7 @@ namespace SEE.Game.City
     /// to its visualization.
     /// </summary>
     [Serializable]
-    public abstract partial class AbstractSEECity : Sirenix.OdinInspector.SerializedMonoBehaviour
+    public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
