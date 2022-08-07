@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -10,6 +11,7 @@ namespace SEE.Game.City
     /// determines the length and color of the section.
     /// </summary>
     [Serializable]
+    [HideReferenceObjectPicker]
     public class AntennaSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
