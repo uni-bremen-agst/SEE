@@ -57,9 +57,9 @@ namespace SEE.Game.City
         private const string DefaultLengthMetricValue = "0.001";
 
         /// <summary>
-        /// A mapping of node metric names onto colors. The first three metrics
+        /// A mapping of node metric names onto lengths. The first three metrics
         /// are generally used to determine the width, height, and depth of visual
-        /// node representations.
+        /// node representations. More complex shapes may offer additional lengths.
         /// </summary>
         [Tooltip("Maps metric names onto lengths of the shape."), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
