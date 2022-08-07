@@ -224,7 +224,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                 if (graph.GraphObject != null)
                 {
                     float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
-                    layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
+                    layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, graph.GraphObject.LocalScale.y, height), rotation);
                 }
 
             }
@@ -243,7 +243,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// calculates edgeLength and repulsionStrength 
+        /// calculates edgeLength and repulsionStrength
         /// </summary>
         public void GetGoodParameter()
         {
@@ -342,7 +342,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Calculates the maximal depth of a node 
+        /// Calculates the maximal depth of a node
         /// </summary>
         /// <param name="layoutNodes">the layout nodes</param>
         /// <returns></returns>
@@ -426,7 +426,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Places the Nodes 
+        /// Places the Nodes
         /// </summary>
         /// <param name="root">Root Node</param>
         private void PlaceNodes(ILayoutNode root)
@@ -445,7 +445,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Starts the layout process 
+        /// Starts the layout process
         /// </summary>
         private void StartLayoutProzess()
         {
@@ -477,7 +477,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Calculates the number of children of every node 
+        /// Calculates the number of children of every node
         /// </summary>
         private void CalcNoOfChildrenForAllNodes()
         {
@@ -503,7 +503,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
                 edgeLengths.Add(0, originalEdgeLength);
 
-                // we dont have to look at the original graph 
+                // we dont have to look at the original graph
                 for (int i = 1; i < gmList.Count; i++)
                 {
                     int k = edgeLengths[i - 1];
@@ -603,7 +603,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Runs the spring embedder 
+        /// Runs the spring embedder
         /// </summary>
         private void RunSpringEmbedder()
         {
@@ -1013,7 +1013,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Move all nodes 
+        /// Move all nodes
         /// </summary>
         private void MoveNodes()
         {
@@ -1128,13 +1128,13 @@ namespace SEE.Layout.NodeLayouts.Cose
 
         /// <summary>
         /// Indicates whether the edge is allowed in coselayout or not.
-        /// All Edge between predecessors and successors in the same hierarchie (inclusion branch) are not allowed in the cose layout 
+        /// All Edge between predecessors and successors in the same hierarchie (inclusion branch) are not allowed in the cose layout
         /// </summary>
         /// <param name="edge">the edge to check</param>
         /// <returns>is Allowed in layout</returns>
         private bool ExcludeEdgesInSameHierarchie(Edge edge)
         {
-            // Kanten zwischen Vorgängern und Nachfolgern in der gleichen Hierarchie werden vom Layout ausgeschlossen 
+            // Kanten zwischen Vorgängern und Nachfolgern in der gleichen Hierarchie werden vom Layout ausgeschlossen
 
             ILayoutNode sourceNode = layoutNodes.Where(node => node.ID == edge.Source.ID).First();
             ILayoutNode targetNode = layoutNodes.Where(node => node.ID == edge.Target.ID).First();
@@ -1263,7 +1263,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Creates a new cose edge 
+        /// Creates a new cose edge
         /// </summary>
         /// <param name="edge">the new edge </param>
         private void CreateEdge(Edge edge)
