@@ -274,20 +274,9 @@ namespace SEE.Utils
         {
             if (attributes.TryGetValue(label, out object storedValue))
             {
-                List<object> values = storedValue as List<object>;
-                if (values == null)
-                {
-                    throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: List<string>. Actual type: {storedValue.GetType()}");
-                }
-                else
-                {
-                    value = new List<string>();
-                    foreach (object item in values)
-                    {
-                        value.Add((string)item);
-                    }
-                    return true;
-                }
+                List<object> values = (List<object>) storedValue;
+                value = values.Cast<string>().ToList();
+                return true;
             }
             else
             {
