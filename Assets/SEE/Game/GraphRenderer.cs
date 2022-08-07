@@ -221,9 +221,14 @@ namespace SEE.Game
                 scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
             // FIXME: This call should be moved somewhere else.
-            SetAntennaDecorators();
+            SetAntennaDecorators(scaler);
         }
 
+        /// <summary>
+        /// Returns all metric names that are used for any antenna segments of all
+        /// relevant <see cref="Settings.NodeTypes"/>.
+        /// </summary>
+        /// <returns>metric names for any antenna segments</returns>
         private HashSet<string> GetAntennaMetrics()
         {
             HashSet<string> result = new HashSet<string>();
@@ -234,13 +239,13 @@ namespace SEE.Game
             return result;
         }
 
-        private void SetAntennaDecorators()
+        private void SetAntennaDecorators(IScale scaler)
         {
             HashSet<string> antennaMetrics = GetAntennaMetrics();
 
             // FIXME: Continue here. Create anntenna decorators.
 
-            //leafAntennaDecorator = new AntennaDecorator(scaler);
+            //AntennaDecorator antennaDecorator = new AntennaDecorator(scaler);
             //innerAntennaDecorator = new AntennaDecorator(scaler);
         }
 
@@ -263,6 +268,13 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// To turn on the extension hack for our VISSOFT paper. Will be
+        /// removed soon.
+        /// </summary>
+        [Obsolete]
+        private const bool VISSOFT = false;
+
+        /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
         /// to the user's choice in the settings.
         /// </summary>
@@ -281,12 +293,13 @@ namespace SEE.Game
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
 
             // FIXME-IWSC: Remove this call after the publication.
-            if (false)
+            if (VISSOFT)
             {
                 GenerateAndVisualizeCloneClasses(nodes, nodeMap);
             }
 
             DrawInnerNodes(nodeMap, nodes);
+
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
 
@@ -323,19 +336,6 @@ namespace SEE.Game
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             AddDecorations(nodeToGameObject);
-
-            // We always need one unique root game node in the scene. If the layout is hierarchical and
-            // the original graph had multiple roots, a unique root was added above. If the layout was
-            // not hierarchical, we can only now add a unique root because non-hierarchical layouts
-            // expect a list of nodes instead of a hierarchy of nodes.
-            //if (!nodeLayout.IsHierarchical() && layoutNodes.Count > 1)
-            //{
-            //    // If we have multiple roots, we need to add a unique one.
-            //    GameObject artificalRoot = AddGameRootNodeIfNecessary(graph, nodeMap);
-            //    // We need a game node for this root in the scene, too.
-
-
-            //}
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
@@ -803,8 +803,6 @@ namespace SEE.Game
         /// Any game objects in <paramref name="gameNodes"/> with an invalid node reference will be skipped.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
-        /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private ICollection<LayoutGameNode> ToLayoutNodes
