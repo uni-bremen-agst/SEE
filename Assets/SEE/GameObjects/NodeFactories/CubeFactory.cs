@@ -27,6 +27,12 @@ namespace SEE.GO.NodeFactories
         }
 
         /// <summary>
+        /// Model mesh for a game object to be re-used for all instances.
+        /// It will be ceated in <see cref="GetMesh()"/> on demand.
+        /// </summary>
+        private static Mesh modelMesh;
+
+        /// <summary>
         /// Returns a (cached) mesh for a cube.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
