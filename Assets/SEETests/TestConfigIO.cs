@@ -103,7 +103,6 @@ namespace SEE.Utils
             {
                 { "label", value }
             };
-            Debug.Log($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r");
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse($"label\t: {value.ToString("F8", System.Globalization.CultureInfo.InvariantCulture)};\r"));
         }
 
