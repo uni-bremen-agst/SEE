@@ -247,17 +247,6 @@ namespace SEE.Game
         private IDictionary<string, AntennaDecorator> antennaDecorators = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
-        /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
-        /// based on the user's choice (settings).
-        /// </summary>
-        /// <param name="graph">graph whose node metrics are to be scaled</param>
-        private void SetScaler(Graph graph)
-        {
-            SetScaler(new List<Graph> { graph });
-        }
-
-        /// <summary>
         /// Returns a mapping of each graph Node onto its containing GameNode for every
         /// element in <paramref name="gameNodes"/>.
         /// </summary>
