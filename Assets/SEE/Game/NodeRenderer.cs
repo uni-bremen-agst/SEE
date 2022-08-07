@@ -48,6 +48,7 @@ namespace SEE.Game
             NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
+            Debug.LogWarning("AddAntenna\n");
             // FIXME leafAntennaDecorator.AddAntenna(result);
             return result;
         }
