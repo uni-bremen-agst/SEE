@@ -17,24 +17,22 @@ namespace SEE.Game.City
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
-        public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
+        [ListDrawerSettings(CustomAddFunction = nameof(AddSegment))]
+        public List<AntennaSection> AntennaSections = new List<AntennaSection>();
 
         /// <summary>
-        /// This parameter determines the sections of the antenna, that is, the
-        /// order of the antenna segments and which properties they depict.
+        /// Returns a new <see cref="AntennaSection"/> with default values.
+        ///
+        /// Note: This method is used as a custom function for additions in <see cref="AntennaSections"/>.
         /// </summary>
-        //[SerializeField]
-        //[ListDrawerSettings(CustomAddFunction = "AddProperty")]
-        //public List<Property> AntennaSegments = new List<Property>();
-
-        //private Property AddProperty()
-        //{
-        //    Debug.Log("AddProperty\n");
-        //    Property result = new Property();
-        //    result.Kind = PropertyKind.Metric;
-        //    result.Name = "Metric.Mine";
-        //    return result;
-        //}
+        /// <returns>new <see cref="AntennaSection"/> with default values</returns>
+        private AntennaSection AddSegment()
+        {
+            AntennaSection result = new AntennaSection();
+            result.Color = Color.white;
+            result.Metric = "Metric.LOC";
+            return result;
+        }
 
         /// <summary>
         /// The width of an antenna.
