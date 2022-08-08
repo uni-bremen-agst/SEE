@@ -98,13 +98,7 @@ namespace SEE.Game
             // The default node factory that we use if the we cannot find a setting for a given node type.
             NodeFactory GetDefaultNodeFactory()
             {
-                return new CubeFactory(ShaderType, DefaultColorRange());
-            }
-
-            // The default color range that we use if the we cannot find a setting for a given node type.
-            static ColorRange DefaultColorRange()
-            {
-                return new ColorRange(Color.white, Color.black, 10);
+                return new CubeFactory(ShaderType, ColorRange.Default());
             }
 
             // The appropriate node factory for value.Shape.
@@ -139,7 +133,7 @@ namespace SEE.Game
                         else
                         {
                             Debug.LogWarning($"No specification of color for node metric {colorProperty.ColorMetric}. Using a default.\n");
-                            return DefaultColorRange();
+                            return ColorRange.Default();
                         }
                     default:
                         throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
