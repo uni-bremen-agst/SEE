@@ -87,11 +87,13 @@ namespace SEE.Game
                 if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
                 {
                     nodeTypeToFactory[nodeType] = GetNodeFactory(value);
+                    nodeTypeToAntennaDectorator[nodeType] = GetAntennaDecorator(value);
                 }
                 else
                 {
                     Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
                     nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+                    nodeTypeToAntennaDectorator[nodeType] = null;
                 }
             }
 
@@ -131,6 +133,11 @@ namespace SEE.Game
                         throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
                 }
             }
+
+            AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
+            {
+                return new AntennaDecorator(scaler, value.AntennaSettings, Settings.MetricToColor);
+            }
         }
 
         /// <summary>
@@ -167,6 +174,12 @@ namespace SEE.Game
         /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
         /// </summary>
         private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
+
+        /// <summary>
+        /// A mapping of the name of node types of <see cref="graphs"/> onto the
+        /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
+        /// </summary>
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -220,7 +233,7 @@ namespace SEE.Game
             HashSet<string> result = new HashSet<string>();
             foreach (VisualNodeAttributes nodeAttributes in Settings.NodeTypes.Values.Where(n => n.IsRelevant))
             {
-                result.UnionWith(nodeAttributes.AntennaSettings.AntennaSections.Select(a => a.Metric));
+                result.UnionWith(nodeAttributes.AntennaSettings.AntennaSections);
             }
             return result;
         }

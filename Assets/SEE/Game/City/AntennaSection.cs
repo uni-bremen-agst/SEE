@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using SEE.Utils;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -12,41 +11,32 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [HideReferenceObjectPicker]
+    [Obsolete]
     public class AntennaSection : ConfigIO.PersistentConfigItem
     {
         /// <summary>
         /// The metric which should determine the length of the section.
         /// </summary>
         public string Metric;
-        /// <summary>
-        /// The color in which the section should be drawn.
-        /// </summary>
-        public Color Color;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="metric">the metric that should determine the length of the section</param>
-        /// <param name="color">color in the section should be drawn</param>
-        public AntennaSection(string metric, Color color)
+        /// <param name="metric">the metric that should determine the length and color of the section</param>
+        public AntennaSection(string metric)
         {
             Metric = metric;
-            Color = color;
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public AntennaSection() : this(string.Empty, Color.white) { }
+        public AntennaSection() : this(string.Empty) { }
 
         /// <summary>
         /// Label in the configuration file for the <see cref="Metric"/>.
         /// </summary>
         private const string MetricLabel = "Metric";
-        /// <summary>
-        /// Label in the configuration file for the <see cref="Color"/>.
-        /// </summary>
-        private const string ColorLabel = "Color";
 
         /// <summary>
         /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
@@ -55,7 +45,6 @@ namespace SEE.Game.City
         {
             writer.BeginGroup(label);
             writer.Save(Metric, MetricLabel);
-            writer.Save(Color, ColorLabel);
             writer.EndGroup();
         }
 
@@ -83,8 +72,7 @@ namespace SEE.Game.City
                 return false;
             }
 
-            bool metricRestored = ConfigIO.Restore(values, MetricLabel, ref Metric);
-            return ConfigIO.Restore(values, ColorLabel, ref Color) || metricRestored;
+            return ConfigIO.Restore(values, MetricLabel, ref Metric);
         }
     }
 }
