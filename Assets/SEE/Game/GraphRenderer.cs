@@ -190,7 +190,7 @@ namespace SEE.Game
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
@@ -604,9 +604,9 @@ namespace SEE.Game
             List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             sublayouts.ForEach(sublayoutNode =>
             {
-                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
+                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(toLayoutNode[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(toLayoutNode[n]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(toLayoutNode[n]));
                 sublayoutLayoutNodes.Add(sublayout);
             });
             return sublayoutLayoutNodes;
@@ -770,7 +770,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, to_layout_node);
+            return ToLayoutNodes(gameObjects, toLayoutNode);
         }
 
         /// <summary>
@@ -788,11 +788,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, toLayoutNode));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, toLayoutNode));
 
             return layoutNodes;
         }
