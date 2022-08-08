@@ -126,15 +126,7 @@ namespace SEE.Game
                     case PropertyKind.Type:
                         return new ColorRange(colorProperty.TypeColor, colorProperty.TypeColor, 1);
                     case PropertyKind.Metric:
-                        if (Settings.MetricToColor.TryGetValue(colorProperty.ColorMetric, out ColorRange color))
-                        {
-                            return color;
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"No specification of color for node metric {colorProperty.ColorMetric}. Using a default.\n");
-                            return ColorRange.Default();
-                        }
+                        return Settings.GetColorForMetric(colorProperty.ColorMetric);
                     default:
                         throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
                 }
