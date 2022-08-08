@@ -108,6 +108,25 @@ namespace SEE.Game.City
         public ColorMap MetricToColor = new ColorMap();
 
         /// <summary>
+        /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
+        /// if one exists; otherwise <see cref="ColorRange.Default()"/> is returned.
+        /// </summary>
+        /// <param name="metricName">name of a metric</param>
+        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/></returns>
+        public ColorRange GetColorForMetric(string metricName)
+        {
+            if (MetricToColor.TryGetValue(metricName, out ColorRange color))
+            {
+                return color;
+            }
+            else
+            {
+                Debug.LogWarning($"No specification of color for node metric {metricName}. Using a default.\n");
+                return ColorRange.Default();
+            }
+        }
+
+        /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
