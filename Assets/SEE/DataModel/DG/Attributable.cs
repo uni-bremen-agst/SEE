@@ -213,6 +213,17 @@ namespace SEE.DataModel.DG
             return result;
         }
 
+        /// <summary>
+        /// Returns the names of all numeric attributes (metrics).
+        /// </summary>
+        /// <returns>names of all numeric attributes</returns>
+        public HashSet<string> AllMetrics()
+        {
+            HashSet<string> result = new HashSet<string>(FloatAttributes.Keys);
+            result.UnionWith(IntAttributes.Keys);
+            return result;
+        }
+
         //----------------------------------
         // General
         //----------------------------------
