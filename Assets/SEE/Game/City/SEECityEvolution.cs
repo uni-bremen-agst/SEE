@@ -149,6 +149,21 @@ namespace SEE.Game.City
         private Graph firstGraph;
 
         /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected override void DumpNodeMetrics()
+        {
+            if (firstGraph == null)
+            {
+                Debug.Log("No graph loaded yet.");
+            }
+            else
+            {
+                DumpNodeMetrics(new List<Graph>() { firstGraph });
+            }
+        }
+
+        /// <summary>
         /// Loads the first graph of the graph series. If a graph was already
         /// loaded, that graph will be destroyed.
         /// </summary>
