@@ -510,6 +510,56 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Lists the metrics for each node type.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "List Node Metrics")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        private void ListNodeMetrics()
+        {
+            DumpNodeMetrics();
+        }
+
+        /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected abstract void DumpNodeMetrics();
+
+        /// <summary>
+        /// Emits all known metric names for each node types in any of the <paramref name="graphs"/>
+        /// to the console.
+        /// </summary>
+        /// <param name="graphs">graphs whose metric names are to be emitted</param>
+        protected static void DumpNodeMetrics(ICollection<Graph> graphs)
+        {
+            IDictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+
+            foreach (Graph graph in graphs)
+            {
+                foreach (Node node in graph.Nodes())
+                {
+                    if (result.TryGetValue(node.Type, out HashSet<string> metrics))
+                    {
+                        metrics.UnionWith(node.AllMetrics());
+                    }
+                    else
+                    {
+                        result[node.Type] = node.AllMetrics();
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, HashSet<string>> item in result)
+            {
+                Debug.Log($"Node type {item.Key}:\n");
+                foreach (string metric in item.Value)
+                {
+                    Debug.Log($"  metric {metric}\n");
+                }
+            }
+        }
+
+        /// <summary>
         /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
         /// </summary>
         /// <param name="graph"></param>
