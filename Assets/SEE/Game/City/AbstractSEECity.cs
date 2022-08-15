@@ -97,7 +97,7 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [OdinSerialize, Tooltip("Visual attributes of nodes.")]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout, IsReadOnly = true)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
         public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
 
         /// <summary>
