@@ -37,6 +37,12 @@ namespace SEE.Game
             SetGraph(settings, new List<Graph> { graph });
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="settings">the settings for the visualization</param>
+        /// <param name="graphs">the graphs to be rendered</param>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graphs"/> is null or empty</exception>
         public GraphRenderer(AbstractSEECity settings, IList<Graph> graphs)
         {
             if (graphs == null || graphs.Count == 0)
@@ -219,36 +225,7 @@ namespace SEE.Game
             {
                 scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
-            // FIXME: This call should be moved somewhere else.
-            SetAntennaDecorators(scaler);
         }
-
-        /// <summary>
-        /// Returns all metric names that are used for any antenna segments of all
-        /// relevant <see cref="Settings.NodeTypes"/>.
-        /// </summary>
-        /// <returns>metric names for any antenna segments</returns>
-        private HashSet<string> GetAntennaMetrics()
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (VisualNodeAttributes nodeAttributes in Settings.NodeTypes.Values.Where(n => n.IsRelevant))
-            {
-                result.UnionWith(nodeAttributes.AntennaSettings.AntennaSections);
-            }
-            return result;
-        }
-
-        private void SetAntennaDecorators(IScale scaler)
-        {
-            HashSet<string> antennaMetrics = GetAntennaMetrics();
-
-            // FIXME: Continue here. Create anntenna decorators.
-
-            //AntennaDecorator antennaDecorator = new AntennaDecorator(scaler);
-            //innerAntennaDecorator = new AntennaDecorator(scaler);
-        }
-
-        private IDictionary<string, AntennaDecorator> antennaDecorators = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
         /// Returns a mapping of each graph Node onto its containing GameNode for every

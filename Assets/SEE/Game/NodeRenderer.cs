@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -36,7 +37,7 @@ namespace SEE.Game
         /// Creates and returns a new game object for representing the given <paramref name="node"/>
         /// as a leaf node. The exact kind of representation depends upon the leaf-node factory. The node is
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
-        /// Its style is determined by LeafNodeStyleMetric (linear interpolation of a color gradient).
+        /// Its style is determined by <see cref="SelectStyle(Node)"/>.
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         ///
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
@@ -48,7 +49,6 @@ namespace SEE.Game
             NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
-            nodeTypeToAntennaDectorator[node.Type]?.AddAntenna(result);
             return result;
         }
 
@@ -340,16 +340,10 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
-                Node node = nodeRef.Value;
-                // FIXME: AddAnntenna
-                //if (node.IsLeaf())
-                //{
-                //    leafAntennaDecorator.AddAntenna(gameNode);
-                //}
-                //else
-                //{
-                //    innerAntennaDecorator.AddAntenna(gameNode);
-                //}
+                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaDecorator decorator))
+                {
+                    decorator.AddAntenna(gameNode);
+                }
             }
             else
             {
@@ -381,6 +375,10 @@ namespace SEE.Game
                 AddMetrics(node, metrics, node.IntAttributes.Keys);
 
                 // There should be at least three values.
+                if (metrics.Count < 3)
+                {
+                    Debug.LogWarning($"There should be at least three metrics for node {node.ID}. Adding zeros.");
+                }
                 for (int i = metrics.Count; i < 3; ++i)
                 {
                     metrics.Add(0);
@@ -575,13 +573,17 @@ namespace SEE.Game
         /// These general decorations currently consist of:
         /// <ul>
         /// <li>Outlines around the node</li>
+        /// <li>Antennas</li>
         /// </ul>
         /// </summary>
-        protected virtual void AddGeneralDecorations(GameObject node)
+        /// <param name="gameNode">game objec representing a node to be decorated</param>
+        protected virtual void AddGeneralDecorations(GameObject gameNode)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
-            VisualNodeAttributes attribs = Settings.NodeTypes[node.GetNode().Type];
-            Outline.Create(node, Color.black, attribs.OutlineWidth);
+            Node node = gameNode.GetNode();
+            VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
+            Outline.Create(gameNode, Color.black, attribs.OutlineWidth);
+            nodeTypeToAntennaDectorator[node.Type]?.AddAntenna(gameNode);
         }
 
         /// <summary>
