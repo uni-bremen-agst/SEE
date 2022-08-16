@@ -9914,6 +9914,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -10013,6 +10016,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -10112,6 +10118,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -10211,6 +10220,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -15620,6 +15632,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Level
@@ -15746,6 +15761,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Lines.LOC
@@ -15881,6 +15899,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: Source.Declaration_Start
@@ -16007,6 +16028,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
     - Name: ColorMetric
       Entry: 1
       Data: Metric.Level
@@ -16083,12 +16107,8 @@ MonoBehaviour:
       Entry: 7
       Data: 29|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
-      Entry: 7
-      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 3
     - Name: 
       Entry: 12
       Data: 3
@@ -16265,7 +16285,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 31|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 30|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -16295,11 +16315,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 33|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 32|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -16315,11 +16335,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 33
+      Data: 32
     - Name: 
       Entry: 12
       Data: 0
@@ -16331,11 +16351,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 33
+      Data: 32
     - Name: 
       Entry: 12
       Data: 0
@@ -16347,11 +16367,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 36|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 33
+      Data: 32
     - Name: 
       Entry: 12
       Data: 0
@@ -16445,7 +16465,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.003080964
+  HeightOffset: 0.0030805469
 --- !u!65 &1535691041
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17773,6 +17793,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: Metric.McCabe_Complexity
@@ -17908,6 +17931,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -18043,6 +18069,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
@@ -18169,6 +18198,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: false
     - Name: ColorMetric
       Entry: 1
       Data: 
