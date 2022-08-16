@@ -18,21 +18,7 @@ namespace SEE.Game.City
         /// </summary>
         [SerializeField]
         [HideReferenceObjectPicker]
-        //[ListDrawerSettings(CustomAddFunction = nameof(AddSegment))]
         public IList<string> AntennaSections = new List<string>();
-
-        /// <summary>
-        /// Returns a new <see cref="AntennaSection"/> with default values.
-        ///
-        /// Note: This method is used as a custom function for additions in <see cref="AntennaSections"/>.
-        /// </summary>
-        /// <returns>new <see cref="AntennaSection"/> with default values</returns>
-        private AntennaSection AddSegment()
-        {
-            AntennaSection result = new AntennaSection();
-            result.Metric = "Metric.LOC";
-            return result;
-        }
 
         /// <summary>
         /// The width of an antenna.
