@@ -1211,6 +1211,30 @@
         <string>mini</string>
       </attr>
     </node>
+	<node id="NGlobal">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N global</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>global</string>
+      </attr>
+    </node>
+	<node id="NRoot">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N root</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>root</string>
+      </attr>
+    </node>
+	<edge id="EGlobalRoot" from="NGlobal" to="NRoot">
+      <type xlink:href="Enclosing"/>
+    </edge>
+	<edge id="EminiGlobal" from="N39252" to="NGlobal">
+      <type xlink:href="Enclosing"/>
+    </edge>
     <edge id="E3416" from="N4574" to="N39252">
       <type xlink:href="Enclosing"/>
       <attr name="Source.Line">
