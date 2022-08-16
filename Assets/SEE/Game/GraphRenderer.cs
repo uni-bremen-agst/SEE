@@ -125,19 +125,36 @@ namespace SEE.Game
                 };
             }
 
-            // The color range for the tiven colorProperty depending upon whether the property
+            // The color range for the given colorProperty depending upon whether the property
             // used to determine the color range is PropertyKind.Type or PropertyKind.Metric.
             ColorRange GetColorRange(ColorProperty colorProperty)
             {
                 switch (colorProperty.Property)
                 {
                     case PropertyKind.Type:
-                        return new ColorRange(colorProperty.TypeColor, colorProperty.TypeColor, 1);
+                        return GetColorRangeForNodeType(colorProperty.TypeColor);
                     case PropertyKind.Metric:
                         return Settings.GetColorForMetric(colorProperty.ColorMetric);
                     default:
                         throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
                 }
+            }
+
+            // Returns a color range where the given color is the upper color and the
+            // the lower color is the given color lightened by 50 %. The number of colors
+            // in this color range is maximal node hierarchy level of all graphs.
+            ColorRange GetColorRangeForNodeType(Color color)
+            {
+                uint maxLevel = 0;
+                foreach (Graph graph in graphs)
+                {
+                    if (graph.MaxDepth > maxLevel)
+                    {
+                        maxLevel = (uint)graph.MaxDepth;
+                    }
+                }
+
+                return new ColorRange(color.Lighter(), color, maxLevel + 1);
             }
 
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
