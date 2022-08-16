@@ -216,8 +216,6 @@ namespace SEE.Game
                     case PropertyKind.Metric:
                         return NodeMetricToColor(node, value.ColorProperty.ColorMetric);
                     case PropertyKind.Type:
-                        /// Node factories using the node type for determining the color have only one base color.
-                        /// <seealso cref="SetNodeFactories"/>
                         return NodeTypeToColor(node, value.ColorProperty.ByLevel);
                     default:
                         throw new NotImplementedException($"Unhandled {typeof(PropertyKind)} {value.ColorProperty.Property}");
