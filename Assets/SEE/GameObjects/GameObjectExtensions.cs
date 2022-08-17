@@ -383,6 +383,20 @@ namespace SEE.GO
 
         /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If a component of the type was found, it will be returned, otherwise a new component of the type
+        /// will be added and returned.
+        /// </summary>
+        /// <param name="gameObject">The gameobject whose component of type <typeparamref name="T"/>
+        /// we wish to return</param>
+        /// <typeparam name="T">The component to get / add</typeparam>
+        /// <returns>The existing or newly created component</returns>
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        {
+            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+        }
+
+        /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
         /// If the component was found, it will be stored in <paramref name="component"/>.
         /// If it wasn't found, <paramref name="component"/> will be <code>null</code> and
         /// <see cref="InvalidOperationException"/> will be thrown.
