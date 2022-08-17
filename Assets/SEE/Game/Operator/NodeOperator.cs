@@ -14,11 +14,11 @@ namespace SEE.Game.Operator
         // of the node we hover over, we might want to animate this while still letting the user
         // drag the node.
 
-        private readonly OperationCategory<float> PositionX = new OperationCategory<float>();
-        private readonly OperationCategory<float> PositionY = new OperationCategory<float>();
-        private readonly OperationCategory<float> PositionZ = new OperationCategory<float>();
+        private readonly TweenOperation<float> PositionX = new TweenOperation<float>();
+        private readonly TweenOperation<float> PositionY = new TweenOperation<float>();
+        private readonly TweenOperation<float> PositionZ = new TweenOperation<float>();
 
-        private readonly OperationCategory<Vector3> Scale = new OperationCategory<Vector3>();
+        private readonly TweenOperation<Vector3> Scale = new TweenOperation<Vector3>();
         // TODO: private readonly OperationCategory<Color> Color = new OperationCategory<Color>();
 
         private float? updateEdgeLayoutDuration;
@@ -42,12 +42,26 @@ namespace SEE.Game.Operator
             PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
+        
+        public void MoveNode(Vector3 newPosition, float duration)
+        {
+            PositionX.AnimateTo(newPosition.x, duration);
+            PositionY.AnimateTo(newPosition.y, duration);
+            PositionZ.AnimateTo(newPosition.z, duration);
+            updateEdgeLayoutDuration = duration;
+        }
 
         public void ScaleNode(Vector3 newScale, float duration)
         {
             Scale.AnimateTo(newScale, duration);
             updateEdgeLayoutDuration = duration;
         }
+
+        public void UpdateAttachedEdges(float duration)
+        {
+            updateEdgeLayoutDuration = duration;
+        }
+        
 
         #endregion
 

@@ -9,43 +9,60 @@ namespace SEE.Game.Operator
 {
     public abstract class AbstractOperator : MonoBehaviour
     {
-        protected class OperationCategory<T>
+        // Collects all non-generic methods
+        protected interface IOperation
         {
-            public Func<T, float, Tween> AnimateToAction { protected get; set; }
+            void KillAnimator(bool complete = false);
+        }
+        
+        protected class Operation<T, V>: IOperation
+        {
+            public Func<V, float, T> AnimateToAction { protected get; set; }
 
-            private Tween Tween;
-            private IList<Tween> CompositedTweens = new List<Tween>();
-            public T TargetValue { get; set; } // note: should only be set at beginning!
+            protected T Animator;
+            private IList<IOperation> CompositedOperations = new List<IOperation>();
+            public V TargetValue { get; set; } // note: should only be set at beginning!
 
-            private void CleanTweens(bool complete = false)
+            public virtual void KillAnimator(bool complete = false)
             {
-                // Kill all old tweens, including those composited with this tween
-                if (Tween.IsActive())
+                // Kill all old animators, including those composited with this tween
+                foreach (IOperation operation in CompositedOperations)
                 {
-                    Tween.Kill(complete);
-                }
-
-                foreach (Tween tween in CompositedTweens)
-                {
-                    if (tween.IsActive())
-                    {
-                        tween.Kill(complete);
-                    }
+                    operation.KillAnimator(complete);
                 }
             }
 
-            public void AnimateTo(T target, float duration, IList<Tween> compositedTweens = null)
+            protected virtual void ChangeAnimatorTarget(V newTarget, float duration)
             {
-                if (EqualityComparer<T>.Default.Equals(target, TargetValue))
+                // Usual approach: Kill old animator and replace it with new one
+                KillAnimator();
+                Animator = AnimateToAction(newTarget, duration);
+            }
+
+            public void AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
+            {
+                if (EqualityComparer<V>.Default.Equals(target, TargetValue))
                 {
                     // Nothing to be done, we're already where we want to be.
                     return;
                 }
 
-                CleanTweens();
-                Tween = AnimateToAction(target, duration);
+                ChangeAnimatorTarget(target, duration);
                 TargetValue = target;
-                CompositedTweens = compositedTweens ?? new List<Tween>();
+                CompositedOperations = compositedOperations ?? new List<IOperation>();
+            }
+        }
+
+        protected class TweenOperation<V> : Operation<Tween, V>
+        {
+            public override void KillAnimator(bool complete = false)
+            {
+                if (Animator.IsActive())
+                {
+                    Animator.Kill(complete);
+                }
+
+                base.KillAnimator(complete);
             }
         }
     }
