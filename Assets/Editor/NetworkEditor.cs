@@ -9,7 +9,7 @@ namespace SEEEditor
     /// <summary>
     /// Custom editor for <see cref="SEE.Net.Network"/>.
     /// </summary>
-    [CustomEditor(typeof(SEE.Net.Network))]
+    //[CustomEditor(typeof(SEE.Net.Network))]
     public class NetworkEditor : Editor
     {
         /// <summary>
