@@ -828,8 +828,20 @@ namespace SEE.Net
         [Serializable]
         private struct AddressInfo
         {
+            /// <summary>
+            /// The address family of the TCP/IP protocol, e.g., InterNetworkV6
+            /// or InterNetwork.
+            /// </summary>
             public readonly string AddressFamily;
+            /// <summary>
+            /// The IP address.
+            /// </summary>
             public readonly string IPAddress;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="addressFamiliy">address family of the TCP/IP protocol</param>
+            /// <param name="ipAddress">IP address</param>
             public AddressInfo(string addressFamiliy, string ipAddress)
             {
                 AddressFamily = addressFamiliy;
