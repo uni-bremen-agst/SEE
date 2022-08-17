@@ -13,11 +13,11 @@ namespace SEE.Game.Operator
         {
             public Func<T, float, Tween> AnimateToAction { protected get; set; }
 
-            protected Tween Tween;
-            protected IList<Tween> CompositedTweens = new List<Tween>();
-            public T TargetValue { get; set; }  // note: should only be set at beginning!
+            private Tween Tween;
+            private IList<Tween> CompositedTweens = new List<Tween>();
+            public T TargetValue { get; set; } // note: should only be set at beginning!
 
-            protected void CleanTweens(bool complete = false)
+            private void CleanTweens(bool complete = false)
             {
                 // Kill all old tweens, including those composited with this tween
                 if (Tween.IsActive())
@@ -41,6 +41,7 @@ namespace SEE.Game.Operator
                     // Nothing to be done, we're already where we want to be.
                     return;
                 }
+
                 CleanTweens();
                 Tween = AnimateToAction(target, duration);
                 TargetValue = target;
