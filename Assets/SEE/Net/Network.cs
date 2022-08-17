@@ -14,7 +14,6 @@ using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -237,6 +236,8 @@ namespace SEE.Net
             /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
             /// main thread here.
             MainThread = Thread.CurrentThread;
+
+            Load(ConfigPath.Path);
         }
 
         /// <summary>
@@ -896,11 +897,7 @@ namespace SEE.Net
         [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
         public void Load()
         {
-            string filename = ConfigPath.Path;
-            if (File.Exists(filename))
-            {
-                Load(filename);
-            }
+            Load(ConfigPath.Path);
         }
 
         #region ConfigIO
@@ -950,8 +947,15 @@ namespace SEE.Net
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new ConfigReader(filename);
-            Restore(stream.Read());
+            if (File.Exists(filename))
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                Restore(stream.Read());
+            }
+            else
+            {
+                Debug.LogError($"Configuration file {filename} does not exist.\n");
+            }
         }
 
         /// <summary>
