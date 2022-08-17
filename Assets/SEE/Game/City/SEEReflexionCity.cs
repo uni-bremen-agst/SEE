@@ -12,6 +12,7 @@ using UnityEngine;
 using System;
 using Sirenix.OdinInspector;
 using DG.Tweening;
+using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
 using UnityEngine.Assertions;
 
@@ -415,91 +416,12 @@ namespace SEE.Game.City
             }
         }
 
-        // If parameters are not given, the current values will be used.
-        private void AnimateNodeMovement(GameObject gameNode, float? newYPosition = null, Vector3? targetScale = null)
-        {
-            // We remember the old position and move the node to the new position so that 
-            // edge layouts can be correctly calculated.
-            Vector3 oldPosition = gameNode.transform.position;
-            gameNode.transform.position = gameNode.transform.position.WithXYZ(y: newYPosition);
-            // Mapped node should be half its parent's size
-            Vector3 oldScale = gameNode.transform.localScale;
-            gameNode.transform.localScale = targetScale ?? oldScale;
-            Node node = gameNode.GetNode();
-
-            // Recalculate edge layout and animate edges due to new node positioning.
-            // TODO: Iterating over all game edges is currently very costly,
-            //       consider adding a cached mapping either here or in SceneQueries.
-            //       Alternatively, we can iterate over game edges instead.
-            foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
-            {
-                GameObject gameEdge = GameObject.Find(edge.ID);
-                Assert.IsNotNull(gameEdge);
-                GameObject source = edge.Source == node ? gameNode : edge.Source.RetrieveGameNode();
-                GameObject target = edge.Target == node ? gameNode : edge.Target.RetrieveGameNode();
-                GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
-                AddEdgeSplineAnimation(gameEdge, newEdge);
-            }
-
-            if (newYPosition == null && targetScale == null)
-            {
-                // Nothing remains to be done. Killing any still running tweens would be counterproductive.
-                return;
-            }
-            
-            // Clean out old tweens from an animation that may still be ongoing.
-            ICollection<Tween> tweens = CleanTweens(nodeTweens, node.ID);
-
-            // Movement of the node should be animated as well. For this, we have to reset its position first.
-            gameNode.transform.position = oldPosition;
-            gameNode.transform.localScale = oldScale;
-            if (newYPosition.HasValue)
-            {
-                tweens.Add(gameNode.transform.DOMoveY(newYPosition.Value, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play());
-            }
-
-            if (targetScale.HasValue)
-            {
-                tweens.Add(gameNode.transform.DOScale(targetScale.Value, ANIMATION_DURATION).SetEase(ANIMATION_EASE).Play());
-            }
-
-            #region Local Methods
-
-            static void AddEdgeSplineAnimation(GameObject sourceEdge, GameObject targetEdge)
-            {
-                if (targetEdge.TryGetComponentOrLog(out SEESpline splineTarget)
-                    && sourceEdge.TryGetComponentOrLog(out SEESpline splineSource))
-                {
-                    // We deactivate the target edge first so it's not visible.
-                    targetEdge.SetActive(false);
-                    // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
-                    if (!splineSource.gameObject.TryGetComponent(out SplineMorphism morphism))
-                    {
-                        morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                    }
-
-                    if (morphism.IsActive())
-                    {
-                        // A tween already exists, we simply need to change its target.
-                        morphism.ChangeTarget(splineTarget.Spline);
-                    }
-                    else
-                    {
-                        morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
-                                .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
-                    }
-                }
-            }
-
-            #endregion
-        }
-
         private void HandleRemovedMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
-            AnimateNodeMovement(implGameNode);
+            implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
         }
 
         private void HandleNewMapping(Edge mapsToEdge)
@@ -521,7 +443,9 @@ namespace SEE.Game.City
             Vector3 newScale = implGameNode.transform.localScale;
             implGameNode.transform.position = oldPosition;
             implGameNode.transform.localScale = oldScale;
-            AnimateNodeMovement(implGameNode, newPosition.y, newScale);
+            NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
+            nodeOperator.MoveNodeY(newPosition.y, ANIMATION_DURATION);
+            nodeOperator.ScaleNode(newScale, ANIMATION_DURATION);
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
