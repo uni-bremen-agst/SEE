@@ -9,7 +9,6 @@ using System.Threading;
 using Dissonance;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
