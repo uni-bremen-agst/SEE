@@ -860,14 +860,9 @@ namespace SEE.Net
         {
             get
             {
-                IPAddress[] ipAddresses = Network.LookupLocalIPAddresses();
-                IList<AddressInfo> result = new List<AddressInfo>(ipAddresses.Length);
-
-                foreach (IPAddress ipAddress in ipAddresses)
-                {
-                    result.Add(new AddressInfo(ipAddress.AddressFamily.ToString(), ipAddress.ToString()));
-                }
-                return result;
+                return Network.LookupLocalIPAddresses()
+                              .Select(ip => new AddressInfo(ip.AddressFamily.ToString(), ip.ToString()))
+                              .ToList();
             }
         }
 
