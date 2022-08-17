@@ -1,13 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using JetBrains.Annotations;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Game.Operator.NodeOperator;
 
 namespace SEE.Game.Operator
 {
@@ -21,11 +17,14 @@ namespace SEE.Game.Operator
         private readonly OperationCategory<float> PositionX = new OperationCategory<float>();
         private readonly OperationCategory<float> PositionY = new OperationCategory<float>();
         private readonly OperationCategory<float> PositionZ = new OperationCategory<float>();
-        // TODO: private OperationCategory<Vector3> Scale = new OperationCategory<Vector3>();
-        // TODO: private OperationCategory<Color> Color = new OperationCategory<Color>();
+
+        private readonly OperationCategory<Vector3> Scale = new OperationCategory<Vector3>();
+        // TODO: private readonly OperationCategory<Color> Color = new OperationCategory<Color>();
 
         private float? updateEdgeLayoutDuration;
-        
+
+        #region Public API
+
         public void MoveNodeX(float newXPosition, float duration)
         {
             PositionX.AnimateTo(newXPosition, duration);
@@ -37,12 +36,20 @@ namespace SEE.Game.Operator
             PositionY.AnimateTo(newYPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
-        
+
         public void MoveNodeZ(float newZPosition, float duration)
         {
             PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
+
+        public void ScaleNode(Vector3 newScale, float duration)
+        {
+            Scale.AnimateTo(newScale, duration);
+            updateEdgeLayoutDuration = duration;
+        }
+
+        #endregion
 
         private void UpdateEdgeLayout(float duration)
         {
@@ -50,10 +57,9 @@ namespace SEE.Game.Operator
             // edge layouts (dependent on position and scale) can be correctly calculated.
             Vector3 oldPosition = transform.position;
             transform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
-            // TODO: Vector3 oldScale = transform.localScale;
-            // TODO: transform.localScale = targetScale ?? oldScale;
+            Vector3 oldScale = transform.localScale;
+            transform.localScale = Scale.TargetValue;
             Node node = gameObject.GetNode();
-            
 
             // Recalculate edge layout and animate edges due to new node positioning.
             // TODO: Iterating over all game edges is currently very costly,
@@ -68,13 +74,13 @@ namespace SEE.Game.Operator
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
                 AddEdgeSplineAnimation(gameEdge, newEdge, duration);
             }
-            
+
             // Once we're done, we reset the gameObject to its original position.
-            gameObject.transform.position = oldPosition;
-            // TODO: gameObject.transform.localScale = oldScale;
+            transform.position = oldPosition;
+            transform.localScale = oldScale;
 
             #region Local Methods
-            
+
             static void AddEdgeSplineAnimation(GameObject sourceEdge, GameObject targetEdge, float duration)
             {
                 // TODO: Move this to EdgeOperator
@@ -101,19 +107,23 @@ namespace SEE.Game.Operator
                     }
                 }
             }
-             
+
             #endregion
         }
 
-        private void Start()
+        private void Awake()
         {
-            Vector3 currentPosition = gameObject.transform.position;
-            PositionX.AnimateToAction = (x, d) => gameObject.transform.DOMoveX(x, d).Play();
+            Vector3 currentPosition = transform.position;
+            PositionX.AnimateToAction = (x, d) => transform.DOMoveX(x, d).Play();
             PositionX.TargetValue = currentPosition.x;
-            PositionY.AnimateToAction = (y, d) => gameObject.transform.DOMoveY(y, d).Play();
+            PositionY.AnimateToAction = (y, d) => transform.DOMoveY(y, d).Play();
             PositionY.TargetValue = currentPosition.y;
-            PositionZ.AnimateToAction = (z, d) => gameObject.transform.DOMoveZ(z, d).Play();
+            PositionZ.AnimateToAction = (z, d) => transform.DOMoveZ(z, d).Play();
             PositionZ.TargetValue = currentPosition.z;
+
+            Vector3 currentScale = transform.localScale;
+            Scale.AnimateToAction = (s, d) => transform.DOScale(s, d).Play();
+            Scale.TargetValue = currentScale;
         }
 
         private void Update()
