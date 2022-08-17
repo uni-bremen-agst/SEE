@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
 using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -58,7 +57,7 @@ namespace SEEEditor
                     SetProperty("ServerActionPort", "Server Action Port", "The port of the server where it listens to SEE actions.");
                     SetProperty("VoiceChat", "Voice Chat System", "The kind of voice chat to be enabled (None for no voice chat).");
                     SetProperty("vivoxChannelName", "Vivox Channel Name", "The name of the voice channel.");
-                    network.ConfigPath = DataPathEditor.GetDataPath("Metric file", network.ConfigPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
+                    network.ConfigPath = DataPathEditor.GetDataPath("Configuration file", network.ConfigPath, Filenames.ExtensionWithoutPeriod(Filenames.ConfigExtension)) as FilePath;
                 }
             }
             EditorGUILayout.EndFoldoutHeaderGroup();
@@ -114,15 +113,15 @@ namespace SEEEditor
         /// </summary>
         protected virtual void Buttons()
         {
-            SEE.Net.Network seeCity = target as SEE.Net.Network;
+            SEE.Net.Network network = target as SEE.Net.Network;
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Load"))
             {
-                seeCity.Load();
+                network.Load();
             }
             if (GUILayout.Button("Save"))
             {
-                seeCity.Save();
+                network.Save();
             }
             EditorGUILayout.EndHorizontal();
         }
