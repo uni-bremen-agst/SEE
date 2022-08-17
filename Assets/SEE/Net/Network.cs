@@ -237,7 +237,7 @@ namespace SEE.Net
             /// main thread here.
             MainThread = Thread.CurrentThread;
 
-            Load(ConfigPath.Path);
+            Load();
         }
 
         /// <summary>
