@@ -13,6 +13,8 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -24,6 +26,7 @@ namespace SEE.Net
     /// <summary>
     /// Handles the most general parts of networking.
     /// </summary>
+    [Serializable]
     public class Network : MonoBehaviour
     {
         /// <summary>
@@ -45,6 +48,7 @@ namespace SEE.Net
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
+        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
         public int ServerActionPort = 12345;
 
         /// <summary>
@@ -127,24 +131,39 @@ namespace SEE.Net
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
+        ///
+        /// FIXME: This is currently not supported. That is why we hide it in the Inspector.
         /// </summary>
-        [SerializeField] private bool loadCityOnStart = false;
+        [SerializeField, HideInInspector] private bool loadCityOnStart = false;
 
 #if UNITY_EDITOR
+
         /// <summary>
-        /// Whether the logging of NetworkComms should be enabled.
+        /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        [SerializeField] private bool networkCommsLoggingEnabled = false;
+        private const string LoggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField] private bool internalLoggingEnabled = true;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("Whether the network logging should be enabled.")]
+        private bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField] private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("The minimal logged severity.")]
+        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+
+        /// <summary>
+        /// Whether the logging of NetworkComms should be enabled.
+        /// </summary>
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
+        [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
+        private bool networkCommsLoggingEnabled = false;
+
 #endif
 
         /// <summary>
@@ -768,11 +787,16 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Name of the Inspector foldout group for the logging setttings.
+        /// </summary>
+        private const string VoiceChatFoldoutGroup = "Voice Chat";
+
+        /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(VoiceChatFoldoutGroup)]
         public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
@@ -793,6 +817,89 @@ namespace SEE.Net
                     break;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Represents an IP address along with its IP address family.
+        /// This is used only for informational purposes in <see cref="AddressesInfo"/>.
+        /// </summary>
+        [Serializable]
+        private struct AddressInfo
+        {
+            public readonly string AddressFamily;
+            public readonly string IPAddress;
+            public AddressInfo(string addressFamiliy, string ipAddress)
+            {
+                AddressFamily = addressFamiliy;
+                IPAddress = ipAddress;
+            }
+        }
+
+        /// <summary>
+        /// The IP addresses and the address families they belong to for the local machine.
+        /// This will be used in the Inspector for informational purposes only.
+        /// </summary>
+        [ShowInInspector]
+        [PropertyTooltip("IP addresses of this machine.")]
+        [TableList(IsReadOnly = true)]
+        private IList<AddressInfo> AddressesInfo
+        {
+            get
+            {
+                IPAddress[] ipAddresses = Network.LookupLocalIPAddresses();
+                IList<AddressInfo> result = new List<AddressInfo>(ipAddresses.Length);
+
+                foreach (IPAddress ipAddress in ipAddresses)
+                {
+                    result.Add(new AddressInfo(ipAddress.AddressFamily.ToString(), ipAddress.ToString()));
+                }
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// The name of the group for the fold-out group of the configuration file.
+        /// </summary>
+        private const string ConfigurationFoldoutGroup = "Configuration File";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons loading and saving the configuration file.
+        /// </summary>
+        private const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// Default path of the configuration file (path and filename).
+        /// </summary>
+        [SerializeField]
+        [PropertyTooltip("Path of the file containing the network configuration.")]
+        [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
+        public FilePath ConfigPath = new FilePath();
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        public void Save()
+        {
+            Save(ConfigPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Loads the network configuration file.")]
+        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        public void Load()
+        {
+            string filename = ConfigPath.Path;
+            if (File.Exists(filename))
+            {
+                Load(filename);
             }
         }
 
@@ -826,34 +933,6 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string ServerIP4AddressLabel = "serverIP4Address";
-
-        /// <summary>
-        /// Default path of the configuration file (path and filename).
-        /// </summary>
-        [SerializeField]
-        public FilePath ConfigPath = new FilePath();
-
-        /// <summary>
-        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
-        /// If the configuration file exists already, it will be overridden.
-        /// </summary>
-        public void Save()
-        {
-            Save(ConfigPath.Path);
-        }
-
-        /// <summary>
-        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
-        /// if it exists. If it does not exist, nothing happens.
-        /// </summary>
-        public void Load()
-        {
-            string filename = ConfigPath.Path;
-            if (File.Exists(filename))
-            {
-                Load(filename);
-            }
-        }
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -925,7 +1004,10 @@ namespace SEE.Net
         public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
-        [SerializeField] private string vivoxChannelName = string.Empty;
+        [SerializeField]
+        [Tooltip("The channel name for Vivox."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
+        private string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()
