@@ -367,24 +367,11 @@ namespace SEE.Game.City
                 edge = edgeId != null ? GameObject.Find(edgeId) : null;
             }
 
-            if (edge != null && edge.TryGetComponent(out SEESpline spline))
+            if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
                 // Animate color change for nicer visuals.
-                // We need two tweens for this, one for each end of the gradient.
-                Tween startTween = DOTween.To(() => spline.GradientColors.start,
-                                              c => spline.GradientColors = (c, spline.GradientColors.end),
-                                              newColors.start, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
-                Tween endTween = DOTween.To(() => spline.GradientColors.end,
-                                            c => spline.GradientColors = (spline.GradientColors.start, c),
-                                            newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
-                
-                // If there are existing tweens, remove them.
-                ICollection<Tween> tweens = CleanTweens(edgeTweens, edgeChange.Edge.ID);
-                
-                // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
-                tweens.Add(startTween.Play());
-                tweens.Add(endTween.Play());
+                edge.AddOrGetComponent<EdgeOperator>().AnimateGradientColors(newColors.start, newColors.end, ANIMATION_DURATION);
             }
             else
             {
@@ -461,43 +448,6 @@ namespace SEE.Game.City
         private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
         {
             // FIXME: Handle event
-        }
-
-        /// <summary>
-        /// Goes through all tweens in the <paramref name="tweenDictionary"/> under the given
-        /// <paramref name="cleanKey"/>, kills them if they're still active, and clears them all out of the dictionary.
-        /// </summary>
-        /// <param name="tweenDictionary">The dictionary in which <paramref name="cleanKey"/> shall be "cleaned".</param>
-        /// <param name="cleanKey">The key whose tweens shall be killed and removed.</param>
-        /// <param name="complete">Whether to set the tween to its target value before killing it</param>
-        /// <typeparam name="T">Type of the key in <paramref name="tweenDictionary"/>.</typeparam>
-        /// <returns>The newly created empty list within <paramref name="tweenDictionary"/>.</returns>
-        private static ICollection<Tween> CleanTweens<T>(IDictionary<T, ICollection<Tween>> tweenDictionary, T cleanKey, bool complete = false)
-        {
-            // Clean out old tweens while killing them
-            if (tweenDictionary.ContainsKey(cleanKey))
-            {
-                foreach (Tween tween in tweenDictionary[cleanKey])
-                {
-                    if (tween.IsActive())
-                    {
-                        tween.Kill(complete);
-                    }
-                }
-            }
-            return tweenDictionary[cleanKey] = new List<Tween>();
-        }
-
-        public void KillNodeTweens(Node node, bool complete = true)
-        {
-            Debug.Log($"Killing tweens for {node.ID}");
-            CleanTweens(nodeTweens, node.ID, complete);
-            
-            // We will also kill any connected edge tweens.
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings))
-            {
-                CleanTweens(edgeTweens, edge.ID, complete);
-            }
         }
     }
 }

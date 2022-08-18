@@ -1,49 +1,80 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using SEE.GO;
 using TinySpline;
+using UnityEngine;
 
 namespace SEE.Game.Operator
 {
-    public class EdgeOperator: AbstractOperator
+    public class EdgeOperator : AbstractOperator
     {
-
-        private readonly MorphismOperation morphismOperation = new MorphismOperation();
+        private readonly MorphismOperation morphism = new MorphismOperation();
+        private readonly TweenOperation<(Color start, Color end)> color = new TweenOperation<(Color start, Color end)>();
 
         private SEESpline spline;
-        
+
         public void AnimateToSpline(SEESpline target, float duration)
         {
             // We deactivate the target edge first so it's not visible.
             target.gameObject.SetActive(false);
             // We now use the MorphismOperation to actually move the edge.
-            morphismOperation.AnimateTo(target, duration);
+            morphism.AnimateTo((target.Spline, target.gameObject), duration);
+        }
+
+        public void AnimateToBSpline(BSpline target, float duration)
+        {
+            morphism.AnimateTo((target, null), duration);
+        }
+
+        public void AnimateGradientColors(Color newStartColor, Color newEndColor, float duration)
+        {
+            color.AnimateTo((newStartColor, newEndColor), duration);
         }
 
         private void Awake()
         {
             gameObject.MustGetComponent(out spline);
-            morphismOperation.TargetValue = spline;
-            morphismOperation.AnimateToAction = (s, d) =>
+            morphism.TargetValue = (spline.Spline, null);
+            morphism.AnimateToAction = (s, d) =>
             {
                 SplineMorphism Animator = gameObject.AddOrGetComponent<SplineMorphism>();
-                
+
                 if (Animator.IsActive())
                 {
                     // A tween already exists, we simply need to change its target.
-                    Animator.ChangeTarget(s.Spline);
-                } 
+                    Animator.ChangeTarget(s.targetSpline);
+                }
                 else
                 {
                     gameObject.MustGetComponent(out SEESpline sourceSpline);
-                    Animator.CreateTween(sourceSpline.Spline, s.Spline, d)
-                            .OnComplete(() => Destroy(s.gameObject)).Play();
+                    Animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
+                        .OnComplete(() =>
+                        {
+                            if (s.temporaryGameObject != null)
+                            {
+                                Destroy(s.temporaryGameObject);
+                            }
+                        }).Play();
                 }
 
                 return Animator;
             };
+
+            color.TargetValue = spline.GradientColors;
+            color.AnimateToAction = (colors, d) =>
+            {
+                Tween startTween = DOTween.To(() => spline.GradientColors.start,
+                                              c => spline.GradientColors = (c, spline.GradientColors.end),
+                                              colors.start, d);
+                Tween endTween = DOTween.To(() => spline.GradientColors.end,
+                                            c => spline.GradientColors = (spline.GradientColors.start, c),
+                                            colors.end, d);
+                return new List<Tween> { startTween, endTween };
+            };
         }
 
-        protected class MorphismOperation : Operation<SplineMorphism, SEESpline>
+        // TODO: Maybe refactor this? Type signature is somewhat complex
+        protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject)>
         {
             public override void KillAnimator(bool complete = false)
             {
@@ -53,10 +84,11 @@ namespace SEE.Game.Operator
                     Destroy(Animator);
                     Animator = null;
                 }
+
                 base.KillAnimator(complete);
             }
 
-            protected override void ChangeAnimatorTarget(SEESpline newTarget, float duration)
+            protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration)
             {
                 // No need to kill any old animators, the spline morphism can change its target.
                 AnimateToAction(newTarget, duration);

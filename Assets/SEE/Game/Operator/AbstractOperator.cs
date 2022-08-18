@@ -53,15 +53,20 @@ namespace SEE.Game.Operator
             }
         }
 
-        protected class TweenOperation<V> : Operation<Tween, V>
+        protected class TweenOperation<V> : Operation<IList<Tween>, V>
         {
             public override void KillAnimator(bool complete = false)
             {
-                if (Animator.IsActive())
+                if (Animator != null)
                 {
-                    Animator.Kill(complete);
+                    foreach (Tween tween in Animator)
+                    {
+                        if (tween.IsActive())
+                        {
+                            tween.Kill(complete);
+                        }
+                    }
                 }
-
                 base.KillAnimator(complete);
             }
         }

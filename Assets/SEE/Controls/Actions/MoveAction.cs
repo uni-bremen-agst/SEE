@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using JetBrains.Annotations;
-using RootMotion.FinalIK;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
@@ -347,12 +345,9 @@ namespace SEE.Controls.Actions
                             spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
 
-                        if (!hitEdge.connectedSpline.TryGetComponent(out SplineMorphism morphism))
-                        {
-                            morphism = hitEdge.connectedSpline.gameObject.AddComponent<SplineMorphism>();
-                        }
+                        EdgeOperator edgeOperator = hitEdge.connectedSpline.gameObject.AddOrGetComponent<EdgeOperator>();
 
-                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, SPLINE_ANIMATION_DURATION).SetEase(Ease.InOutExpo).Play();
+                        edgeOperator.AnimateToBSpline(spline, SPLINE_ANIMATION_DURATION);
                     }
 
                     hit.InteractableObject.SetGrab(true, true);
@@ -363,10 +358,11 @@ namespace SEE.Controls.Actions
                     originalParent = hit.HoveredObject;
                     
                     // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
-                    if (hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture())
+                    if ((hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture()) && hit.HoveredObject.gameObject.TryGetComponent(out NodeOperator nodeOperator))
                     {
-                        reflexionCity = hit.HoveredObject.gameObject.ContainingCity<SEEReflexionCity>();
-                        reflexionCity.KillNodeTweens(hit.node.Value);
+                        // TODO: Instead of just killing animations here with this trick,
+                        //       handle all movement inside the NodeOperator.
+                        nodeOperator.MoveNode(nodeOperator.gameObject.transform.position, 0);
                     }
                 }
 
@@ -448,14 +444,11 @@ namespace SEE.Controls.Actions
                         {
                             spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
-                        SplineMorphism morphism = hitEdge.connectedSpline.gameObject.GetComponent<SplineMorphism>();
-                        if (morphism.tween.IsActive() && morphism.tween.IsPlaying())
+
+                        if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
                         {
-                            morphism.ChangeTarget(spline);
-                        }
-                        else
-                        {
-                            hitEdge.connectedSpline.Spline = spline;
+                            // Edges should stick to the node and not lag behind, so the duration is set to zero.
+                            edgeOperator.AnimateToBSpline(spline, 0);
                         }
                     }
 

@@ -19,7 +19,6 @@ namespace SEE.Game.Operator
         private readonly TweenOperation<float> PositionZ = new TweenOperation<float>();
 
         private readonly TweenOperation<Vector3> Scale = new TweenOperation<Vector3>();
-        // TODO: private readonly OperationCategory<Color> Color = new OperationCategory<Color>();
 
         private float? updateEdgeLayoutDuration;
 
@@ -42,7 +41,7 @@ namespace SEE.Game.Operator
             PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
-        
+
         public void MoveNode(Vector3 newPosition, float duration)
         {
             PositionX.AnimateTo(newPosition.x, duration);
@@ -61,7 +60,6 @@ namespace SEE.Game.Operator
         {
             updateEdgeLayoutDuration = duration;
         }
-        
 
         #endregion
 
@@ -81,62 +79,37 @@ namespace SEE.Game.Operator
             //       Alternatively, we can iterate over game edges instead.
             foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
+                // Add new target edge, we'll animate the current edge to it
                 GameObject gameEdge = GameObject.Find(edge.ID);
                 Assert.IsNotNull(gameEdge);
                 GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == node ? gameObject : edge.Target.RetrieveGameNode();
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
-                AddEdgeSplineAnimation(gameEdge, newEdge, duration);
+
+                EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                if (newEdge.TryGetComponentOrLog(out SEESpline newSpline))
+                {
+                    edgeOperator.AnimateToSpline(newSpline, duration);
+                }
             }
 
             // Once we're done, we reset the gameObject to its original position.
             transform.position = oldPosition;
             transform.localScale = oldScale;
-
-            #region Local Methods
-
-            static void AddEdgeSplineAnimation(GameObject sourceEdge, GameObject targetEdge, float duration)
-            {
-                // TODO: Move this to EdgeOperator
-                if (targetEdge.TryGetComponentOrLog(out SEESpline splineTarget)
-                    && sourceEdge.TryGetComponentOrLog(out SEESpline splineSource))
-                {
-                    // We deactivate the target edge first so it's not visible.
-                    targetEdge.SetActive(false);
-                    // We now use the EdgeAnimator and SplineMorphism to actually move the edge.
-                    if (!splineSource.gameObject.TryGetComponent(out SplineMorphism morphism))
-                    {
-                        morphism = splineSource.gameObject.AddComponent<SplineMorphism>();
-                    }
-
-                    if (morphism.IsActive())
-                    {
-                        // A tween already exists, we simply need to change its target.
-                        morphism.ChangeTarget(splineTarget.Spline);
-                    }
-                    else
-                    {
-                        morphism.CreateTween(splineSource.Spline, splineTarget.Spline, duration)
-                                .OnComplete(() => Destroy(targetEdge)).Play();
-                    }
-                }
-            }
-
-            #endregion
         }
 
         private void Awake()
         {
             Vector3 currentPosition = transform.position;
-            PositionX.AnimateToAction = (x, d) => transform.DOMoveX(x, d).Play();
+            PositionX.AnimateToAction = (x, d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             PositionX.TargetValue = currentPosition.x;
-            PositionY.AnimateToAction = (y, d) => transform.DOMoveY(y, d).Play();
+            PositionY.AnimateToAction = (y, d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             PositionY.TargetValue = currentPosition.y;
-            PositionZ.AnimateToAction = (z, d) => transform.DOMoveZ(z, d).Play();
+            PositionZ.AnimateToAction = (z, d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             PositionZ.TargetValue = currentPosition.z;
 
             Vector3 currentScale = transform.localScale;
-            Scale.AnimateToAction = (s, d) => transform.DOScale(s, d).Play();
+            Scale.AnimateToAction = (s, d) => new Tween[] { transform.DOScale(s, d).Play() };
             Scale.TargetValue = currentScale;
         }
 
