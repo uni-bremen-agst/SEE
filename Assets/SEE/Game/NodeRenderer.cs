@@ -583,7 +583,7 @@ namespace SEE.Game
         /// <li>Antennas</li>
         /// </ul>
         /// </summary>
-        /// <param name="gameNode">game objec representing a node to be decorated</param>
+        /// <param name="gameNode">game object representing a node to be decorated</param>
         protected virtual void AddGeneralDecorations(GameObject gameNode)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
