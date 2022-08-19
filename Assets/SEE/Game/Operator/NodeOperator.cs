@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
@@ -22,27 +23,30 @@ namespace SEE.Game.Operator
 
         private float? updateEdgeLayoutDuration;
 
+        public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        public Vector3 TargetScale => Scale.TargetValue;
+
         #region Public API
 
-        public void MoveNodeX(float newXPosition, float duration)
+        public void MoveXTo(float newXPosition, float duration)
         {
             PositionX.AnimateTo(newXPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
-        public void MoveNodeY(float newYPosition, float duration)
+        public void MoveYTo(float newYPosition, float duration)
         {
             PositionY.AnimateTo(newYPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
-        public void MoveNodeZ(float newZPosition, float duration)
+        public void MoveZTo(float newZPosition, float duration)
         {
             PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
-        public void MoveNode(Vector3 newPosition, float duration)
+        public void MoveTo(Vector3 newPosition, float duration)
         {
             PositionX.AnimateTo(newPosition.x, duration);
             PositionY.AnimateTo(newPosition.y, duration);
@@ -50,7 +54,7 @@ namespace SEE.Game.Operator
             updateEdgeLayoutDuration = duration;
         }
 
-        public void ScaleNode(Vector3 newScale, float duration)
+        public void ScaleTo(Vector3 newScale, float duration)
         {
             Scale.AnimateTo(newScale, duration);
             updateEdgeLayoutDuration = duration;
@@ -71,7 +75,16 @@ namespace SEE.Game.Operator
             transform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
             Vector3 oldScale = transform.localScale;
             transform.localScale = Scale.TargetValue;
-            Node node = gameObject.GetNode();
+            Node node;
+            try
+            {
+                node = gameObject.GetNode();
+            }
+            catch (NullReferenceException)
+            {
+                // Node may be an artificial root without a proper node reference.
+                return;
+            }
 
             // Recalculate edge layout and animate edges due to new node positioning.
             // TODO: Iterating over all game edges is currently very costly,
@@ -89,7 +102,7 @@ namespace SEE.Game.Operator
                 EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
                 if (newEdge.TryGetComponentOrLog(out SEESpline newSpline))
                 {
-                    edgeOperator.AnimateToSpline(newSpline, duration);
+                    edgeOperator.MorphTo(newSpline, duration);
                 }
             }
 

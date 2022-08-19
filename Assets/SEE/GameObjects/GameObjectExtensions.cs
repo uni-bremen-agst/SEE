@@ -471,7 +471,7 @@ namespace SEE.GO
         /// <returns>the correponding graph node (will never be null)</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
@@ -481,17 +481,17 @@ namespace SEE.GO
                     }
                     else
                     {
-                        throw new Exception($"Node referenced by game object {gameObject.name} is null.");
+                        throw new NullReferenceException($"Node referenced by game object {gameObject.name} is null.");
                     }
                 }
                 else
                 {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null.");
+                    throw new NullReferenceException($"Node reference of game object {gameObject.name} is null.");
                 }
             }
             else
             {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef.");
+                throw new NullReferenceException($"Game object {gameObject.name} has no NodeRef.");
             }
         }
 

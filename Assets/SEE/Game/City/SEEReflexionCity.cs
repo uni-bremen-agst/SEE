@@ -108,12 +108,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
         /// </summary>
-        private const float ANIMATION_DURATION = 0.5f;
-
-        /// <summary>
-        /// Ease function of any animation (edge movement, color change...).
-        /// </summary>
-        private const Ease ANIMATION_EASE = Ease.OutExpo;
+        private const float ANIMATION_DURATION = 5f;
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -371,7 +366,7 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
                 // Animate color change for nicer visuals.
-                edge.AddOrGetComponent<EdgeOperator>().AnimateGradientColors(newColors.start, newColors.end, ANIMATION_DURATION);
+                edge.AddOrGetComponent<EdgeOperator>().FadeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
             }
             else
             {
@@ -431,8 +426,8 @@ namespace SEE.Game.City
             implGameNode.transform.position = oldPosition;
             implGameNode.transform.localScale = oldScale;
             NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
-            nodeOperator.MoveNodeY(newPosition.y, ANIMATION_DURATION);
-            nodeOperator.ScaleNode(newScale, ANIMATION_DURATION);
+            nodeOperator.MoveYTo(newPosition.y, ANIMATION_DURATION);
+            nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
         }
 
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
