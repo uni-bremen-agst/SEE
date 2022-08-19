@@ -97,7 +97,7 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [OdinSerialize, Tooltip("Visual attributes of nodes.")]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout, IsReadOnly = true)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
         public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
 
         /// <summary>
@@ -106,6 +106,25 @@ namespace SEE.Game.City
         [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
         public ColorMap MetricToColor = new ColorMap();
+
+        /// <summary>
+        /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
+        /// if one exists; otherwise <see cref="ColorRange.Default()"/> is returned.
+        /// </summary>
+        /// <param name="metricName">name of a metric</param>
+        /// <returns><see cref="ColorRange"/> for <paramref name="metricName"/></returns>
+        public ColorRange GetColorForMetric(string metricName)
+        {
+            if (MetricToColor.TryGetValue(metricName, out ColorRange color))
+            {
+                return color;
+            }
+            else
+            {
+                Debug.LogWarning($"No specification of color for node metric {metricName}. Using a default.\n");
+                return ColorRange.Default();
+            }
+        }
 
         /// <summary>
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
@@ -487,6 +506,56 @@ namespace SEE.Game.City
             {
                 Debug.LogError($"GXL file {filename} of city {name} does not exist.\n");
                 return new Graph(SourceCodeDirectory.Path);
+            }
+        }
+
+        /// <summary>
+        /// Lists the metrics for each node type.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "List Node Metrics")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        private void ListNodeMetrics()
+        {
+            DumpNodeMetrics();
+        }
+
+        /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected abstract void DumpNodeMetrics();
+
+        /// <summary>
+        /// Emits all known metric names for each node types in any of the <paramref name="graphs"/>
+        /// to the console.
+        /// </summary>
+        /// <param name="graphs">graphs whose metric names are to be emitted</param>
+        protected static void DumpNodeMetrics(ICollection<Graph> graphs)
+        {
+            IDictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+
+            foreach (Graph graph in graphs)
+            {
+                foreach (Node node in graph.Nodes())
+                {
+                    if (result.TryGetValue(node.Type, out HashSet<string> metrics))
+                    {
+                        metrics.UnionWith(node.AllMetrics());
+                    }
+                    else
+                    {
+                        result[node.Type] = node.AllMetrics();
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, HashSet<string>> item in result)
+            {
+                Debug.Log($"Node type {item.Key}:\n");
+                foreach (string metric in item.Value)
+                {
+                    Debug.Log($"  metric {metric}\n");
+                }
             }
         }
 

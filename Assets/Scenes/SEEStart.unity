@@ -350,9 +350,9 @@ MonoBehaviour:
   ServerActionPort: 55555
   GameScene: SEEWorld
   loadCityOnStart: 0
-  networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1
   minimalSeverity: 2
+  networkCommsLoggingEnabled: 0
   VoiceChat: 1
   ConfigPath:
     Root: 3

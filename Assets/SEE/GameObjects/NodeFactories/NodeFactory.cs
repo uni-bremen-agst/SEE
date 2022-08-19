@@ -296,12 +296,6 @@ namespace SEE.GO.NodeFactories
         }
 
         /// <summary>
-        /// Model mesh for a game object to be re-used for all instances.
-        /// It will be ceated in <see cref="GetMesh()"/> on demand.
-        /// </summary>
-        protected static Mesh modelMesh;
-
-        /// <summary>
         /// Returns all <paramref name="metrics"/> except for the height metric (index 1).
         /// </summary>
         /// <param name="metrics">the metric values to be put onto the spider axes</param>

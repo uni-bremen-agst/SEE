@@ -37,6 +37,12 @@ namespace SEE.Game
             SetGraph(settings, new List<Graph> { graph });
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="settings">the settings for the visualization</param>
+        /// <param name="graphs">the graphs to be rendered</param>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graphs"/> is null or empty</exception>
         public GraphRenderer(AbstractSEECity settings, IList<Graph> graphs)
         {
             if (graphs == null || graphs.Count == 0)
@@ -87,24 +93,20 @@ namespace SEE.Game
                 if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
                 {
                     nodeTypeToFactory[nodeType] = GetNodeFactory(value);
+                    nodeTypeToAntennaDectorator[nodeType] = GetAntennaDecorator(value);
                 }
                 else
                 {
                     Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
                     nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+                    nodeTypeToAntennaDectorator[nodeType] = null;
                 }
             }
 
             // The default node factory that we use if the we cannot find a setting for a given node type.
             NodeFactory GetDefaultNodeFactory()
             {
-                return new CubeFactory(ShaderType, DefaultColorRange());
-            }
-
-            // The default color range that we use if the we cannot find a setting for a given node type.
-            static ColorRange DefaultColorRange()
-            {
-                return new ColorRange(Color.white, Color.black, 10);
+                return new CubeFactory(ShaderType, ColorRange.Default());
             }
 
             // The appropriate node factory for value.Shape.
@@ -123,27 +125,34 @@ namespace SEE.Game
                 };
             }
 
-            // The color range for the tiven colorProperty depending upon whether the property
+            // The color range for the given colorProperty depending upon whether the property
             // used to determine the color range is PropertyKind.Type or PropertyKind.Metric.
             ColorRange GetColorRange(ColorProperty colorProperty)
             {
                 switch (colorProperty.Property)
                 {
                     case PropertyKind.Type:
-                        return new ColorRange(colorProperty.TypeColor, colorProperty.TypeColor, 1);
+                        return GetColorRangeForNodeType(colorProperty.TypeColor);
                     case PropertyKind.Metric:
-                        if (Settings.MetricToColor.TryGetValue(colorProperty.ColorMetric, out ColorRange color))
-                        {
-                            return color;
-                        }
-                        else
-                        {
-                            Debug.LogWarning($"No specification of color for node metric {colorProperty.ColorMetric}. Using a default.\n");
-                            return DefaultColorRange();
-                        }
+                        return Settings.GetColorForMetric(colorProperty.ColorMetric);
                     default:
                         throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
                 }
+            }
+
+            // Returns a color range where the given color is the upper color and
+            // the lower color is the given color lightened by 50 %. The number of colors
+            // in this color range is the maximal node hierarchy level of all graphs.
+            ColorRange GetColorRangeForNodeType(Color color)
+            {
+                uint maxLevel = (uint)graphs.Max(x => x.MaxDepth);
+
+                return new ColorRange(color.Lighter(), color, maxLevel + 1);
+            }
+
+            AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
+            {
+                return new AntennaDecorator(scaler, value.AntennaSettings, Settings.MetricToColor);
             }
         }
 
@@ -183,6 +192,12 @@ namespace SEE.Game
         private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
 
         /// <summary>
+        /// A mapping of the name of node types of <see cref="graphs"/> onto the
+        /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
+        /// </summary>
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
+
+        /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
@@ -190,7 +205,7 @@ namespace SEE.Game
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
@@ -220,41 +235,6 @@ namespace SEE.Game
             {
                 scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
-            // FIXME: This call should be moved somewhere else.
-            SetAntennaDecorators();
-        }
-
-        private HashSet<string> GetAntennaMetrics()
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (VisualNodeAttributes nodeAttributes in Settings.NodeTypes.Values.Where(n => n.IsRelevant))
-            {
-                result.UnionWith(nodeAttributes.AntennaSettings.AntennaSections.Select(a => a.Metric));
-            }
-            return result;
-        }
-
-        private void SetAntennaDecorators()
-        {
-            HashSet<string> antennaMetrics = GetAntennaMetrics();
-
-            // FIXME: Continue here. Create anntenna decorators.
-
-            //leafAntennaDecorator = new AntennaDecorator(scaler);
-            //innerAntennaDecorator = new AntennaDecorator(scaler);
-        }
-
-        private IDictionary<string, AntennaDecorator> antennaDecorators = new Dictionary<string, AntennaDecorator>();
-
-        /// <summary>
-        /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, color) for given <paramref name="graph"/>
-        /// based on the user's choice (settings).
-        /// </summary>
-        /// <param name="graph">graph whose node metrics are to be scaled</param>
-        private void SetScaler(Graph graph)
-        {
-            SetScaler(new List<Graph> { graph });
         }
 
         /// <summary>
@@ -272,6 +252,13 @@ namespace SEE.Game
             }
             return map;
         }
+
+        /// <summary>
+        /// To turn on the extension hack for our VISSOFT paper. Will be
+        /// removed soon.
+        /// </summary>
+        [Obsolete]
+        private const bool VISSOFT = false;
 
         /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
@@ -292,12 +279,13 @@ namespace SEE.Game
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
 
             // FIXME-IWSC: Remove this call after the publication.
-            if (false)
+            if (VISSOFT)
             {
                 GenerateAndVisualizeCloneClasses(nodes, nodeMap);
             }
 
             DrawInnerNodes(nodeMap, nodes);
+
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
 
@@ -334,19 +322,6 @@ namespace SEE.Game
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             AddDecorations(nodeToGameObject);
-
-            // We always need one unique root game node in the scene. If the layout is hierarchical and
-            // the original graph had multiple roots, a unique root was added above. If the layout was
-            // not hierarchical, we can only now add a unique root because non-hierarchical layouts
-            // expect a list of nodes instead of a hierarchy of nodes.
-            //if (!nodeLayout.IsHierarchical() && layoutNodes.Count > 1)
-            //{
-            //    // If we have multiple roots, we need to add a unique one.
-            //    GameObject artificalRoot = AddGameRootNodeIfNecessary(graph, nodeMap);
-            //    // We need a game node for this root in the scene, too.
-
-
-            //}
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
@@ -615,9 +590,9 @@ namespace SEE.Game
             List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             sublayouts.ForEach(sublayoutNode =>
             {
-                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
+                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(toLayoutNode[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(toLayoutNode[n]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(toLayoutNode[n]));
                 sublayoutLayoutNodes.Add(sublayout);
             });
             return sublayoutLayoutNodes;
@@ -781,7 +756,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         public ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, to_layout_node);
+            return ToLayoutNodes(gameObjects, toLayoutNode);
         }
 
         /// <summary>
@@ -799,11 +774,11 @@ namespace SEE.Game
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, toLayoutNode));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, toLayoutNode));
 
             return layoutNodes;
         }
@@ -814,8 +789,6 @@ namespace SEE.Game
         /// Any game objects in <paramref name="gameNodes"/> with an invalid node reference will be skipped.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
-        /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
         /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private ICollection<LayoutGameNode> ToLayoutNodes

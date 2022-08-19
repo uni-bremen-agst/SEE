@@ -27,6 +27,14 @@ namespace SEE.Game.City
         public Color TypeColor = Color.white;
 
         /// <summary>
+        /// Whether the <see cref="TypeColor"/> should be varied by the level of the node
+        /// in the node hierarchy.
+        /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
+        /// </summary>
+        [ShowIf("Property", PropertyKind.Type)]
+        public bool ByLevel = true;
+
+        /// <summary>
         /// The name of the metric determining the style (color) of a node. The
         /// actual color is found in a <see cref="ColorMap"/> for the metrics.
         /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
@@ -48,6 +56,7 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.RestoreEnum(values, PropertyLabel, ref Property);
                 ConfigIO.Restore(values, TypeColorLabel, ref TypeColor);
+                ConfigIO.Restore(values, ByLevelLabel, ref ByLevel);
                 ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
                 return true;
             }
@@ -68,6 +77,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Property.ToString(), PropertyLabel);
             writer.Save(TypeColor, TypeColorLabel);
+            writer.Save(ByLevel, ByLevelLabel);
             writer.Save(ColorMetric, ColorMetricLabel);
             writer.EndGroup();
         }
@@ -80,6 +90,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="TypeColor"/>.
         /// </summary>
         private const string TypeColorLabel = "TypeColor";
+        /// <summary>
+        /// Label in the configuration file for <see cref="TypeColor"/>.
+        /// </summary>
+        private const string ByLevelLabel = "ByLevel";
         /// <summary>
         /// Label in the configuration file for a <see cref="ColorMetric"/>
         /// </summary>
