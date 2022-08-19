@@ -21,11 +21,11 @@ namespace SEE.GO.Decorators
         /// </summary>
         /// <param name="scaler">the scaler to be used to normalize the metric values</param>
         /// <param name="antennaAttributes">the visual attributes to be considered for the antenna segments</param>
-        public AntennaDecorator(IScale scaler, AntennaAttributes antennaAttributes)
+        public AntennaDecorator(IScale scaler, AntennaAttributes antennaAttributes, ColorMap metricToColor)
         {
             this.scaler = scaler;
             this.antennaAttributes = antennaAttributes;
-            metricToFactory = CreateSegmentFactories(antennaAttributes);
+            metricToFactory = CreateSegmentFactories(antennaAttributes, metricToColor);
         }
 
         /// <summary>
@@ -85,15 +85,15 @@ namespace SEE.GO.Decorators
             // segment's metric.
             Vector3 segmentScale = new Vector3(antennaAttributes.AntennaWidth, 0, antennaAttributes.AntennaWidth);
 
-            foreach (AntennaSection section in antennaAttributes.AntennaSections)
+            foreach (string metricName in antennaAttributes.AntennaSections)
             {
-                if (node.TryGetNumeric(section.Metric, out float sectionMetric) && sectionMetric > 0)
+                if (node.TryGetNumeric(metricName, out float sectionMetric) && sectionMetric > 0)
                 {
-                    GameObject segment = NewSegment(metricToFactory[section.Metric]);
-                    segment.name = section.Metric + ": " + sectionMetric;
+                    GameObject segment = NewSegment(metricToFactory[metricName]);
+                    segment.name = metricName + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 
-                    float height = scaler.GetNormalizedValue(section.Metric, sectionMetric);
+                    float height = scaler.GetNormalizedValue(metricName, sectionMetric);
                     segmentScale.y = height;
                     segment.transform.localScale = segmentScale;
 
@@ -148,12 +148,22 @@ namespace SEE.GO.Decorators
         /// <param name="antennaAttributes">a specification of the antenna segments for which to create
         /// the cylinder factories</param>
         /// <returns>mapping of metrics onto factories</returns>
-        private static Dictionary<string, CylinderFactory> CreateSegmentFactories(AntennaAttributes antennaAttributes)
+        private static Dictionary<string, CylinderFactory> CreateSegmentFactories(AntennaAttributes antennaAttributes, ColorMap metricToColor)
         {
             Dictionary<string, CylinderFactory> result = new Dictionary<string, CylinderFactory>(antennaAttributes.AntennaSections.Count);
-            foreach (AntennaSection section in antennaAttributes.AntennaSections)
+            foreach (string metricName in antennaAttributes.AntennaSections)
             {
-                result[section.Metric] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(section.Color, section.Color, 1));
+                Color color;
+                if (!metricToColor.TryGetValue(metricName, out ColorRange colorRange))
+                {
+                    Debug.LogWarning($"No antenna-segment color specification for metric {metricName}.\n");
+                    color = Color.white;
+                }
+                else
+                {
+                    color = colorRange.Upper;
+                }
+                result[metricName] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(color, color, 1));
             }
             return result;
         }

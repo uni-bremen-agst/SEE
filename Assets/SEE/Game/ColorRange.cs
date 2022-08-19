@@ -41,6 +41,16 @@ namespace SEE.Game
             NumberOfColors = 1;
         }
 
+        /// <summary>
+        /// The default color range that we use if the we cannot find an
+        /// explicit setting by the user.
+        /// </summary>
+        /// <returns>default color range</returns>
+        public static ColorRange Default()
+        {
+            return new ColorRange(Color.white, Color.black, 10);
+        }
+
         private const string LowerLabel = "Lower";
         private const string UpperLabel = "Upper";
         private const string NumberOfColorsLabel = "NumberOfColors";

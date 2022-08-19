@@ -358,12 +358,6 @@ namespace SEE.Game.City
         private GraphRenderer graphRenderer;
 
         /// <summary>
-        /// Color property of the shader. Lookups using this value are more efficient than lookups using the
-        /// string value "_Color".
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public GraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
@@ -423,6 +417,21 @@ namespace SEE.Game.City
             else
             {
                 return loadedGraph.AllNumericNodeAttributes();
+            }
+        }
+
+        /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected override void DumpNodeMetrics()
+        {
+            if (loadedGraph == null)
+            {
+                Debug.Log("No graph loaded yet.");
+            }
+            else
+            {
+                DumpNodeMetrics(new List<Graph>() { loadedGraph });
             }
         }
 

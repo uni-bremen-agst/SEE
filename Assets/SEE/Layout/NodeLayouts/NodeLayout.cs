@@ -39,15 +39,6 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         protected readonly float groundLevel;
 
-        public float Groundlevel { get => groundLevel; }
-
-        public float InnerNodeHeight { get => innerNodeHeight; }
-
-        /// <summary>
-        /// The height of inner nodes (y co-ordinate).
-        /// </summary>
-        protected const float innerNodeHeight = 0.01f;
-
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
         /// and the visualizations of those inner nodes are stacked in a hierarchical layout,
