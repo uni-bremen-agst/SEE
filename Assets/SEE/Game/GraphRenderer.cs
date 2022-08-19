@@ -145,14 +145,7 @@ namespace SEE.Game
             // in this color range is the maximal node hierarchy level of all graphs.
             ColorRange GetColorRangeForNodeType(Color color)
             {
-                uint maxLevel = 0;
-                foreach (Graph graph in graphs)
-                {
-                    if (graph.MaxDepth > maxLevel)
-                    {
-                        maxLevel = (uint)graph.MaxDepth;
-                    }
-                }
+                uint maxLevel = (uint)graphs.Max(x => x.MaxDepth);
 
                 return new ColorRange(color.Lighter(), color, maxLevel + 1);
             }
