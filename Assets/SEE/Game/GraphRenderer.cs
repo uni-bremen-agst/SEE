@@ -140,9 +140,9 @@ namespace SEE.Game
                 }
             }
 
-            // Returns a color range where the given color is the upper color and the
+            // Returns a color range where the given color is the upper color and
             // the lower color is the given color lightened by 50 %. The number of colors
-            // in this color range is maximal node hierarchy level of all graphs.
+            // in this color range is the maximal node hierarchy level of all graphs.
             ColorRange GetColorRangeForNodeType(Color color)
             {
                 uint maxLevel = 0;
