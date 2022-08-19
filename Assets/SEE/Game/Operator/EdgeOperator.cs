@@ -13,7 +13,7 @@ namespace SEE.Game.Operator
 
         private SEESpline spline;
 
-        public void AnimateToSpline(SEESpline target, float duration)
+        public void MorphTo(SEESpline target, float duration)
         {
             // We deactivate the target edge first so it's not visible.
             target.gameObject.SetActive(false);
@@ -21,12 +21,12 @@ namespace SEE.Game.Operator
             morphism.AnimateTo((target.Spline, target.gameObject), duration);
         }
 
-        public void AnimateToBSpline(BSpline target, float duration)
+        public void MorphTo(BSpline target, float duration)
         {
             morphism.AnimateTo((target, null), duration);
         }
 
-        public void AnimateGradientColors(Color newStartColor, Color newEndColor, float duration)
+        public void FadeColorsTo(Color newStartColor, Color newEndColor, float duration)
         {
             color.AnimateTo((newStartColor, newEndColor), duration);
         }

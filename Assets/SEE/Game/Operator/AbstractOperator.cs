@@ -14,8 +14,8 @@ namespace SEE.Game.Operator
         {
             void KillAnimator(bool complete = false);
         }
-        
-        protected class Operation<T, V>: IOperation
+
+        protected class Operation<T, V> : IOperation
         {
             public Func<V, float, T> AnimateToAction { protected get; set; }
 
@@ -67,6 +67,7 @@ namespace SEE.Game.Operator
                         }
                     }
                 }
+
                 base.KillAnimator(complete);
             }
         }

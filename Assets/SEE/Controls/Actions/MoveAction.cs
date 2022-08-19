@@ -263,6 +263,11 @@ namespace SEE.Controls.Actions
         private SEEReflexionCity reflexionCity;
         
         /// <summary>
+        /// The Operator of this node.
+        /// </summary>
+        private NodeOperator nodeOperator;
+        
+        /// <summary>
         /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
         /// </summary>
         private Edge temporaryMapsTo;
@@ -295,7 +300,7 @@ namespace SEE.Controls.Actions
                 if (moving)
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                    Positioner.Set(hit.HoveredObject, originalPosition);
+                    nodeOperator.MoveTo(originalPosition, 0);
                     hit.InteractableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -347,7 +352,7 @@ namespace SEE.Controls.Actions
 
                         EdgeOperator edgeOperator = hitEdge.connectedSpline.gameObject.AddOrGetComponent<EdgeOperator>();
 
-                        edgeOperator.AnimateToBSpline(spline, SPLINE_ANIMATION_DURATION);
+                        edgeOperator.MorphTo(spline, SPLINE_ANIMATION_DURATION);
                     }
 
                     hit.InteractableObject.SetGrab(true, true);
@@ -356,13 +361,18 @@ namespace SEE.Controls.Actions
                     dragStartOffset = planeHitPoint - hit.HoveredObject.position;
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
                     originalParent = hit.HoveredObject;
+
+                    nodeOperator = hit.HoveredObject.gameObject.AddOrGetComponent<NodeOperator>();
                     
                     // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
-                    if ((hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture()) && hit.HoveredObject.gameObject.TryGetComponent(out NodeOperator nodeOperator))
+                    if (hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture())
                     {
+                        // We need the reflexion city for later.
+                        reflexionCity = hit.HoveredObject.gameObject.ContainingCity<SEEReflexionCity>();
+                        
                         // TODO: Instead of just killing animations here with this trick,
                         //       handle all movement inside the NodeOperator.
-                        nodeOperator.MoveNode(nodeOperator.gameObject.transform.position, 0);
+                        nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
                     }
                 }
 
@@ -385,7 +395,8 @@ namespace SEE.Controls.Actions
                     // TODO: Adjust for snapping
                     Vector3 newPosition = raycastHit?.point ?? dragStartTransformPosition + totalDragOffsetFromStart;
                     ResetHitObjectColor();
-                    Positioner.Set(hit.HoveredObject, newPosition);
+                    nodeOperator.MoveXTo(newPosition.x, 0);
+                    nodeOperator.MoveZTo(newPosition.z, 0);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.HoveredObject.position;
@@ -416,7 +427,7 @@ namespace SEE.Controls.Actions
                             {
                                 // Both are in implementation, so we'll just need to adjust the scaling.
                                 // No need to delete any Maps-To edge, because temporaryMapsTo == null or is deleted.
-                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, targetXZ: hit.HoveredObject.position.XZ(), scaleDown: true);
+                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, scaleDown: true);
                             }
                         }
                     }
@@ -448,7 +459,7 @@ namespace SEE.Controls.Actions
                         if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
                         {
                             // Edges should stick to the node and not lag behind, so the duration is set to zero.
-                            edgeOperator.AnimateToBSpline(spline, 0);
+                            edgeOperator.MorphTo(spline, 0);
                         }
                     }
 

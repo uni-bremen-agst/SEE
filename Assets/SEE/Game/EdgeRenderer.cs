@@ -248,8 +248,8 @@ namespace SEE.Game
 
 #if UNITY_EDITOR
             p.End();
-            Debug.Log($"Calculated \"  {Settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
-                      + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
+            //Debug.Log($"Calculated \"  {Settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
+            //          + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
 #endif
             return result;
         }
