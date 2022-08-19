@@ -232,7 +232,7 @@ namespace SEE.Game
                 if (byLevel)
                 {
                     /// This color will be adjusted according to the level of <paramref name="node"/> in the
-                    /// node hierarchy, i.e, the artifical Metric.Level.
+                    /// node hierarchy, i.e., the artificial Metric.Level.
                     return NodeMetricToColor(node, Graph.MetricLevel);
                 }
                 else
