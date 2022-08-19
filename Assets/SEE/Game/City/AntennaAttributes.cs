@@ -17,24 +17,8 @@ namespace SEE.Game.City
         /// This parameter determines the sections of the antenna.
         /// </summary>
         [SerializeField]
-        public List<AntennaSection> AntennaSections = new List<AntennaSection>(1);
-
-        /// <summary>
-        /// This parameter determines the sections of the antenna, that is, the
-        /// order of the antenna segments and which properties they depict.
-        /// </summary>
-        //[SerializeField]
-        //[ListDrawerSettings(CustomAddFunction = "AddProperty")]
-        //public List<Property> AntennaSegments = new List<Property>();
-
-        //private Property AddProperty()
-        //{
-        //    Debug.Log("AddProperty\n");
-        //    Property result = new Property();
-        //    result.Kind = PropertyKind.Metric;
-        //    result.Name = "Metric.Mine";
-        //    return result;
-        //}
+        [HideReferenceObjectPicker]
+        public IList<string> AntennaSections = new List<string>();
 
         /// <summary>
         /// The width of an antenna.
@@ -73,36 +57,12 @@ namespace SEE.Game.City
                 bool result = false;
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 ConfigIO.Restore(values, AntennaWidthLabel, ref AntennaWidth);
-                if (values.TryGetValue(AntennaSectionsLabel, out object antennaSections))
-                {
-                    if (!(antennaSections is IList<object> objects))
-                    {
-                        throw new InvalidCastException($"Value to be cast {antennaSections} is expected to be a list. Actual type is {antennaSections.GetType().Name}");
-                    }
-                    foreach (object anObject in objects)
-                    {
-                        if (!(anObject is Dictionary<string, object> antennaSection))
-                        {
-                            throw new InvalidCastException($"Value to be cast {anObject} is expected to be a dictionary. Actual type is {anObject.GetType().Name}");
-                        }
-                        AntennaSection section = new AntennaSection();
-                        result = section.Restore(antennaSection) || result;
-                        AddAntennaSection(section);
-                    }
-                }
+                ConfigIO.RestoreStringList(values, AntennaSectionsLabel, ref AntennaSections);
                 return result;
             }
             else
             {
                 return false;
-            }
-
-            // If AntennaSections already has an antenna section for the metric in newSection,
-            // it will be removed. Then the newSection is added to it.
-            void AddAntennaSection(AntennaSection newSection)
-            {
-                AntennaSections.RemoveAll(section => section.Metric == newSection.Metric);
-                AntennaSections.Add(newSection);
             }
         }
 

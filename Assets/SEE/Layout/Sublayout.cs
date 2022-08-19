@@ -44,11 +44,6 @@ namespace SEE.Layout
         private readonly float groundLevel;
 
         /// <summary>
-        /// he height of objects (y co-ordinate) drawn for inner nodes
-        /// </summary>
-        private float innerNodeHeight;
-
-        /// <summary>
         /// the scale of the calculated layout
         /// </summary>
         private Vector3 layoutScale;
@@ -283,7 +278,7 @@ namespace SEE.Layout
 
                 if (!nodeLayout.GetModel().OnlyLeaves)
                 {
-                    rootNodeRealScale = new Vector3(sublayout.Node.LocalScale.x, innerNodeHeight, sublayout.Node.LocalScale.z);
+                    rootNodeRealScale = sublayout.Node.LocalScale;
                     LayoutOffset = position - sublayout.Node.CenterPosition;
                 }
 
@@ -317,7 +312,6 @@ namespace SEE.Layout
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
             NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, settings);
-            innerNodeHeight = layout.InnerNodeHeight;
             if (layout.UsesEdgesAndSublayoutNodes())
             {
                 return layout.Layout(sublayoutNodes, edges, new List<SublayoutLayoutNode>());

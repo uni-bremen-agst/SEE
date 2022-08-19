@@ -352,8 +352,8 @@ namespace SEE.Utils
         public void TestAntennaAttributes()
         {
             AntennaAttributes saved = new AntennaAttributes();
-            saved.AntennaSections.Add(new AntennaSection("metricA", Color.white));
-            saved.AntennaSections.Add(new AntennaSection("metricB", Color.black));
+            saved.AntennaSections.Add("metricA");
+            saved.AntennaSections.Add("metricB");
             saved.AntennaWidth = 2.0f;
 
             const string filename = "antenna.cfg";
@@ -965,8 +965,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.AntennaSections.Count, actual.AntennaSections.Count);
             for (int i = 0; i < expected.AntennaSections.Count; i++)
             {
-                Assert.AreEqual(expected.AntennaSections[i].Metric, actual.AntennaSections[i].Metric);
-                Assert.AreEqual(expected.AntennaSections[i].Color, actual.AntennaSections[i].Color);
+                Assert.AreEqual(expected.AntennaSections[i], actual.AntennaSections[i]);
             }
         }
 

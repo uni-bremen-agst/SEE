@@ -6,6 +6,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -36,7 +37,7 @@ namespace SEE.Game
         /// Creates and returns a new game object for representing the given <paramref name="node"/>
         /// as a leaf node. The exact kind of representation depends upon the leaf-node factory. The node is
         /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
-        /// Its style is determined by LeafNodeStyleMetric (linear interpolation of a color gradient).
+        /// Its style is determined by <see cref="SelectStyle(Node)"/>.
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
         ///
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
@@ -48,7 +49,6 @@ namespace SEE.Game
             NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
-            // FIXME leafAntennaDecorator.AddAntenna(result);
             return result;
         }
 
@@ -216,9 +216,7 @@ namespace SEE.Game
                     case PropertyKind.Metric:
                         return NodeMetricToColor(node, value.ColorProperty.ColorMetric);
                     case PropertyKind.Type:
-                        /// Node factories using the node type for determining the color have only one color.
-                        /// <seealso cref="SetNodeFactories"/>
-                        return 0;
+                        return NodeTypeToColor(node, value.ColorProperty.ByLevel);
                     default:
                         throw new NotImplementedException($"Unhandled {typeof(PropertyKind)} {value.ColorProperty.Property}");
                 }
@@ -227,6 +225,20 @@ namespace SEE.Game
             {
                 Debug.LogError($"No color specification for node {node.ID} of type {node.Type}.\n");
                 return 0;
+            }
+
+            int NodeTypeToColor(Node node, bool byLevel)
+            {
+                if (byLevel)
+                {
+                    /// This color will be adjusted according to the level of <paramref name="node"/> in the
+                    /// node hierarchy, i.e., the artificial Metric.Level.
+                    return NodeMetricToColor(node, Graph.MetricLevel);
+                }
+                else
+                {
+                    return 0;
+                }
             }
 
             int NodeMetricToColor(Node node, string colorMetric)
@@ -312,17 +324,7 @@ namespace SEE.Game
             if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
-                int style = SelectStyle(node);
-                if (node.IsLeaf())
-                {
-                    nodeTypeToFactory[node.Type].SetStyle(gameNode, style);
-                }
-                else
-                {
-                    // TODO: for some reason, the material is selected twice. Once here and once
-                    // somewhere earlier (I believe in NewBlock somewhere).
-                    nodeTypeToFactory[node.Type].SetStyle(gameNode, style);
-                }
+                nodeTypeToFactory[node.Type].SetStyle(gameNode, SelectStyle(node));
             }
             else
             {
@@ -340,16 +342,10 @@ namespace SEE.Game
         {
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
-                Node node = nodeRef.Value;
-                // FIXME: AddAnntenna
-                //if (node.IsLeaf())
-                //{
-                //    leafAntennaDecorator.AddAntenna(gameNode);
-                //}
-                //else
-                //{
-                //    innerAntennaDecorator.AddAntenna(gameNode);
-                //}
+                if (nodeTypeToAntennaDectorator.TryGetValue(nodeRef.Value.Type, out AntennaDecorator decorator))
+                {
+                    decorator.AddAntenna(gameNode);
+                }
             }
             else
             {
@@ -381,39 +377,48 @@ namespace SEE.Game
                 AddMetrics(node, metrics, node.IntAttributes.Keys);
 
                 // There should be at least three values.
+                if (metrics.Count < 3)
+                {
+                    Debug.LogWarning($"There should be at least three metrics for node {node.ID}. Adding zeros.");
+                }
                 for (int i = metrics.Count; i < 3; ++i)
                 {
                     metrics.Add(0);
                 }
                 return metrics.ToArray();
             }
-            Vector3 scale = GetScale(node);
-            if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+            else
             {
-                // FIXME: This is ugly. The graph renderer should not need to care what
-                // kind of layout was applied.
+                Vector3 scale = GetScale(node);
+                if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+                {
+                    // FIXME: This is ugly. The graph renderer should not need to care what
+                    // kind of layout was applied.
 
-                // Treemaps can represent a metric by the area of a rectangle. Hence,
-                // they can represent only a single metric in the x/z plane.
-                // Let M be the metric selected to be represented by the treemap.
-                // Here, we choose the width metric (as selected by the user) to be M.
-                // That is, M mapped onto the rectangle area.
-                // The area of a rectangle is the product of the lengths of its two sides.
-                // That is why we need to take the square root of M for the lengths, because
-                // sqrt(M) * sqrt(M) = M. If we were instead using M as width and depth of the
-                // rectangle, the area would be M^2, which would skew the visual impression
-                // in the eye of the beholder. Nodes with larger values of M would have a
-                // disproportionally larger area.
+                    // Treemaps can represent a metric by the area of a rectangle. Hence,
+                    // they can represent only a single metric in the x/z plane.
+                    // Let M be the metric selected to be represented by the treemap.
+                    // Here, we choose the width metric (as selected by the user) to be M.
+                    // That is, M mapped onto the rectangle area.
+                    // The area of a rectangle is the product of the lengths of its two sides.
+                    // That is why we need to take the square root of M for the lengths, because
+                    // sqrt(M) * sqrt(M) = M. If we were instead using M as width and depth of the
+                    // rectangle, the area would be M^2, which would skew the visual impression
+                    // in the eye of the beholder. Nodes with larger values of M would have a
+                    // disproportionally larger area.
 
-                // The input to the treemap layout are rectangles with equally sized lengths,
-                // in other words, squares. This determines only the ground area of the input
-                // blocks. The height of the blocks remains the original value of the metric
-                // chosen to determine the height, without any kind of transformation.
-                float widthOfSquare = Mathf.Sqrt(scale.x);
-                scale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
+                    // The input to the treemap layout are rectangles with equally sized lengths,
+                    // in other words, squares. This determines only the ground area of the input
+                    // blocks. The height of the blocks remains the original value of the metric
+                    // chosen to determine the height, without any kind of transformation.
+                    float widthOfSquare = Mathf.Sqrt(scale.x);
+                    scale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
+                }
+                return new float[] { scale.x, scale.y, scale.z };
             }
-            return new float[] { scale.x, scale.y, scale.z };
 
+            // Adds the values of the metrics of node listed in metricNames (excluding the
+            // metric chosen to determine the color) to metrics.
             void AddMetrics(Node node, IList<float> metrics, ICollection<string> metricNames)
             {
                 HashSet<string> relevantMetrics = new HashSet<string>(metricNames);
@@ -575,13 +580,17 @@ namespace SEE.Game
         /// These general decorations currently consist of:
         /// <ul>
         /// <li>Outlines around the node</li>
+        /// <li>Antennas</li>
         /// </ul>
         /// </summary>
-        protected virtual void AddGeneralDecorations(GameObject node)
+        /// <param name="gameNode">game object representing a node to be decorated</param>
+        protected virtual void AddGeneralDecorations(GameObject gameNode)
         {
             // Add outline around nodes so they can be visually differentiated without needing the same color.
-            VisualNodeAttributes attribs = Settings.NodeTypes[node.GetNode().Type];
-            Outline.Create(node, Color.black, attribs.OutlineWidth);
+            Node node = gameNode.GetNode();
+            VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
+            Outline.Create(gameNode, Color.black, attribs.OutlineWidth);
+            nodeTypeToAntennaDectorator[node.Type]?.AddAntenna(gameNode);
         }
 
         /// <summary>
