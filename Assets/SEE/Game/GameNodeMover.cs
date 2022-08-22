@@ -184,7 +184,8 @@ namespace SEE.Game
             Vector3 oldScale = child.localScale;
             if (scaleDown)
             {
-                nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
+                Vector3 targetScale = new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR);
+                nodeOperator.ScaleTo(targetScale, 0);
             }
             
             float parentRoof = parent.GetRoof();
