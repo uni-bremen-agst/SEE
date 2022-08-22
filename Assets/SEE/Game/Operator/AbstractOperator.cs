@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace SEE.Game.Operator
 {
+    [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
         // Collects all non-generic methods
@@ -41,9 +42,14 @@ namespace SEE.Game.Operator
 
             public void AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
             {
-                if (EqualityComparer<V>.Default.Equals(target, TargetValue))
+                if (duration < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater than zero!");
+                }
+                if (EqualityComparer<V>.Default.Equals(target, TargetValue) && duration > 0)
                 {
                     // Nothing to be done, we're already where we want to be.
+                    // If duration is 0, however, we must trigger the change immediately.
                     return;
                 }
 
@@ -69,6 +75,21 @@ namespace SEE.Game.Operator
                 }
 
                 base.KillAnimator(complete);
+            }
+
+            protected override void ChangeAnimatorTarget(V newTarget, float duration)
+            {
+                base.ChangeAnimatorTarget(newTarget, duration);
+                if (duration == 0)
+                {
+                    foreach (Tween tween in Animator)
+                    {
+                        // We execute the first step immediately. This way, callers can expect the change to
+                        // be implemented when control is returned to them, as it would work when
+                        // setting the target value manually.
+                        tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                    }
+                }
             }
         }
     }
