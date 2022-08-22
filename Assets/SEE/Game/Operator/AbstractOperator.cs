@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace SEE.Game.Operator
 {
+    [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
         // Collects all non-generic methods
