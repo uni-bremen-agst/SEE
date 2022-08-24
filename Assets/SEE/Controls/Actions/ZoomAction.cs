@@ -120,6 +120,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void FixedUpdate()
         {
+            // FIXME: This allocation happens in a fixed frame rate. This looks expensive.
             Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
