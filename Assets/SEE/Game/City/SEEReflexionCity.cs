@@ -98,7 +98,7 @@ namespace SEE.Game.City
         /// All tweens which control edges' colors on reflexion changes.
         /// </summary>
         private readonly Dictionary<string, ICollection<Tween>> edgeTweens = new Dictionary<string, ICollection<Tween>>();
-        
+
         /// <summary>
         /// All tweens which control nodes' movement and scale on reflexion changes.
         /// </summary>
@@ -236,13 +236,13 @@ namespace SEE.Game.City
             }
         }
 
-        internal override void Start()
+        protected override void Start()
         {
             base.Start();
 
             foreach (Edge edge in LoadedGraph.Edges())
             {
-                GameObject edgeObject = GameObject.Find(edge.ID);
+                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
                     spline.GradientColors = GetEdgeGradient(edge.State());
@@ -332,7 +332,7 @@ namespace SEE.Game.City
             // TODO: Make sure these actions don't interfere with reversible actions.
             // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
             // TODO: Handle these asynchronously
-            
+
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:
@@ -358,12 +358,12 @@ namespace SEE.Game.City
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
             Debug.Log(edgeChange);
-            GameObject edge = GameObject.Find(edgeChange.Edge.ID);
+            GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
             if (edge == null)
             {
                 // If no such edge can be found, the given edge must be propagated
                 string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
-                edge = edgeId != null ? GameObject.Find(edgeId) : null;
+                edge = edgeId != null ? GraphElementIDMap.Find(edgeId) : null;
             }
 
             if (edge != null && edge.TryGetComponent(out SEESpline spline))
@@ -377,10 +377,10 @@ namespace SEE.Game.City
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             newColors.end, ANIMATION_DURATION).SetEase(ANIMATION_EASE);
-                
+
                 // If there are existing tweens, remove them.
                 ICollection<Tween> tweens = CleanTweens(edgeTweens, edgeChange.Edge.ID);
-                
+
                 // Pressing `Play` will have an effect at the next frame, so they will be played simultaneously.
                 tweens.Add(startTween.Play());
                 tweens.Add(endTween.Play());
@@ -418,7 +418,7 @@ namespace SEE.Game.City
         // If parameters are not given, the current values will be used.
         private void AnimateNodeMovement(GameObject gameNode, float? newYPosition = null, Vector3? targetScale = null)
         {
-            // We remember the old position and move the node to the new position so that 
+            // We remember the old position and move the node to the new position so that
             // edge layouts can be correctly calculated.
             Vector3 oldPosition = gameNode.transform.position;
             gameNode.transform.position = gameNode.transform.position.WithXYZ(y: newYPosition);
@@ -433,7 +433,7 @@ namespace SEE.Game.City
             //       Alternatively, we can iterate over game edges instead.
             foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
-                GameObject gameEdge = GameObject.Find(edge.ID);
+                GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
                 Assert.IsNotNull(gameEdge);
                 GameObject source = edge.Source == node ? gameNode : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == node ? gameNode : edge.Target.RetrieveGameNode();
@@ -446,7 +446,7 @@ namespace SEE.Game.City
                 // Nothing remains to be done. Killing any still running tweens would be counterproductive.
                 return;
             }
-            
+
             // Clean out old tweens from an animation that may still be ongoing.
             ICollection<Tween> tweens = CleanTweens(nodeTweens, node.ID);
 
@@ -486,7 +486,7 @@ namespace SEE.Game.City
                     else
                     {
                         morphism.CreateTween(splineSource.Spline, splineTarget.Spline, ANIMATION_DURATION)
-                                .OnComplete(() => Destroy(targetEdge)).SetEase(ANIMATION_EASE).Play();
+                                .OnComplete(() => Destroyer.DestroyGameObject(targetEdge)).SetEase(ANIMATION_EASE).Play();
                     }
                 }
             }
@@ -568,7 +568,7 @@ namespace SEE.Game.City
         {
             Debug.Log($"Killing tweens for {node.ID}");
             CleanTweens(nodeTweens, node.ID, complete);
-            
+
             // We will also kill any connected edge tweens.
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings))
             {

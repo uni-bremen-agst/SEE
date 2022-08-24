@@ -210,11 +210,11 @@ namespace SEE.Controls.Actions
             // game objects for these from the scene using their IDs.
             if (memento.from == null)
             {
-                memento.from = GameObject.Find(memento.fromID);
+                memento.from = GraphElementIDMap.Find(memento.fromID);
             }
             if (memento.to == null)
             {
-                memento.to = GameObject.Find(memento.toID);
+                memento.to = GraphElementIDMap.Find(memento.toID);
             }
             try
             {

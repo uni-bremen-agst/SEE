@@ -36,7 +36,7 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(GameObjectID);
+                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
                     Positioner.Set(gameObject.transform, Position);
