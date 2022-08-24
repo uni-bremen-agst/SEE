@@ -151,12 +151,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent,
-                                                  bool draw = true)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent)
         {
-            return EdgeLayout(ToLayoutNodes(gameNodes), parent, draw);
+            return EdgeLayout(ToLayoutNodes(gameNodes), parent);
         }
 
         /// <summary>
@@ -166,12 +164,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
-        /// <param name="draw">decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, GameObject parent,
-                                                   bool draw = true)
+        private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, GameObject parent)
         {
-            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
+            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
             AddToParent(result, parent);
             return result;
         }
@@ -210,10 +206,8 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
         /// <param name="layoutEdges">the edges to be laid out</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes, ICollection<LayoutGraphEdge<T>> layoutEdges,
-                                                      bool draw = true)
+        private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes, ICollection<LayoutGraphEdge<T>> layoutEdges)
             where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             IEdgeLayout layout = GetEdgeLayout();
@@ -225,26 +219,13 @@ namespace SEE.Game
 #if UNITY_EDITOR
             Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
-            EdgeFactory edgeFactory = new EdgeFactory(layout,
-                                                      Settings.EdgeLayoutSettings.EdgeWidth,
-                                                      Settings.EdgeSelectionSettings.TubularSegments,
-                                                      Settings.EdgeSelectionSettings.Radius,
-                                                      Settings.EdgeSelectionSettings.RadialSegments,
-                                                      Settings.EdgeSelectionSettings.AreSelectable);
+            EdgeFactory edgeFactory = new EdgeFactory(layout, Settings.EdgeLayoutSettings.EdgeWidth);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
-            // Calculate only
-            if (!draw)
-            {
-                result = edgeFactory.CalculateNewEdges(gameNodes, layoutEdges);
-            }
             // Calculate and draw edges
-            else
-            {
-                result = edgeFactory.DrawEdges(gameNodes, layoutEdges);
-                InteractionDecorator.PrepareForInteraction(result);
-                AddLOD(result);
-            }
+            result = edgeFactory.DrawEdges(gameNodes, layoutEdges);
+            InteractionDecorator.PrepareForInteraction(result);
+            AddLOD(result);
 
 #if UNITY_EDITOR
             p.End();

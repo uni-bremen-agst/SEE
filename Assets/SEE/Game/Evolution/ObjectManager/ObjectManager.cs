@@ -218,7 +218,7 @@ namespace SEE.Game.Evolution
                 }
 
                 // Create the entire edge layout from the nodes.
-                ICollection<GameObject> edgeObjects = graphRenderer.EdgeLayout(nodeObjecs, city, true);
+                ICollection<GameObject> edgeObjects = graphRenderer.EdgeLayout(nodeObjecs, city);
 
                 // Put all edge objects into the cache and find `gameEdge'.
                 foreach (GameObject edgeObject in edgeObjects)
