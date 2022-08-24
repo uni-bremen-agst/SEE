@@ -346,15 +346,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to start dragging the city in its entirety or parts of it.
-        /// </summary>
-        /// <returns>true if the user requests this action</returns>
-        internal static bool StartDrag()
-        {
-            return Input.GetMouseButtonDown(MiddleMouseButton);
-        }
-
-        /// <summary>
         /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
