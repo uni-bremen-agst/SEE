@@ -1028,7 +1028,7 @@ namespace SEE.Game
                         child.SetParent(null);
                     }
                 }
-                Destroy(go);
+                Destroyer.DestroyGameObject(go);
             }
         }
 
