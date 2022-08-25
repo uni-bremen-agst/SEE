@@ -10,7 +10,7 @@ namespace SEE.Game
     /// A mapping of IDs (name) of GameObjects representing nodes or edges
     /// onto those GameObjects.
     /// </summary>
-    static class GraphElementIDMap
+    internal static class GraphElementIDMap
     {
         /// <summary>
         /// Mapping of IDs (name) of GameObject representing nodes or edges
@@ -27,7 +27,7 @@ namespace SEE.Game
         /// <param name="ID">the ID of the game object to be looked up</param>
         /// <returns>the game object with the given <paramref name="ID"/> or null if there is
         /// no such game object</returns>
-        public static GameObject Find(string ID)
+        internal static GameObject Find(string ID)
         {
             Assert.IsFalse(string.IsNullOrEmpty(ID));
             if (mapping.TryGetValue(ID, out GameObject result))
@@ -67,7 +67,7 @@ namespace SEE.Game
         /// <param name="gameObject">game object to be added</param>
         /// <exception cref="ArgumentException">thrown if there is already a game object with
         /// this ID (name attribute)</exception>
-        public static void Add(GameObject gameObject)
+        internal static void Add(GameObject gameObject)
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
@@ -77,13 +77,26 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Adds all <paramref name="gameObjects"/> to the mapping using
+        /// <see cref="Add(GameObject)"/>.
+        /// </summary>
+        /// <param name="gameObjects">game objects to be added</param>
+        internal static void Add(ICollection<GameObject> gameObjects)
+        {
+            foreach (GameObject gameEdge in gameObjects)
+            {
+                Add(gameEdge);
+            }
+        }
+
+        /// <summary>
         /// Removes <paramref name="gameObject"/> from the mapping.
         ///
         /// If there is no such <paramref name="gameObject"/> in the mapping, nothing
         /// happens.
         /// </summary>
         /// <param name="gameObject">game object to be removed</param>
-        public static void Remove(GameObject gameObject)
+        internal static void Remove(GameObject gameObject)
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));

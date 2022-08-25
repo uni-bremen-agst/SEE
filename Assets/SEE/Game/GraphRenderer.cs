@@ -327,7 +327,7 @@ namespace SEE.Game
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
-            EdgeLayout(gameNodes, rootGameNode);
+            EdgeLayout(gameNodes, rootGameNode, true);
 
             Portal.SetPortal(parent);
 

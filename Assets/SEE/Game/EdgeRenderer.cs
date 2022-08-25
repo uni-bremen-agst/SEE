@@ -68,7 +68,7 @@ namespace SEE.Game
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
                 { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
             // Calculate the edge layout (for the single edge only).
-            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
+            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges, true);
             GameObject resultingEdge = edges.First();
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
@@ -151,10 +151,14 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
+        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be
+        /// added to <see cref="GraphElementIDMap"/></param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, GameObject parent)
+        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes,
+                                                  GameObject parent,
+                                                  bool addToGraphElementIDMap)
         {
-            return EdgeLayout(ToLayoutNodes(gameNodes), parent);
+            return EdgeLayout(ToLayoutNodes(gameNodes), parent, addToGraphElementIDMap);
         }
 
         /// <summary>
@@ -164,10 +168,14 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
         /// <param name="parent">the object the new edges are to become children of</param>
+        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be
+        /// added to <see cref="GraphElementIDMap"/></param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes, GameObject parent)
+        private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes,
+                                        GameObject parent,
+                                        bool addToGraphElementIDMap)
         {
-            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes));
+            ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), addToGraphElementIDMap);
             AddToParent(result, parent);
             return result;
         }
@@ -206,8 +214,13 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
         /// <param name="layoutEdges">the edges to be laid out</param>
+        /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
+        /// to <see cref="GraphElementIDMap"/></param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes, ICollection<LayoutGraphEdge<T>> layoutEdges)
+        private ICollection<GameObject> EdgeLayout<T>
+            (ICollection<T> gameNodes,
+             ICollection<LayoutGraphEdge<T>> layoutEdges,
+             bool addToGraphElementIDMap)
             where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             IEdgeLayout layout = GetEdgeLayout();
@@ -224,6 +237,10 @@ namespace SEE.Game
             ICollection<GameObject> result;
             // Calculate and draw edges
             result = edgeFactory.DrawEdges(gameNodes, layoutEdges);
+            if (addToGraphElementIDMap)
+            {
+                GraphElementIDMap.Add(result);
+            }
             InteractionDecorator.PrepareForInteraction(result);
             AddLOD(result);
 
