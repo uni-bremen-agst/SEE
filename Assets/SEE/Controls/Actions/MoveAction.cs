@@ -393,7 +393,8 @@ namespace SEE.Controls.Actions
 
                     RaycastLowestNode(out RaycastHit? raycastHit, out Node newParentNode, hit.node);
                     // TODO: Adjust for snapping
-                    Vector3 newPosition = raycastHit?.point ?? dragStartTransformPosition + totalDragOffsetFromStart;
+                    // FIXME: Position is not exact depending on scale. Needs to be reworked.
+                    Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
                     ResetHitObjectColor();
                     nodeOperator.MoveXTo(newPosition.x, 0);
                     nodeOperator.MoveZTo(newPosition.z, 0);
@@ -404,6 +405,7 @@ namespace SEE.Controls.Actions
 
                     if (raycastHit.HasValue)
                     {
+                        // FIXME: Under certain circumstances, "flickering" can occur. Relates to above FIXME comment.
                         GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: true);
                         SetHitObjectColor(raycastHit.Value);
                         if (reflexionCity != null)
