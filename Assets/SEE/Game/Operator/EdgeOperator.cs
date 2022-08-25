@@ -91,7 +91,14 @@ namespace SEE.Game.Operator
             protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration)
             {
                 // No need to kill any old animators, the spline morphism can change its target.
-                AnimateToAction(newTarget, duration);
+                Animator = AnimateToAction(newTarget, duration);
+                if (duration == 0)
+                {
+                    // We execute the first step immediately. This way, callers can expect the change to
+                    // be implemented when control is returned to them, as it would work when
+                    // setting the target value manually.
+                    Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                }
             }
         }
     }
