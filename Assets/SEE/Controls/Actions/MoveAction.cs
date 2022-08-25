@@ -414,7 +414,7 @@ namespace SEE.Controls.Actions
                             {
                                 // If we are in a reflexion city, we will simply
                                 // trigger the incremental reflexion analysis here.
-                                // That way, the relevant code is in one place (SEEReflexionCity)
+                                // That way, the relevant code is in one place
                                 // and edges will be colored on hover (#451).
                                 temporaryMapsTo = reflexionCity.Analysis.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
                             }

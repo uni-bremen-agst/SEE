@@ -94,7 +94,11 @@ namespace SEE.Game.Operator
             {
                 // Add new target edge, we'll animate the current edge to it
                 GameObject gameEdge = GameObject.Find(edge.ID);
-                Assert.IsNotNull(gameEdge);
+                if (gameEdge == null)
+                {
+                    // FIXME: How is this possible?
+                    continue;
+                }
                 GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == node ? gameObject : edge.Target.RetrieveGameNode();
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
