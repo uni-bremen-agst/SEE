@@ -63,7 +63,6 @@ namespace SEE.GO
 
             gameEdge.AddComponent<SEESpline>().Spline = layoutGraphEdge.Spline;
 
-            GraphElementIDMap.Add(gameEdge);
             return gameEdge;
         }
 
