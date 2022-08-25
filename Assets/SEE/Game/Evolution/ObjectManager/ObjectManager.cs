@@ -350,6 +350,14 @@ namespace SEE.Game.Evolution
             return wasNodeRemoved;
         }
 
+        /// <summary>
+        /// Removes the game object representing the given <paramref name="edge"/> by using the ID
+        /// of the <paramref name="edge"/> and returns the removed edge in <paramref name="gameObject"/>, if
+        /// it existed. Returns true if such a game object existed in the cache.
+        /// </summary>
+        /// <param name="edge">edge determining the game object to be removed from the cache</param>
+        /// <param name="gameObject">the corresponding game object that was removed from the cache or null</param>
+        /// <returns>true if a corresponding game object existed and was removed from the cache</returns>
         public bool RemoveEdge(Edge edge, out GameObject gameObject)
         {
             edge.AssertNotNull("edge");
