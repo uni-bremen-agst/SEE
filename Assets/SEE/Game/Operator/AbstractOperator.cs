@@ -169,7 +169,7 @@ namespace SEE.Game.Operator
                     foreach (Tween tween in Animator)
                     {
                         // We execute the first step immediately. This way, callers can expect the change to
-                        // be implemented when control is returned to them, as it would work when
+                        // be implemented when control is returned to them, the same way it would work when
                         // setting the target value manually.
                         tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                     }

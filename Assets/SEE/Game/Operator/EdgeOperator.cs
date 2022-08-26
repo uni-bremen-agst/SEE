@@ -7,13 +7,38 @@ using UnityEngine;
 
 namespace SEE.Game.Operator
 {
+    /// <summary>
+    /// A component managing operations done on the edge it is attached to.
+    /// Available operations consist of the public methods exported by this class.
+    /// Operations can be animated or executed directly, by setting the duration to 0.
+    /// </summary>
     public class EdgeOperator : AbstractOperator
     {
+        /// <summary>
+        /// Operation handling edge morphing.
+        /// </summary>
         private MorphismOperation morphism;
+        
+        /// <summary>
+        /// Operation handling changes to the color gradient of the edge.
+        /// </summary>
         private TweenOperation<(Color start, Color end)> color;
 
+        /// <summary>
+        /// The <see cref="SEESpline"/> represented by this edge.
+        /// </summary>
         private SEESpline spline;
 
+        #region Public API
+
+        /// <summary>
+        /// Morph the spline represented by this edge to the given <paramref name="target"/> spline,
+        /// destroying the associated game object of <paramref name="target"/> once the animation is complete.
+        /// This will also disable the <paramref name="target"/>'s game object immediately so it's invisible.
+        /// </summary>
+        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MorphTo(SEESpline target, float duration)
         {
             // We deactivate the target edge first so it's not visible.
@@ -22,15 +47,30 @@ namespace SEE.Game.Operator
             morphism.AnimateTo((target.Spline, target.gameObject), duration);
         }
 
+        /// <summary>
+        /// Morph the spline represented by this edge to the given <paramref name="target"/> spline.
+        /// </summary>
+        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MorphTo(BSpline target, float duration)
         {
             morphism.AnimateTo((target, null), duration);
         }
 
-        public void FadeColorsTo(Color newStartColor, Color newEndColor, float duration)
+        /// <summary>
+        /// Change the color gradient of the edge to a new gradient from <paramref name="newStartColor"/> to
+        /// <paramref name="newEndColor"/>.
+        /// </summary>
+        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        public void ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
         {
             color.AnimateTo((newStartColor, newEndColor), duration);
         }
+
+        #endregion
 
         private void Awake()
         {
@@ -76,6 +116,12 @@ namespace SEE.Game.Operator
         }
 
         // TODO: Maybe refactor this? Type signature is somewhat complex
+        /// <summary>
+        /// An <see cref="Operation{T,V}"/> which uses a <see cref="SplineMorphism"/> as the animator.
+        /// Use this operation for morphing edges.
+        /// The target value consists of the target spline, as well as an optional temporary game object associated
+        /// to the spline. If the latter is given, it will be destroyed upon completion.
+        /// </summary>
         protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject)>
         {
             public override void KillAnimator(bool complete = false)
@@ -97,13 +143,14 @@ namespace SEE.Game.Operator
                 if (duration == 0)
                 {
                     // We execute the first step immediately. This way, callers can expect the change to
-                    // be implemented when control is returned to them, as it would work when
+                    // be implemented when control is returned to them, the same way it would work when
                     // setting the target value manually.
                     Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
             }
 
-            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction, BSpline targetSpline, GameObject temporaryGameObject) : base(animateToAction, (targetSpline, temporaryGameObject))
+            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction, 
+                                     BSpline targetSpline, GameObject temporaryGameObject) : base(animateToAction, (targetSpline, temporaryGameObject))
             {
             }
         }

@@ -169,7 +169,7 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
                 // Animate color change for nicer visuals.
-                edge.AddOrGetComponent<EdgeOperator>().FadeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
+                edge.AddOrGetComponent<EdgeOperator>().ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
             }
             else
             {
