@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using SEE.GO;
@@ -8,8 +9,8 @@ namespace SEE.Game.Operator
 {
     public class EdgeOperator : AbstractOperator
     {
-        private readonly MorphismOperation morphism = new MorphismOperation();
-        private readonly TweenOperation<(Color start, Color end)> color = new TweenOperation<(Color start, Color end)>();
+        private MorphismOperation morphism;
+        private TweenOperation<(Color start, Color end)> color;
 
         private SEESpline spline;
 
@@ -33,9 +34,7 @@ namespace SEE.Game.Operator
 
         private void Awake()
         {
-            gameObject.MustGetComponent(out spline);
-            morphism.TargetValue = (spline.Spline, null);
-            morphism.AnimateToAction = (s, d) =>
+            SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
                 SplineMorphism Animator = gameObject.AddOrGetComponent<SplineMorphism>();
 
@@ -48,20 +47,22 @@ namespace SEE.Game.Operator
                 {
                     gameObject.MustGetComponent(out SEESpline sourceSpline);
                     Animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
-                        .OnComplete(() =>
-                        {
-                            if (s.temporaryGameObject != null)
+                            .OnComplete(() =>
                             {
-                                Destroy(s.temporaryGameObject);
-                            }
-                        }).Play();
+                                if (s.temporaryGameObject != null)
+                                {
+                                    Destroy(s.temporaryGameObject);
+                                }
+                            }).Play();
                 }
 
                 return Animator;
             };
 
-            color.TargetValue = spline.GradientColors;
-            color.AnimateToAction = (colors, d) =>
+            gameObject.MustGetComponent(out spline);
+            morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
+
+            List<Tween> AnimateToColorAction((Color start, Color end) colors, float d)
             {
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
                                               c => spline.GradientColors = (c, spline.GradientColors.end),
@@ -71,6 +72,7 @@ namespace SEE.Game.Operator
                                             colors.end, d);
                 return new List<Tween> { startTween, endTween };
             };
+            color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
         }
 
         // TODO: Maybe refactor this? Type signature is somewhat complex
@@ -99,6 +101,10 @@ namespace SEE.Game.Operator
                     // setting the target value manually.
                     Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
+            }
+
+            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction, BSpline targetSpline, GameObject temporaryGameObject) : base(animateToAction, (targetSpline, temporaryGameObject))
+            {
             }
         }
     }

@@ -15,11 +15,11 @@ namespace SEE.Game.Operator
         // of the node we hover over, we might want to animate this while still letting the user
         // drag the node.
 
-        private readonly TweenOperation<float> PositionX = new TweenOperation<float>();
-        private readonly TweenOperation<float> PositionY = new TweenOperation<float>();
-        private readonly TweenOperation<float> PositionZ = new TweenOperation<float>();
+        private TweenOperation<float> PositionX;
+        private TweenOperation<float> PositionY;
+        private TweenOperation<float> PositionZ;
 
-        private readonly TweenOperation<Vector3> Scale = new TweenOperation<Vector3>();
+        private TweenOperation<Vector3> Scale;
 
         private float? updateEdgeLayoutDuration;
 
@@ -115,19 +115,31 @@ namespace SEE.Game.Operator
             transform.localScale = oldScale;
         }
 
-        private void Awake()
+        private void OnEnable()
         {
             Vector3 currentPosition = transform.position;
-            PositionX.AnimateToAction = (x, d) => new Tween[] { transform.DOMoveX(x, d).Play() };
-            PositionX.TargetValue = currentPosition.x;
-            PositionY.AnimateToAction = (y, d) => new Tween[] { transform.DOMoveY(y, d).Play() };
-            PositionY.TargetValue = currentPosition.y;
-            PositionZ.AnimateToAction = (z, d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
-            PositionZ.TargetValue = currentPosition.z;
+            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
+            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            Tween[] AnimateToZAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
+            PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
+            PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
 
             Vector3 currentScale = transform.localScale;
-            Scale.AnimateToAction = (s, d) => new Tween[] { transform.DOScale(s, d).Play() };
-            Scale.TargetValue = currentScale;
+            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
+            Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
+        }
+
+        private void OnDisable()
+        {
+            PositionX.KillAnimator();
+            PositionX = null;
+            PositionY.KillAnimator();
+            PositionY = null;
+            PositionZ.KillAnimator();
+            PositionZ = null;
+            Scale.KillAnimator();
+            Scale = null;
         }
 
         private void Update()
