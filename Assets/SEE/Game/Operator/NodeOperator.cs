@@ -120,7 +120,7 @@ namespace SEE.Game.Operator
             Vector3 currentPosition = transform.position;
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
-            Tween[] AnimateToZAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
