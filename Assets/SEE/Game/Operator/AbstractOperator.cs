@@ -7,29 +7,82 @@ using UnityEngine;
 
 namespace SEE.Game.Operator
 {
+    /// <summary>
+    /// A component managing operations done on a single game object it is attached to, such as a node or an edge.
+    /// Operations are represented by the inner <see cref="Operation"/> class, and include things like
+    /// movement, color changes, etc.
+    /// Operations can be animated or executed directly, by setting the duration to 0.
+    /// </summary>
     [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
-        // Collects all non-generic methods
+        /// <summary>
+        /// Interface for <see cref="Operation{T,V}"/> which collects all non-generic methods.
+        /// <see cref="Operation{T,V}"/> should be preferred over this if generic parameters can be used.
+        /// </summary>
         protected interface IOperation
         {
+            /// <summary>
+            /// Kills (i.e., stops) all active animators.
+            /// </summary>
+            /// <param name="complete">Whether to stop at the current value (<c>false</c>)
+            /// or at the target (<c>true</c>)</param>
             void KillAnimator(bool complete = false);
         }
 
+        /// <summary>
+        /// Represents an animated operation to a value of type <typeparamref name="T"/>
+        /// carried out via an animator of type <typeparamref name="T"/>.
+        /// The operation must be properly initialized by setting <see cref="AnimateToAction"/> as well as
+        /// an initial <see cref="TargetValue"/> before calling any methods.
+        /// To then execute the operation, <see cref="AnimateTo"/> will be called, which will in turn
+        /// call <see cref="ChangeAnimatorTarget"/> to replace any active animation with the newly created one.
+        /// </summary>
+        /// <typeparam name="T">Type of the animator</typeparam>
+        /// <typeparam name="V">Type of the value</typeparam>
         protected class Operation<T, V> : IOperation
         {
+            /// <summary>
+            /// The function that is called when the animation shall be constructed and played.
+            /// The first parameter is the target value, and the second parameter is the duration of the animation.
+            /// The return value is the animator controlling this animation.
+            /// </summary>
             protected readonly Func<V, float, T> AnimateToAction;
 
+            /// <summary>
+            /// The animator that is controlling the current animation.
+            /// May be <c>null</c> if no animation is running.
+            /// </summary>
             protected T Animator;
+            
+            /// <summary>
+            /// Any operations that are composited (i.e., running together) with this one.
+            /// Any entries here will be killed when this operation is killed.
+            /// <b>NOTE: This property may not necessarily be kept here.</b>
+            /// </summary>
             private IList<IOperation> CompositedOperations = new List<IOperation>();
-            public V TargetValue { get; private set; } // note: should only be set at beginning!
+            
+            /// <summary>
+            /// The target value that we're animating towards.
+            /// </summary>
+            public V TargetValue { get; private set; }
 
+            /// <summary>
+            /// Instantiates a new operation.
+            /// </summary>
+            /// <param name="animateToAction">The function that starts the animation.</param>
+            /// <param name="targetValue">The initial target value (i.e., the current value).</param>
             protected Operation(Func<V, float, T> animateToAction, V targetValue)
             {
                 AnimateToAction = animateToAction;
                 TargetValue = targetValue;
             }
 
+            /// <summary>
+            /// Kills (i.e., stops) all active animators.
+            /// </summary>
+            /// <param name="complete">Whether to stop at the current value (<c>false</c>)
+            /// or at the target (<c>true</c>)</param>
             public virtual void KillAnimator(bool complete = false)
             {
                 // Kill all old animators, including those composited with this tween
@@ -39,6 +92,11 @@ namespace SEE.Game.Operator
                 }
             }
 
+            /// <summary>
+            /// Changes the target of the animation from the current target value to <paramref name="newTarget"/>.
+            /// </summary>
+            /// <param name="newTarget">The new target value.</param>
+            /// <param name="duration">The duration of the new animation.</param>
             protected virtual void ChangeAnimatorTarget(V newTarget, float duration)
             {
                 // Usual approach: Kill old animator and replace it with new one
@@ -46,6 +104,16 @@ namespace SEE.Game.Operator
                 Animator = AnimateToAction(newTarget, duration);
             }
 
+            /// <summary>
+            /// Animate to the new <paramref name="target"/> value, taking <paramref name="duration"/> seconds.
+            /// If the target value should be set immediately (without an animation),
+            /// set the <paramref name="duration"/> to 0. 
+            /// </summary>
+            /// <param name="target">The new target value that shall be animated towards.</param>
+            /// <param name="duration">The desired length of the animation.</param>
+            /// <param name="compositedOperations">Any operations running in tandem with this one. They will
+            /// be killed once this operation is killed. Parameter may be removed in the future.</param>
+            /// <exception cref="ArgumentOutOfRangeException">If <paramref name="duration"/> is negative.</exception>
             public void AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
             {
                 if (duration < 0)
