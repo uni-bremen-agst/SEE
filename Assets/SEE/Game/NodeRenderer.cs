@@ -152,7 +152,7 @@ namespace SEE.Game
         {
             // We create a new inner node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject innerNode = CreateGameNode(node);
+            GameObject innerNode = CreateGameNode(node, false);
             gameNode.GetComponent<MeshFilter>().mesh = innerNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
