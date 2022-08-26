@@ -13,6 +13,10 @@ namespace SEE.Game.Operator
     /// movement, color changes, etc.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
+    /// <remarks>
+    /// Operator classes may also expose several "target" values, which are values the object is supposed to have. 
+    /// "Supposed" means the object might have this value already, but it also might still animate towards it.
+    /// </remarks>
     [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
@@ -133,6 +137,12 @@ namespace SEE.Game.Operator
             }
         }
 
+        /// <summary>
+        /// An <see cref="Operation{T,V}"/> which uses one or multiple <see cref="Tween"/>s as the animator.
+        /// Use this operation for any animations doable with <see cref="DOTween"/>.
+        /// Note that the type of the target value <typeparamref name="V"/> still has to be specified.
+        /// </summary>
+        /// <typeparam name="V">The type of the target value</typeparam>
         protected class TweenOperation<V> : Operation<IList<Tween>, V>
         {
             public override void KillAnimator(bool complete = false)
