@@ -4,48 +4,103 @@ using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
+    /// <summary>
+    /// A component managing operations done on the node it is attached to.
+    /// Available operations consist of the public methods exported by this class.
+    /// Operations can be animated or executed directly, by setting the duration to 0.
+    /// </summary>
     public class NodeOperator : AbstractOperator
     {
         // We split up movement on the three axes because it makes sense in certain situations.
         // For example, when dragging a node along the XZ-axis, if we want to place it on top
-        // of the node we hover over, we might want to animate this while still letting the user
-        // drag the node.
+        // of the node we hover over, we might want to animate this Y-axis movement while
+        // still letting the user drag the node.
 
+        /// <summary>
+        /// Operation handling X-axis movement.
+        /// </summary>
         private TweenOperation<float> PositionX;
+
+        /// <summary>
+        /// Operation handling Y-axis movement.
+        /// </summary>
         private TweenOperation<float> PositionY;
+
+        /// <summary>
+        /// Operation handling Z-axis movement.
+        /// </summary>
         private TweenOperation<float> PositionZ;
 
+        /// <summary>
+        /// Operation handling node scaling (specifically, localScale).
+        /// </summary>
         private TweenOperation<Vector3> Scale;
 
+        /// <summary>
+        /// If this isn't null, represents the duration in seconds the edge layout update should take,
+        /// and if this is null, the edge layout shall not be updated.
+        /// </summary>
         private float? updateEdgeLayoutDuration;
 
+        /// <summary>
+        /// The position this node is supposed to be at.
+        /// </summary>
+        /// <seealso cref="AbstractOperator"/>
         public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        
+        /// <summary>
+        /// The scale this node is supposed to be at.
+        /// </summary>
+        /// <seealso cref="AbstractOperator"/>
         public Vector3 TargetScale => Scale.TargetValue;
 
         #region Public API
 
+        /// <summary>
+        /// Moves the node to the <paramref name="newXPosition"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newXPosition">the desired new target X coordinate</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MoveXTo(float newXPosition, float duration)
         {
             PositionX.AnimateTo(newXPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
+        /// <summary>
+        /// Moves the node to the <paramref name="newYPosition"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newYPosition">the desired new target Y coordinate</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MoveYTo(float newYPosition, float duration)
         {
             PositionY.AnimateTo(newYPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
+        /// <summary>
+        /// Moves the node to the <paramref name="newZPosition"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newZPosition">the desired new target Z coordinate</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MoveZTo(float newZPosition, float duration)
         {
             PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
         }
 
+        /// <summary>
+        /// Moves the node to the <paramref name="newPosition"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newPosition">the desired new target position</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void MoveTo(Vector3 newPosition, float duration)
         {
             PositionX.AnimateTo(newPosition.x, duration);
@@ -54,12 +109,24 @@ namespace SEE.Game.Operator
             updateEdgeLayoutDuration = duration;
         }
 
+        /// <summary>
+        /// Scales the node to the given <paramref name="newScale"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newScale">the desired new target scale</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
         public void ScaleTo(Vector3 newScale, float duration)
         {
             Scale.AnimateTo(newScale, duration);
             updateEdgeLayoutDuration = duration;
         }
 
+        /// <summary>
+        /// Updates the edges attached to this node during the next <see cref="Update"/> cycle.
+        /// This involves recalculating the edge layout for each attached edge.
+        /// Note that this is already automatically done when the node is moved or scaled.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take.</param>
         public void UpdateAttachedEdges(float duration)
         {
             updateEdgeLayoutDuration = duration;
@@ -67,6 +134,11 @@ namespace SEE.Game.Operator
 
         #endregion
 
+        /// <summary>
+        /// Updates the edges attached to this node.
+        /// This involves recalculating the edge layout for each attached edge.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take.</param>
         private void UpdateEdgeLayout(float duration)
         {
             // We remember the old position and scale, and move the node to the new position and scale so that 
