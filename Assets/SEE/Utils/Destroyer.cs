@@ -25,7 +25,7 @@ namespace SEE.Utils
         {
             if (gameObject != null)
             {
-                if (gameObject.HasNodeRef() || gameObject.HasEdgeRef())
+                if (gameObject.IsNode() || gameObject.IsEdge())
                 {
                     GraphElementIDMap.Remove(gameObject);
                 }
