@@ -18,7 +18,7 @@ namespace SEE.Game.Operator
         /// Operation handling edge morphing.
         /// </summary>
         private MorphismOperation morphism;
-        
+
         /// <summary>
         /// Operation handling changes to the color gradient of the edge.
         /// </summary>
@@ -97,7 +97,9 @@ namespace SEE.Game.Operator
                 }
 
                 return Animator;
-            };
+            }
+
+            ;
 
             gameObject.MustGetComponent(out spline);
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
@@ -111,7 +113,9 @@ namespace SEE.Game.Operator
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             colors.end, d);
                 return new List<Tween> { startTween, endTween };
-            };
+            }
+
+            ;
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
         }
 
@@ -149,7 +153,7 @@ namespace SEE.Game.Operator
                 }
             }
 
-            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction, 
+            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction,
                                      BSpline targetSpline, GameObject temporaryGameObject) : base(animateToAction, (targetSpline, temporaryGameObject))
             {
             }
