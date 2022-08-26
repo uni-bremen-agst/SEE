@@ -168,7 +168,7 @@ namespace SEE.Game.Operator
                 GameObject gameEdge = GameObject.Find(edge.ID);
                 if (gameEdge == null)
                 {
-                    // FIXME: How is this possible?
+                    // TODO: How is this possible?
                     continue;
                 }
                 GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
