@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
@@ -8,7 +7,6 @@ using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
@@ -73,7 +71,7 @@ namespace SEE.Game.City
                 }
             }
         }
-        
+
         private void Update()
         {
             // Unhandled events should only be handled once the city is drawn.
@@ -95,7 +93,7 @@ namespace SEE.Game.City
             Analysis.Register(this);
             Analysis.Run();
         }
-        
+
         /// <summary>
         /// Returns a fitting color gradient from the first to the second color for the given state.
         /// </summary>
@@ -132,7 +130,7 @@ namespace SEE.Game.City
             // TODO: Make sure these actions don't interfere with reversible actions.
             // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
             // TODO: Handle these asynchronously?
-            
+
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:

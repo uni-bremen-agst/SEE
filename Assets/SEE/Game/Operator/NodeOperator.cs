@@ -50,7 +50,7 @@ namespace SEE.Game.Operator
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
         public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
-        
+
         /// <summary>
         /// The scale this node is supposed to be at.
         /// </summary>
@@ -171,6 +171,7 @@ namespace SEE.Game.Operator
                     // TODO: How is this possible?
                     continue;
                 }
+
                 GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == node ? gameObject : edge.Target.RetrieveGameNode();
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);

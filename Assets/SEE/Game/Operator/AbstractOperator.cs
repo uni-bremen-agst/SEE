@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace SEE.Game.Operator
@@ -58,14 +56,14 @@ namespace SEE.Game.Operator
             /// May be <c>null</c> if no animation is running.
             /// </summary>
             protected T Animator;
-            
+
             /// <summary>
             /// Any operations that are composited (i.e., running together) with this one.
             /// Any entries here will be killed when this operation is killed.
             /// <b>NOTE: This property may not necessarily be kept here.</b>
             /// </summary>
             private IList<IOperation> CompositedOperations = new List<IOperation>();
-            
+
             /// <summary>
             /// The target value that we're animating towards.
             /// </summary>
@@ -124,6 +122,7 @@ namespace SEE.Game.Operator
                 {
                     throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater than zero!");
                 }
+
                 if (EqualityComparer<V>.Default.Equals(target, TargetValue) && duration > 0)
                 {
                     // Nothing to be done, we're already where we want to be.
