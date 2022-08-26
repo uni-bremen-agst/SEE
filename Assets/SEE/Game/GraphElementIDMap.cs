@@ -71,7 +71,7 @@ namespace SEE.Game
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
-            Assert.IsTrue(gameObject.HasNodeRef() || gameObject.HasEdgeRef());
+            Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
             mapping.Add(gameObject.name, gameObject);
             Debug.Log($"{nameof(GraphElementIDMap)}.Add({gameObject.name}).\n");
         }
@@ -100,7 +100,7 @@ namespace SEE.Game
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
-            Assert.IsTrue(gameObject.HasNodeRef() || gameObject.HasEdgeRef());
+            Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
             mapping.Remove(gameObject.name);
             Debug.Log($"{nameof(GraphElementIDMap)}.Remove({gameObject.name}).\n");
         }
