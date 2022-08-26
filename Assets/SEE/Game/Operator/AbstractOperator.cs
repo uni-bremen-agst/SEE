@@ -18,11 +18,17 @@ namespace SEE.Game.Operator
 
         protected class Operation<T, V> : IOperation
         {
-            public Func<V, float, T> AnimateToAction { protected get; set; }
+            protected readonly Func<V, float, T> AnimateToAction;
 
             protected T Animator;
             private IList<IOperation> CompositedOperations = new List<IOperation>();
-            public V TargetValue { get; set; } // note: should only be set at beginning!
+            public V TargetValue { get; private set; } // note: should only be set at beginning!
+
+            protected Operation(Func<V, float, T> animateToAction, V targetValue)
+            {
+                AnimateToAction = animateToAction;
+                TargetValue = targetValue;
+            }
 
             public virtual void KillAnimator(bool complete = false)
             {
@@ -90,6 +96,10 @@ namespace SEE.Game.Operator
                         tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                     }
                 }
+            }
+
+            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue) : base(animateToAction, targetValue)
+            {
             }
         }
     }
