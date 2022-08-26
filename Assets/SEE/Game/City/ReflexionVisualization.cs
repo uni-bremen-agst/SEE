@@ -12,6 +12,11 @@ using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
+    /// <summary>
+    /// Component responsible for implementing the results reported by the <see cref="ReflexionAnalysis"/>
+    /// in the scene.
+    /// Must be attached to a <see cref="SEECity"/>.
+    /// </summary>
     [DisallowMultipleComponent]
     public class ReflexionVisualization : MonoBehaviour, Observer
     {
@@ -36,17 +41,10 @@ namespace SEE.Game.City
         /// </summary>
         private readonly List<ChangeEvent> Events = new List<ChangeEvent>();
 
+        /// <summary>
+        /// The graph used for the reflexion analysis.
+        /// </summary>
         private Graph CityGraph;
-
-        /// <summary>
-        /// All tweens which control edges' colors on reflexion changes.
-        /// </summary>
-        private readonly Dictionary<string, ICollection<Tween>> edgeTweens = new Dictionary<string, ICollection<Tween>>();
-        
-        /// <summary>
-        /// All tweens which control nodes' movement and scale on reflexion changes.
-        /// </summary>
-        private readonly Dictionary<string, ICollection<Tween>> nodeTweens = new Dictionary<string, ICollection<Tween>>();
 
         /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
@@ -61,6 +59,7 @@ namespace SEE.Game.City
 
         private void Start()
         {
+            // We have to set an initial color for the edges.
             foreach (Edge edge in CityGraph.Edges())
             {
                 GameObject edgeObject = GameObject.Find(edge.ID);
@@ -77,12 +76,17 @@ namespace SEE.Game.City
         
         private void Update()
         {
+            // Unhandled events should only be handled once the city is drawn.
             while (UnhandledEvents.Count > 0 && CityDrawn)
             {
                 HandleChange(UnhandledEvents.Dequeue());
             }
         }
 
+        /// <summary>
+        /// Starts the reflexion analysis from scratch, clearing any existing events.
+        /// </summary>
+        /// <param name="graph">The graph on which the reflexion analysis shall run</param>
         public void StartFromScratch(Graph graph)
         {
             CityGraph = graph;
