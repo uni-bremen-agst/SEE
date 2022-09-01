@@ -154,6 +154,10 @@ namespace SEE.Game.City
             Events.Incorporate(changeEvent);
         }
 
+        /// <summary>
+        /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="edgeChange">The event which shall be handled.</param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
             GameObject edge = GameObject.Find(edgeChange.Edge.ID);
@@ -177,6 +181,10 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Handles the given <paramref name="edgeEvent"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="edgeEvent">The event which shall be handled.</param>
         private void HandleEdgeEvent(EdgeEvent edgeEvent)
         {
             if (edgeEvent.Change == ChangeType.Addition)
@@ -190,8 +198,7 @@ namespace SEE.Game.City
                     // FIXME: Handle edge additions other than new mapping
                 }
             }
-
-            if (edgeEvent.Change == ChangeType.Removal)
+            else if (edgeEvent.Change == ChangeType.Removal)
             {
                 if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
                 {
@@ -200,6 +207,10 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Handles the given removed <paramref name="mapsToEdge"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="mapsToEdge">The edge which has been removed.</param>
         private void HandleRemovedMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
@@ -208,6 +219,10 @@ namespace SEE.Game.City
             implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
         }
 
+        /// <summary>
+        /// Handles the given new <paramref name="mapsToEdge"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="mapsToEdge">The edge which has been added.</param>
         private void HandleNewMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
@@ -232,16 +247,28 @@ namespace SEE.Game.City
             nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
         }
 
+        /// <summary>
+        /// Handles the given <paramref name="hierarchyChangeEvent"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="hierarchyChangeEvent">The event which shall be handled.</param>
         private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
         {
             // FIXME: Handle event
         }
 
+        /// <summary>
+        /// Handles the given <paramref name="nodeChangeEvent"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="nodeChangeEvent">The event which shall be handled.</param>
         private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent)
         {
             // FIXME: Handle event
         }
 
+        /// <summary>
+        /// Handles the given <paramref name="propagatedEdgeEvent"/> by modifying the scene accordingly.
+        /// </summary>
+        /// <param name="propagatedEdgeEvent">The event which shall be handled.</param>
         private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
         {
             // FIXME: Handle event

@@ -37,7 +37,7 @@ namespace SEE.Game.Operator
         /// carried out via an animator of type <typeparamref name="T"/>.
         /// The operation must be properly initialized by setting <see cref="AnimateToAction"/> as well as
         /// an initial <see cref="TargetValue"/> before calling any methods.
-        /// To then execute the operation, <see cref="AnimateTo"/> will be called, which will in turn
+        /// In order to execute the operation, the user will call <see cref="AnimateTo"/>, which will itself
         /// call <see cref="ChangeAnimatorTarget"/> to replace any active animation with the newly created one.
         /// </summary>
         /// <typeparam name="T">Type of the animator</typeparam>
