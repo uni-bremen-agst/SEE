@@ -141,7 +141,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take.</param>
         private void UpdateEdgeLayout(float duration)
         {
-            // We remember the old position and scale, and move the node to the new position and scale so that 
+            // We remember the old position and scale, and move the node to the new position and scale so that
             // edge layouts (dependent on position and scale) can be correctly calculated.
             Vector3 oldPosition = transform.position;
             transform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
@@ -164,7 +164,8 @@ namespace SEE.Game.Operator
             //       Alternatively, we can iterate over game edges instead.
             foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
-                // Add new target edge, we'll animate the current edge to it
+                // Add new target edge, we'll animate the current edge to it.
+                // FIXME: This should be replaced by GraphElementIDMap.Find(edge.ID) later on.
                 GameObject gameEdge = GameObject.Find(edge.ID);
                 if (gameEdge == null)
                 {

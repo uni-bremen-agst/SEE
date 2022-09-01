@@ -60,6 +60,7 @@ namespace SEE.Game.City
             // We have to set an initial color for the edges.
             foreach (Edge edge in CityGraph.Edges())
             {
+                // FIXME: This needs to be replaced by GraphElementIDMap.Find(edge.ID).
                 GameObject edgeObject = GameObject.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
