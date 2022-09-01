@@ -101,7 +101,7 @@ namespace SEE.Layout.EdgeLayouts
         /// </summary>
         /// <param name="start">starting point</param>
         /// <param name="end">ending point</param>
-        /// <param name="above">whether middle point of the spline should be above <paramref name="start"/>
+        /// <param name="above">whether middle point of the spline should be above <paramref name="start"/></param>
         /// <param name="minOffset">the minimal y offset for the point in between <paramref name="start"/>
         /// and <paramref name="end"/> through which the spline should pass</param>
         /// <returns>points of the spline</returns>

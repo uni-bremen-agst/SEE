@@ -25,7 +25,7 @@ namespace SEE.DataModel
         /// a change occurs.
         /// </summary>
         /// <param name="observer">observer to be unregistered</param>
-        public void Unregister(Observer observer)
+        public void Deregister(Observer observer)
         {
             observers.Remove(observer);
         }

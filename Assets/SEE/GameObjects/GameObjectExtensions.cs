@@ -383,6 +383,20 @@ namespace SEE.GO
 
         /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If a component of the type was found, it will be returned, otherwise a new component of the type
+        /// will be added and returned.
+        /// </summary>
+        /// <param name="gameObject">The gameobject whose component of type <typeparamref name="T"/>
+        /// we wish to return</param>
+        /// <typeparam name="T">The component to get / add</typeparam>
+        /// <returns>The existing or newly created component</returns>
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        {
+            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+        }
+
+        /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
         /// If the component was found, it will be stored in <paramref name="component"/>.
         /// If it wasn't found, <paramref name="component"/> will be <code>null</code> and
         /// <see cref="InvalidOperationException"/> will be thrown.
@@ -457,7 +471,7 @@ namespace SEE.GO
         /// <returns>the correponding graph node (will never be null)</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
@@ -467,17 +481,17 @@ namespace SEE.GO
                     }
                     else
                     {
-                        throw new Exception($"Node referenced by game object {gameObject.name} is null.");
+                        throw new NullReferenceException($"Node referenced by game object {gameObject.name} is null.");
                     }
                 }
                 else
                 {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null.");
+                    throw new NullReferenceException($"Node reference of game object {gameObject.name} is null.");
                 }
             }
             else
             {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef.");
+                throw new NullReferenceException($"Game object {gameObject.name} has no NodeRef.");
             }
         }
 
