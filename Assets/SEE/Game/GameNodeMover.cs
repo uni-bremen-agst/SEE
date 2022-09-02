@@ -27,6 +27,8 @@ namespace SEE.Game
         /// </summary>
         public const float SCALING_FACTOR = 0.2f;
 
+        private const float OUTER_EDGE_MARGIN = 0.03f;
+
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
         /// camera. The radius sphere of this sphere is the original distance
@@ -194,6 +196,9 @@ namespace SEE.Game
                 nodeOperator.MoveXTo(targetXZ.Value.x, 0);
                 nodeOperator.MoveZTo(targetXZ.Value.y, 0);
             }
+
+            // TODO: Disallow placing node when this evaluates to true
+            Debug.Log($"Node is in margins: {child.gameObject.IsInEdges(parent, OUTER_EDGE_MARGIN)}");
             return oldScale;
         }
 
