@@ -3,6 +3,7 @@ using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO.NodeFactories
@@ -300,7 +301,7 @@ namespace SEE.GO.NodeFactories
         /// </summary>
         /// <param name="metrics">the metric values to be put onto the spider axes</param>
         /// <returns>all <paramref name="metrics"/> but the height metric at index 1</returns>
-        protected static IEnumerable<float> AllButHeight(float[] metrics)
+        protected static IEnumerable<float> AllButHeight(IEnumerable<float> metrics)
         {
             return metrics.Where((value, index) => index != 1);
         }

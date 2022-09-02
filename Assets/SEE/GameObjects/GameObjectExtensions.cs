@@ -358,6 +358,59 @@ namespace SEE.GO
                 return gameObject.transform.lossyScale;
             }
         }
+        
+        /// <summary>
+        /// Returns true if this <paramref name="block"/> is within the edges of <paramref name="parentBlock"/>.
+        /// Note that this only checks on the XZ-plane, and ignores any height difference between the two blocks.
+        /// </summary>
+        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s edges
+        /// </param>
+        /// <param name="parentBlock">The block whose edges shall be checked</param>
+        /// <param name="outerEdgeMargin">Additional margins that should be added inward the edges</param>
+        /// <returns>True if this <paramref name="block"/> is within the edges of <paramref name="parentBlock"/>
+        /// </returns>
+        public static bool IsInEdges(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
+        {
+            // FIXME: Support node types other than cubes
+            block.MustGetComponent(out Collider collider);
+            Vector3 blockCenter = collider.bounds.center;
+            // We only care about the XZ-plane. Setting z to zero here makes it consistent with the bounds setup below.
+            Bounds blockBounds = new Bounds(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
+            parentBlock.MustGetComponent(out Collider parentCollider);
+            Bounds parentBlockBounds = parentCollider.bounds;
+
+            Vector2 topRight = parentBlockBounds.max.XZ();
+            Vector2 bottomLeft = parentBlockBounds.min.XZ();
+            Vector2 topLeft = topRight.WithXY(x: bottomLeft.x);
+            Vector2 bottomRight = topRight.WithXY(y: bottomLeft.y);
+
+            // These represent the outer edge regions of the parent block with the margins applied.
+            Bounds left = new Bounds(bottomLeft, Vector3.zero);
+            left.Encapsulate(topLeft.WithXY(x: topLeft.x + outerEdgeMargin));
+            if (left.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds right = new Bounds(bottomRight, Vector3.zero);
+            right.Encapsulate(topRight.WithXY(x: topRight.x - outerEdgeMargin));
+            if (right.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds bottom = new Bounds(bottomLeft, Vector3.zero);
+            bottom.Encapsulate(bottomRight.WithXY(y: bottomRight.y + outerEdgeMargin));
+            if (bottom.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds top = new Bounds(topLeft, Vector3.zero);
+            top.Encapsulate(topRight.WithXY(y: topRight.y - outerEdgeMargin));
+            return top.Intersects(blockBounds);
+        }
+
 
         /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.

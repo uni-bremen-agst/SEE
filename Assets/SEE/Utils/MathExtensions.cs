@@ -331,6 +331,20 @@ namespace SEE.Utils
         {
             return new Vector3(x ?? vector3.x, y ?? vector3.y, z ?? vector3.z);
         }
+        
+        /// <summary>
+        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
+        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
+        /// If no parameter are given, this method will be equivalent to the identity function.
+        /// </summary>
+        /// <param name="vector2">The vector whose components shall be replaced</param>
+        /// <param name="x">New X component</param>
+        /// <param name="y">New Y component</param>
+        /// <returns></returns>
+        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
+        {
+            return new Vector2(x ?? vector2.x, y ?? vector2.y);
+        }
 
         /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a
