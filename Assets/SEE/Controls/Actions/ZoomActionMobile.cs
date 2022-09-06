@@ -97,9 +97,7 @@ namespace SEE.Controls.Actions
             zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomModifier, ZoomState.DefaultZoomDuration);
 
             UpdateZoomState(cityRootNodeFirstTouch, zoomState);
-
         }
-
     }
 }
 
