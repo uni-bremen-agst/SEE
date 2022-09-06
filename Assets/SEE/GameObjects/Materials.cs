@@ -12,7 +12,7 @@ namespace SEE.GO
     /// reduce the number of drawing calls. The material does not have
     /// any reflexions to save computation run-time.
     /// </summary>
-    internal class Materials
+    public class Materials
     {
         /// <summary>
         /// Different types of shaders used to draw the materials.
@@ -20,31 +20,27 @@ namespace SEE.GO
         public enum ShaderType
         {
             Opaque,          // fully drawn with no transparency
-            Transparent,     // transparency is available
             TransparentLine, // for lines with transparency
-            Invisible        // the object will be invisible
         }
 
-        // Normal materials
-        public const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
-        public const string TransparentMaterialName = "Materials/TransparentPortalMaterial";
-        public const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
-        public const string InvisibleMaterialName = "Materials/InvisibleMaterial";
+        /// <summary>
+        /// Name of the material for opaque objects (located in folder Resources).
+        /// </summary>
+        private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        /// <summary>
+        /// Name of the material for transparent lines (located in folder Resources).
+        /// </summary>
+        private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
 
-        // MRTK variants
-        public const string MRTKOpaqueMaterialName = "Materials/OpaqueMRTKMaterial";
-        public const string MRTKTransparentMaterialName = "Materials/TransparentMRTKMaterial";
-        public const string MRTKTransparentLineMaterialName = "Materials/TransparentLineMRTKMaterial";
-        public const string MRTKInvisibleMaterialName = "Materials/InvisibleMRTKMaterial";
-
-        // Special materials
-        public const string TransparentMeshParticleSystemMaterialName = "Materials/TransparentMeshParticleMaterial";
-        public const string MeshParticleSystemMaterialName = "Materials/MeshParticleMaterial";
+        /// <summary>
+        /// The id of the shader property for the texture.
+        /// </summary>
+        private static readonly int TexturePropertyID = Shader.PropertyToID("_Texture");
 
         /// <summary>
         /// The type of the shaders of this material instance.
         /// </summary>
-        public readonly ShaderType Type;
+        private readonly ShaderType shaderType;
 
         /// <summary>
         /// The number of different colors and, thus, the number of
@@ -55,12 +51,17 @@ namespace SEE.GO
         /// <summary>
         /// The color at the lower end of the color spectrum.
         /// </summary>
-        public readonly Color Lower;
+        private readonly Color lowerColor;
 
         /// <summary>
         /// The color at the higher end of the color spectrum.
         /// </summary>
-        public readonly Color Higher;
+        private readonly Color higherColor;
+
+        /// <summary>
+        /// Texture to be added to the material; can be null in which case no texture is added.
+        /// </summary>
+        private readonly Texture texture;
 
         /// <summary>
         /// The different materials. They depend upon two aspects:
@@ -84,15 +85,17 @@ namespace SEE.GO
         /// </summary>
         /// <param name="shaderType">shader type to be used to draw the new materials</param>
         /// <param name="colorRange">the color range for the new materials</param>
-        public Materials(ShaderType shaderType, ColorRange colorRange)
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
+        public Materials(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
         {
-            Type = shaderType;
+            this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");
             NumberOfMaterials = colorRange.NumberOfColors;
-            Lower = colorRange.lower;
-            Higher = colorRange.upper;
+            lowerColor = colorRange.Lower;
+            higherColor = colorRange.Upper;
+            this.texture = texture;
             // materials[0] is set up with the given colorRange for the render-queue offset 0.
-            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.lower, colorRange.upper, 0) };
+            materials = new List<Material[]>() { Init(shaderType, colorRange.NumberOfColors, colorRange.Lower, colorRange.Upper, texture, 0) };
         }
 
         /// <summary>
@@ -104,14 +107,15 @@ namespace SEE.GO
         /// <param name="numberOfColors">the number of materials with different colors to be created</param>
         /// <param name="lower">the color at the lower end of the color spectrum</param>
         /// <param name="higher">the color at the higher end of the color spectrum</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
         /// <returns>materials</returns>
-        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, int renderQueueOffset)
+        private static Material[] Init(ShaderType shaderType, uint numberOfColors, Color lower, Color higher, Texture texture, int renderQueueOffset)
         {
             Material[] result = new Material[numberOfColors];
             if (numberOfColors == 1)
             {
-                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), renderQueueOffset);
+                result[0] = New(shaderType, Color.Lerp(lower, higher, 0.5f), texture, renderQueueOffset);
             }
             else
             {
@@ -119,7 +123,7 @@ namespace SEE.GO
                 for (int i = 0; i < result.Length; i++)
                 {
                     Color color = Color.Lerp(lower, higher, (float)i / (float)(numberOfColors - 1));
-                    result[i] = New(shaderType, color, renderQueueOffset);
+                    result[i] = New(shaderType, color, texture, renderQueueOffset);
                 }
             }
             return result;
@@ -152,7 +156,7 @@ namespace SEE.GO
                 // there are no materials for this renderQueueOffset; we need to create these first
                 for (int i = materials.Count; i <= renderQueueOffset; i++)
                 {
-                    materials.Add(Init(Type, NumberOfMaterials, Lower, Higher, i));
+                    materials.Add(Init(shaderType, NumberOfMaterials, lowerColor, higherColor, texture, i));
                 }
             }
             return materials[renderQueueOffset][index];
@@ -166,9 +170,93 @@ namespace SEE.GO
         /// <param name="renderer">renderer whose shared material is to be set</param>
         /// <param name="renderQueueOffset">the offset in the render queue</param>
         /// <param name="index">the index of the material</param>
-        public void SetSharedMaterial(Renderer renderer, int renderQueueOffset, int index)
+        public void SetSharedMaterial(Renderer renderer, int index)
         {
-            renderer.sharedMaterial = Get(renderQueueOffset, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
+            renderer.sharedMaterial = Get(0, Mathf.Clamp(index, 0, (int)NumberOfMaterials - 1));
+        }
+
+        /// <summary>
+        /// Adds a texture to <paramref name="material"/>.
+        /// </summary>
+        /// <param name="material">material to which a texture should be added</param>
+        private static void AddTexture(Material material)
+        {
+            if (material.HasProperty(TexturePropertyID))
+            {
+                if (false)
+                {
+                    material.SetTexture(TexturePropertyID, NewTexture());
+                }
+                else
+                {
+                    const string TextureName = "Textures/TestTexture";
+                    Texture texture = Resources.Load<Texture>(TextureName);
+                    if (texture == null)
+                    {
+                        Debug.LogError($"No such texture {TextureName}\n");
+                    }
+                    else
+                    {
+                        //Debug.Log($"_Texture: {texture.name}\n");
+                        material.SetTexture(TexturePropertyID, texture);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds <paramref name="texture"/> to <paramref name="material"/> as <see cref="TexturePropertyName"/>
+        /// if <paramref name="material"/> has this property. If not, nothing happens. Likewise, if <paramref name="texture"/>
+        /// is null, nothing happens.
+        /// </summary>
+        /// <param name="material">material to which a texture should be added</param>
+        /// <param name="texture">texture to be added; can be null</param>
+        private static void AddTexture(Material material, Texture texture)
+        {
+            if (texture != null && material.HasProperty(TexturePropertyID))
+            {
+                material.SetTexture(TexturePropertyID, texture);
+            }
+        }
+
+        /// <summary>
+        /// Creates and returns a new texture.
+        /// Note: This method is currently used only to demonstrate on how to
+        /// create a texture.
+        /// </summary>
+        /// <returns>a new texture</returns>
+        private static Texture NewTexture()
+        {
+            Texture2D result = new Texture2D(512, 512);
+
+            Color visible = new Color(1, 1, 1, 1);
+            Color invisible = new Color(0, 0, 0, 0);
+
+            for (int x = 0; x < result.width; x++)
+            {
+                for (int y = 0; y < result.height; y++)
+                {
+                    if (y % 5 == 0)
+                    {
+                        result.SetPixel(x, y, invisible);
+                    }
+                    else
+                    {
+                        result.SetPixel(x, y, visible);
+                    }
+                }
+            }
+            result.Apply();
+            // SaveTexture(result);
+            return result;
+
+            static void SaveTexture(Texture2D result)
+            {
+                byte[] bytes = result.EncodeToPNG();
+                string path = Application.dataPath + "/Resources/Textures/TestTexture.png";
+                System.IO.File.WriteAllBytes(path, bytes);
+                Debug.Log($"Texture written to {path}.\n");
+            }
         }
 
         /// <summary>
@@ -176,9 +264,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="name">the name of the file for the material; must be located in a resources folder</param>
         /// <param name="color">the color of the new material</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the new material in the render queue</param>
         /// <returns>new material</returns>
-        public static Material New(string name, Color color, int renderQueueOffset = 0)
+        private static Material New(string name, Color color, Texture texture, int renderQueueOffset)
         {
             Material prefab = Resources.Load<Material>(name);
             Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
@@ -187,6 +276,8 @@ namespace SEE.GO
                 renderQueue = prefab.renderQueue + renderQueueOffset,
                 color = color
             };
+
+            AddTexture(material, texture);
             return material;
         }
 
@@ -198,51 +289,27 @@ namespace SEE.GO
         /// <param name="shaderType">the type of the shader to be used to create the
         /// material</param>
         /// <param name="color">requested color of the new material</param>
+        /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
         /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <param name="forHoloLens">whether materials suitable for the HoloLens should be used</param>
         /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, Color color, int renderQueueOffset = 0, bool forHoloLens = false)
+        public static Material New(ShaderType shaderType, Color color, Texture texture = null, int renderQueueOffset = 0)
         {
             string name = null;
 
-            // When the user is on a HoloLens, the special MRTK shader variants should be used
-            if (forHoloLens)
+            switch (shaderType)
             {
-                switch (shaderType)
-                {
-                    case ShaderType.Opaque: name = MRTKOpaqueMaterialName; break;
-                    case ShaderType.Transparent: name = MRTKTransparentMaterialName; break;
-                    case ShaderType.TransparentLine: name = MRTKTransparentLineMaterialName; break;
-                    case ShaderType.Invisible: name = MRTKInvisibleMaterialName; break;
-                    default: Assertions.InvalidCodePath(); break;
-                }
+                case ShaderType.Opaque:
+                    name = OpaqueMaterialName;
+                    break;
+                case ShaderType.TransparentLine:
+                    name = TransparentLineMaterialName;
+                    break;
+                default:
+                    Assertions.InvalidCodePath();
+                    break;
             }
-            else
-            {
-                switch (shaderType)
-                {
-                    case ShaderType.Opaque: name = OpaqueMaterialName; break;
-                    case ShaderType.Transparent: name = TransparentMaterialName; break;
-                    case ShaderType.TransparentLine: name = TransparentLineMaterialName; break;
-                    case ShaderType.Invisible: name = InvisibleMaterialName; break;
-                    default: Assertions.InvalidCodePath(); break;
-                }
-            }
-            return New(name, color, renderQueueOffset);
-        }
 
-        /// <summary>
-        /// Creates and returns a new material of given <paramref name="shaderType"/> and
-        /// <paramref name="color"/>. This material will be unique and not reused by this
-        /// class!
-        /// </summary>
-        /// <param name="shaderType">the type of the shader to be used to create the
-        /// material</param>
-        /// <param name="renderQueueOffset">the offset of the render queue</param>
-        /// <returns>new material</returns>
-        public static Material New(ShaderType shaderType, int renderQueueOffset = 0)
-        {
-            return New(shaderType, Color.white, renderQueueOffset);
+            return New(name, color, texture, renderQueueOffset);
         }
     }
 }

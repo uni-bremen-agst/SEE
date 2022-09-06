@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.18373182, g: 0.22818229, b: 0.2991498, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -603,6 +603,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -800,6 +801,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 224134273}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -840,6 +842,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 224134273}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -880,6 +883,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 224134273}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -920,6 +924,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 224134273}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1011,6 +1016,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1258,6 +1264,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1328,6 +1335,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1398,6 +1406,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1502,6 +1511,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1603,6 +1613,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1643,6 +1654,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1722,6 +1734,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1801,6 +1814,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1880,6 +1894,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1946,9 +1961,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   salsaInstance: {fileID: 580689207}
   bufferSize: 512
-  silenceThreshold: 0.7
+  silenceThreshold: 0.9
   timingStartPoint: 0.4
-  timingEndVariance: 1
+  timingEndVariance: 0.8
   silenceSampleWeight: 0.9
   silenceHits: 0
   salsaCanAnalyzeAudio: 1

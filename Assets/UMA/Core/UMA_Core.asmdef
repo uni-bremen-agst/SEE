@@ -4,7 +4,9 @@
         "Unity.Timeline",
         "Unity.ResourceManager",
         "Unity.Addressables",
-        "Addressable_Editor"
+        "Addressable_Editor",
+        "UnityEngine.UI",
+        "UnityEditor.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

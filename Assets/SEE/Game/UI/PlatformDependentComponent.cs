@@ -1,8 +1,9 @@
-﻿using OdinSerializer.Utilities;
+﻿using Sirenix.Serialization.Utilities;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using Sirenix.Utilities;
 
 namespace SEE.Game.UI
 {
@@ -17,6 +18,18 @@ namespace SEE.Game.UI
     /// </summary>
     public abstract class PlatformDependentComponent: MonoBehaviour
     {
+        /// <summary>
+        /// Name of the canvas on which UI elements are placed.
+        /// </summary>
+        private const string UI_CANVAS_NAME = "UI Canvas";
+
+        /// <summary>
+        /// Path to where the UI Canvas prefab is stored.
+        /// This prefab should contain all components necessary for the UI canvas, such as an event system,
+        /// a graphic raycaster, etc.
+        /// </summary>
+        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
+
         /// <summary>
         /// The canvas on which UI elements are placed.
         /// This GameObject must be named <see cref="CanvasUtils.UI_CANVAS_NAME"/>.
@@ -47,10 +60,6 @@ namespace SEE.Game.UI
         /// </summary>
         protected virtual void StartVR() => PlatformUnsupported();
         /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the HoloLens platform.
-        /// </summary>
-        protected virtual void StartHoloLens() => PlatformUnsupported();
-        /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Mobile platform.
         /// </summary>
         protected virtual void StartMobile() => PlatformUnsupported();
@@ -68,11 +77,6 @@ namespace SEE.Game.UI
         /// Called when the <see cref="Update()"/> method of this component is executed on the VR platform.
         /// </summary>
         protected virtual void UpdateVR() { }
-
-        /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the HoloLens platform.
-        /// </summary>
-        protected virtual void UpdateHoloLens() { }
 
         /// <summary>
         /// Called when the <see cref="Update()"/> method of this component is executed on the Mobile platform.
@@ -99,10 +103,6 @@ namespace SEE.Game.UI
                     StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
-                case PlayerInputType.HoloLensPlayer:
-                    StartHoloLens();
-                    //TODO: Convert to MRTK Canvas and add NearInteractionTouchableUnityUI, as recommended
-                    break;
                 case PlayerInputType.MobilePlayer:
                     StartMobile();
                     break;
@@ -125,9 +125,6 @@ namespace SEE.Game.UI
                     break;
                 case PlayerInputType.VRPlayer:
                     UpdateVR();
-                    break;
-                case PlayerInputType.HoloLensPlayer:
-                    UpdateHoloLens();
                     break;
                 case PlayerInputType.MobilePlayer:
                     UpdateMobile();

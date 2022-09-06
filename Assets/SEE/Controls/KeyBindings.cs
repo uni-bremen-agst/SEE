@@ -15,7 +15,7 @@ namespace SEE.Controls
         // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
         // (3) The digits 0-9 are reserved for shortcuts for the player menu.
 
-        /// <summary>        
+        /// <summary>
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
         private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
@@ -30,6 +30,7 @@ namespace SEE.Controls
             Architecture,  // use case architecture; related to architecture mapping and analysis
             Browsing,      // browsing a code city (panning, zooming, etc.)
             CameraPaths,   // recording a camera (player) path
+            Chat,          // text chatting with other remote players
             CodeViewer,    // source-code viewer
             Debugging,     // use case debugging
             Evolution,     // use case evolution; observing the series of revisions of a city
@@ -38,7 +39,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Registers the given <paramref name="keyCode"/> for the given <paramref name="scope"/> 
+        /// Registers the given <paramref name="keyCode"/> for the given <paramref name="scope"/>
         /// and the <paramref name="helpMessage"/>. If a <paramref name="keyCode"/> is already registered,
         /// an error message will be emitted.
         /// </summary>
@@ -115,12 +116,12 @@ namespace SEE.Controls
         /// <summary>
         /// Saves the current position when recording paths.
         /// </summary>
-        internal static readonly KeyCode SavePathPosition = Register(KeyCode.P, Scope.CameraPaths, "Saves the current position when recording paths.");
+        internal static readonly KeyCode SavePathPosition = Register(KeyCode.F11, Scope.CameraPaths, "Saves the current position when recording paths.");
 
         /// <summary>
         /// Starts/stops the automated path replay.
         /// </summary>
-        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F3, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
+        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F12, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
 
         //-----------------------------------------------------
         // Metric charts
@@ -198,14 +199,18 @@ namespace SEE.Controls
         /// Toggles between the locked and free camera mode.
         /// </summary>
         internal static readonly KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
+        /// <summary>
+        /// Toggles between pointing.
+        /// </summary>
+        internal static readonly KeyCode Pointing = Register(KeyCode.P, Scope.Browsing, "Toggles between Pointing.");
 
         //-----------------------------------------------------
         // Player (camera) movements.
         //-----------------------------------------------------
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
-        /// </summary>        
-        internal static readonly KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
+        /// </summary>
+        internal static readonly KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Movement, "Boosts the speed of the player movement. While pressed, movement is faster.");
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
@@ -232,7 +237,7 @@ namespace SEE.Controls
         internal static readonly KeyCode MoveDown = Register(KeyCode.E, Scope.Movement, "Move down.");
 
         //--------------------------
-        // Evolution 
+        // Evolution
         //--------------------------
 
         /// <summary>
@@ -273,7 +278,7 @@ namespace SEE.Controls
         internal static readonly KeyCode DecreaseAnimationSpeed = Register(KeyCode.DownArrow, Scope.Animation, "Halves animation speed.");
 
         //--------------------------
-        // Debugging 
+        // Debugging
         //--------------------------
 
         /// <summary>
@@ -311,9 +316,42 @@ namespace SEE.Controls
         internal static readonly KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
 
         /// <summary>
-        /// Toggles the source-code viewer.
+        /// Undoes an edit in the source-code viewer.
         /// </summary>
-        [Obsolete("This keybinding is needed only for the video trailer and will soon disappear again.")]
-        internal static readonly KeyCode ShowCodeWindow = Register(KeyCode.F2, Scope.CodeViewer, "Toggles the source-code viewer.");
+        internal static readonly KeyCode CodeWindowUndo = Register(KeyCode.F5, Scope.CodeViewer, "Undoes an edit in the source-code viewer.");
+
+        /// <summary>
+        /// Redoes an undone edit in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowRedo = Register(KeyCode.F6, Scope.CodeViewer, "Redoes an undone edit in the source-code viewer.");
+
+        /// <summary>
+        /// Saves the content of the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowSave = Register(KeyCode.F7, Scope.CodeViewer, "Saves the content of the source-code viewer.");
+
+        /// <summary>
+        /// Refreshes syntax highlighting in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode RefreshSyntaxHighlighting = Register(KeyCode.F8, Scope.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
+
+        //-----------------------------------------------------
+        // Text chat to communicate with other remote players
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the global chat room.
+        /// </summary>
+        internal static readonly KeyCode ToggleGlobalChat = Register(KeyCode.F2, Scope.Chat, "Toggles the global chat room.");
+
+        /// <summary>
+        /// Toggles the chat room for team 1.
+        /// </summary>
+        internal static readonly KeyCode ToggleTeam1Channel = Register(KeyCode.F3, Scope.Chat, "Toggles the chat room for team 1.");
+
+        /// <summary>
+        /// Toggles the chat room for team 2.
+        /// </summary>
+        internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
     }
 }

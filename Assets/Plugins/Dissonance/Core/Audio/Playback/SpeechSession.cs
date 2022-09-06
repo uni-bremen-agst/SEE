@@ -8,10 +8,10 @@ namespace Dissonance.Audio.Playback
     /// <summary>
     ///     Represents a decoder pipeline for a single playback session.
     /// </summary>
-    public struct SpeechSession
+    public readonly struct SpeechSession
     {
         #region fields and properties
-        private static readonly Log Log = Logs.Create(LogCategory.Playback, typeof(SpeechSession).Name);
+        private static readonly Log Log = Logs.Create(LogCategory.Playback, nameof(SpeechSession));
 
         private static readonly float[] DesyncFixBuffer = new float[1024];
         private const float MinimumDelayFactor = 1.5f;
@@ -140,6 +140,15 @@ namespace Dissonance.Audio.Playback
         public bool Read(ArraySegment<float> samples)
         {
             return _pipeline.Read(samples);
+        }
+
+        /// <summary>
+        /// Override automatic output sample rate determination and set it to a fixed value
+        /// </summary>
+        /// <param name="rate"></param>
+        public void SetOutputSampleRate(int? rate)
+        {
+            _pipeline.SetOutputSampleRate(rate);
         }
     }
 }

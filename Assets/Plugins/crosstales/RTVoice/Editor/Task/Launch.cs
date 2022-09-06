@@ -9,15 +9,15 @@ namespace Crosstales.RTVoice.EditorTask
    {
       public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
       {
-         if (Enumerable.Any(importedAssets, str => str.Contains(EditorUtil.EditorConstants.ASSET_UID.ToString())))
+         if (Enumerable.Any(importedAssets, str => str.Contains(Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_UID.ToString())))
          {
-            Common.EditorTask.SetupResources.Setup();
+            Crosstales.Common.EditorTask.SetupResources.Setup();
             SetupResources.Setup();
 
-            EditorIntegration.ConfigWindow.ShowWindow(4);
+            Crosstales.RTVoice.EditorIntegration.ConfigWindow.ShowWindow(4);
          }
       }
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

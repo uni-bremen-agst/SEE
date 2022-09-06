@@ -31,10 +31,11 @@
 	public class PlayerManager : MonoBehaviour
 	{
 		public GameObject playerPrefab;
-		
+
 		const int maxPlayers = 4;
 
-		List<Vector3> playerPositions = new List<Vector3>() {
+		List<Vector3> playerPositions = new List<Vector3>()
+		{
 			new Vector3( -1, 1, -10 ),
 			new Vector3( 1, 1, -10 ),
 			new Vector3( -1, -1, -10 ),
@@ -42,7 +43,6 @@
 		};
 
 		List<Player> players = new List<Player>( maxPlayers );
-
 
 
 		void Start()

@@ -5,7 +5,7 @@ using UnityEditor;
 namespace Crosstales.RTVoice.EditorUtil
 {
    /// <summary>Editor helper class.</summary>
-   public abstract class EditorHelper : Common.EditorUtil.BaseEditorHelper
+   public abstract class EditorHelper : Crosstales.Common.EditorUtil.BaseEditorHelper
    {
       #region Static variables
 
@@ -94,13 +94,13 @@ namespace Crosstales.RTVoice.EditorUtil
       {
          EditorGUILayout.HelpBox("RT-Voice not available!", MessageType.Warning);
 
-         EditorGUILayout.HelpBox($"Did you add the '{Util.Constants.RTVOICE_SCENE_OBJECT_NAME}'-prefab to the scene?", MessageType.Info);
+         EditorGUILayout.HelpBox($"Did you add the '{Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME}'-prefab to the scene?", MessageType.Info);
 
          GUILayout.Space(8);
 
-         if (GUILayout.Button(new GUIContent($"Add {Util.Constants.RTVOICE_SCENE_OBJECT_NAME}", Icon_Plus, $"Add the '{Util.Constants.RTVOICE_SCENE_OBJECT_NAME}'-prefab to the current scene.")))
+         if (GUILayout.Button(new GUIContent($"Add {Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME}", Icon_Plus, $"Add the '{Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME}'-prefab to the current scene.")))
          {
-            InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
+            InstantiatePrefab(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
          }
       }
 
@@ -109,17 +109,17 @@ namespace Crosstales.RTVoice.EditorUtil
       {
          if (isRTVoiceInScene)
          {
-            if (Speaker.Instance.isPlatformSupported && !Speaker.Instance.isWorkingInPlaymode)
+            if (Crosstales.RTVoice.Speaker.Instance.isPlatformSupported && !Crosstales.RTVoice.Speaker.Instance.isWorkingInPlaymode)
             {
                EditorGUILayout.HelpBox("The current TTS only works in builds!", MessageType.Error);
             }
-            else if (!Speaker.Instance.isPlatformSupported)
+            else if (!Crosstales.RTVoice.Speaker.Instance.isPlatformSupported)
             {
                EditorGUILayout.HelpBox("The current platform is not supported by the active voice provider. Please use MaryTTS or a custom provider (e.g. Klattersynth).", MessageType.Error);
             }
             else
             {
-               if (Speaker.Instance.hasVoicesInEditor)
+               if (Crosstales.RTVoice.Speaker.Instance.hasVoicesInEditor)
                   EditorGUILayout.HelpBox("TTS with the current settings is not possible!", MessageType.Error);
             }
          }
@@ -127,13 +127,13 @@ namespace Crosstales.RTVoice.EditorUtil
          {
             EditorGUILayout.HelpBox("Could not load voices!", MessageType.Warning);
 
-            EditorGUILayout.HelpBox("Did you add the '" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene?", MessageType.Info);
+            EditorGUILayout.HelpBox("Did you add the '" + Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the scene?", MessageType.Info);
 
             GUILayout.Space(8);
 
-            if (GUILayout.Button(new GUIContent(" Add RTVoice", Icon_Plus, "Add the '" + Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the current scene.")))
+            if (GUILayout.Button(new GUIContent(" Add RTVoice", Icon_Plus, "Add the '" + Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME + "'-prefab to the current scene.")))
             {
-               InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
+               InstantiatePrefab(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
             }
          }
       }
@@ -142,22 +142,22 @@ namespace Crosstales.RTVoice.EditorUtil
       /// <param name="prefabName">Name of the prefab.</param>
       public static void InstantiatePrefab(string prefabName)
       {
-         InstantiatePrefab(prefabName, EditorConfig.PREFAB_PATH);
+         InstantiatePrefab(prefabName, Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_PATH);
       }
 
       /// <summary>Checks if the "RTVoice"-prefab is in the scene.</summary>
       /// <returns>True if the "RTVoice"-prefab is in the scene.</returns>
-      public static bool isRTVoiceInScene => GameObject.FindObjectOfType(typeof(Speaker)) != null; //GameObject.Find(Util.Constants.RTVOICE_SCENE_OBJECT_NAME) != null;
+      public static bool isRTVoiceInScene => GameObject.FindObjectOfType(typeof(Crosstales.RTVoice.Speaker)) != null; //GameObject.Find(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME) != null;
 
       /// <summary>Checks if the "GlobalCache"-prefab is in the scene.</summary>
       /// <returns>True if the "GlobalCache"-prefab is in the scene.</returns>
-      public static bool isGlobalCacheInScene => GameObject.FindObjectOfType(typeof(GlobalCache)) != null; //GameObject.Find(Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME) != null;
+      public static bool isGlobalCacheInScene => GameObject.FindObjectOfType(typeof(Crosstales.RTVoice.GlobalCache)) != null; //GameObject.Find(Crosstales.RTVoice.Util.Constants.GLOBALCACHE_SCENE_OBJECT_NAME) != null;
 
       /// <summary>Shows a banner for "Online Check".</summary>
       public static void BannerOC()
       {
 #if !CT_OC
-         if (Util.Constants.SHOW_OC_BANNER)
+         if (Crosstales.RTVoice.Util.Constants.SHOW_OC_BANNER)
          {
             GUILayout.BeginHorizontal();
             {
@@ -168,7 +168,7 @@ namespace Crosstales.RTVoice.EditorUtil
                   GUILayout.Space(4);
 
                   if (GUILayout.Button(new GUIContent(string.Empty, Logo_Asset_OC, "Visit Online Check in the Unity AssetStore")))
-                     Util.Helper.OpenURL(Util.Constants.ASSET_OC);
+                     Crosstales.Common.Util.NetworkHelper.OpenURL(Crosstales.RTVoice.Util.Constants.ASSET_OC);
                }
                GUILayout.EndVertical();
             }
@@ -186,15 +186,13 @@ namespace Crosstales.RTVoice.EditorUtil
          if (logo == null)
          {
 #if CT_DEVELOP
-            logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets" + EditorConfig.ASSET_PATH + "Icons/" + fileName, typeof(Texture2D));
+            logo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets" + Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH + "Icons/" + fileName, typeof(Texture2D));
 #else
-                logo = (Texture2D)EditorGUIUtility.Load("crosstales/RTVoice/" + fileName);
+            logo = (Texture2D)EditorGUIUtility.Load("crosstales/RTVoice/" + fileName);
 #endif
 
             if (logo == null)
-            {
                Debug.LogWarning("Image not found: " + fileName);
-            }
          }
 
          return logo;
@@ -204,4 +202,4 @@ namespace Crosstales.RTVoice.EditorUtil
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

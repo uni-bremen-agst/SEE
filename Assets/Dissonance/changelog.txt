@@ -1,5 +1,23 @@
 # Release Notes
 
+## v8.1.0 (2022-04-29)
+
+**Features**
+ - New FMOD Recording Integration - significantly reduce audio recording latency!
+ - New FMOD Playback Integration - bypass the Unity audio engine and play voice through FMOD!
+ - Marked custom inspector as child inspectors so that scripts derived from Dissonance scripts will have the correct inspector.
+
+**Bugfixes**
+ - Fixed VoicePlayback editor not saving changes in some circumstances.
+ - Fixed VoiceBroadcastTrigger collider fader to apply properly when exiting the collider volume.
+
+## v8.0.4 (2022-01-05)
+
+**bugfixes**
+ - Fixed possible exception in audio debugger on some platforms caused by missing permissions.
+ - Replaced a confusing log message about 'active sessions'.
+ - Slightly reduced overhead of AudioClip generation.
+
 ## v8.0.3 (2021-10-27)
 
 **bugfixes**

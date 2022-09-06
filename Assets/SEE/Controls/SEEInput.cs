@@ -107,6 +107,88 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Un-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowUndo()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+               return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
+            }
+            else
+            {
+                return false;
+            }
+#else
+            // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowUndo) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Re-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowRedo()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+            }
+            return false;
+#else
+            //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowRedo) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Saves the changes made in an active code window
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool SaveCodeWindow()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
+            }
+            else
+            {
+                return false;
+            }
+#else
+            // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowSave) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Recalculates the Syntaxhighliting
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ReCalculateSyntaxHighlighting()
+        {
+#if UNITY_EDITOR == false
+           // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
+            }
+            return false;
+#else
+            // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
+            return Input.GetKeyDown(KeyBindings.RefreshSyntaxHighlighting) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
         /// Whether the left or right shift key was pressed down (and not again released).
         /// </summary>
         private static bool isModPressed = false;
@@ -379,6 +461,15 @@ namespace SEE.Controls
                 || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
         }
 
+        /// <summary>
+        /// True if the user wishes to point.
+        /// </summary>
+        /// <returns>true if the user wishes to point</returns>
+        public static bool TogglePointing()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Pointing);
+        }
+
         //--------------------------
         // Evolution
         //--------------------------
@@ -538,6 +629,37 @@ namespace SEE.Controls
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        //----------------------------------------------------
+        // Chat
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to toggle the global text chat.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleGlobalChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleGlobalChat);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 1.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam1Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam1Channel);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 2.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam2Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
         }
     }
 }

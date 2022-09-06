@@ -34,10 +34,10 @@ namespace Crosstales.RTVoice.EditorTask
       {
          if (currentScene != EditorSceneManager.GetActiveScene())
          {
-            if (EditorUtil.EditorConfig.PREFAB_AUTOLOAD)
+            if (Crosstales.RTVoice.EditorUtil.EditorConfig.PREFAB_AUTOLOAD)
             {
-               if (!EditorUtil.EditorHelper.isRTVoiceInScene)
-                  EditorUtil.EditorHelper.InstantiatePrefab(Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
+               if (!Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
+                  Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab(Crosstales.RTVoice.Util.Constants.RTVOICE_SCENE_OBJECT_NAME);
             }
 
             currentScene = EditorSceneManager.GetActiveScene();
@@ -48,4 +48,4 @@ namespace Crosstales.RTVoice.EditorTask
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

@@ -24,6 +24,7 @@ namespace Dissonance
         /// <summary>
         /// Get or set if this comms trigger should use a unity collider trigger volume.
         /// </summary>
+        /// Marked Obsolete: 2017-11-08
         [Obsolete("Replaced with UseColliderTrigger")]
         public bool UseTrigger
         {
@@ -32,7 +33,7 @@ namespace Dissonance
         }
 
         /// <summary>
-        /// Get or set if this comms trigger can currently be activated.
+        /// Get if this comms trigger can currently be activated.
         /// Override to serialise the value and to implement custom logic to disable the trigger.
         /// </summary>
         public abstract bool CanTrigger { get; }
@@ -210,7 +211,7 @@ namespace Dissonance
 
         [UsedImplicitly] private void OnTriggerEnter2D([NotNull] Collider2D other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             if (ColliderTriggerFilter2D(other) && !_entitiesInCollider.Contains(other.gameObject))
             {   
@@ -221,7 +222,7 @@ namespace Dissonance
 
         [UsedImplicitly] private void OnTriggerExit2D([NotNull] Collider2D other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             if (_entitiesInCollider.Remove(other.gameObject))
                 Log.Debug("Collider2D exited ({0})", _entitiesInCollider.Count);
@@ -229,7 +230,7 @@ namespace Dissonance
 
         [UsedImplicitly] private void OnTriggerEnter([NotNull] Collider other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             if (ColliderTriggerFilter(other) && !_entitiesInCollider.Contains(other.gameObject))
             {   
@@ -240,7 +241,7 @@ namespace Dissonance
 
         [UsedImplicitly] private void OnTriggerExit([NotNull] Collider other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             if (_entitiesInCollider.Remove(other.gameObject))
                 Log.Debug("Collider exited ({0})", _entitiesInCollider.Count);
@@ -254,7 +255,7 @@ namespace Dissonance
         /// <returns>true if this entity should affect the trigger, otherwise false</returns>
         protected virtual bool ColliderTriggerFilter([NotNull] Collider other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             var player = other.GetComponent<IDissonancePlayer>();
             return player != null && player.Type == NetworkPlayerType.Local;
@@ -268,7 +269,7 @@ namespace Dissonance
         /// <returns>true if this entity should affect the trigger, otherwise false</returns>
         protected virtual bool ColliderTriggerFilter2D([NotNull] Collider2D other)
         {
-            if (other == null) throw new ArgumentNullException("other");
+            if (other == null) throw new ArgumentNullException(nameof(other));
 
             var player = other.GetComponent<IDissonancePlayer>();
             return player != null && player.Type == NetworkPlayerType.Local;

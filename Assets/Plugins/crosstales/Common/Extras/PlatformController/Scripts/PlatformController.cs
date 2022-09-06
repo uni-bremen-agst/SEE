@@ -9,7 +9,7 @@ namespace Crosstales.Common.Util
       #region Variables
 
       ///<summary>Selected platforms for the controller.</summary>
-      [Header("Configuration")] [Tooltip("Selected platforms for the controller.")] public System.Collections.Generic.List<Model.Enum.Platform> Platforms;
+      [Header("Configuration")] [Tooltip("Selected platforms for the controller.")] public System.Collections.Generic.List<Crosstales.Common.Model.Enum.Platform> Platforms;
 
       ///<summary>Enable or disable the 'Objects' for the selected 'Platforms' (default: true).</summary>
       [Tooltip("Enable or disable the 'Objects' for the selected 'Platforms' (default: true).")] public bool Active = true;
@@ -22,7 +22,7 @@ namespace Crosstales.Common.Util
       [Header("MonoBehaviour Scripts")] [Tooltip("Selected scripts for the controller.")] public MonoBehaviour[] Scripts;
 
 
-      protected Model.Enum.Platform currentPlatform;
+      protected Crosstales.Common.Model.Enum.Platform currentPlatform;
 
       #endregion
 
@@ -47,7 +47,7 @@ namespace Crosstales.Common.Util
 
       protected void selectPlatform()
       {
-         currentPlatform = BaseHelper.CurrentPlatform;
+         currentPlatform = Crosstales.Common.Util.BaseHelper.CurrentPlatform;
 
          activateGameObjects();
          activateScripts();
@@ -82,4 +82,4 @@ namespace Crosstales.Common.Util
       #endregion
    }
 }
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

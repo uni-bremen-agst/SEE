@@ -7,5 +7,3 @@
 		DuplicateBindingOnActionSet
 	}
 }
-
-

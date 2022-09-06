@@ -4,7 +4,11 @@
         "SteamVR",
         "Unity.XR.OpenVR",
         "Unity.XR.Management.Editor",
-        "Unity.XR.Management"
+        "Unity.XR.Management",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

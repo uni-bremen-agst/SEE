@@ -12,7 +12,7 @@ namespace Crosstales.RTVoice.Tool
 
       [Header("Configuration")]
       /// <summary>Selected provider to initialize the voices (default: Any).</summary>
-      [Tooltip("Selected provider to initialize the voices (default: Any).")] public Model.Enum.ProviderType Provider = Model.Enum.ProviderType.Any;
+      [Tooltip("Selected provider to initialize the voices (default: Any).")] public Crosstales.RTVoice.Model.Enum.ProviderType Provider = Crosstales.RTVoice.Model.Enum.ProviderType.Any;
 
       /// <summary>Initialize voices by name.</summary>
       [Tooltip("Initialize voices by name.")] public string[] VoiceNames;
@@ -39,7 +39,7 @@ namespace Crosstales.RTVoice.Tool
          Speaker.Instance.OnVoicesReady += onVoicesReady;
          Speaker.Instance.OnSpeakComplete += onSpeakComplete;
 
-         if (!Util.Helper.isEditorMode)
+         if (!Crosstales.RTVoice.Util.Helper.isEditorMode)
             DontDestroyOnLoad(transform.root.gameObject);
       }
 
@@ -62,7 +62,7 @@ namespace Crosstales.RTVoice.Tool
 #if !UNITY_STANDALONE_OSX && !UNITY_EDITOR_OSX
          if (AllVoices)
          {
-            foreach (Model.Voice voice in Speaker.Instance.Voices)
+            foreach (Crosstales.RTVoice.Model.Voice voice in Speaker.Instance.Voices)
             {
                activeUid = Speaker.Instance.SpeakNative(text, voice, 3, 1, 0);
 
@@ -74,7 +74,7 @@ namespace Crosstales.RTVoice.Tool
          }
          else
          {
-            foreach (Model.Voice voice in from voiceName in VoiceNames
+            foreach (Crosstales.RTVoice.Model.Voice voice in from voiceName in VoiceNames
                where !string.IsNullOrEmpty(voiceName)
                where Speaker.Instance.isVoiceForNameAvailable(voiceName)
                select Speaker.Instance.VoiceForName(voiceName))
@@ -102,7 +102,7 @@ namespace Crosstales.RTVoice.Tool
 
       private void onVoicesReady()
       {
-         if (Provider == Model.Enum.ProviderType.Any || Provider == Util.Helper.CurrentProviderType)
+         if (Provider == Crosstales.RTVoice.Model.Enum.ProviderType.Any || Provider == Crosstales.RTVoice.Util.Helper.CurrentProviderType)
          {
             StopAllCoroutines();
             StartCoroutine(initializeVoices());
@@ -114,7 +114,7 @@ namespace Crosstales.RTVoice.Tool
          }
       }
 
-      private void onSpeakComplete(Model.Wrapper wrapper)
+      private void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          completedUid = wrapper.Uid;
       }
@@ -122,4 +122,4 @@ namespace Crosstales.RTVoice.Tool
       #endregion
    }
 }
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

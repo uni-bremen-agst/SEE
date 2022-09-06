@@ -269,7 +269,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DontDestroy: 1
   RunInBackground: 1
   LogLevel: 1
   NetworkConfig:
@@ -278,42 +277,32 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 721120223912629427, guid: bdc327a459a327942924a0bff5220ed4, type: 3}
+      Prefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 223132874815050282, guid: 4ae18712e3e90e54783307947de7ff71, type: 3}
+      Prefab: {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 2148359632239371273, guid: d29c2b8a1bf586a49aa969b83210166c, type: 3}
+      Prefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 3413141361298906494, guid: c78211f36da6bc74093166055fbe27a5, type: 3}
+      Prefab: {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 1119361092242382542, guid: e18558cd1cec9cf44a76097b7e541483, type: 3}
+      Prefab: {fileID: 7839154548958412681, guid: aa2505da96d6e284a9ff9d911702535a, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 7704617729666261720, guid: cc8fbe2ffa34728439843fa0953c8d1c, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 3430662996609522360, guid: c062a229b1fe2eb46957d8e26b52c47d, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 6417270086092738961, guid: e1e6a1e44a01a0d4bb0bb38d1c7df536, type: 3}
+      Prefab: {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
@@ -361,9 +350,9 @@ MonoBehaviour:
   ServerActionPort: 55555
   GameScene: SEEWorld
   loadCityOnStart: 0
-  networkCommsLoggingEnabled: 0
   internalLoggingEnabled: 1
   minimalSeverity: 2
+  networkCommsLoggingEnabled: 0
   VoiceChat: 1
   ConfigPath:
     Root: 3
@@ -424,8 +413,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1909299428}
   - component: {fileID: 1909299427}
-  - component: {fileID: 1909299426}
   - component: {fileID: 1909299429}
+  - component: {fileID: 1909299426}
   m_Layer: 0
   m_Name: Event System
   m_TagString: Untagged
@@ -442,16 +431,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 1909299425}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
 --- !u!114 &1909299427
 MonoBehaviour:
   m_ObjectHideFlags: 0

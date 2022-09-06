@@ -39,15 +39,6 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         protected readonly float groundLevel;
 
-        public float Groundlevel { get => groundLevel; }
-
-        public float InnerNodeHeight { get => innerNodeHeight; }
-
-        /// <summary>
-        /// The height of inner nodes (y co-ordinate).
-        /// </summary>
-        protected const float innerNodeHeight = 0.01f;
-
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
         /// and the visualizations of those inner nodes are stacked in a hierarchical layout,
@@ -140,19 +131,24 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Scales all nodes in <paramref name="layoutNodes"/> so that the total width
-        /// of the layout (along the x axis) equals <paramref name="width"/>.
+        /// Scales all nodes in <paramref name="layoutNodes"/> so that they fit into
+        /// a rectangled defined by <paramref name="width"/> and <paramref name="depth"/>.
         /// The aspect ratio of every node is maintained.
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be scaled</param>
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
+        /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        public static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width)
+        public static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
         {
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
-            Bounding3DBox(layoutNodeList.ToList(), out Vector3 left, out Vector3 right);
-            float currentWidth = right.x - left.x;
-            float scaleFactor = width / currentWidth;
+            Bounding3DBox(layoutNodeList, out Vector3 leftFrontCorner, out Vector3 rightBackCorner);
+            // The actual occupied space is a rectangle defined by leftFrontCorner and rightBackCorner.
+
+            float actualWidth = rightBackCorner.x - leftFrontCorner.x;
+            float actualDepth = rightBackCorner.z - leftFrontCorner.z;
+
+            float scaleFactor = Mathf.Min(width / actualWidth, depth / actualDepth);
             foreach (ILayoutNode layoutNode in layoutNodeList)
             {
                 layoutNode.ScaleBy(scaleFactor);

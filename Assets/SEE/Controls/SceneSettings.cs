@@ -1,16 +1,10 @@
-﻿using Microsoft.MixedReality.Toolkit;
-using Microsoft.MixedReality.Toolkit.UI;
-using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
-using Microsoft.MixedReality.Toolkit.Utilities;
-using OdinSerializer;
-using SEE.DataModel;
+﻿using Sirenix.Serialization;
 using SEE.Game;
 using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 #if !UNITY_ANDROID
 using Valve.VR;
@@ -26,20 +20,6 @@ namespace SEE.Controls
         // we are running in).
         //----------------------------------------------------------------------------------
 
-        /// <summary>
-        /// The name of the game object where the MixedRealityToolkit is attached to.
-        /// Used only for the Hololens player.
-        /// </summary>
-        private const string MixedRealityToolkitName = "MixedRealityToolkit";
-        /// <summary>
-        /// The name of the game object where the GridObjectCollection is attached to.
-        /// Used only for the Hololens player.
-        /// </summary>
-        private const string CityCollectionName = "CityCollection";
-        /// <summary>
-        /// The name of the game object which represents the app bar for a CodeCity.
-        /// </summary>
-        private const string AppBarName = "HoloLensAppBar";
         /// <summary>
         /// The name of the game object where the ChartManager component and his friends are
         /// attached to. It is used for handling the metric charts.
@@ -66,8 +46,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// The game object representing the ground in the scene. A Unity plane
-        /// should generally be attached to it. Will be deactivated for the Hololens player. In the VR
-        /// environment, the TeleportArea will be attached to it.
+        /// should generally be attached to it. In the VR  environment, the TeleportArea will be attached to it.
         /// </summary>
         [Tooltip("The ground in the scene. This attribute must be set in VR for determining the teleporting area.")]
         [OdinSerialize]
@@ -79,19 +58,8 @@ namespace SEE.Controls
         [Tooltip("Whether hints should be shown for controllers.")]
         public bool ShowControllerHints = false;
 
-        [Header("HoloLens specific settings (relevant only for HoloLens players)")]
-        [Tooltip("Which scale shall be used for HoloLens players.")]
-        public ExperienceScale ExperienceScale = ExperienceScale.Seated;
-
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
-
-        [Tooltip("Whether eye gaze should trigger hovering actions, such as node labels.")]
-        public bool EyeGazeHover = true;
-
-        [Range(0, 20)]
-        [Tooltip("The time in seconds after which staring at an object triggers its hovering action.")]
-        public float EyeStareDelay = 1;
 
         /// <summary>
         /// The name of the game object holding the unique <see cref="SceneSettings"/>
@@ -123,7 +91,7 @@ namespace SEE.Controls
         /// <see cref="NameOfPlayerSettingsGameObject"/> holding a
         /// <see cref="SceneSettings"/> component.
         /// </summary>
-        private void SetInstance()
+        private static void SetInstance()
         {
             // Note: instance = FindObjectOfType<SceneSettings>() would not work
             // because FindObjectOfType does not work when changing scenes.
@@ -139,11 +107,29 @@ namespace SEE.Controls
             }
         }
 
+        private static GameObject localPlayer;
         /// <summary>
         /// The game object representing the active local player, that is, the player
         /// executing on this local instance of Unity.
         /// </summary>
-        public static GameObject LocalPlayer { get; private set; }
+        public static GameObject LocalPlayer
+        {
+            get
+            {
+                if (localPlayer == null)
+                {
+                    localPlayer = instance.CreatePlayer(PlayerSettings.GetInputType());
+                }
+                return localPlayer;
+            }
+            private set
+            {
+                if (LocalPlayer == null)
+                {
+                    localPlayer = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
@@ -153,8 +139,7 @@ namespace SEE.Controls
         {
             playerInputType = PlayerSettings.GetInputType();
             Debug.Log($"Player input type: {playerInputType}.\n");
-            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer || playerInputType == PlayerInputType.HoloLensPlayer);
-            LocalPlayer = CreatePlayer(playerInputType);
+            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer);
         }
 
         /// <summary>
@@ -169,6 +154,7 @@ namespace SEE.Controls
         /// </summary>
         private void Start()
         {
+            SetDoTweenSettings();
             SetInstance();
 #if !UNITY_ANDROID
             // Turn off VR controller hints if requested in the user settings.
@@ -192,7 +178,15 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates the kind of player required for the given <paramref name="inputType"/>.
+        /// Sets the DOTween settings for newly created tweens, such as the ease type.
+        /// </summary>
+        private static void SetDoTweenSettings()
+        {
+            DOTween.defaultEaseType = Ease.OutExpo;
+        }
+
+        /// <summary>
+        /// Finds or creates the kind of player required for the given <paramref name="inputType"/>.
         /// For some players, additional game objects and/or components will be added to the
         /// scene required for the particular player to work correctly.
         /// </summary>
@@ -206,25 +200,20 @@ namespace SEE.Controls
 
             switch (inputType)
             {
-                /// FIXME: This could should be moved to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                 case PlayerInputType.DesktopPlayer:
-                    /// The code original executed here has now be moved to
-                    /// <see cref="SEE.Game.Avatars.AvatarAdapter"/>. The other
-                    /// code must be moved there, too.
-                    return null;
+                    // position and rotation of the local desktop player are set
+                    // elsewhere by the player spawner. That is why we can return
+                    // this local player immediately.
+                    return LocalPlayerForDesktop();
                 case PlayerInputType.VRPlayer:
                     {
+                        /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = PlayerFactory.CreateVRPlayer();
-                        SetupVR(player);
-                    }
-                    break;
-                case PlayerInputType.HoloLensPlayer:
-                    {
-                        player = PlayerFactory.CreateHololensPlayer();
-                        SetupMixedReality();
+                        SetupVR(player, Ground);
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
+                    /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                     player = PlayerFactory.CreateTouchGamepadPlayer();
                     break;
                 case PlayerInputType.None: return null; // No player needs to be created
@@ -234,6 +223,18 @@ namespace SEE.Controls
             player.transform.position = PlayerOrigin;
             player.transform.rotation = Quaternion.Euler(0, PlayerYRotation, 0);
             return player;
+
+            static GameObject LocalPlayerForDesktop()
+            {
+                // The local player is holding the main camera. Remote players do not have
+                // a camera attached. Hence, we only need to retrieve that camera.
+
+                /// FIXME: This should be the case for all environments as soon as we
+                /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
+                /// <see cref="Game.Avatars.AvatarAdapter"/>
+                return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
+                    MainCamera.Camera.gameObject : null;
+            }
         }
 
         /// <summary>
@@ -245,10 +246,11 @@ namespace SEE.Controls
         /// the ground (a Unity Plane would be attached to it).
         /// </summary>
         /// <param name="player">the current VR player</param>
+        /// <param name="ground"></param>
         /// <exception cref="Exception">thrown if there is no plane named <see cref="FloorName"/> in the scene</exception>
-        private void SetupVR(GameObject player)
+        private static void SetupVR(GameObject player, GameObject ground)
         {
-            if (Ground == null)
+            if (ground == null)
             {
                 throw new InvalidOperationException("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
             }
@@ -262,11 +264,11 @@ namespace SEE.Controls
                     // into a transparent material. This way the game object becomes invisible.
                     // For this reason, we will clone the floor and move the cloned floor slightly above
                     // its origin and then attach the TeleportArea to the cloned floor.
-                    Vector3 position = Ground.transform.position;
+                    Vector3 position = ground.transform.position;
                     position.y += 0.01f;
-                    GameObject clonedFloor = Instantiate(Ground, position, Ground.transform.rotation);
+
 #if !UNITY_ANDROID
-                    clonedFloor.AddComponent<TeleportArea>();
+                    Instantiate(ground, position, ground.transform.rotation).AddComponent<TeleportArea>();
 #endif
                 }
                 {
@@ -292,97 +294,6 @@ namespace SEE.Controls
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Enables mixed reality capabilities in the scene, including the Mixed Reality Toolkit.
-        /// </summary>
-        private void SetupMixedReality()
-        {
-            Destroy(UnityEngine.SceneManagement.SceneManager.GetActiveScene()
-                               .GetRootGameObjects().SingleOrDefault(x => x.name == "MixedRealityPlayspace"));
-
-            // Add a MixedRealityToolkit to the scene
-            PrefabInstantiator.InstantiatePrefab("Prefabs/MixedRealityToolkit").name = MixedRealityToolkitName;
-
-            // Create HoloLensAppBar from prefab
-            PrefabInstantiator.InstantiatePrefab("Prefabs/HoloLensAppBar").name = AppBarName;
-
-            // Add a city collection
-            GameObject cityCollection = PrefabInstantiator.InstantiatePrefab("Prefabs/CityCollection");
-            cityCollection.name = CityCollectionName;
-#if !UNITY_ANDROID
-            // Hide all decoration to improve performance.
-            GameObject.FindGameObjectsWithTag(Tags.Decoration).ForEach(go => go.SetActive(false));
-#endif
-            {
-                // Set selected experience scale.
-                MixedRealityToolkit.Instance.ActiveProfile.TargetExperienceScale = ExperienceScale;
-
-                Debug.Log($"Current HoloLens scale: {ExperienceScale}\n");
-                if (ExperienceScale == ExperienceScale.Seated || ExperienceScale == ExperienceScale.OrientationOnly)
-                {
-                    // Position and scale planes and CodeCities accordingly using CityCollection grid
-                    if (cityCollection.TryGetComponentOrLog(out GridObjectCollection grid))
-                    {
-                        GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
-
-                        GameObject[] citiesWithContainer = cities.Select(AddCodeCityContainer).ToArray();
-
-                        foreach (GameObject city in citiesWithContainer)
-                        {
-                            SetCityScale(city, cityCollection.transform, CityScalingFactor);
-                            AddInteractions(city);
-                            AppBarCityConfiguration(city);
-                        }
-
-                        SetGridCellWidth(grid, citiesWithContainer);
-                    }
-                }
-            }
-
-#region Local Methods
-            //Scales the city by factor and pretend it to collection
-            static void SetCityScale(GameObject cityWitchContainer, Transform cityCollectionTransform, float cityScaleFactor)
-            {
-                cityWitchContainer.transform.localScale *= cityScaleFactor;
-                // City needs to be parented to collection to be organized by it
-                cityWitchContainer.transform.parent = cityCollectionTransform;
-            }
-
-            //Sets the width of the Grid containing the cities
-            static void SetGridCellWidth(GridObjectCollection grid, IEnumerable<GameObject> cities)
-            {
-                // To avoid overlaps, set cell width to maximum length of code cities
-                grid.CellWidth = cities.Max(x => x.transform.localScale.MaxComponent());
-                grid.UpdateCollection();
-            }
-
-            // Adds AppBar and ObjectManipulator components to City
-            static void AddInteractions(GameObject city)
-            {
-                city.AddComponent<AppBarInteractableObject>();
-                city.AddComponent<ObjectManipulator>();
-            }
-
-            static void AppBarCityConfiguration(GameObject city)
-            {
-                BoundsControl boundsControl = city.AddComponent<BoundsControl>();
-                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes
-                                                                 .BoundsControlActivationType.ActivateManually;
-            }
-
-
-            // Creates a Container GameObject for Cities
-            static GameObject AddCodeCityContainer(GameObject city)
-            {
-                GameObject cityContainer = new GameObject { name = city.name + "Container" };
-                cityContainer.transform.position = city.transform.position;
-                city.transform.SetParent(cityContainer.transform);
-                return cityContainer;
-            }
-
-#endregion
         }
 
         /// <summary>

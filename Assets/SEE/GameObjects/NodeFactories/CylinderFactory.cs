@@ -1,12 +1,12 @@
 ﻿using SEE.Game;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.NodeFactories
 {
     /// <summary>
     /// A factory for cylinder game objects.
     /// </summary>
-    internal class CylinderFactory : InnerNodeFactory
+    internal class CylinderFactory : NodeFactory
     {
         /// <summary>
         /// Constructor.
@@ -17,18 +17,13 @@ namespace SEE.GO
             : base(shaderType, colorRange)
         { }
 
-        public override GameObject NewBlock(int style = 0, int renderQueueOffset = 0)
+        /// <summary>
+        /// Adds a <see cref="MeshCollider"/> to <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object receiving the collider</param>
+        protected override void AddCollider(GameObject gameObject)
         {
-            GameObject result = CreateCylinder();
-            result.AddComponent<MeshCollider>();
-
-            MeshRenderer renderer = result.AddComponent<MeshRenderer>();
-            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-            Materials.SetSharedMaterial(renderer, renderQueueOffset: renderQueueOffset, index: style);
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
-
-            return result;
+            gameObject.AddComponent<MeshCollider>();
         }
 
         // ----------------------------------------------------------------------------------
@@ -46,44 +41,36 @@ namespace SEE.GO
         private const float DEFAULT_RADIUS = 0.5f;
         private const float DEFAULT_HEIGHT = 1.0f;
 
-        private GameObject CreateCylinder()
-        {
-            GameObject gameObject = new GameObject();
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            meshFilter.sharedMesh = GetCylinderMesh();
-            return gameObject;
-        }
-
         /// <summary>
-        /// Model mesh for cylinder to be re-used for all instances of a cylinder.
-        /// It will be ceated in GetCylinderMesh() on demand.
+        /// Model mesh for a game object to be re-used for all instances.
+        /// It will be created in <see cref="GetMesh()"/> on demand.
         /// </summary>
         private static Mesh modelMesh;
 
         /// <summary>
-        /// Returns a cylinder mesh.
+        /// Returns a (cached) cylinder mesh.
+        /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
-        /// <param name="radialSegments">the number circle segments of the cylinder
-        /// (e.g., 3 gives you a triangle shape)</param>
-        /// <param name="heightSegments">the number of height segments</param>
+        /// <param name="metrics">this parameter will be ignored</param>
         /// <returns>cylinder mesh (the same for each call)</returns>
-        public static Mesh GetCylinderMesh(int radialSegments = DEFAULT_RADIAL_SEGMENTS,
-                                            int heightSegments = DEFAULT_HEIGHT_SEGMENTS)
+        protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)
             {
                 return modelMesh;
             }
-            //create the mesh
             modelMesh = new Mesh
             {
-                name = "CylinderMesh"
+                name = "SEECylinderMesh"
             };
+
+            int radialSegments = DEFAULT_RADIAL_SEGMENTS;
+            int heightSegments = DEFAULT_HEIGHT_SEGMENTS;
 
             float radius = DEFAULT_RADIUS;
             float length = DEFAULT_HEIGHT;
 
-            //sanity check
+            // sanity check
             if (radialSegments < MIN_RADIAL_SEGMENTS)
             {
                 radialSegments = MIN_RADIAL_SEGMENTS;
@@ -109,9 +96,13 @@ namespace SEE.GO
             // Debug.Log ("CustomCylinder has " + trisArrayLength/3 + " tris");
 
             // initialize arrays
-            Vector3[] Vertices = new Vector3[numVertices];
+            Vector3[] vertices = new Vector3[numVertices];
+            // UV is the mapping specifying which part of a two-dimensional texture is to
+            // be mapped onto which triangle of the three-dimensional mesh.
+            // The U coordinate represents the horizontal axis of the 2D texture,
+            // and the V coordinate represents the vertical axis.
             Vector2[] UVs = new Vector2[numUVs];
-            int[] Tris = new int[trisArrayLength];
+            int[] tris = new int[trisArrayLength];
 
             // precalculate increments to improve performance
             float heightStep = length / heightSegments;
@@ -134,8 +125,8 @@ namespace SEE.GO
                     }
 
                     // position current vertex
-                    Vertices[j * numVertexColumns + i] = new Vector3(radius * Mathf.Cos(angle),
-                                                                     j * heightStep,
+                    vertices[j * numVertexColumns + i] = new Vector3(radius * Mathf.Cos(angle),
+                                                                     j * heightStep - length / 2,
                                                                      radius * Mathf.Sin(angle));
 
                     // calculate UVs
@@ -157,14 +148,14 @@ namespace SEE.GO
                         int baseIndex = numCapTris * 3 + (j - 1) * radialSegments * 6 + i * 6;
 
                         // 1st tri - below and in front
-                        Tris[baseIndex + 0] = j * numVertexColumns + i;
-                        Tris[baseIndex + 1] = j * numVertexColumns + i + 1;
-                        Tris[baseIndex + 2] = (j - 1) * numVertexColumns + i;
+                        tris[baseIndex + 0] = j * numVertexColumns + i;
+                        tris[baseIndex + 1] = j * numVertexColumns + i + 1;
+                        tris[baseIndex + 2] = (j - 1) * numVertexColumns + i;
 
                         // 2nd tri - the one it doesn't touch
-                        Tris[baseIndex + 3] = (j - 1) * numVertexColumns + i;
-                        Tris[baseIndex + 4] = j * numVertexColumns + i + 1;
-                        Tris[baseIndex + 5] = (j - 1) * numVertexColumns + i + 1;
+                        tris[baseIndex + 3] = (j - 1) * numVertexColumns + i;
+                        tris[baseIndex + 4] = j * numVertexColumns + i + 1;
+                        tris[baseIndex + 5] = (j - 1) * numVertexColumns + i + 1;
                     }
                 }
             }
@@ -200,20 +191,20 @@ namespace SEE.GO
                 leftSided = !leftSided;
 
                 // assign bottom tris
-                Tris[bottomCapBaseIndex + 0] = rightIndex;
-                Tris[bottomCapBaseIndex + 1] = middleIndex;
-                Tris[bottomCapBaseIndex + 2] = leftIndex;
+                tris[bottomCapBaseIndex + 0] = rightIndex;
+                tris[bottomCapBaseIndex + 1] = middleIndex;
+                tris[bottomCapBaseIndex + 2] = leftIndex;
 
                 // assign top tris
-                Tris[topCapBaseIndex + 0] = topCapVertexOffset + leftIndex;
-                Tris[topCapBaseIndex + 1] = topCapVertexOffset + middleIndex;
-                Tris[topCapBaseIndex + 2] = topCapVertexOffset + rightIndex;
+                tris[topCapBaseIndex + 0] = topCapVertexOffset + leftIndex;
+                tris[topCapBaseIndex + 1] = topCapVertexOffset + middleIndex;
+                tris[topCapBaseIndex + 2] = topCapVertexOffset + rightIndex;
             }
 
             // assign vertices, uvs and tris
-            modelMesh.vertices = Vertices;
+            modelMesh.vertices = vertices;
             modelMesh.uv = UVs;
-            modelMesh.triangles = Tris;
+            modelMesh.triangles = tris;
 
             modelMesh.RecalculateNormals();
             modelMesh.RecalculateBounds();
@@ -242,11 +233,11 @@ namespace SEE.GO
 
             Vector4[] tangents = new Vector4[vertexCount];
 
-            for (long a = 0; a < triangleCount; a += 3)
+            for (long triangle = 0; triangle < triangleCount; triangle += 3)
             {
-                long i1 = triangles[a + 0];
-                long i2 = triangles[a + 1];
-                long i3 = triangles[a + 2];
+                long i1 = triangles[triangle + 0];
+                long i2 = triangles[triangle + 1];
+                long i3 = triangles[triangle + 2];
 
                 Vector3 v1 = vertices[i1];
                 Vector3 v2 = vertices[i2];
@@ -282,19 +273,19 @@ namespace SEE.GO
                 tan2[i3] += tdir;
             }
 
-            for (long a = 0; a < vertexCount; ++a)
+            for (int vertex = 0; vertex < vertexCount; ++vertex)
             {
-                Vector3 n = normals[a];
-                Vector3 t = tan1[a];
+                Vector3 normal = normals[vertex];
+                Vector3 tangent = tan1[vertex];
 
                 //Vector3 tmp = (t - n * Vector3.Dot(n, t)).normalized;
                 //tangents[a] = new Vector4(tmp.x, tmp.y, tmp.z);
-                Vector3.OrthoNormalize(ref n, ref t);
-                tangents[a].x = t.x;
-                tangents[a].y = t.y;
-                tangents[a].z = t.z;
+                Vector3.OrthoNormalize(ref normal, ref tangent);
+                tangents[vertex].x = tangent.x;
+                tangents[vertex].y = tangent.y;
+                tangents[vertex].z = tangent.z;
 
-                tangents[a].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[a]) < 0.0f) ? -1.0f : 1.0f;
+                tangents[vertex].w = (Vector3.Dot(Vector3.Cross(normal, tangent), tan2[vertex]) < 0.0f) ? -1.0f : 1.0f;
             }
 
             mesh.tangents = tangents;

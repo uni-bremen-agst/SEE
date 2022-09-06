@@ -15,7 +15,7 @@ namespace Crosstales.RTVoice
 
       /// <summary>Speaks a text with a given wrapper -> native mode.</summary>
       /// <param name="wrapper">Wrapper with the speech details.</param>
-      public void SpeakNativeLive(Model.Wrapper wrapper)
+      public void SpeakNativeLive(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Speaker.Instance.SpeakNative(wrapper);
       }
@@ -48,7 +48,7 @@ namespace Crosstales.RTVoice
                culture = args[1];
             }
 
-            Model.Voice voice = null;
+            Crosstales.RTVoice.Model.Voice voice = null;
             if (args.Length >= 3)
             {
                voice = Speaker.Instance.VoiceForName(args[2]);
@@ -89,7 +89,7 @@ namespace Crosstales.RTVoice
                voice = Speaker.Instance.VoiceForCulture(culture);
             }
 
-            SpeakNativeLive(new Model.Wrapper(text, voice, rate, pitch, volume, true)); //TODO add ForceSSML as parameter?
+            SpeakNativeLive(new Crosstales.RTVoice.Model.Wrapper(text, voice, rate, pitch, volume, true)); //TODO add ForceSSML as parameter?
          }
          else
          {
@@ -99,7 +99,7 @@ namespace Crosstales.RTVoice
 
       /// <summary>Speaks a text with a given wrapper.</summary>
       /// <param name="wrapper">Wrapper with the speech details.</param>
-      public void SpeakLive(Model.Wrapper wrapper)
+      public void SpeakLive(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          Speaker.Instance.Speak(wrapper);
       }
@@ -138,7 +138,7 @@ namespace Crosstales.RTVoice
                culture = args[1];
             }
 
-            Model.Voice voice = null;
+            Crosstales.RTVoice.Model.Voice voice = null;
             if (args.Length >= 3)
             {
                voice = Speaker.Instance.VoiceForName(args[2]);
@@ -179,7 +179,7 @@ namespace Crosstales.RTVoice
                voice = Speaker.Instance.VoiceForCulture(culture);
             }
 
-            SpeakLive(new Model.Wrapper(text, voice, rate, pitch, volume, null));
+            SpeakLive(new Crosstales.RTVoice.Model.Wrapper(text, voice, rate, pitch, volume, null));
          }
          else
          {
@@ -196,4 +196,4 @@ namespace Crosstales.RTVoice
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

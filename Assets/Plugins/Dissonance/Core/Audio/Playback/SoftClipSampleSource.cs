@@ -21,7 +21,7 @@ namespace Dissonance.Audio.Playback
             if (upstream == null) throw new ArgumentNullException("upstream");
 
             _upstream = upstream;
-            _clipper = new OpusNative.OpusSoftClip(upstream.WaveFormat.Channels);
+            _clipper = new OpusNative.OpusSoftClip();
         }
 
         public void Prepare(SessionContext context)

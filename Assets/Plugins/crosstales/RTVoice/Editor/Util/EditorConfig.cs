@@ -11,23 +11,23 @@ namespace Crosstales.RTVoice.EditorUtil
       #region Variables
 
       /// <summary>Enable or disable update-checks for the asset.</summary>
-      public static bool UPDATE_CHECK = EditorConstants.DEFAULT_UPDATE_CHECK;
+      public static bool UPDATE_CHECK = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_UPDATE_CHECK;
 
       /// <summary>Enable or disable adding compile define "CT_RTV" for the asset.</summary>
-      public static bool COMPILE_DEFINES = EditorConstants.DEFAULT_COMPILE_DEFINES;
+      public static bool COMPILE_DEFINES = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_COMPILE_DEFINES;
 
       /// <summary>Automatically load and add the prefabs to the scene.</summary>
-      public static bool PREFAB_AUTOLOAD = EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
+      public static bool PREFAB_AUTOLOAD = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
 
       /// <summary>Enable or disable the icon in the hierarchy.</summary>
-      public static bool HIERARCHY_ICON = EditorConstants.DEFAULT_HIERARCHY_ICON;
+      public static bool HIERARCHY_ICON = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_HIERARCHY_ICON;
 
       /// <summary>Is the configuration loaded?</summary>
       public static bool isLoaded;
 
       private static string assetPath;
       private const string idPath = "Documentation/id/";
-      private static readonly string idName = EditorConstants.ASSET_UID + ".txt";
+      private static readonly string idName = Crosstales.RTVoice.EditorUtil.EditorConstants.ASSET_UID + ".txt";
 
       #endregion
 
@@ -64,7 +64,7 @@ namespace Crosstales.RTVoice.EditorUtil
 
       /// <summary>Returns the path of the prefabs.</summary>
       /// <returns>The path of the prefabs.</returns>
-      public static string PREFAB_PATH => ASSET_PATH + EditorConstants.PREFAB_SUBPATH;
+      public static string PREFAB_PATH => ASSET_PATH + Crosstales.RTVoice.EditorUtil.EditorConstants.PREFAB_SUBPATH;
 
       #endregion
 
@@ -74,10 +74,10 @@ namespace Crosstales.RTVoice.EditorUtil
       /// <summary>Resets all changeable variables to their default value.</summary>
       public static void Reset()
       {
-         UPDATE_CHECK = EditorConstants.DEFAULT_UPDATE_CHECK;
-         COMPILE_DEFINES = EditorConstants.DEFAULT_COMPILE_DEFINES;
-         PREFAB_AUTOLOAD = EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
-         HIERARCHY_ICON = EditorConstants.DEFAULT_HIERARCHY_ICON;
+         UPDATE_CHECK = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_UPDATE_CHECK;
+         COMPILE_DEFINES = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_COMPILE_DEFINES;
+         PREFAB_AUTOLOAD = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_PREFAB_AUTOLOAD;
+         HIERARCHY_ICON = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_HIERARCHY_ICON;
       }
 
       /// <summary>Loads all changeable variables.</summary>
@@ -85,17 +85,17 @@ namespace Crosstales.RTVoice.EditorUtil
       {
          initAssetPath();
 
-         if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_UPDATE_CHECK))
-            UPDATE_CHECK = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_UPDATE_CHECK);
+         if (Crosstales.Common.Util.CTPlayerPrefs.HasKey(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_UPDATE_CHECK))
+            UPDATE_CHECK = Crosstales.Common.Util.CTPlayerPrefs.GetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_UPDATE_CHECK);
 
-         if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_COMPILE_DEFINES))
-            COMPILE_DEFINES = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_COMPILE_DEFINES);
+         if (Crosstales.Common.Util.CTPlayerPrefs.HasKey(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_COMPILE_DEFINES))
+            COMPILE_DEFINES = Crosstales.Common.Util.CTPlayerPrefs.GetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_COMPILE_DEFINES);
 
-         if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_PREFAB_AUTOLOAD))
-            PREFAB_AUTOLOAD = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_PREFAB_AUTOLOAD);
+         if (Crosstales.Common.Util.CTPlayerPrefs.HasKey(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_PREFAB_AUTOLOAD))
+            PREFAB_AUTOLOAD = Crosstales.Common.Util.CTPlayerPrefs.GetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_PREFAB_AUTOLOAD);
 
-         if (Common.Util.CTPlayerPrefs.HasKey(EditorConstants.KEY_HIERARCHY_ICON))
-            HIERARCHY_ICON = Common.Util.CTPlayerPrefs.GetBool(EditorConstants.KEY_HIERARCHY_ICON);
+         if (Crosstales.Common.Util.CTPlayerPrefs.HasKey(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_HIERARCHY_ICON))
+            HIERARCHY_ICON = Crosstales.Common.Util.CTPlayerPrefs.GetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_HIERARCHY_ICON);
 
          isLoaded = true;
       }
@@ -103,12 +103,12 @@ namespace Crosstales.RTVoice.EditorUtil
       /// <summary>Saves all changeable variables.</summary>
       public static void Save()
       {
-         Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_UPDATE_CHECK, UPDATE_CHECK);
-         Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_COMPILE_DEFINES, COMPILE_DEFINES);
-         Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_PREFAB_AUTOLOAD, PREFAB_AUTOLOAD);
-         Common.Util.CTPlayerPrefs.SetBool(EditorConstants.KEY_HIERARCHY_ICON, HIERARCHY_ICON);
+         Crosstales.Common.Util.CTPlayerPrefs.SetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_UPDATE_CHECK, UPDATE_CHECK);
+         Crosstales.Common.Util.CTPlayerPrefs.SetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_COMPILE_DEFINES, COMPILE_DEFINES);
+         Crosstales.Common.Util.CTPlayerPrefs.SetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_PREFAB_AUTOLOAD, PREFAB_AUTOLOAD);
+         Crosstales.Common.Util.CTPlayerPrefs.SetBool(Crosstales.RTVoice.EditorUtil.EditorConstants.KEY_HIERARCHY_ICON, HIERARCHY_ICON);
 
-         Common.Util.CTPlayerPrefs.Save();
+         Crosstales.Common.Util.CTPlayerPrefs.Save();
       }
 
       #endregion
@@ -119,9 +119,9 @@ namespace Crosstales.RTVoice.EditorUtil
          {
             try
             {
-               if (System.IO.File.Exists(Application.dataPath + EditorConstants.DEFAULT_ASSET_PATH + idPath + idName))
+               if (System.IO.File.Exists(Application.dataPath + Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_ASSET_PATH + idPath + idName))
                {
-                  assetPath = EditorConstants.DEFAULT_ASSET_PATH;
+                  assetPath = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_ASSET_PATH;
                }
                else
                {
@@ -135,13 +135,13 @@ namespace Crosstales.RTVoice.EditorUtil
                   else
                   {
                      Debug.LogWarning("Could not locate the asset! File not found: " + idName);
-                     assetPath = EditorConstants.DEFAULT_ASSET_PATH;
+                     assetPath = Crosstales.RTVoice.EditorUtil.EditorConstants.DEFAULT_ASSET_PATH;
                   }
                }
 
                //Debug.LogWarning("PATH : " + assetPath);
-               Common.Util.CTPlayerPrefs.SetString(Util.Constants.KEY_ASSET_PATH, assetPath);
-               Common.Util.CTPlayerPrefs.Save();
+               Crosstales.Common.Util.CTPlayerPrefs.SetString(Crosstales.RTVoice.Util.Constants.KEY_ASSET_PATH, assetPath);
+               Crosstales.Common.Util.CTPlayerPrefs.Save();
             }
             catch (System.Exception ex)
             {
@@ -152,4 +152,4 @@ namespace Crosstales.RTVoice.EditorUtil
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

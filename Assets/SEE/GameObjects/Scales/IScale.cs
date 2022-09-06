@@ -17,7 +17,7 @@ namespace SEE.GO
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        protected IScale(IEnumerable<Graph> graphs, IList<string> metrics, bool leavesOnly)
+        protected IScale(IEnumerable<Graph> graphs, ISet<string> metrics, bool leavesOnly)
         {
             this.metrics = metrics;
             this.leavesOnly = leavesOnly;
@@ -29,7 +29,7 @@ namespace SEE.GO
         /// <summary>
         /// The list of metrics to be scaled.
         /// </summary>
-        protected readonly IList<string> metrics;
+        protected readonly ISet<string> metrics;
 
         /// <summary>
         /// The maximal values of all metrics as a map metric-name -> maximal value.
@@ -64,6 +64,27 @@ namespace SEE.GO
             else
             {
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// If <paramref name="metricName"/> can be parsed as a number, the parsed number is
+        /// returned. If <paramref name="metricName"/> is the name of a metric, the corresponding
+        /// normalized value for <paramref name="node"/> is returned if it exists; otherwise 0
+        /// is returned.
+        /// </summary>
+        /// <param name="node">node whose metric is to be returned</param>
+        /// <param name="metricName">the name of a node metric or a number</param>
+        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        public float GetMetricValue(Node node, string metricName)
+        {
+            if (Utils.FloatUtils.TryGetFloat(metricName, out float value))
+            {
+                return value;
+            }
+            else
+            {
+                return GetNormalizedValue(metricName, node);
             }
         }
 

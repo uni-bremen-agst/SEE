@@ -166,7 +166,7 @@ namespace SEE.Utils
 
         public virtual void Load()
         {
-            // Preserves the last text content of an XML node seen, 
+            // Preserves the last text content of an XML node seen,
             // e.g., "mystring" in <string>mystring</string>.
             // Defined only at the EndElement, e.g. </string> here.
             string lastText = "";
@@ -187,8 +187,8 @@ namespace SEE.Utils
                                 State state = ToState(reader.Name);
                                 if (!reader.IsEmptyElement)
                                 {
-                                    // This is not a self-closing (empty) element, e.g., <item/>. 
-                                    // Note: A corresponding EndElement node is not generated for empty elements. 
+                                    // This is not a self-closing (empty) element, e.g., <item/>.
+                                    // Note: A corresponding EndElement node is not generated for empty elements.
                                     // That is why we must push an expected EndElement onto the context stack
                                     // only if the element is not self-closing.
                                     context.Push(state);
@@ -321,6 +321,10 @@ namespace SEE.Utils
                             break;
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                LogError($"Problem in parsing {filename}: {e.Message}");
             }
             finally
             {

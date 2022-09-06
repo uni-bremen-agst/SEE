@@ -231,7 +231,7 @@ MonoBehaviour:
   suspendInBackground: 0
   updateMode: 0
   enableICade: 0
-  enableXInput: 0
+  enableXInput: 1
   xInputOverrideUpdateRate: 0
   xInputUpdateRate: 0
   xInputOverrideBufferSize: 0

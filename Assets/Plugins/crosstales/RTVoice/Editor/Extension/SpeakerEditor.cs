@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
@@ -19,17 +18,17 @@ namespace Crosstales.RTVoice.EditorExtension
       private float volume = 1f;
       private Speaker script;
 
-      private bool showVoices;
-
       private Object customProvider;
       private bool customMode;
 
       private bool eSpeakMode;
-      private Model.Enum.ESpeakModifiers eSpeakModifier;
+      private Crosstales.RTVoice.Model.Enum.ESpeakModifiers eSpeakModifier;
       private string eSpeakApp;
       private string eSpeakData;
 
       private string androidEngine;
+
+      private bool windowsForce32bit;
 
       private bool autoClearTags;
 
@@ -41,6 +40,14 @@ namespace Crosstales.RTVoice.EditorExtension
       private bool silenceOnFocusLost;
       private bool handleFocus;
       private bool dontDestroy;
+
+      private static bool showPlatformSettings;
+      private static bool showAdvancedSettings;
+      private static bool showBehaviourSettings;
+      private static bool showEvents;
+      private static bool showVoices;
+      private static bool showTD;
+      private static bool showInfo;
 
       #endregion
 
@@ -64,7 +71,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnDisable()
       {
-         if (Util.Helper.isEditorMode)
+         if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             script.Silence();
       }
 
@@ -75,7 +82,8 @@ namespace Crosstales.RTVoice.EditorExtension
 
       public override void OnInspectorGUI()
       {
-         EditorHelper.BannerOC();
+         if (script.isOnlineService)
+            Crosstales.RTVoice.EditorUtil.EditorHelper.BannerOC();
 
          if (script.enforcedStandaloneTTS)
          {
@@ -99,7 +107,7 @@ namespace Crosstales.RTVoice.EditorExtension
             }
          }
 
-         if (Util.Helper.isIL2CPP && !script.isIL2CPPSupported)
+         if (Crosstales.RTVoice.Util.Helper.isIL2CPP && !script.isIL2CPPSupported)
          {
             GUILayout.Space(6);
             EditorGUILayout.HelpBox("IL2CPP is not supported by the current voice provider. Please use Mono, MaryTTS or a custom provider (e.g. Klattersynth).", MessageType.Error);
@@ -110,30 +118,32 @@ namespace Crosstales.RTVoice.EditorExtension
          GUILayout.Label("Custom Provider", EditorStyles.boldLabel);
 
          customMode = EditorGUILayout.BeginToggleGroup(new GUIContent("Active", "Enables or disables the custom provider (default: false)."), script.CustomMode);
-         if (customMode != script.CustomMode)
          {
-            serializedObject.FindProperty("customMode").boolValue = customMode;
-            serializedObject.ApplyModifiedProperties();
+            if (customMode != script.CustomMode)
+            {
+               serializedObject.FindProperty("customMode").boolValue = customMode;
+               serializedObject.ApplyModifiedProperties();
 
-            voiceIndex = 0;
+               voiceIndex = 0;
 
-            script.ReloadProvider();
+               script.ReloadProvider();
+            }
+
+            EditorGUI.indentLevel++;
+
+            customProvider = EditorGUILayout.ObjectField("Custom Provider", script.CustomProvider, typeof(Crosstales.RTVoice.Provider.BaseCustomVoiceProvider), true);
+            if (customProvider != script.CustomProvider)
+            {
+               serializedObject.FindProperty("customProvider").objectReferenceValue = customProvider;
+               serializedObject.ApplyModifiedProperties();
+
+               voiceIndex = 0;
+
+               script.ReloadProvider();
+            }
+
+            EditorGUI.indentLevel--;
          }
-
-         EditorGUI.indentLevel++;
-
-         customProvider = EditorGUILayout.ObjectField("Custom Provider", script.CustomProvider, typeof(Provider.BaseCustomVoiceProvider), true);
-         if (customProvider != script.CustomProvider)
-         {
-            serializedObject.FindProperty("customProvider").objectReferenceValue = customProvider;
-            serializedObject.ApplyModifiedProperties();
-
-            voiceIndex = 0;
-
-            script.ReloadProvider();
-         }
-
-         EditorGUI.indentLevel--;
          EditorGUILayout.EndToggleGroup();
 
          if (customMode)
@@ -152,135 +162,190 @@ namespace Crosstales.RTVoice.EditorExtension
          }
 
          GUILayout.Space(8);
-         GUILayout.Label("eSpeak Settings", EditorStyles.boldLabel);
 
-         eSpeakMode = EditorGUILayout.BeginToggleGroup(new GUIContent("Active", "Enable or disable eSpeak for standalone platforms (default: false)."), script.ESpeakMode);
-         if (eSpeakMode != script.ESpeakMode)
+         EditorStyles.foldout.fontStyle = FontStyle.Bold;
+         showPlatformSettings = EditorGUILayout.Foldout(showPlatformSettings, "Platform Settings");
+         EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
+         if (showPlatformSettings)
          {
-            serializedObject.FindProperty("eSpeakMode").boolValue = eSpeakMode;
-            serializedObject.ApplyModifiedProperties();
+            EditorGUI.indentLevel++;
 
-            voiceIndex = 0;
+            GUILayout.Label("Android", EditorStyles.boldLabel);
+            androidEngine = EditorGUILayout.TextField(new GUIContent("Engine", "Active speech engine under Android (default: empty)."), script.AndroidEngine);
+            if (!androidEngine.Equals(script.AndroidEngine))
+            {
+               serializedObject.FindProperty("androidEngine").stringValue = androidEngine;
+               serializedObject.ApplyModifiedProperties();
 
-            script.ReloadProvider();
-         }
+               //script.ReloadProvider();
+            }
 
-         EditorGUI.indentLevel++;
+            GUILayout.Space(8);
+            GUILayout.Label("eSpeak (Linux)", EditorStyles.boldLabel);
 
-         eSpeakApp = EditorGUILayout.TextField(new GUIContent("Application", "eSpeak application name/path (default: 'espeak')."), script.ESpeakApplication);
-         if (!eSpeakApp.Equals(script.ESpeakApplication))
-         {
-            serializedObject.FindProperty("eSpeakApplication").stringValue = eSpeakApp;
-            serializedObject.ApplyModifiedProperties();
+            eSpeakMode = EditorGUILayout.BeginToggleGroup(new GUIContent("Active", "Enable or disable eSpeak for standalone platforms (default: false)."), script.ESpeakMode);
+            {
+               if (eSpeakMode != script.ESpeakMode)
+               {
+                  serializedObject.FindProperty("eSpeakMode").boolValue = eSpeakMode;
+                  serializedObject.ApplyModifiedProperties();
 
-            //script.ReloadProvider();
-         }
+                  voiceIndex = 0;
 
-         eSpeakData = EditorGUILayout.TextField(new GUIContent("Data Path", "eSpeak application data path (default: empty)."), script.ESpeakDataPath);
-         if (!eSpeakData.Equals(script.ESpeakDataPath))
-         {
-            serializedObject.FindProperty("eSpeakDataPath").stringValue = eSpeakData;
-            serializedObject.ApplyModifiedProperties();
+                  script.ReloadProvider();
+               }
 
-            //script.ReloadProvider();
-         }
+               EditorGUI.indentLevel++;
 
-         eSpeakModifier = (Model.Enum.ESpeakModifiers)EditorGUILayout.EnumPopup(new GUIContent("Modifier", "Active modifier for all eSpeak voices (default: none, m1-m6 = male, f1-f4 = female)."), script.ESpeakModifier);
-         if (eSpeakModifier != script.ESpeakModifier)
-         {
-            serializedObject.FindProperty("eSpeakModifier").enumValueIndex = (int)eSpeakModifier;
-            serializedObject.ApplyModifiedProperties();
-         }
+               eSpeakApp = EditorGUILayout.TextField(new GUIContent("Application", "eSpeak application name/path (default: 'espeak')."), script.ESpeakApplication);
+               if (!eSpeakApp.Equals(script.ESpeakApplication))
+               {
+                  serializedObject.FindProperty("eSpeakApplication").stringValue = eSpeakApp;
+                  serializedObject.ApplyModifiedProperties();
 
-         EditorGUI.indentLevel--;
-         EditorGUILayout.EndToggleGroup();
+                  //script.ReloadProvider();
+               }
 
-         if (eSpeakMode && !Provider.VoiceProviderLinux.isSupported)
-         {
-            EditorGUILayout.HelpBox("'eSpeak' is not supported on the current platform!", MessageType.Warning);
+               eSpeakData = EditorGUILayout.TextField(new GUIContent("Data Path", "eSpeak application data path (default: empty)."), script.ESpeakDataPath);
+               if (!eSpeakData.Equals(script.ESpeakDataPath))
+               {
+                  serializedObject.FindProperty("eSpeakDataPath").stringValue = eSpeakData;
+                  serializedObject.ApplyModifiedProperties();
+
+                  //script.ReloadProvider();
+               }
+
+               eSpeakModifier = (Crosstales.RTVoice.Model.Enum.ESpeakModifiers)EditorGUILayout.EnumPopup(new GUIContent("Modifier", "Active modifier for all eSpeak voices (default: none, m1-m6 = male, f1-f4 = female)."), script.ESpeakModifier);
+               if (eSpeakModifier != script.ESpeakModifier)
+               {
+                  serializedObject.FindProperty("eSpeakModifier").enumValueIndex = (int)eSpeakModifier;
+                  serializedObject.ApplyModifiedProperties();
+               }
+
+               EditorGUI.indentLevel--;
+            }
+            EditorGUILayout.EndToggleGroup();
+
+            if (eSpeakMode && !Crosstales.RTVoice.Provider.VoiceProviderLinux.isSupported)
+            {
+               EditorGUILayout.HelpBox("'eSpeak' is not supported on the current platform!", MessageType.Warning);
+            }
+
+            GUILayout.Space(8);
+            GUILayout.Label("Windows", EditorStyles.boldLabel);
+            windowsForce32bit = EditorGUILayout.Toggle(new GUIContent("Force 32bit", "Force 32bit under Windows standalone (default: false)."), script.WindowsForce32bit);
+            if (windowsForce32bit != script.WindowsForce32bit)
+            {
+               serializedObject.FindProperty("windowsForce32bit").boolValue = windowsForce32bit;
+               serializedObject.ApplyModifiedProperties();
+
+               script.ReloadProvider();
+            }
+
+            EditorGUI.indentLevel--;
          }
 
          GUILayout.Space(8);
-         GUILayout.Label("Android Settings", EditorStyles.boldLabel);
-         androidEngine = EditorGUILayout.TextField(new GUIContent("Engine", "Active speech engine under Android (default: empty)."), script.AndroidEngine);
-         if (!androidEngine.Equals(script.AndroidEngine))
-         {
-            serializedObject.FindProperty("androidEngine").stringValue = androidEngine;
-            serializedObject.ApplyModifiedProperties();
 
-            //script.ReloadProvider();
+         EditorStyles.foldout.fontStyle = FontStyle.Bold;
+         showAdvancedSettings = EditorGUILayout.Foldout(showAdvancedSettings, "Advanced Settings");
+         EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
+         if (showAdvancedSettings)
+         {
+            EditorGUI.indentLevel++;
+
+            autoClearTags = EditorGUILayout.Toggle(new GUIContent("Auto Clear Tags", "Automatically clear tags from speeches depending on the capabilities of the current TTS-system (default: false)."), script.AutoClearTags);
+            if (autoClearTags != script.AutoClearTags)
+            {
+               serializedObject.FindProperty("autoClearTags").boolValue = autoClearTags;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            caching = EditorGUILayout.Toggle(new GUIContent("Caching", "Enable or disable the caching of generated speeches (default: true)."), script.Caching);
+            if (caching != script.Caching)
+            {
+               serializedObject.FindProperty("caching").boolValue = caching;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            EditorGUI.indentLevel--;
          }
 
          GUILayout.Space(8);
-         GUILayout.Label("Advanced Settings", EditorStyles.boldLabel);
 
-         autoClearTags = EditorGUILayout.Toggle(new GUIContent("Auto Clear Tags", "Automatically clear tags from speeches depending on the capabilities of the current TTS-system (default: false)."), script.AutoClearTags);
-         if (autoClearTags != script.AutoClearTags)
+         EditorStyles.foldout.fontStyle = FontStyle.Bold;
+         showBehaviourSettings = EditorGUILayout.Foldout(showBehaviourSettings, "Behaviour Settings");
+         EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
+         if (showBehaviourSettings)
          {
-            serializedObject.FindProperty("autoClearTags").boolValue = autoClearTags;
-            serializedObject.ApplyModifiedProperties();
+            EditorGUI.indentLevel++;
+
+            silenceOnDisable = EditorGUILayout.Toggle(new GUIContent("Silence On Disable", "Silence any speeches if this component gets disabled (default: false)."), script.SilenceOnDisable);
+            if (silenceOnDisable != script.SilenceOnDisable)
+            {
+               serializedObject.FindProperty("silenceOnDisable").boolValue = silenceOnDisable;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            silenceOnFocusLost = EditorGUILayout.Toggle(new GUIContent("Silence On Focus Lost", "Silence any speeches if the application loses the focus (default: true)."), script.SilenceOnFocusLost);
+            if (silenceOnFocusLost != script.SilenceOnFocusLost)
+            {
+               serializedObject.FindProperty("silenceOnFocusLost").boolValue = silenceOnFocusLost;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            handleFocus = EditorGUILayout.Toggle(new GUIContent("Handle Focus", "Starts and stops the Speaker depending on the focus and running state (default: true)."), script.HandleFocus);
+            if (handleFocus != script.HandleFocus)
+            {
+               serializedObject.FindProperty("handleFocus").boolValue = handleFocus;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            dontDestroy = EditorGUILayout.Toggle(new GUIContent("Dont Destroy", "Don't destroy gameobject during scene switches (default: true)."), script.DontDestroy);
+            if (dontDestroy != script.DontDestroy)
+            {
+               serializedObject.FindProperty("dontDestroy").boolValue = dontDestroy;
+               serializedObject.ApplyModifiedProperties();
+            }
+
+            EditorGUI.indentLevel--;
          }
 
-         caching = EditorGUILayout.Toggle(new GUIContent("Caching", "Enable or disable the caching of generated speeches (default: true)."), script.Caching);
-         if (caching != script.Caching)
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
+
+         EditorStyles.foldout.fontStyle = FontStyle.Bold;
+         showEvents = EditorGUILayout.Foldout(showEvents, "Events");
+         EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
+         if (showEvents)
          {
-            serializedObject.FindProperty("caching").boolValue = caching;
-            serializedObject.ApplyModifiedProperties();
+            SerializedProperty onReady = serializedObject.FindProperty("OnReady");
+            EditorGUILayout.PropertyField(onReady);
+
+            SerializedProperty onSpeakStarted = serializedObject.FindProperty("OnSpeakStarted");
+            EditorGUILayout.PropertyField(onSpeakStarted);
+
+            SerializedProperty onSpeakCompleted = serializedObject.FindProperty("OnSpeakCompleted");
+            EditorGUILayout.PropertyField(onSpeakCompleted);
+
+            SerializedProperty onProviderChanged = serializedObject.FindProperty("OnProviderChanged");
+            EditorGUILayout.PropertyField(onProviderChanged);
+
+            SerializedProperty onError = serializedObject.FindProperty("OnError");
+            EditorGUILayout.PropertyField(onError);
          }
 
-         GUILayout.Space(8);
-         GUILayout.Label("Behaviour Settings", EditorStyles.boldLabel);
-
-         silenceOnDisable = EditorGUILayout.Toggle(new GUIContent("Silence On Disable", "Silence any speeches if this component gets disabled (default: false)."), script.SilenceOnDisable);
-         if (silenceOnDisable != script.SilenceOnDisable)
-         {
-            serializedObject.FindProperty("silenceOnDisable").boolValue = silenceOnDisable;
-            serializedObject.ApplyModifiedProperties();
-         }
-
-         silenceOnFocusLost = EditorGUILayout.Toggle(new GUIContent("Silence On Focus Lost", "Silence any speeches if the application loses the focus (default: true)."), script.SilenceOnFocusLost);
-         if (silenceOnFocusLost != script.SilenceOnFocusLost)
-         {
-            serializedObject.FindProperty("silenceOnFocusLost").boolValue = silenceOnFocusLost;
-            serializedObject.ApplyModifiedProperties();
-         }
-
-         handleFocus = EditorGUILayout.Toggle(new GUIContent("Handle Focus", "Starts and stops the Speaker depending on the focus and running state (default: true)."), script.HandleFocus);
-         if (handleFocus != script.HandleFocus)
-         {
-            serializedObject.FindProperty("handleFocus").boolValue = handleFocus;
-            serializedObject.ApplyModifiedProperties();
-         }
-
-         dontDestroy = EditorGUILayout.Toggle(new GUIContent("Dont Destroy", "Don't destroy gameobject during scene switches (default: true)."), script.DontDestroy);
-         if (dontDestroy != script.DontDestroy)
-         {
-            serializedObject.FindProperty("dontDestroy").boolValue = dontDestroy;
-            serializedObject.ApplyModifiedProperties();
-         }
-
-         SerializedProperty onReady = serializedObject.FindProperty("OnReady");
-         EditorGUILayout.PropertyField(onReady);
-
-         SerializedProperty onSpeakStarted = serializedObject.FindProperty("OnSpeakStarted");
-         EditorGUILayout.PropertyField(onSpeakStarted);
-
-         SerializedProperty onSpeakCompleted = serializedObject.FindProperty("OnSpeakCompleted");
-         EditorGUILayout.PropertyField(onSpeakCompleted);
-
-         SerializedProperty onProviderChanged = serializedObject.FindProperty("OnProviderChanged");
-         EditorGUILayout.PropertyField(onProviderChanged);
-
-         SerializedProperty onError = serializedObject.FindProperty("OnError");
-         EditorGUILayout.PropertyField(onError);
-
-         EditorHelper.SeparatorUI();
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
          if (script.isActiveAndEnabled)
          {
-            GUILayout.Label("Data", EditorStyles.boldLabel);
-
+            EditorStyles.foldout.fontStyle = FontStyle.Bold;
             showVoices = EditorGUILayout.Foldout(showVoices, "Voices (" + script.Voices.Count + ")");
+            EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
             if (showVoices)
             {
                EditorGUI.indentLevel++;
@@ -290,84 +355,93 @@ namespace Crosstales.RTVoice.EditorExtension
                   EditorGUILayout.SelectableLabel(voice, GUILayout.Height(16), GUILayout.ExpandHeight(false));
                }
 
+               if (GUILayout.Button(new GUIContent(" Reload", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Refresh, "Reload the provider.")))
+               {
+                  script.ReloadProvider();
+               }
+
                EditorGUI.indentLevel--;
             }
 
-            if (GUILayout.Button(new GUIContent(" Reload", EditorHelper.Icon_Refresh, "Reload the provider.")))
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
+
+            EditorStyles.foldout.fontStyle = FontStyle.Bold;
+            showTD = EditorGUILayout.Foldout(showTD, "Test-Drive");
+            EditorStyles.foldout.fontStyle = FontStyle.Normal;
+
+            if (showTD)
             {
-               script.ReloadProvider();
-            }
+               EditorGUI.indentLevel++;
 
-            EditorHelper.SeparatorUI();
-
-            GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
-
-            if (script.Voices.Count > 0)
-            {
-               //EditorHelper.SeparatorUI();
-
-               //GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
-
-               if (Util.Helper.isEditorMode)
+               if (script.Voices.Count > 0)
                {
-                  if (script.isWorkingInEditor)
+                  //EditorHelper.SeparatorUI();
+
+                  //GUILayout.Label("Test-Drive", EditorStyles.boldLabel);
+
+                  if (Crosstales.RTVoice.Util.Helper.isEditorMode)
                   {
-                     GUI.enabled = !script.isSpeaking;
-
-                     text = EditorGUILayout.TextField("Text: ", text);
-                     voiceIndex = EditorGUILayout.Popup("Voice", voiceIndex, script.Voices.CTToString().ToArray());
-                     rate = EditorGUILayout.Slider("Rate", rate, 0f, 3f);
-
-                     if (Util.Helper.isWindowsPlatform)
+                     if (script.isWorkingInEditor)
                      {
-                        pitch = EditorGUILayout.Slider("Pitch", pitch, 0f, 2f);
+                        GUI.enabled = !script.isSpeaking;
 
-                        volume = EditorGUILayout.Slider("Volume", volume, 0f, 1f);
-                     }
+                        text = EditorGUILayout.TextField("Text: ", text);
+                        voiceIndex = EditorGUILayout.Popup("Voice", voiceIndex, script.Voices.CTToString().ToArray());
+                        rate = EditorGUILayout.Slider("Rate", rate, 0f, 3f);
 
-                     GUI.enabled = true;
-
-                     GUILayout.Space(8);
-
-                     if (script.isSpeaking)
-                     {
-                        if (GUILayout.Button(new GUIContent(" Silence", EditorHelper.Icon_Silence, "Silence all active speakers.")))
+                        if (Crosstales.RTVoice.Util.Helper.isWindowsPlatform)
                         {
-                           script.Silence();
+                           pitch = EditorGUILayout.Slider("Pitch", pitch, 0f, 2f);
+
+                           volume = EditorGUILayout.Slider("Volume", volume, 0f, 1f);
+                        }
+
+                        GUI.enabled = true;
+
+                        GUILayout.Space(8);
+
+                        if (script.isSpeaking)
+                        {
+                           if (GUILayout.Button(new GUIContent(" Silence", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Silence, "Silence all active speakers.")))
+                           {
+                              script.Silence();
+                           }
+                        }
+                        else
+                        {
+                           if (GUILayout.Button(new GUIContent(" Speak", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
+                           {
+                              //script.SpeakNative("You have selected " + script.Voices[voiceIndex].Name, script.Voices[voiceIndex], rate, pitch, volume);
+                              script.SpeakNative(text, script.Voices[voiceIndex], rate, pitch, volume);
+                           }
                         }
                      }
                      else
                      {
-                        if (GUILayout.Button(new GUIContent(" Speak", EditorHelper.Icon_Speak, "Speaks the text with the selected voice and settings.")))
-                        {
-                           //script.SpeakNative("You have selected " + script.Voices[voiceIndex].Name, script.Voices[voiceIndex], rate, pitch, volume);
-                           script.SpeakNative(text, script.Voices[voiceIndex], rate, pitch, volume);
-                        }
+                        EditorGUILayout.HelpBox("Test-Drive is not supported for the current TTS-system.", MessageType.Info);
                      }
                   }
                   else
                   {
-                     EditorGUILayout.HelpBox("Test-Drive is not supported for the current TTS-system.", MessageType.Info);
+                     EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
                   }
                }
                else
                {
-                  EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
-               }
-            }
-            else
-            {
-               if (Util.Helper.isEditorMode)
-               {
-                  if (!script.isWorkingInEditor)
+                  if (Crosstales.RTVoice.Util.Helper.isEditorMode)
                   {
-                     EditorGUILayout.HelpBox("Test-Drive is not supported for the current TTS-system.", MessageType.Info);
+                     if (!script.isWorkingInEditor)
+                     {
+                        EditorGUILayout.HelpBox("Test-Drive is not supported for the current TTS-system.", MessageType.Info);
+                     }
+                  }
+                  else
+                  {
+                     EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
                   }
                }
-               else
-               {
-                  EditorGUILayout.HelpBox("Disabled in Play-mode!", MessageType.Info);
-               }
+
+               EditorGUI.indentLevel--;
             }
 
             /*
@@ -388,26 +462,35 @@ namespace Crosstales.RTVoice.EditorExtension
             }
             */
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
-            GUILayout.Label("Information", EditorStyles.boldLabel);
+            EditorStyles.foldout.fontStyle = FontStyle.Bold;
+            showInfo = EditorGUILayout.Foldout(showInfo, "Information");
+            EditorStyles.foldout.fontStyle = FontStyle.Normal;
 
-            GUILayout.Label("Speech Count:\t" + script.SpeechCount);
-            GUILayout.Label("Total Speeches:\t" + Util.Context.NumberOfSpeeches);
+            if (showInfo)
+            {
+               EditorGUI.indentLevel++;
+
+               GUILayout.Label("Speech Count:\t" + script.SpeechCount);
+               GUILayout.Label("Total Speeches:\t" + Crosstales.RTVoice.Util.Context.NumberOfSpeeches);
 #if UNITY_2019_1_OR_NEWER
-            GUILayout.Label("Total Files:\t" + Util.Context.NumberOfAudioFiles);
+               GUILayout.Label("Total Files:\t" + Crosstales.RTVoice.Util.Context.NumberOfAudioFiles);
 #else
-            GUILayout.Label("Total Audio Files:\t" + Util.Context.NumberOfAudioFiles);
+               GUILayout.Label("Total Audio Files:\t" + Crosstales.RTVoice.Util.Context.NumberOfAudioFiles);
 #endif
 
-            /*
-            if (script.Caching)
-            {
-               GUILayout.Space(12);
-               GUILayout.Label($"Cached Speeches:\t{Util.Helper.FormatBytesToHRF(GlobalCache.Instance.CurrentClipCacheSize)}/{Util.Helper.FormatBytesToHRF(GlobalCache.Instance.ClipCacheSize)} ({GlobalCache.Instance.Clips.Count})");
-               GUILayout.Label($"Cache Efficiency:\t{Util.Context.CacheEfficiency:P}");
+               /*
+               if (script.Caching)
+               {
+                  GUILayout.Space(12);
+                  GUILayout.Label($"Cached Speeches:\t{Util.Helper.FormatBytesToHRF(GlobalCache.Instance.CurrentClipCacheSize)}/{Util.Helper.FormatBytesToHRF(GlobalCache.Instance.ClipCacheSize)} ({GlobalCache.Instance.Clips.Count})");
+                  GUILayout.Label($"Cache Efficiency:\t{Util.Context.CacheEfficiency:P}");
+               }
+               */
+
+               EditorGUI.indentLevel--;
             }
-            */
          }
          else
          {
@@ -424,7 +507,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private static void hierarchyItemCB(int instanceID, Rect selectionRect)
       {
-         if (EditorConfig.HIERARCHY_ICON)
+         if (Crosstales.RTVoice.EditorUtil.EditorConfig.HIERARCHY_ICON)
          {
             GameObject go = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
 
@@ -435,7 +518,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
                //Debug.Log("HierarchyItemCB: " + r);
 
-               GUI.Label(r, EditorHelper.Logo_Asset_Small);
+               GUI.Label(r, Crosstales.RTVoice.EditorUtil.EditorHelper.Logo_Asset_Small);
             }
          }
       }
@@ -444,4 +527,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

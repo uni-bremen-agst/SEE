@@ -1,7 +1,9 @@
 {
     "name": "UMA_Content",
     "references": [
-        "UMA_Core"
+        "UMA_Core",
+        "UnityEngine.UI",
+        "UnityEditor.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": []

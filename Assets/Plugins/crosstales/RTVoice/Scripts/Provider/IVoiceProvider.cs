@@ -22,7 +22,7 @@ namespace Crosstales.RTVoice.Provider
 
       /// <summary>Get all available voices from the current TTS-provider and fills it into a given list.</summary>
       /// <returns>All available voices (alphabetically ordered by 'Name') as a list.</returns>
-      System.Collections.Generic.List<Model.Voice> Voices { get; }
+      System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> Voices { get; }
 
       /// <summary>Maximal length of the speech text (in characters).</summary>
       /// <returns>The maximal length of the speech text.</returns>
@@ -72,6 +72,10 @@ namespace Crosstales.RTVoice.Provider
       /// <returns>All available cultures (alphabetically ordered by 'Culture') as a list.</returns>
       System.Collections.Generic.List<string> Cultures { get; }
 
+      /// <summary>Maximal number of simultaneous speeches (0 = unlimited).</summary>
+      /// <returns>The maximal number of simultaneous speeches.</returns>
+      int MaxSimultaneousSpeeches { get; }
+
       #endregion
 
 
@@ -86,20 +90,20 @@ namespace Crosstales.RTVoice.Provider
 
       /// <summary>The current provider speaks a text with a given voice (native mode).</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
-      IEnumerator SpeakNative(Model.Wrapper wrapper);
+      IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper);
 
       /// <summary>The current provider speaks a text with a given voice.</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
-      IEnumerator Speak(Model.Wrapper wrapper);
+      IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper);
 
       /// <summary>The current provider generates an audio file from a text with a given voice.</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
-      IEnumerator Generate(Model.Wrapper wrapper);
+      IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper);
 
       /// <summary>The provider speaks a text with a given AudioClip.</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
       /// <param name="clip">AudioClip with the speech audio.</param>
-      IEnumerator SpeakWithClip(Model.Wrapper wrapper, AudioClip clip);
+      IEnumerator SpeakWithClip(Crosstales.RTVoice.Model.Wrapper wrapper, AudioClip clip);
 
       /// <summary>Load the provider (e.g. all voices).</summary>
       /// <param name="forceReload">Force reload the provider (default: false, optional).</param>
@@ -114,15 +118,15 @@ namespace Crosstales.RTVoice.Provider
 
       /// <summary>The current provider speaks a text with a given voice (native mode & Editor only).</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
-      void SpeakNativeInEditor(Model.Wrapper wrapper);
+      void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper);
 
       /// <summary>Generates an audio file with the current provider (Editor only).</summary>
       /// <param name="wrapper">Wrapper containing the data.</param>
-      void GenerateInEditor(Model.Wrapper wrapper);
+      void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper);
 
 #endif
 
       #endregion
    }
 }
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

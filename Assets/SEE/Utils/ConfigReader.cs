@@ -16,9 +16,9 @@ namespace SEE.Utils
     }
 
     /// <summary>
-    /// Parser for configuration settings according to the following 
+    /// Parser for configuration settings according to the following
     /// grammar in EBNF:
-    /// 
+    ///
     ///  Config ::= AttributeSeq EndToken .
     ///  AttributeSeq ::= { Attribute } .
     ///  Attribute ::= Label ':' Value ';' .
@@ -59,8 +59,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Parses the file whose name was passed to the constructor
-        /// and returns the read configuration settings therein. 
-        /// 
+        /// and returns the read configuration settings therein.
+        ///
         /// Throws an exception if the file content does not conform to the grammar.
         /// </summary>
         /// <returns>the collected attribute values as (nested) dictionary</returns>
@@ -71,7 +71,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Parses <paramref name="input"/> for configuration setttings.
-        ///  
+        ///
         /// Throws an exception if <paramref name="input"/> does not conform to the grammar.
         /// </summary>
         /// <param name="input">input to be parsed</param>
@@ -83,12 +83,19 @@ namespace SEE.Utils
 
         /// <summary>
         /// The number style acceptable when parsing float numbers.
-        /// Implied by System.Globalization.NumberStyles.Float are AllowLeadingWhite, AllowTrailingWhite, 
+        /// Implied by System.Globalization.NumberStyles.Float are AllowLeadingWhite, AllowTrailingWhite,
         /// AllowLeadingSign, AllowDecimalPoint, AllowExponent. We also allow AllowThousands.
         /// </summary>
         private const System.Globalization.NumberStyles FloatStyle = System.Globalization.NumberStyles.Float
                     | System.Globalization.NumberStyles.AllowThousands;
 
+        /// <summary>
+        /// Tries to parse a float from <paramref name="s"/>. Upon success, the float value
+        /// is returned in <paramref name="value"/>.
+        /// </summary>
+        /// <param name="s">a string from which to parse a float (can also be Infinity and -Infinity)</param>
+        /// <param name="value">the parsed float value; defined only if <c>true</c> was returned</param>
+        /// <returns>true if a float could be parsed</returns>
         private static bool TryParseFloat(string s, out float value)
         {
             return Single.TryParse(s: s, style: FloatStyle,

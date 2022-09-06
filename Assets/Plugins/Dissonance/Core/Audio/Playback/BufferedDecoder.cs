@@ -70,21 +70,19 @@ namespace Dissonance.Audio.Playback
         {
             if (DebugSettings.Instance.EnablePlaybackDiagnostics && DebugSettings.Instance.RecordDecodedAudio)
             {
-                var filename = string.Format("Dissonance_Diagnostics/Decoded_{0}_{1}_{2}", context.PlayerName, context.Id, DateTime.UtcNow.ToFileTime());
+                var filename = $"Dissonance_Diagnostics/Decoded_{context.PlayerName}_{context.Id}_{DateTime.UtcNow.ToFileTime()}";
                 _diagnosticOutput = new AudioFileWriter(filename, _waveFormat);
             }
         }
 
         public bool Read(ArraySegment<float> frame)
         {
-            VoicePacket? encoded;
-            bool peekLostPacket;
-            var lastFrame = _buffer.Read(out encoded, out peekLostPacket);
+            var lastFrame = _buffer.Read(out var encoded, out var peekLostPacket);
 
-            var p = new EncodedBuffer(encoded.HasValue ? encoded.Value.EncodedAudioFrame : (ArraySegment<byte>?)null, peekLostPacket || !encoded.HasValue);
+            var p = new EncodedBuffer(encoded?.EncodedAudioFrame, peekLostPacket || !encoded.HasValue);
 
             //Decode the frame
-            int decodedCount = _decoder.Decode(p, frame);
+            var decodedCount = _decoder.Decode(p, frame);
 
             //If it was not a lost frame, also decode the metadata
             if (!p.PacketLost && encoded.HasValue)
@@ -102,7 +100,7 @@ namespace Dissonance.Audio.Playback
             
             //Sanity check that decoding got correct number of samples
             if (decodedCount != _frameSize)
-                throw new InvalidOperationException(string.Format("Decoding a frame of audio got {0} samples, but should have decoded {1} samples", decodedCount, _frameSize));
+                throw new InvalidOperationException($"Decoding a frame of audio got {decodedCount} samples, but should have decoded {_frameSize} samples");
 
             if (_diagnosticOutput != null)
                 _diagnosticOutput.WriteSamples(frame);
@@ -122,8 +120,6 @@ namespace Dissonance.Audio.Playback
                     l.Value.Clear();
                     l.Value.AddRange(encoded.Channels);
                 }
-
-                _receivedFirstPacket = true;
             }
         }
 
@@ -135,7 +131,7 @@ namespace Dissonance.Audio.Playback
             _receivedFirstPacket = false;
 
             using (var l = _options.Lock())
-                l.Value = new PlaybackOptions(false, 1, ChannelPriority.Default);
+                l.Value = new PlaybackOptions(false, 0, ChannelPriority.Default);
 
             using (var l = _channels.Lock())
                 l.Value.Clear();
@@ -149,9 +145,14 @@ namespace Dissonance.Audio.Playback
 
         public void Push(VoicePacket frame)
         {
-            //If this is the first packet extract the channel data ahead of time so that it is available in the PlayerStartedSpeaking event
+            //If this is the first packet extract some data ahead of time so that it is available when playback starts
             if (!_receivedFirstPacket)
+            {
                 ExtractChannels(frame);
+
+                using (var l = _options.Lock())
+                    l.Value = frame.PlaybackOptions;
+            }
 
             _buffer.Push(frame);
             _receivedFirstPacket = true;

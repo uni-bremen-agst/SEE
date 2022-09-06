@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SEETests
@@ -18,11 +19,19 @@ namespace SEETests
          * work at all (i.e. cause no error). Before more useful tests can be implemented, a project with constant
          * properties has to be created, because the currently existing SEE project is too dynamic to reliably test.
          */
+        
+        [SetUp]
+        public void SetUp()
+        {
+            GameObject retrieverObject = new GameObject("Retriever");
+            retrieverObject.AddComponent<DashboardRetriever>();
+        }
+        
         [UnityTest]
         public IEnumerator testDashboardVersionCorrect() => UniTask.ToCoroutine(async () =>
         {
             DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersion();
-            Assert.AreEqual(version, DashboardVersion.SupportedVersion);
+            Assert.AreEqual(DashboardVersion.SupportedVersion, version);
         });
 
         [UnityTest]
@@ -32,7 +41,7 @@ namespace SEETests
             Assert.IsNotNull(list);
             Assert.AreEqual(1, list.entities.Count);
         });
-        
+
         [UnityTest]
         public IEnumerator testDashboardEntities() => UniTask.ToCoroutine(async () =>
         {
@@ -40,7 +49,7 @@ namespace SEETests
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.entities);
         });
-        
+
         [UnityTest]
         public IEnumerator testDashboardMetrics() => UniTask.ToCoroutine(async () =>
         {
@@ -48,7 +57,7 @@ namespace SEETests
             Assert.IsNotNull(list);
             Assert.IsNotEmpty(list.metrics);
         });
-        
+
         [UnityTest]
         public IEnumerator testDashboardMetricValue() => UniTask.ToCoroutine(async () =>
         {
@@ -61,7 +70,7 @@ namespace SEETests
             Assert.AreEqual(range.metric, metric);
             Assert.IsFalse(range.values.Contains(null));
         });
-        
+
         [UnityTest]
         public IEnumerator testDashboardMetricTable() => UniTask.ToCoroutine(async () =>
         {
@@ -69,7 +78,7 @@ namespace SEETests
             Assert.IsNotNull(table);
             Assert.IsNotEmpty(table.rows);
         });
-        
+
         [UnityTest]
         public IEnumerator testDashboardIssueDescription() => UniTask.ToCoroutine(async () =>
         {

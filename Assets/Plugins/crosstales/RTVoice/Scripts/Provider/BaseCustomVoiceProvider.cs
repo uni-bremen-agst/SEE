@@ -10,7 +10,7 @@ namespace Crosstales.RTVoice.Provider
    {
       #region Variables
 
-      protected System.Collections.Generic.List<Model.Voice> cachedVoices = new System.Collections.Generic.List<Model.Voice>();
+      protected System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> cachedVoices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>();
 
       private System.Collections.Generic.List<string> cachedCultures;
 
@@ -75,9 +75,9 @@ namespace Crosstales.RTVoice.Provider
          if (isOnlineService)
             OnlineCheck.OnlineCheck.Instance.OnOnlineStatusChange += onOnlineStatusChange;
 #endif
-         if (isPlatformSupported && Speaker.Instance.CustomProvider == this)
+         if (isPlatformSupported) // && Speaker.Instance.CustomProvider == this)
          {
-            if (isOnlineService && !Util.Helper.isInternetAvailable)
+            if (isOnlineService && !Crosstales.Common.Util.NetworkHelper.isInternetAvailable)
             {
                Speaker.Instance.CustomMode = false;
 #if CT_OC
@@ -113,7 +113,7 @@ namespace Crosstales.RTVoice.Provider
 
       public abstract string DefaultVoiceName { get; }
 
-      public virtual System.Collections.Generic.List<Model.Voice> Voices => cachedVoices;
+      public virtual System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> Voices => cachedVoices;
 
       public abstract bool isWorkingInEditor { get; }
 
@@ -145,10 +145,10 @@ namespace Crosstales.RTVoice.Provider
             {
                cachedCultures = new System.Collections.Generic.List<string>();
 
-               System.Collections.Generic.IEnumerable<Model.Voice> cultures = Voices.GroupBy(cul => cul.Culture)
+               System.Collections.Generic.IEnumerable<Crosstales.RTVoice.Model.Voice> cultures = Voices.GroupBy(cul => cul.Culture)
                   .Select(grp => grp.First()).OrderBy(s => s.Culture).ToList();
 
-               foreach (Model.Voice voice in cultures)
+               foreach (Crosstales.RTVoice.Model.Voice voice in cultures)
                {
                   cachedCultures.Add(voice.Culture);
                }
@@ -157,6 +157,8 @@ namespace Crosstales.RTVoice.Provider
             return cachedCultures;
          }
       }
+
+      public abstract int MaxSimultaneousSpeeches { get; }
 
       public virtual void Silence()
       {
@@ -168,13 +170,13 @@ namespace Crosstales.RTVoice.Provider
          //do nothing
       }
 
-      public abstract IEnumerator SpeakNative(Model.Wrapper wrapper);
+      public abstract IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-      public abstract IEnumerator Speak(Model.Wrapper wrapper);
+      public abstract IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-      public abstract IEnumerator Generate(Model.Wrapper wrapper);
+      public abstract IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-      public virtual IEnumerator SpeakWithClip(Model.Wrapper wrapper, AudioClip clip)
+      public virtual IEnumerator SpeakWithClip(Crosstales.RTVoice.Model.Wrapper wrapper, AudioClip clip)
       {
          if (wrapper != null && wrapper.Source != null)
          {
@@ -185,7 +187,7 @@ namespace Crosstales.RTVoice.Provider
 
             yield return null;
 
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.Log("Text generated: " + wrapper.Text);
 
             onSpeakAudioGenerationComplete(wrapper);
@@ -202,7 +204,7 @@ namespace Crosstales.RTVoice.Provider
                   yield return null;
                } while (!silence && wrapper.Source.CTHasActiveClip());
 
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("Text spoken: " + wrapper.Text);
 
                onSpeakComplete(wrapper);
@@ -225,18 +227,18 @@ namespace Crosstales.RTVoice.Provider
 
       protected virtual string getOutputFile(string uid, bool isPersistentData = false /*, bool createFile = false*/)
       {
-         string filename = Util.Constants.AUDIOFILE_PREFIX + uid + AudioFileExtension;
+         string filename = Crosstales.RTVoice.Util.Constants.AUDIOFILE_PREFIX + uid + AudioFileExtension;
 
          string outputFile;
          if (isPersistentData)
          {
             //outputFile = Util.Helper.ValidatePath(Application.persistentDataPath) + filename;
-            outputFile = Util.Helper.ValidatePath(Application.temporaryCachePath) + filename;
+            outputFile = Crosstales.Common.Util.FileHelper.ValidatePath(Application.temporaryCachePath) + filename;
          }
 
          else
          {
-            outputFile = Util.Config.AUDIOFILE_PATH + filename;
+            outputFile = Crosstales.RTVoice.Util.Config.AUDIOFILE_PATH + filename;
          }
 
          /*
@@ -256,7 +258,7 @@ namespace Crosstales.RTVoice.Provider
          return outputFile;
       }
 
-      protected virtual IEnumerator playAudioFile(Model.Wrapper wrapper, AudioClip ac, bool isNative = false)
+      protected virtual IEnumerator playAudioFile(Crosstales.RTVoice.Model.Wrapper wrapper, AudioClip ac, bool isNative = false)
       {
          if (wrapper != null && wrapper.Source != null)
          {
@@ -282,7 +284,7 @@ namespace Crosstales.RTVoice.Provider
                      yield return null;
                   } while (!silence && wrapper.Source.CTHasActiveClip());
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Text spoken: " + wrapper.Text, this);
 
                   onSpeakComplete(wrapper);
@@ -293,7 +295,7 @@ namespace Crosstales.RTVoice.Provider
 
                if (ac != null && Speaker.Instance.Caching)
                {
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Adding wrapper to clips-cache: " + wrapper);
 
                   GlobalCache.Instance.AddClip(wrapper, ac);
@@ -314,15 +316,16 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      protected virtual IEnumerator playAudioFile(Model.Wrapper wrapper, string url, string outputFile,
+      protected virtual IEnumerator playAudioFile(Crosstales.RTVoice.Model.Wrapper wrapper, string url, string outputFile,
          AudioType type = AudioType.WAV, bool isNative = false, bool isLocalFile = true,
          System.Collections.Generic.Dictionary<string, string> headers = null)
       {
          if (wrapper != null && wrapper.Source != null)
          {
+            //Debug.LogWarning("LOCAL: " + isLocalFile + " - " + outputFile);
             if (!isLocalFile || isLocalFile && (System.IO.File.Exists(outputFile) && new System.IO.FileInfo(outputFile).Length > 1024))
             {
-               if (Util.Helper.isStandalonePlatform && type == AudioType.MPEG)
+               if (Crosstales.RTVoice.Util.Helper.isStandalonePlatform && type == AudioType.MPEG)
                {
                   Debug.LogWarning("MP3 is not supported under the current platform!");
                   //TODO add support for DJ!
@@ -352,7 +355,7 @@ namespace Crosstales.RTVoice.Provider
 #if UNITY_WEBGL
                      if (type == AudioType.WAV)
                      {
-                        AudioClip ac = Common.Audio.WavMaster.ToAudioClip(www.downloadHandler.data);
+                        AudioClip ac = Crosstales.Common.Audio.WavMaster.ToAudioClip(www.downloadHandler.data);
 #else
                         AudioClip ac = DownloadHandlerAudioClip.GetContent(www);
 
@@ -367,7 +370,7 @@ namespace Crosstales.RTVoice.Provider
                         {
                            wrapper.Source.clip = ac;
 
-                           if (Util.Config.DEBUG)
+                           if (Crosstales.RTVoice.Util.Config.DEBUG)
                               Debug.Log($"Text generated: {wrapper.Text}", this);
 
                            copyAudioFile(wrapper, outputFile, isLocalFile, www.downloadHandler.data);
@@ -377,7 +380,7 @@ namespace Crosstales.RTVoice.Provider
 
                            if (ac != null && Speaker.Instance.Caching)
                            {
-                              if (Util.Config.DEBUG)
+                              if (Crosstales.RTVoice.Util.Config.DEBUG)
                                  Debug.Log($"Adding wrapper to clips-cache: {wrapper}", this);
 
                               GlobalCache.Instance.AddClip(wrapper, ac);
@@ -393,7 +396,7 @@ namespace Crosstales.RTVoice.Provider
                                  yield return null;
                               } while (!silence && wrapper.Source.CTHasActiveClip());
 
-                              if (Util.Config.DEBUG)
+                              if (Crosstales.RTVoice.Util.Config.DEBUG)
                                  Debug.Log($"Text spoken: {wrapper.Text}", this);
 
                               onSpeakComplete(wrapper);
@@ -443,7 +446,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      protected virtual void copyAudioFile(Model.Wrapper wrapper, string outputFile, bool isLocalFile = true, byte[] data = null)
+      protected virtual void copyAudioFile(Crosstales.RTVoice.Model.Wrapper wrapper, string outputFile, bool isLocalFile = true, byte[] data = null)
       {
          if (wrapper != null)
          {
@@ -453,7 +456,7 @@ namespace Crosstales.RTVoice.Provider
 
                if (isLocalFile)
                {
-                  Util.Helper.CopyFile(outputFile, wrapper.OutputFile, Util.Config.AUDIOFILE_AUTOMATIC_DELETE);
+                  Crosstales.Common.Util.FileHelper.CopyFile(outputFile, wrapper.OutputFile, Crosstales.RTVoice.Util.Config.AUDIOFILE_AUTOMATIC_DELETE);
                }
                else
                {
@@ -471,7 +474,7 @@ namespace Crosstales.RTVoice.Provider
                }
             }
 
-            if (Util.Config.AUDIOFILE_AUTOMATIC_DELETE)
+            if (Crosstales.RTVoice.Util.Config.AUDIOFILE_AUTOMATIC_DELETE)
             {
                try
                {
@@ -502,13 +505,13 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      protected virtual void processAudioFile(Model.Wrapper wrapper, string outputFile, bool isLocalFile = true, byte[] data = null)
+      protected virtual void processAudioFile(Crosstales.RTVoice.Model.Wrapper wrapper, string outputFile, bool isLocalFile = true, byte[] data = null)
       {
          if (wrapper != null)
          {
             if (!isLocalFile || isLocalFile && (System.IO.File.Exists(outputFile) && new System.IO.FileInfo(outputFile).Length > 1024))
             {
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log("Text generated: " + wrapper.Text, this);
 
                copyAudioFile(wrapper, outputFile, isLocalFile, data);
@@ -531,11 +534,11 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      protected virtual string getVoiceName(Model.Wrapper wrapper)
+      protected virtual string getVoiceName(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper != null && string.IsNullOrEmpty(wrapper.Voice?.Name))
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.LogWarning("'wrapper.Voice' or 'wrapper.Voice.Name' is null! Using the providers 'default' voice.", this);
 
             return DefaultVoiceName;
@@ -565,7 +568,7 @@ namespace Crosstales.RTVoice.Provider
 
             if (isconnected)
             {
-               if (Util.Config.DEBUG)
+               if (Crosstales.RTVoice.Util.Config.DEBUG)
                   Debug.Log($"'{GetType().Name}' has now again an Internet connection.", this);
             }
             else
@@ -577,33 +580,33 @@ namespace Crosstales.RTVoice.Provider
 #endif
       protected void onVoicesReady()
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onVoicesReady", this);
 
          OnVoicesReady?.Invoke();
       }
 
-      protected void onSpeakStart(Model.Wrapper wrapper)
+      protected void onSpeakStart(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakStart: " + wrapper, this);
 
          OnSpeakStart?.Invoke(wrapper);
       }
 
-      protected void onSpeakComplete(Model.Wrapper wrapper)
+      protected void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakComplete: " + wrapper, this);
 
          OnSpeakComplete?.Invoke(wrapper);
       }
 
-      protected void onSpeakCurrentWord(Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
+      protected void onSpeakCurrentWord(Crosstales.RTVoice.Model.Wrapper wrapper, string[] speechTextArray, int wordIndex)
       {
          if (wordIndex < speechTextArray.Length)
          {
-            if (Util.Config.DEBUG)
+            if (Crosstales.RTVoice.Util.Config.DEBUG)
                Debug.Log("onSpeakCurrentWord: " + speechTextArray[wordIndex] + System.Environment.NewLine + wrapper, this);
 
             OnSpeakCurrentWord?.Invoke(wrapper, speechTextArray, wordIndex);
@@ -615,49 +618,49 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      protected void onSpeakCurrentWord(Model.Wrapper wrapper, string word)
+      protected void onSpeakCurrentWord(Crosstales.RTVoice.Model.Wrapper wrapper, string word)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakCurrentWord: " + word + System.Environment.NewLine + wrapper);
 
          OnSpeakCurrentWordString?.Invoke(wrapper, word);
       }
 
-      protected void onSpeakCurrentPhoneme(Model.Wrapper wrapper, string phoneme)
+      protected void onSpeakCurrentPhoneme(Crosstales.RTVoice.Model.Wrapper wrapper, string phoneme)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakCurrentPhoneme: " + phoneme + System.Environment.NewLine + wrapper, this);
 
          OnSpeakCurrentPhoneme?.Invoke(wrapper, phoneme);
       }
 
-      protected void onSpeakCurrentViseme(Model.Wrapper wrapper, string viseme)
+      protected void onSpeakCurrentViseme(Crosstales.RTVoice.Model.Wrapper wrapper, string viseme)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakCurrentViseme: " + viseme + System.Environment.NewLine + wrapper, this);
 
          OnSpeakCurrentViseme?.Invoke(wrapper, viseme);
       }
 
-      protected void onSpeakAudioGenerationStart(Model.Wrapper wrapper)
+      protected void onSpeakAudioGenerationStart(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakAudioGenerationStart: " + wrapper, this);
 
          OnSpeakAudioGenerationStart?.Invoke(wrapper);
       }
 
-      protected void onSpeakAudioGenerationComplete(Model.Wrapper wrapper)
+      protected void onSpeakAudioGenerationComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onSpeakAudioGenerationComplete: " + wrapper, this);
 
          OnSpeakAudioGenerationComplete?.Invoke(wrapper);
       }
 
-      protected void onErrorInfo(Model.Wrapper wrapper, string info)
+      protected void onErrorInfo(Crosstales.RTVoice.Model.Wrapper wrapper, string info)
       {
-         if (Util.Config.DEBUG)
+         if (Crosstales.RTVoice.Util.Config.DEBUG)
             Debug.Log("onErrorInfo: " + info, this);
 
          OnErrorInfo?.Invoke(wrapper, info);
@@ -670,13 +673,13 @@ namespace Crosstales.RTVoice.Provider
 
 #if UNITY_EDITOR
 
-      public abstract void SpeakNativeInEditor(Model.Wrapper wrapper);
+      public abstract void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper);
 
-      public abstract void GenerateInEditor(Model.Wrapper wrapper);
+      public abstract void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper);
 
 #endif
 
       #endregion
    }
 }
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

@@ -12,4 +12,4 @@
 
 mergeInto(LibraryManager.library, CTOpenWindowPlugin);
 
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

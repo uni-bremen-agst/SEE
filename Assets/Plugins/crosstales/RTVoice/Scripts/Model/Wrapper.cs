@@ -49,7 +49,7 @@ namespace Crosstales.RTVoice.Model
          {
             //if (cachedString == null)
             //{
-            string result /*= cachedString*/ = Util.Helper.CleanText(text, Speaker.Instance.AutoClearTags || !ForceSSML /*&& !(Speaker.isMaryMode /* || Util.Helper.isWindowsPlatform )*/);
+            string result /*= cachedString*/ = Crosstales.RTVoice.Util.Helper.CleanText(text, Speaker.Instance.AutoClearTags || !ForceSSML /*&& !(Speaker.isMaryMode /* || Util.Helper.isWindowsPlatform )*/);
 
             if (result.Length > Speaker.Instance.MaxTextLength)
             {
@@ -148,7 +148,7 @@ namespace Crosstales.RTVoice.Model
       {
          get
          {
-            if (!Util.Helper.isEditorMode && source != null && source.clip != null)
+            if (!Crosstales.RTVoice.Util.Helper.isEditorMode && source != null && source.clip != null)
             {
                return source.clip.length;
             }
@@ -236,57 +236,57 @@ namespace Crosstales.RTVoice.Model
          System.Text.StringBuilder result = new System.Text.StringBuilder();
 
          result.Append(GetType().Name);
-         result.Append(Util.Constants.TEXT_TOSTRING_START);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_START);
 
          result.Append("Uid='");
          result.Append(uid);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Text='");
          result.Append(text);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Source='");
          result.Append(source);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Voice='");
          result.Append(voice);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("SpeakImmediately='");
          result.Append(speakImmediately);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Rate='");
          result.Append(rate);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Pitch='");
          result.Append(pitch);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Volume='");
          result.Append(volume);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("OutputFile='");
          result.Append(outputFile);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("ForceSSML='");
          result.Append(forceSSML);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("isPartial='");
          result.Append(isPartial);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Created='");
          result.Append(Created);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER_END);
 
-         result.Append(Util.Constants.TEXT_TOSTRING_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_END);
 
          return result.ToString();
       }
@@ -300,13 +300,18 @@ namespace Crosstales.RTVoice.Model
 
          bool result = Text == other.Text &&
                        (Voice == null || Voice.Equals(other.Voice)) &&
-                       System.Math.Abs(Rate - other.Rate) < Util.Constants.FLOAT_TOLERANCE &&
-                       System.Math.Abs(Pitch - other.Pitch) < Util.Constants.FLOAT_TOLERANCE &&
-                       System.Math.Abs(Volume - other.Volume) < Util.Constants.FLOAT_TOLERANCE;
+                       System.Math.Abs(Rate - other.Rate) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE &&
+                       System.Math.Abs(Pitch - other.Pitch) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE &&
+                       System.Math.Abs(Volume - other.Volume) < Crosstales.RTVoice.Util.Constants.FLOAT_TOLERANCE;
 
          return result;
       }
 
+      public override int GetHashCode()
+      {
+         return base.GetHashCode();
+      }
+/*
       public override int GetHashCode()
       {
          int hash = 0;
@@ -321,8 +326,8 @@ namespace Crosstales.RTVoice.Model
 
          return hash;
       }
-
+*/
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

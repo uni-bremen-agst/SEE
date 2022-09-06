@@ -29,7 +29,7 @@ namespace Dissonance
         private CommActivationMode? _previousMode;
         private IDissonancePlayer _self;
 
-        private Fader _activationFader = new Fader();
+        private Fader _activationFader;
         // ReSharper disable once FieldCanBeMadeReadOnly.Local (Justification: Confuses unity serialization)
         [SerializeField] private VolumeFaderSettings _activationFaderSettings = new VolumeFaderSettings {
             Volume = 1,
@@ -44,7 +44,7 @@ namespace Dissonance
             get { return _activationFaderSettings; }
         }
 
-        private Fader _triggerFader = new Fader();
+        private Fader _triggerFader;
         // ReSharper disable once FieldCanBeMadeReadOnly.Local (Justification: Confuses unity serialization)
         [SerializeField] private VolumeFaderSettings _triggerFaderSettings = new VolumeFaderSettings {
             Volume = 1,
@@ -317,33 +317,48 @@ namespace Dissonance
             SetChannelVolume(CurrentFaderVolume);
 
             //Decide if we need to change state
-            var current = IsTransmitting;
-            var next = ShouldActivate(IsUserActivated());
+            var intent = IsUserActivated();
+            var next = ShouldActivate(intent);
 
-            //Apply state if changed
-            if (current != next)
+            // Change the activation fader based on user intent
+            if (intent)
             {
-                if (current)
-                {
-                    //Begin fade out (if it's not already fading to zero)
-                    if (Math.Abs(_activationFader.EndVolume) > float.Epsilon)
-                        _activationFader.FadeTo(0, (float)_activationFaderSettings.FadeOut.TotalSeconds);
+                // If we're speaking and the activation fader is not going to the max volume yet, start fading in
+                if (Math.Abs(_activationFader.EndVolume - _activationFaderSettings.Volume) > float.Epsilon)
+                    _activationFader.FadeTo(_activationFaderSettings.Volume, (float)_activationFaderSettings.FadeIn.TotalSeconds);
+            }
+            else
+            {
+                // Begin fade out (if it's not already fading to zero)
+                if (Math.Abs(_activationFader.EndVolume) > float.Epsilon)
+                    _activationFader.FadeTo(0, (float)_activationFaderSettings.FadeOut.TotalSeconds);
+            }
 
-                    //Stop transmitting once fade out is complete
-                    if (CurrentFaderVolume <= float.Epsilon)
+            // Apply state if changed
+            if (IsTransmitting != next)
+            {
+                // Check if we need to start or stop transmitting
+                if (!next)
+                {
+                    // We need to stop transmitting, but is that because the intent has changed or something else?
+                    // If the intent is active (user wants to talk) and the collider is triggered then something else
+                    // is blocking speech, slam this connection closed immediately.
+                    if (intent && (IsColliderTriggered || !UseColliderTrigger))
+                    {
                         CloseChannel();
+                    }
+                    else
+                    {
+                        // Stop transmitting once fade out is complete
+                        if (CurrentFaderVolume <= float.Epsilon)
+                            CloseChannel();
+                    }
                 }
                 else
                 {
-                    //Start transmitting
+                    // Start transmitting
                     OpenChannel();
                 }
-            }
-            else if (current)
-            {
-                //If we're speaking and the activation fader is not going to the max volume yet, start fading in
-                if (Math.Abs(_activationFader.EndVolume - _activationFaderSettings.Volume) > float.Epsilon)
-                    _activationFader.FadeTo(_activationFaderSettings.Volume, (float)_activationFaderSettings.FadeIn.TotalSeconds);
             }
         }
 

@@ -24,8 +24,8 @@ namespace SEE.DataModel.DG
         /// <param name="type">type of the edge</param>
         public Edge(Node source, Node target, string type)
         {
-            this.Source = source;
-            this.Target = target;
+            Source = source;
+            Target = target;
             Type = type;
         }
 
@@ -45,6 +45,13 @@ namespace SEE.DataModel.DG
         /// original graph loaded. Such edges are introduced artificially.
         /// </summary>
         public const string IsLiftedToggle = "IsLifted";
+
+        /// <summary>
+        /// The name of the toggle attribute that marks "virtual" edges, which are
+        /// edges that are not intended to be layouted or drawn in SEE and only
+        /// exist in the underlying graph.
+        /// </summary>
+        public const string IsVirtualToggle = "IsVirtual";
 
         /// <summary>
         /// The source of the edge.
@@ -126,6 +133,11 @@ namespace SEE.DataModel.DG
             result += base.ToString();
             result += "}";
             return result;
+        }
+
+        public override string ToShortString()
+        {
+            return $"({Source.ToShortString()}) --({Type})-> ({Target.ToShortString()})";
         }
 
         /// <summary>

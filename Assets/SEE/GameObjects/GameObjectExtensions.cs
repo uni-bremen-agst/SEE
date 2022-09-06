@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OdinSerializer.Utilities;
+using Sirenix.Serialization.Utilities;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using Sirenix.Utilities;
 
 namespace SEE.GO
 {
@@ -39,6 +40,7 @@ namespace SEE.GO
                     return edgeRef.Value.ID;
                 }
             }
+
             return nodeRef.Value.ID;
         }
 
@@ -48,7 +50,18 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
-        public static SEECity ContainingCity(this GameObject gameObject)
+        public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city of type <typeparamref name="T"/>
+        /// this object is contained in will be returned. Otherwise null is returned.
+        /// </summary>
+        /// <param name="gameObject">graph node or edge whose containing city of type <typeparamref name="T"/>
+        /// is requested</param>
+        /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
+        /// or null</returns>
+        /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
+        public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
             if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
             {
@@ -57,7 +70,7 @@ namespace SEE.GO
             else
             {
                 Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out SEECity city))
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
@@ -85,53 +98,57 @@ namespace SEE.GO
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
-        /// <param name="tag">tag the ancestors must have</param>
+        /// <param name="tag">tag the descendants must have</param>
         /// <returns>all transitive children with <paramref name="tag"/></returns>
-        public static List<GameObject> AllAncestors(this GameObject gameObject, string tag)
+        public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
             List<GameObject> result = new List<GameObject>();
             if (gameObject.CompareTag(tag))
             {
                 result.Add(gameObject);
             }
+
             foreach (Transform child in gameObject.transform)
             {
-                result.AddRange(child.gameObject.AllAncestors(tag));
+                result.AddRange(child.gameObject.AllDescendants(tag));
             }
+
             return result;
         }
 
         /// <summary>
-        /// Returns the first ancestor of the given <paramref name="gameObject"/> with the given <paramref name="id"/>.
-        /// Will also return inactive game objects. If no such ancestor exists, null will be returned.
+        /// Returns the first descendant of the given <paramref name="gameObject"/> with the given <paramref name="name"/>
+        /// (attribute 'name' of a GameObject).
+        /// Will also return inactive game objects. If no such descendant exists, null will be returned.
         /// Unlike <see cref="Transform.Find(string)"/>, this method will descend into the game-object hierarchy.
         /// </summary>
         /// <param name="gameObject">root object</param>
-        /// <param name="id">id of the ancestor to be found</param>
+        /// <param name="name">name of the descendant to be found</param>
         /// <returns>found game object or null</returns>
-        public static GameObject Ancestor(this GameObject gameObject, string id)
+        public static GameObject Descendant(this GameObject gameObject, string name)
         {
             foreach (Transform child in gameObject.transform)
             {
-                if (child.name == id)
+                if (child.name == name)
                 {
                     return child.gameObject;
                 }
                 else
                 {
-                    GameObject ancestor = child.gameObject.Ancestor(id);
+                    GameObject ancestor = child.gameObject.Descendant(name);
                     if (ancestor != null)
                     {
                         return ancestor;
                     }
                 }
             }
+
             return null;
         }
 
         /// <summary>
-        /// Returns all ancestors of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
-        /// The result will also include inactive game objects, but does not contained <paramref name="gameObject"/> itself.
+        /// Returns all descendants of <paramref name="gameObject"/> having a name contained in <paramref name="gameObjectIDs"/>.
+        /// The result will also include inactive game objects, but does not contain <paramref name="gameObject"/> itself.
         /// This method will descend into the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
         /// Precondition: <paramref name="gameObjectIDs"/> is not null.
@@ -139,7 +156,7 @@ namespace SEE.GO
         /// <param name="gameObject">root of the game-object hierarchy to be searched</param>
         /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
         /// <returns>found game objects</returns>
-        public static IList<GameObject> Ancestors(this GameObject gameObject, ISet<string> gameObjectIDs)
+        public static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
             List<GameObject> result = new List<GameObject>();
             foreach (Transform child in gameObject.transform)
@@ -148,27 +165,11 @@ namespace SEE.GO
                 {
                     result.Add(child.gameObject);
                 }
-                result.AddRange(child.gameObject.Ancestors(gameObjectIDs));
-            }
-            return result;
-        }
 
-        /// <summary>
-        /// Returns the render-queue offset of given <paramref name="gameObject"/>.
-        ///
-        /// Precondition: <paramref name="gameObject"/> must have a renderer attached
-        /// to it; otherwise 0 will be returned.
-        /// </summary>
-        /// <param name="gameObject">objects whose render-queue is requested</param>
-        /// <returns>render-queue offset</returns>
-        public static int GetRenderQueue(this GameObject gameObject)
-        {
-            if (gameObject.TryGetComponent(out Renderer renderer))
-            {
-                return renderer.sharedMaterial.renderQueue;
+                result.AddRange(child.gameObject.Descendants(gameObjectIDs));
             }
-            Debug.LogWarning($"GetRenderQueue: Game object {gameObject.name} has no renderer.\n");
-            return 0;
+
+            return result;
         }
 
         /// <summary>
@@ -262,10 +263,12 @@ namespace SEE.GO
             {
                 renderer.enabled = show;
             }
+
             if (gameObject.TryGetComponent(out Collider collider))
             {
                 collider.enabled = show;
             }
+
             if (includingChildren)
             {
                 foreach (Transform child in gameObject.transform)
@@ -290,13 +293,49 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Gets the Height (Roof) of this <paramref name="node"/>
+        /// Returns the world-space position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="node">node whose height has to be determined</param>
-        /// <returns>The height of the Roof from this <paramref name="node"/></returns>
-        public static float GetRoof(this GameObject node)
+        /// <param name="gameObject">game object whose roof has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/></returns>
+        public static float GetRoof(this GameObject gameObject)
         {
-            return node.transform.position.y + node.WorldSpaceScale().y / 2.0f;
+            return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the maximal world-space position (y co-ordinate) of the roof of
+        /// this <paramref name="gameObject"/> or any of its active descendants.
+        /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
+        /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Note: only descendants that are currently active in the scene are
+        /// considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
+        /// or any of its active descendants</returns>
+        public static float GetMaxY(this GameObject gameObject)
+        {
+            float result = float.NegativeInfinity;
+            Recurse(gameObject, ref result);
+            return result;
+
+            void Recurse(GameObject root, ref float max)
+            {
+                float roof = root.GetRoof();
+                if (max < roof)
+                {
+                    max = roof;
+                }
+
+                foreach (Transform child in root.transform)
+                {
+                    if (child.gameObject.activeInHierarchy)
+                    {
+                        Recurse(child.gameObject, ref max);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -338,7 +377,22 @@ namespace SEE.GO
                                + $"on game object '{gameObject.name}'.\n");
                 return false;
             }
+
             return true;
+        }
+
+        /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If a component of the type was found, it will be returned, otherwise a new component of the type
+        /// will be added and returned.
+        /// </summary>
+        /// <param name="gameObject">The gameobject whose component of type <typeparamref name="T"/>
+        /// we wish to return</param>
+        /// <typeparam name="T">The component to get / add</typeparam>
+        /// <returns>The existing or newly created component</returns>
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        {
+            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
         }
 
         /// <summary>
@@ -356,8 +410,7 @@ namespace SEE.GO
         {
             if (!gameObject.TryGetComponent(out component))
             {
-                throw new InvalidOperationException(
-                    $"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
             }
         }
 
@@ -404,6 +457,7 @@ namespace SEE.GO
             {
                 node = nodeRef.Value;
             }
+
             return node != null;
         }
 
@@ -417,7 +471,7 @@ namespace SEE.GO
         /// <returns>the correponding graph node (will never be null)</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
@@ -427,17 +481,17 @@ namespace SEE.GO
                     }
                     else
                     {
-                        throw new Exception($"Node referenced by game object {gameObject.name} is null.");
+                        throw new NullReferenceException($"Node referenced by game object {gameObject.name} is null.");
                     }
                 }
                 else
                 {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null.");
+                    throw new NullReferenceException($"Node reference of game object {gameObject.name} is null.");
                 }
             }
             else
             {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef.");
+                throw new NullReferenceException($"Game object {gameObject.name} has no NodeRef.");
             }
         }
 
@@ -469,6 +523,7 @@ namespace SEE.GO
             {
                 edge = edgeRef.Value;
             }
+
             return edge != null;
         }
 
@@ -501,31 +556,20 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the full name of given <paramref name="gameObject"/>.
-        /// The full name is the concatenation of all names of the ancestors of <paramref name="gameObject"/>
-        /// separated by a period. E.g., if <paramref name="gameObject"/> has name C and its parent
-        /// has name B and the parent's parent has name A, then the result will be A.B.C.
+        /// Returns the full name of the game object, that is, its name and the
+        /// names of its ancestors in the game-object hierarchy separated by /.
         /// </summary>
-        /// <param name="gameObject">the gameObject whose full name is to be retrieved</param>
-        /// <returns>full name</returns>
+        /// <param name="gameObject">game object for which to retrieve the full name</param>
         public static string FullName(this GameObject gameObject)
         {
-            if (gameObject == null)
+            string result = gameObject.name;
+            while (gameObject.transform.parent != null)
             {
-                return "";
+                gameObject = gameObject.transform.parent.gameObject;
+                result = gameObject.name + "/" + result;
             }
-            else
-            {
-                Transform parent = gameObject.transform.parent;
-                if (parent != null)
-                {
-                    return FullName(parent.gameObject) + "." + gameObject.name;
-                }
-                else
-                {
-                    return gameObject.name;
-                }
-            }
+
+            return result;
         }
 
         /// <summary>
@@ -605,22 +649,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the full name of the game object, that is, its name and the
-        /// names of its ancestors in the game-object hierarchy separated by /.
-        /// </summary>
-        /// <param name="gameObject">game object for which to retrieve the full name</param>
-        public static string GetFullName(this GameObject gameObject)
-        {
-            string result = gameObject.name;
-            while (gameObject.transform.parent != null)
-            {
-                gameObject = gameObject.transform.parent.gameObject;
-                result = gameObject.name + "/" + result;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Updates the portal of this game object by setting the boundaries of itself
         /// (and its descendants, depending on <paramref name="includeDescendants"/>)
         /// to the code city they're contained in.
@@ -646,7 +674,7 @@ namespace SEE.GO
             else if (warnOnFailure)
             {
                 Debug.LogWarning("Couldn't update portal: No code city has been found"
-                                 + $" attached to game object {gameObject.GetFullName()}.\n");
+                                 + $" attached to game object {gameObject.FullName()}.\n");
             }
         }
     }

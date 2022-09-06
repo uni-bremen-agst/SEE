@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -278,7 +277,7 @@ namespace SEE.Game
         /// <param name="node">the node to be retrieved</param>
         /// <returns>the game object representing the given <paramref name="node"/></returns>
         /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(Node node)
+        public static GameObject RetrieveGameNode(this Node node)
         {
             return RetrieveGameNode(node.ID);
         }
@@ -303,43 +302,40 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the first game object in the current scene with the given <paramref name="id"/>.
+        /// Returns the first game object in the current scene with the given <paramref name="name"/>.
         /// Will also return inactive game objects. If no such object exists, null will be returned.
         ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be considered.
+        /// Note: This method is expensive because it will iterate over all game objects in the
+        /// scene. Use it wisely.
         /// </summary>
-        /// <param name="id">id of the game object to be found</param>
+        /// <param name="name">name of the game object to be found</param>
         /// <returns>found game object or null</returns>
-        public static GameObject Find(string id)
+        public static GameObject Find(string name)
         {
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
+                GameObject ancestor = root.Descendant(name);
+                if (ancestor != null)
                 {
-                    GameObject ancestor = root.Ancestor(id);
-                    if (ancestor != null)
-                    {
-                        return ancestor;
-                    }
+                    return ancestor;
                 }
             }
             return null;
         }
 
         /// <summary>
-        /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectIDs"/>.
+        /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be included.
+        /// Note: This method is expensive because it will iterate over all game objects in the
+        /// scene. Use it wisely.
         /// </summary>
-        /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
+        /// <param name="gameObjectNames">list of names any of the game objects to be retrieved should have</param>
         /// <returns>found game objects</returns>
-        public static ISet<GameObject> Find(ISet<string> gameObjectIDs)
+        public static ISet<GameObject> Find(ISet<string> gameObjectNames)
         {
             ISet<GameObject> result = new HashSet<GameObject>();
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
@@ -347,10 +343,7 @@ namespace SEE.Game
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
-                {
-                    result.UnionWith(root.Ancestors(gameObjectIDs));
-                }
+                result.UnionWith(root.Descendants(gameObjectNames));
             }
             return result;
         }

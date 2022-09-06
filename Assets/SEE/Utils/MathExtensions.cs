@@ -318,6 +318,21 @@ namespace SEE.Utils
         public static Vector2 ZW(this Vector4 a) => new Vector2(a.z, a.w);
 
         /// <summary>
+        /// Returns the given <paramref name="vector3"/>, replacing any of its components with
+        /// <paramref name="x"/>, <paramref name="y"/>, and/or <paramref name="z"/>, respectively, if they were given.
+        /// If no parameter are given, this method will be equivalent to the identity function.
+        /// </summary>
+        /// <param name="vector3">The vector whose components shall be replaced</param>
+        /// <param name="x">New X component</param>
+        /// <param name="y">New Y component</param>
+        /// <param name="z">New Z component</param>
+        /// <returns></returns>
+        public static Vector3 WithXYZ(this Vector3 vector3, float? x = null, float? y = null, float? z = null)
+        {
+            return new Vector3(x ?? vector3.x, y ?? vector3.y, z ?? vector3.z);
+        }
+
+        /// <summary>
         /// Performs a collision test between a point and a circle. The distance and a
         /// normal pointing from the point towards to the surface of the circle are
         /// returned. If the point lies inside of the AABB, the distance is negative. If

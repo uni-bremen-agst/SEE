@@ -89,7 +89,7 @@ namespace SEE.Game
         /// <exception cref="Exception">thrown if <paramref name="parent"/> is not contained in a code city</exception>
         public static GameObject AddChild(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
         {
-            SEECity city = parent.ContainingCity();
+            SEECity city = parent.ContainingCity() as SEECity;
             if (city != null)
             {
                 bool wasLeaf = parent.IsLeaf();
@@ -114,7 +114,7 @@ namespace SEE.Game
                     GameEdgeMover.MoveAllConnectingEdgesOfNode(parent);
                 }
 
-                GameObject result = city.Renderer.DrawLeafNode(node);
+                GameObject result = city.Renderer.DrawNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = new Vector3(position.x, parent.transform.position.y + worldSpaceScale.y / 2, position.z);
                 result.transform.SetParent(parent.transform);

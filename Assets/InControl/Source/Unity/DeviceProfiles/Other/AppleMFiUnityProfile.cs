@@ -97,7 +97,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.Pause,
 					Source = Button( 0 )
 				},
-#if !UNITY_5_3_OR_NEWER
+				#if !UNITY_5_3_OR_NEWER
 				new InputControlMapping {
 					Handle = "Left Trigger",
 					Target = InputControlType.LeftTrigger,
@@ -108,7 +108,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.RightTrigger,
 					Source = Button( 11 )
 				}
-#endif
+				#endif
 			};
 
 			AnalogMappings = new[]
@@ -123,7 +123,7 @@ namespace InControl.UnityDeviceProfiles
 				RightStickUpMapping( 3 ),
 				RightStickDownMapping( 3 ),
 
-#if UNITY_5_3_OR_NEWER
+				#if UNITY_5_3_OR_NEWER
 				new InputControlMapping
 				{
 					Name = "Left Trigger",
@@ -136,7 +136,7 @@ namespace InControl.UnityDeviceProfiles
 					Target = InputControlType.RightTrigger,
 					Source = Analog( 11 )
 				}
-#endif
+				#endif
 			};
 		}
 	}

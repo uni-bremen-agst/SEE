@@ -25,9 +25,9 @@ namespace InControl
 		public bool allowSlideToggle = true;
 		public bool toggleOnLeave = false;
 
-#if !(UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+		#if !(UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
 		public bool pressureSensitive = false;
-#endif
+		#endif
 
 
 		[Header( "Sprites" )]
@@ -86,7 +86,7 @@ namespace InControl
 
 		public override void SubmitControlState( ulong updateTick, float deltaTime )
 		{
-#if !(UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+			#if !(UNITY_4_3 || UNITY_4_5 || UNITY_4_6 || UNITY_4_7 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
 			if (pressureSensitive)
 			{
 				var buttonValue = 0.0f;
@@ -114,7 +114,7 @@ namespace InControl
 				SubmitButtonValue( target, buttonValue, updateTick, deltaTime );
 				return;
 			}
-#endif
+			#endif
 
 			if (currentTouch == null && allowSlideToggle)
 			{

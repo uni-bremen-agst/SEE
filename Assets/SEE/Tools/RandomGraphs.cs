@@ -8,11 +8,11 @@ namespace SEE.Tools
 {
     /// <summary>
     /// A descriptor defining the name of an attribute and the normal distribution
-    /// (mean, standard deviation) from which to draw its values randomly.
+    /// (mean, standard deviation, minimum, maximum) from which to draw its values randomly.
     ///
     /// Note: This class must be serializable. The names of the attributes must
     /// be consistent with the string literals used to retrieved them in
-    /// SeeCityRandomEditor.
+    /// SEECityRandomEditor.
     /// </summary>
     [Serializable]
     public class RandomAttributeDescriptor : ConfigIO.PersistentConfigItem
@@ -20,22 +20,71 @@ namespace SEE.Tools
         public RandomAttributeDescriptor()
         { }
 
-        public RandomAttributeDescriptor(string name, float mean, float standardDeviation)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">name of the attribute</param>
+        /// <param name="mean">mean of the distribution of the attribute's value range</param>
+        /// <param name="standardDeviation">standard deviation of the distribution of the attribute's value range</param>
+        /// <param name="minimum">minimum of the attribute's value range</param>
+        /// <param name="maximum">maximum of the attribute's value range</param>
+        public RandomAttributeDescriptor
+            (string name,
+            float mean,
+            float standardDeviation,
+            float minimum = 0,
+            float maximum = float.PositiveInfinity)
         {
             Name = name;
             Mean = mean;
             StandardDeviation = standardDeviation;
+            Minimum = minimum;
+            Maximum = maximum;
         }
+        /// <summary>
+        /// Name of the attribute.
+        /// </summary>
         [SerializeField]
         public string Name;
+        /// <summary>
+        /// The mean of the distribution of the attribute's value range.
+        /// </summary>
         [SerializeField]
         public float Mean;
+        /// <summary>
+        /// The standard deviation of the distribution of the attribute's value range.
+        /// </summary>
         [SerializeField]
         public float StandardDeviation;
+        /// <summary>
+        /// The minimum of the attribute's value range.
+        /// </summary>
+        public float Minimum = 0;
+        /// <summary>
+        /// The maximum of the attribute's value range.
+        /// </summary>
+        public float Maximum = float.PositiveInfinity;
 
+        /// <summary>
+        /// Label of <see cref="Name"/> in the configuration file.
+        /// </summary>
         private const string NameLabel = "Name";
+        /// <summary>
+        /// Label of <see cref="Mean"/> in the configuration file.
+        /// </summary>
         private const string MeanLabel = "Mean";
+        /// <summary>
+        /// Label of <see cref="StandardDeviation"/> in the configuration file.
+        /// </summary>
         private const string StandardDeviationLabel = "StandardDeviation";
+        /// <summary>
+        /// Label of <see cref="Minimum"/> in the configuration file.
+        /// </summary>
+        private const string MinimumLabel = "Minimum";
+        /// <summary>
+        /// Label of <see cref="Maximum"/> in the configuration file.
+        /// </summary>
+        private const string MaximumLabel = "Maximum";
 
         /// <summary>
         /// <see cref="ConfigIO.PersistentConfigItem.Save()"/>
@@ -46,6 +95,8 @@ namespace SEE.Tools
             writer.Save(Name, NameLabel);
             writer.Save(Mean, MeanLabel);
             writer.Save(StandardDeviation, StandardDeviationLabel);
+            writer.Save(Minimum, MinimumLabel);
+            writer.Save(Maximum, MaximumLabel);
             writer.EndGroup();
         }
 
@@ -76,6 +127,8 @@ namespace SEE.Tools
             bool result = ConfigIO.Restore(values, NameLabel, ref Name);
             result = ConfigIO.Restore(values, MeanLabel, ref Mean) || result;
             result = ConfigIO.Restore(values, StandardDeviationLabel, ref StandardDeviation) || result;
+            result = ConfigIO.Restore(values, MinimumLabel, ref Minimum) || result;
+            result = ConfigIO.Restore(values, MaximumLabel, ref Maximum) || result;
             return result;
         }
     }
@@ -195,7 +248,8 @@ namespace SEE.Tools
         {
             leafConstraint.Check();
             innerNodeConstraint.Check();
-            Graph graph = new Graph();
+            // Randomly generated graph do not need to have a base path; that is why we use the empty string.
+            Graph graph = new Graph("");
             ICollection<Node> leaves = CreateLeaves(graph, leafConstraint, leafAttributes);
             ICollection<Edge> leafEdges = CreateEdges(graph, leaves, leafConstraint);
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
@@ -290,7 +344,9 @@ namespace SEE.Tools
             {
                 foreach (RandomAttributeDescriptor attr in attributes)
                 {
-                    node.SetFloat(attr.Name, RandomGaussian(random, attr.Mean, attr.StandardDeviation));
+                    node.SetFloat(attr.Name,
+                                  Mathf.Clamp(RandomGaussian(random, attr.Mean, attr.StandardDeviation),
+                                  attr.Minimum, attr.Maximum));
                 }
             }
         }

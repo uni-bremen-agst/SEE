@@ -29,6 +29,11 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 // I am the avatar of the local player.
+                if (!gameObject.TryGetComponent(out CodeSpaceManager _))
+                {
+                    gameObject.AddComponent<CodeSpaceManager>();
+                }
+
                 switch (PlayerSettings.GetInputType())
                 {
                     case PlayerInputType.DesktopPlayer:
@@ -54,6 +59,19 @@ namespace SEE.Game.Avatars
                 gameObject.name = "Remote " + gameObject.name;
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 StartCoroutine(SetUpSALSA());
+            }
+            EnableLocalControl(IsLocalPlayer);
+        }
+
+        /// <summary>
+        /// Enables/disables local control of the aiming system of the avatar.
+        /// </summary>
+        /// <param name="isLocalPlayer">if true, the aiming system will be enabled, otherwise disabled</param>
+        private void EnableLocalControl(bool isLocalPlayer)
+        {
+            if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
+            {
+                aimingSystem.IsLocallyControlled = isLocalPlayer;
             }
         }
 

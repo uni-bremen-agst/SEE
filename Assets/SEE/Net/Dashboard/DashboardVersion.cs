@@ -15,17 +15,17 @@ namespace SEE.Net.Dashboard
         /// First component of the version string. Indicates major changes.
         /// </summary>
         public readonly int MajorVersion;
-        
+
         /// <summary>
         /// Second component of the version string. Indicates minor changes.
         /// </summary>
         public readonly int MinorVersion;
-        
+
         /// <summary>
         /// Third component of the version string. Indicates small changes and bugfixes.
         /// </summary>
         public readonly int PatchVersion;
-        
+
         /// <summary>
         /// Fourth component of the version string. Indicates very small changes.
         /// </summary>
@@ -35,7 +35,7 @@ namespace SEE.Net.Dashboard
         /// Latest supported version of the Axivion Dashboard.
         /// Should be updated when new (supported and tested) versions come out.
         /// </summary>
-        public static readonly DashboardVersion SupportedVersion = new DashboardVersion(7,1,5,6367);
+        public static readonly DashboardVersion SupportedVersion = new DashboardVersion(7, 3, 2, 8778);
 
         /// <summary>
         /// Represents the difference of another version in comparison to this one.
@@ -47,43 +47,43 @@ namespace SEE.Net.Dashboard
             /// <summary>
             /// When the major version of the other version is smaller than this one.
             /// </summary>
-            MAJOR_OLDER, 
-            
+            MAJOR_OLDER,
+
             /// <summary>
             /// When the minor version of the other version is smaller than this one.
             /// </summary>
             MINOR_OLDER,
-            
+
             /// <summary>
             /// When the patch version of the other version is smaller than this one.
             /// </summary>
             PATCH_OLDER,
-            
+
             /// <summary>
             /// When the extra version of the other version is smaller than this one.
             /// </summary>
-            EXTRA_OLDER, 
-            
+            EXTRA_OLDER,
+
             /// <summary>
             /// When the major version of the other version is bigger than this one.
             /// </summary>
             MAJOR_NEWER,
-            
+
             /// <summary>
             /// When the minor version of the other version is bigger than this one.
             /// </summary>
             MINOR_NEWER,
-            
+
             /// <summary>
             /// When the patch version of the other version is bigger than this one.
             /// </summary>
             PATCH_NEWER,
-            
+
             /// <summary>
             /// When the extra version of the other version is bigger than this one.
             /// </summary>
             EXTRA_NEWER,
-            
+
             /// <summary>
             /// When both versions are equal.
             /// </summary>
@@ -145,9 +145,9 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <param name="other">The version with which this one shall be compared.</param>
         /// <returns>The difference between this version and <paramref name="other"/>.</returns>
-        public Difference GetDifference(DashboardVersion other) => 
+        public Difference GetDifference(DashboardVersion other) =>
             CompareTo(other) switch
-            { 
+            {
                 // All of these refer to the OTHER one, i.e., the OTHER is newer than this one
                 4 => Difference.MAJOR_NEWER,
                 3 => Difference.MINOR_NEWER,

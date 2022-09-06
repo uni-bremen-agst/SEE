@@ -17,9 +17,9 @@ namespace SEEEditor
         {
             PersonalAssistantSpeechInput editedTarget = target as PersonalAssistantSpeechInput;
             editedTarget.GrammarFilePath = DataPathEditor.GetDataPath
-                                              ("SRGS file", 
-                                              editedTarget.GrammarFilePath, 
-                                              Filenames.ExtensionWithoutPeriod(Filenames.GrammarExtension));
+                                              ("SRGS file",
+                                              editedTarget.GrammarFilePath,
+                                              Filenames.ExtensionWithoutPeriod(Filenames.GrammarExtension)) as FilePath;
         }
     }
 }

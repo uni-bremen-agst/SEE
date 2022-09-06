@@ -8,7 +8,7 @@ namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Calculates a simple grid layout for leaf nodes (only). The order is
-    /// alphabetic with respect to the ID of the nodes. 
+    /// alphabetic with respect to the ID of the nodes.
     /// </summary>
     public class ManhattanLayout : FlatNodeLayout
     {
@@ -19,11 +19,10 @@ namespace SEE.Layout.NodeLayouts
         /// placed on this level</param>
         /// <param name="Unit">the factor to be multiplied with the default distance between buildings;
         /// if game objects are 'naturally' larger, the distances between them should be larger, too.</param>
-        public ManhattanLayout(float groundLevel, float Unit)
+        public ManhattanLayout(float groundLevel)
             : base(groundLevel)
         {
             name = "Manhattan";
-            this.Unit = Unit;
         }
 
         /// <summary>
@@ -68,9 +67,9 @@ namespace SEE.Layout.NodeLayouts
 
                 // center position of the block to be placed
                 positionX += size.x / 2.0f;
-                // The x,z position in a NodeTransform is the center of a GameObject, whereas 
+                // The x,z position in a NodeTransform is the center of a GameObject, whereas
                 // (position.X, position.Y) is the left lower corner of the game object in the X,Z plane.
-                // We want all GameObjects be placed at the same ground level 0. 
+                // We want all GameObjects be placed at the same ground level 0.
                 // We maintain the original scaleof the gameNode.
                 result[gameNode] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ + size.z / 2.0f), size);
                 // right border position of the block to be placed + space in between buildings

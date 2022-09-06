@@ -97,9 +97,9 @@ namespace InControl
 
 			set
 			{
-#pragma warning disable 0168, 0219
+				#pragma warning disable 0168, 0219
 				var dummy = value;
-#pragma warning restore 0168, 0219
+				#pragma warning restore 0168, 0219
 			}
 		}
 
@@ -114,9 +114,9 @@ namespace InControl
 
 			set
 			{
-#pragma warning disable 0168, 0219
+				#pragma warning disable 0168, 0219
 				var dummy = value;
-#pragma warning restore 0168, 0219
+				#pragma warning restore 0168, 0219
 			}
 		}
 	}

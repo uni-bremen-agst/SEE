@@ -1,18 +1,17 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'ChangeGender'-class.</summary>
-   [CustomEditor(typeof(Tool.ChangeGender))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.ChangeGender))]
    [CanEditMultipleObjects]
    public class ChangeGenderEditor : Editor
    {
       #region Variables
 
-      private Tool.ChangeGender script;
+      private Crosstales.RTVoice.Tool.ChangeGender script;
 
       #endregion
 
@@ -21,24 +20,24 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.ChangeGender)target;
+         script = (Crosstales.RTVoice.Tool.ChangeGender)target;
       }
 
       public override void OnInspectorGUI()
       {
          DrawDefaultInspector();
 
-         EditorHelper.SeparatorUI();
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
          if (script.isActiveAndEnabled)
          {
-            if (Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
+            if (Crosstales.RTVoice.Speaker.Instance.isTTSAvailable && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
             {
                GUILayout.Label("Action", EditorStyles.boldLabel);
 
-               if (Util.Helper.isEditorMode)
+               if (Crosstales.RTVoice.Util.Helper.isEditorMode)
                {
-                  if (GUILayout.Button(new GUIContent(" Change Gender", EditorHelper.Icon_Refresh, "Change the gender of all voices (useful for eSpeak).")))
+                  if (GUILayout.Button(new GUIContent(" Change Gender", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Refresh, "Change the gender of all voices (useful for eSpeak).")))
                      script.Change();
                }
                else
@@ -48,7 +47,7 @@ namespace Crosstales.RTVoice.EditorExtension
             }
             else
             {
-               EditorHelper.NoVoicesUI();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
             }
          }
          else
@@ -61,4 +60,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2019-2021 crosstales LLC (https://www.crosstales.com)
+// © 2019-2022 crosstales LLC (https://www.crosstales.com)

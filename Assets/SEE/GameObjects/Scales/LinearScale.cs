@@ -16,7 +16,7 @@ namespace SEE.GO
         /// <param name="graphs">the set of graph whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        public LinearScale(IEnumerable<Graph> graphs, IList<string> metrics, bool leavesOnly)
+        public LinearScale(IEnumerable<Graph> graphs, ISet<string> metrics, bool leavesOnly)
             : base(graphs, metrics, leavesOnly)
         {
         }
@@ -32,7 +32,7 @@ namespace SEE.GO
         /// <returns>normalized value of node metric</returns>
         public override float GetNormalizedValue(string metric, float value)
         {
-            float max = metricMaxima[metric];
+            metricMaxima.TryGetValue(metric, out float max);
             if (max <= 0.0f || value <= 0.0f)
             {
                 return 0.0f;

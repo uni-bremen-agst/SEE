@@ -1,11 +1,14 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
-using SEE.Utils;
-using System.Collections.Generic;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
+using Assert = UnityEngine.Assertions.Assert;
 
 namespace SEE.Tools.Architecture
 {
@@ -14,10 +17,9 @@ namespace SEE.Tools.Architecture
     /// </summary>
     internal class TestReflexionAnalysis : Observer
     {
+        // TODO: Test types as well
         protected const string call = "call";
-        protected Graph impl;
-        protected Graph arch;
-        protected Graph mapping;
+        protected Graph fullGraph;
         protected Reflexion reflexion;
         protected SEELogger logger = new SEELogger();
 
@@ -31,7 +33,7 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        protected static HashSet<string> Hierarchical_Edge_Types()
+        protected static HashSet<string> HierarchicalEdgeTypes()
         {
             HashSet<string> result = new HashSet<string>
             {
@@ -44,146 +46,103 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
-        /// List of edges changed for a single reflexion-analysis run.
+        /// List of all changes for a single reflexion-analysis run or incremental change.
+        /// Since <see cref="ChangeEvent"/> is abstract, this will contain concrete subtypes.
         /// </summary>
-        protected List<EdgeChange> edgeChanges = new List<EdgeChange>();
+        protected List<ChangeEvent> changes = new List<ChangeEvent>();
 
         /// <summary>
-        /// List of edges propagated from the implementation onto the architecture for
-        /// a single reflexion-analysis run.
-        /// </summary>
-        protected List<PropagatedEdge> propagatedEdgesAdded = new List<PropagatedEdge>();
-        /// <summary>
-        /// List of propagated dependency edges removed from the reflexion result.
-        /// </summary>
-        protected List<PropagatedEdge> propagatedEdgesRemoved = new List<PropagatedEdge>();
-
-        /// <summary>
-        /// List of Maps_To edges added to the mapping.
-        /// </summary>
-        protected List<MapsToEdgeAdded> mapsToEdgesAdded = new List<MapsToEdgeAdded>();
-        /// <summary>
-        /// List of Maps_To edges removed from the mapping.
-        /// </summary>
-        protected List<MapsToEdgeRemoved> mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
-
-        /// <summary>
-        /// Re-sets the event chaches edgeChanges, propagatedEdges, and removedEdges to
-        /// to their initial value (empty).
+        /// Re-sets the event cache in <see cref="changes"/> to its initial value (empty).
         /// </summary>
         protected void ResetEvents()
         {
-            edgeChanges = new List<EdgeChange>();
-            propagatedEdgesAdded = new List<PropagatedEdge>();
-            propagatedEdgesRemoved = new List<PropagatedEdge>();
-            mapsToEdgesAdded = new List<MapsToEdgeAdded>();
-            mapsToEdgesRemoved = new List<MapsToEdgeRemoved>();
+            changes = new List<ChangeEvent>();
         }
 
         /// <summary>
-        /// True if edgeChanges has an edge from source to target with given edgeType whose new state is the
+        /// True if changes has an edge from source to target with given edgeType whose new state is the
         /// given state.
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
         /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        private bool HasNewState(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType, State state)
+        private bool HasNewState(Node source, Node target, string edgeType, State state)
         {
-            foreach (EdgeChange e in edgeChanges)
-            {
-                if (e.Edge.Source == source && e.Edge.Target == target && e.Edge.Type == edgeType && e.NewState == state)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return changes.OfType<EdgeChange>().Any(e => e.Edge.Source == source && e.Edge.Target == target && e.Edge.Type == edgeType && e.NewState == state);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.convergent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Convergent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsConvergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsConvergent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Convergent);
+            return HasNewState(source, target, edgeType, State.Convergent);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Allowed).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAllowed(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Allowed);
+            return HasNewState(source, target, edgeType, State.Allowed);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.absent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Absent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAbsent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Absent);
+            return HasNewState(source, target, edgeType, State.Absent);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.implicitly_allowed).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.ImplicitlyAllowed).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsImplicitlyAllowed(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsImplicitlyAllowed(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.ImplicitlyAllowed);
+            return HasNewState(source, target, edgeType, State.ImplicitlyAllowed);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.allowed_absent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.AllowedAbsent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsAllowedAbsent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsAllowedAbsent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.AllowedAbsent);
+            return HasNewState(source, target, edgeType, State.AllowedAbsent);
         }
 
         /// <summary>
-        /// Equivalent to: HasNewState(edgeChanges, source, target, edgeType, State.divergent).
+        /// Equivalent to: HasNewState(source, target, edgeType, State.Divergent).
         /// </summary>
-        /// <param name="edgeChanges">list of edge-change events</param>
         /// <param name="source">source of edge</param>
         /// <param name="target">target of edge</param>
         /// <param name="edgeType">type of edge</param>
-        /// <param name="state">new state</param>
         /// <returns>true if such an edge exists</returns>
-        protected bool IsDivergent(List<EdgeChange> edgeChanges, Node source, Node target, string edgeType)
+        protected bool IsDivergent(Node source, Node target, string edgeType)
         {
-            return HasNewState(edgeChanges, source, target, edgeType, State.Divergent);
+            return HasNewState(source, target, edgeType, State.Divergent);
         }
 
         /// <summary>
@@ -196,7 +155,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesAdded</returns>
         protected bool IsPropagated(Node from, Node to, string edgeType)
         {
-            return IsContained(from, to, edgeType, propagatedEdgesAdded);
+            return IsContained(from, to, edgeType, ChangeType.Addition);
         }
 
         /// <summary>
@@ -209,7 +168,7 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in propagatedEdgesRemoved</returns>
         protected bool IsUnpropagated(Node from, Node to, string edgeType)
         {
-            return IsContained(from, to, edgeType, propagatedEdgesRemoved);
+            return IsContained(from, to, edgeType, ChangeType.Removal);
         }
 
         /// <summary>
@@ -219,19 +178,25 @@ namespace SEE.Tools.Architecture
         /// <param name="from">source of the propagated edge</param>
         /// <param name="to">target of the propagated edge</param>
         /// <param name="edgeType">type of the propagated edge</param>
+        /// <param name="change">change type for the propagated edge</param>
         /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
-        protected bool IsContained(Node from, Node to, string edgeType, List<PropagatedEdge> propagatedEdges)
+        protected bool IsContained(Node from, Node to, string edgeType, ChangeType change)
         {
-            foreach (PropagatedEdge edge in propagatedEdges)
-            {
-                if (from.ID == edge.ThePropagatedEdge.Source.ID
-                    && to.ID == edge.ThePropagatedEdge.Target.ID
-                    && edgeType == edge.ThePropagatedEdge.Type)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return changes.OfType<PropagatedEdgeEvent>().Any(edge => from.ID == edge.PropagatedEdge.Source.ID &&
+                                                                     to.ID == edge.PropagatedEdge.Target.ID &&
+                                                                     edgeType == edge.PropagatedEdge.Type && change == edge.Change);
+        }
+
+        protected bool IsNotContained(Node from, Node to, string edgeType)
+        {
+            return !changes.OfType<EdgeChange>().Any(edge => from.ID == edge.Edge.Source.ID &&
+                                                             to.ID == edge.Edge.Target.ID &&
+                                                             edgeType == edge.Edge.Type);
+        }
+
+        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraph? affectedGraph = null) where T : ChangeEvent
+        {
+            Assert.AreEqual(expected, changes.OfType<T>().Count(x => (change == null || x.Change == change) && (affectedGraph == null || x.Affected == affectedGraph)));
         }
 
         /// <summary>
@@ -240,32 +205,10 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected void DumpEvents()
         {
-            Debug.Log("MAPS_TO EDGES ADDED TO MAPPING\n");
-            foreach (MapsToEdge e in mapsToEdgesAdded)
+            Debug.Log("CHANGES IN REFLEXION\n\n");
+            foreach (ChangeEvent e in changes)
             {
-                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge.ToString());
-            }
-            Debug.Log("MAPS_TO EDGES REMOVED FROM MAPPING\n");
-            foreach (MapsToEdge e in mapsToEdgesRemoved)
-            {
-                Debug.LogFormat("maps_to {0}\n", e.TheMapsToEdge.ToString());
-            }
-
-            Debug.Log("DEPENDENCIES PROPAGATED TO ARCHITECTURE\n");
-            foreach (PropagatedEdgeAdded e in propagatedEdgesAdded)
-            {
-                Debug.LogFormat("propagated {0}\n", e.ThePropagatedEdge.ToString());
-            }
-            Debug.Log("PROPAGATED DEPENDENCIES REMOVED FROM ARCHITECTURE\n");
-            foreach (PropagatedEdgeRemoved e in propagatedEdgesRemoved)
-            {
-                Debug.LogFormat("removed {0}\n", e.ThePropagatedEdge.ToString());
-            }
-
-            Debug.Log("DEPENDENCIES CHANGED IN ARCHITECTURE\n");
-            foreach (EdgeChange e in edgeChanges)
-            {
-                Debug.LogFormat("changed {0} from {1} to {2}\n", e.Edge.ToString(), e.OldState, e.NewState);
+                Debug.Log(e);
             }
         }
 
@@ -288,7 +231,8 @@ namespace SEE.Tools.Architecture
         [SetUp]
         protected virtual void Setup()
         {
-            HierarchicalEdges = Hierarchical_Edge_Types();
+            HierarchicalEdges = HierarchicalEdgeTypes();
+            fullGraph = new Graph("DUMMYBASEPATH");
             ResetEvents();
         }
 
@@ -298,68 +242,65 @@ namespace SEE.Tools.Architecture
         [TearDown]
         protected virtual void Teardown()
         {
-            impl = null;
-            arch = null;
-            mapping = null;
+            fullGraph = null;
             reflexion = null;
             HierarchicalEdges = null;
             logger = null;
-            edgeChanges = null;
-            propagatedEdgesAdded = null;
-            mapsToEdgesAdded = null;
-            mapsToEdgesRemoved = null;
-            propagatedEdgesRemoved = null;
+            changes = null;
         }
 
-        protected static Node NewNode(Graph graph, string linkname, string type = "Routine")
+        protected Node NewNode(bool inArchitecture, string linkname, string type = "Routine")
         {
-            Node result = new Node();
-            result.ID = linkname;
-            result.SourceName = linkname;
-            result.Type = type;
-            graph.AddNode(result);
+            Node result = new Node
+            {
+                ID = linkname,
+                SourceName = linkname,
+                Type = type
+            };
+            if (inArchitecture)
+            {
+                result.SetInArchitecture();
+            }
+            else
+            {
+                result.SetInImplementation();
+            }
+
+            fullGraph.AddNode(result);
             return result;
         }
 
-        protected static Edge NewEdge(Graph graph, Node from, Node to, string type)
+        protected Edge NewEdge(Node from, Node to, string type)
         {
             Edge result = new Edge(from, to, type);
-            graph.AddEdge(result);
+            if (type == ReflexionGraphTools.MapsToType)
+            {
+                Assert.IsTrue(from.IsInImplementation());
+                Assert.IsTrue(to.IsInArchitecture());
+            }
+            else if (from.IsInImplementation())
+            {
+                Assert.IsTrue(to.IsInImplementation());
+                result.SetInImplementation();
+            }
+            else if (from.IsInArchitecture())
+            {
+                Assert.IsTrue(to.IsInArchitecture());
+                result.SetInArchitecture();
+            }
+
+            fullGraph.AddEdge(result);
             return result;
         }
 
         /// <summary>
         /// Callback of reflexion analysis. Will be called by reflexion analysis on every
-        /// state change. Collects the events in the respective change-event lists
-        /// edgeChanges, propagatedEdges, removedEdges.
+        /// state change. Collects the events in the change-event list.
         /// </summary>
         /// <param name="changeEvent">the event that occurred</param>
-        public virtual void Update(ChangeEvent changeEvent)
+        public virtual void HandleChange(ChangeEvent changeEvent)
         {
-            if (changeEvent is EdgeChange)
-            {
-                edgeChanges.Add(changeEvent as EdgeChange);
-            }
-            else if (changeEvent is PropagatedEdgeAdded)
-            {
-                propagatedEdgesAdded.Add(changeEvent as PropagatedEdgeAdded);
-            }
-            else if (changeEvent is PropagatedEdgeRemoved)
-            {
-                propagatedEdgesRemoved.Add(changeEvent as PropagatedEdgeRemoved);
-            }
-            else if (changeEvent is MapsToEdgeAdded)
-            {
-                mapsToEdgesAdded.Add(changeEvent as MapsToEdgeAdded);
-            }
-            else if (changeEvent is MapsToEdgeRemoved)
-            {
-                mapsToEdgesRemoved.Add(changeEvent as MapsToEdgeRemoved);
-            }
-            else
-            {
-                Debug.LogErrorFormat("UNHANDLED CALLBACK: {0}\n", changeEvent.ToString());
-            }
+            changes = changes.Incorporate(changeEvent).ToList();
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using Dissonance.Audio.Playback;
+using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 
 namespace Dissonance.Editor
 {
     [CustomEditor(typeof(SamplePlaybackComponent))]
-    public class SamplePlaybackComponentEditor : UnityEditor.Editor
+    [UsedImplicitly]
+    public class SamplePlaybackComponentEditor
+        : UnityEditor.Editor
     {
         private Texture2D _logo;
 
@@ -26,11 +29,10 @@ namespace Dissonance.Editor
         {
             GUILayout.Label(_logo);
 
-            var component = (SamplePlaybackComponent) target;
-            var maybeSession = component.Session;
-
             if (Application.isPlaying)
             {
+                var component = (SamplePlaybackComponent)target;
+                var maybeSession = component.Session;
                 if (maybeSession != null)
                 {
                     var session = maybeSession.Value;
@@ -49,7 +51,7 @@ namespace Dissonance.Editor
                 }
                 else
                 {
-                    EditorGUILayout.LabelField("No Active Session");
+                    EditorGUILayout.LabelField("Not Speaking");
 
                     // Clear the data from the buffer graph
                     while (_rateGraph.length > 0)

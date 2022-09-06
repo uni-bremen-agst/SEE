@@ -33,7 +33,7 @@ namespace Crosstales.RTVoice.Model
       [Tooltip("Fallback culture for the text (e.g. 'en', optional).")] public string Culture = "en";
 
       /// <summary>Fallback gender for the text.</summary>
-      [Tooltip("Fallback gender for the text.")] public Enum.Gender Gender = Enum.Gender.UNKNOWN;
+      [Tooltip("Fallback gender for the text.")] public Crosstales.RTVoice.Model.Enum.Gender Gender = Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
 
       #endregion
 
@@ -50,23 +50,23 @@ namespace Crosstales.RTVoice.Model
 
             if (Speaker.Instance.CustomProvider == null)
             {
-               if (Util.Helper.isWindowsPlatform && !Speaker.Instance.ESpeakMode)
+               if (Crosstales.RTVoice.Util.Helper.isWindowsPlatform && !Speaker.Instance.ESpeakMode)
                {
                   result = VoiceNameWindows;
                }
-               else if (Util.Helper.isMacOSPlatform && !Speaker.Instance.ESpeakMode)
+               else if (Crosstales.RTVoice.Util.Helper.isMacOSPlatform && !Speaker.Instance.ESpeakMode)
                {
                   result = VoiceNameMac;
                }
-               else if (Util.Helper.isAndroidPlatform)
+               else if (Crosstales.RTVoice.Util.Helper.isAndroidPlatform)
                {
                   result = VoiceNameAndroid;
                }
-               else if (Util.Helper.isWSABasedPlatform)
+               else if (Crosstales.RTVoice.Util.Helper.isWSABasedPlatform)
                {
                   result = VoiceNameWSA;
                }
-               else if (Util.Helper.isIOSBasedPlatform)
+               else if (Crosstales.RTVoice.Util.Helper.isIOSBasedPlatform)
                {
                   result = VoiceNameIOS;
                }
@@ -106,45 +106,45 @@ namespace Crosstales.RTVoice.Model
          System.Text.StringBuilder result = new System.Text.StringBuilder();
 
          result.Append(GetType().Name);
-         result.Append(Util.Constants.TEXT_TOSTRING_START);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_START);
 
          result.Append("VoiceNameWindows='");
          result.Append(VoiceNameWindows);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameMac='");
          result.Append(VoiceNameMac);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameLinux='");
          result.Append(VoiceNameLinux);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameAndroid='");
          result.Append(VoiceNameAndroid);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameIOS='");
          result.Append(VoiceNameIOS);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameWSA='");
          result.Append(VoiceNameWSA);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("VoiceNameCustom='");
          result.Append(VoiceNameCustom);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Culture='");
          result.Append(Culture);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER);
 
          result.Append("Gender='");
          result.Append(Gender);
-         result.Append(Util.Constants.TEXT_TOSTRING_DELIMITER_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_DELIMITER_END);
 
-         result.Append(Util.Constants.TEXT_TOSTRING_END);
+         result.Append(Crosstales.RTVoice.Util.Constants.TEXT_TOSTRING_END);
 
          return result.ToString();
       }
@@ -169,6 +169,11 @@ namespace Crosstales.RTVoice.Model
 
       public override int GetHashCode()
       {
+         return base.GetHashCode();
+      }
+/*
+      public override int GetHashCode()
+      {
          int hash = 0;
 
          if (VoiceNameWindows != null)
@@ -191,8 +196,8 @@ namespace Crosstales.RTVoice.Model
 
          return hash;
       }
-
+*/
       #endregion
    }
 }
-// © 2018-2021 crosstales LLC (https://www.crosstales.com)
+// © 2018-2022 crosstales LLC (https://www.crosstales.com)

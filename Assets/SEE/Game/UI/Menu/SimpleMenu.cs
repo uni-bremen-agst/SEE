@@ -193,8 +193,6 @@ namespace SEE.Game.UI.Menu
                     break;
                 case PlayerInputType.VRPlayer:
                     break;
-                case PlayerInputType.HoloLensPlayer:
-                    break;
                 case PlayerInputType.MobilePlayer:
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
@@ -313,7 +311,7 @@ namespace SEE.Game.UI.Menu
         {
             if (entries.Any(x => x.Title == entry.Title))
             {
-                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!\n");
+                throw new InvalidOperationException($"Button with the given title '{entry.Title}' already exists!");
             }
             entries.Add(entry);
             if (HasStarted)

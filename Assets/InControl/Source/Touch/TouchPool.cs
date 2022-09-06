@@ -12,7 +12,6 @@
 		List<Touch> freeTouches;
 
 
-
 		public TouchPool( int capacity )
 		{
 			freeTouches = new List<Touch>( capacity );
@@ -28,9 +27,7 @@
 
 
 		public TouchPool()
-		: this( 16 )
-		{
-		}
+			: this( 16 ) {}
 
 
 		public Touch FindOrCreateTouch( int fingerId )

@@ -14,18 +14,16 @@ namespace SEE.GO
         /// Constructor.
         /// </summary>
         /// <param name="issueMap">the relevant metrics for the erosion issues</param>
-        /// <param name="innerNodeFactory">factory that created the game nodes that are to be decorated</param>
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="erosionScalingFactor">the factor by which the erosion icons shall be scaled</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             NodeFactory innerNodeFactory, IScale scaler, float erosionScalingFactor)
+                             IScale scaler, float erosionScalingFactor)
         {
             this.issueMap = issueMap;
-            this.innerNodeFactory = innerNodeFactory;
             this.scaler = scaler;
             this.erosionScalingFactor = erosionScalingFactor;
         }
-        
+
         /// <summary>
         /// Prefix used for game objects containing erosion sprites.
         /// </summary>
@@ -35,11 +33,6 @@ namespace SEE.GO
         /// The settings that determine the relevant metrics for the erosion issues.
         /// </summary>
         private readonly Dictionary<string, IconFactory.Erosion> issueMap;
-
-        /// <summary>
-        /// The factory that created the game nodes that are to be decorated.
-        /// </summary>
-        private readonly NodeFactory innerNodeFactory;
 
         /// <summary>
         /// The scaling to be applied on the metrics for the erosion issues.
@@ -87,11 +80,11 @@ namespace SEE.GO
                     // maximum value of the normalized metric. Hence, this value is in [0,1].
                     float metricScale = scaler.GetRelativeNormalizedValueInLevel(issue.Key, node);
 
-                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value, 
-                                                                     value.ToString(CultureInfo.InvariantCulture), 
-                                                                     new Color(metricScale, 0, 0, 
+                    GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value,
+                                                                     value.ToString(CultureInfo.InvariantCulture),
+                                                                     new Color(metricScale, 0, 0,
                                                                                Mathf.Lerp(0.75f, 1f, metricScale)));
-                    
+
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
                     // otherwise partial erosion display won't work!
                     sprite.name = $"{EROSION_SPRITE_PREFIX} {sprite.name} {node.SourceName}";
@@ -111,13 +104,13 @@ namespace SEE.GO
                     // UnityEngine.Assertions.Assert.IsTrue(scale.x <= 1, $"scale.x={scale.x}");
 
                     // Now scale the sprite into the corridor [0, maxSpriteWidth]
-                    scale *= Mathf.Lerp(0, innerNodeFactory.GetSize(gameNode.gameObject).x, scale.x);
+                    scale *= Mathf.Lerp(0, gameNode.gameObject.transform.lossyScale.x, scale.x);
 
                     // Finally, scale sprite by the configured scaling factor
                     scale *= erosionScalingFactor;
 
                     sprite.transform.localScale = scale;
-                    sprite.transform.position = innerNodeFactory.Roof(gameNode.gameObject);
+                    sprite.transform.position = GetRoof(gameNode);
 
                     sprites.Add(sprite);
                 }
@@ -126,8 +119,8 @@ namespace SEE.GO
             // Now we stack the sprites on top of the roof of the building in
             // ascending order of their widths.
             {
-                Vector3 currentRoof = innerNodeFactory.Roof(gameNode.gameObject);
-                currentRoof += Vector3.up * innerNodeFactory.GetSize(gameNode.gameObject).x / 6;
+                Vector3 currentRoof = GetRoof(gameNode);
+                currentRoof += Vector3.up * gameNode.gameObject.transform.lossyScale.x / 6;
                 sprites.Sort(Comparer<GameObject>.Create((left, right) =>
                                                              GetSizeOfSprite(left).x.CompareTo(GetSizeOfSprite(right).x)));
                 foreach (GameObject sprite in sprites)
@@ -145,6 +138,22 @@ namespace SEE.GO
             {
                 sprite.transform.SetParent(gameNode.transform);
             }
+        }
+
+        /// <summary>
+        /// Returns the world-space center of the roof of <paramref name="gameNode"/> thereby
+        /// considering all descendants of <paramref name="gameNode"/>. More precisely, the
+        /// x and z co-ordinates are those of the game object referred to by <paramref name="gameNode"/>
+        /// and the y co-ordinate is the maximum y co-ordinate of that game object and all its
+        /// descendants in the game-object hierarchy.
+        /// </summary>
+        /// <param name="gameNode">game node whose roof is to be determined</param>
+        /// <returns>world-space position of the roof of <paramref name="gameNode"/></returns>
+        protected static Vector3 GetRoof(NodeRef gameNode)
+        {
+            Vector3 position = gameNode.gameObject.transform.position;
+            position.y = gameNode.gameObject.GetMaxY();
+            return position;
         }
 
         /// <summary>

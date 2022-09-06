@@ -101,7 +101,7 @@ namespace Dissonance.Audio.Playback
         }
     }
 
-    internal interface IVolumeProvider
+    public interface IVolumeProvider
     {
         float TargetVolume { get; }
     }

@@ -21,6 +21,7 @@ namespace Dissonance.Audio.Playback
         private readonly ConcurrentPool<List<RemoteChannel>> _channelListPool;
         private readonly BufferedDecoder _source;
         private readonly SynchronizerSampleSource _synchronizer;
+        private readonly Resampler _resampler;
         private readonly ISampleSource _output;
 
         private volatile bool _prepared;
@@ -103,10 +104,10 @@ namespace Dissonance.Audio.Playback
             _synchronizer = new SynchronizerSampleSource(samples, TimeSpan.FromSeconds(1));
 
             // Resample the data to the output rate
-            var resampled = new Resampler(_synchronizer, this);
+            _resampler = new Resampler(_synchronizer, this);
 
             // Chain a soft clip stage if necessary
-            _output = softClip ? (ISampleSource)new SoftClipSampleSource(resampled) : resampled;
+            _output = softClip ? (ISampleSource)new SoftClipSampleSource(_resampler) : _resampler;
         }
         #endregion
 
@@ -136,6 +137,11 @@ namespace Dissonance.Audio.Playback
         public void EnableDynamicSync()
         {
             _synchronizer.Enable();
+        }
+
+        public void SetOutputSampleRate(int? rate)
+        {
+            _resampler.SetOutputRate(rate);
         }
 
         public bool Read(ArraySegment<float> samples)

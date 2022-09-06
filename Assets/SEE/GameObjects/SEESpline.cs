@@ -1,9 +1,12 @@
-﻿using OdinSerializer;
-using SEE.Utils;
+﻿using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
+using SEE.DataModel.DG;
+using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace SEE.GO
 {
@@ -38,7 +41,7 @@ namespace SEE.GO
     /// The geometric characteristics of the generated mesh, e.g., the radius
     /// of the tube, can be set via properties. By setting a property, the
     /// rendering of the spline is updated in the next frame. If an update
-    /// needs to be applied immediatly, call <see cref="UpdateMesh"/> after
+    /// needs to be applied immediately, call <see cref="UpdateMesh"/> after
     /// setting one or more properties.
     /// </summary>
     public class SEESpline : SerializedMonoBehaviour
@@ -68,7 +71,7 @@ namespace SEE.GO
         /// </summary>
         public BSpline Spline
         {
-            get { return spline; }
+            get => spline;
             set
             {
                 spline = value;
@@ -94,7 +97,7 @@ namespace SEE.GO
         /// </summary>
         public float Radius
         {
-            get { return radius; }
+            get => radius;
             set
             {
                 radius = Math.Max(0.0001f, value);
@@ -108,14 +111,14 @@ namespace SEE.GO
         /// updated (<see cref="UpdateMesh"/>).
         /// </summary>
         [SerializeField, Min(5)]
-        public int tubularSegments = 50; // default value; based on Holten
+        private int tubularSegments = 50; // default value; based on Holten
 
         /// <summary>
         /// Property of <see cref="tubularSegments"/>. Domain [5, inf]
         /// </summary>
         public int TubularSegments
         {
-            get { return tubularSegments; }
+            get => tubularSegments;
             set
             {
                 int max = Math.Max(5, value);
@@ -133,14 +136,14 @@ namespace SEE.GO
         /// (<see cref="UpdateMesh"/>).
         /// </summary>
         [SerializeField, Min(3)]
-        public int radialSegments = 8; // default value; octagon
+        private int radialSegments = 8; // default value; octagon
 
         /// <summary>
         /// Property of <see cref="radialSegments"/>. Domain: [3, inf]
         /// </summary>
         public int RadialSegments
         {
-            get { return radialSegments; }
+            get => radialSegments;
             set
             {
                 int max = Math.Max(3, value);
@@ -149,6 +152,26 @@ namespace SEE.GO
                     radialSegments = max;
                     needsUpdate = true;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Tuple of the start color of the gradient and the end color of it.
+        /// Should only be changed via <see cref="GradientColors"/>.
+        /// </summary>
+        [SerializeField]
+        private (Color start, Color end) gradientColors = (Color.red, Color.green);
+
+        /// <summary>
+        /// Tuple of the start color of the gradient and the end color of it.
+        /// </summary>
+        public (Color start, Color end) GradientColors
+        {
+            get => gradientColors;
+            set
+            {
+                gradientColors = value;
+                needsUpdate = true;
             }
         }
 
@@ -194,11 +217,34 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Changes the last control point of the spline represented by this object to <paramref name="newPosition"/>.
+        /// </summary>
+        /// <param name="newPosition">The new position the last control point of this spline should have</param>
+        public void UpdateEndPosition(Vector3 newPosition) => UpdateControlPoint(spline.NumControlPoints - 1, newPosition);
+        
+        /// <summary>
+        /// Changes the first control point of the spline represented by this object to <paramref name="newPosition"/>.
+        /// </summary>
+        /// <param name="newPosition">The new position the first control point of this spline should have</param>
+        public void UpdateStartPosition(Vector3 newPosition) => UpdateControlPoint(0, newPosition);
+
+        /// <summary>
+        /// Changes the control point at <paramref name="index"/> to the given <paramref name="newControlPoint"/>.
+        /// </summary>
+        /// <param name="index">Index of the control point which is to be changed</param>
+        /// <param name="newControlPoint">New value for the control point at <paramref name="index"/></param>
+        private void UpdateControlPoint(uint index, Vector3 newControlPoint)
+        {
+            spline.SetControlPointVec3At(index, new Vec3(newControlPoint.x, newControlPoint.y, newControlPoint.z));
+            needsUpdate = true;
+        }
+
+        /// <summary>
         /// Approximates <see cref="Spline"/> as poly line. The greater
         /// <paramref name="num"/>, the more accurate the approximation.
         /// The poly line can be visualized with a <see cref="LineRenderer"/>.
         /// </summary>
-        /// <param name="num">Number of vertecies in the poly line</param>
+        /// <param name="num">Number of vertices in the poly line</param>
         /// <returns>A poly line approximating <see cref="Spline"/></returns>
         public Vector3[] PolyLine(int num = 100)
         {
@@ -217,11 +263,13 @@ namespace SEE.GO
         /// </summary>
         private void UpdateLineRenderer()
         {
-            if (gameObject.TryGetComponent<LineRenderer>(out var lr))
+            if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                var polyLine = PolyLine(lr.positionCount);
+                Vector3[] polyLine = PolyLine(lr.positionCount);
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
+                lr.startColor = gradientColors.start;
+                lr.endColor = gradientColors.end;
             }
             needsUpdate = false;
         }
@@ -325,10 +373,10 @@ namespace SEE.GO
             mesh = filter.mesh;
             updateMaterial = updateMaterial // Implies new mesh.
                 || // Or the geometrics of the mesh have changed.
-                (mesh.vertices.Length != vertices.Count ||
-                 mesh.normals.Length  != normals.Count  ||
-                 mesh.tangents.Length != tangents.Count ||
-                 mesh.uv.Length != uvs.Count);
+                mesh.vertices.Length != vertices.Count ||
+                mesh.normals.Length  != normals.Count  ||
+                mesh.tangents.Length != tangents.Count ||
+                mesh.uv.Length != uvs.Count;
             if (updateMaterial)
             {
                 mesh.Clear();
@@ -348,9 +396,9 @@ namespace SEE.GO
             }
 
             // Remove line renderer.
-            if (gameObject.TryGetComponent(out LineRenderer renderer))
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                Destroy(renderer);
+                Destroy(lineRenderer);
             }
 
             return mesh;
@@ -363,24 +411,24 @@ namespace SEE.GO
         protected virtual void UpdateMaterial()
         {
             if (!gameObject.TryGetComponent(out MeshFilter filter) ||
-                !gameObject.TryGetComponent(out MeshRenderer renderer))
+                !gameObject.TryGetComponent(out MeshRenderer meshRenderer))
             {
                 return;
             }
 
-            if (renderer.sharedMaterial == null)
+            if (meshRenderer.sharedMaterial == null)
             {
-                renderer.sharedMaterial = defaultMaterial;
+                meshRenderer.sharedMaterial = defaultMaterial;
             }
-            if (renderer.sharedMaterial.shader == defaultMaterial.shader)
+            if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
             {
                 // Don't re-color non-default material.
                 Mesh mesh = filter.mesh;
                 Vector2[] uv = mesh.uv;
                 Color[] colors = new Color[uv.Length];
-                for (var i = 0; i < uv.Length; i++)
+                for (int i = 0; i < uv.Length; i++)
                 {
-                    colors[i] = Color.Lerp(Color.red, Color.green, uv[i].y);
+                    colors[i] = Color.Lerp(gradientColors.start, gradientColors.end, uv[i].y);
                 }
                 mesh.colors = colors;
             }
@@ -401,7 +449,7 @@ namespace SEE.GO
         /// <returns>A mesh approximating <see cref="Spline"/></returns>
         public Mesh CreateMesh()
         {
-            if (gameObject.TryGetComponent<MeshFilter>(out var filter))
+            if (gameObject.TryGetComponent(out MeshFilter filter))
             {
                 return filter.mesh;
             }
@@ -451,21 +499,20 @@ namespace SEE.GO
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
     ///
-    /// By implementing the <see cref="EdgeAnimator.IEvaluator"/> interface,
-    /// spline morphisms can used by <see cref="EdgeAnimator"/> to run linear
-    /// edge animations.
+    /// <see cref="CreateTween"/> can be used to create a <see cref="Tween"/>
+    /// object with which the morphism can be played as an animation.
+    /// The animation can be controlled using the tween object.
     /// </summary>
-    public class SplineMorphism :
-        SerializedMonoBehaviour, EdgeAnimator.IEvaluator
+    public class SplineMorphism : SerializedMonoBehaviour
     {
         /// <summary>
         /// Origin of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline source;
+        private BSpline Source;
 
         /// <summary>
-        /// Serializable representation of <see cref="source"/>.
+        /// Serializable representation of <see cref="Source"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSource;
@@ -474,10 +521,10 @@ namespace SEE.GO
         /// Target of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline target;
+        private BSpline Target;
 
         /// <summary>
-        /// Serializable representation of <see cref="target"/>.
+        /// Serializable representation of <see cref="Target"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableTarget;
@@ -489,17 +536,56 @@ namespace SEE.GO
         private Morphism morphism;
 
         /// <summary>
+        /// The tween which can play the spline morphism from <see cref="Source"/>
+        /// to <see cref="Target"/>, created by <see cref="CreateTween"/>.
+        /// </summary>
+        public Tween tween;
+
+        /// <summary>
+        /// Creates a new <see cref="Tween"/> which can play the spline morphism from <paramref name="source"/>
+        /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="source">Origin of the spline morphism</param>
+        /// <param name="target">Target of the spline morphism</param>
+        /// <param name="duration">Duration of the animation; lower bound is clamped to 0.01</param>
+        /// <remarks>
+        /// Note that the returned tween can be modified (e.g., to apply an ease function)
+        /// and that <c>Play()</c> has to be called to actually start the animation.
+        /// </remarks>
+        public Tween CreateTween(BSpline source, BSpline target, float duration)
+        {
+            Init(source, target);
+            return tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+        }
+
+        /// <summary>
+        /// Changes the target of the morphism to <paramref name="newTarget"/>.
+        /// </summary>
+        /// <param name="newTarget">The new target of this morphism.</param>
+        public void ChangeTarget(BSpline newTarget)
+        {
+            Target = newTarget;
+            morphism = Source.MorphTo(Target);
+        }
+
+        /// <summary>
+        /// Whether the <paramref name="tween"/> belonging to this morphism is active.
+        /// If no tween exists, <c>false</c> will be returned.
+        /// </summary>
+        public bool IsActive() => tween?.IsActive() ?? false;
+
+        /// <summary>
         /// Initializes the spline morphism.
         ///
         /// Postcondition: <see cref="SEESpline"/> is morphed to
         /// <paramref name="source"/>.
         /// </summary>
-        /// <param name="source">Origin of the spline morphsim</param>
+        /// <param name="source">Origin of the spline morphism</param>
         /// <param name="target">Target of the spline morphism</param>
         public void Init(BSpline source, BSpline target)
         {
-            this.source = source;
-            this.target = target;
+            Source = source;
+            Target = target;
             morphism = source.MorphTo(target);
             Morph(0); // Morph to source.
         }
@@ -514,44 +600,35 @@ namespace SEE.GO
         /// morphism result and can be used by the caller for further
         /// calculations.
         /// </summary>
-        /// <param name="time">Time parameter in seconds; clamped to domain [0, 1]</param>
+        /// <param name="time">Time parameter; clamped to domain [0, 1]</param>
         /// <returns>Linear interpolation of source and target at t</returns>
         public BSpline Morph(double time)
         {
-            if (gameObject.TryGetComponent<SEESpline>(out SEESpline spline))
+            if (gameObject.TryGetComponent(out SEESpline spline))
             {
                 spline.Spline = morphism.Eval(time);
             }
             else
             {
-                Debug.LogWarning("gameObject without SEESpline component.\n");
+                Debug.LogWarning($"GameObject '{gameObject.name}' without SEESpline component.\n");
             }
             // Protect internal state of `spline'.
             return new BSpline(spline.Spline);
         }
 
-        /// <summary>
-        /// Implementation of <see cref="IEvaluator"/> interface.
-        /// </summary>
-        /// <param name="time">time in seconds</param>
-        public void Eval(float time)
-        {
-            Morph(time);
-        }
-
         protected override void OnBeforeSerialize()
         {
             base.OnBeforeSerialize();
-            serializableSource = TinySplineInterop.Serialize(source);
-            serializableTarget = TinySplineInterop.Serialize(target);
+            serializableSource = TinySplineInterop.Serialize(Source);
+            serializableTarget = TinySplineInterop.Serialize(Target);
         }
 
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            source = TinySplineInterop.Deserialize(serializableSource);
-            target = TinySplineInterop.Deserialize(serializableTarget);
-            morphism = source.MorphTo(target);
+            Source = TinySplineInterop.Deserialize(serializableSource);
+            Target = TinySplineInterop.Deserialize(serializableTarget);
+            morphism = Source.MorphTo(Target);
         }
     }
 }

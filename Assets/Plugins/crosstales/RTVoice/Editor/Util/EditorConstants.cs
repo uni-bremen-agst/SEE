@@ -7,13 +7,13 @@ namespace Crosstales.RTVoice.EditorUtil
       #region Constant variables
 
       // Keys for the configuration of the asset
-      public const string KEY_UPDATE_CHECK = Util.Constants.KEY_PREFIX + "UPDATE_CHECK";
-      public const string KEY_COMPILE_DEFINES = Util.Constants.KEY_PREFIX + "COMPILE_DEFINES";
-      public const string KEY_PREFAB_AUTOLOAD = Util.Constants.KEY_PREFIX + "PREFAB_AUTOLOAD";
+      public const string KEY_UPDATE_CHECK = Crosstales.RTVoice.Util.Constants.KEY_PREFIX + "UPDATE_CHECK";
+      public const string KEY_COMPILE_DEFINES = Crosstales.RTVoice.Util.Constants.KEY_PREFIX + "COMPILE_DEFINES";
+      public const string KEY_PREFAB_AUTOLOAD = Crosstales.RTVoice.Util.Constants.KEY_PREFIX + "PREFAB_AUTOLOAD";
 
-      public const string KEY_HIERARCHY_ICON = Util.Constants.KEY_PREFIX + "HIERARCHY_ICON";
+      public const string KEY_HIERARCHY_ICON = Crosstales.RTVoice.Util.Constants.KEY_PREFIX + "HIERARCHY_ICON";
 
-      public const string KEY_UPDATE_DATE = Util.Constants.KEY_PREFIX + "UPDATE_DATE";
+      public const string KEY_UPDATE_DATE = Crosstales.RTVoice.Util.Constants.KEY_PREFIX + "UPDATE_DATE";
 
 
       // Default values
@@ -41,7 +41,7 @@ namespace Crosstales.RTVoice.EditorUtil
 
       /// <summary>Returns the URL of the asset in UAS.</summary>
       /// <returns>The URL of the asset in UAS.</returns>
-      public static string ASSET_URL => Util.Constants.ASSET_PRO_URL;
+      public static string ASSET_URL => Crosstales.RTVoice.Util.Constants.ASSET_PRO_URL;
 
       /// <summary>Returns the ID of the asset in UAS.</summary>
       /// <returns>The ID of the asset in UAS.</returns>
@@ -55,4 +55,4 @@ namespace Crosstales.RTVoice.EditorUtil
    }
 }
 #endif
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

@@ -14,7 +14,7 @@ namespace InControl.NativeDeviceProfiles
 
 			DeviceName = "Xbox Series X Controller";
 			DeviceNotes = "Xbox Series X Controller on Windows";
-			
+
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.XboxSeriesX;
 
@@ -221,4 +221,3 @@ namespace InControl.NativeDeviceProfiles
 
 	// @endcond
 }
-

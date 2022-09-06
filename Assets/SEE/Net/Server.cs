@@ -80,8 +80,8 @@ namespace SEE.Net
                 incomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
                 outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
-                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => pendingEstablishedConnections.Push(c));
-                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => pendingClosedConnections.Push(c));
+                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => { if (c != null) pendingEstablishedConnections.Push(c); });
+                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c != null) pendingClosedConnections.Push(c); });
 
                 void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
@@ -186,10 +186,11 @@ namespace SEE.Net
                         IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
                         if (Network.LoadCityOnStart)
                         {
-                            foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
-                            {
-                                new LoadCityAction(city).Execute(recipient);
-                            }
+                            // TODO: Here we would tranfer all local cities to the connecting client.
+                            //foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
+                            //{
+                            //    new LoadCityAction(city).Execute(recipient);
+                            //}
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {

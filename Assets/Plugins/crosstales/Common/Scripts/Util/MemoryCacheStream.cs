@@ -33,7 +33,7 @@ namespace Crosstales.Common.Util
       /// <summary>Constructor with a specified cache size.</summary>
       /// <param name="cacheSize">Cache size of the stream in bytes.</param>
       /// <param name="maxCacheSize">Maximum cache size of the stream in bytes.</param>
-      public MemoryCacheStream(int cacheSize = 64 * BaseConstants.FACTOR_KB, int maxCacheSize = 64 * BaseConstants.FACTOR_MB)
+      public MemoryCacheStream(int cacheSize = 64 * Crosstales.Common.Util.BaseConstants.FACTOR_KB, int maxCacheSize = 64 * Crosstales.Common.Util.BaseConstants.FACTOR_MB)
       {
          length = writePosition = readPosition = 0;
          size = cacheSize;
@@ -70,7 +70,6 @@ namespace Crosstales.Common.Util
                throw new System.ArgumentOutOfRangeException(nameof(value), "Non-negative number required.");
             }
 
-            //writePosition = readPosition = value; //TODO only readPosition?
             readPosition = value;
          }
       }
@@ -241,4 +240,4 @@ namespace Crosstales.Common.Util
       #endregion
    }
 }
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

@@ -30,7 +30,7 @@ namespace InControl.UnityDeviceProfiles
 
 			Matchers = new[]
 			{
-				new InputDeviceMatcher { NameLiteral = "Wireless Controller" },
+				//new InputDeviceMatcher { NameLiteral = "Wireless Controller" }, <-- commenting out due to PlayStation 5 controller using the same NameLiteral
 				new InputDeviceMatcher { NameLiteral = "Sony Computer Entertainment Wireless Controller" },
 				new InputDeviceMatcher { NameLiteral = "Sony Interactive Entertainment Wireless Controller" }
 			};

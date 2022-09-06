@@ -1,3 +1,4 @@
+using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ namespace SEE.Controls.Actions
         ///      selected or unselected if it was
         /// or
         ///   2) all currently selected objects are unselected and O becomes selected.
+        /// When there is no interaction taken by the user, any pending selection of
+        /// the IDE will be checked.
         /// </summary>
         private void Update()
         {
@@ -43,16 +46,22 @@ namespace SEE.Controls.Actions
 #else
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    if (obj != null)
-                    {
-                        obj.SetSelect(!obj.IsSelected, true);
-                    }
+                    obj?.SetSelect(!obj.IsSelected, true);
                 }
                 else
                 {
                     InteractableObject.ReplaceSelection(obj, true);
                 }
 #endif
+            }
+            else if (IDEIntegration.Instance != null && IDEIntegration.Instance.PendingSelectionsAction())
+            {
+                InteractableObject.UnselectAll(false);
+
+                foreach (InteractableObject elem in IDEIntegration.Instance?.PopPendingSelections())
+                {
+                    elem?.SetSelect(true, true);
+                }
             }
         }
     }

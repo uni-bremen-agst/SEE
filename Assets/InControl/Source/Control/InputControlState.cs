@@ -1,6 +1,6 @@
 namespace InControl
 {
-#pragma warning disable 0660, 0661
+	#pragma warning disable 0660, 0661
 
 	public struct InputControlState
 	{

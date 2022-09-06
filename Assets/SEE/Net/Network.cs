@@ -14,6 +14,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -25,6 +26,7 @@ namespace SEE.Net
     /// <summary>
     /// Handles the most general parts of networking.
     /// </summary>
+    [Serializable]
     public class Network : MonoBehaviour
     {
         /// <summary>
@@ -35,7 +37,7 @@ namespace SEE.Net
         /// <summary>
         /// The single unique instance of the network.
         /// </summary>
-        public static Network Instance { get; set; }
+        public static Network Instance { get; private set; }
 
         /// <summary>
         /// The maximal port number.
@@ -46,6 +48,7 @@ namespace SEE.Net
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
+        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
         public int ServerActionPort = 12345;
 
         /// <summary>
@@ -128,24 +131,39 @@ namespace SEE.Net
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
+        ///
+        /// FIXME: This is currently not supported. That is why we hide it in the Inspector.
         /// </summary>
-        [SerializeField] private bool loadCityOnStart = false;
+        [SerializeField, HideInInspector] private bool loadCityOnStart = false;
 
 #if UNITY_EDITOR
+
         /// <summary>
-        /// Whether the logging of NetworkComms should be enabled.
+        /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        [SerializeField] private bool networkCommsLoggingEnabled = false;
+        private const string LoggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField] private bool internalLoggingEnabled = true;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("Whether the network logging should be enabled.")]
+        private bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField] private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("The minimal logged severity.")]
+        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+
+        /// <summary>
+        /// Whether the logging of NetworkComms should be enabled.
+        /// </summary>
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
+        [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
+        private bool networkCommsLoggingEnabled = false;
+
 #endif
 
         /// <summary>
@@ -197,9 +215,12 @@ namespace SEE.Net
             }
             private set
             {
-                Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
                 Assert.IsNotNull(value, "The main Unity thread must not be null!");
-                mainThread = value;
+                if (mainThread != value)
+                {
+                    Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                    mainThread = value;
+                }
             }
         }
 
@@ -216,6 +237,8 @@ namespace SEE.Net
             /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
             /// main thread here.
             MainThread = Thread.CurrentThread;
+
+            Load();
         }
 
         /// <summary>
@@ -227,16 +250,11 @@ namespace SEE.Net
             {
                 if (Instance != this)
                 {
-                    Util.Logger.LogError("There must not be more than one Network component! "
-                        + $"This component in {gameObject.GetFullName()} will be destroyed!\n");
-                    Destroy(this);
-                    return;
+                    Util.Logger.LogWarning("There must not be more than one Network component! "
+                        + $"The component {typeof(Network)} in {Instance.gameObject.FullName()} will be destroyed!\n");
                 }
             }
-            else
-            {
-                Instance = this;
-            }
+            Instance = this;
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
         }
@@ -403,6 +421,8 @@ namespace SEE.Net
 
         /// <summary>
         /// Shuts down the server and the client.
+        /// This method is called only when this component is destroyed, which
+        /// may be at the very end of the game.
         /// </summary>
         private void OnDestroy()
         {
@@ -441,6 +461,8 @@ namespace SEE.Net
                 }
             }
 #endif
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            Debug.Log("Network is shut down.\n");
         }
 
         /// <summary>
@@ -527,8 +549,11 @@ namespace SEE.Net
         /// </summary>
         private void OnServerStarted()
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
 
         /// <summary>
@@ -543,8 +568,24 @@ namespace SEE.Net
             // Now we have loaded the scene that is supposed to contain settings for the voice chat
             // system. We can now turn on the voice chat system.
             Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
-            StartVoiceChat();
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            StartVoiceChat();
+        }
+
+        /// <summary>
+        /// Unregisters itself from <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        private void OnSceneUnloaded(Scene scene)
+        {
+            Debug.Log($"Unloaded scene {scene.name}.\n");
+            if (scene.name == GameScene)
+            {
+                SceneManager.sceneUnloaded -= OnSceneUnloaded;
+                ShutdownNetwork();
+                Destroy(Instance);
+            }
         }
 
         /// <summary>
@@ -567,7 +608,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartHost(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartHost));
+            StartCoroutine(ShutdownNetwork(InternalStartHost));
 
             void InternalStartHost()
             {
@@ -604,7 +645,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartClient(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartClient));
+            StartCoroutine(ShutdownNetwork(InternalStartClient));
 
             void InternalStartClient()
             {
@@ -673,7 +714,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartServer(CallBack callBack)
         {
-            StartCoroutine(RestartNetwork(InternalStartServer));
+            StartCoroutine(ShutdownNetwork(InternalStartServer));
 
             void InternalStartServer()
             {
@@ -699,21 +740,21 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// A delegate that will be called in <see cref="RestartNetwork(StartNetwork)"/> when
-        /// the network has been shut down (if needed at all) to (re-)start the network.
+        /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when
+        /// the network has been shut down (if needed at all), for instance, to (re-)start the network.
         /// </summary>
-        delegate void StartNetwork();
+        delegate void OnShutdownFinished();
 
         /// <summary>
-        /// If the network is already running, it will be shut down. Finally, <paramref name="startNetwork"/>
+        /// If the network is already running, it will be shut down. Finally, <paramref name="onShutdownFinished"/>
         /// will be called.
         ///
         /// This method is used as a co-routine started in <see cref="StartHost(CallBack)"/>,
         /// <see cref="StartServer(CallBack)"/>, and <see cref="StartClient(CallBack)"/>.
         /// </summary>
-        /// <param name="startNetwork">function to be called to start the network</param>
+        /// <param name="onShutdownFinished">function to be called at the end of the shutdown</param>
         /// <returns>whether to continue this co-routine</returns>
-        private IEnumerator RestartNetwork(StartNetwork startNetwork)
+        private IEnumerator ShutdownNetwork(OnShutdownFinished onShutdownFinished)
         {
             // In case we are connected, we will first disconnect.
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
@@ -735,7 +776,7 @@ namespace SEE.Net
 
             ShutdownNetwork();
 
-            startNetwork();
+            onShutdownFinished();
         }
 
         /// <summary>
@@ -750,11 +791,16 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Name of the Inspector foldout group for the logging setttings.
+        /// </summary>
+        private const string VoiceChatFoldoutGroup = "Voice Chat";
+
+        /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
         /// can be changed in the editor via <see cref="NetworkEditor"/> as well
         /// as at the start up in the <see cref="OpeningDialog"/>.
         /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(VoiceChatFoldoutGroup)]
         public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
@@ -778,7 +824,93 @@ namespace SEE.Net
             }
         }
 
-#region ConfigIO
+        /// <summary>
+        /// Represents an IP address along with its IP address family.
+        /// This is used only for informational purposes in <see cref="AddressesInfo"/>.
+        /// </summary>
+        [Serializable]
+        private struct AddressInfo
+        {
+            /// <summary>
+            /// The address family of the TCP/IP protocol, e.g., InterNetworkV6
+            /// or InterNetwork.
+            /// </summary>
+            public readonly string AddressFamily;
+            /// <summary>
+            /// The IP address.
+            /// </summary>
+            public readonly string IPAddress;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="addressFamiliy">address family of the TCP/IP protocol</param>
+            /// <param name="ipAddress">IP address</param>
+            public AddressInfo(string addressFamiliy, string ipAddress)
+            {
+                AddressFamily = addressFamiliy;
+                IPAddress = ipAddress;
+            }
+        }
+
+        /// <summary>
+        /// The IP addresses and the address families they belong to for the local machine.
+        /// This will be used in the Inspector for informational purposes only.
+        /// </summary>
+        [ShowInInspector]
+        [PropertyTooltip("IP addresses of this machine.")]
+        [TableList(IsReadOnly = true)]
+        private IList<AddressInfo> AddressesInfo
+        {
+            get
+            {
+                return Network.LookupLocalIPAddresses()
+                              .Select(ip => new AddressInfo(ip.AddressFamily.ToString(), ip.ToString()))
+                              .ToList();
+            }
+        }
+
+        /// <summary>
+        /// The name of the group for the fold-out group of the configuration file.
+        /// </summary>
+        private const string ConfigurationFoldoutGroup = "Configuration File";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons loading and saving the configuration file.
+        /// </summary>
+        private const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// Default path of the configuration file (path and filename).
+        /// </summary>
+        [SerializeField]
+        [PropertyTooltip("Path of the file containing the network configuration.")]
+        [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
+        public FilePath ConfigPath = new FilePath();
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        public void Save()
+        {
+            Save(ConfigPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Loads the network configuration file.")]
+        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        public void Load()
+        {
+            Load(ConfigPath.Path);
+        }
+
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -810,39 +942,6 @@ namespace SEE.Net
         private const string ServerIP4AddressLabel = "serverIP4Address";
 
         /// <summary>
-        /// Default path of the configuration file (path and filename).
-        /// </summary>
-        [SerializeField]
-        public DataPath ConfigPath = new DataPath();
-
-        /// <summary>
-        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
-        /// If the configuration file exists already, it will be overridden.
-        /// </summary>
-        public void Save()
-        {
-            Save(ConfigPath.Path);
-        }
-
-        /// <summary>
-        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
-        /// if it exists. If it does not exist, nothing happens.
-        /// </summary>
-        public void Load()
-        {
-            string filename = ConfigPath.Path;
-#if UNITY_ANDROID
-            if (File.Exists(Application.persistentDataPath + "/NetworkConfig/network.cfg"))
-            {
-#else
-            if (File.Exists(filename))
-            {
-#endif
-                Load(filename);
-            }
-        }
-
-        /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
         /// </summary>
         /// <param name="filename">name of the file in which the settings are stored</param>
@@ -858,8 +957,21 @@ namespace SEE.Net
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new ConfigReader(filename);
-            Restore(stream.Read());
+
+#if UNITY_ANDROID
+            if (File.Exists(Application.persistentDataPath + "/NetworkConfig/network.cfg"))
+            {
+#else
+            if (File.Exists(filename))
+            {
+#endif
+                using ConfigReader stream = new ConfigReader(filename);
+                Restore(stream.Read());
+            }
+            else
+            {
+                Debug.LogError($"Configuration file {filename} does not exist.\n");
+            }
         }
 
         /// <summary>
@@ -898,7 +1010,7 @@ namespace SEE.Net
             }
         }
 
-#endregion
+    #endregion ConfigIO
 
 #region Vivox
 
@@ -912,7 +1024,10 @@ namespace SEE.Net
         public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
-        [SerializeField] private string vivoxChannelName = string.Empty;
+        [SerializeField]
+        [Tooltip("The channel name for Vivox."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
+        private string vivoxChannelName = string.Empty;
         public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()
@@ -1031,6 +1146,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-#endregion
+#endregion Vivox
     }
 }

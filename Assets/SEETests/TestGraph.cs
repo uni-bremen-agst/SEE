@@ -60,12 +60,12 @@ namespace SEE.DataModel.DG
         ///   graph.RemoveEdge
         ///   graph.RemoveNode
         ///   node.Outgoings
-        ///   node.From_To
+        ///   node.FromTo
         /// </summary>
         [Test]
         public void AddingRemovingGraphElements()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -88,10 +88,10 @@ namespace SEE.DataModel.DG
             use_n1_n3_b.SetToggle("Duplicated");
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a, use_n1_n3_b }, AsSet(n1.Outgoings));
 
-            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n3, "none")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_b }, AsSet(n1.From_To(n3, "abuse")));
+            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.FromTo(n3, "none")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.FromTo(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.FromTo(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_b }, AsSet(n1.FromTo(n3, "abuse")));
 
             Edge call_n2_n3 = NewEdge(g, n2, n3);
 
@@ -113,11 +113,11 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(nodes, g.Nodes());
             Assert.AreEqual(edges, g.Edges());
 
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.From_To(n3, "call")));
-            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.From_To(n3, "use")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n2 }, AsSet(n1.From_To(n2, "call")));
-            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.From_To(n1, "call")));
-            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.From_To(n2, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n3 }, AsSet(n1.FromTo(n3, "call")));
+            Assert.AreEqual(new HashSet<Edge> { use_n1_n3_a }, AsSet(n1.FromTo(n3, "use")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n2 }, AsSet(n1.FromTo(n2, "call")));
+            Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.FromTo(n1, "call")));
+            Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.FromTo(n2, "use")));
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
         }
 
@@ -135,7 +135,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveNode()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -255,7 +255,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeChildren()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -274,7 +274,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeRoots()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -296,7 +296,7 @@ namespace SEE.DataModel.DG
         {
             string t = "Routine";
 
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
             Assert.AreEqual(0, g.MaxDepth);
 
             Node a = NewNode(g, "a", t);
@@ -406,7 +406,7 @@ namespace SEE.DataModel.DG
                                    Func<GraphElement, bool> isRelevant, Func<Graph, Graph> makeSubgraph)
         {
             // Note: This test is rather imperfect and may be improved in the future.
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
 
             Node a = NewNode(g, "a");
             makeIrrelevant(a);
@@ -639,7 +639,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNode()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
             Node a = NewNode(g, "a");
             SubgraphMemento subgraph = a.DeleteTree();
             Assert.IsNull(a.ItsGraph);
@@ -659,7 +659,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNodeAndEdge()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
             Node a = NewNode(g, "a");
             Edge e = NewEdge(g, a, a);
             SubgraphMemento subgraph = a.DeleteTree();
@@ -683,7 +683,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTree()
         {
-            Graph g = new Graph();
+            Graph g = new Graph("DUMMYBASEPATH");
             Node a = NewNode(g, "a"); // root
             Node b = Child(g, a, "b"); // child of a, but not descendant of c
             Node c = Child(g, a, "c"); // root of subtree to be deleted

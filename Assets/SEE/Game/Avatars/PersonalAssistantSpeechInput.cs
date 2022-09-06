@@ -1,6 +1,7 @@
 ﻿#if !UNITY_ANDROID
 using SEE.Controls;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.IO;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace SEE.Game.Avatars
         /// following semantics: help, time, about.
         /// </summary>
         [Tooltip("Path to the SRGS grammar file defining the speech input language.")]
-        public DataPath GrammarFilePath;
+        public FilePath GrammarFilePath;
 
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
@@ -32,7 +33,7 @@ namespace SEE.Game.Avatars
         private PersonalAssistantBrain brain;
 
         /// <summary>
-        /// Sets up the grammar <see cref="input"/> and registers the callback 
+        /// Sets up the grammar <see cref="input"/> and registers the callback
         /// <see cref="OnPhraseRecognized(PhraseRecognizedEventArgs)"/>.
         /// </summary>
         private void Start()
@@ -70,7 +71,7 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Callback that is called by the <see cref="input"/> recognizer when a 
+        /// Callback that is called by the <see cref="input"/> recognizer when a
         /// sentence was recognized.
         /// </summary>
         /// <param name="args">details about the recognized sentence</param>

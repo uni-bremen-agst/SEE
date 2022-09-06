@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
@@ -29,7 +28,7 @@ namespace Crosstales.RTVoice.EditorExtension
       {
          DrawDefaultInspector();
 
-         EditorHelper.SeparatorUI();
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
          if (script.isActiveAndEnabled)
          {
@@ -37,7 +36,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
             GUILayout.Space(6);
 
-            showCachedClips = EditorGUILayout.Foldout(showCachedClips, $"Cached Speeches (Clips): {Util.Helper.FormatBytesToHRF(script.CurrentClipCacheSize)}/{Util.Helper.FormatBytesToHRF(script.ClipCacheSize)} ({script.Clips.Count})");
+            showCachedClips = EditorGUILayout.Foldout(showCachedClips, $"Cached Speeches (Clips): {Crosstales.RTVoice.Util.Helper.FormatBytesToHRF(script.CurrentClipCacheSize)}/{Crosstales.RTVoice.Util.Helper.FormatBytesToHRF(script.ClipCacheSize)} ({script.Clips.Count})");
             if (showCachedClips)
             {
                EditorGUI.indentLevel++;
@@ -52,11 +51,11 @@ namespace Crosstales.RTVoice.EditorExtension
 
             GUILayout.Space(6);
 
-            GUILayout.Label($"Cache Efficiency: {Util.Context.CacheEfficiency:P}");
+            GUILayout.Label($"Cache Efficiency: {Crosstales.RTVoice.Util.Context.CacheEfficiency:P}");
 
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
-            if (GUILayout.Button(new GUIContent(" Clear", EditorHelper.Icon_Delete, "Clears the cache.")))
+            if (GUILayout.Button(new GUIContent(" Clear", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Delete, "Clears the cache.")))
                script.ClearCache();
          }
          else
@@ -74,4 +73,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2020-2021 crosstales LLC (https://www.crosstales.com)
+// © 2020-2022 crosstales LLC (https://www.crosstales.com)

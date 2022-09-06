@@ -7,8 +7,6 @@ namespace Dissonance.Integrations.Unity_NFGO.Demo
     public class NfgoDemoMenu
         : MonoBehaviour
     {
-        private const string GameScene = "NFGO Game World";
-
         private void Start()
         {
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
@@ -16,13 +14,13 @@ namespace Dissonance.Integrations.Unity_NFGO.Demo
 
         private static void OnServerStarted()
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("NFGO Game World", LoadSceneMode.Single);
         }
 
         private void OnGUI()
         {
             using (new GUILayout.AreaScope(new Rect(30, 30, 300, 300)))
-            {
+            { 
                 if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
                     StartButtons();
             }

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Dissonance.Editor
 {
-    [CustomEditor(typeof(VoiceBroadcastTrigger))]
+    [CustomEditor(typeof(VoiceBroadcastTrigger), editorForChildClasses: true)]
     public class VoiceBroadcastTriggerEditor
         : UnityEditor.Editor
     {

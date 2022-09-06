@@ -32,16 +32,20 @@ namespace Crosstales.Common.Util
          {
             //Debug.Log("Instance: " + SingletonHelper.isQuitting + " - " + BaseHelper.isEditorMode + " - " + BaseHelper.ApplicationIsPlaying);
 
-            if (SingletonHelper.isQuitting && BaseHelper.isEditorMode)
+            if (SingletonHelper.isQuitting && Crosstales.Common.Util.BaseHelper.isEditorMode)
             {
-               //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+                  Debug.Log($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
+
                return instance;
             }
 
             if (instance == null)
                CreateInstance();
 
-            //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' GET: {instance.GetInstanceID()}");
+            //if (Util.BaseConstants.DEV_DEBUG)
+            //   Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' GET: {instance.GetInstanceID()}");
+
             return instance;
          }
 
@@ -49,7 +53,9 @@ namespace Crosstales.Common.Util
          {
             lock (lockObj)
             {
-               //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' SET: {value?.GetInstanceID()}");
+               //if (Util.BaseConstants.DEV_DEBUG)
+               //   Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' SET: {value.GetInstanceID()}");
+
                instance = value;
             }
          }
@@ -69,9 +75,11 @@ namespace Crosstales.Common.Util
 
       protected virtual void Awake()
       {
-         //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' AWAKE: {activeInstance.GetInstanceID()}");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' AWAKE"); //: {instance.GetInstanceID()}");
+
 //#if !UNITY_2020_1_OR_NEWER
-         Util.BaseHelper.ApplicationIsPlaying = Application.isPlaying; //needed to enforce the right mode
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = Application.isPlaying; //needed to enforce the right mode
 //#endif
          //isQuitting = false;
 
@@ -79,12 +87,12 @@ namespace Crosstales.Common.Util
          {
             Instance = GetComponent<T>();
 
-            if (!Util.BaseHelper.isEditorMode && dontDestroy)
+            if (!Crosstales.Common.Util.BaseHelper.isEditorMode && dontDestroy)
                DontDestroyOnLoad(transform.root.gameObject);
          }
          else
          {
-            if (!Util.BaseHelper.isEditorMode && dontDestroy && instance != this)
+            if (!Crosstales.Common.Util.BaseHelper.isEditorMode && dontDestroy && instance != this)
             {
                Debug.LogWarning($"Only one active instance of '{typeof(T).Name}' allowed in all scenes!{System.Environment.NewLine}This object will now be destroyed.", this);
                Destroy(gameObject, 0.1f);
@@ -99,7 +107,8 @@ namespace Crosstales.Common.Util
             //SingletonHelper.isQuitting = !BaseHelper.isEditorMode;
             //SingletonHelper.isQuitting = true;
 
-            //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY: {instance.GetInstanceID()}");
+            if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+               Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' ONDESTROY: {instance.GetInstanceID()}");
 
             if (!dontDestroy)
                Instance = null;
@@ -111,8 +120,10 @@ namespace Crosstales.Common.Util
       {
          SingletonHelper.isQuitting = true;
 
-         //Debug.Log("OnApplicationQuit", this);
-         Util.BaseHelper.ApplicationIsPlaying = false;
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log("OnApplicationQuit", this);
+
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = false;
       }
 
       #endregion
@@ -123,7 +134,8 @@ namespace Crosstales.Common.Util
       /// <param name="deleteExistingInstance">Delete existing instance of this object (default: false, optional)</param>
       public static void CreateInstance(bool searchExistingGameObject = true, bool deleteExistingInstance = false)
       {
-         //Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' will be newly created.");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"[Singleton] Instance '{typeof(T)}' will be newly created.");
 
          if (deleteExistingInstance)
             DeleteInstance();
@@ -147,28 +159,33 @@ namespace Crosstales.Common.Util
                   }
                   else
                   {
+                     if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+                        Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Prefab"); //: {instance.GetInstanceID()}");
+
                      Instance = Instantiate(prefab);
 
                      Instance.name = GameObjectName;
-                     //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Prefab: {instance.GetInstanceID()}");
                   }
                }
 
                if (instance == null)
                {
-                  if (BaseHelper.isEditorMode)
+                  if (Crosstales.Common.Util.BaseHelper.isEditorMode)
                   {
 #if UNITY_EDITOR
+                     if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+                        Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Editor: {Crosstales.Common.Util.BaseHelper.isEditorMode}");
+
                      //instanceEditor = UnityEditor.EditorUtility.CreateGameObjectWithHideFlags($"{typeof(T).Name} (Hidden Singleton)", HideFlags.DontSaveInBuild | HideFlags.HideInHierarchy).AddComponent<T>();
                      Instance = new GameObject(GameObjectName).AddComponent<T>();
 #endif
-                     //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Editor: {instance.GetInstanceID()} - {BaseHelper.isEditorMode}");
                   }
                   else
                   {
-                     Instance = new GameObject(GameObjectName).AddComponent<T>();
+                     if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+                        Debug.Log($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Play: {Crosstales.Common.Util.BaseHelper.isEditorMode}");
 
-                     //Debug.LogWarning($"{Time.realtimeSinceStartup}-[Singleton] Instance '{typeof(T)}' CREATE Play: {instance.GetInstanceID()} - {BaseHelper.isEditorMode}");
+                     Instance = new GameObject(GameObjectName).AddComponent<T>();
                   }
                }
             }
@@ -222,7 +239,8 @@ namespace Crosstales.Common.Util
          {
             if (value != quitting)
             {
-               //Debug.Log("SET isQuitting: " + value);
+               if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+                  Debug.Log("SET isQuitting: " + value);
 
                quitting = value;
 
@@ -241,7 +259,8 @@ namespace Crosstales.Common.Util
 
       static SingletonHelper()
       {
-         //Debug.Log($"{Time.realtimeSinceStartup} - Constructor!");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - Constructor!");
 
          initialize();
       }
@@ -254,11 +273,13 @@ namespace Crosstales.Common.Util
       {
          if (isInitialized)
          {
-            //Debug.Log($"{Time.realtimeSinceStartup} - already initialized!");
+            if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+               Debug.Log($"{Time.realtimeSinceStartup} - already initialized!");
          }
          else
          {
-            //Debug.Log($"{Time.realtimeSinceStartup} - initialize: {isQuitting}");
+            if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+               Debug.Log($"{Time.realtimeSinceStartup} - initialize: {isQuitting}");
 
             isInitialized = true;
 
@@ -266,7 +287,7 @@ namespace Crosstales.Common.Util
             //Application.wantsToQuit += onWantsToQuit;
 
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += onSceneLoaded;
-            UnityEngine.SceneManagement.SceneManager.sceneUnloaded += onSceneUnloaded;
+            //UnityEngine.SceneManagement.SceneManager.sceneUnloaded += onSceneUnloaded;
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged += onPlayModeStateChanged;
@@ -279,37 +300,39 @@ namespace Crosstales.Common.Util
 
       private static void onSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
       {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneLoaded");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onSceneLoaded");
 
          isQuitting = false;
-         //Debug.Log("onSceneLoaded");
-         Util.BaseHelper.ApplicationIsPlaying = true;
+         Crosstales.Common.Util.BaseHelper.ApplicationIsPlaying = true;
       }
-
+/*
       private static void onSceneUnloaded(UnityEngine.SceneManagement.Scene scene)
       {
-         //Debug.Log("onSceneUnloaded");
+         if (Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onSceneUnloaded");
+
          //if (Util.BaseHelper.ApplicationIsPlaying)
          //{
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneUnloaded");
-
          isQuitting = true;
          Util.BaseHelper.ApplicationIsPlaying = false;
          //}
       }
-
+*/
 #if UNITY_EDITOR
       private static void onPlayModeStateChanged(UnityEditor.PlayModeStateChange obj)
       {
          //isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingEditMode || obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
          isQuitting = obj == UnityEditor.PlayModeStateChange.ExitingPlayMode;
 
-         //Debug.LogWarning($"{Time.realtimeSinceStartup} - onPlayModeStateChanged: {obj} - {isQuitting}");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onPlayModeStateChanged: {obj} - {isQuitting}");
       }
 
       private static void onSceneClosing(UnityEngine.SceneManagement.Scene scene, bool removingscene)
       {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneClosing");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onSceneClosing");
 
          isQuitting = true;
       }
@@ -324,7 +347,8 @@ namespace Crosstales.Common.Util
 */
       private static void onSceneOpened(UnityEngine.SceneManagement.Scene scene, UnityEditor.SceneManagement.OpenSceneMode mode)
       {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpened");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onSceneOpened");
 
          isQuitting = false;
       }
@@ -341,10 +365,11 @@ namespace Crosstales.Common.Util
 */
       private static void onQuitting()
       {
-         //Debug.Log($"{Time.realtimeSinceStartup} - onQuitting");
+         if (Crosstales.Common.Util.BaseConstants.DEV_DEBUG)
+            Debug.Log($"{Time.realtimeSinceStartup} - onQuitting");
 
          isQuitting = true;
       }
    }
 }
-// © 2020-2021 crosstales LLC (https://www.crosstales.com)
+// © 2020-2022 crosstales LLC (https://www.crosstales.com)

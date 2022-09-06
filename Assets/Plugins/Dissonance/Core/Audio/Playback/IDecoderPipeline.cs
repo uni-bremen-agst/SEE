@@ -58,5 +58,12 @@ namespace Dissonance.Audio.Playback
         /// Enable dynamic audio synchronisation.
         /// </summary>
         void EnableDynamicSync();
+
+        /// <summary>
+        /// If non-null, override automatic output sample rate determination and set it to a fixed value.
+        /// If null, use automatic rate determination.
+        /// </summary>
+        /// <param name="rate"></param>
+        void SetOutputSampleRate(int? rate);
     }
 }

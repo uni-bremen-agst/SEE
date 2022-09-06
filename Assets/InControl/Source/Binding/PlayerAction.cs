@@ -748,11 +748,11 @@
 				{
 					if (listenOptions.RejectRedundantBindings)
 					{
-						listenOptions.CallOnBindingRejected( this, binding, BindingSourceRejectionType.DuplicateBindingOnActionSet );
+						listenOptions.CallOnBindingRejected( this, binding, BindingSourceRejectionType.DuplicateBindingOnAction );
 						return;
 					}
 
-					// By default, we just accept a reduntant binding, do nothing, and move on.
+					// By default, we just accept a redundant binding, do nothing, and move on.
 					StopListeningForBinding();
 					listenOptions.CallOnBindingAdded( this, binding );
 					return;

@@ -1,19 +1,15 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
-
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
 #*.c text
 #*.h text
 #*.cs text
-
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
-
 # Denote all files that are truly binary and should not be modified.
 *.png binary
 *.jpg binary
-
 # These should not show up in diffs or language statistics.
 # We exclude Assets by default, then whitelist all SEE-specific stuff.
 /Assets/** linguist-generated=true
@@ -30,3 +26,5 @@
 /Assets/StreamingAssets/** linguist-generated=false
 /Assets/Trailer/** linguist-generated=false
 /Packages/** linguist-generated=true
+Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
+Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text

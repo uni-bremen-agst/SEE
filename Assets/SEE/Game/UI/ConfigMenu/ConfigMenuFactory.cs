@@ -67,18 +67,20 @@ namespace SEE.Game.UI.ConfigMenu
             configMenuGo.name = configMenuPrefab.name;
             configMenuGo.transform.SetSiblingIndex(0);
             configMenuGo.MustGetComponent(out configMenu);
+            configMenu.CurrentlyEditing = instanceToEdit;
+            configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
             if (turnMenuOn)
             {
                 configMenu.On();
             }
-            configMenu.CurrentlyEditing = instanceToEdit;
-            configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
         }
+
         private void ReplaceMenu(EditableInstance newInstance)
         {
             Destroy(configMenu.gameObject);
             BuildConfigMenu(newInstance, true);
         }
+
         private void Update()
         {
             switch (PlayerSettings.GetInputType())
@@ -93,6 +95,7 @@ namespace SEE.Game.UI.ConfigMenu
                     throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
             }
         }
+
         private void HandleDesktopUpdate()
         {
             if (SEEInput.ToggleConfigMenu())

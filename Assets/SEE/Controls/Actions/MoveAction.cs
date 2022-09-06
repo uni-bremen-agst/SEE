@@ -1,9 +1,18 @@
 using System.Collections.Generic;
+using System.Linq;
+using DG.Tweening;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Game.UI3D;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Net;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
+using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
 using static SEE.Utils.Raycasting;
@@ -22,10 +31,26 @@ namespace SEE.Controls.Actions
             internal Hit(Transform hoveredObject)
             {
                 CityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
-                this.HoveredObject = hoveredObject;
+                HoveredObject = hoveredObject;
                 InteractableObject = hoveredObject.GetComponent<InteractableObject>();
                 Plane = new Plane(Vector3.up, CityRootNode.position);
                 node = hoveredObject.GetComponent<NodeRef>();
+                ConnectedEdges = new List<(SEESpline, bool)>();
+
+                // We want to animate the edges attached to the moving node, so we cache them here.
+                // TODO: Why can this be null?
+                if (node.Value != null)
+                {
+                    foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                    {
+                        GameObject gameEdge = GameObject.Find(edge.ID);
+                        Assert.IsNotNull(gameEdge);
+                        if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                        {
+                            ConnectedEdges.Add((spline, node.Value == edge.Source));
+                        }
+                    }
+                }
             }
 
             /// <summary>
@@ -44,6 +69,13 @@ namespace SEE.Controls.Actions
             /// The interactable component attached to <see cref="HoveredObject"/>.
             /// </summary>
             internal InteractableObject InteractableObject;
+
+            /// <summary>
+            /// Map from connected edges represented as <see cref="SEESpline"/>s to a boolean
+            /// representing whether <see cref="node"/> is the source for this edge (otherwise, it's the target).
+            /// </summary>
+            internal IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
+
             internal Plane Plane;
             internal NodeRef node;
         }
@@ -54,6 +86,8 @@ namespace SEE.Controls.Actions
         private const float FullCircleDegree = 360.0f;
         private const float SnapStepCount = 8;
         private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
+        private const float MIN_SPLINE_OFFSET = 0.05f;
+        private const float SPLINE_ANIMATION_DURATION = 0.5f;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
@@ -62,7 +96,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool moving = false;
 
-        private Hit hit = new Hit();
+        private Hit hit;
         private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
         private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
@@ -237,12 +271,35 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// <summary>
+        /// Reflexion city belonging to the dragged node, if it does belong to one.
+        /// </summary>
+        private SEEReflexionCity reflexionCity;
+
+        /// <summary>
+        /// The Operator of this node.
+        /// </summary>
+        private NodeOperator nodeOperator;
+
+        /// <summary>
+        /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
+        /// </summary>
+        private Edge temporaryMapsTo;
+
+        /// <summary>
+        /// Original parent of the dragged node before temporarily changing it.
+        /// </summary>
+        private Transform originalParent;
+
+        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
 #if UNITY_ANDROID
+
+            // FIXME: This is a copy-paste-and-modify variant of the other branch of UNITY_ANDROID.
+            // We need to provide a uniform solution. The other branch has already evolved.
             // Check for touch input
             if (Input.touchCount != 1)
             {
@@ -255,7 +312,7 @@ namespace SEE.Controls.Actions
             Vector3 touchPosition = touch.position;
             Transform hoveredObject = null;
             Transform cityRootNode = null;
-            if (touch.phase == TouchPhase.Began) 
+            if (touch.phase == TouchPhase.Began)
             {
                 Ray ray = Camera.main.ScreenPointToRay(touchPosition);
                 RaycastHit raycastHit;
@@ -322,7 +379,11 @@ namespace SEE.Controls.Actions
                 Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
                 gizmo.SetPositions(startPoint, endPoint);
 
-                SetHitObjectColor(hit.node);
+                // FIXME: The following call does not work anymore because the formal parameter type has changed:
+                // SetHitObjectColor(hit.node);
+                // The variant in the other #ifdef branch uses:
+                // SetHitObjectColor(raycastHit.Value);
+                // We need to merge those two #ifdef branches.
 
                 synchronize = true;
             }
@@ -332,7 +393,9 @@ namespace SEE.Controls.Actions
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                           - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
                     if (parent != null)
                     {
                         // The move has come to a successful end.
@@ -346,8 +409,6 @@ namespace SEE.Controls.Actions
                     {
                         // An attempt was made to move the hovered object outside of the city.
                         // We need to reset it to its original position. And then we start from scratch.
-                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
-                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
                         hit.HoveredObject.position = originalPosition;
                         new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
                         // The following assignment will override hit.interactableObject; that is why we
@@ -393,7 +454,7 @@ namespace SEE.Controls.Actions
                 if (moving)
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                    Positioner.Set(hit.HoveredObject, originalPosition);
+                    nodeOperator.MoveTo(originalPosition, 0);
                     hit.InteractableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -405,6 +466,14 @@ namespace SEE.Controls.Actions
                 {
                     // TODO(torben): this should be in SelectAction.cs
                     InteractableObject.UnselectAllInGraph(hoveredObject.ItsGraph, true);
+                }
+
+                if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                {
+                    // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                    hit.HoveredObject.SetParent(originalParent);
+                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                    temporaryMapsTo = null;
                 }
 
                 ResetHitObjectColor();
@@ -422,16 +491,49 @@ namespace SEE.Controls.Actions
                     hit = new Hit(draggedObject);
                     memento = new Memento(draggedObject);
 
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
+                    {
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, MIN_SPLINE_OFFSET);
+                        }
+                        else
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
+                        }
+
+                        EdgeOperator edgeOperator = hitEdge.connectedSpline.gameObject.AddOrGetComponent<EdgeOperator>();
+
+                        edgeOperator.MorphTo(spline, SPLINE_ANIMATION_DURATION);
+                    }
+
                     hit.InteractableObject.SetGrab(true, true);
                     gizmo.gameObject.SetActive(true);
                     dragStartTransformPosition = hit.HoveredObject.position;
                     dragStartOffset = planeHitPoint - hit.HoveredObject.position;
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
+                    originalParent = hit.HoveredObject;
+
+                    nodeOperator = hit.HoveredObject.gameObject.AddOrGetComponent<NodeOperator>();
+
+                    // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
+                    if (hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture())
+                    {
+                        // We need the reflexion city for later.
+                        reflexionCity = hit.HoveredObject.gameObject.ContainingCity<SEEReflexionCity>();
+
+                        // TODO: Instead of just killing animations here with this trick,
+                        //       handle all movement inside the NodeOperator.
+                        nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
+                    }
                 }
 
                 if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
-                    Vector3 totalDragOffsetFromStart = planeHitPoint - (dragStartTransformPosition + dragStartOffset);
+                    // FIXME: Doesn't work in certain perspectives, particularly when looking at the horizon.
+                    Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
                     if (SEEInput.Snap())
                     {
                         Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
@@ -443,13 +545,79 @@ namespace SEE.Controls.Actions
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }
 
-                    Positioner.Set(hit.HoveredObject, dragStartTransformPosition + totalDragOffsetFromStart);
+                    RaycastLowestNode(out RaycastHit? raycastHit, out Node newParentNode, hit.node);
+                    // TODO: Adjust for snapping
+                    // FIXME: Position is not exact depending on scale. Needs to be reworked.
+                    Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
+                    ResetHitObjectColor();
+                    nodeOperator.MoveXTo(newPosition.x, 0);
+                    nodeOperator.MoveZTo(newPosition.z, 0);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
-                    Vector3 endPoint = hit.HoveredObject.position + Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    Vector3 endPoint = hit.HoveredObject.position;
                     gizmo.SetPositions(startPoint, endPoint);
 
-                    SetHitObjectColor(hit.node);
+                    if (raycastHit.HasValue)
+                    {
+                        // FIXME: Under certain circumstances, "flickering" can occur. Relates to above FIXME comment.
+                        GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.collider.gameObject, setParent: true);
+                        SetHitObjectColor(raycastHit.Value);
+                        if (reflexionCity != null)
+                        {
+                            if (hit.node.Value.IsInImplementation() && newParentNode.IsInArchitecture())
+                            {
+                                // If we are in a reflexion city, we will simply
+                                // trigger the incremental reflexion analysis here.
+                                // That way, the relevant code is in one place
+                                // and edges will be colored on hover (#451).
+                                temporaryMapsTo = reflexionCity.Analysis.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
+                            }
+                            else if (temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                            {
+                                // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                                hit.HoveredObject.SetParent(raycastHit.Value.collider.transform);
+                                reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                                temporaryMapsTo = null;
+                            }
+                            else if (hit.node.Value.IsInImplementation() && newParentNode.IsInImplementation())
+                            {
+                                // Both are in implementation, so we'll just need to adjust the scaling.
+                                // No need to delete any Maps-To edge, because temporaryMapsTo == null or is deleted.
+                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, scaleDown: true);
+                            }
+                        }
+                    }
+                    else if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                    {
+                        // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                        // We'll change its parent so it becomes a root node in the implementation city.
+                        // The user will have to drop it on another node to re-parent it.
+                        hit.HoveredObject.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
+                        reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                        temporaryMapsTo = null;
+                    }
+
+                    // We will also "stick" the connected edges to the moved node during its movement.
+                    // In order to do this, we need to modify the splines of each one.
+                    foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in hit.ConnectedEdges)
+                    {
+                        Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                        BSpline spline;
+                        if (hitEdge.nodeIsSource)
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(hit.HoveredObject.transform.position, edge.Target.RetrieveGameNode().transform.position, true, MIN_SPLINE_OFFSET);
+                        }
+                        else
+                        {
+                            spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
+                        }
+
+                        if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
+                        {
+                            // Edges should stick to the node and not lag behind, so the duration is set to zero.
+                            edgeOperator.MorphTo(spline, 0);
+                        }
+                    }
 
                     synchronize = true;
                 }
@@ -470,32 +638,23 @@ namespace SEE.Controls.Actions
             }
             else if (moving)
             {
-                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
+                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject);
+                    Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
+                                               - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
+                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
                     if (parent != null)
                     {
-                        // The move has come to a successful end.
+                        // The node has been re-parented.
                         new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
                         memento.SetNewParent(parent);
-                        memento.SetNewPosition(hit.HoveredObject.position);
-                        currentState = ReversibleAction.Progress.Completed;
-                        result = true;
                     }
-                    else
-                    {
-                        // An attempt was made to move the hovered object outside of the city.
-                        // We need to reset it to its original position. And then we start from scratch.
-                        Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
-                                                   - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                        hit.HoveredObject.position = originalPosition;
-                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
-                        // The following assignment will override hit.interactableObject; that is why we
-                        // stored its value in interactableObjectToBeUngrabbed above.
-                        hit = new Hit();
-                    }
+
+                    memento.SetNewPosition(hit.HoveredObject.position);
+                    currentState = ReversibleAction.Progress.Completed;
+                    result = true;
 
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
@@ -520,19 +679,13 @@ namespace SEE.Controls.Actions
 
             #region Local Functions
 
-            void SetHitObjectColor(NodeRef movingNode)
+            void SetHitObjectColor(RaycastHit raycastHit)
             {
-                ResetHitObjectColor();
-
-                RaycastLowestNode(out RaycastHit? raycastHit, out Node _, movingNode);
-                if (raycastHit != null)
-                {
-                    hitObjectMaterial = raycastHit.Value.collider.GetComponent<Renderer>().material;
-                    // We persist hoveredObjectColor in case we want to use something different than simple
-                    // inversion in the future, such as a constant color (we would then need the original color).
-                    hitObjectColor = hitObjectMaterial.color;
-                    hitObjectMaterial.color = hitObjectColor.Invert();
-                }
+                hitObjectMaterial = raycastHit.collider.GetComponent<Renderer>().material;
+                // We persist hoveredObjectColor in case we want to use something different than simple
+                // inversion in the future, such as a constant color (we would then need the original color).
+                hitObjectColor = hitObjectMaterial.color;
+                hitObjectMaterial.color = hitObjectColor.Invert();
             }
 
             void ResetHitObjectColor()

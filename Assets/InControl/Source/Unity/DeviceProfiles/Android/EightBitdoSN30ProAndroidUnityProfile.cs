@@ -31,25 +31,25 @@ namespace InControl.UnityDeviceProfiles
 				new InputControlMapping
 				{
 					Name = "A",
-					Target = InputControlType.Action1,
+					Target = InputControlType.Action2,
 					Source = Button( 0 )
 				},
 				new InputControlMapping
 				{
 					Name = "B",
-					Target = InputControlType.Action2,
+					Target = InputControlType.Action1,
 					Source = Button( 1 )
 				},
 				new InputControlMapping
 				{
 					Name = "X",
-					Target = InputControlType.Action3,
+					Target = InputControlType.Action4,
 					Source = Button( 2 )
 				},
 				new InputControlMapping
 				{
 					Name = "Y",
-					Target = InputControlType.Action4,
+					Target = InputControlType.Action3,
 					Source = Button( 3 )
 				},
 				new InputControlMapping

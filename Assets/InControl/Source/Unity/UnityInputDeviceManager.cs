@@ -160,10 +160,10 @@ namespace InControl
 			{
 				if (Application.platform == RuntimePlatform.OSXEditor ||
 				    Application.platform == RuntimePlatform.OSXPlayer
-					#if !UNITY_5_4_OR_NEWER
+				    #if !UNITY_5_4_OR_NEWER
 					|| Application.platform == RuntimePlatform.OSXWebPlayer
-					#endif
-				)
+				    #endif
+				   )
 				{
 					if (unityJoystickName == "Unknown Wireless Controller")
 					{
@@ -178,10 +178,10 @@ namespace InControl
 			{
 				if (Application.platform == RuntimePlatform.WindowsEditor ||
 				    Application.platform == RuntimePlatform.WindowsPlayer
-					#if !UNITY_5_4_OR_NEWER
+				    #if !UNITY_5_4_OR_NEWER
 					|| Application.platform == RuntimePlatform.WindowsWebPlayer
-					#endif
-				)
+				    #endif
+				   )
 				{
 					if (string.IsNullOrEmpty( unityJoystickName ))
 					{

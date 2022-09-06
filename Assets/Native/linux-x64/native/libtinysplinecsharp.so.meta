@@ -31,12 +31,6 @@ PluginImporter:
       settings:
         CPU: ARMv7
   - first:
-      Android: Android
-    second:
-      enabled: 0
-      settings:
-        CPU: ARMv7
-  - first:
       Any: 
     second:
       enabled: 0

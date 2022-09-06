@@ -12,7 +12,7 @@ namespace Crosstales.RTVoice.UI
 
       protected override string speak(string text)
       {
-         return Mode == Model.Enum.SpeakMode.Speak
+         return Mode == Crosstales.RTVoice.Model.Enum.SpeakMode.Speak
             ? Speaker.Instance.Speak(text, Source, Speaker.Instance.VoiceForName(TextComponent.text), true, Rate, Pitch, Volume)
             : Speaker.Instance.SpeakNative(text, Speaker.Instance.VoiceForName(TextComponent.text), Rate, Pitch, Volume);
       }
@@ -20,4 +20,4 @@ namespace Crosstales.RTVoice.UI
       #endregion
    }
 }
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

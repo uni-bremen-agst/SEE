@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Crosstales.RTVoice.Util
 {
    /// <summary>Various helper functions.</summary>
-   public abstract class Helper : Common.Util.BaseHelper
+   public abstract class Helper : Crosstales.Common.Util.BaseHelper
    {
       #region Variables
 
@@ -420,29 +420,29 @@ namespace Crosstales.RTVoice.Util
 
       /// <summary>The current provider type.</summary>
       /// <returns>Current provider type.</returns>
-      public static Model.Enum.ProviderType CurrentProviderType
+      public static Crosstales.RTVoice.Model.Enum.ProviderType CurrentProviderType
       {
          get
          {
             if (Speaker.Instance.CustomMode)
-               return Model.Enum.ProviderType.Custom;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.Custom;
 
             if (isWindowsPlatform && !Speaker.Instance.ESpeakMode)
-               return Model.Enum.ProviderType.Windows;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.Windows;
 
             if (isAndroidPlatform)
-               return Model.Enum.ProviderType.Android;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.Android;
 
             if (isIOSBasedPlatform)
-               return Model.Enum.ProviderType.iOS;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.iOS;
 
             if (isWSABasedPlatform)
-               return Model.Enum.ProviderType.WSA;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.WSA;
 
             if (isMacOSPlatform && !Speaker.Instance.ESpeakMode)
-               return Model.Enum.ProviderType.macOS;
+               return Crosstales.RTVoice.Model.Enum.ProviderType.macOS;
 
-            return Model.Enum.ProviderType.Linux;
+            return Crosstales.RTVoice.Model.Enum.ProviderType.Linux;
          }
       }
 
@@ -454,75 +454,75 @@ namespace Crosstales.RTVoice.Util
       /// <summary>Converts a string to a Gender.</summary>
       /// <param name="gender">Gender as text.</param>
       /// <returns>Gender from the given string.</returns>
-      public static Model.Enum.Gender StringToGender(string gender)
+      public static Crosstales.RTVoice.Model.Enum.Gender StringToGender(string gender)
       {
          if ("male".CTEquals(gender) || "m".CTEquals(gender))
-            return Model.Enum.Gender.MALE;
+            return Crosstales.RTVoice.Model.Enum.Gender.MALE;
 
          if ("female".CTEquals(gender) || "f".CTEquals(gender))
-            return Model.Enum.Gender.FEMALE;
+            return Crosstales.RTVoice.Model.Enum.Gender.FEMALE;
 
-         return Model.Enum.Gender.UNKNOWN;
+         return Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
       }
 
       /// <summary>Converts an Apple voice name to a Gender.</summary>
       /// <param name="voiceName">Voice name.</param>
       /// <returns>Gender from the given Apple voice name.</returns>
-      public static Model.Enum.Gender AppleVoiceNameToGender(string voiceName)
+      public static Crosstales.RTVoice.Model.Enum.Gender AppleVoiceNameToGender(string voiceName)
       {
          if (!string.IsNullOrEmpty(voiceName))
          {
             if (appleFemales.Any(female => voiceName.CTContains(female)))
-               return Model.Enum.Gender.FEMALE;
+               return Crosstales.RTVoice.Model.Enum.Gender.FEMALE;
 
             if (appleMales.Any(male => voiceName.CTContains(male)))
-               return Model.Enum.Gender.MALE;
+               return Crosstales.RTVoice.Model.Enum.Gender.MALE;
          }
 
-         return Model.Enum.Gender.UNKNOWN;
+         return Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
       }
 
       /// <summary>Converts an WSA voice name to a Gender.</summary>
       /// <param name="voiceName">Voice name.</param>
       /// <returns>Gender from the given WSA voice name.</returns>
-      public static Model.Enum.Gender WSAVoiceNameToGender(string voiceName)
+      public static Crosstales.RTVoice.Model.Enum.Gender WSAVoiceNameToGender(string voiceName)
       {
          if (!string.IsNullOrEmpty(voiceName))
          {
             if (wsaFemales.Any(female => voiceName.CTContains(female)))
-               return Model.Enum.Gender.FEMALE;
+               return Crosstales.RTVoice.Model.Enum.Gender.FEMALE;
 
             if (wsaMales.Any(male => voiceName.CTContains(male)))
-               return Model.Enum.Gender.MALE;
+               return Crosstales.RTVoice.Model.Enum.Gender.MALE;
          }
 
-         return Model.Enum.Gender.UNKNOWN;
+         return Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
       }
 
 
       /// <summary>Converts an Android voice name to a Gender.</summary>
       /// <param name="voiceName">Voice name.</param>
       /// <returns>Gender from the given Android voice name.</returns>
-      public static Model.Enum.Gender AndroidVoiceNameToGender(string voiceName)
+      public static Crosstales.RTVoice.Model.Enum.Gender AndroidVoiceNameToGender(string voiceName)
       {
-         Model.Enum.Gender gender = Model.Enum.Gender.UNKNOWN;
+         Crosstales.RTVoice.Model.Enum.Gender gender = Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN;
          if (!string.IsNullOrEmpty(voiceName))
          {
             if (voiceName.CTContains("#male"))
             {
-               gender = Model.Enum.Gender.MALE;
+               gender = Crosstales.RTVoice.Model.Enum.Gender.MALE;
             }
             else if (voiceName.CTContains("#female"))
             {
-               gender = Model.Enum.Gender.FEMALE;
+               gender = Crosstales.RTVoice.Model.Enum.Gender.FEMALE;
             }
 
-            if (gender == Model.Enum.Gender.UNKNOWN)
+            if (gender == Crosstales.RTVoice.Model.Enum.Gender.UNKNOWN)
             {
-               gender = Model.Enum.Gender.FEMALE; //fallback, 2/3 of the Google TTS under Android 11 are female
+               gender = Crosstales.RTVoice.Model.Enum.Gender.FEMALE; //fallback, 2/3 of the Google TTS under Android 11 are female
 
                if (androidMales.Any(male => voiceName.CTContains(male)))
-                  return Model.Enum.Gender.MALE;
+                  return Crosstales.RTVoice.Model.Enum.Gender.MALE;
             }
          }
 
@@ -603,4 +603,4 @@ namespace Crosstales.RTVoice.Util
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

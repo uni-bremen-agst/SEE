@@ -1,13 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
-using SEE.Game;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
-using SEE.Utils;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -17,20 +11,11 @@ namespace SEE.Layout
     /// </summary>
     public class TestLayoutIO
     {
-        private static Graph LoadGraph(string filename)
-        {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string>() { hierarchicalEdgeType, "Belongs_To" });
-            graphReader.Load();
-            return graphReader.GetGraph();
-        }
-
         /// <summary>
-        /// The name of the hierarchical edge type we use for emitting the parent-child
-        /// relation among nodes.
+        /// By how much two floats may differ to be considered still equal.
         /// </summary>
-        private const string hierarchicalEdgeType = "Enclosing";
         private const float floatTolerance = 0.1f;
-        
+
         /// <summary>
         /// Test for reading and writing a node layout in GVL.
         /// </summary>
@@ -48,17 +33,17 @@ namespace SEE.Layout
                             out Dictionary<string, NodeTransform> layoutMap);
 
             // Save the layout.
-            SEE.Layout.IO.GVLWriter.Save(filename, "architecture", gameObjects);
+            IO.GVLWriter.Save(filename, "architecture", gameObjects);
             Dump(gameObjects, 10);
 
             ClearLayout(gameObjects, yIsStored);
 
-            // Read the saved layout. 
+            // Read the saved layout.
             Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
             Dump(readLayout, 10);
 
             Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-            // Now layoutMap and readLayout should be the same except for  
+            // Now layoutMap and readLayout should be the same except for
             // scale.y and, thus, position.y (none of those are stored in GVL).
             LayoutsAreEqual(readLayout, layoutMap, yIsStored);
         }
@@ -85,27 +70,27 @@ namespace SEE.Layout
 
         //    ClearLayout(gameObjects, yIsStored);
 
-        //    // Read the saved layout. 
+        //    // Read the saved layout.
         //    Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
         //    Dump(readLayout, 10);
 
         //    Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
-        //    // Now layoutMap and readLayout should be the same except for  
+        //    // Now layoutMap and readLayout should be the same except for
         //    // scale.y and, thus, position.y (none of those are stored in GVL).
         //    LayoutsAreEqual(readLayout, layoutMap, yIsStored);
         //}
 
         /// <summary>
-        /// Clears the scale and position of the position of all <paramref name="gameObjects"/> 
+        /// Clears the scale and position of the position of all <paramref name="gameObjects"/>
         /// so that we can be sure that they are actually read. If <paramref name="yIsStored"/>
         /// scale and position are reset completely; otherwise only the x and z components
         /// of those two vectors are reset.
-        /// Note that the GVL does not contain scale.y and position.y, that is why we need 
+        /// Note that the GVL does not contain scale.y and position.y, that is why we need
         /// to maintain it.
         /// </summary>
         /// <param name="gameObjects">game objects whose layout is to be reset</param>
         private static void ClearLayout(ICollection<ILayoutNode> gameObjects, bool yIsStored)
-        {            
+        {
             foreach (ILayoutNode layoutNode in gameObjects)
             {
                 if (yIsStored)
@@ -129,10 +114,10 @@ namespace SEE.Layout
         /// <param name="readLayout">the layout read from disk</param>
         /// <param name="layoutMap">the layout calculated originally</param>
         /// <param name="compareY">whether the y scale and y position should be compared</param>
-        private static void LayoutsAreEqual(Dictionary<ILayoutNode, NodeTransform> readLayout, 
-                                            Dictionary<string, NodeTransform> layoutMap, 
+        private static void LayoutsAreEqual(Dictionary<ILayoutNode, NodeTransform> readLayout,
+                                            Dictionary<string, NodeTransform> layoutMap,
                                             bool compareY)
-        {            
+        {
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in readLayout)
             {
                 ILayoutNode node = entry.Key;
@@ -157,7 +142,7 @@ namespace SEE.Layout
         }
 
         private static void CalculateLayout
-            (ICollection<ILayoutNode> gameObjects, 
+            (ICollection<ILayoutNode> gameObjects,
             out Dictionary<ILayoutNode, NodeTransform> savedLayout,
             out Dictionary<string, NodeTransform> layoutMap)
         {
@@ -218,9 +203,9 @@ namespace SEE.Layout
             ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
 
             // Save the layout.
-            SEE.Layout.IO.GVLWriter.Save(filename, graphName, gameObjects);
+            IO.GVLWriter.Save(filename, graphName, gameObjects);
 
-            // Read the saved layout. 
+            // Read the saved layout.
             LoadedNodeLayout loadedNodeLayout = new LoadedNodeLayout(0, filename);
             Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(gameObjects);
             Assert.AreEqual(0, readLayout.Count);
@@ -267,7 +252,7 @@ namespace SEE.Layout
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
 
-            //SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(path + "Architecture.gvl", 
+            //SEE.Layout.IO.Reader reader = new SEE.Layout.IO.Reader(path + "Architecture.gvl",
             //                                                       gameObjects.Cast<IGameNode>().ToList(),
             //                                                       0.0f);
             DumpTree(layoutNodes);
@@ -314,7 +299,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// Dumps the hierarchy for given root by adding level many - 
+        /// Dumps the hierarchy for given root by adding level many -
         /// as indentation followed by the layout information. Used for debugging.
         /// </summary>
         private void DumpTree(ILayoutNode root, int level)

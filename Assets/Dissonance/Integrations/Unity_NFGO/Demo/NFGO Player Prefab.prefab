@@ -73,11 +73,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tokens:
     _tokens: []
-  _channelTypeExpanded: 1
-  _metadataExpanded: 1
-  _activationModeExpanded: 1
-  _tokensExpanded: 1
-  _ampExpanded: 1
+  _channelTypeExpanded: 0
+  _metadataExpanded: 0
+  _activationModeExpanded: 0
+  _tokensExpanded: 0
+  _ampExpanded: 0
   _activationFaderSettings:
     _volume: 1
     _fadeInTicks: 0

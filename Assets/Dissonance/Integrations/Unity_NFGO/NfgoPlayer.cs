@@ -30,14 +30,14 @@ namespace Dissonance.Integrations.Unity_NFGO
         public bool IsTracking { get; private set; }
 
         private string _playerIdString;
-        private readonly NetworkVariable<FixedString128Bytes> _playerId = new NetworkVariable<FixedString128Bytes>(NetworkVariableReadPermission.Everyone, new FixedString128Bytes(""));
+        private readonly NetworkVariable<FixedString128Bytes> _playerId = new NetworkVariable<FixedString128Bytes>(new FixedString128Bytes(""));
 
         public string PlayerId
         {
             get
             {
                 // Cache the player ID converted into a string, to prevent this being repeated and generating lots of garbage
-                if (!_playerId.Value.Equals(_playerIdString))
+                if (_playerIdString == null || !_playerId.Value.Equals(_playerIdString))
                     _playerIdString = _playerId.Value.ToString();
                 return _playerIdString;
             }

@@ -37,6 +37,9 @@ namespace SEE.DataModel.DG
         /// </summary>
         public bool NodeHierarchyHasChanged = true;
 
+        /// <summary>
+        /// <see cref="MaxDepth"/>.
+        /// </summary>
         private int maxDepth = -1;
 
         /// <summary>
@@ -56,7 +59,6 @@ namespace SEE.DataModel.DG
                 {
                     FinalizeNodeHierarchy();
                 }
-
                 return maxDepth;
             }
         }
@@ -64,11 +66,24 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="basePath">the base path of this graph; it will be prepended to
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/> for every graph element of
+        /// this graph</param>
         /// <param name="name">name of the graph</param>
-        public Graph(string name = "")
+        public Graph(string basePath, string name = "")
         {
-            this.Name = name;
+            Name = name;
+            BasePath = basePath;
         }
+
+        /// <summary>
+        /// The base path of this graph. It will be prepended to the
+        /// <see cref="GraphElement.AbsolutePlatformPath()"/>.
+        /// It should be set platform dependent.
+        ///
+        /// Note: This attribute will not be stored in a GXL file.
+        /// </summary>
+        public string BasePath { get; set; } = "";
 
         /// Adds a node to the graph.
         /// Preconditions:
@@ -370,6 +385,20 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns the names of all node types of this graph
+        /// </summary>
+        /// <returns>node types of this graph</returns>
+        internal HashSet<string> AllNodeTypes()
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (Node node in Nodes())
+            {
+                result.Add(node.Type);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// The number of nodes of the graph.
         /// </summary>
         public int NodeCount => nodes.Count;
@@ -387,6 +416,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The path of the file from which this graph was loaded. Could be the
         /// empty string if the graph was not created by loading it from disk.
+        /// Not to be confused with <see cref="BasePath"/>.
         /// </summary>
         public string Path { get; set; } = "";
 
@@ -1066,7 +1096,7 @@ namespace SEE.DataModel.DG
         /// </returns>
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
         {
-            Graph subgraph = new Graph();
+            Graph subgraph = new Graph(BasePath);
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
             return subgraph;
@@ -1194,7 +1224,10 @@ namespace SEE.DataModel.DG
             GetRoots().ForEach(rootNode =>
             {
                 rootAction?.Invoke(rootNode);
-                rootNode.Children().ForEach(child => TraverseTree(child, innerNodeAction, leafAction));
+                foreach (Node child in rootNode.Children())
+                {
+                    TraverseTree(child, innerNodeAction, leafAction);
+                }
             });
         }
 
@@ -1237,7 +1270,10 @@ namespace SEE.DataModel.DG
             else
             {
                 innerNodeAction?.Invoke(node);
-                node.Children().ForEach(childNode => TraverseTree(childNode, innerNodeAction, leafAction));
+                foreach (Node child in node.Children())
+                {
+                    TraverseTree(child, innerNodeAction, leafAction);
+                }
             }
         }
 
@@ -1328,7 +1364,7 @@ namespace SEE.DataModel.DG
         /// All names of integer attributes of all nodes in the graph.
         /// </summary>
         /// <returns>names of integer node attributes</returns>
-        public List<string> AllIntNodeAttributes()
+        public ISet<string> AllIntNodeAttributes()
         {
             return AllNodeAttributes(AllIntAttributeNames);
         }
@@ -1337,7 +1373,7 @@ namespace SEE.DataModel.DG
         /// All names of float attributes of all nodes in the graph.
         /// </summary>
         /// <returns>names of float node attributes</returns>
-        public List<string> AllFloatNodeAttributes()
+        public ISet<string> AllFloatNodeAttributes()
         {
             return AllNodeAttributes(AllFloatAttributeNames);
         }
@@ -1347,10 +1383,10 @@ namespace SEE.DataModel.DG
         /// and <see cref="AllIntNodeAttributes()"/>.
         /// </summary>
         /// <returns>names of all numeric (int or float) node attributes</returns>
-        public List<string> AllNumericNodeAttributes()
+        public ISet<string> AllNumericNodeAttributes()
         {
-            List<string> result = AllIntNodeAttributes();
-            result.AddRange(AllFloatNodeAttributes());
+            ISet<string> result = AllIntNodeAttributes();
+            result.UnionWith(AllFloatNodeAttributes());
             return result;
         }
 
@@ -1358,7 +1394,7 @@ namespace SEE.DataModel.DG
         /// All names of toggle attributes of all nodes in the graph.
         /// </summary>
         /// <returns>names of toggle node attributes</returns>
-        public List<string> AllToggleNodeAttributes()
+        public ISet<string> AllToggleNodeAttributes()
         {
             return AllNodeAttributes(AllToggleAttributeNames);
         }
@@ -1367,7 +1403,7 @@ namespace SEE.DataModel.DG
         /// All names of string attributes of all nodes in the graph.
         /// </summary>
         /// <returns>names of string node attributes</returns>
-        public List<string> AllStringNodeAttributes()
+        public ISet<string> AllStringNodeAttributes()
         {
             return AllNodeAttributes(AllStringAttributeNames);
         }
@@ -1425,7 +1461,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="attributeNames">yields the node attribute names to collect</param>
         /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
-        private List<string> AllNodeAttributes(AllAttributeNames attributeNames)
+        private ISet<string> AllNodeAttributes(AllAttributeNames attributeNames)
         {
             HashSet<string> result = new HashSet<string>();
             foreach (Node node in Nodes())
@@ -1435,8 +1471,22 @@ namespace SEE.DataModel.DG
                     result.Add(name);
                 }
             }
+            return result;
+        }
 
-            return result.ToList();
+        /// <summary>
+        /// Returns the union of the names of all numeric node attributes of the given <paramref name="graphs"/>.
+        /// </summary>
+        /// <param name="graphs">graphs for which to yield the metric names</param>
+        /// <returns>union of the names of all numeric node attributes</returns>
+        internal static HashSet<string> AllMetrics(ICollection<Graph> graphs)
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (Graph graph in graphs)
+            {
+                result.UnionWith(graph.AllNumericNodeAttributes());
+            }
+            return result;
         }
 
         public static implicit operator bool(Graph graph)

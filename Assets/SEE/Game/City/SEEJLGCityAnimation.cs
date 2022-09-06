@@ -7,6 +7,7 @@ using SEE.DataModel;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,41 +29,55 @@ namespace SEE.Game.City
         /// <summary>
         /// The class the breakpoint is contained in.
         /// </summary>
+        [Tooltip("The class the breakpoint is contained in."), FoldoutGroup(JLGFoldoutGroup)]
         public string BreakpointClass = "classname";
 
         /// <summary>
         /// The source line of the breakpoint.
         /// </summary>
+        [Tooltip("The source line of the breakpoint."), FoldoutGroup(JLGFoldoutGroup)]
         public int BreakpointLine = 0;
 
         /// <summary>
-        /// The distance between the code-city object and the source-code window
+        /// The distance between the code city and the source-code window
         /// in Unity units.
         /// </summary>
+        [Tooltip("The distance between the code city and the source-code window."),
+         FoldoutGroup(JLGFoldoutGroup)]
         public float DistanceAboveCity = 0.01f;
 
         /// <summary>
-        /// The distance between the back edge of the code-city object and the source-code window
+        /// The distance between the line connecting the code city and the source-code window
         /// in Unity units.
         /// </summary>
+        [Tooltip("The distance between the line connecting the code city and the source-code window."),
+         FoldoutGroup(JLGFoldoutGroup)]
         public float DistanceBehindCity = 0.3f;
 
         /// <summary>
         /// The width of the line connecting the source-code window and the game objects
         /// whose source code is currently shown.
         /// </summary>
+        [Tooltip("The width of the line connecting the source-code window and the game objects whose source code is currently shown."),
+         FoldoutGroup(JLGFoldoutGroup)]
         public float LineWidth = 0.01f;
 
         /// <summary>
-        /// If true we always move to the next/previous call statement in the execution
+        /// If true, we always move to the next/previous call statement in the execution
         /// (depending upon whether the execution is forward or backward, respectively),
         /// that is, only interprocedural control flow will be shown.
         /// </summary>
+        [Tooltip("If true, we always move to the next/previous call statement in the execution"
+                 + " (depending upon whether the execution is forward or backward, respectively),"
+                 + " that is, only interprocedural control flow will be shown."),
+         FoldoutGroup(JLGFoldoutGroup)]
         public bool ShowOnlyCalls = false;
 
         //-------------------------------------------------------
         // Private attributes not saved in the configuration file
         //-------------------------------------------------------
+
+        private const string JLGFoldoutGroup = "JLG Settings";
 
         /// <summary>
         /// This name will be added at the end of every game object representing a
@@ -246,7 +261,7 @@ namespace SEE.Game.City
         private Dictionary<string, GameObject> GetNodes()
         {
             Dictionary<string, GameObject> result = new Dictionary<string, GameObject>();
-            foreach(GameObject node in gameObject.AllAncestors(Tags.Node))
+            foreach(GameObject node in gameObject.AllDescendants(Tags.Node))
             {
                 result[node.name] = node;
             }

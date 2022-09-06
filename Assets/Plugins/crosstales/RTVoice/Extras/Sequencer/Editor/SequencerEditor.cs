@@ -1,16 +1,15 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'Sequencer'-class.</summary>
-   [CustomEditor(typeof(Tool.Sequencer))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.Sequencer))]
    public class SequencerEditor : Editor
    {
       #region Variables
 
-      private Tool.Sequencer script;
+      private Crosstales.RTVoice.Tool.Sequencer script;
 
       #endregion
 
@@ -19,7 +18,7 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.Sequencer)target;
+         script = (Crosstales.RTVoice.Tool.Sequencer)target;
       }
 
       public override void OnInspectorGUI()
@@ -30,21 +29,21 @@ namespace Crosstales.RTVoice.EditorExtension
          {
             if (script.Sequences?.Length > 0)
             {
-               if (!Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
+               if (!Speaker.Instance.isTTSAvailable && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
                {
-                  EditorHelper.SeparatorUI();
-                  EditorHelper.NoVoicesUI();
+                  Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
+                  Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
                }
             }
             else
             {
-               EditorHelper.SeparatorUI();
+               Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
                EditorGUILayout.HelpBox("Please add an entry to 'Sequences'!", MessageType.Warning);
             }
          }
          else
          {
-            EditorHelper.SeparatorUI();
+            Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
             EditorGUILayout.HelpBox("Script is disabled!", MessageType.Info);
          }
       }
@@ -53,4 +52,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2016-2021 crosstales LLC (https://www.crosstales.com)
+// © 2016-2022 crosstales LLC (https://www.crosstales.com)

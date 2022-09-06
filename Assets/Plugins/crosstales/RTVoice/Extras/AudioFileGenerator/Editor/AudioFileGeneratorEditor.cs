@@ -1,18 +1,17 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using Crosstales.RTVoice.EditorUtil;
 
 namespace Crosstales.RTVoice.EditorExtension
 {
    /// <summary>Custom editor for the 'SpeechText'-class.</summary>
-   [CustomEditor(typeof(Tool.AudioFileGenerator))]
+   [CustomEditor(typeof(Crosstales.RTVoice.Tool.AudioFileGenerator))]
    [CanEditMultipleObjects]
    public class AudioFileGeneratorEditor : Editor
    {
       #region Variables
 
-      private Tool.AudioFileGenerator script;
+      private Crosstales.RTVoice.Tool.AudioFileGenerator script;
 
       #endregion
 
@@ -21,22 +20,22 @@ namespace Crosstales.RTVoice.EditorExtension
 
       private void OnEnable()
       {
-         script = (Tool.AudioFileGenerator)target;
+         script = (Crosstales.RTVoice.Tool.AudioFileGenerator)target;
       }
 
       public override void OnInspectorGUI()
       {
          DrawDefaultInspector();
 
-         EditorHelper.SeparatorUI();
+         Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
          if (script.isActiveAndEnabled)
          {
             if (script.TextFiles?.Length > 0)
             {
-               if (Speaker.Instance.isTTSAvailable && EditorHelper.isRTVoiceInScene)
+               if (Speaker.Instance.isTTSAvailable && Crosstales.RTVoice.EditorUtil.EditorHelper.isRTVoiceInScene)
                {
-                  if (Util.Helper.isEditorMode)
+                  if (Crosstales.RTVoice.Util.Helper.isEditorMode)
                   {
                      GUILayout.Label("Generate Audio Files", EditorStyles.boldLabel);
 
@@ -44,7 +43,7 @@ namespace Crosstales.RTVoice.EditorExtension
                      {
                         if (Speaker.Instance.isWorkingInEditor)
                         {
-                           if (GUILayout.Button(new GUIContent(" Generate", EditorHelper.Icon_Speak, "Generates the speeches from the text files.")))
+                           if (GUILayout.Button(new GUIContent(" Generate", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Speak, "Generates the speeches from the text files.")))
                               script.Generate();
                         }
                         else
@@ -54,13 +53,13 @@ namespace Crosstales.RTVoice.EditorExtension
                      }
                      GUILayout.EndHorizontal();
 
-                     EditorHelper.SeparatorUI();
+                     Crosstales.RTVoice.EditorUtil.EditorHelper.SeparatorUI();
 
                      GUILayout.Label("Editor", EditorStyles.boldLabel);
 
-                     if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
+                     if (GUILayout.Button(new GUIContent(" Refresh AssetDatabase", Crosstales.RTVoice.EditorUtil.EditorHelper.Icon_Refresh, "Refresh the AssetDatabase from the Editor.")))
                      {
-                        EditorHelper.RefreshAssetDatabase();
+                        Crosstales.RTVoice.EditorUtil.EditorHelper.RefreshAssetDatabase();
                      }
                   }
                   else
@@ -70,7 +69,7 @@ namespace Crosstales.RTVoice.EditorExtension
                }
                else
                {
-                  EditorHelper.NoVoicesUI();
+                  Crosstales.RTVoice.EditorUtil.EditorHelper.NoVoicesUI();
                }
             }
             else
@@ -88,4 +87,4 @@ namespace Crosstales.RTVoice.EditorExtension
    }
 }
 #endif
-// © 2017-2021 crosstales LLC (https://www.crosstales.com)
+// © 2017-2022 crosstales LLC (https://www.crosstales.com)

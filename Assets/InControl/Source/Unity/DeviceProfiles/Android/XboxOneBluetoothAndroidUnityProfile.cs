@@ -5,15 +5,15 @@
 namespace InControl.UnityDeviceProfiles
 {
 	// @cond nodoc
-	[Preserve] [UnityInputDeviceProfile]
+	[Preserve, UnityInputDeviceProfile]
 	public class XboxOneBluetoothAndroidUnityProfile : InputDeviceProfile
 	{
 		public override void Define()
 		{
 			base.Define();
 
-			DeviceName = "XBox One Controller";
-			DeviceNotes = "XBox One Controller on Android";
+			DeviceName = "Xbox One Controller";
+			DeviceNotes = "Xbox One Controller on Android";
 
 			DeviceClass = InputDeviceClass.Controller;
 			DeviceStyle = InputDeviceStyle.XboxOne;

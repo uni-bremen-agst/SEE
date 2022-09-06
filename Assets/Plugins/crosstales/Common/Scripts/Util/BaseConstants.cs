@@ -123,9 +123,11 @@ namespace Crosstales.Common.Util
       public static readonly System.Text.RegularExpressions.Regex REGEX_CLEAN_TAGS = new System.Text.RegularExpressions.Regex(@"<.*?>");
       //public static readonly System.Text.RegularExpressions.Regex asciiOnlyRegex = new System.Text.RegularExpressions.Regex(@"[^\u0000-\u00FF]+");
 
-      public const string LATIN_ABC_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      public const string LATIN_ABC_LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-      public const string LATIN_ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+      public const string ALPHABET_LATIN_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      public const string ALPHABET_LATIN_LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+      public const string ALPHABET_FRENCH_UPPERCASE = "ÀÂÄÆÇÈÉÊËÎÏÔŒÙÛÜ";
+      public const string ALPHABET_FRENCH_LOWERCASE = "àâäæçèéêëîïôœùûü";
+      //public const string ALPHABET_LATIN = ALPHABET_LATIN_UPPERCASE + ALPHABET_LATIN_LOWERCASE;
 
       public const string NUMBERS = "0123456789";
 
@@ -193,7 +195,7 @@ namespace Crosstales.Common.Util
       {
          get
          {
-            if ((BaseHelper.isWindowsBasedPlatform || BaseHelper.isWindowsEditor) && !BaseHelper.isMacOSEditor && !BaseHelper.isLinuxEditor)
+            if ((Crosstales.Common.Util.BaseHelper.isWindowsBasedPlatform || Crosstales.Common.Util.BaseHelper.isWindowsEditor) && !Crosstales.Common.Util.BaseHelper.isMacOSEditor && !Crosstales.Common.Util.BaseHelper.isLinuxEditor)
             {
                return "file:///";
             }
@@ -203,9 +205,9 @@ namespace Crosstales.Common.Util
       }
 
       /// <summary>Application path.</summary>
-      public static string APPLICATION_PATH => BaseHelper.ValidatePath(Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') + 1));
+      public static string APPLICATION_PATH => Crosstales.Common.Util.FileHelper.ValidatePath(Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/') + 1));
 
       #endregion
    }
 }
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

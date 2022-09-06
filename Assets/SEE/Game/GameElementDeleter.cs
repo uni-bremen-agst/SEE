@@ -124,7 +124,7 @@ namespace SEE.Game
                 if (parentTransform != null)
                 {
                     GameObject parent = parentTransform.gameObject;
-                    SEECity city = parent.ContainingCity();
+                    SEECity city = parent.ContainingCity() as SEECity;
                     if (city != null)
                     {
                         city.Renderer.RedrawAsLeafNode(parent);
@@ -330,7 +330,7 @@ namespace SEE.Game
             /// </summary>
             /// <param name="gameNode">the game node for which to look up the graph</param>
             /// <return>corresponding graph or null</return>
-            Graph GetGraphOfNode(GameObject gameNode)
+            static Graph GetGraphOfNode(GameObject gameNode)
             {
                 while (gameNode != null)
                 {

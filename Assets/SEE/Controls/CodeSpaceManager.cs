@@ -16,7 +16,7 @@ namespace SEE.Controls
     /// Note that only one instance of this class may be active in the scene. This instance can be retrieved
     /// using <see cref="ManagerInstance"/>.
     /// </summary>
-    public class CodeSpaceManager: MonoBehaviour
+    public class CodeSpaceManager : MonoBehaviour
     {
         /// <summary>
         /// String representing the local player.
@@ -113,7 +113,9 @@ namespace SEE.Controls
                     else
                     {
                         // Visible line may have changed
-                        CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title).VisibleLine = windowValue.VisibleLine;
+                        CodeWindow window = CodeSpaces[playerName].CodeWindows.First(x => x.Title == windowValue.Title);
+                        window.VisibleLine = windowValue.VisibleLine;
+                        //TODO: Text merge between windowValue.Text and window.Text
 
                         // Window is still open, so it's not closed
                         closedWindows.RemoveAll(x => x.Title == windowValue.Title);
@@ -135,18 +137,17 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<CodeSpaceManager>().Length > 1)
             {
-                Debug.LogError($"Warning: More than one {typeof(CodeSpaceManager)} is present in the scene! "
+                Debug.LogError($"Warning: More than one  {typeof(CodeSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "code windows across the network! No new indicator will be created.\n");
                 foreach (CodeSpaceManager manager in FindObjectsOfType<CodeSpaceManager>())
                 {
-                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.GetFullName()}.\n");
+                    Debug.LogError($"{typeof(CodeSpaceManager)} at game object {manager.gameObject.FullName()}.\n");
                 }
             }
             else
             {
                 SpaceIndicator = gameObject.AddComponent<StateIndicator>();
-                SpaceIndicator.name = "Code Space Indicator";
                 // Anchor to lower left
                 SpaceIndicator.AnchorMin = Vector2.zero;
                 SpaceIndicator.AnchorMax = Vector2.zero;

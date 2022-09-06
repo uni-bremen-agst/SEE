@@ -76,7 +76,7 @@ namespace Crosstales.RTVoice.UI
          InputComponent.placeholder.color = originalPHColor;
       }
 
-      protected override void onSpeakComplete(Model.Wrapper wrapper)
+      protected override void onSpeakComplete(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper.Uid == uid)
          {
@@ -90,4 +90,4 @@ namespace Crosstales.RTVoice.UI
       #endregion
    }
 }
-// © 2021 crosstales LLC (https://www.crosstales.com)
+// © 2021-2022 crosstales LLC (https://www.crosstales.com)

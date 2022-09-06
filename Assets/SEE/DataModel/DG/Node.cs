@@ -154,7 +154,7 @@ namespace SEE.DataModel.DG
         /// including the node itself.
         /// </summary>
         /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
-        public List<Node> Ascendants()
+        public IList<Node> Ascendants()
         {
             List<Node> result = new List<Node>();
             Node cursor = this;
@@ -174,6 +174,7 @@ namespace SEE.DataModel.DG
         /// <returns>transitive descendants of this node in post order</returns>
         public IList<Node> PostOrderDescendants()
         {
+            // FIXME: Check for cycles in the graph, aborting with an appropriate exception (maybe in a separate method)
             IList<Node> result = new List<Node>();
             PostOrderDescendants(this);
             return result;
@@ -290,6 +291,11 @@ namespace SEE.DataModel.DG
             result += base.ToString();
             result += "}";
             return result;
+        }
+
+        public override string ToShortString()
+        {
+            return $"{SourceName} [{Type}]";
         }
 
         /// <summary>
@@ -440,12 +446,12 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The descendants of the node.
-        /// Note: This is not a copy. Do not modify the result.
+        /// Note: This is not a copy. The result can't be modified.
         /// </summary>
         /// <returns>descendants of the node</returns>
-        public List<Node> Children()
+        public IList<Node> Children()
         {
-            return children;
+            return children.AsReadOnly();
         }
 
         /// <summary>
@@ -616,13 +622,14 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the list of outgoing edges from this node to the given
         /// target node that have exactly the given edge type.
+        /// If the given edge type is null, it will not be taken into account.
         ///
         /// Precondition: target must not be null
         /// </summary>
         /// <param name="target">target node</param>
-        /// <param name="its_type">requested edge type</param>
+        /// <param name="itsType">requested edge type</param>
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
-        public List<Edge> From_To(Node target, string its_type)
+        public List<Edge> FromTo(Node target, string itsType = null)
         {
             if (ReferenceEquals(target, null))
             {
@@ -630,7 +637,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                return Outgoings.Where(edge => edge.Target == target && edge.Type == its_type).ToList();
+                return Outgoings.Where(edge => edge.Target == target && (itsType == null || edge.Type == itsType)).ToList();
             }
         }
 

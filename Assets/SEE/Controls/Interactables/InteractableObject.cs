@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.MixedReality.Toolkit.Input;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
@@ -32,7 +31,7 @@ namespace SEE.Controls
     /// <summary>
     /// Super class of the behaviours of game objects the player interacts with.
     /// </summary>
-    public sealed class InteractableObject : MonoBehaviour, IMixedRealityFocusHandler
+    public sealed class InteractableObject : MonoBehaviour
     {
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -260,10 +259,7 @@ namespace SEE.Controls
         /// <returns>the interactable with the given <paramref name="id"/>; null if none exists</returns>
         public static InteractableObject Get(string id)
         {
-            if (!idToInteractableObjectDict.TryGetValue(id, out InteractableObject result))
-            {
-                result = null;
-            }
+            idToInteractableObjectDict.TryGetValue(id, out InteractableObject result);
             return result;
         }
 
@@ -337,7 +333,7 @@ namespace SEE.Controls
                 if (IsHoverFlagSet(HoverFlag.World))
                 {
                     // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
-                    // investigation.
+                    //   investigation.
                     //if (HoveredObjectWithWorldFlag != null)
                     //{
                     //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
@@ -918,36 +914,6 @@ namespace SEE.Controls
             if (PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer
                 && IsHoverFlagSet(HoverFlag.World))
             {
-                SetHoverFlag(HoverFlag.World, false, true);
-            }
-        }
-
-        //----------------------------------------
-        // Actions called by the MRTK on HoloLens.
-        //----------------------------------------
-
-        public void OnFocusEnter(FocusEventData eventData)
-        {
-            // In case of eye gaze, we discard the input.
-            // We handle eye gaze using the BaseEyeFocusHandler in order to only activate hovering mechanisms
-            // when the user dwells on the object, otherwise the sudden changes would be too jarring.
-            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes)
-            {
-                SetHoverFlag(HoverFlag.World, true, true);
-            }
-        }
-
-        public void OnFocusExit(FocusEventData eventData)
-        {
-            // Similarly to OnFocusEnter(), we discard the input in case of eye gaze to avoid jarring changes.
-            if (eventData.Pointer.InputSourceParent.SourceType != InputSourceType.Eyes
-                && !eventData.Pointer.PointerName.StartsWith("None"))
-            {
-                // Unfortunately, there seems to be a bug in the MRTK:
-                // The SourceType is falsely reported by the MRTK as "Hands" here
-                // (in contrast to OnFocusEnter(), where Eyes are correctly reported.)
-                // The only recognizable difference seems to be that the pointer isn't attached to any hand
-                // so it's just called "None Hand" instead of "Right Hand", we use this to detect it.
                 SetHoverFlag(HoverFlag.World, false, true);
             }
         }

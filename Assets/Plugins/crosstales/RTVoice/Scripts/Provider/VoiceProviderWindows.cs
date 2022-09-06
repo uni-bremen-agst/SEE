@@ -13,7 +13,7 @@ namespace Crosstales.RTVoice.Provider
 #if ENABLE_IL2CPP
       private const bool useVisemesAndPhonemesIL2CPP = false;
 #endif
-      private readonly string dataPath = Util.Helper.ValidatePath(Application.temporaryCachePath);
+      private readonly string dataPath = Crosstales.Common.Util.FileHelper.ValidatePath(Application.temporaryCachePath);
 
       private const string idVoice = "@VOICE:";
       private const string idSpeak = "@SPEAK";
@@ -25,7 +25,7 @@ namespace Crosstales.RTVoice.Provider
       private static readonly char[] splitChar = { ':' };
 
 #if ENABLE_IL2CPP && CT_PROC
-      private System.Collections.Generic.Dictionary<string, Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Common.Util.CTProcess>();
+      private System.Collections.Generic.Dictionary<string, Crosstales.Common.Util.CTProcess> processCreators = new System.Collections.Generic.Dictionary<string, Crosstales.Common.Util.CTProcess>();
 #endif
       private bool isLoading;
 
@@ -45,9 +45,9 @@ namespace Crosstales.RTVoice.Provider
 
       public override string DefaultVoiceName => "Microsoft David Desktop";
 
-      public override bool isWorkingInEditor => Util.Helper.isWindowsEditor;
+      public override bool isWorkingInEditor => Crosstales.RTVoice.Util.Helper.isWindowsEditor;
 
-      public override bool isWorkingInPlaymode => Util.Helper.isWindowsEditor;
+      public override bool isWorkingInPlaymode => Crosstales.RTVoice.Util.Helper.isWindowsEditor;
 
       public override int MaxTextLength => 32000;
 
@@ -55,7 +55,7 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool isSpeakSupported => true;
 
-      public override bool isPlatformSupported => Util.Helper.isWindowsPlatform;
+      public override bool isPlatformSupported => Crosstales.RTVoice.Util.Helper.isWindowsPlatform;
 
       public override bool isSSMLSupported => true;
 
@@ -67,6 +67,8 @@ namespace Crosstales.RTVoice.Provider
 
       public override bool hasVoicesInEditor => true;
 
+      public override int MaxSimultaneousSpeeches => 0;
+
       #endregion
 
 /*
@@ -77,7 +79,7 @@ namespace Crosstales.RTVoice.Provider
       /// </summary>
       public VoiceProviderWindows()
       {
-         dataPath = Util.Helper.ValidatePath(Application.temporaryCachePath);
+         dataPath = Crosstales.RTVoice.Util.Helper.ValidatePath(Application.temporaryCachePath);
       }
 
       #endregion
@@ -89,7 +91,7 @@ namespace Crosstales.RTVoice.Provider
       {
          if (cachedVoices?.Count == 0 || forceReload)
          {
-            if (Util.Helper.isEditorMode)
+            if (Crosstales.RTVoice.Util.Helper.isEditorMode)
             {
 #if UNITY_EDITOR
                getVoicesInEditor();
@@ -110,7 +112,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      public override IEnumerator SpeakNative(Model.Wrapper wrapper)
+      public override IEnumerator SpeakNative(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -138,10 +140,10 @@ namespace Crosstales.RTVoice.Provider
                                 $" -volume {calculatedVolume}" +
                                 $" -voice \"{voiceName.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 #if ENABLE_IL2CPP && CT_PROC
-                  using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                  using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -151,7 +153,7 @@ namespace Crosstales.RTVoice.Provider
                      process.StartInfo.FileName = applicationName;
                      process.StartInfo.Arguments = args;
 
-                     string[] speechTextArray = Util.Helper.CleanText(wrapper.Text, false)
+                     string[] speechTextArray = Crosstales.RTVoice.Util.Helper.CleanText(wrapper.Text, false)
                         .Split(splitCharWords, System.StringSplitOptions.RemoveEmptyEntries);
                      int wordIndex = 0;
                      string word = string.Empty;
@@ -222,7 +224,7 @@ namespace Crosstales.RTVoice.Provider
                      if (process.ExitCode == 0 || process.ExitCode == -1) //-1 = Killed
 #endif
                      {
-                        if (Util.Config.DEBUG)
+                        if (Crosstales.RTVoice.Util.Config.DEBUG)
                            Debug.Log("Text spoken: " + wrapper.Text);
 
                         onSpeakComplete(wrapper);
@@ -256,7 +258,7 @@ namespace Crosstales.RTVoice.Provider
       }
 
 
-      public override IEnumerator Speak(Model.Wrapper wrapper)
+      public override IEnumerator Speak(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -294,10 +296,10 @@ namespace Crosstales.RTVoice.Provider
                                    $" -volume {calculatedVolume}" +
                                    $" -voice \"{voiceName.Replace('"', '\'')}\"";
 
-                     if (Util.Config.DEBUG)
+                     if (Crosstales.RTVoice.Util.Config.DEBUG)
                         Debug.Log("Process arguments: " + args);
 #if ENABLE_IL2CPP && CT_PROC
-                     using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                     using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                      using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -324,7 +326,7 @@ namespace Crosstales.RTVoice.Provider
 
                         if (process.ExitCode == 0)
                         {
-                           yield return playAudioFile(wrapper, Util.Helper.ValidURLFromFilePath(outputFile), outputFile);
+                           yield return playAudioFile(wrapper, Crosstales.Common.Util.NetworkHelper.ValidURLFromFilePath(outputFile), outputFile);
                         }
                         else
                         {
@@ -355,7 +357,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      public override IEnumerator Generate(Model.Wrapper wrapper)
+      public override IEnumerator Generate(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -386,10 +388,10 @@ namespace Crosstales.RTVoice.Provider
                                 $" -volume {calculatedVolume}" +
                                 $" -voice \"{voiceName.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 #if ENABLE_IL2CPP && CT_PROC
-                  using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                  using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -484,9 +486,9 @@ namespace Crosstales.RTVoice.Provider
       {
          if (System.IO.File.Exists(applicationName))
          {
-            System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>();
+            System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>();
 #if ENABLE_IL2CPP && CT_PROC
-            using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+            using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -494,7 +496,7 @@ namespace Crosstales.RTVoice.Provider
                process.StartInfo.FileName = applicationName;
                process.StartInfo.Arguments = "--voices";
 
-               System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, Util.Constants.DEFAULT_TTS_KILL_TIME));
+               System.Threading.Thread worker = new System.Threading.Thread(() => startProcess(process, Crosstales.RTVoice.Util.Constants.DEFAULT_TTS_KILL_TIME));
                worker.Start();
 
                do
@@ -510,7 +512,7 @@ namespace Crosstales.RTVoice.Provider
                      {
                         string reply = streamReader.ReadLine();
 
-                        if (Util.Config.DEBUG)
+                        if (Crosstales.RTVoice.Util.Config.DEBUG)
                            Debug.Log("reply: " + reply);
 
                         if (!string.IsNullOrEmpty(reply))
@@ -524,8 +526,8 @@ namespace Crosstales.RTVoice.Provider
                               {
                                  //if (!splittedString[1].CTContains("espeak")) //ignore eSpeak voices
                                  //{
-                                 voices.Add(new Model.Voice(splittedString[1], splittedString[2],
-                                    Util.Helper.StringToGender(splittedString[3]), splittedString[4],
+                                 voices.Add(new Crosstales.RTVoice.Model.Voice(splittedString[1], splittedString[2],
+                                    Crosstales.RTVoice.Util.Helper.StringToGender(splittedString[3]), splittedString[4],
                                     splittedString[5]));
                                  //}
                               }
@@ -552,7 +554,7 @@ namespace Crosstales.RTVoice.Provider
 
             cachedVoices = voices.OrderBy(s => s.Name).ToList();
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Voices read: " + cachedVoices.CTDump());
          }
          else
@@ -568,7 +570,7 @@ namespace Crosstales.RTVoice.Provider
       }
 
 #if ENABLE_IL2CPP
-      private void readSpeakNativeStream(Common.Util.CTProcess process, ref string[] speechTextArray, out int wordIndex, out string word, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
+      private void readSpeakNativeStream(Crosstales.Common.Util.CTProcess process, ref string[] speechTextArray, out int wordIndex, out string word, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
 #else
       private static void readSpeakNativeStream(System.Diagnostics.Process process, ref string[] speechTextArray, out int wordIndex, out string word, out string phoneme, out string viseme, out bool start, bool redirectOutputData = true, bool redirectErrorData = true)
 #endif
@@ -604,7 +606,7 @@ namespace Crosstales.RTVoice.Provider
                         {
                            word = reply.Substring(idWord.Length + 1);
 
-                           if (Util.Constants.DEV_DEBUG)
+                           if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                               Debug.Log($"Word spoken: {word}");
 
                            if (wordIndex < speechTextArray.Length)
@@ -625,7 +627,7 @@ namespace Crosstales.RTVoice.Provider
                            {
                               phoneme = splittedString[1];
 
-                              if (Util.Constants.DEV_DEBUG)
+                              if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                                  Debug.Log($"Phoneme spoken: {phoneme}");
                            }
                         }
@@ -637,7 +639,7 @@ namespace Crosstales.RTVoice.Provider
                            {
                               viseme = splittedString[1];
 
-                              if (Util.Constants.DEV_DEBUG)
+                              if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                                  Debug.Log($"Viseme spoken: {viseme}");
                            }
                         }
@@ -665,7 +667,7 @@ namespace Crosstales.RTVoice.Provider
       {
          get
          {
-            string appName = System.IntPtr.Size == 4 ? dataPath + Util.Constants.TTS_WINDOWS_x86_SUBPATH : dataPath + Util.Constants.TTS_WINDOWS_SUBPATH;
+            string appName = System.IntPtr.Size == 4 || (Speaker.Instance != null && Speaker.Instance.WindowsForce32bit) ? dataPath + Crosstales.RTVoice.Util.Constants.TTS_WINDOWS_x86_SUBPATH : dataPath + Crosstales.RTVoice.Util.Constants.TTS_WINDOWS_SUBPATH;
 
             if (appName.Contains("'"))
             {
@@ -677,7 +679,7 @@ namespace Crosstales.RTVoice.Provider
                {
                   if (!System.IO.File.Exists(appName))
                   {
-                     System.IO.File.WriteAllBytes(appName, System.IntPtr.Size == 4 ? System.Convert.FromBase64String(bin32) : System.Convert.FromBase64String(bin64));
+                     System.IO.File.WriteAllBytes(appName, System.IntPtr.Size == 4 || (Speaker.Instance != null && Speaker.Instance.WindowsForce32bit) ? System.Convert.FromBase64String(bin32) : System.Convert.FromBase64String(bin64));
                   }
                }
                catch (System.Exception ex)
@@ -690,7 +692,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      private static string prepareText(Model.Wrapper wrapper)
+      private static string prepareText(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          //TEST
          //wrapper.ForceSSML = false;
@@ -706,20 +708,20 @@ namespace Crosstales.RTVoice.Provider
 
             float _pitch = wrapper.Pitch - 1f;
 
-            if (Mathf.Abs(_pitch) > Common.Util.BaseConstants.FLOAT_TOLERANCE)
+            if (Mathf.Abs(_pitch) > Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE)
             {
                sbXML.Append("<prosody pitch='");
 
                sbXML.Append(_pitch > 0f
-                  ? _pitch.ToString("+#0%", Util.Helper.BaseCulture)
-                  : _pitch.ToString("#0%", Util.Helper.BaseCulture));
+                  ? _pitch.ToString("+#0%", Crosstales.RTVoice.Util.Helper.BaseCulture)
+                  : _pitch.ToString("#0%", Crosstales.RTVoice.Util.Helper.BaseCulture));
 
                sbXML.Append("'>");
             }
 
             sbXML.Append(wrapper.Text);
 
-            if (Mathf.Abs(_pitch) > Common.Util.BaseConstants.FLOAT_TOLERANCE)
+            if (Mathf.Abs(_pitch) > Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE)
                sbXML.Append("</prosody>");
 
             sbXML.Append("</speak>");
@@ -740,7 +742,7 @@ namespace Crosstales.RTVoice.Provider
          //allowed range: 0 - 3f - all other values were cropped
          int result = 0;
 
-         if (Mathf.Abs(rate - 1f) > Common.Util.BaseConstants.FLOAT_TOLERANCE)
+         if (Mathf.Abs(rate - 1f) > Crosstales.Common.Util.BaseConstants.FLOAT_TOLERANCE)
          {
             //relevant?
             if (rate > 1f)
@@ -833,7 +835,7 @@ namespace Crosstales.RTVoice.Provider
             }
          }
 
-         if (Util.Constants.DEV_DEBUG)
+         if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
             Debug.Log("calculateRate: " + result + " - " + rate);
 
          return result;
@@ -846,7 +848,7 @@ namespace Crosstales.RTVoice.Provider
 
 #if UNITY_EDITOR
 
-      public override void GenerateInEditor(Model.Wrapper wrapper)
+      public override void GenerateInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -875,10 +877,10 @@ namespace Crosstales.RTVoice.Provider
                                 $" -volume {calculatedVolume}" +
                                 $" -voice \"{voiceName.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 #if ENABLE_IL2CPP && CT_PROC
-                  using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                  using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -924,7 +926,7 @@ namespace Crosstales.RTVoice.Provider
          }
       }
 
-      public override void SpeakNativeInEditor(Model.Wrapper wrapper)
+      public override void SpeakNativeInEditor(Crosstales.RTVoice.Model.Wrapper wrapper)
       {
          if (wrapper == null)
          {
@@ -950,10 +952,10 @@ namespace Crosstales.RTVoice.Provider
                                 $" -volume {calculatedVolume}" +
                                 $" -voice \"{voiceName.Replace('"', '\'')}\"";
 
-                  if (Util.Config.DEBUG)
+                  if (Crosstales.RTVoice.Util.Config.DEBUG)
                      Debug.Log("Process arguments: " + args);
 #if ENABLE_IL2CPP && CT_PROC
-                  using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+                  using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
                   using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -982,7 +984,7 @@ namespace Crosstales.RTVoice.Provider
                      if (process.ExitCode == 0 || process.ExitCode == -1) //-1 = Killed
 #endif
                      {
-                        if (Util.Config.DEBUG)
+                        if (Crosstales.RTVoice.Util.Config.DEBUG)
                            Debug.Log("Text spoken: " + wrapper.Text);
 
                         onSpeakComplete(wrapper);
@@ -1011,9 +1013,9 @@ namespace Crosstales.RTVoice.Provider
       {
          if (System.IO.File.Exists(applicationName))
          {
-            System.Collections.Generic.List<Model.Voice> voices = new System.Collections.Generic.List<Model.Voice>();
+            System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice> voices = new System.Collections.Generic.List<Crosstales.RTVoice.Model.Voice>();
 #if ENABLE_IL2CPP && CT_PROC
-            using (Common.Util.CTProcess process = new Common.Util.CTProcess())
+            using (Crosstales.Common.Util.CTProcess process = new Crosstales.Common.Util.CTProcess())
 #else
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
 #endif
@@ -1023,7 +1025,7 @@ namespace Crosstales.RTVoice.Provider
 
                try
                {
-                  System.Threading.Thread voiceWorker = new System.Threading.Thread(() => startProcess(process, Util.Constants.DEFAULT_TTS_KILL_TIME));
+                  System.Threading.Thread voiceWorker = new System.Threading.Thread(() => startProcess(process, Crosstales.RTVoice.Util.Constants.DEFAULT_TTS_KILL_TIME));
                   voiceWorker.Start();
 
                   do
@@ -1031,7 +1033,7 @@ namespace Crosstales.RTVoice.Provider
                      System.Threading.Thread.Sleep(50);
                   } while (voiceWorker.IsAlive || !process.HasExited);
 
-                  if (Util.Constants.DEV_DEBUG)
+                  if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                      Debug.Log("Finished after: " + (process.ExitTime - process.StartTime).Seconds);
 
                   if (process.ExitCode == 0)
@@ -1053,8 +1055,8 @@ namespace Crosstales.RTVoice.Provider
                                  {
                                     //if (!splittedString[1].CTContains("espeak")) //ignore eSpeak voices
                                     //{
-                                    voices.Add(new Model.Voice(splittedString[1], splittedString[2],
-                                       Util.Helper.StringToGender(splittedString[3]), splittedString[4],
+                                    voices.Add(new Crosstales.RTVoice.Model.Voice(splittedString[1], splittedString[2],
+                                       Crosstales.RTVoice.Util.Helper.StringToGender(splittedString[3]), splittedString[4],
                                        splittedString[5]));
                                     //}
                                  }
@@ -1086,7 +1088,7 @@ namespace Crosstales.RTVoice.Provider
 
             cachedVoices = voices.OrderBy(s => s.Name).ToList();
 
-            if (Util.Constants.DEV_DEBUG)
+            if (Crosstales.RTVoice.Util.Constants.DEV_DEBUG)
                Debug.Log("Voices read: " + cachedVoices.CTDump());
          }
          else
@@ -1106,4 +1108,4 @@ namespace Crosstales.RTVoice.Provider
    }
 }
 #endif
-// © 2015-2021 crosstales LLC (https://www.crosstales.com)
+// © 2015-2022 crosstales LLC (https://www.crosstales.com)

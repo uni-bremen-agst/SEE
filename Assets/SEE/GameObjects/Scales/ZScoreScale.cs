@@ -22,7 +22,7 @@ namespace SEE.GO
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        public ZScoreScale(ICollection<Graph> graphs, IList<string> metrics,  bool leavesOnly)
+        public ZScoreScale(ICollection<Graph> graphs, ISet<string> metrics,  bool leavesOnly)
             : base(graphs, metrics, leavesOnly)
         {
             DetermineStatistics(graphs, leavesOnly);

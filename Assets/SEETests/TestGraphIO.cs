@@ -83,8 +83,8 @@ namespace SEE.DataModel.DG.IO
             Constraint innerNodesConstraint = new Constraint("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new List<RandomAttributeDescriptor>()
             {
-                new RandomAttributeDescriptor("Metric.LOC", 200, 50),
-                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f),
+                new RandomAttributeDescriptor("Metric.LOC", 200, 50, -10, 100),
+                new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
             };
             string basename = "random";
 
@@ -166,7 +166,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType });
+            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
             graphReader.Load();
             return graphReader.GetGraph();
         }
@@ -201,7 +201,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph Create()
         {
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             // Note: GXL does currently not support attributes of graphs
             //graph.SetString("Date", "2020-04-02");
             //graph.SetToggle("IsGenerated");

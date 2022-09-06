@@ -120,7 +120,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="text">Text from which the token stream shall be created.</param>
         /// <param name="language">Language the given <paramref name="text"/> is written in</param>
         /// <returns>A list of tokens created from the source code file.</returns>
-        public static IList<SEEToken> fromString(string text, TokenLanguage language)
+        public static IList<SEEToken> FromString(string text, TokenLanguage language)
         {
             Lexer lexer = language.CreateLexer(text);
             CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -181,7 +181,7 @@ namespace SEE.Game.UI.CodeWindow
             /// Identifier tokens, such as variable names.
             /// </summary>
             public static readonly Type Identifier = new Type("Identifiers", "FFFFFF"); // white
-            
+
             /// <summary>
             /// Comments of any kind.
             /// </summary>

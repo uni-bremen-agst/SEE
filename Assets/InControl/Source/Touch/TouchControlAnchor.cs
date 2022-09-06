@@ -12,5 +12,4 @@ namespace InControl
 		CenterRight,
 		BottomRight
 	}
-	
 }

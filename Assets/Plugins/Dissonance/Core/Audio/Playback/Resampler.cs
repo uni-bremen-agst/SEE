@@ -19,13 +19,14 @@ namespace Dissonance.Audio.Playback
         private volatile WaveFormat _outputFormat;
         private readonly WdlResampler _resampler;
 
+        private bool _fixedRateEnabled = false;
+
         public Resampler(ISampleSource source, IRateProvider rate)
         {
             _source = source;
             _rate = rate;
 
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
-            OnAudioConfigurationChanged(false);
 
             _resampler = new WdlResampler();
             _resampler.SetMode(true, 2, false);
@@ -40,6 +41,8 @@ namespace Dissonance.Audio.Playback
 
         public void Prepare(SessionContext context)
         {
+            OnAudioConfigurationChanged(false);
+
             _source.Prepare(context);
         }
 
@@ -91,11 +94,33 @@ namespace Dissonance.Audio.Playback
 
         private void OnAudioConfigurationChanged(bool deviceWasChanged)
         {
+            if (_fixedRateEnabled)
+                return;
+
 #if NCRUNCH
             _outputFormat = new WaveFormat(44100, _source.WaveFormat.Channels);
 #else
             _outputFormat = new WaveFormat(AudioSettings.outputSampleRate, _source.WaveFormat.Channels);
 #endif
+        }
+
+        /// <summary>
+        /// Override automatic output sample rate determination and set it to a fixed value
+        /// </summary>
+        /// <param name="rate"></param>
+        public void SetOutputRate(int? rate)
+        {
+            if (rate.HasValue)
+            {
+                _fixedRateEnabled = true;
+                if (_outputFormat == null || _outputFormat.SampleRate != rate.Value)
+                    _outputFormat = new WaveFormat(rate.Value, _source.WaveFormat.Channels);
+            }
+            else
+            {
+                _fixedRateEnabled = false;
+                OnAudioConfigurationChanged(false);
+            }
         }
     }
 }

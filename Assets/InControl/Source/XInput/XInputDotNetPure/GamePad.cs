@@ -10,11 +10,16 @@ namespace XInputDotNetPure
 	{
 		[DllImport( "XInputInterface32", EntryPoint = "XInputGamePadGetState" )]
 		public static extern uint XInputGamePadGetState32( uint playerIndex, IntPtr state );
+
+
 		[DllImport( "XInputInterface32", EntryPoint = "XInputGamePadSetState" )]
 		public static extern void XInputGamePadSetState32( uint playerIndex, float leftMotor, float rightMotor );
 
+
 		[DllImport( "XInputInterface64", EntryPoint = "XInputGamePadGetState" )]
 		public static extern uint XInputGamePadGetState64( uint playerIndex, IntPtr state );
+
+
 		[DllImport( "XInputInterface64", EntryPoint = "XInputGamePadSetState" )]
 		public static extern void XInputGamePadSetState64( uint playerIndex, float leftMotor, float rightMotor );
 
@@ -56,6 +61,7 @@ namespace XInputDotNetPure
 	public struct GamePadButtons
 	{
 		ButtonState start, back, leftStick, rightStick, leftShoulder, rightShoulder, a, b, x, y;
+
 
 		internal GamePadButtons( ButtonState start, ButtonState back, ButtonState leftStick, ButtonState rightStick,
 		                         ButtonState leftShoulder, ButtonState rightShoulder, ButtonState a, ButtonState b,
@@ -139,6 +145,7 @@ namespace XInputDotNetPure
 	{
 		ButtonState up, down, left, right;
 
+
 		internal GamePadDPad( ButtonState up, ButtonState down, ButtonState left, ButtonState right )
 		{
 			this.up = up;
@@ -179,10 +186,12 @@ namespace XInputDotNetPure
 		{
 			Vector2 vector;
 
+
 			internal StickValue( float x, float y )
 			{
 				vector = new Vector2( x, y );
 			}
+
 
 			public float X
 			{
@@ -403,4 +412,3 @@ namespace XInputDotNetPure
 	}
 }
 #endif
-
