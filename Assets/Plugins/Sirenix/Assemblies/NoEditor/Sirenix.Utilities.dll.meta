@@ -25,13 +25,19 @@ PluginImporter:
   - first:
       Any: 
     second:
-      enabled: 1
+      enabled: 0
       settings: {}
   - first:
       CloudRendering: CloudRendering
     second:
       enabled: 1
       settings: {}
+  - first:
+      Editor: Editor
+    second:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
   - first:
       GameCoreXboxOne: GameCoreXboxOne
     second:
@@ -80,7 +86,7 @@ PluginImporter:
   - first:
       Standalone: Win64
     second:
-      enabled: 1
+      enabled: 0
       settings: {}
   - first:
       WebGL: WebGL
@@ -91,7 +97,8 @@ PluginImporter:
       Windows Store Apps: WindowsStoreApps
     second:
       enabled: 1
-      settings: {}
+      settings:
+        CPU: AnyCPU
   - first:
       XboxOne: XboxOne
     second:
