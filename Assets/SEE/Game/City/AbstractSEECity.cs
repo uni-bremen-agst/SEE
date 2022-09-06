@@ -485,18 +485,15 @@ namespace SEE.Game.City
                 return graph;
             }
 
-#if UNITY_ANDROID
-            bool FileExists = WebRequests.FileExists(filename);
-#if UNITY_EDITOR
+            bool FileExists;
+
+#if (UNITY_ANDROID && !UNITY_EDITOR)
+            FileExists = WebRequests.FileExists(filename);
+#else
             FileExists = File.Exists(filename);
 #endif
-            Debug.Log("Abstract" + FileExists);
             if (FileExists)
-            { 
-#else
-            if (File.Exists(filename))
             {
-#endif
                 Performance p = Performance.Begin("loading graph data from " + filename);
                 GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
                                                            basePath: SourceCodeDirectory.Path,

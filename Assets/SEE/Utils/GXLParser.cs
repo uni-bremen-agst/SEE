@@ -11,15 +11,8 @@ namespace SEE.Utils
         {
             this.filename = filename;
             this.logger = logger;
-#if UNITY_ANDROID
-#if !UNITY_EDITOR
+#if (UNITY_ANDROID && !UNITY_EDITOR)
             reader = new XmlTextReader(WebRequests.GetStream(filename));
-#else
-            reader = new XmlTextReader(filename)
-            {
-                WhitespaceHandling = WhitespaceHandling.None
-            };
-#endif
 #else
             reader = new XmlTextReader(filename)
             {
