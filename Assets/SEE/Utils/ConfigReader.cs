@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.Utils
 {
@@ -42,11 +41,7 @@ namespace SEE.Utils
         /// <param name="filename">name of the file to be parsed</param>
         public ConfigReader(string filename)
         {
-#if UNITY_ANDROID
-            stream = new System.IO.StreamReader(Application.persistentDataPath + "/NetworkConfig/network.cfg");
-#else
             stream = new System.IO.StreamReader(filename);
-#endif
         }
 
         /// <summary>

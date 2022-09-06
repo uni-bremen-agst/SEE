@@ -973,14 +973,8 @@ namespace SEE.Net
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-
-#if UNITY_ANDROID
-            if (File.Exists(Application.persistentDataPath + "/NetworkConfig/network.cfg"))
-            {
-#else
             if (File.Exists(filename))
             {
-#endif
                 using ConfigReader stream = new ConfigReader(filename);
                 Restore(stream.Read());
             }
