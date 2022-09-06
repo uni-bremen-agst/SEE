@@ -1,3 +1,4 @@
+using SEE.DataModel;
 using SEE.Game;
 using SEE.Utils;
 using UnityEngine;
@@ -29,8 +30,8 @@ namespace SEE.Controls.Actions
             RaycastHit raycastHitFirstTouch;
             if (Physics.Raycast(rayFirstTouch, out raycastHitFirstTouch))
             {
-                if (raycastHitFirstTouch.collider.tag == "Node" ||
-                    raycastHitFirstTouch.collider.tag == "Edge")
+                if (raycastHitFirstTouch.collider.tag == Tags.Node ||
+                    raycastHitFirstTouch.collider.tag == Tags.Edge)
                 {
                     cityRootNodeFirstTouch = SceneQueries.GetCityRootTransformUpwards(raycastHitFirstTouch.transform);
                 }
@@ -39,8 +40,8 @@ namespace SEE.Controls.Actions
             RaycastHit raycastHitSecondTouch;
             if (Physics.Raycast(raySecondTouch, out raycastHitSecondTouch))
             {
-                if (raycastHitSecondTouch.collider.tag == "Node" ||
-                    raycastHitSecondTouch.collider.tag == "Edge")
+                if (raycastHitSecondTouch.collider.tag == Tags.Node ||
+                    raycastHitSecondTouch.collider.tag == Tags.Edge)
                 {
                     cityRootNodeSecondTouch = SceneQueries.GetCityRootTransformUpwards(raycastHitSecondTouch.transform);
                 }

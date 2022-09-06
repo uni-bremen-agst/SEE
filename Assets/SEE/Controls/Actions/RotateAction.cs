@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
                 RaycastHit raycastHit;
                 if (Physics.Raycast(ray, out raycastHit))
                 {
-                    if (raycastHit.collider.tag == "Node")
+                    if (raycastHit.collider.tag == Tags.Node)
                     {
                         cityRootNodeMobile = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
                         CityRootNodeMemory.CityRootNode = cityRootNodeMobile;

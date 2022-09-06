@@ -37,7 +37,7 @@ namespace SEE.Controls.Actions
                 RaycastHit raycastHit;
                 if (Physics.Raycast(ray, out raycastHit))
                 {
-                    if (raycastHit.collider.tag == "Node")
+                    if (raycastHit.collider.tag == Tags.Node)
                     {
                         // the hit object is the parent in which to create the new node
                         GameObject parent = raycastHit.collider.gameObject;
