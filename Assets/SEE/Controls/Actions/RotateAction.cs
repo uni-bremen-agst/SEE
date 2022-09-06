@@ -114,7 +114,8 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
 #if UNITY_ANDROID
-             // Check for touch input
+            // FIXME: This branch of the the #ifdef and the #else branch should be consolidated.
+            // Check for touch input
             if (Input.touchCount != 1)
             {
                 rotating = false;

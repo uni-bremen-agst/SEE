@@ -242,6 +242,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
 #if UNITY_ANDROID
+            // FIXME: This branch of the the #ifdef and the #else branch should be consolidated.
             if (objectToScale != null)
             {
                 // We can scale objectToScale.

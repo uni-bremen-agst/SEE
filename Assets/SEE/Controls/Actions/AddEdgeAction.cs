@@ -130,6 +130,8 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 #if UNITY_ANDROID
+            // FIXME: This branch of the the #ifdef and the #else branch should be consolidated.
+
             // Check for touch input
             if (Input.touchCount != 1)
             {
