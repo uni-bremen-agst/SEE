@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -135,7 +134,7 @@ namespace SEE.Controls.Actions
                 RaycastHit raycastHit;
                 if (Physics.Raycast(ray, out raycastHit))
                 {
-                    if (raycastHit.collider.tag == Tags.Node)
+                    if (raycastHit.collider.tag == DataModel.Tags.Node)
                     {
                         cityRootNodeMobile = SceneQueries.GetCityRootTransformUpwards(raycastHit.transform);
                         CityRootNodeMemory.CityRootNode = cityRootNodeMobile;

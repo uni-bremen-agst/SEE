@@ -6,7 +6,6 @@ using SEE.Net;
 using SEE.Utils;
 using System;
 using UnityEngine;
-using SEE.DataModel;
 
 namespace SEE.Controls.Actions
 {
@@ -148,7 +147,7 @@ namespace SEE.Controls.Actions
                 RaycastHit raycastHit;
                 if (Physics.Raycast(ray, out raycastHit))
                 {
-                    if (raycastHit.collider.tag == Tags.Node)
+                    if (raycastHit.collider.tag == DataModel.Tags.Node)
                     {
                         if (from == null)
                         {

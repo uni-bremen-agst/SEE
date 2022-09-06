@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -318,7 +316,7 @@ namespace SEE.Controls.Actions
                 RaycastHit raycastHit;
                 if (Physics.Raycast(ray, out raycastHit))
                 {
-                    if (raycastHit.collider.tag == Tags.Node)
+                    if (raycastHit.collider.tag == DataModel.Tags.Node)
                     {
                         hoveredObject = raycastHit.transform;
                         cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject);
