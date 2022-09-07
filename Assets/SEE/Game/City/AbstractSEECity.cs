@@ -90,15 +90,15 @@ namespace SEE.Game.City
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize, Tooltip("Edge types of hierarchical edges.")]
-        public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes(); // serialized by Odin
+        public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes();
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not and if so, how.
         /// </summary>
-        [OdinSerialize, Tooltip("Visual attributes of nodes.")]
+        [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
         [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
-        public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
+        public NodeTypeVisualsMap NodeTypes = new NodeTypeVisualsMap();
 
         /// <summary>
         /// A mapping of node metric names onto colors.
@@ -289,6 +289,30 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Dumps the content of <see cref="GraphElementIDMap"/>.
+        /// Used for debugging.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Dump Map")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        public void DumpGraphElementIDMap()
+        {
+            GraphElementIDMap.Dump();
+        }
+
+        /// <summary>
+        /// Clears the content of <see cref="GraphElementIDMap"/>.
+        /// Used for debugging.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Clear Map")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
+        public void ClearGraphElementIDMap()
+        {
+            GraphElementIDMap.Clear();
+        }
+
+        /// <summary>
         /// Deletes all game objects that were created for rendering nodes or edges
         /// of the graph or any decoration thereof. More precisely, all transitive descendants of this
         /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed
@@ -355,10 +379,7 @@ namespace SEE.Game.City
         /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
         /// a node type that existed in <see cref="NodeTypes"/> before, that node type's
         /// selection information will be re-used. If <see cref="NodeTypes"/> contains a node
-        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="NodeTypes"/>.
-        ///
-        /// The node types can be retrieved and also be marked as irrelevant later via property
-        /// <see cref="NodeTypes"/>.
+        /// type not contained in <paramref name="graph"/>, a new entry with default values will be added.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void InspectSchema(Graph graph)
@@ -368,20 +389,29 @@ namespace SEE.Game.City
                 /// <see cref="NodeTypes"/> contains the node types of the previously loaded graph.
                 /// Node types in <see cref="NodeTypes"/> not in the graph will disappear
                 /// because we are iterating only over those.
-                Dictionary<string, VisualNodeAttributes> newNodeTypes = new Dictionary<string, VisualNodeAttributes>();
+                //NodeTypeVisualsMap newNodeTypes = new NodeTypeVisualsMap();
+                //foreach (string type in graph.AllNodeTypes())
+                //{
+                //    // preserve existing node types and create new entry for types not yet seen
+                //    if (NodeTypes.TryGetValue(type, out VisualNodeAttributes value))
+                //    {
+                //        newNodeTypes[type] = value;
+                //    }
+                //    else
+                //    {
+                //        newNodeTypes[type] = new VisualNodeAttributes();
+                //    }
+                //}
+                //NodeTypes = newNodeTypes;
+
                 foreach (string type in graph.AllNodeTypes())
                 {
                     // preserve existing node types and create new entry for types not yet seen
-                    if (NodeTypes.TryGetValue(type, out VisualNodeAttributes value))
+                    if (!NodeTypes.TryGetValue(type, out VisualNodeAttributes _))
                     {
-                        newNodeTypes[type] = value;
-                    }
-                    else
-                    {
-                        newNodeTypes[type] = new VisualNodeAttributes(type);
+                        NodeTypes[type] = new VisualNodeAttributes();
                     }
                 }
-                NodeTypes = newNodeTypes;
 
                 // TO BE DECIDED: The following code will list all available metrics.
                 // That may be convenient for a user. However, a GXL file may have
