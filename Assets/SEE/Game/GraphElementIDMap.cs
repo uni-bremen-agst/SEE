@@ -42,6 +42,11 @@ namespace SEE.Game
             }
         }
 
+        /// <summary>
+        /// Emits the <paramref name="ID"/> and all current entries of the map.
+        /// </summary>
+        /// <remarks>Used for debugging when <paramref name="ID"/> cannot be found in the map.</remarks>
+        /// <param name="ID">the ID not found in the map</param>
         private static void DumpError(string ID)
         {
             Debug.LogError($"ID {ID} not found in {nameof(GraphElementIDMap)}.\n");
