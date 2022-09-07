@@ -321,18 +321,35 @@ namespace SEE.Game.City
         /// </summary>
         protected void DeleteGraphGameObjects()
         {
-            // Delete all descendants.
-            // Note: foreach (GameObject child in transform)... would not work;
-            // we really need to collect all descendants first and only then can destroy each.
-            foreach (GameObject descendant in AllDescendantsTaggedBy(gameObject, new string[] { Tags.Node, Tags.Edge, Tags.Decoration }))
+            DestroyTree(gameObject);
+        }
+
+        /// <summary>
+        /// Recurses into the game-object hierarchy rooted by <paramref name="parent"/>
+        /// and destroys everything tagged by <see cref="Tags.Node"/>, <see cref="Tags.Edge"/>,
+        /// or <see cref="Tags.Decoration"/>.
+        /// </summary>
+        /// <param name="parent">root of the game-object hierarchy to be destroyed</param>
+        private static void DestroyTree(GameObject parent)
+        {
+            // We cannot traverse the children and destroy them at the same time.
+            // We first need to collect all children.
+            GameObject[] allChildren = new GameObject[parent.transform.childCount];
+            int i = 0;
+            foreach (Transform child in parent.transform)
             {
-                // descendant may have already been destroyed as part of a prior destruction
-                // of another descendant
-                if (descendant != null)
-                {
-                    descendant.transform.parent = null;
-                    Destroyer.DestroyGameObject(descendant);
-                }
+                allChildren[i] = child.gameObject;
+                i += 1;
+            }
+
+            // Only now we can destroy all children.
+            foreach (GameObject child in allChildren)
+            {
+                DestroyTree(child);
+            }
+            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge) || parent.CompareTag(Tags.Decoration))
+            {
+                Destroyer.DestroyGameObject(parent);
             }
         }
 
@@ -386,24 +403,6 @@ namespace SEE.Game.City
         {
             if (graph != null)
             {
-                /// <see cref="NodeTypes"/> contains the node types of the previously loaded graph.
-                /// Node types in <see cref="NodeTypes"/> not in the graph will disappear
-                /// because we are iterating only over those.
-                //NodeTypeVisualsMap newNodeTypes = new NodeTypeVisualsMap();
-                //foreach (string type in graph.AllNodeTypes())
-                //{
-                //    // preserve existing node types and create new entry for types not yet seen
-                //    if (NodeTypes.TryGetValue(type, out VisualNodeAttributes value))
-                //    {
-                //        newNodeTypes[type] = value;
-                //    }
-                //    else
-                //    {
-                //        newNodeTypes[type] = new VisualNodeAttributes();
-                //    }
-                //}
-                //NodeTypes = newNodeTypes;
-
                 foreach (string type in graph.AllNodeTypes())
                 {
                     // preserve existing node types and create new entry for types not yet seen
@@ -412,24 +411,6 @@ namespace SEE.Game.City
                         NodeTypes[type] = new VisualNodeAttributes();
                     }
                 }
-
-                // TO BE DECIDED: The following code will list all available metrics.
-                // That may be convenient for a user. However, a GXL file may have
-                // hundreds of metrics. And then all would be listed in the inspector.
-                /// Update <see cref="MetricToColor"/>.
-                //ColorMap newMetricToColor = new ColorMap();
-                //foreach (string metric in graph.AllNumericNodeAttributes())
-                //{
-                //    if (MetricToColor.TryGetValue(metric, out Color color))
-                //    {
-                //        newMetricToColor[metric] = color;
-                //    }
-                //    else
-                //    {
-                //        newMetricToColor[metric] = Color.white;
-                //    }
-                //}
-                //MetricToColor = newMetricToColor;
             }
         }
 
