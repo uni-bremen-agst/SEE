@@ -4,6 +4,7 @@ using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using System;
+using DG.Tweening;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
@@ -88,7 +89,7 @@ namespace SEE.Controls
         /// <see cref="NameOfPlayerSettingsGameObject"/> holding a
         /// <see cref="SceneSettings"/> component.
         /// </summary>
-        private void SetInstance()
+        private static void SetInstance()
         {
             // Note: instance = FindObjectOfType<SceneSettings>() would not work
             // because FindObjectOfType does not work when changing scenes.
@@ -151,6 +152,7 @@ namespace SEE.Controls
         /// </summary>
         private void Start()
         {
+            SetDoTweenSettings();
             SetInstance();
             // Turn off VR controller hints if requested in the user settings.
             if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
@@ -169,6 +171,14 @@ namespace SEE.Controls
 #if UNITY_EDITOR
             KeyBindings.PrintBindings();
 #endif
+        }
+
+        /// <summary>
+        /// Sets the DOTween settings for newly created tweens, such as the ease type.
+        /// </summary>
+        private static void SetDoTweenSettings()
+        {
+            DOTween.defaultEaseType = Ease.OutExpo;
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
@@ -102,7 +103,7 @@ namespace SEE.Game
                 {
                     // The new position of the movingNode in world space.
                     Vector3 newPosition = raycastHit.Value.point;
-                    movingObject.transform.position = newPosition;
+                    movingObject.AddOrGetComponent<NodeOperator>().MoveTo(newPosition, 0);
                     PutOn(movingObject.transform, newGameParent);
                     if (movingNode.Parent != newGraphParent)
                     {
@@ -178,16 +179,23 @@ namespace SEE.Game
             {
                 child.SetParent(parent.transform);
             }
+
+            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
             Vector3 oldScale = child.localScale;
             if (scaleDown)
             {
-                child.localScale = new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR);
+                nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
             }
 
             targetXZ ??= child.position.XZ();
+
             float parentRoof = parent.GetRoof();
-            Vector3 targetPosition = new Vector3(targetXZ.Value.x, parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, targetXZ.Value.y);
-            child.position = targetPosition;
+            nodeOperator.MoveYTo(parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, 0);
+            if (targetXZ.HasValue)
+            {
+                nodeOperator.MoveXTo(targetXZ.Value.x, 0);
+                nodeOperator.MoveZTo(targetXZ.Value.y, 0);
+            }
             return oldScale;
         }
 
