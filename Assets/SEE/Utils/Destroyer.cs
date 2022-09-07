@@ -29,6 +29,7 @@ namespace SEE.Utils
                 {
                     GraphElementIDMap.Remove(gameObject);
                 }
+                gameObject.transform.parent = null;
                 // We must use DestroyImmediate when we are in the editor mode.
                 if (Application.isPlaying)
                 {
