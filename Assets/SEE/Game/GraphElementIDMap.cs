@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using SEE.DataModel;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace SEE.Game
             }
             else
             {
-                DumpError(ID);
+                //DumpError(ID);
                 return null;
             }
         }
@@ -51,9 +52,24 @@ namespace SEE.Game
             }
             else
             {
-                foreach (var entry in mapping)
+                Dump();
+            }
+        }
+
+        /// <summary>
+        /// Dumps the content of this map into the console.
+        /// </summary>
+        internal static void Dump()
+        {
+            foreach (var entry in mapping)
+            {
+                if (entry.Value != null)
                 {
                     Debug.Log($"  {entry.Key} => {entry.Value.name}\n");
+                }
+                else
+                {
+                    Debug.LogError($"  {entry.Key} => NULL (The GameObject has been destroyed but you are still trying to access it.)\n");
                 }
             }
         }
@@ -73,7 +89,6 @@ namespace SEE.Game
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
             Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
             mapping.Add(gameObject.name, gameObject);
-            Debug.Log($"{nameof(GraphElementIDMap)}.Add({gameObject.name}).\n");
         }
 
         /// <summary>
@@ -102,7 +117,14 @@ namespace SEE.Game
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
             Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
             mapping.Remove(gameObject.name);
-            Debug.Log($"{nameof(GraphElementIDMap)}.Remove({gameObject.name}).\n");
+        }
+
+        /// <summary>
+        /// Clears the content of this map.
+        /// </summary>
+        internal static void Clear()
+        {
+            mapping.Clear();
         }
     }
 }
