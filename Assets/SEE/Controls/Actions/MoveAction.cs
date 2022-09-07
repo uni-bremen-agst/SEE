@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using JetBrains.Annotations;
-using RootMotion.FinalIK;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
@@ -265,6 +263,11 @@ namespace SEE.Controls.Actions
         private SEEReflexionCity reflexionCity;
 
         /// <summary>
+        /// The Operator of this node.
+        /// </summary>
+        private NodeOperator nodeOperator;
+
+        /// <summary>
         /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
         /// </summary>
         private Edge temporaryMapsTo;
@@ -297,7 +300,7 @@ namespace SEE.Controls.Actions
                 if (moving)
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                    Positioner.Set(hit.HoveredObject, originalPosition);
+                    nodeOperator.MoveTo(originalPosition, 0);
                     hit.InteractableObject.SetGrab(false, true);
                     gizmo.gameObject.SetActive(false);
 
@@ -348,12 +351,9 @@ namespace SEE.Controls.Actions
                             spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
 
-                        if (!hitEdge.connectedSpline.TryGetComponent(out SplineMorphism morphism))
-                        {
-                            morphism = hitEdge.connectedSpline.gameObject.AddComponent<SplineMorphism>();
-                        }
+                        EdgeOperator edgeOperator = hitEdge.connectedSpline.gameObject.AddOrGetComponent<EdgeOperator>();
 
-                        morphism.CreateTween(hitEdge.connectedSpline.Spline, spline, SPLINE_ANIMATION_DURATION).SetEase(Ease.InOutExpo).Play();
+                        edgeOperator.MorphTo(spline, SPLINE_ANIMATION_DURATION);
                     }
 
                     hit.InteractableObject.SetGrab(true, true);
@@ -363,11 +363,17 @@ namespace SEE.Controls.Actions
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
                     originalParent = hit.HoveredObject;
 
+                    nodeOperator = hit.HoveredObject.gameObject.AddOrGetComponent<NodeOperator>();
+
                     // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
                     if (hit.node.Value.IsInImplementation() || hit.node.Value.IsInArchitecture())
                     {
+                        // We need the reflexion city for later.
                         reflexionCity = hit.HoveredObject.gameObject.ContainingCity<SEEReflexionCity>();
-                        reflexionCity.KillNodeTweens(hit.node.Value);
+
+                        // TODO: Instead of just killing animations here with this trick,
+                        //       handle all movement inside the NodeOperator.
+                        nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
                     }
                 }
 
@@ -391,7 +397,8 @@ namespace SEE.Controls.Actions
                     // FIXME: Position is not exact depending on scale. Needs to be reworked.
                     Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
                     ResetHitObjectColor();
-                    Positioner.Set(hit.HoveredObject, newPosition);
+                    nodeOperator.MoveXTo(newPosition.x, 0);
+                    nodeOperator.MoveZTo(newPosition.z, 0);
 
                     Vector3 startPoint = dragStartTransformPosition + dragStartOffset;
                     Vector3 endPoint = hit.HoveredObject.position;
@@ -408,7 +415,7 @@ namespace SEE.Controls.Actions
                             {
                                 // If we are in a reflexion city, we will simply
                                 // trigger the incremental reflexion analysis here.
-                                // That way, the relevant code is in one place (SEEReflexionCity)
+                                // That way, the relevant code is in one place
                                 // and edges will be colored on hover (#451).
                                 temporaryMapsTo = reflexionCity.Analysis.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
                             }
@@ -423,7 +430,7 @@ namespace SEE.Controls.Actions
                             {
                                 // Both are in implementation, so we'll just need to adjust the scaling.
                                 // No need to delete any Maps-To edge, because temporaryMapsTo == null or is deleted.
-                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, targetXZ: hit.HoveredObject.position.XZ(), scaleDown: true);
+                                GameNodeMover.PutOn(hit.HoveredObject, raycastHit.Value.transform.gameObject, scaleDown: true);
                             }
                         }
                     }
@@ -451,14 +458,11 @@ namespace SEE.Controls.Actions
                         {
                             spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position, hit.HoveredObject.transform.position, true, MIN_SPLINE_OFFSET);
                         }
-                        SplineMorphism morphism = hitEdge.connectedSpline.gameObject.GetComponent<SplineMorphism>();
-                        if (morphism.tween.IsActive() && morphism.tween.IsPlaying())
+
+                        if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
                         {
-                            morphism.ChangeTarget(spline);
-                        }
-                        else
-                        {
-                            hitEdge.connectedSpline.Spline = spline;
+                            // Edges should stick to the node and not lag behind, so the duration is set to zero.
+                            edgeOperator.MorphTo(spline, 0);
                         }
                     }
 
