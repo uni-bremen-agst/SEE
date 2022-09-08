@@ -217,10 +217,9 @@ namespace SEE.Game
         /// <param name="addToGraphElementIDMap">if true, all newly created edges will be added
         /// to <see cref="GraphElementIDMap"/></param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout<T>
-            (ICollection<T> gameNodes,
-             ICollection<LayoutGraphEdge<T>> layoutEdges,
-             bool addToGraphElementIDMap)
+        private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes,
+                                                      ICollection<LayoutGraphEdge<T>> layoutEdges,
+                                                      bool addToGraphElementIDMap)
             where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
             IEdgeLayout layout = GetEdgeLayout();
