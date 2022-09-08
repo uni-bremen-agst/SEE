@@ -514,7 +514,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose EdgeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it that is not null</returns>
+        /// component attached to it whose edge is not null</returns>
         public static bool HasEdgeRef(this GameObject gameObject)
         {
             return gameObject.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null;
