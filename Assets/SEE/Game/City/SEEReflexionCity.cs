@@ -232,6 +232,5 @@ namespace SEE.Game.City
         }
 
         #endregion
-
     }
 }

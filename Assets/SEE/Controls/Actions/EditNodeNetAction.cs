@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Net;
 using UnityEngine;
@@ -6,8 +7,8 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This class is responsible for the edit-node process via network from one client 
-    /// to all others and to the server. 
+    /// This class is responsible for the edit-node process via network from one client
+    /// to all others and to the server.
     /// </summary>
     public class EditNodeNetAction : AbstractNetAction
     {
@@ -55,7 +56,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                Node node = GameObject.Find(NodeID)?.GetNode();
+                Node node = GraphElementIDMap.Find(NodeID)?.GetNode();
                 if (node != null)
                 {
                     node.SourceName = SourceName;

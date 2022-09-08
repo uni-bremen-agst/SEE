@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
@@ -42,13 +43,19 @@ namespace SEE.Game
         ///
         /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
         /// </summary>
-        /// <param name="node">leaf node</param>
+        /// <param name="node">node for which to create a game object</param>
+        /// <param name="addToGraphElementIDMap">if true, the resulting game object will be added to
+        /// <see cref="GraphElementIDMap"/></param>
         /// <returns>game object representing given <paramref name="node"/></returns>
-        private GameObject CreateGameNode(Node node)
+        private GameObject CreateGameNode(Node node, bool addToGraphElementIDMap = true)
         {
             NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
+            if (addToGraphElementIDMap)
+            {
+                GraphElementIDMap.Add(result);
+            }
             return result;
         }
 
@@ -100,7 +107,7 @@ namespace SEE.Game
         {
             // We create a new leaf node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject leafNode = CreateGameNode(node);
+            GameObject leafNode = CreateGameNode(node, addToGraphElementIDMap: false);
             gameNode.GetComponent<MeshFilter>().mesh = leafNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.
@@ -125,8 +132,11 @@ namespace SEE.Game
             // you set the .triangles, but not when you set the .vertices:
             //   newMesh.RecalculateBounds();
 
-            // leafNode is no longer needed; we have its mesh that is all we needed.
-            // It can be dismissed.
+            /// leafNode is no longer needed; we have its mesh that is all we needed.
+            /// It can be dismissed.
+            /// We do not use  <see cref="Destroyer.DestroyGameObject"/> because that would also
+            /// remove the node from <see cref="GraphElementIDMap"/> and would also remove the
+            /// incoming and outgoing edges. leafNode was not added <see cref="GraphElementIDMap"/>.
             Object.Destroy(leafNode);
         }
 
@@ -142,7 +152,7 @@ namespace SEE.Game
         {
             // We create a new inner node and then "steal" its mesh.
             Node node = gameNode.GetNode();
-            GameObject innerNode = CreateGameNode(node);
+            GameObject innerNode = CreateGameNode(node, false);
             gameNode.GetComponent<MeshFilter>().mesh = innerNode.GetComponent<MeshFilter>().mesh;
 
             // The original ground position of gameNode.

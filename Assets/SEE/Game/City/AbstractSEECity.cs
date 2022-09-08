@@ -90,15 +90,15 @@ namespace SEE.Game.City
         /// The names of the edge types of hierarchical edges.
         /// </summary>
         [OdinSerialize, Tooltip("Edge types of hierarchical edges.")]
-        public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes(); // serialized by Odin
+        public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes();
 
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not and if so, how.
         /// </summary>
-        [OdinSerialize, Tooltip("Visual attributes of nodes.")]
+        [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
         [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
-        public Dictionary<string, VisualNodeAttributes> NodeTypes = new Dictionary<string, VisualNodeAttributes>();
+        public NodeTypeVisualsMap NodeTypes = new NodeTypeVisualsMap();
 
         /// <summary>
         /// A mapping of node metric names onto colors.
@@ -171,14 +171,40 @@ namespace SEE.Game.City
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
 
         /// <summary>
+        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
+        /// of this game object including its descendants to <see cref="GraphElementIDMap"/>.
+        /// </summary>
+        protected virtual void Awake()
+        {
+            UpdateGraphElementIDMap(gameObject);
+        }
+
+        /// <summary>
         /// Called at game start. Sets up additional components.
         /// </summary>
-        internal virtual void Start()
+        protected virtual void Start()
         {
             if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
             {
                 gameObject.AddComponent<EdgeMeshScheduler>()
                     .Init(EdgeLayoutSettings, EdgeSelectionSettings);
+            }
+        }
+
+        /// <summary>
+        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
+        /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
+        /// </summary>
+        /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
+        protected static void UpdateGraphElementIDMap(GameObject parent)
+        {
+            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
+            {
+                GraphElementIDMap.Add(parent);
+            }
+            foreach (Transform child in parent.transform)
+            {
+                UpdateGraphElementIDMap(child.gameObject);
             }
         }
 
@@ -263,37 +289,88 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Dumps the content of <see cref="GraphElementIDMap"/>.
+        /// Used for debugging.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Dump Map")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        public void DumpGraphElementIDMap()
+        {
+            GraphElementIDMap.Dump();
+        }
+
+        /// <summary>
+        /// Clears the content of <see cref="GraphElementIDMap"/>.
+        /// Used for debugging.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Clear Map")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
+        public void ClearGraphElementIDMap()
+        {
+            GraphElementIDMap.Clear();
+        }
+
+        /// <summary>
         /// Deletes all game objects that were created for rendering nodes or edges
-        /// of the graph or any decoration thereof. More precisely, all children of this
+        /// of the graph or any decoration thereof. More precisely, all transitive descendants of this
         /// game object tagged by Tags.Node, Tags.Edge, or Tags.Decoration are destroyed
         /// (in editor mode or play mode).
-        /// The underlying loaded graph is not deleted.
+        /// The underlying loaded graph is not changed.
         /// </summary>
         protected void DeleteGraphGameObjects()
         {
-            // Delete all children.
-            // Note: foreach (GameObject child in transform)... would not work;
-            // we really need to collect all children first and only then can destroy each.
-            foreach (GameObject child in AllNodesEdgesDecorationChildren())
+            DestroyTree(gameObject);
+        }
+
+        /// <summary>
+        /// Recurses into the game-object hierarchy rooted by <paramref name="parent"/>
+        /// and destroys everything tagged by <see cref="Tags.Node"/>, <see cref="Tags.Edge"/>,
+        /// or <see cref="Tags.Decoration"/>.
+        /// </summary>
+        /// <param name="parent">root of the game-object hierarchy to be destroyed</param>
+        private static void DestroyTree(GameObject parent)
+        {
+            // We cannot traverse the children and destroy them at the same time.
+            // We first need to collect all children.
+            GameObject[] allChildren = new GameObject[parent.transform.childCount];
+            int i = 0;
+            foreach (Transform child in parent.transform)
             {
-                child.transform.parent = null;
-                Destroyer.DestroyGameObject(child);
+                allChildren[i] = child.gameObject;
+                i += 1;
+            }
+
+            // Only now we can destroy all children.
+            foreach (GameObject child in allChildren)
+            {
+                DestroyTree(child);
+            }
+            if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge) || parent.CompareTag(Tags.Decoration))
+            {
+                Destroyer.DestroyGameObject(parent);
             }
         }
 
         /// <summary>
-        /// Returns all immediate children of the game object this SEECity is attached to.
+        /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
+        /// the <paramref name="tags"/>.
         /// </summary>
-        /// <returns>immediate children of the game object this SEECity is attached to</returns>
-        private List<GameObject> AllNodesEdgesDecorationChildren()
+        /// <param name="gameObject">game objects whose descendants are required</param>
+        /// <param name="tags">the list of tags against which to check the descendants</param>
+        /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
+        /// any of the <paramref name="tags"/></returns>
+        private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
         {
             List<GameObject> result = new List<GameObject>();
-            foreach (Transform child in transform)
+            foreach (Transform child in gameObject.transform)
             {
-                if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge) || child.CompareTag(Tags.Decoration))
+                if (tags.Contains(child.tag))
                 {
                     result.Add(child.gameObject);
                 }
+                result.AddRange(AllDescendantsTaggedBy(child.gameObject, tags));
             }
             return result;
         }
@@ -302,21 +379,11 @@ namespace SEE.Game.City
         /// Returns all (transitive) descendants of <paramref name="go"/> that are tagged
         /// by Tags.Node (including <paramref name="go"/> if it is tagged by Tags.Node).
         /// </summary>
-        /// <param name="go">game objects whose node descendants are required</param>
+        /// <param name="go">game object whose node descendants are required</param>
         /// <returns>all node descendants of <paramref name="go"/></returns>
         protected static ICollection<GameObject> AllNodeDescendants(GameObject go)
         {
-            List<GameObject> result = new List<GameObject>();
-            if (go.CompareTag(Tags.Node))
-            {
-                result.Add(go);
-            }
-            foreach (Transform child in go.transform)
-            {
-                ICollection<GameObject> ascendants = AllNodeDescendants(child.gameObject);
-                result.AddRange(ascendants);
-            }
-            return result;
+            return AllDescendantsTaggedBy(go, new string[] { Tags.Node });
         }
 
         /// <summary>
@@ -330,51 +397,21 @@ namespace SEE.Game.City
         /// All new node types are considered relevant initially. If <paramref name="graph"/> contains
         /// a node type that existed in <see cref="NodeTypes"/> before, that node type's
         /// selection information will be re-used. If <see cref="NodeTypes"/> contains a node
-        /// type not contained in <paramref name="graph"/>, it will be removed from <see cref="NodeTypes"/>.
-        ///
-        /// The node types can be retrieved and also be marked as irrelevant later via property
-        /// <see cref="NodeTypes"/>.
+        /// type not contained in <paramref name="graph"/>, a new entry with default values will be added.
         /// </summary>
         /// <param name="graph">graph from which to retrieve the node types (may be null)</param>
         public void InspectSchema(Graph graph)
         {
             if (graph != null)
             {
-                /// <see cref="NodeTypes"/> contains the node types of the previously loaded graph.
-                /// Node types in <see cref="NodeTypes"/> not in the graph will disappear
-                /// because we are iterating only over those.
-                Dictionary<string, VisualNodeAttributes> newNodeTypes = new Dictionary<string, VisualNodeAttributes>();
                 foreach (string type in graph.AllNodeTypes())
                 {
                     // preserve existing node types and create new entry for types not yet seen
-                    if (NodeTypes.TryGetValue(type, out VisualNodeAttributes value))
+                    if (!NodeTypes.TryGetValue(type, out VisualNodeAttributes _))
                     {
-                        newNodeTypes[type] = value;
-                    }
-                    else
-                    {
-                        newNodeTypes[type] = new VisualNodeAttributes(type);
+                        NodeTypes[type] = new VisualNodeAttributes();
                     }
                 }
-                NodeTypes = newNodeTypes;
-
-                // TO BE DECIDED: The following code will list all available metrics.
-                // That may be convenient for a user. However, a GXL file may have
-                // hundreds of metrics. And then all would be listed in the inspector.
-                /// Update <see cref="MetricToColor"/>.
-                //ColorMap newMetricToColor = new ColorMap();
-                //foreach (string metric in graph.AllNumericNodeAttributes())
-                //{
-                //    if (MetricToColor.TryGetValue(metric, out Color color))
-                //    {
-                //        newMetricToColor[metric] = color;
-                //    }
-                //    else
-                //    {
-                //        newMetricToColor[metric] = Color.white;
-                //    }
-                //}
-                //MetricToColor = newMetricToColor;
             }
         }
 

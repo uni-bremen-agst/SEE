@@ -165,8 +165,7 @@ namespace SEE.Game.Operator
             foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
                 // Add new target edge, we'll animate the current edge to it.
-                // FIXME: This should be replaced by GraphElementIDMap.Find(edge.ID) later on.
-                GameObject gameEdge = GameObject.Find(edge.ID);
+                GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
                 if (gameEdge == null)
                 {
                     // TODO: How is this possible?
