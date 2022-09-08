@@ -354,12 +354,13 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns all (transitive) descendants (tagged by <see cref="Tags.Node"/>, <see cref="Tags.Edge"/>
-        /// or <see cref="Tags.Decoration"/)> of <paramref name="gameObject"/>.
+        /// Returns all (transitive) descendants of <paramref name="gameObject"/> tagged by any of
+        /// the <paramref name="tags"/>.
         /// </summary>
         /// <param name="gameObject">game objects whose descendants are required</param>
-        /// <returns>(transitive) descendants (nodes, edges, or decorations) of the game
-        /// object this SEECity is attached to</returns>
+        /// <param name="tags">the list of tags against which to check the descendants</param>
+        /// <returns>(transitive) descendants of the game object this AbstractSEECity is attached to tagged by
+        /// any of the <paramref name="tags"/></returns>
         private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
         {
             List<GameObject> result = new List<GameObject>();
