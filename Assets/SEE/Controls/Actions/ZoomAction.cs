@@ -212,7 +212,9 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Converts zoom steps to an actual zoom factor (scale factor).
+        /// The result is 2^(<paramref name="zoomSteps"/> * <see cref="ZoomState.ZoomFactor"/>).
         /// </summary>
+        /// <remarks>Returns 1 only if <paramref name="zoomSteps"/> equals 0.</remarks>
         /// <param name="zoomSteps">The amount of zoom steps.</param>
         /// <returns>The zoom factor.</returns>
         protected static float ConvertZoomStepsToZoomFactor(float zoomSteps)
