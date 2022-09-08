@@ -510,7 +510,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it that is not null.
+        /// component attached to it whose edge is not null.
         /// </summary>
         /// <param name="gameObject">the game object whose EdgeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
