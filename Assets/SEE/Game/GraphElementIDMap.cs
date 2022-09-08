@@ -100,7 +100,7 @@ namespace SEE.Game
         /// <see cref="Add(GameObject)"/>.
         /// </summary>
         /// <param name="gameObjects">game objects to be added</param>
-        internal static void Add(ICollection<GameObject> gameObjects)
+        internal static void Add(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject gameEdge in gameObjects)
             {
