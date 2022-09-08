@@ -1,6 +1,7 @@
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using static SEE.GO.GameObjectExtensions;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -57,7 +58,7 @@ namespace SEE.Controls.Actions
                     // Zoom into city containing the currently hovered element
                     if (zoomInto)
                     {
-                        CityCursor cursor = rootTransform.parent.GetComponent<CityCursor>();
+                        rootTransform.parent.gameObject.MustGetComponent(out CityCursor cursor);
                         if (cursor.E.HasFocus())
                         {
                             float optimalTargetZoomFactor = clippingPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.currentZoomFactor);
@@ -73,6 +74,8 @@ namespace SEE.Controls.Actions
                             if (zoomSteps != 0)
                             {
                                 float zoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
+                                // Note: zoomFactor will be different from 1 because ConvertZoomStepsToZoomFactor(zoomSteps) yields 1
+                                // only if zoomSteps equals 0, which is excluded because of the if condition.
                                 Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? rootTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
                                 Vector2 toCenterOfTable = clippingPlane.CenterXZ - centerOfTableAfterZoom;
                                 Vector2 zoomCenter = clippingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
@@ -85,7 +88,7 @@ namespace SEE.Controls.Actions
                     // Apply zoom steps towards the city containing the currently hovered element
                     if (zoomTowards)
                     {
-                        int zoomSteps = zoomStepsDelta >= 0 ? Mathf.FloorToInt(zoomStepsDelta) : Mathf.FloorToInt(zoomStepsDelta);
+                        int zoomSteps = Mathf.RoundToInt(zoomStepsDelta);
                         zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
                         zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
                     }
