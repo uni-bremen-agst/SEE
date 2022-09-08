@@ -24,7 +24,7 @@ namespace SEE.DataModel.DG
         /// Name of the artificial node type used for artificial root nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
-        public const string UnknownType = "";
+        public const string UnknownType = "UNKNOWNTYPE";
 
         /// <summary>
         /// Indicates whether the node hierarchy has changed and, hence,

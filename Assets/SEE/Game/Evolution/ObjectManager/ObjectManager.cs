@@ -209,34 +209,43 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                // Find all relevant node objects.
-                List<GameObject> nodeObjecs = new List<GameObject>();
+                // A game edge for this graph edge does not exist yet, hence, we need to create one.
+                // In order to create the requested game edge, the entire edge layout must be calculated.
+                // Yet, this needs to be done only once when we move from one graph to the next one
+                // for the very first graph edge that does not have a game edge. To manage that we put
+                // all recalculated edges into 'edges' and not just the game edge created specifically
+                // for this particular graph edge at hand.
+
+                // Important assumption: The node positions do not change between consecutive calls
+                // to GetEdge() when moving from one graph to the next one.
+
+                // Determine all game nodes.
+                List<GameObject> gameNodes = new List<GameObject>();
                 foreach (Node node in edge.ItsGraph.Nodes())
                 {
-                    GetNode(node, out GameObject no);
-                    nodeObjecs.Add(no);
+                    GetNode(node, out GameObject gameNode);
+                    gameNodes.Add(gameNode);
                 }
 
-                // Create the entire edge layout from the nodes.
-                ICollection<GameObject> edgeObjects = graphRenderer.EdgeLayout(nodeObjecs, city, true);
-
-                // Put all edge objects into the cache and find `gameEdge'.
-                foreach (GameObject edgeObject in edgeObjects)
+                // Create the entire edge layout from the game nodes and
+                // put all game edges into the cache 'edges' (if not already present) and find `gameEdge'.
+                foreach (GameObject newGameEdge in graphRenderer.EdgeLayout(gameNodes, city, false))
                 {
-                    string id = edgeObject.GetComponent<EdgeRef>().Value.ID;
+                    string id = newGameEdge.GetComponent<EdgeRef>().Value.ID;
                     if (edges.ContainsKey(id))
                     {
                         // Edge object has already been created in previous call.
-                        Destroyer.DestroyGameObject(edgeObject);
+                        Destroyer.DestroyGameObject(newGameEdge);
                     }
                     else
                     {
-                        edgeObject.SetActive(false); // Disable renderer
-                        edges.Add(id, edgeObject);
+                        newGameEdge.SetActive(false); // Disable renderer
+                        edges.Add(id, newGameEdge);
+                        GraphElementIDMap.Add(newGameEdge);
                     }
                     if (id == edge.ID)
                     {
-                        gameEdge = edgeObject;
+                        gameEdge = newGameEdge;
                     }
                 }
 
@@ -350,6 +359,14 @@ namespace SEE.Game.Evolution
             return wasNodeRemoved;
         }
 
+        /// <summary>
+        /// Removes the game object representing the given <paramref name="edge"/> by using the ID
+        /// of the <paramref name="edge"/> and returns the removed edge in <paramref name="gameObject"/>, if
+        /// it existed. Returns true if such a game object existed in the cache.
+        /// </summary>
+        /// <param name="edge">edge determining the game object to be removed from the cache</param>
+        /// <param name="gameObject">the corresponding game object that was removed from the cache or null</param>
+        /// <returns>true if a corresponding game object existed and was removed from the cache</returns>
         public bool RemoveEdge(Edge edge, out GameObject gameObject)
         {
             edge.AssertNotNull("edge");

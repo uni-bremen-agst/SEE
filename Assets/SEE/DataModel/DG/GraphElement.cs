@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.Game;
+﻿using System.Collections.Generic;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG

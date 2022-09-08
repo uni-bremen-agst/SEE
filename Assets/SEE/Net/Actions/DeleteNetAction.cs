@@ -42,7 +42,7 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(GameObjectID);
+                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
                     GameElementDeleter.Delete(gameObject);

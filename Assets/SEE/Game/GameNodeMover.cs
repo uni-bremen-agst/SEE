@@ -1,5 +1,4 @@
 ﻿using System;
-using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -93,7 +92,7 @@ namespace SEE.Game
                     ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
                                                                  + "architecture, not the other way around.");
                     return null;
-                } 
+                }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
                 {
                     // We are moving an already mapped node back to its implementation city, so we should unmap it.
@@ -121,7 +120,7 @@ namespace SEE.Game
                 if (movingNode.IsInImplementation())
                 {
                     SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
-                    
+
                     if (movingNode.IsInMapping())
                     {
                         // If the node was already mapped, we'll unmap it again.
@@ -130,7 +129,7 @@ namespace SEE.Game
                     }
 
                     return null;
-                } 
+                }
                 return null;
             }
         }
@@ -144,7 +143,7 @@ namespace SEE.Game
         /// <param name="position">new position</param>
         public static void Reparent(GameObject child, string parentName, Vector3 position)
         {
-            GameObject parent = GameObject.Find(parentName);
+            GameObject parent = GraphElementIDMap.Find(parentName);
             if (parent != null)
             {
                 child.transform.position = position;
@@ -188,7 +187,7 @@ namespace SEE.Game
             {
                 nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
             }
-            
+
             float parentRoof = parent.GetRoof();
             nodeOperator.MoveYTo(parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, 0);
             if (targetXZ.HasValue)

@@ -382,15 +382,17 @@ namespace SEE.Utils
             // FIXME: We need tests for the antenna settings
             //savedCity.LeafNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("leafmetric", Color.white));
             //savedCity.InnerNodeSettings.AntennaSettings.AntennaSections.Add(new AntennaSection("innermetric", Color.black));
-            VisualNodeAttributes function = new VisualNodeAttributes("Function")
+            VisualNodeAttributes function = new VisualNodeAttributes()
             {
                 IsRelevant = true
             };
-            VisualNodeAttributes file = new VisualNodeAttributes("File")
+            VisualNodeAttributes file = new VisualNodeAttributes()
             {
                 IsRelevant = false
             };
-            savedCity.NodeTypes = new Dictionary<string, VisualNodeAttributes>() { { function.NodeType, function }, { file.NodeType, file } };
+            savedCity.NodeTypes = new NodeTypeVisualsMap();
+            savedCity.NodeTypes["Function"] = function;
+            savedCity.NodeTypes["File"] = file;
             savedCity.Save(filename);
 
             // Create a new city with all its default values and then
@@ -973,7 +975,7 @@ namespace SEE.Utils
         {
             city.LODCulling++;
             city.HierarchicalEdges = new HashSet<string>() { "Nonsense", "Whatever" };
-            city.NodeTypes = new Dictionary<string, VisualNodeAttributes>();
+            city.NodeTypes = new NodeTypeVisualsMap();
             city.ConfigurationPath.Set("C:/MyAbsoluteDirectory/config.cfg");
             city.SourceCodeDirectory.Set("C:/MyAbsoluteDirectory");
             city.SolutionPath.Set("C:/MyAbsoluteDirectory/mysolution.sln");
@@ -993,7 +995,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.ScaleOnlyLeafMetrics, actual.ScaleOnlyLeafMetrics);
         }
 
-        private static void AreEquivalent(Dictionary<string, VisualNodeAttributes> expected, Dictionary<string, VisualNodeAttributes> actual)
+        private static void AreEquivalent(NodeTypeVisualsMap expected, NodeTypeVisualsMap actual)
         {
             Assert.AreEqual(expected.Count, actual.Count);
             foreach (var entry in expected)

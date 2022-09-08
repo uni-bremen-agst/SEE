@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions
         {
             if (!IsRequester())
             {
-                GameObject parent = GameObject.Find(ParentID);
+                GameObject parent = GraphElementIDMap.Find(ParentID);
                 if (parent == null)
                 {
                     throw new System.Exception($"There is no node with the ID {ParentID}.");

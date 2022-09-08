@@ -25,12 +25,18 @@
       <attr name="Source.Name">
         <string>inner1</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>inner1</string>
+      </attr>	  
     </node>
     <node id="NY">
       <type xlink:href="Class"/>
       <attr name="Source.Name">
         <string>inner2</string>
       </attr>
+      <attr name="Linkage.Name">
+        <string>inner2</string>
+      </attr>		  
     </node>
     <node id="N6">
       <type xlink:href="Package"/>

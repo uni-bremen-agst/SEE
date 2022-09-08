@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
                 if (cityRootNode)
                 {
                     UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
-                    if (SEEInput.StartDrag() && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
+                    if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
                         rotating = true;
                         hit.CityRootNode = cityRootNode;
