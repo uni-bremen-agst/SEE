@@ -93,7 +93,6 @@ namespace SEE.GO
         /// <summary>
         /// Creates and returns a game object representing <paramref name="layoutGraphEdge"/> where
         /// a <see cref="LineRenderer"/> has been added with default attribute values.
-        /// the default
         /// </summary>
         /// <typeparam name="T">Type of node this edge connects to.</typeparam>
         /// <param name="layoutGraphEdge">the layout edge for which to create a game object</param>
