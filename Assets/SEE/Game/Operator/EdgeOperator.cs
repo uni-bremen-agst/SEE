@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using SEE.GO;
+using SEE.Utils;
 using TinySpline;
 using UnityEngine;
 
@@ -91,7 +92,7 @@ namespace SEE.Game.Operator
                             {
                                 if (s.temporaryGameObject != null)
                                 {
-                                    Destroy(s.temporaryGameObject);
+                                    Destroyer.DestroyGameObject(s.temporaryGameObject);
                                 }
                             }).Play();
                 }

@@ -60,8 +60,7 @@ namespace SEE.Game.City
             // We have to set an initial color for the edges.
             foreach (Edge edge in CityGraph.Edges())
             {
-                // FIXME: This needs to be replaced by GraphElementIDMap.Find(edge.ID).
-                GameObject edgeObject = GameObject.Find(edge.ID);
+                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
                     spline.GradientColors = GetEdgeGradient(edge.State());
@@ -160,12 +159,12 @@ namespace SEE.Game.City
         /// <param name="edgeChange">The event which shall be handled.</param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
-            GameObject edge = GameObject.Find(edgeChange.Edge.ID);
+            GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
             if (edge == null)
             {
                 // If no such edge can be found, the given edge must be propagated
                 string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
-                edge = edgeId != null ? GameObject.Find(edgeId) : null;
+                edge = edgeId != null ? GraphElementIDMap.Find(edgeId) : null;
             }
 
             if (edge != null)
