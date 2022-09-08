@@ -43,7 +43,7 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(ChildObjectID);
+                GameObject gameObject = GraphElementIDMap.Find(ChildObjectID);
                 if (gameObject != null)
                 {
                     GameNodeMover.Reparent(gameObject, ParentObjectID, Position);

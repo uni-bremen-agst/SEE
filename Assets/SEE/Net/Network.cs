@@ -83,20 +83,20 @@ namespace SEE.Net
         /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
         private UNetTransport GetNetworkTransport()
         {
-#if UNITY_EDITOR
-            if (gameObject.TryGetComponentOrLog(out NetworkManager networkManager))
+            // NetworkManager.Singleton is available only during run-time.
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager == null)
             {
-                return networkManager.NetworkConfig.NetworkTransport as UNetTransport;
-            }
-            else
-            {
+                Debug.LogError("NetworkManager.Singleton is null.\n");
                 return null;
             }
-
-#else
-            // NetworkManager.Singleton is available only during run-time.
-            return NetworkManager.Singleton.NetworkConfig.NetworkTransport as UNetTransport;
-#endif
+            NetworkConfig networkConfig = networkManager.NetworkConfig;
+            if (networkConfig == null)
+            {
+                Debug.LogError("NetworkManager.Singleton has no valid NetworkConfig.\n");
+                return null;
+            }
+            return networkConfig.NetworkTransport as UNetTransport;
         }
 
         /// <summary>

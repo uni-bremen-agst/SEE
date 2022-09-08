@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace SEE.Game
 {
     /// <summary>
-    /// Used to recalculate the incoming and outgoing edges of a node, as well as the edges of its children. 
+    /// Used to recalculate the incoming and outgoing edges of a node, as well as the edges of its children.
     /// </summary>
     public static class GameEdgeMover
     {
@@ -111,8 +112,8 @@ namespace SEE.Game
                 // Search for the corresponding GameObjects.
                 foreach (Edge edge in edgesToBeRedrawn)
                 {
-                    GameObject source = GameObject.Find(edge.Source.ID);
-                    GameObject target = GameObject.Find(edge.Target.ID);
+                    GameObject source = GraphElementIDMap.Find(edge.Source.ID);
+                    GameObject target = GraphElementIDMap.Find(edge.Target.ID);
 
                     if (source != null && target != null)
                     {
@@ -157,12 +158,10 @@ namespace SEE.Game
             // Delete all old edges.
             foreach ((GameObject, GameObject, string) element in edges)
             {
-                // FIXME GameObject.Find is an expensive operation.
-                GameObject edgeToBeRedrawn = GameObject.Find(element.Item3);
+                GameObject edgeToBeRedrawn = GraphElementIDMap.Find(element.Item3);
                 // Removes the edge from the graph.
                 GameEdgeAdder.Remove(edgeToBeRedrawn);
-                // Removes the edge game object.
-                Object.Destroy(edgeToBeRedrawn);
+                Destroyer.DestroyGameObject(edgeToBeRedrawn);
             }
             // Create all new edges.
             foreach ((GameObject, GameObject, string) element in edges)
