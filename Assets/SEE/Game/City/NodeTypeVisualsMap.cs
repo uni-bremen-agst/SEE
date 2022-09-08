@@ -54,7 +54,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns all <see cref="VisualNodeAttributes"/> stored in this map.
         /// </summary>
-        public ICollection<VisualNodeAttributes> Values { get => map.Values; }
+        public ICollection<VisualNodeAttributes> Values => map.Values;
 
         /// <summary>
         /// Resets this <see cref="NodeTypeVisualsMap"/> to an empty mapping.
