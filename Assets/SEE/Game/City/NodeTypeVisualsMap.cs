@@ -49,10 +49,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The number of elements in the map.
         /// </summary>
-        public int Count
-        {
-            get => map.Count;
-        }
+        public int Count => map.Count;
 
         /// <summary>
         /// Returns all <see cref="VisualNodeAttributes"/> stored in this map.
