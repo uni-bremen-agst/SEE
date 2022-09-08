@@ -1,5 +1,4 @@
 ﻿using System;
-using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -186,8 +185,6 @@ namespace SEE.Game
             {
                 nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
             }
-
-            targetXZ ??= child.position.XZ();
 
             float parentRoof = parent.GetRoof();
             nodeOperator.MoveYTo(parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, 0);
