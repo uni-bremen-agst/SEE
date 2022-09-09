@@ -552,7 +552,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 74436660}
-  m_LocalRotation: {x: -0.043310538, y: 0.11334796, z: 0.99172777, w: -0.041864377}
+  m_LocalRotation: {x: -0.043310534, y: 0.11334796, z: 0.99172777, w: -0.04186438}
   m_LocalPosition: {x: 0.016968204, y: 0.11095241, z: 0.001984996}
   m_LocalScale: {x: 0.98299956, y: 0.9929998, z: 0.9930001}
   m_Children:
@@ -1238,7 +1238,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 271722674}
-  m_LocalRotation: {x: 0.7958541, y: 0.017692193, z: 0.04643733, w: 0.6034459}
+  m_LocalRotation: {x: 0.795854, y: 0.017692417, z: 0.04643738, w: 0.6034459}
   m_LocalPosition: {x: -0.2998947, y: 0.00000037073818, z: 0.000000017842801}
   m_LocalScale: {x: 0.82675916, y: 0.82675874, z: 0.826759}
   m_Children:
@@ -1895,7 +1895,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 353222182}
-  m_LocalRotation: {x: -0.8142715, y: 0.037790664, z: -0.03325967, w: 0.5782972}
+  m_LocalRotation: {x: -0.8142715, y: 0.03779062, z: -0.03325957, w: 0.5782972}
   m_LocalPosition: {x: -0.2998938, y: -0.00000013835121, z: 0.0000000120892665}
   m_LocalScale: {x: 0.826759, y: 0.826759, z: 0.826759}
   m_Children:
@@ -3120,7 +3120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a487ee49603842638fb6cab3ce6911c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 4502019871543381570, guid: 7988052e71dc86c7f929098312152f15, type: 3}
+  tachometerPrefab: {fileID: 4502019871543381570, guid: 7988052e71dc86c7f929098312152f15, type: 3}
 --- !u!212 &554678974
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12510,7 +12510,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1018132344}
-  m_LocalRotation: {x: 0.06985483, y: -0.07028267, z: 0.0021271703, w: 0.99507594}
+  m_LocalRotation: {x: 0.06985496, y: -0.07028267, z: 0.0021271666, w: 0.99507594}
   m_LocalPosition: {x: -0.44173032, y: 0, z: 0.000000088543594}
   m_LocalScale: {x: 0.9999999, y: 0.9999998, z: 0.99999964}
   m_Children:
@@ -13401,7 +13401,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1089742817}
-  m_LocalRotation: {x: 0.019781506, y: -0.08757731, z: -0.007793946, w: 0.99593085}
+  m_LocalRotation: {x: 0.019781532, y: -0.087577306, z: -0.007793943, w: 0.9959308}
   m_LocalPosition: {x: -0.44173002, y: -0.00000007173158, z: 0.000000029000836}
   m_LocalScale: {x: 0.99999976, y: 0.99999994, z: 0.9999999}
   m_Children:
@@ -13800,7 +13800,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268875404}
-  m_LocalRotation: {x: 0.08640053, y: 0.14152272, z: 0.009556203, w: 0.98611104}
+  m_LocalRotation: {x: 0.08640064, y: 0.14152423, z: 0.009556174, w: 0.9861108}
   m_LocalPosition: {x: -0.26411504, y: -0.0000008867418, z: -0.00000008256315}
   m_LocalScale: {x: 1.0078583, y: 1.0078585, z: 1.0078589}
   m_Children:
@@ -15213,7 +15213,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1362366685}
-  m_LocalRotation: {x: 0.58837867, y: -0.036457162, z: 0.39575356, w: -0.7041737}
+  m_LocalRotation: {x: 0.58837867, y: -0.036457278, z: 0.39575347, w: -0.7041738}
   m_LocalPosition: {x: -0.039707847, y: 0.03904563, z: -0.021918526}
   m_LocalScale: {x: 1.0000004, y: 1.0000002, z: 1}
   m_Children:
@@ -16234,8 +16234,12 @@ MonoBehaviour:
       Entry: 7
       Data: 29|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
-      Entry: 9
-      Data: 3
+      Entry: 7
+      Data: 30|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 3
@@ -16412,7 +16416,7 @@ MonoBehaviour:
       Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 30|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 31|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -16442,11 +16446,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 31|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 32|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 32|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 33|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -16462,11 +16466,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 33|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -16478,11 +16482,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 34|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -16494,11 +16498,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 35|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 36|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 32
+      Data: 33
     - Name: 
       Entry: 12
       Data: 0
@@ -16846,7 +16850,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1567681759}
-  m_LocalRotation: {x: -0.18357235, y: 0.020800624, z: -0.4048511, w: 0.89552456}
+  m_LocalRotation: {x: -0.1835723, y: 0.02080088, z: -0.40485123, w: 0.89552444}
   m_LocalPosition: {x: -0.12266766, y: -0.00007851965, z: 0.000026953752}
   m_LocalScale: {x: 1.0236676, y: 1.0236675, z: 1.0236677}
   m_Children:
@@ -21235,7 +21239,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1998591310}
-  m_LocalRotation: {x: -0.05953055, y: 0.09806171, z: -0.0058329212, w: 0.9933811}
+  m_LocalRotation: {x: -0.059530586, y: 0.09806105, z: -0.005833015, w: 0.9933812}
   m_LocalPosition: {x: -0.26411498, y: 0.0000001941492, z: -0.000000009802646}
   m_LocalScale: {x: 1.0078585, y: 1.0078588, z: 1.0078589}
   m_Children:
@@ -21422,7 +21426,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2042072556}
-  m_LocalRotation: {x: 0.22060165, y: 0.117539465, z: 0.39754653, w: 0.88287944}
+  m_LocalRotation: {x: 0.22060172, y: 0.117539085, z: 0.3975465, w: 0.8828795}
   m_LocalPosition: {x: -0.12266697, y: 0.00007929859, z: 0.000026936787}
   m_LocalScale: {x: 1.0236679, y: 1.0236677, z: 1.0236677}
   m_Children:
@@ -21788,7 +21792,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2141282090}
-  m_LocalRotation: {x: -0.05240061, y: -0.06871384, z: 0.9958986, w: 0.02680676}
+  m_LocalRotation: {x: -0.05240078, y: -0.06871379, z: 0.99589866, w: 0.02680676}
   m_LocalPosition: {x: 0.016968133, y: -0.1109525, z: 0.0019851236}
   m_LocalScale: {x: 0.98299915, y: 0.9929993, z: 0.99299985}
   m_Children:
