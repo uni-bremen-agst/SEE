@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.Metrics;
 using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
@@ -419,6 +420,7 @@ namespace SEE.Game
                     }
                 }
             }
+            GameObject.Find("MetricsBoard").GetComponent<BoardController>().OnGraphLoad();
         }
 
         /// <summary>
