@@ -703,7 +703,7 @@ namespace SEE.Game
                 {
                     GameObject child = childTransform.gameObject;
                     /// If a game node was deleted, it was marked inactive in
-                    /// <see cref="OnRemovedNodeFinishedAnimation"/>. We need to ignore such
+                    /// <see cref="OnRemoveFinishedAnimation"/>. We need to ignore such
                     /// game nodes.
                     if (child.activeInHierarchy && child.CompareTag(Tags.Node))
                     {
@@ -746,7 +746,7 @@ namespace SEE.Game
 
             UpdateGameNodeHierarchy();
             RenderPlane();
-            DestroyDeletedNodes();
+            DestroyDeletedGraphElements();
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -922,18 +922,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The list of game nodes that were removed from the current graph to the next
+        /// The list of game nodes and edges that were removed from the current graph to the next
         /// graph. They will need to be destroyed at the end of phase 1 (or at the beginning
         /// of phase 2, respectively).
-        /// <seealso cref="DestroyDeletedNodes"/>.
+        /// <seealso cref="DestroyDeletedGraphElements"/>.
         /// </summary>
         private IList<GameObject> toBeDestroyed = new List<GameObject>();
 
         /// <summary>
-        /// Destroys all game nodes in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
+        /// Destroys all game nodes and edges in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
         /// will be cleared at the end.
         /// </summary>
-        private void DestroyDeletedNodes()
+        private void DestroyDeletedGraphElements()
         {
             foreach (GameObject gameObject in toBeDestroyed)
             {
@@ -948,7 +948,7 @@ namespace SEE.Game
         /// removed has been finished.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed</param>
-        private void OnRemovedNodeFinishedAnimation(object gameObject)
+        private void OnRemoveFinishedAnimation(object gameObject)
         {
             GameObject go = gameObject as GameObject;
             /// The gameObject must not be destroyed immediately, because the animator still
@@ -1028,7 +1028,7 @@ namespace SEE.Game
                         child.SetParent(null);
                     }
                 }
-                Destroy(go);
+                Destroyer.DestroyGameObject(go);
             }
         }
 
@@ -1040,16 +1040,11 @@ namespace SEE.Game
         /// <param name="node">leaf node to be removed</param>
         private void RenderRemovedNode(Node node)
         {
-            if (objectManager.RemoveNode(node, out GameObject block))
+            if (objectManager.RemoveNode(node, out GameObject nodeObject))
             {
-                Assert.IsNotNull(block);
-                block.transform.SetParent(null);
-                /// if the node needs to be removed, mark it dead and let it raise to <see cref="SkyLevel"/>
-                marker.MarkDead(block);
-                Vector3 newPosition = block.transform.position;
-                newPosition.y = SkyLevel;
-                ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveAnimator.AnimateTo(block, nodeTransform, OnRemovedNodeFinishedAnimation);
+                Assert.IsNotNull(nodeObject);
+                marker.MarkDead(nodeObject);
+                AnimateToDeath(nodeObject);
             }
             else
             {
@@ -1057,27 +1052,32 @@ namespace SEE.Game
             }
         }
 
-        /// <summary>
-        /// Rendes given <paramref name="edge"/>.
-        /// </summary>
-        /// <param name="edge">edge to be rendered</param>
-        /// FOR ANIMATION: protected virtual void RenderEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
+        private void AnimateToDeath(GameObject gameObject)
+        {
+            gameObject.transform.SetParent(null);
+            /// Let it raise to <see cref="SkyLevel"/>.
+            Vector3 newPosition = gameObject.transform.position;
+            newPosition.y = SkyLevel;
+            ILayoutNode nodeTransform = new AnimationNode(newPosition, gameObject.transform.localScale);
+            moveAnimator.AnimateTo(gameObject, nodeTransform, OnRemoveFinishedAnimation);
+        }
 
         /// <summary>
-        /// Removes the given edge. The edge is not destroyed, however.
+        /// Removes the given edge. The edge is not destroyed immediately, however.
+        /// Its destruction is postponed to <see cref="toBeDestroyed"/>. Yet, it is
+        /// set inactive here.
         /// </summary>
-        /// <param name="edge"></param>
+        /// <param name="edge">removed edge</param>
         private void RenderRemovedEdge(Edge edge)
         {
-            if (edgesAreDrawn)
+            if (edgesAreDrawn && objectManager.RemoveEdge(edge, out GameObject edgeObject))
             {
-                objectManager.GetEdge(edge, out GameObject edgeObject);
-                edgeObject.SetActive(false);
+                AnimateToDeath(edgeObject);
             }
-            phase1AnimationWatchDog.Finished();
+            else
+            {
+                phase1AnimationWatchDog.Finished();
+            }
         }
 
         // **********************************************************************

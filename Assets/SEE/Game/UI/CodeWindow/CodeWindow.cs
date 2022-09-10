@@ -262,7 +262,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             if (attachTo == null)
             {
-                attachTo = GameObject.Find(valueObject.AttachedTo);
+                attachTo = GraphElementIDMap.Find(valueObject.AttachedTo);
                 if (attachTo == null)
                 {
                     throw new InvalidOperationException($"GameObject with name {valueObject} could not be found.\n");

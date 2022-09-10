@@ -120,8 +120,9 @@ namespace SEE.Game.City
         /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
         /// nodes saved in the underlying GXL file.
         /// </summary>
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             LoadData();
             loadedGraph = VisualizedSubGraph;
             if (loadedGraph != null)

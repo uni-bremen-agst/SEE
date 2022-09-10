@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game.City;
 
 namespace SEE.Net
 {
@@ -164,9 +163,13 @@ namespace SEE.Net
         /// <param name="connection">The established connection.</param>
         private static void OnConnectionEstablished(Connection connection)
         {
+            UnityEngine.Assertions.Assert.IsNotNull(connection);
+            UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo);
+            UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo.LocalEndPoint);
             bool connectionListenerInitialized = false;
             foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
             {
+                UnityEngine.Assertions.Assert.IsNotNull(connectionListener);
                 if (connectionListener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint))
                 {
                     connectionListenerInitialized = true;

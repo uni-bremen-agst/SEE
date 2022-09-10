@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using SEE.DataModel.DG;
-using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -221,7 +219,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="newPosition">The new position the last control point of this spline should have</param>
         public void UpdateEndPosition(Vector3 newPosition) => UpdateControlPoint(spline.NumControlPoints - 1, newPosition);
-        
+
         /// <summary>
         /// Changes the first control point of the spline represented by this object to <paramref name="newPosition"/>.
         /// </summary>

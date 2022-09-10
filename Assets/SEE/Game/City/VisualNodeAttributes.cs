@@ -16,30 +16,6 @@ namespace SEE.Game.City
     public class VisualNodeAttributes : VisualAttributes
     {
         /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="typeName">name of the node type for which these settings are intended</param>
-        public VisualNodeAttributes(string typeName)
-        {
-            NodeType = typeName;
-        }
-
-        public VisualNodeAttributes()
-        {
-            NodeType = "A Node Type";
-        }
-
-        /// <summary>
-        /// The name of the node type that is specified. See <see cref="NodeType"/>.
-        /// </summary>
-        [SerializeField, HideInInspector]
-        private string nodeType = string.Empty;
-        /// <summary>
-        /// The name of the node type that is specified.
-        /// </summary>
-        [HideInInspector]
-        public string NodeType { get => nodeType; private set => nodeType = value; }
-        /// <summary>
         /// If true, the node should be rendered. Otherwise the node will be ignored when
         /// the graph is loaded.
         /// </summary>
@@ -62,7 +38,7 @@ namespace SEE.Game.City
         /// node representations. More complex shapes may offer additional lengths.
         /// </summary>
         [Tooltip("Maps metric names onto lengths of the shape."), HideReferenceObjectPicker]
-        [NonSerialized, OdinSerialize]
+        [OdinSerialize]
         public IList<string> MetricToLength = new List<string>() { DefaultLengthMetricValue, DefaultLengthMetricValue, DefaultLengthMetricValue };
 
         /// <summary>
@@ -183,7 +159,6 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(NodeType, NodeTypeLabel);
             writer.Save(Shape.ToString(), NodeShapeLabel);
             writer.Save(IsRelevant, IsRelevantLabel);
             writer.Save(MetricToLength, MetricToLengthLabel);
@@ -219,7 +194,6 @@ namespace SEE.Game.City
         /// <param name="values">dictionary of attributes from which to retrieve the settings</param>
         internal virtual void Restore(Dictionary<string, object> values)
         {
-            ConfigIO.Restore(values, NodeTypeLabel, ref nodeType);
             ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
             ConfigIO.Restore(values, IsRelevantLabel, ref IsRelevant);
             ConfigIO.RestoreStringList(values, MetricToLengthLabel, ref MetricToLength);
@@ -232,10 +206,6 @@ namespace SEE.Game.City
             ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
         }
 
-        /// <summary>
-        /// Label in the configuration file for <see cref="NodeType"/>.
-        /// </summary>
-        private const string NodeTypeLabel = "NodeType";
         /// <summary>
         /// Label in the configuration file for <see cref="Shape"/>.
         /// </summary>
