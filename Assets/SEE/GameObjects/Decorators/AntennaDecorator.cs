@@ -83,7 +83,7 @@ namespace SEE.GO.Decorators
             // The world-space scale of the segment to be added in the current iteration.
             // We will adjust only the y component of it for each iteration based on
             // segment's metric.
-            Vector3 segmentScale = new Vector3(antennaAttributes.AntennaWidth, 0, antennaAttributes.AntennaWidth);
+            Vector3 segmentScale = GetSegmentScale(gameNode);
 
             foreach (string metricName in antennaAttributes.AntennaSections)
             {
@@ -117,6 +117,15 @@ namespace SEE.GO.Decorators
                     antenna.transform.localScale = Vector3.one;
                 }
                 segment.transform.SetParent(antenna.transform);
+            }
+
+            // returns an antenna scale such that the antenna fits on the gameNode.
+            Vector3 GetSegmentScale(GameObject gameNode)
+            {
+                Vector3 scale = gameNode.transform.lossyScale;
+                float width = Mathf.Min(antennaAttributes.AntennaWidth,
+                                        Mathf.Min(scale.x, scale.z));
+                return new Vector3(width, 0, width);
             }
         }
 

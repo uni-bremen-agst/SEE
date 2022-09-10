@@ -265,7 +265,7 @@ namespace SEE.Game.City
         /// Loads all graphs, calculates their layouts, and displays the first graph in the
         /// graph series.
         /// </summary>
-        override internal void Start()
+        override protected void Start()
         {
             Reset();
             base.Start();

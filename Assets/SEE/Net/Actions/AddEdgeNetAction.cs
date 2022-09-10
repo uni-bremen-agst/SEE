@@ -32,9 +32,9 @@ namespace SEE.Net
         /// <param name="edgeType">The type of the edge</param>
         public AddEdgeNetAction(string fromId, string toId, string edgeType)
         {
-            this.FromId = fromId;
-            this.ToId = toId;
-            this.EdgeType = edgeType;
+            FromId = fromId;
+            ToId = toId;
+            EdgeType = edgeType;
         }
 
         /// <summary>
@@ -52,10 +52,10 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                GameObject fromGO = GameObject.Find(FromId);
+                GameObject fromGO = GraphElementIDMap.Find(FromId);
                 if (fromGO)
                 {
-                    GameObject toGO = GameObject.Find(ToId);
+                    GameObject toGO = GraphElementIDMap.Find(ToId);
                     if (toGO)
                     {
                         GameEdgeAdder.Add(fromGO, toGO, EdgeType);
