@@ -89,7 +89,7 @@ namespace SEE.Controls.Actions
         private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
         private const float MIN_SPLINE_OFFSET = 0.05f;
         private const float SPLINE_ANIMATION_DURATION = 0.5f;
-        private const bool FOLLOW_RAYCAST_HIT = true;
+        private const bool FOLLOW_RAYCAST_HIT = false;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
