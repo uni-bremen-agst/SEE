@@ -44,8 +44,6 @@ namespace SEE.Controls.Actions
                     foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                     {
                         GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
-                        // FIXME: Assertion is violated after reflexion mapping. Perhaps the temporary edge
-                        //        isn't deleted correctly.
                         Assert.IsNotNull(gameEdge);
                         if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
                         {
