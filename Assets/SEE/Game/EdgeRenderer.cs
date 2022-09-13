@@ -18,7 +18,7 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
-        public GameObject DrawEdge(Edge edge, GameObject from = null, GameObject to = null)
+        public GameObject DrawEdge(Edge edge, GameObject from = null, GameObject to = null, bool addToGraphElementIDMap = true)
         {
             from ??= edge.Source.RetrieveGameNode();
             to ??= edge.Target.RetrieveGameNode();
@@ -68,7 +68,7 @@ namespace SEE.Game
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
                 { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
             // Calculate the edge layout (for the single edge only).
-            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges, true);
+            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges, addToGraphElementIDMap);
             GameObject resultingEdge = edges.First();
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
@@ -125,7 +125,7 @@ namespace SEE.Game
                 fromNode.ItsGraph.AddEdge(edge);
             }
 
-            return DrawEdge(edge, from, to);
+            return DrawEdge(edge, from, to, existingEdge == null);
         }
 
         /// <summary>
@@ -172,8 +172,8 @@ namespace SEE.Game
         /// added to <see cref="GraphElementIDMap"/></param>
         /// <returns>all game objects created to represent the edges; may be empty</returns>
         private ICollection<GameObject> EdgeLayout(ICollection<LayoutGameNode> gameNodes,
-                                        GameObject parent,
-                                        bool addToGraphElementIDMap)
+                                                   GameObject parent,
+                                                   bool addToGraphElementIDMap)
         {
             ICollection<GameObject> result = EdgeLayout(gameNodes, ConnectingEdges(gameNodes), addToGraphElementIDMap);
             AddToParent(result, parent);
@@ -240,6 +240,7 @@ namespace SEE.Game
             {
                 GraphElementIDMap.Add(result);
             }
+
             InteractionDecorator.PrepareForInteraction(result);
             AddLOD(result);
 
