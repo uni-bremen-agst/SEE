@@ -7,7 +7,8 @@ namespace SEE.Utils
 {
     /// <summary>
     /// Android does not allow to simply store files in a file system.
-    /// This class provides a way to read data from a JAR file
+    /// This class provides a way to read data from a JAR file instead.
+    /// It is intended for Android.
     /// </summary>
     public static class WebRequests
     {
