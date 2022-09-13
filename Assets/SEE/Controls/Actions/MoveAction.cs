@@ -44,6 +44,8 @@ namespace SEE.Controls.Actions
                     foreach (Edge edge in node.Value.Incomings.Union(node.Value.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                     {
                         GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                        // FIXME: Assertion is violated after reflexion mapping. Perhaps the temporary edge
+                        //        isn't deleted correctly.
                         Assert.IsNotNull(gameEdge);
                         if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
                         {
@@ -84,10 +86,12 @@ namespace SEE.Controls.Actions
         /// The number of degrees in a full circle.
         /// </summary>
         private const float FullCircleDegree = 360.0f;
+
         private const float SnapStepCount = 8;
         private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
         private const float MIN_SPLINE_OFFSET = 0.05f;
         private const float SPLINE_ANIMATION_DURATION = 0.5f;
+        private const bool FOLLOW_RAYCAST_HIT = true;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
 
@@ -158,6 +162,7 @@ namespace SEE.Controls.Actions
             /// The transform of the game object that was moved.
             /// </summary>
             internal Transform GameObject;
+
             /// <summary>
             /// The parent of <see cref="GameObject"/> at the time before it was moved.
             /// This will be used to restore the original parent upon <see cref="Undo"/>.
@@ -327,7 +332,7 @@ namespace SEE.Controls.Actions
             else if (SEEInput.Drag()) // start or continue moving a grabbed object
             {
                 if (!moving && hoveredObject
-                    && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint))
+                            && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint))
                 {
                     // start movement of the grabbed object
                     moving = true;
@@ -395,7 +400,7 @@ namespace SEE.Controls.Actions
                     RaycastLowestNode(out RaycastHit? raycastHit, out Node newParentNode, hit.node);
                     // TODO: Adjust for snapping
                     // FIXME: Position is not exact depending on scale. Needs to be reworked.
-                    Vector3 newPosition = dragStartTransformPosition + totalDragOffsetFromStart;
+                    Vector3 newPosition = FOLLOW_RAYCAST_HIT && raycastHit?.point != null ? raycastHit.Value.point : dragStartTransformPosition + totalDragOffsetFromStart;
                     ResetHitObjectColor();
                     nodeOperator.MoveXTo(newPosition.x, 0);
                     nodeOperator.MoveZTo(newPosition.z, 0);
@@ -485,26 +490,41 @@ namespace SEE.Controls.Actions
             }
             else if (moving)
             {
+                InteractableObject interactableObjectToBeUngrabbed = hit.InteractableObject;
                 // No canceling, no dragging, no reset, but still moving =>  finalize movement
                 if (hit.HoveredObject != hit.CityRootNode) // only reparent non-root nodes
                 {
                     Vector3 originalPosition = dragStartTransformPosition + dragStartOffset
                                                - Vector3.Scale(dragCanonicalOffset, hit.HoveredObject.localScale);
-                    GameObject parent = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, originalPosition);
-                    if (parent != null)
+                    bool movementAllowed = GameNodeMover.FinalizePosition(hit.HoveredObject.gameObject, out GameObject parent);
+                    if (movementAllowed)
                     {
-                        // The node has been re-parented.
-                        new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
-                        memento.SetNewParent(parent);
-                    }
+                        if (parent != null)
+                        {
+                            // The node has been re-parented.
+                            new ReparentNetAction(hit.HoveredObject.gameObject.name, parent.name, hit.HoveredObject.position).Execute();
+                            memento.SetNewParent(parent);
+                        }
 
-                    memento.SetNewPosition(hit.HoveredObject.position);
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
+                        memento.SetNewPosition(hit.HoveredObject.position);
+                        currentState = ReversibleAction.Progress.Completed;
+                        result = true;
+                    }
+                    else
+                    {
+                        // An attempt was made to move the hovered object illegally.
+                        // We need to reset it to its original position. And then we start from scratch.
+                        nodeOperator.MoveTo(originalPosition, 0);
+                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
+                        // The following assignment will override hit.interactableObject; that is why we
+                        // stored its value in interactableObjectToBeUngrabbed above.
+                        hit = new Hit();
+                    }
 
                     synchronize = false; // false because we just called the necessary network action ReparentNetAction() or MoveNodeNetAction, respectively.
                 }
-                hit.InteractableObject?.SetGrab(false, true);
+
+                interactableObjectToBeUngrabbed.SetGrab(false, true);
                 gizmo.gameObject.SetActive(false);
                 ResetHitObjectColor();
                 moving = false;
