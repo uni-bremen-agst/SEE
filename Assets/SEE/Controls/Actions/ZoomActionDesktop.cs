@@ -10,6 +10,8 @@ namespace SEE.Controls.Actions
     /// Zoom actions holding data about zooming into or out of the city
     /// for a Desktop environment.
     /// </summary>
+    /// <remarks>This component is attached to a desktop player in the respective
+    /// desktop player prefab.</remarks>
     public class ZoomActionDesktop : ZoomAction
     {
         /// <summary>
@@ -17,14 +19,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Update()
         {
+            // Whether the user presses a keyboard shortcut to zoom into the city.
             bool zoomInto = SEEInput.ZoomInto();
+            // Alternatively, the user can select the mouse wheel for zooming.
             float zoomStepsDelta = Input.mouseScrollDelta.y;
+            // Whether zooming per mouse wheel was requested.
             bool zoomTowards = Mathf.Abs(zoomStepsDelta) >= 1.0f;
 
             if (!zoomInto && !zoomTowards)
             {
                 return;
             }
+
             InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
 
             // If we don't hover over any part of a city, we can't initiate any zooming related action
@@ -55,7 +61,8 @@ namespace SEE.Controls.Actions
                 {
                     ZoomState zoomState = GetZoomStateCopy(rootTransform);
 
-                    // Zoom into city containing the currently hovered element
+                    // Zoom into city containing the currently hovered element upon the
+                    // request of SEEInput.ZoomInto().
                     if (zoomInto)
                     {
                         rootTransform.parent.gameObject.MustGetComponent(out CityCursor cursor);
@@ -86,6 +93,7 @@ namespace SEE.Controls.Actions
                     }
 
                     // Apply zoom steps towards the city containing the currently hovered element
+                    // as requested per mouse wheel.
                     if (zoomTowards)
                     {
                         int zoomSteps = Mathf.RoundToInt(zoomStepsDelta);
