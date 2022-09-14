@@ -142,8 +142,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void FixedUpdate()
         {
-            // FIXME: This allocation happens in a fixed frame rate. This looks expensive.
-            Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
+            // This loop iterates over all code cities. Because there will be only a few
+            // code cities in a scene, the number of iterations per fixed update is low.
+            // We will never remove a code city from rootTransformToZoomStates because
+            // a user might want to reset its scale to the original one.
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
                 // The root node of the current code city to be zoomed.
@@ -200,9 +202,7 @@ namespace SEE.Controls.Actions
                         transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
                     }
                 }
-                newDict[transform] = zoomState;
             }
-            rootTransformToZoomStates = newDict;
         }
 
         /// <summary>
