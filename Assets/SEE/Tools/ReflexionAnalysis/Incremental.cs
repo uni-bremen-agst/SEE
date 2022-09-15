@@ -45,7 +45,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, to));
-            Edge edge = AddEdge(from, to, type);
+            Edge edge = AddEdge(from, to, type, false);
             Notify(new EdgeEvent(edge, ChangeType.Addition, Implementation));
             PropagateAndLiftDependency(edge);
             return edge;
@@ -141,7 +141,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInArchitecture(),
                           () => new NotInSubgraphException(Architecture, to));
             AssertNotRedundant(from, to, type);
-            Edge edge = AddEdge(from, to, type);
+            Edge edge = AddEdge(from, to, type, true);
             SetState(edge, State.Specified);
             Notify(new EdgeEvent(edge, ChangeType.Addition, Architecture));
 

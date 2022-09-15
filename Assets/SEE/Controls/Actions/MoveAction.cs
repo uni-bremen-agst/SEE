@@ -56,27 +56,27 @@ namespace SEE.Controls.Actions
             /// The root of the code city. This is the top-most game object representing a node,
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
-            internal Transform CityRootNode;
+            internal readonly Transform CityRootNode;
 
             /// <summary>
             /// The game object currently being hovered over. It is a descendant of <see cref="CityRootNode"/>
             /// or <see cref="CityRootNode"/> itself.
             /// </summary>
-            internal Transform HoveredObject;
+            internal readonly Transform HoveredObject;
 
             /// <summary>
             /// The interactable component attached to <see cref="HoveredObject"/>.
             /// </summary>
-            internal InteractableObject InteractableObject;
+            internal readonly InteractableObject InteractableObject;
 
             /// <summary>
             /// Map from connected edges represented as <see cref="SEESpline"/>s to a boolean
             /// representing whether <see cref="node"/> is the source for this edge (otherwise, it's the target).
             /// </summary>
-            internal IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
+            internal readonly IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
 
-            internal Plane Plane;
-            internal NodeRef node;
+            internal readonly Plane Plane;
+            internal readonly NodeRef node;
         }
 
         /// <summary>
