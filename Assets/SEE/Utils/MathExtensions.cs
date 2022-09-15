@@ -16,7 +16,7 @@ namespace SEE.Utils
         /// Returns the angle of <paramref name="a"/> in range [-180, 180) in degrees. The
         /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
         /// to be clockwise.
-        /// 
+        ///
         ///              -90
         ///            _  _  _
         ///         -'    |    '-
@@ -29,7 +29,7 @@ namespace SEE.Utils
         ///  ^           90
         ///  |
         ///  +---> x
-        /// 
+        ///
         /// </summary>
         /// <param name="a">The vector of which the angle is to be determined.</param>
         /// <returns>The angle of given vector.</returns>
@@ -39,7 +39,7 @@ namespace SEE.Utils
         /// Returns the angle of <paramref name="a"/> in range [0, 360) in degrees. The
         /// rotation starts with vector (1.0f, 0.0f) at an angle of zero and is assumed
         /// to be clockwise.
-        /// 
+        ///
         ///              270
         ///            _  _  _
         ///         -'    |    '-
@@ -52,7 +52,7 @@ namespace SEE.Utils
         ///  ^           90
         ///  |
         ///  +---> x
-        /// 
+        ///
         /// </summary>
         /// <param name="a">The vector of which the angle is to be determined.</param>
         /// <returns>The angle of given vector.</returns>
@@ -157,7 +157,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="a">The vector.</param>
         /// <returns>The floored vector.</returns>
-        public static Vector3Int FloorToInt(this Vector3 a) => 
+        public static Vector3Int FloorToInt(this Vector3 a) =>
             new Vector3Int(Mathf.FloorToInt(a.x), Mathf.FloorToInt(a.y), Mathf.FloorToInt(a.z));
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace SEE.Utils
         /// the AABB are returned. If the circle lies inside of the AABB, the distance is
         /// negative. If the circle just touches the surface of the AABB, the distance
         /// and the magnitude of the normal are zero.
-        /// 
+        ///
         /// This method uses the idea of the minkowski sum to convert a collision test
         /// between a circle and an AABB into a test with a single point against four
         /// circles and two rectangles.
@@ -320,16 +320,30 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the given <paramref name="vector3"/>, replacing any of its components with
         /// <paramref name="x"/>, <paramref name="y"/>, and/or <paramref name="z"/>, respectively, if they were given.
-        /// If no parameter are given, this method will be equivalent to the identity function.
+        /// If no parameters are given, this method will be equivalent to the identity function.
         /// </summary>
         /// <param name="vector3">The vector whose components shall be replaced</param>
         /// <param name="x">New X component</param>
         /// <param name="y">New Y component</param>
         /// <param name="z">New Z component</param>
-        /// <returns></returns>
+        /// <returns><paramref name="vector2"/> with its components replaced</returns>
         public static Vector3 WithXYZ(this Vector3 vector3, float? x = null, float? y = null, float? z = null)
         {
             return new Vector3(x ?? vector3.x, y ?? vector3.y, z ?? vector3.z);
+        }
+
+        /// <summary>
+        /// Returns the given <paramref name="vector2"/>, replacing any of its components with
+        /// <paramref name="x"/>, and/or <paramref name="y"/> respectively, if they were given.
+        /// If no parameters are given, this method will be equivalent to the identity function.
+        /// </summary>
+        /// <param name="vector2">The vector whose components shall be replaced</param>
+        /// <param name="x">New X component</param>
+        /// <param name="y">New Y component</param>
+        /// <returns><paramref name="vector2"/> with its components replaced</returns>
+        public static Vector2 WithXY(this Vector2 vector2, float? x = null, float? y = null)
+        {
+            return new Vector2(x ?? vector2.x, y ?? vector2.y);
         }
 
         /// <summary>

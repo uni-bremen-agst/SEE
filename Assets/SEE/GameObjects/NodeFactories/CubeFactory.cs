@@ -59,8 +59,7 @@ namespace SEE.GO.NodeFactories
             const float d = -extent; // down
             const float u =  extent; // up
 
-            Vector3[] vertices = new Vector3[24]
-            {
+            Vector3[] vertices = {
                 // back rectangle
                 /*  0 */ new Vector3(r, d,  b),
                 /*  1 */ new Vector3(l, d,  b),
@@ -98,8 +97,7 @@ namespace SEE.GO.NodeFactories
                 /* 23 */ new Vector3(r, d, b),
             };
 
-            Vector3[] normals = new Vector3[24]
-            {
+            Vector3[] normals = {
                 /*  0 */ new Vector3(0.0f, 0.0f, 1.0f),
                 /*  1 */ new Vector3(0.0f, 0.0f, 1.0f),
                 /*  2 */ new Vector3(0.0f, 0.0f, 1.0f),

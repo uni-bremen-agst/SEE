@@ -3,7 +3,10 @@ using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
+using TinySpline;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace SEE.Game.Operator
 {
@@ -174,13 +177,19 @@ namespace SEE.Game.Operator
 
                 GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
                 GameObject target = edge.Target == node ? gameObject : edge.Target.RetrieveGameNode();
+                // NOTE: newEdge will not be added to the GraphElementIDMap.
                 GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
 
                 EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                if (newEdge.TryGetComponentOrLog(out SEESpline newSpline))
-                {
-                    edgeOperator.MorphTo(newSpline, duration);
-                }
+                newEdge.MustGetComponent(out SEESpline newSpline);
+                BSpline targetSpline = newSpline.Spline;
+
+                // NOTE: We *must not* use the Destroyer class here. newEdge hasn't been added to the GraphElementIDMap,
+                //       and newEdge.name == gameEdge.name, so it would delete the original gameEdge from the map.
+                // TODO: Instead of this work around, there should be a way to work on BSpline's alone, without
+                //       having to use SEESpline as a wrapper.
+                Destroy(newEdge);
+                edgeOperator.MorphTo(targetSpline, duration);
             }
 
             // Once we're done, we reset the gameObject to its original position.
