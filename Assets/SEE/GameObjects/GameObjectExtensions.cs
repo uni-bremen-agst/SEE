@@ -358,18 +358,21 @@ namespace SEE.GO
                 return gameObject.transform.lossyScale;
             }
         }
-        
+
         /// <summary>
-        /// Returns true if this <paramref name="block"/> is within the edges of <paramref name="parentBlock"/>.
+        /// Returns true if this <paramref name="block"/> is within the spatial area of <paramref name="parentBlock"/>,
+        /// that is, if the bounding box of <paramref name="block"/> plus the extra padding <paramref name="outerEdgeMargin"/>
+        /// is fully contained in the bounding box of <paramref name="parentBlock"/>.
+        ///
         /// Note that this only checks on the XZ-plane, and ignores any height difference between the two blocks.
         /// </summary>
-        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s edges
+        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s area
         /// </param>
-        /// <param name="parentBlock">The block whose edges shall be checked</param>
-        /// <param name="outerEdgeMargin">Additional margins that should be added inward the edges</param>
-        /// <returns>True if this <paramref name="block"/> is within the edges of <paramref name="parentBlock"/>
+        /// <param name="parentBlock">The block whose area shall be checked</param>
+        /// <param name="outerEdgeMargin">Additional margins that should be added inward the area </param>
+        /// <returns>True if this <paramref name="block"/> is within the area of <paramref name="parentBlock"/>
         /// </returns>
-        public static bool IsInEdges(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
+        public static bool IsInArea(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
         {
             // FIXME: Support node types other than cubes
             block.MustGetComponent(out Collider collider);

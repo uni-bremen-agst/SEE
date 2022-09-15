@@ -85,7 +85,7 @@ namespace SEE.Game
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
 
-                if (movingObject.IsInEdges(newGameParent, OUTER_EDGE_MARGIN))
+                if (movingObject.IsInArea(newGameParent, OUTER_EDGE_MARGIN))
                 {
                     ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer edges of other nodes!", log: false);
                     parent = null;
