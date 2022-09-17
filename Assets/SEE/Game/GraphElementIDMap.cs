@@ -1,6 +1,8 @@
 ﻿using SEE.GO;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -18,7 +20,7 @@ namespace SEE.Game
         ///
         /// Invariant: mapping[gameObject.name] = gameObject
         /// </summary>
-        private static IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
+        internal static IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
 
         /// <summary>
         /// Returns the game object with the given <paramref name="ID"/> or null if there is

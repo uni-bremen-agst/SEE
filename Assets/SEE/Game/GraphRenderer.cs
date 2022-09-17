@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.Metrics;
+using SEE.Game.HolisticMetrics;
 using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
@@ -23,6 +23,9 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
+        private readonly CanvasController _metricsCanvasController =
+            GameObject.Find("MetricsCanvas").GetComponent<CanvasController>();
+        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -420,7 +423,7 @@ namespace SEE.Game
                     }
                 }
             }
-            GameObject.Find("MetricsBoard").GetComponent<BoardController>().OnGraphLoad();
+            _metricsCanvasController.OnGraphLoad();
         }
 
         /// <summary>
