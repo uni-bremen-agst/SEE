@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
             int totalNodes = 0;
             float totalLines = 0.0f;
 
-            foreach (GameObject node in GraphElementIDMap.mapping.Values)
+            foreach (GameObject node in GraphElementIDMap.MappingForHolisticMetrics.Values)
             {
                 if (!node.tag.Equals(Tags.Node))
                     continue;
