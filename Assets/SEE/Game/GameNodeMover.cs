@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -25,6 +26,8 @@ namespace SEE.Game
         /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
         /// </summary>
         public const float SCALING_FACTOR = 0.2f;
+
+        private const float OUTER_EDGE_MARGIN = 0.03f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
@@ -58,16 +61,18 @@ namespace SEE.Game
         /// associated with the target parent and <paramref name="movingObject"/> becomes
         /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
         /// must be in sync). That target node is returned.
-        ///
+        /// 
         /// If no such target node can be identified, neither the graph-node hierarchy
         /// nor the game-node hierarchy will be changed and null will be returned.
-        ///
+        /// 
         /// The assumption is that <paramref name="movingObject"/> is not the root node
         /// of a code city.
         /// </summary>
         /// <param name="movingObject">the object being moved</param>
-        /// <returns>the game object that is the new parent or null</returns>
-        public static GameObject FinalizePosition(GameObject movingObject, Vector3 oldPosition)
+        /// <param name="parent">Will be set to the new parent of <paramref name="movingObject"/> (may be null)</param>
+        /// <returns>Whether the movement shall be actually implemented.
+        /// Will be false if, e.g., the movement was illegal—in such a case, the movement must be cancelled.</returns>
+        public static bool FinalizePosition(GameObject movingObject, out GameObject parent)
         {
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
@@ -79,17 +84,25 @@ namespace SEE.Game
             {
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
+
+                if (movingObject.IsInArea(newGameParent, OUTER_EDGE_MARGIN))
+                {
+                    ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer edges of other nodes!", log: false);
+                    parent = null;
+                    return false;
+                }
+
                 if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
                 {
                     // Reflexion analysis already done in MoveAction
                     // TODO: Make sure this action is still reversible
-                    return newGameParent;
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
                 {
                     ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
-                                                                 + "architecture, not the other way around.");
-                    return null;
+                                                                 + "architecture, not the other way around.", log: false);
+                    parent = null;
+                    return false;
                 }
                 else if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
                 {
@@ -103,18 +116,20 @@ namespace SEE.Game
                     // The new position of the movingNode in world space.
                     Vector3 newPosition = raycastHit.Value.point;
                     movingObject.AddOrGetComponent<NodeOperator>().MoveTo(newPosition, 0);
-                    PutOn(movingObject.transform, newGameParent);
                     if (movingNode.Parent != newGraphParent)
                     {
                         movingNode.Reparent(newGraphParent);
                         movingObject.transform.SetParent(newGameParent.transform);
                     }
                 }
-                return newGameParent;
+
+                parent = newGameParent;
+                return true;
             }
             else
             {
                 // Attempt to move the node outside of any node in the node hierarchy.
+                parent = null;
                 if (movingNode.IsInImplementation())
                 {
                     SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
@@ -125,10 +140,9 @@ namespace SEE.Game
                         Reflexion analysis = reflexionCity.Analysis;
                         analysis.DeleteFromMapping(movingNode);
                     }
-
-                    return null;
                 }
-                return null;
+
+                return true;
             }
         }
 
@@ -172,7 +186,7 @@ namespace SEE.Game
         /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
         /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
         public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, float topPadding = 0,
-                                 bool setParent = true, bool scaleDown = false)
+                                    bool setParent = true, bool scaleDown = false)
         {
             if (setParent)
             {
@@ -193,6 +207,7 @@ namespace SEE.Game
                 nodeOperator.MoveXTo(targetXZ.Value.x, 0);
                 nodeOperator.MoveZTo(targetXZ.Value.y, 0);
             }
+
             return oldScale;
         }
 
