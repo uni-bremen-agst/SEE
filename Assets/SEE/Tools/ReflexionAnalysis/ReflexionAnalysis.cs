@@ -1141,8 +1141,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="from">the source of the edge</param>
         /// <param name="to">the target of the edge</param>
         /// <param name="itsType">the type of the edge</param>
+        /// <param name="isVirtual">whether the new edge should be drawn in the scene</param>
         /// <returns>the new edge</returns>
-        private Edge AddEdge(Node from, Node to, string itsType)
+        private Edge AddEdge(Node from, Node to, string itsType, bool isVirtual)
         {
             // Note: a propagated edge between the same two architectural entities may be specified as well;
             // hence, we may have multiple edges in between.
@@ -1162,6 +1163,11 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
                 result.SetInArchitecture();
+            }
+
+            if (isVirtual)
+            {
+                result.SetToggle(Edge.IsVirtualToggle);
             }
 
             FullGraph.AddEdge(result);
@@ -1207,7 +1213,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(alreadyPropagated == null, () => new AlreadyPropagatedException(alreadyPropagated, originatingEdge));
 
             const int counter = 1;
-            Edge propagatedArchitectureDep = AddEdge(archSource, archTarget, edgeType);
+            Edge propagatedArchitectureDep = AddEdge(archSource, archTarget, edgeType, true);
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
             propagationTable[propagatedArchitectureDep.ID] = originatingEdge;

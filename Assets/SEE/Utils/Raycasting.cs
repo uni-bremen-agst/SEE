@@ -211,10 +211,13 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Raycasts against the given plane.
+        /// Raycasts against the given <paramref name="plane"/>. If the plane is hit, <paramref name="hit"/>
+        /// contains the co-ordinates of the location where the raycast hit the <paramref name="plane"/>
+        /// and <c>true</c> is returned. If the plane is not hit, <c>false</c> is returned and <paramref name="hit"/>
+        /// will be <see cref="Vector3.positiveInfinity"/>.
         /// </summary>
         /// <param name="plane">The plane to raycast against.</param>
-        /// <param name="hit">The hit point of the plane or <see cref="Vector3.positiveInfinity"/>,
+        /// <param name="hit">The hit point on the plane or <see cref="Vector3.positiveInfinity"/>,
         /// if ray and plane are parallel.</param>
         /// <returns>Whether the plane was hit.</returns>
         public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)

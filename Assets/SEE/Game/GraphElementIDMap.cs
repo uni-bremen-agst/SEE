@@ -20,7 +20,7 @@ namespace SEE.Game
         ///
         /// Invariant: mapping[gameObject.name] = gameObject
         /// </summary>
-        internal static IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
+        private static readonly IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
 
         /// <summary>
         /// Returns the game object with the given <paramref name="ID"/> or null if there is
@@ -107,6 +107,32 @@ namespace SEE.Game
             foreach (GameObject gameEdge in gameObjects)
             {
                 Add(gameEdge);
+            }
+        }
+
+        /// <summary>
+        /// Adds <paramref name="gameObject"/> to the mapping where <paramref name="gameObject.name"/>
+        /// is used as key, removing any game object present in the mapping under the same name.
+        ///
+        /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
+        /// </summary>
+        /// <param name="gameObject">game object to be added</param>
+        internal static void Update(GameObject gameObject)
+        {
+            Remove(gameObject);
+            Add(gameObject);
+        }
+
+        /// <summary>
+        /// Adds all <paramref name="gameObjects"/> to the mapping, removing those which were already present,
+        /// using <see cref="Update(GameObject)"/>.
+        /// </summary>
+        /// <param name="gameObjects">game objects to be updated</param>
+        internal static void Update(IEnumerable<GameObject> gameObjects)
+        {
+            foreach (GameObject gameObject in gameObjects)
+            {
+                Update(gameObject);
             }
         }
 

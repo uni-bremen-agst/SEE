@@ -61,6 +61,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 Implementation => "Implementation",
                 Architecture => "Architecture",
+                None => null,
                 Mapping => null, // identified by edges' nodes
                 FullReflexion => null, // simply the whole graph
                 _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
