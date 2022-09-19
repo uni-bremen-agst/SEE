@@ -12,7 +12,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         {
             HashSet<string> nodeTypes = new HashSet<string>();
             
-            foreach (GameObject graphElement in GraphElementIDMap.MappingForHolisticMetrics.Values)
+            foreach (GameObject graphElement in GraphElements)
             {
                 if (!graphElement.tag.Equals(Tags.Node))
                     continue;
@@ -21,11 +21,6 @@ namespace SEE.Game.HolisticMetrics.Metrics
             }
             
             WidgetController.Display(nodeTypes.Count, "Number of node types");
-            Debug.Log("Nodetypes: ");
-            foreach (string nodeType in nodeTypes)
-            {
-                Debug.Log(nodeType);
-            }
         }
     }
 }

@@ -7,6 +7,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     {
         /// <summary>
         /// This method displays a given value on the widget this WidgetController is attached to.
+        /// TODO: Write a definition here for every possible type instead of making this generic.
         /// </summary>
         /// <param name="value">
         /// The value that you wish to display.
