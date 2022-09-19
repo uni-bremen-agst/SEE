@@ -10,10 +10,10 @@ namespace SEE.Game.HolisticMetrics
     /// </summary>
     public class RangeValue
     {
-        public (float, float) Range;
-        public float Value;
+        public readonly (float, float) Range;
+        public readonly float Value;
 
-        public RangeValue(float value, float rangeLower = 0f, float rangeHigher = 1000f)
+        public RangeValue(float value, float rangeLower, float rangeHigher)
         {
             Value = value;
             Range = (rangeLower, rangeHigher);

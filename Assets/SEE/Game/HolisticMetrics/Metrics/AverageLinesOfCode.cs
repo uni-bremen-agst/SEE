@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
             int totalNodes = 0;
             float totalLines = 0.0f;
 
-            foreach (GameObject node in GraphElementIDMap.MappingForHolisticMetrics.Values)
+            foreach (GameObject node in GraphElements)
             {
                 if (!node.tag.Equals(Tags.Node))
                     continue;
@@ -29,7 +29,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             if (totalNodes != 0)
             {
-                RangeValue value = new RangeValue(totalLines / totalNodes);
+                RangeValue value = new RangeValue(totalLines / totalNodes, 0f, 1000f);
                 WidgetController.Display(value, "Average lines of code");
             }
         }
