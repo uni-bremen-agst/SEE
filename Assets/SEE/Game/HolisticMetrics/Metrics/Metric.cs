@@ -8,6 +8,10 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// </summary>
     public abstract class Metric : MonoBehaviour
     {
+        /// <summary>
+        /// The WidgetController that should be attached to the same widget that this Metric is attached to. Use this to
+        /// display your metric's value.
+        /// </summary>
         protected WidgetController WidgetController;
         
         /// <summary>
