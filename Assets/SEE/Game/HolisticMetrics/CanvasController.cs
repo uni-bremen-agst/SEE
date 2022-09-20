@@ -23,6 +23,9 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         public void OnGraphLoad()
         {
+            // Before iterating through the list, ensure no metric is null.
+            _metrics.RemoveAll(metric => metric is null);
+            
             foreach (Metric metric in _metrics)
             {
                 metric.Refresh();

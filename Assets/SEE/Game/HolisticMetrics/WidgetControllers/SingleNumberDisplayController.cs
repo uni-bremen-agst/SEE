@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,34 +9,31 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         [SerializeField] private Text valueText;
         [SerializeField] private Text titleText;
 
-        private static readonly HashSet<Type> NumericTypes = new HashSet<Type>(){
-            typeof(ushort),
-            typeof(uint),
-            typeof(ulong),
-            typeof(short),
-            typeof(int),
-            typeof(long),
-            typeof(decimal),
-            typeof(double),
-            typeof(float)
-        };
+        public override void Display(RangeValue value, string title) => Display(value.Value, title);
 
-        public override void Display<T>(T value, string title)
+        public override void Display(ushort value, string title) => Display((long)value, title);
+        
+        public override void Display(uint value, string title) => Display((long)value, title);
+        
+        public override void Display(ulong value, string title) => Display((long)value, title);
+        
+        public override void Display(short value, string title) => Display((long)value, title);
+        
+        public override void Display(int value, string title) => Display((long)value, title);
+
+        public override void Display(long value, string title)
         {
-            if (NumericTypes.Contains(typeof(T)))
-            {
-                valueText.text = value.ToString();
-            }
-            else if (typeof(T) == typeof(RangeValue))
-            {
-                RangeValue castedValue = value as RangeValue;
-                valueText.text = castedValue!.Value.ToString(CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                throw new ArgumentException($"This widget is not compatible with the data type {typeof(T)}");
-            }
-            
+            valueText.text = value.ToString();
+            titleText.text = title;
+        }
+        
+        public override void Display(float value, string title) => Display((decimal)value, title);
+        
+        public override void Display(double value, string title) => Display((long)value, title);
+
+        public override void Display(decimal value, string title)
+        {
+            valueText.text = value.ToString("0.##", CultureInfo.InvariantCulture);
             titleText.text = title;
         }
     }
