@@ -45,7 +45,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Debug.LogWarning("Widgets should be added to the scene as children of the MetricsCanvas.");
                 
                 // Now we try to find the CanvasController by searching the entire scene for the MetricsCanvas.
-                canvasController = GameObject.Find("enemy").GetComponent<CanvasController>();
+                canvasController = GameObject.Find("MetricsCanvas").GetComponent<CanvasController>();
             }
             canvasController.Register(this);
             WidgetController = transform.GetComponent<WidgetController>();

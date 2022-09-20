@@ -5,19 +5,54 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
     public abstract class WidgetController : MonoBehaviour
     {
-        /// <summary>
-        /// This method displays a given value on the widget this WidgetController is attached to.
-        /// TODO: Write a definition here for every possible type instead of making this generic.
-        /// </summary>
-        /// <param name="value">
-        /// The value that you wish to display.
-        /// </param>
-        /// <param name="title">The name of this metric, this will appear somewhere near the widget.</param>
-        /// <typeparam name="T">This just exists to accept any given value type.</typeparam>
-        /// <exception cref="ArgumentException">
-        /// Thrown when this method does not contain an implementation for the type of data passed in the parameter
-        /// "value".
-        /// </exception>
-        public abstract void Display<T>(T value, string title);
+        public virtual void Display(RangeValue value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+
+        public virtual void Display(ushort value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(uint value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(ulong value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(short value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(int value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(long value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+
+        public virtual void Display(float value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+
+        public virtual void Display(double value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
+        
+        public virtual void Display(decimal value, string title)
+        {
+            throw new ArgumentException("This widget is not compatible with the given data type.");
+        }
     }
 }
