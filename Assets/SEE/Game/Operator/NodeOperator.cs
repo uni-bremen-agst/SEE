@@ -68,10 +68,11 @@ namespace SEE.Game.Operator
         /// <param name="newXPosition">the desired new target X coordinate</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MoveXTo(float newXPosition, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> MoveXTo(float newXPosition, float duration)
         {
-            PositionX.AnimateTo(newXPosition, duration);
             updateEdgeLayoutDuration = duration;
+            return PositionX.AnimateTo(newXPosition, duration);
         }
 
         /// <summary>
@@ -80,10 +81,11 @@ namespace SEE.Game.Operator
         /// <param name="newYPosition">the desired new target Y coordinate</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MoveYTo(float newYPosition, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> MoveYTo(float newYPosition, float duration)
         {
-            PositionY.AnimateTo(newYPosition, duration);
             updateEdgeLayoutDuration = duration;
+            return PositionY.AnimateTo(newYPosition, duration);
         }
 
         /// <summary>
@@ -92,10 +94,11 @@ namespace SEE.Game.Operator
         /// <param name="newZPosition">the desired new target Z coordinate</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MoveZTo(float newZPosition, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> MoveZTo(float newZPosition, float duration)
         {
-            PositionZ.AnimateTo(newZPosition, duration);
             updateEdgeLayoutDuration = duration;
+            return PositionZ.AnimateTo(newZPosition, duration);
         }
 
         /// <summary>
@@ -104,12 +107,16 @@ namespace SEE.Game.Operator
         /// <param name="newPosition">the desired new target position</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MoveTo(Vector3 newPosition, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration)
         {
-            PositionX.AnimateTo(newPosition.x, duration);
-            PositionY.AnimateTo(newPosition.y, duration);
-            PositionZ.AnimateTo(newPosition.z, duration);
             updateEdgeLayoutDuration = duration;
+            return new AndCombinedOperationCallback<TweenCallback>(new[]
+            {
+                PositionX.AnimateTo(newPosition.x, duration),
+                PositionY.AnimateTo(newPosition.y, duration),
+                PositionZ.AnimateTo(newPosition.z, duration)
+            }, a => new TweenCallback(a));
         }
 
         /// <summary>
@@ -118,10 +125,11 @@ namespace SEE.Game.Operator
         /// <param name="newScale">the desired new target scale</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void ScaleTo(Vector3 newScale, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> ScaleTo(Vector3 newScale, float duration)
         {
-            Scale.AnimateTo(newScale, duration);
             updateEdgeLayoutDuration = duration;
+            return Scale.AnimateTo(newScale, duration);
         }
 
         /// <summary>
@@ -200,15 +208,15 @@ namespace SEE.Game.Operator
         private void OnEnable()
         {
             Vector3 currentPosition = transform.position;
-            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
-            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
-            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
+            Tween AnimateToXAction(float x, float d) => transform.DOMoveX(x, d).Play();
+            Tween AnimateToYAction(float y, float d) => transform.DOMoveY(y, d).Play();
+            Tween AnimateToZAction(float z, float d) => transform.DOMoveZ(z, d).Play();
             PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
 
             Vector3 currentScale = transform.localScale;
-            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
+            Tween AnimateToScaleAction(Vector3 s, float d) => transform.DOScale(s, d).Play();
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
         }
 
