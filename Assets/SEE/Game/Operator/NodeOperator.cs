@@ -3,7 +3,6 @@ using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using TinySpline;
 using UnityEngine;
 using Object = UnityEngine.Object;
