@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions
         private const float SnapStepCount = 8;
         private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
         private const float MIN_SPLINE_OFFSET = 0.05f;
-        private const float SPLINE_ANIMATION_DURATION = 0.5f;
+        private const float SPLINE_ANIMATION_DURATION = 2f;
         private const bool FOLLOW_RAYCAST_HIT = false;
 
         private static readonly MoveGizmo gizmo = MoveGizmo.Create();
@@ -101,6 +101,8 @@ namespace SEE.Controls.Actions
         private Vector3 dragStartTransformPosition = Vector3.positiveInfinity;
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
         private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
+
+        private Vector3 originalScale = Vector3.one;
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
@@ -365,6 +367,7 @@ namespace SEE.Controls.Actions
                     dragStartOffset = planeHitPoint - hit.HoveredObject.position;
                     dragCanonicalOffset = dragStartOffset.DividePairwise(hit.HoveredObject.localScale);
                     originalParent = hit.HoveredObject;
+                    originalScale = hit.HoveredObject.localScale;
 
                     nodeOperator = hit.HoveredObject.gameObject.AddOrGetComponent<NodeOperator>();
 
@@ -523,8 +526,13 @@ namespace SEE.Controls.Actions
                     {
                         // An attempt was made to move the hovered object illegally.
                         // We need to reset it to its original position. And then we start from scratch.
-                        nodeOperator.MoveTo(originalPosition, 0);
-                        new MoveNodeNetAction(hit.HoveredObject.name, hit.HoveredObject.position).Execute();
+                        // TODO: Instead of manually restoring the position like this, we can maybe use the memento
+                        //       or ReversibleActions for resetting.
+                        hit.HoveredObject.SetParent(originalParent);
+                        nodeOperator.ScaleTo(originalScale, 1f);
+                        nodeOperator.MoveTo(originalPosition, 1f);
+                        
+                        new MoveNodeNetAction(hit.HoveredObject.name, originalPosition).Execute();
                         // The following assignment will override hit.interactableObject; that is why we
                         // stored its value in interactableObjectToBeUngrabbed above.
                         hit = new Hit();
