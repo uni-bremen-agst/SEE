@@ -48,7 +48,12 @@ namespace SEE.Game.City
         /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
         /// </summary>
-        private const float ANIMATION_DURATION = 5f;
+        private const float ANIMATION_DURATION = 2f;
+
+        /// <summary>
+        /// Percentage by which the starting color of an edge differs to its end color.
+        /// </summary>
+        private const float EDGE_GRADIENT_FACTOR = 0.7f;
 
         /// <summary>
         /// A queue of <see cref="ChangeEvent"/>s which were received from the analysis, but not yet handled.
@@ -104,14 +109,14 @@ namespace SEE.Game.City
             state switch
             {
                 State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, 0.9f)),
-                State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
-                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, 0.5f)),
+                State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.ImplicitlyAllowed => (Color.green, Color.white),
                 State.AllowedAbsent => (Color.green, Color.white),
                 State.Allowed => (Color.green, Color.white),
-                State.Divergent => (Color.magenta, Color.Lerp(Color.magenta, Color.black, 0.5f)),
-                State.Absent => (Color.red, Color.Lerp(Color.red, Color.black, 0.5f)),
-                State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, 0.5f)),
+                State.Divergent => (Color.magenta, Color.Lerp(Color.magenta, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Absent => (Color.red, Color.Lerp(Color.red, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, EDGE_GRADIENT_FACTOR)),
                 _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state!")
             };
 
@@ -213,7 +218,7 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been removed.</param>
         private void HandleRemovedMapping(Edge mapsToEdge)
         {
-            ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.");
+            ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.", duration: 3f);
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
             implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
@@ -226,7 +231,7 @@ namespace SEE.Game.City
         private void HandleNewMapping(Edge mapsToEdge)
         {
             ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
-                                                        + $"onto '{mapsToEdge.Target.ToShortString()}'.");
+                                                        + $"onto '{mapsToEdge.Target.ToShortString()}'.", duration: 3f);
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);
 
@@ -271,7 +276,7 @@ namespace SEE.Game.City
         /// <param name="propagatedEdgeEvent">The event which shall be handled.</param>
         private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
         {
-            // FIXME: Handle event
+            // Since this is an internal event, there is nothing to be done.
         }
     }
 }
