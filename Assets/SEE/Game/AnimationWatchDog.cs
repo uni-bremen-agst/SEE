@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Game.Evolution;
-using System;
+﻿using SEE.Game.Evolution;
 
 namespace SEE.Game
 {
@@ -10,14 +8,8 @@ namespace SEE.Game
         /// A watchdog for outstanding animations whose completion needs to be awaited
         /// until a particular method can be triggered.
         /// </summary>
-        private abstract class AnimationWatchDog
+        private abstract class AnimationWatchDog : CountingJoin
         {
-            /// <summary>
-            /// The number of outstanding animations that need to be awaited before
-            /// a particular method can be called.
-            /// </summary>
-            protected int outstandingAnimations;
-
             /// <summary>
             /// The <see cref="EvolutionRenderer"/> whose method should be called
             /// when there are no more outstanding animations.
@@ -35,25 +27,8 @@ namespace SEE.Game
             public AnimationWatchDog(EvolutionRenderer evolutionRenderer)
             {
                 this.evolutionRenderer = evolutionRenderer;
-                outstandingAnimations = 0;
-            }
 
-            /// <summary>
-            /// Sets the <paramref name="numberOfAnimations"/> to be waited for until the
-            /// particular method should be called.
-            /// </summary>
-            /// <param name="numberOfAnimations">the number of animations to be awaited</param>
-            public void Await(int numberOfAnimations)
-            {
-                outstandingAnimations = numberOfAnimations;
             }
-
-            /// <summary>
-            /// Signals this <see cref="AnimationWatchDog"/> that one animation has been completed.
-            /// If there are no more other animations to be awaited, the particular method will be
-            /// called. That method depends upon the concrete subclass.
-            /// </summary>
-            public abstract void Finished();
         }
 
         /// <summary>
@@ -89,21 +64,15 @@ namespace SEE.Game
             public void Await(int numberOfAnimations, LaidOutGraph next)
             {
                 Await(numberOfAnimations);
-                this.next = next;
             }
 
             /// <summary>
-            /// Signals this <see cref="Phase1AnimationWatchDog"/> that one animation has been completed.
             /// If there are no more other animations to be awaited, <see cref="Phase2AddNewAndExistingGraphElements"/>
             /// will be called.
             /// </summary>
-            public override void Finished()
+            protected override void Continue()
             {
-                outstandingAnimations--;
-                if (outstandingAnimations == 0)
-                {
-                    evolutionRenderer.Phase2AddNewAndExistingGraphElements(next);
-                }
+                evolutionRenderer.Phase2AddNewAndExistingGraphElements(next);
             }
 
             /// <summary>
@@ -115,8 +84,8 @@ namespace SEE.Game
             /// <param name="next">the next graph to be shown</param>
             public void Skip(LaidOutGraph next)
             {
-                outstandingAnimations = 0;
-                evolutionRenderer.Phase2AddNewAndExistingGraphElements(next);
+                this.next = next;
+                Skip();
             }
         }
 
@@ -141,17 +110,12 @@ namespace SEE.Game
             { }
 
             /// <summary>
-            /// Signals this <see cref="Phase2AnimationWatchDog"/> that one animation has been completed.
             /// If there are no more other animations to be awaited, <see cref="OnAnimationsFinished"/>
             /// will be called.
             /// </summary>
-            public override void Finished()
+            protected override void Continue()
             {
-                outstandingAnimations--;
-                if (outstandingAnimations == 0)
-                {
-                    evolutionRenderer.OnAnimationsFinished();
-                }
+                evolutionRenderer.OnAnimationsFinished();
             }
         }
     }
