@@ -5,8 +5,8 @@ using System.Linq;
 namespace SEE.Game.Operator
 {
     /// <summary>
-    /// Will fire each respective callback when every one of the passed in callbacks has fired the corresponding event.
-    /// Hence, this can be seen as an AND-linked set of callbacks.
+    /// Will fire a callback when every callback that has been passed in has fired the
+    /// corresponding event. Hence, this can be seen as an AND-linked set of callbacks.
     /// </summary>
     /// <typeparam name="C">the type of the callback of each operation</typeparam>
     public class AndCombinedOperationCallback<C> : IOperationCallback<Action> where C : MulticastDelegate
