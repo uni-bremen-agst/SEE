@@ -10,13 +10,22 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         [SerializeField] private Text text;
         [SerializeField] private Text title;
 
-        public override void Display(RangeValue value, string titleText)
+        public override void Display(MetricValue metricValue)
         {
-            title.text = titleText;
-            text.text = value.Value.ToString("0.##", CultureInfo.InvariantCulture);
-            float maximum = value.Range.Item2 - value.Range.Item1;
-            float actual = value.Value - value.Range.Item1;
-            circle.fillAmount = actual / maximum;
+            if (metricValue.GetType() == typeof(MetricValueRange))
+            {
+                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
+                title.text = metricValueRange.Name;
+                text.text = metricValueRange.Value.ToString("0.##", CultureInfo.InvariantCulture);
+                float maximum = metricValueRange.Higher - metricValueRange.Lower;
+                float actual = metricValueRange.Value - metricValueRange.Lower;
+                circle.fillAmount = actual / maximum;    
+            }
+            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            {
+                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
+                Display(metricValueCollection.MetricValues[0]);
+            }
         }
     }
 }

@@ -25,8 +25,14 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 }
             }
 
-            RangeValue rangeValue = new RangeValue(totalDensity / totalNodes, 0f, 1f);
-            WidgetController.Display(rangeValue, "Average comment density");
+            MetricValueRange metricValueRange = new MetricValueRange()
+            {
+                Name = "Average comment density",
+                Value = totalDensity / totalNodes,
+                Lower = 0f,
+                Higher = 1f
+            };
+            WidgetController.Display(metricValueRange);
         }
     }
 }

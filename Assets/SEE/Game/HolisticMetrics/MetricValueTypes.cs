@@ -2,21 +2,41 @@
 // here, but bear in mind that you will also need to add an implementation for this type in each widget that is
 // supposed to be compatible with the new type.
 
+using System.Collections.Generic;
+
 namespace SEE.Game.HolisticMetrics
 {
-    /// <summary>
-    /// Depending on which widget is supposed to display the average lines of code metric, simply passing the float
-    /// value to the widget's Display() method is not enough. Some widgets also need to know the range.
-    /// </summary>
-    public class RangeValue
+    public class MetricValue
     {
-        public readonly (float, float) Range;
-        public readonly float Value;
+        /// <summary>
+        /// The name of the metric.
+        /// </summary>
+        public string Name;
+    }
 
-        public RangeValue(float value, float rangeLower, float rangeHigher)
-        {
-            Value = value;
-            Range = (rangeLower, rangeHigher);
-        }
+    /// <summary>
+    /// Represents one concrete value of a metric.
+    /// </summary>
+    public class MetricValueRange : MetricValue
+    {
+        /// <summary>
+        /// The worst possible value for this metric.
+        /// </summary>
+        public float Lower;
+        
+        /// <summary>
+        /// The best possible value for this metric.
+        /// </summary>
+        public float Higher;
+        
+        /// <summary>
+        /// The concrete value.
+        /// </summary>
+        public float Value;
+    }
+    
+    public class MetricValueCollection : MetricValue
+    {
+        public List<MetricValue> MetricValues;
     }
 }
