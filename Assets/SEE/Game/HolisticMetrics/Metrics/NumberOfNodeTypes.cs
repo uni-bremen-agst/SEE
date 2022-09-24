@@ -19,8 +19,14 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Node node = graphElement.GetComponent<NodeRef>().Value;
                 nodeTypes.Add(node.Type);
             }
+
+            MetricValueRange metricValueRange = new MetricValueRange()
+            {
+                Name = "Number of node types",
+                Value = nodeTypes.Count
+            };
             
-            WidgetController.Display(nodeTypes.Count, "Number of node types");
+            WidgetController.Display(metricValueRange);
         }
     }
 }

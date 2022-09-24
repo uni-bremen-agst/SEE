@@ -9,32 +9,19 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         [SerializeField] private Text valueText;
         [SerializeField] private Text titleText;
 
-        public override void Display(RangeValue value, string title) => Display(value.Value, title);
-
-        public override void Display(ushort value, string title) => Display((long)value, title);
-        
-        public override void Display(uint value, string title) => Display((long)value, title);
-        
-        public override void Display(ulong value, string title) => Display((long)value, title);
-        
-        public override void Display(short value, string title) => Display((long)value, title);
-        
-        public override void Display(int value, string title) => Display((long)value, title);
-
-        public override void Display(long value, string title)
+        public override void Display(MetricValue metricValue)
         {
-            valueText.text = value.ToString();
-            titleText.text = title;
-        }
-        
-        public override void Display(float value, string title) => Display((decimal)value, title);
-        
-        public override void Display(double value, string title) => Display((long)value, title);
-
-        public override void Display(decimal value, string title)
-        {
-            valueText.text = value.ToString("0.##", CultureInfo.InvariantCulture);
-            titleText.text = title;
+            if (metricValue.GetType() == typeof(MetricValueRange))
+            {
+                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
+                valueText.text = metricValueRange.Value.ToString(CultureInfo.InvariantCulture);
+                titleText.text = metricValueRange.Name;
+            } 
+            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            {
+                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
+                Display(metricValueCollection.MetricValues[0]);
+            }
         }
     }
 }

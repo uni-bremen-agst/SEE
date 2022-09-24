@@ -10,6 +10,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// </summary>
     public class AverageLinesOfCode : Metric
     {
+        [SerializeField] private int optimalValue;  // Default = 0
+        [SerializeField] private int worstValue = 300;
         internal override void Refresh()
         {
             int totalNodes = 0;
@@ -29,8 +31,14 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             if (totalNodes != 0)
             {
-                RangeValue value = new RangeValue(totalLines / totalNodes, 0f, 1000f);
-                WidgetController.Display(value, "Average lines of code");
+                MetricValueRange metricValueRange = new MetricValueRange()
+                {
+                    Name = "Average lines of code",
+                    Value = totalLines / totalNodes,
+                    Higher = worstValue,
+                    Lower = optimalValue
+                };
+                WidgetController.Display(metricValueRange);
             }
         }
     }
