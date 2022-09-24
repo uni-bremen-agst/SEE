@@ -311,15 +311,10 @@ namespace SEE.Game
 
             // Fit layoutNodes into parent.
             Fit(parent, layoutNodes);
+            Stack(parent, layoutNodes);
 
             // a mapping of graph nodes onto the game objects by which they are represented
             Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeMap.Values;
-
-            // The plane upon which the game objects will be placed.
-            // We add the plane surrounding all game objects for nodes
-            GameObject plane = DrawPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-            AddToParent(plane, parent);
-            Stack(plane, layoutNodes);
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
@@ -336,7 +331,7 @@ namespace SEE.Game
             Portal.SetPortal(parent);
 
             // Add light to simulate emissive effect
-            AddLight(nodeToGameObject, rootGameNode);
+            AddLight(nodeToGameObject, parent);
 
             if (parent.TryGetComponent(out Plane portalPlane))
             {
@@ -437,24 +432,28 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds light to simulate an emissive effect.
+        /// Adds light to simulate an emissive effect. The new light object will be added to
+        /// <paramref name="parent"/> above its center such that it covers all <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects"></param>
-        /// <param name="rootGameNode"></param>
-        private void AddLight(ICollection<GameObject> gameObjects, GameObject rootGameNode)
+        /// <param name="gameObjects">the game object to be covered by the light</param>
+        /// <param name="parent">parent of the new light</param>
+        private void AddLight(ICollection<GameObject> gameObjects, GameObject parent)
         {
-            GameObject lightGameObject = new GameObject("Light");
-            lightGameObject.transform.parent = rootGameNode.transform;
+            GameObject lightGameObject = new GameObject("Light")
+            {
+                tag = Tags.Decoration
+            };
+            lightGameObject.transform.parent = parent.transform;
 
             Light light = lightGameObject.AddComponent<Light>();
 
             ComputeBoundingBox(gameObjects, out Vector2 minCorner, out Vector2 maxCorner);
-            float bbw = maxCorner.x - minCorner.x;
-            float bbh = maxCorner.y - minCorner.y;
+            float boundingBoxWidth = maxCorner.x - minCorner.x;
+            float boundingBoxDepth = maxCorner.y - minCorner.y;
 
-            lightGameObject.transform.position = rootGameNode.transform.position + new Vector3(0.0f, 0.25f * (bbw + bbh), 0.0f);
+            lightGameObject.transform.position = parent.transform.position + new Vector3(0.0f, 0.25f * (boundingBoxWidth + boundingBoxDepth), 0.0f);
 
-            light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
+            light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
             light.intensity = 1.0f;
         }

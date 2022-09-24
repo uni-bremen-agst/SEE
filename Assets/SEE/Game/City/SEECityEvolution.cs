@@ -298,7 +298,7 @@ namespace SEE.Game.City
                 {
                     // Node types have been filtered out. Because of that
                     // there may now be multiple roots again.
-                    relevantGraph.AddSingleRoot(name: "ROOT", type: "ROOT");
+                    relevantGraph.AddSingleRoot(name: "ROOT", type: Graph.UnknownType);
                 }
                 graphs[i] = relevantGraph;
                 LoadDataForGraphListing(graphs[i]);

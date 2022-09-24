@@ -49,7 +49,10 @@ namespace SEE.Game
         /// <returns>game object representing given <paramref name="node"/></returns>
         private GameObject CreateGameNode(Node node, bool addToGraphElementIDMap = true)
         {
-            NodeFactory nodeFactory = nodeTypeToFactory[node.Type];
+            if (!nodeTypeToFactory.TryGetValue(node.Type, out NodeFactory nodeFactory))
+            {
+                Debug.LogError($"No node type factory for node type {node.Type}.\n");
+            }
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
             if (addToGraphElementIDMap)
@@ -371,9 +374,10 @@ namespace SEE.Game
         /// <returns>selected metrics of <paramref name="node"/></returns>
         private float[] SelectMetrics(Node node)
         {
-            if (Settings.NodeTypes[node.Type].Shape == NodeShapes.Spiders
-                || Settings.NodeTypes[node.Type].Shape == NodeShapes.Polygons
-                || Settings.NodeTypes[node.Type].Shape == NodeShapes.Bars)
+            if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes attributes)
+                && (attributes.Shape == NodeShapes.Spiders
+                    || attributes.Shape == NodeShapes.Polygons
+                    || attributes.Shape == NodeShapes.Bars))
             {
                 // FIXME: Not all nodes have necessarily the same set of metrics.
                 // If one does not have a particular numeric attributes, but others
@@ -515,10 +519,17 @@ namespace SEE.Game
         /// <returns>requested absolute scale in world space</returns>
         private Vector3 GetScale(Node node)
         {
-            VisualNodeAttributes attribs = Settings.NodeTypes[node.Type];
-            return new Vector3(GetMetricValue(node, attribs.WidthMetric),
-                               GetMetricValue(node, attribs.HeightMetric),
-                               GetMetricValue(node, attribs.DepthMetric));
+            if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes attribs))
+            {
+                return new Vector3(GetMetricValue(node, attribs.WidthMetric),
+                                   GetMetricValue(node, attribs.HeightMetric),
+                                   GetMetricValue(node, attribs.DepthMetric));
+            }
+            else
+            {
+                Debug.LogWarning($"No metric specifiction (width, height, depth) for node type {node.Type}.\n");
+                return Vector3.zero;
+            }
         }
 
         /// <summary>

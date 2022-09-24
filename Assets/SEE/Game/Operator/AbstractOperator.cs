@@ -42,7 +42,8 @@ namespace SEE.Game.Operator
         /// </summary>
         /// <typeparam name="T">Type of the animator</typeparam>
         /// <typeparam name="V">Type of the value</typeparam>
-        protected class Operation<T, V> : IOperation
+        /// <typeparam name="C">Type of the callback delegate</typeparam>
+        protected abstract class Operation<T, V, C> : IOperation where C: MulticastDelegate
         {
             /// <summary>
             /// The function that is called when the animation shall be constructed and played.
@@ -55,7 +56,7 @@ namespace SEE.Game.Operator
             /// The animator that is controlling the current animation.
             /// May be <c>null</c> if no animation is running.
             /// </summary>
-            protected T Animator;
+            protected T Animator { get; set; }
 
             /// <summary>
             /// Any operations that are composited (i.e., running together) with this one.
@@ -116,7 +117,8 @@ namespace SEE.Game.Operator
             /// <param name="compositedOperations">Any operations running in tandem with this one. They will
             /// be killed once this operation is killed. Parameter may be removed in the future.</param>
             /// <exception cref="ArgumentOutOfRangeException">If <paramref name="duration"/> is negative.</exception>
-            public void AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
+            /// <returns>An operation callback for the requested animation</returns>
+            public IOperationCallback<C> AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
             {
                 if (duration < 0)
                 {
@@ -127,13 +129,21 @@ namespace SEE.Game.Operator
                 {
                     // Nothing to be done, we're already where we want to be.
                     // If duration is 0, however, we must trigger the change immediately.
-                    return;
+                    return new DummyOperationCallback<C>();
                 }
 
                 ChangeAnimatorTarget(target, duration);
                 TargetValue = target;
                 CompositedOperations = compositedOperations ?? new List<IOperation>();
+                // If the duration is zero, the change has already been applied, so the callback never triggers.
+                // Hence, we create a dummy callback that triggers its respective methods immediately on registration.
+                return duration == 0 ? new DummyOperationCallback<C>() : AnimatorCallback;
             }
+            
+            /// <summary>
+            /// The callback that shall be returned at the end of <see cref="AnimateTo"/>.
+            /// </summary>
+            protected abstract IOperationCallback<C> AnimatorCallback { get; }
         }
 
         /// <summary>
@@ -142,19 +152,13 @@ namespace SEE.Game.Operator
         /// Note that the type of the target value <typeparamref name="V"/> still has to be specified.
         /// </summary>
         /// <typeparam name="V">The type of the target value</typeparam>
-        protected class TweenOperation<V> : Operation<IList<Tween>, V>
+        protected class TweenOperation<V> : Operation<Tween, V, TweenCallback>
         {
             public override void KillAnimator(bool complete = false)
             {
-                if (Animator != null)
+                if (Animator != null && Animator.IsActive())
                 {
-                    foreach (Tween tween in Animator)
-                    {
-                        if (tween.IsActive())
-                        {
-                            tween.Kill(complete);
-                        }
-                    }
+                    Animator.Kill(complete);
                 }
 
                 base.KillAnimator(complete);
@@ -165,17 +169,16 @@ namespace SEE.Game.Operator
                 base.ChangeAnimatorTarget(newTarget, duration);
                 if (duration == 0)
                 {
-                    foreach (Tween tween in Animator)
-                    {
-                        // We execute the first step immediately. This way, callers can expect the change to
-                        // be implemented when control is returned to them, the same way it would work when
-                        // setting the target value manually.
-                        tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
-                    }
+                    // We execute the first step immediately. This way, callers can expect the change to
+                    // be implemented when control is returned to them, the same way it would work when
+                    // setting the target value manually.
+                    Animator.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
             }
 
-            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue) : base(animateToAction, targetValue)
+            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator);
+
+            public TweenOperation(Func<V, float, Tween> animateToAction, V targetValue) : base(animateToAction, targetValue)
             {
             }
         }

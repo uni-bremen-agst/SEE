@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using DG.Tweening;
 using SEE.GO;
 using SEE.Utils;
@@ -40,12 +39,13 @@ namespace SEE.Game.Operator
         /// <param name="target">The spline this edge should animate towards</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MorphTo(SEESpline target, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> MorphTo(SEESpline target, float duration)
         {
             // We deactivate the target edge first so it's not visible.
             target.gameObject.SetActive(false);
             // We now use the MorphismOperation to actually move the edge.
-            morphism.AnimateTo((target.Spline, target.gameObject), duration);
+            return morphism.AnimateTo((target.Spline, target.gameObject), duration);
         }
 
         /// <summary>
@@ -54,9 +54,10 @@ namespace SEE.Game.Operator
         /// <param name="target">The spline this edge should animate towards</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void MorphTo(BSpline target, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> MorphTo(BSpline target, float duration)
         {
-            morphism.AnimateTo((target, null), duration);
+            return morphism.AnimateTo((target, null), duration);
         }
 
         /// <summary>
@@ -66,9 +67,10 @@ namespace SEE.Game.Operator
         /// <param name="target">The spline this edge should animate towards</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
-        public void ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<TweenCallback> ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
         {
-            color.AnimateTo((newStartColor, newEndColor), duration);
+            return color.AnimateTo((newStartColor, newEndColor), duration);
         }
 
         #endregion
@@ -103,7 +105,7 @@ namespace SEE.Game.Operator
             gameObject.MustGetComponent(out spline);
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
 
-            List<Tween> AnimateToColorAction((Color start, Color end) colors, float d)
+            Tween AnimateToColorAction((Color start, Color end) colors, float d)
             {
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
                                               c => spline.GradientColors = (c, spline.GradientColors.end),
@@ -111,7 +113,10 @@ namespace SEE.Game.Operator
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             colors.end, d);
-                return new List<Tween> { startTween, endTween };
+                Sequence sequence = DOTween.Sequence();
+                sequence.Insert(0, startTween);
+                sequence.Insert(0, endTween);
+                return sequence.Play();
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
@@ -124,7 +129,7 @@ namespace SEE.Game.Operator
         /// The target value consists of the target spline, as well as an optional temporary game object associated
         /// to the spline. If the latter is given, it will be destroyed upon completion.
         /// </summary>
-        protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject)>
+        protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject), TweenCallback>
         {
             public override void KillAnimator(bool complete = false)
             {
@@ -150,6 +155,8 @@ namespace SEE.Game.Operator
                     Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
             }
+
+            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator.tween);
 
             public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction,
                                      BSpline targetSpline, GameObject temporaryGameObject)
