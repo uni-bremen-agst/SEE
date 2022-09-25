@@ -114,8 +114,8 @@ namespace SEE.Game.City
                 State.ImplicitlyAllowed => (Color.green, Color.white),
                 State.AllowedAbsent => (Color.green, Color.white),
                 State.Allowed => (Color.green, Color.white),
-                State.Divergent => (Color.magenta, Color.Lerp(Color.magenta, Color.black, EDGE_GRADIENT_FACTOR)),
-                State.Absent => (Color.red, Color.Lerp(Color.red, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Divergent => (Color.red, Color.Lerp(Color.red, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Absent => (Color.yellow, Color.Lerp(Color.yellow, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, EDGE_GRADIENT_FACTOR)),
                 _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state!")
             };
