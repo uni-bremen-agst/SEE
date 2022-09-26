@@ -54,6 +54,13 @@ namespace SEE.DataModel.DG
         public const string IsVirtualToggle = "IsVirtual";
 
         /// <summary>
+        /// The name of the toggle attribute that marks hidden edges.
+        /// Hidden edges exist in the scene, but have an alpha value set to zero.
+        /// The <see cref="ShowEdges"/> action will only display these edges when hovering over them.
+        /// </summary>
+        public const string IsHiddenToggle = "IsHidden";
+
+        /// <summary>
         /// The source of the edge.
         /// </summary>
         public Node Source { get; set; }
