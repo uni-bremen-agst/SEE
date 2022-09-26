@@ -56,7 +56,7 @@ namespace SEE.Game.Operator
         /// List of all callbacks combined by this class.
         /// </summary>
         private readonly IList<IOperationCallback<C>> Callbacks = new List<IOperationCallback<C>>();
-
+        
         /// <summary>
         /// Function which converts from an <see cref="Action"/> to a delegate of type <typeparamref name="C"/>.
         /// </summary>
@@ -69,9 +69,20 @@ namespace SEE.Game.Operator
         /// will only be triggered once every callback class of this parameter has fired the respective method.</param>
         /// <param name="callbackConverter">Converts from an <see cref="Action"/> to the type of the given
         /// <paramref name="callbacks"/>' callbacks.</param>
-        public AndCombinedOperationCallback(IEnumerable<IOperationCallback<C>> callbacks, Func<Action, C> callbackConverter)
+        public AndCombinedOperationCallback(IEnumerable<IOperationCallback<C>> callbacks, Func<Action, C> callbackConverter = null)
         {
-            CallbackConverter = callbackConverter;
+            if (typeof(C) == typeof(Action))
+            {
+                CallbackConverter = a => a as C;
+            } 
+            else if (callbackConverter == null)
+            {
+                throw new ArgumentException("callbackConverter must not be null when generic parameter C != Action!");
+            }
+            else
+            {
+                CallbackConverter = callbackConverter;
+            }
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 Callbacks.Add(operationCallback);

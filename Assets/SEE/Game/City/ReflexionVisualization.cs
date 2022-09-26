@@ -7,6 +7,7 @@ using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -56,6 +57,15 @@ namespace SEE.Game.City
         private const float EDGE_GRADIENT_FACTOR = 0.7f;
 
         /// <summary>
+        /// States in which an edge shall be hidden.
+        /// </summary>
+        private static readonly ISet<State> HiddenEdgeStates = new HashSet<State>
+        {
+            State.Specified, State.Unmapped, State.ImplicitlyAllowed, State.AllowedAbsent,
+            State.Allowed, State.Convergent
+        };
+
+        /// <summary>
         /// A queue of <see cref="ChangeEvent"/>s which were received from the analysis, but not yet handled.
         /// More specifically, these are intended to be handled after the city has been drawn.
         /// </summary>
@@ -69,7 +79,7 @@ namespace SEE.Game.City
                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
-                    spline.GradientColors = GetEdgeGradient(edge.State());
+                    spline.GradientColors = GetEdgeGradient(edge);
                 }
                 else
                 {
@@ -101,14 +111,16 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns a fitting color gradient from the first to the second color for the given state.
+        /// Returns a fitting color gradient from the first to the second color for the given edge by examining
+        /// its state.
         /// </summary>
-        /// <param name="state">state for which to yield a color gradient</param>
+        /// <param name="edge">edge for which to yield a color gradient</param>
         /// <returns>color gradient</returns>
-        private static (Color, Color) GetEdgeGradient(State state) =>
-            state switch
+        private static (Color, Color) GetEdgeGradient(Edge edge)
+        {
+            (Color, Color) gradient = edge.State() switch
             {
-                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, 0.9f)),
+                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.ImplicitlyAllowed => (Color.green, Color.white),
@@ -117,8 +129,18 @@ namespace SEE.Game.City
                 State.Divergent => (Color.red, Color.Lerp(Color.red, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.Absent => (Color.yellow, Color.Lerp(Color.yellow, Color.black, EDGE_GRADIENT_FACTOR)),
                 State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, EDGE_GRADIENT_FACTOR)),
-                _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state!")
+                _ => throw new ArgumentOutOfRangeException(nameof(edge), edge.State(), "Unknown state of given edge!")
             };
+            if (edge.HasToggle(Edge.IsHiddenToggle))
+            {
+                // If the edge is supposed to be hidden, its alpha value must be zero.
+                return (gradient.Item1.WithAlpha(0f), gradient.Item2.WithAlpha(0f));
+            }
+            else
+            {
+                return gradient;
+            }
+        }
 
         /// <summary>
         /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
@@ -165,6 +187,16 @@ namespace SEE.Game.City
         /// <param name="edgeChange">The event which shall be handled.</param>
         private void HandleEdgeChange(EdgeChange edgeChange)
         {
+            // We first check if the corresponding edge should be hidden.
+            if (HiddenEdgeStates.Contains(edgeChange.NewState))
+            {
+                edgeChange.Edge.SetToggle(Edge.IsHiddenToggle);
+            }
+            else
+            {
+                edgeChange.Edge.UnsetToggle(Edge.IsHiddenToggle);
+            }
+
             GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
             if (edge == null)
             {
@@ -175,8 +207,7 @@ namespace SEE.Game.City
 
             if (edge != null)
             {
-                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.NewState);
-                // Animate color change for nicer visuals.
+                (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 edge.AddOrGetComponent<EdgeOperator>().ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
             }
             else

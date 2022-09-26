@@ -40,6 +40,7 @@ namespace SEE.Game
             {
                 gameObject.AddComponentIfNecessary<GameNodeScaler>();
                 gameObject.AddComponentIfNecessary<ShowLabel>();
+                gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
             }
         }
