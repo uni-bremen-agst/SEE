@@ -7,7 +7,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// <summary>
     /// This could be any holistic metric (a metric that is calculated on the entire code city, not on individual nodes)
     /// </summary>
-    public abstract class Metric : MonoBehaviour
+    internal abstract class Metric : MonoBehaviour
     {
         /// <summary>
         /// The WidgetController that should be attached to the same widget that this Metric is attached to. Use this to
@@ -34,7 +34,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// this instance and can call its Refresh() method. Also it will retrieve a reference to the WidgetController
         /// that should be attached to the same GameObject this Metric is attached to.
         /// </summary>
-        public void Start()
+        internal void Start()
         {
             // Try to get the CanvasController from the parent GameObject.
             CanvasController canvasController = transform.parent.GetComponent<CanvasController>();

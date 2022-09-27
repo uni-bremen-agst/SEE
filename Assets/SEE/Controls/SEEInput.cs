@@ -640,5 +640,10 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
         }
+
+        public static bool ToggleHolisticMetricsMenu()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);
+        }
     }
 }

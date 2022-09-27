@@ -4,13 +4,13 @@ using UnityEngine.UI;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
-    public class PercentageController : WidgetController
+    internal class PercentageController : WidgetController
     {
         [SerializeField] private Text valueText;
         [SerializeField] private Text titleText;
         [SerializeField] private Image fade;
 
-        public override void Display(MetricValue metricValue)
+        internal override void Display(MetricValue metricValue)
         {
             if (metricValue.GetType() == typeof(MetricValueRange))
             {
@@ -29,7 +29,9 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     return;
                 }
                 if (percentage > 1)  // Assume that the caller meant it as a percentage between 0 and 100.
+                {
                     percentage /= 100;
+                }
                 fade.fillAmount = percentage;
                 percentage *= 100;
                 valueText.text = percentage.ToString("0.##", CultureInfo.InvariantCulture) + "%";

@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
-    public abstract class WidgetController : MonoBehaviour
+    internal abstract class WidgetController : MonoBehaviour
     {
-        public abstract void Display(MetricValue metricValue);
+        internal abstract void Display(MetricValue metricValue);
     }
 }
