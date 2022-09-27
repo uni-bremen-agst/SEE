@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 6800333804276665222}
   - component: {fileID: 6571662490047221171}
   - component: {fileID: 182833635018827598}
+  - component: {fileID: 6554778879720288185}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -209,3 +210,15 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+--- !u!114 &6554778879720288185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 756551d49e894841af2289ec2be9abb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

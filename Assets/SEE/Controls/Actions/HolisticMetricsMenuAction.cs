@@ -1,16 +1,22 @@
+using SEE.Game.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     public class HolisticMetricsMenuAction : MonoBehaviour
     {
-        [SerializeField] private GameObject menu;
+        private HolisticMetricsManager holisticMetricsManager;
+
+        private void Start()
+        {
+            holisticMetricsManager = GameObject.Find("HolisticMetricsManager").GetComponent<HolisticMetricsManager>();
+        }
 
         private void Update()
         {
             if (SEEInput.ToggleHolisticMetricsMenu())
             {
-                 menu.SetActive(!menu.activeInHierarchy);
+                 holisticMetricsManager.ToggleMenu();
             }
         }
     }
