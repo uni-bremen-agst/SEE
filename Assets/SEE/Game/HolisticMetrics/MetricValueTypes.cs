@@ -6,37 +6,37 @@ using System.Collections.Generic;
 
 namespace SEE.Game.HolisticMetrics
 {
-    public class MetricValue
+    internal class MetricValue
     {
         /// <summary>
         /// The name of the metric.
         /// </summary>
-        public string Name;
+        internal string Name;
     }
 
     /// <summary>
     /// Represents one concrete value of a metric.
     /// </summary>
-    public class MetricValueRange : MetricValue
+    internal class MetricValueRange : MetricValue
     {
         /// <summary>
         /// The worst possible value for this metric.
         /// </summary>
-        public float Lower;
+        internal float Lower;
         
         /// <summary>
         /// The best possible value for this metric.
         /// </summary>
-        public float Higher;
+        internal float Higher;
         
         /// <summary>
         /// The concrete value.
         /// </summary>
-        public float Value;
+        internal float Value;
     }
     
-    public class MetricValueCollection : MetricValue
+    internal class MetricValueCollection : MetricValue
     {
-        public List<MetricValue> MetricValues;
+        internal List<MetricValue> MetricValues;
     }
 }

@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
-    public class SingleNumberDisplayController : WidgetController
+    internal class SingleNumberDisplayController : WidgetController
     {
         [SerializeField] private Text valueText;
         [SerializeField] private Text titleText;
 
-        public override void Display(MetricValue metricValue)
+        internal override void Display(MetricValue metricValue)
         {
             if (metricValue.GetType() == typeof(MetricValueRange))
             {

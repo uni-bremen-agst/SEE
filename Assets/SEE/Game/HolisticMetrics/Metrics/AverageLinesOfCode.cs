@@ -8,9 +8,9 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// <summary>
     /// This class manages the average lines of code metric.
     /// </summary>
-    public class AverageLinesOfCode : Metric
+    internal class AverageLinesOfCode : Metric
     {
-        [SerializeField] private int optimalValue;  // Default = 0
+        [SerializeField] private int optimalValue;
         [SerializeField] private int worstValue = 300;
         internal override void Refresh()
         {
@@ -20,7 +20,9 @@ namespace SEE.Game.HolisticMetrics.Metrics
             foreach (GameObject node in GraphElements)
             {
                 if (!node.tag.Equals(Tags.Node))
+                {
                     continue;
+                }
                 Node graphNode = node.GetComponent<NodeRef>().Value;
                 if (graphNode != null && graphNode.TryGetNumeric("Metric.Lines.LOC", out var lines))
                 {

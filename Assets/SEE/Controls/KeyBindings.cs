@@ -353,5 +353,14 @@ namespace SEE.Controls
         /// Toggles the chat room for team 2.
         /// </summary>
         internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
+        
+        //-----------------------------------------------------
+        // Holistic metrics menu
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the menu for holistic code metrics.
+        /// </summary>
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, "Toggles the menu for holistic code metrics");
     }
 }

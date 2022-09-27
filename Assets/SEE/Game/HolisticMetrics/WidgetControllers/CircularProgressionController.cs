@@ -4,13 +4,13 @@ using UnityEngine.UI;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
-    public class CircularProgressionController : WidgetController
+    internal class CircularProgressionController : WidgetController
     {
         [SerializeField] private Image circle;
         [SerializeField] private Text text;
         [SerializeField] private Text title;
 
-        public override void Display(MetricValue metricValue)
+        internal override void Display(MetricValue metricValue)
         {
             if (metricValue.GetType() == typeof(MetricValueRange))
             {

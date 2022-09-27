@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
 {
-    public class CanvasController : MonoBehaviour
+    internal class CanvasController : MonoBehaviour
     {
-        private readonly List<Metric> _metrics = new List<Metric>();
+        private readonly List<Metric> metrics = new List<Metric>();
 
         /// <summary>
         /// This method will be called by every Metric to register itself with this CanvasController.
@@ -14,19 +14,19 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="metric"></param>
         internal void Register(Metric metric)
         {
-            _metrics.Add(metric);
+            metrics.Add(metric);
         }
         
         /// <summary>
         /// Whenever a code city changes, this method needs to be called. It will call the Refresh() methods of all
         /// Metrics.
         /// </summary>
-        public void OnGraphLoad()
+        internal void OnGraphLoad()
         {
             // Before iterating through the list, ensure no metric is null.
-            _metrics.RemoveAll(metric => metric is null);
+            metrics.RemoveAll(metric => metric is null);
             
-            foreach (Metric metric in _metrics)
+            foreach (Metric metric in metrics)
             {
                 metric.Refresh();
             }
