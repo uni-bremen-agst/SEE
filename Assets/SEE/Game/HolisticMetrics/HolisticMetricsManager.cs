@@ -59,7 +59,7 @@ namespace SEE.Game.HolisticMetrics
                 .Where(type => type.IsSubclassOf(typeof(Metric)))
                 .ToArray();
                 
-            widgetPrefabs = Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics");
+            widgetPrefabs = Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics/Widgets");
 
             foreach (Type metricType in metricTypes)
             {
