@@ -45,7 +45,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnEnable for {name} has NO interactable.\n");
+                Debug.LogError($"ShowLabel.OnEnable for {name} has no interactable.\n");
             }
         }
 
@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnDisable for {name} has NO interactable.\n");
+                Debug.LogError($"ShowLabel.OnDisable for {name} has no interactable.\n");
             }
         }
 
