@@ -48,6 +48,11 @@ namespace SEE.Game.HolisticMetrics
         private List<GameObject> widgetInstances = new List<GameObject>();
 
         /// <summary>
+        /// Reference to the canvas controller of the metrics canvas.
+        /// </summary>
+        private CanvasController canvasController;
+
+        /// <summary>
         /// Dynamically gets types of all classes that inherit from Metric and puts them in an array. Also dynamically
         /// gets all widget prefabs from the Resources folder and puts them in an array. After filling the array, the
         /// dropdowns in the menu are filled with the array values.
@@ -70,6 +75,8 @@ namespace SEE.Game.HolisticMetrics
             {
                 selectWidget.CreateNewItem(widgetPrefab.name, null);
             }
+
+            canvasController = metricsCanvas.GetComponent<CanvasController>();
         }
         
         internal void ToggleMenu()
@@ -85,9 +92,7 @@ namespace SEE.Game.HolisticMetrics
         {
             Type selectedMetric = metricTypes[selectMetric.selectedItemIndex];
             GameObject selectedWidget = widgetPrefabs[selectWidget.selectedItemIndex];
-            GameObject widgetInstance = Instantiate(selectedWidget, metricsCanvas.transform); 
-            widgetInstances.Add(widgetInstance);
-            widgetInstance.AddComponent(selectedMetric);
+            canvasController.AddMetric(selectedMetric, selectedWidget);
         }
     }
 }
