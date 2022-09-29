@@ -346,21 +346,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to start dragging the city in its entirety or parts of it.
-        /// </summary>
-        /// <returns>true if the user requests this action</returns>
-        internal static bool StartDrag()
-        {
-            return Input.GetMouseButtonDown(2);
-        }
-
-        /// <summary>
         /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
         {
-            return Input.GetMouseButton(2);
+            return Input.GetMouseButton(MiddleMouseButton);
         }
 
         //-----------------------------------------------------
@@ -433,6 +424,11 @@ namespace SEE.Controls
         /// Index of the right mouse button.
         /// </summary>
         private const int RightMouseButton = 1;
+
+        /// <summary>
+        /// Index of the middle mouse button.
+        /// </summary>
+        private const int MiddleMouseButton = 2;
 
         /// <summary>
         /// Rotates the camera.

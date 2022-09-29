@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -21,6 +22,19 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
+
+        /// <summary>
+        /// The path to the GXL file containing the graph data.
+        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), FoldoutGroup(DataFoldoutGroup)]
+        public FilePath GXLPath = new FilePath();
+
+        /// <summary>
+        /// The path to the CSV file containing the additional metric values.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), FoldoutGroup(DataFoldoutGroup)]
+        public FilePath CSVPath = new FilePath();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -72,7 +86,7 @@ namespace SEE.Game.City
         {
             if (loadedGraph != null)
             {
-                loadedGraph.BasePath = ProjectPath.Path;
+                loadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
 
@@ -106,8 +120,9 @@ namespace SEE.Game.City
         /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
         /// nodes saved in the underlying GXL file.
         /// </summary>
-        protected void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             LoadData();
             loadedGraph = VisualizedSubGraph;
             if (loadedGraph != null)
@@ -182,17 +197,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// The path to the GXL file containing the graph data.
-        /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
-        /// </summary>
-        public DataPath GXLPath = new DataPath();
-
-        /// <summary>
-        /// The path to the CSV file containing the additional metric values.
-        /// </summary>
-        public DataPath CSVPath = new DataPath();
-
-        /// <summary>
         /// Loads the metrics from CSVPath() and aggregates and adds them to the graph.
         /// Precondition: graph must have been loaded before.
         /// </summary>
@@ -261,6 +265,9 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
             if (string.IsNullOrEmpty(GXLPath.Path))
@@ -281,6 +288,9 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
         public virtual void SaveData()
         {
             if (string.IsNullOrEmpty(GXLPath.Path))
@@ -315,7 +325,10 @@ namespace SEE.Game.City
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        public void DrawGraph()
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public virtual void DrawGraph()
         {
             if (loadedGraph == null)
             {
@@ -333,7 +346,7 @@ namespace SEE.Game.City
                     graphRenderer = new GraphRenderer(this, visualizedSubGraph);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(gameObject);
+                    graphRenderer.DrawGraph(visualizedSubGraph, gameObject);
                 }
             }
         }
@@ -346,12 +359,6 @@ namespace SEE.Game.City
         private GraphRenderer graphRenderer;
 
         /// <summary>
-        /// Color property of the shader. Lookups using this value are more efficient than lookups using the
-        /// string value "_Color".
-        /// </summary>
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
         /// Yields a graph renderer that can draw this city.
         /// </summary>
         public GraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
@@ -362,6 +369,9 @@ namespace SEE.Game.City
         /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
         /// the file is saved in the SLD format.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
@@ -380,6 +390,9 @@ namespace SEE.Game.City
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup)]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -396,15 +409,30 @@ namespace SEE.Game.City
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        public override List<string> AllExistingMetrics()
+        public override ISet<string> AllExistingMetrics()
         {
             if (loadedGraph == null)
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
             else
             {
                 return loadedGraph.AllNumericNodeAttributes();
+            }
+        }
+
+        /// <summary>
+        /// Dumps the metric names of all node types of the currently loaded graph.
+        /// </summary>
+        protected override void DumpNodeMetrics()
+        {
+            if (loadedGraph == null)
+            {
+                Debug.Log("No graph loaded yet.");
+            }
+            else
+            {
+                DumpNodeMetrics(new List<Graph>() { loadedGraph });
             }
         }
 

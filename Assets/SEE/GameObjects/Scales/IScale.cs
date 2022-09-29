@@ -17,7 +17,7 @@ namespace SEE.GO
         /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
         /// <param name="metrics">node metrics for scaling</param>
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
-        protected IScale(IEnumerable<Graph> graphs, IList<string> metrics, bool leavesOnly)
+        protected IScale(IEnumerable<Graph> graphs, ISet<string> metrics, bool leavesOnly)
         {
             this.metrics = metrics;
             this.leavesOnly = leavesOnly;
@@ -29,7 +29,7 @@ namespace SEE.GO
         /// <summary>
         /// The list of metrics to be scaled.
         /// </summary>
-        protected readonly IList<string> metrics;
+        protected readonly ISet<string> metrics;
 
         /// <summary>
         /// The maximal values of all metrics as a map metric-name -> maximal value.

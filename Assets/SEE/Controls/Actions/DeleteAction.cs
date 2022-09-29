@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
@@ -75,7 +74,7 @@ namespace SEE.Controls.Actions
                 {
                     if (!nodeOrEdge.activeInHierarchy)
                     {
-                        GameObject.Destroy(nodeOrEdge);
+                        Destroyer.DestroyGameObject(nodeOrEdge);
                     }
                 }
             }

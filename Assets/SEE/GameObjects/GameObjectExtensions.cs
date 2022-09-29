@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OdinSerializer.Utilities;
+using Sirenix.Serialization.Utilities;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using Sirenix.Utilities;
 
 namespace SEE.GO
 {
@@ -39,6 +40,7 @@ namespace SEE.GO
                     return edgeRef.Value.ID;
                 }
             }
+
             return nodeRef.Value.ID;
         }
 
@@ -48,7 +50,18 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">graph node or edge whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
-        public static AbstractSEECity ContainingCity(this GameObject gameObject)
+        public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> represents a graph node or edge, the city of type <typeparamref name="T"/>
+        /// this object is contained in will be returned. Otherwise null is returned.
+        /// </summary>
+        /// <param name="gameObject">graph node or edge whose containing city of type <typeparamref name="T"/>
+        /// is requested</param>
+        /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
+        /// or null</returns>
+        /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
+        public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
             if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
             {
@@ -57,7 +70,7 @@ namespace SEE.GO
             else
             {
                 Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out AbstractSEECity city))
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
@@ -94,10 +107,12 @@ namespace SEE.GO
             {
                 result.Add(gameObject);
             }
+
             foreach (Transform child in gameObject.transform)
             {
                 result.AddRange(child.gameObject.AllDescendants(tag));
             }
+
             return result;
         }
 
@@ -127,6 +142,7 @@ namespace SEE.GO
                     }
                 }
             }
+
             return null;
         }
 
@@ -149,27 +165,11 @@ namespace SEE.GO
                 {
                     result.Add(child.gameObject);
                 }
+
                 result.AddRange(child.gameObject.Descendants(gameObjectIDs));
             }
-            return result;
-        }
 
-        /// <summary>
-        /// Returns the render-queue offset of given <paramref name="gameObject"/>.
-        ///
-        /// Precondition: <paramref name="gameObject"/> must have a renderer attached
-        /// to it; otherwise 0 will be returned.
-        /// </summary>
-        /// <param name="gameObject">objects whose render-queue is requested</param>
-        /// <returns>render-queue offset</returns>
-        public static int GetRenderQueue(this GameObject gameObject)
-        {
-            if (gameObject.TryGetComponent(out Renderer renderer))
-            {
-                return renderer.sharedMaterial.renderQueue;
-            }
-            Debug.LogWarning($"GetRenderQueue: Game object {gameObject.name} has no renderer.\n");
-            return 0;
+            return result;
         }
 
         /// <summary>
@@ -263,10 +263,12 @@ namespace SEE.GO
             {
                 renderer.enabled = show;
             }
+
             if (gameObject.TryGetComponent(out Collider collider))
             {
                 collider.enabled = show;
             }
+
             if (includingChildren)
             {
                 foreach (Transform child in gameObject.transform)
@@ -325,6 +327,7 @@ namespace SEE.GO
                 {
                     max = roof;
                 }
+
                 foreach (Transform child in root.transform)
                 {
                     if (child.gameObject.activeInHierarchy)
@@ -357,6 +360,62 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns true if this <paramref name="block"/> is within the spatial area of <paramref name="parentBlock"/>,
+        /// that is, if the bounding box of <paramref name="block"/> plus the extra padding <paramref name="outerEdgeMargin"/>
+        /// is fully contained in the bounding box of <paramref name="parentBlock"/>.
+        ///
+        /// Note that this only checks on the XZ-plane, and ignores any height difference between the two blocks.
+        /// </summary>
+        /// <param name="block">We check whether this block is included in <paramref name="parentBlock"/>'s area
+        /// </param>
+        /// <param name="parentBlock">The block whose area shall be checked</param>
+        /// <param name="outerEdgeMargin">Additional margins that should be added inward the area </param>
+        /// <returns>True if this <paramref name="block"/> is within the area of <paramref name="parentBlock"/>
+        /// </returns>
+        public static bool IsInArea(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
+        {
+            // FIXME: Support node types other than cubes
+            block.MustGetComponent(out Collider collider);
+            Vector3 blockCenter = collider.bounds.center;
+            // We only care about the XZ-plane. Setting z to zero here makes it consistent with the bounds setup below.
+            Bounds blockBounds = new Bounds(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
+            parentBlock.MustGetComponent(out Collider parentCollider);
+            Bounds parentBlockBounds = parentCollider.bounds;
+
+            Vector2 topRight = parentBlockBounds.max.XZ();
+            Vector2 bottomLeft = parentBlockBounds.min.XZ();
+            Vector2 topLeft = topRight.WithXY(x: bottomLeft.x);
+            Vector2 bottomRight = topRight.WithXY(y: bottomLeft.y);
+
+            // These represent the outer edge regions of the parent block with the margins applied.
+            Bounds left = new Bounds(bottomLeft, Vector3.zero);
+            left.Encapsulate(topLeft.WithXY(x: topLeft.x + outerEdgeMargin));
+            if (left.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds right = new Bounds(bottomRight, Vector3.zero);
+            right.Encapsulate(topRight.WithXY(x: topRight.x - outerEdgeMargin));
+            if (right.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds bottom = new Bounds(bottomLeft, Vector3.zero);
+            bottom.Encapsulate(bottomRight.WithXY(y: bottomRight.y + outerEdgeMargin));
+            if (bottom.Intersects(blockBounds))
+            {
+                return true;
+            }
+
+            Bounds top = new Bounds(topLeft, Vector3.zero);
+            top.Encapsulate(topRight.WithXY(y: topRight.y - outerEdgeMargin));
+            return top.Intersects(blockBounds);
+        }
+
+
+        /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
         /// If the component was found, it will be stored in <paramref name="component"/> and true will be returned.
         /// If it wasn't found, <paramref name="component"/> will be <code>null</code>, false will be returned,
@@ -374,7 +433,22 @@ namespace SEE.GO
                                + $"on game object '{gameObject.name}'.\n");
                 return false;
             }
+
             return true;
+        }
+
+        /// <summary>
+        /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
+        /// If a component of the type was found, it will be returned, otherwise a new component of the type
+        /// will be added and returned.
+        /// </summary>
+        /// <param name="gameObject">The gameobject whose component of type <typeparamref name="T"/>
+        /// we wish to return</param>
+        /// <typeparam name="T">The component to get / add</typeparam>
+        /// <returns>The existing or newly created component</returns>
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        {
+            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
         }
 
         /// <summary>
@@ -392,8 +466,7 @@ namespace SEE.GO
         {
             if (!gameObject.TryGetComponent(out component))
             {
-                throw new InvalidOperationException(
-                    $"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
             }
         }
 
@@ -404,10 +477,23 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it</returns>
+        /// component attached to it whose node is non-null</returns>
         public static bool HasNodeRef(this GameObject gameObject)
         {
             return gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null;
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it. Unlike <see cref="HasNodeRef(GameObject)"/>, the
+        /// node reference may be null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose NodeRef is checked</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
+        /// component attached to it</returns>
+        public static bool IsNode(this GameObject gameObject)
+        {
+            return gameObject.TryGetComponent(out NodeRef _);
         }
 
         /// <summary>
@@ -440,6 +526,7 @@ namespace SEE.GO
             {
                 node = nodeRef.Value;
             }
+
             return node != null;
         }
 
@@ -453,7 +540,7 @@ namespace SEE.GO
         /// <returns>the correponding graph node (will never be null)</returns>
         public static Node GetNode(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameObject.TryGetComponent(out NodeRef nodeRef))
             {
                 if (nodeRef != null)
                 {
@@ -463,28 +550,41 @@ namespace SEE.GO
                     }
                     else
                     {
-                        throw new Exception($"Node referenced by game object {gameObject.name} is null.");
+                        throw new NullReferenceException($"Node referenced by game object {gameObject.name} is null.");
                     }
                 }
                 else
                 {
-                    throw new Exception($"Node reference of game object {gameObject.name} is null.");
+                    throw new NullReferenceException($"Node reference of game object {gameObject.name} is null.");
                 }
             }
             else
             {
-                throw new Exception($"Game object {gameObject.name} has no NodeRef.");
+                throw new NullReferenceException($"Game object {gameObject.name} has no NodeRef.");
             }
         }
 
         /// <summary>
         /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it.
+        /// component attached to it whose edge is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
+        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it whose edge is not null</returns>
+        public static bool HasEdgeRef(this GameObject gameObject)
+        {
+            return gameObject.TryGetComponent(out EdgeRef edgeRef) && edgeRef.Value != null;
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
+        /// component attached to it. Unlike <see cref="HasEdgeRef(GameObject)"/> the
+        /// value of this edge reference may be null
         /// </summary>
         /// <param name="gameObject">the game object whose EdgeRef is checked</param>
         /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
         /// component attached to it</returns>
-        public static bool HasEdgeRef(this GameObject gameObject)
+        public static bool IsEdge(this GameObject gameObject)
         {
             return gameObject.TryGetComponent(out EdgeRef _);
         }
@@ -505,6 +605,7 @@ namespace SEE.GO
             {
                 edge = edgeRef.Value;
             }
+
             return edge != null;
         }
 
@@ -549,6 +650,7 @@ namespace SEE.GO
                 gameObject = gameObject.transform.parent.gameObject;
                 result = gameObject.name + "/" + result;
             }
+
             return result;
         }
 

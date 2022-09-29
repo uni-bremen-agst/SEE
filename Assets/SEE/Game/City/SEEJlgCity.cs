@@ -23,6 +23,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -44,12 +45,16 @@ namespace SEE.Game.City
         /// Path to the JLG file containing the runtime trace data.
         /// </summary>
         /// <returns>path of JLG file</returns>
-        public DataPath JLGPath = new DataPath();
+        [SerializeField, ShowInInspector, Tooltip("Path of JLG file"), FoldoutGroup(DataFoldoutGroup)]
+        public FilePath JLGPath = new FilePath();
 
         /// <summary>
         /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the
         /// JLG tracing data.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
             base.LoadData();

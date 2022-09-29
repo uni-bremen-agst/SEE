@@ -13,10 +13,8 @@ namespace SEE.Game.City
         /// The attribute labels for all attributes in the stored configuration file.
         /// </summary>
         private const string HierarchicalEdgesLabel = "HierarchicalEdges";
-        private const string SelectedNodeTypesLabel = "NodeTypes";
+        private const string NodeTypesLabel = "NodeTypes";
         private const string CoseGraphSettingsLabel = "CoseGraph";
-        private const string LeafNodeAttributesLabel = "LeafNodes";
-        private const string InnerNodeAttributesLabel = "InnerNodes";
         private const string ErosionMetricsLabel = "ErosionIssues";
         private const string NodeLayoutSettingsLabel = "NodeLayout";
         private const string EdgeLayoutSettingsLabel = "EdgeLayout";
@@ -27,6 +25,7 @@ namespace SEE.Game.City
         private const string ZScoreScaleLabel = "ZScoreScale";
         private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
         private const string EdgeSelectionLabel = "EdgeSelection";
+        private const string MetricToColorLabel = "MetricToColor";
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
@@ -35,16 +34,15 @@ namespace SEE.Game.City
         /// <param name="writer">writer for the configuration file</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            CityPath.Save(writer, CityPathLabel);
-            ProjectPath.Save(writer, ProjectPathLabel);
+            ConfigurationPath.Save(writer, CityPathLabel);
+            SourceCodeDirectory.Save(writer, ProjectPathLabel);
             SolutionPath.Save(writer, SolutionPathLabel);
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
-            writer.Save(SelectedNodeTypes, SelectedNodeTypesLabel);
+            NodeTypes.Save(writer, NodeTypesLabel);
+            MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
-            LeafNodeSettings.Save(writer, LeafNodeAttributesLabel);
-            InnerNodeSettings.Save(writer, InnerNodeAttributesLabel);
             ErosionSettings.Save(writer, ErosionMetricsLabel);
             NodeLayoutSettings.Save(writer, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
@@ -58,16 +56,15 @@ namespace SEE.Game.City
         /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            CityPath.Restore(attributes, CityPathLabel);
-            ProjectPath.Restore(attributes, ProjectPathLabel);
+            ConfigurationPath.Restore(attributes, CityPathLabel);
+            SourceCodeDirectory.Restore(attributes, ProjectPathLabel);
             SolutionPath.Restore(attributes, SolutionPathLabel);
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
-            ConfigIO.Restore(attributes, SelectedNodeTypesLabel, ref SelectedNodeTypes);
+            NodeTypes.Restore(attributes, NodeTypesLabel);
+            MetricToColor.Restore(attributes, MetricToColorLabel);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
-            LeafNodeSettings.Restore(attributes, LeafNodeAttributesLabel);
-            InnerNodeSettings.Restore(attributes, InnerNodeAttributesLabel);
             ErosionSettings.Restore(attributes, ErosionMetricsLabel);
             NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);

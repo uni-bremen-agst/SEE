@@ -182,8 +182,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return city == null ? DefaultAnimationDuration
-                : (node.IsLeaf() ? city.LeafNodeSettings.LabelSettings : city.InnerNodeSettings.LabelSettings).AnimationDuration;
+            return city == null ? DefaultAnimationDuration : city.NodeTypes[node.Type].LabelSettings.AnimationDuration;
         }
 
         private void On()

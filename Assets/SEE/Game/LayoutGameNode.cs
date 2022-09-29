@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.GO.NodeFactories;
 using SEE.Layout;
 using UnityEngine;
 
@@ -18,15 +19,15 @@ namespace SEE.Game
         private readonly NodeFactory nodeFactory;
 
         /// <summary>
-        /// Constructor in cases where <paramref name="gameObject"/> is not a leaf and was created by
-        /// a <paramref name="nodeFactory"/>.
+        /// Constructor.
         /// </summary>
-        /// <param name="to_layout_node">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
+        /// <param name="toLayoutNode">the mapping of graph nodes onto <see cref="ILayoutNode"/>s
+        /// this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
         /// <param name="nodeFactory">the node factory that created <paramref name="gameObject"/>;
         /// may be null for inner nodes</param>
-        public LayoutGameNode(Dictionary<Node, ILayoutNode> to_layout_node, GameObject gameObject, NodeFactory nodeFactory)
-            : base(gameObject.GetComponent<NodeRef>().Value, to_layout_node)
+        public LayoutGameNode(Dictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject, NodeFactory nodeFactory)
+            : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
         {
             this.gameObject = gameObject;
             this.nodeFactory = nodeFactory;

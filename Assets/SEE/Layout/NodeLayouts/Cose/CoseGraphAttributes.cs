@@ -84,7 +84,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// key: inner-node ids, value: the inner node kind
         /// </summary>
-        public Dictionary<string, InnerNodeKinds> InnerNodeShape = new Dictionary<string, InnerNodeKinds>();
+        public Dictionary<string, NodeShapes> InnerNodeShape = new Dictionary<string, NodeShapes>();
 
         /// <summary>
         /// the nodetypes
@@ -130,8 +130,8 @@ namespace SEE.Layout.NodeLayouts.Cose
             writer.Save(RepulsionStrength, RepulsionStrengthLabel);
             writer.Save(MultiLevelScaling, MultiLevelScalingLabel);
             writer.Save(ListInnerNodeToggle, ListInnerNodeToggleLabel);
-            writer.Save(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
-            writer.Save(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
+            writer.SaveAsStrings(InnerNodeLayout, InnerNodeLayoutLabel); // saves enums as strings
+            writer.SaveAsStrings(InnerNodeShape, InnerNodeShapeLabel);   // saves enums as strings
             writer.Save(LoadedForNodeTypes, LoadedForNodeTypesLabel);
             writer.Save(UseCalculationParameter, UseCalculationParameterLabel);
             writer.Save(UseIterativeCalculation, UseIterativeCalculationLabel);

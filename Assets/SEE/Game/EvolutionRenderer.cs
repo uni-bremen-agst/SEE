@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
@@ -49,11 +50,15 @@ namespace SEE.Game
     public partial class EvolutionRenderer : MonoBehaviour
     {
         /// <summary>
-        /// Constructors for MonoBehaviours are meaningless. We need to initialize everything
-        /// at Awake() time.
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
+        /// This method is expected to be called before attemption to draw any graph.
         /// </summary>
-        private void Awake()
+        /// <param name="graphs">series of graphs to be visualized</param>
+        public void SetGraphEvolution(List<Graph> graphs)
         {
+            this.graphs = graphs;
             if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
             {
                 // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
@@ -62,8 +67,7 @@ namespace SEE.Game
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(cityEvolution, null);
-                Assert.IsNotNull(graphRenderer);
+                graphRenderer = new GraphRenderer(cityEvolution, graphs);
                 edgesAreDrawn = graphRenderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
@@ -81,6 +85,7 @@ namespace SEE.Game
                 Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
                 enabled = false;
             }
+            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -159,12 +164,11 @@ namespace SEE.Game
             = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
-        /// Maps from the source of an edge to its animator. This storage is
+        /// Maps from the source of an edge to its tween. This storage is
         /// used by <see cref="RenderNode(Node)"/> to synchronize node
         /// animation with edge animation.
         /// </summary>
-        private Dictionary<Node, EdgeAnimator> edgeAnimators
-            = new Dictionary<Node, EdgeAnimator>();
+        private readonly Dictionary<Node, Tween> edgeTweens = new Dictionary<Node, Tween>();
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -585,7 +589,7 @@ namespace SEE.Game
                 if (currentCity != null)
                 {
                     // We are transitioning to another graph.
-                    edgeAnimators.Clear();
+                    edgeTweens.Clear();
                     foreach (Edge edge in next.Graph.Edges())
                     {
                         if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> target))
@@ -600,13 +604,8 @@ namespace SEE.Game
                             {
                                 morphism = edgeObject.AddComponent<SplineMorphism>();
                             }
-                            morphism.Init(source.Spline, target.Spline);
-                            if (!edgeObject.TryGetComponent(out EdgeAnimator animator))
-                            {
-                                animator = edgeObject.AddComponent<EdgeAnimator>();
-                                animator.Evaluator = morphism;
-                            }
-                            edgeAnimators[edge.Source] = animator;
+                            // We can adjust the duration later using the timeScale attribute.
+                            edgeTweens[edge.Source] = morphism.CreateTween(source.Spline, target.Spline, 1f);
                         }
                     }
                 }
@@ -704,7 +703,7 @@ namespace SEE.Game
                 {
                     GameObject child = childTransform.gameObject;
                     /// If a game node was deleted, it was marked inactive in
-                    /// <see cref="OnRemovedNodeFinishedAnimation"/>. We need to ignore such
+                    /// <see cref="OnRemoveFinishedAnimation"/>. We need to ignore such
                     /// game nodes.
                     if (child.activeInHierarchy && child.CompareTag(Tags.Node))
                     {
@@ -747,7 +746,7 @@ namespace SEE.Game
 
             UpdateGameNodeHierarchy();
             RenderPlane();
-            DestroyDeletedNodes();
+            DestroyDeletedGraphElements();
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -895,10 +894,9 @@ namespace SEE.Game
             RemoveFromNodeHierarchy(currentGameNode);
             // currentGameNode is shifted to its new position through the animator.
             Action<float> onEdgeAnimationStart = null;
-            if (edgeAnimators.TryGetValue(graphNode, out EdgeAnimator animator))
+            if (edgeTweens.TryGetValue(graphNode, out Tween tween))
             {
-                onEdgeAnimationStart = duration =>
-                    { OnEdgeAnimationStart(animator, duration); };
+                onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
             changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode,
                 OnAnimationNodeAnimationFinished, onEdgeAnimationStart);
@@ -924,18 +922,18 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The list of game nodes that were removed from the current graph to the next
+        /// The list of game nodes and edges that were removed from the current graph to the next
         /// graph. They will need to be destroyed at the end of phase 1 (or at the beginning
         /// of phase 2, respectively).
-        /// <seealso cref="DestroyDeletedNodes"/>.
+        /// <seealso cref="DestroyDeletedGraphElements"/>.
         /// </summary>
         private IList<GameObject> toBeDestroyed = new List<GameObject>();
 
         /// <summary>
-        /// Destroys all game nodes in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
+        /// Destroys all game nodes and edges in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
         /// will be cleared at the end.
         /// </summary>
-        private void DestroyDeletedNodes()
+        private void DestroyDeletedGraphElements()
         {
             foreach (GameObject gameObject in toBeDestroyed)
             {
@@ -950,7 +948,7 @@ namespace SEE.Game
         /// removed has been finished.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed</param>
-        private void OnRemovedNodeFinishedAnimation(object gameObject)
+        private void OnRemoveFinishedAnimation(object gameObject)
         {
             GameObject go = gameObject as GameObject;
             /// The gameObject must not be destroyed immediately, because the animator still
@@ -995,15 +993,21 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Starts the animation of <paramref name="animator"/> with given <paramref name="duration"/>.
+        /// Starts the animation of <paramref name="animatorTween"/> with given <paramref name="duration"/>.
         /// </summary>
-        /// <param name="animator">Animator to start</param>
+        /// <param name="animatorTween">Animator tween to start</param>
         /// <param name="duration">Duration of the animation</param>
-        private void OnEdgeAnimationStart(EdgeAnimator animator, float duration)
+        private void OnEdgeAnimationStart(Tween animatorTween, float duration)
         {
-            if (animator != null)
+            if (animatorTween != null)
             {
-                animator.DoAnimation(duration);
+                // We previously set the duration to 1 second and now want
+                // to change it to `duration` (henceforth actualDuration):
+                // actualDuration = setDuration / timeScale
+                // => actualDuration = 1 / timeScale
+                // => timeScale = 1 / actualDuration
+                animatorTween.timeScale = 1.0f / duration;
+                animatorTween.PlayForward();
             }
         }
 
@@ -1024,7 +1028,7 @@ namespace SEE.Game
                         child.SetParent(null);
                     }
                 }
-                Destroy(go);
+                Destroyer.DestroyGameObject(go);
             }
         }
 
@@ -1036,16 +1040,11 @@ namespace SEE.Game
         /// <param name="node">leaf node to be removed</param>
         private void RenderRemovedNode(Node node)
         {
-            if (objectManager.RemoveNode(node, out GameObject block))
+            if (objectManager.RemoveNode(node, out GameObject nodeObject))
             {
-                Assert.IsNotNull(block);
-                block.transform.SetParent(null);
-                /// if the node needs to be removed, mark it dead and let it raise to <see cref="SkyLevel"/>
-                marker.MarkDead(block);
-                Vector3 newPosition = block.transform.position;
-                newPosition.y = SkyLevel;
-                ILayoutNode nodeTransform = new AnimationNode(newPosition, block.transform.localScale);
-                moveAnimator.AnimateTo(block, nodeTransform, OnRemovedNodeFinishedAnimation);
+                Assert.IsNotNull(nodeObject);
+                marker.MarkDead(nodeObject);
+                AnimateToDeath(nodeObject);
             }
             else
             {
@@ -1053,27 +1052,32 @@ namespace SEE.Game
             }
         }
 
-        /// <summary>
-        /// Rendes given <paramref name="edge"/>.
-        /// </summary>
-        /// <param name="edge">edge to be rendered</param>
-        /// FOR ANIMATION: protected virtual void RenderEdge(Edge edge)
-        /// FOR ANIMATION: {
-        /// FOR ANIMATION: // FIXME.
-        /// FOR ANIMATION: }
+        private void AnimateToDeath(GameObject gameObject)
+        {
+            gameObject.transform.SetParent(null);
+            /// Let it raise to <see cref="SkyLevel"/>.
+            Vector3 newPosition = gameObject.transform.position;
+            newPosition.y = SkyLevel;
+            ILayoutNode nodeTransform = new AnimationNode(newPosition, gameObject.transform.localScale);
+            moveAnimator.AnimateTo(gameObject, nodeTransform, OnRemoveFinishedAnimation);
+        }
 
         /// <summary>
-        /// Removes the given edge. The edge is not destroyed, however.
+        /// Removes the given edge. The edge is not destroyed immediately, however.
+        /// Its destruction is postponed to <see cref="toBeDestroyed"/>. Yet, it is
+        /// set inactive here.
         /// </summary>
-        /// <param name="edge"></param>
+        /// <param name="edge">removed edge</param>
         private void RenderRemovedEdge(Edge edge)
         {
-            if (edgesAreDrawn)
+            if (edgesAreDrawn && objectManager.RemoveEdge(edge, out GameObject edgeObject))
             {
-                objectManager.GetEdge(edge, out GameObject edgeObject);
-                edgeObject.SetActive(false);
+                AnimateToDeath(edgeObject);
             }
-            phase1AnimationWatchDog.Finished();
+            else
+            {
+                phase1AnimationWatchDog.Finished();
+            }
         }
 
         // **********************************************************************
@@ -1165,18 +1169,6 @@ namespace SEE.Game
                 shownGraphHasChangedEvent.Invoke();
                 isAutoplayReverse = value;
             }
-        }
-
-        /// <summary>
-        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
-        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
-        /// that can be called next.
-        /// </summary>
-        /// <param name="graphs">series of graphs to be visualized</param>
-        public void SetGraphEvolution(List<Graph> graphs)
-        {
-            this.graphs = graphs;
-            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -1505,11 +1497,11 @@ namespace SEE.Game
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
         /// <returns>names of all existing node metrics</returns>
-        internal List<string> AllExistingMetrics()
+        internal ISet<string> AllExistingMetrics()
         {
             if (currentCity == null || currentCity.Graph == null)
             {
-                return new List<string>();
+                return new HashSet<string>();
             }
             else
             {
