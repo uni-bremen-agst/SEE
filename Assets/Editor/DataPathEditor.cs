@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Game;
+using SEE.Utils;
 using UnityEditor;
 using UnityEngine;
 

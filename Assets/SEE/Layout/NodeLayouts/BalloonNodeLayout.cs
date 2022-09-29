@@ -7,9 +7,9 @@ using UnityEngine;
 namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
-    /// Creates a balloon layout according to "Reconfigurable Disc Trees for Visualizing 
+    /// Creates a balloon layout according to "Reconfigurable Disc Trees for Visualizing
     /// Large Hierarchical Information Space" by Chang-Sung Jeong and Alex Pang.
-    /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on 
+    /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on
     /// Information Visualization, Pages 19-25.
     /// </summary>
     public class BalloonNodeLayout : HierarchicalNodeLayout
@@ -118,7 +118,7 @@ namespace SEE.Layout.NodeLayouts
         // which lies on the vertical line between rp_i and cp_i.
         //
         // We define apex height ah_i and reference height rh_i as the vertical
-        // heights of ap_i and rp_i from cp_i, respectively. We define 
+        // heights of ap_i and rp_i from cp_i, respectively. We define
         // reference length rl_i as the length between i and rp_i. Each node
         // is associated with its attribute set AT_i = {rl_i, ah_i, rh_i},
         // which consists of reference length, apex, and reference height.
@@ -132,7 +132,7 @@ namespace SEE.Layout.NodeLayouts
         //
         // We define a 3D RDT as one with zero reference length rl_i, and a 2D
         // RDT with non-zero reference length rl_i and zero reference height
-        // rh_i for every node i, respectively. 
+        // rh_i for every node i, respectively.
         //
         // Note that each node i in the 3D RDT is identical to its reference
         // point r_i, and each center point cp_i in the 2D RDT is identical to
@@ -140,17 +140,17 @@ namespace SEE.Layout.NodeLayouts
         //
         // A 3D RDG can change its shape into a disc tree or a compact disc tree
         // by changing apex and reference height as follows. A disc tree is a
-        // 3D RDT with zero apex and non-zero reference heights for each node. 
-        // A compact disc tree is a 3D RDT with both of reference and apex heights 
+        // 3D RDT with zero apex and non-zero reference heights for each node.
+        // A compact disc tree is a 3D RDT with both of reference and apex heights
         // equal to zero for each node at odd levels and with the identical apex
         // and reference heights for each node at even levels. A plane disc tree is
         // a 2D RDT which lies on the plane.
-        // 
-        // To draw a node i, cp_i, rad_i, and out_rad_i need to be known. The disc with 
+        //
+        // To draw a node i, cp_i, rad_i, and out_rad_i need to be known. The disc with
         // radius rad_i and center point cp_i will be left empty. A circle will be drawn
-        // with center point cp_i and radius out_rad_i representing i. The centers cp_k of 
+        // with center point cp_i and radius out_rad_i representing i. The centers cp_k of
         // the disc of every child k of i will all be located on a circle with center point
-        // cp_i and radius (rad_i + rl_k), where all children of i have the same reference 
+        // cp_i and radius (rad_i + rl_k), where all children of i have the same reference
         // length rl_k.
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace SEE.Layout.NodeLayouts
         /// This algorithm is described in the paper.
         /// </summary>
         /// <param name="node">the node for which the ballon layout is to be computed</param>
-        /// <param name="out_rad">radius of the minimal circle around node that includes every circle 
+        /// <param name="out_rad">radius of the minimal circle around node that includes every circle
         ///                       of its descendants</param>
         private void CalculateRadius2D(ILayoutNode node, out float out_rad)
         {
@@ -248,14 +248,15 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 // inner node
-                // inner nodes will be positioned and scaled, primarily in x and z axes; 
+                // inner nodes will be positioned and scaled, primarily in x and z axes;
                 // the inner nodes will be slightly lifted along the y axis according to their
                 // tree depth so that they can be stacked visually (level 0 is at the bottom)
                 position.y += LevelLift(node);
                 layout_result[node]
                     = new NodeTransform(position,
                                         new Vector3(2 * nodeInfos[node].outer_radius,
-                                                    innerNodeHeight, 2 * nodeInfos[node].outer_radius));
+                                                    node.LocalScale.y,
+                                                    2 * nodeInfos[node].outer_radius));
 
                 // The center points of the children circles are located on the circle
                 // with center point 'position' and radius of the inner circle of the
@@ -263,7 +264,7 @@ namespace SEE.Layout.NodeLayouts
                 // for details.
                 float parent_inner_radius = nodeInfos[node].radius + nodeInfos[node].reference_length_children;
 
-                // Placing all children of the inner circle defined by the 
+                // Placing all children of the inner circle defined by the
                 // center point (the given position) and the radius with some
                 // space in between if that is possible.
 
@@ -282,7 +283,7 @@ namespace SEE.Layout.NodeLayouts
                     foreach (ILayoutNode child in children)
                     {
                         double child_outer_radius = nodeInfos[child].outer_radius;
-                        // As in polar coordinates, the angle of the child circle w.r.t. to the 
+                        // As in polar coordinates, the angle of the child circle w.r.t. to the
                         // circle point of the node's circle. The distance from the node's center point
                         // to the child node's center point together with this angle defines the polar
                         // coordinates of the child relative to the node.
@@ -325,19 +326,19 @@ namespace SEE.Layout.NodeLayouts
 
                     foreach (ILayoutNode child in children)
                     {
-                        // As in polar coordinates, the angle of the child circle w.r.t. to the 
+                        // As in polar coordinates, the angle of the child circle w.r.t. to the
                         // circle point of the node's circle. The distance from the node's center point
                         // to the child node's center point together with this angle defines the polar
                         // coordinates of the child relative to the node.
                         double child_outer_radius = nodeInfos[child].outer_radius;
 
-                        // Asin (arcsin) returns an angle, θ, measured in radians, such that 
+                        // Asin (arcsin) returns an angle, θ, measured in radians, such that
                         // -π/2 ≤ θ ≤ π/2 -or- NaN if d < -1 or d > 1 or d equals NaN.
                         double alpha = 2 * System.Math.Asin(child_outer_radius / (2 * parent_inner_radius));
 
                         if (accummulated_alpha > 0.0)
                         {
-                            // We are not drawing the very first child circle. We need to add 
+                            // We are not drawing the very first child circle. We need to add
                             // the alpha angle of the current child circle to the accumulated alpha.
                             accummulated_alpha += alpha;
 

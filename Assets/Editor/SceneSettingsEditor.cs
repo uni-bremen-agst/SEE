@@ -26,7 +26,7 @@ namespace SEEEditor
         private static readonly Type[] CityTypes =
         {
             // If there are SEECity types not listed in the menu, you can add them here.
-            typeof(SEECity), typeof(SEECityEvolution), typeof(SEECityRandom), typeof(SEEDynCity), typeof(SEEJlgCity)
+            typeof(SEECity), typeof(SEECityEvolution), typeof(SEECityRandom), typeof(SEEJlgCity)
         };
 
         /// <summary>

@@ -3,7 +3,9 @@
     "references": [
         "SteamVR_Windows_EditorHelper",
         "Unity.XR.OpenVR",
-        "UnityEngine.SpatialTracking"
+        "UnityEngine.SpatialTracking",
+        "UnityEngine.UI",
+        "UnityEditor.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [

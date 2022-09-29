@@ -1,7 +1,11 @@
 {
     "name": "UMotionSourceEditor",
     "references": [
-        "UMotionSourceApplication"
+        "UMotionSourceApplication",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

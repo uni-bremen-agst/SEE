@@ -114,7 +114,7 @@ namespace SEE.Game
                     GameEdgeMover.MoveAllConnectingEdgesOfNode(parent);
                 }
 
-                GameObject result = city.Renderer.DrawLeafNode(node);
+                GameObject result = city.Renderer.DrawNode(node);
                 result.transform.localScale = worldSpaceScale;
                 result.transform.position = new Vector3(position.x, parent.transform.position.y + worldSpaceScale.y / 2, position.z);
                 result.transform.SetParent(parent.transform);

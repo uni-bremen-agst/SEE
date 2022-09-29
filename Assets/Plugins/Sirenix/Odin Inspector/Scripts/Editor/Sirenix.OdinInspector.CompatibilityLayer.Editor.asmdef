@@ -1,7 +1,11 @@
 {
     "name": "Sirenix.OdinInspector.CompatibilityLayer.Editor",
     "references": [
-        "Sirenix.OdinInspector.CompatibilityLayer"
+        "Sirenix.OdinInspector.CompatibilityLayer",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

@@ -5,7 +5,11 @@
         "Unity.Addressables.Editor",
         "Unity.ResourceManager",
         "Unity.Addressables",
-        "Addressable_Editor"
+        "Addressable_Editor",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

@@ -4,7 +4,6 @@ using SEE.Layout.NodeLayouts.TreeMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -110,7 +109,7 @@ namespace SEE.Layout.NodeLayouts
             if (roots.Count == 1)
             {
                 ILayoutNode root = roots[0];
-                UnityEngine.Assertions.Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
+                Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
                 layout_result[root] = new NodeTransform(Vector3.zero,
                                                         new Vector3(width, root.LocalScale.y, depth));
                 CalculateLayout(root.Children(), x: -width / 2.0f, z: -depth / 2.0f, width, depth);
@@ -253,7 +252,7 @@ namespace SEE.Layout.NodeLayouts
                 ILayoutNode o = nodes[i].gameNode;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
-                UnityEngine.Assertions.Assert.AreEqual(o.AbsoluteScale, o.LocalScale);
+                Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
                 layout_result[o] = new NodeTransform(position, scale);
                 i++;
             }

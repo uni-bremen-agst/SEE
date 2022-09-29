@@ -12,32 +12,13 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      : N3DS
+      : Any
     second:
-      enabled: 1
-      settings: {}
+      enabled: 0
+      settings:
+        Exclude Editor: 1
   - first:
-      : PSM
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      : PSP2
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      : SamsungTV
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      : Tizen
-    second:
-      enabled: 1
-      settings: {}
-  - first:
-      : WiiU
+      Android: Android
     second:
       enabled: 1
       settings: {}
@@ -45,29 +26,12 @@ PluginImporter:
       Any: 
     second:
       enabled: 0
-      settings:
-        Exclude Android: 1
-        Exclude Editor: 1
-        Exclude Linux: 1
-        Exclude Linux64: 1
-        Exclude LinuxUniversal: 1
-        Exclude N3DS: 0
-        Exclude OSXIntel: 1
-        Exclude OSXIntel64: 1
-        Exclude OSXUniversal: 1
-        Exclude PS4: 0
-        Exclude PSM: 0
-        Exclude PSP2: 0
-        Exclude SamsungTV: 0
-        Exclude Tizen: 0
-        Exclude WebGL: 0
-        Exclude WiiU: 0
-        Exclude Win: 1
-        Exclude Win64: 1
-        Exclude WindowsStoreApps: 0
-        Exclude XboxOne: 0
-        Exclude iOS: 0
-        Exclude tvOS: 0
+      settings: {}
+  - first:
+      CloudRendering: CloudRendering
+    second:
+      enabled: 1
+      settings: {}
   - first:
       Editor: Editor
     second:
@@ -75,7 +39,47 @@ PluginImporter:
       settings:
         DefaultValueInitialized: true
   - first:
+      GameCoreXboxOne: GameCoreXboxOne
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Lumin: Lumin
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Nintendo Switch: Switch
+    second:
+      enabled: 1
+      settings: {}
+  - first:
       PS4: PS4
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      PS5: PS5
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Stadia: Stadia
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Linux64
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: OSXUniversal
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Win
     second:
       enabled: 1
       settings: {}

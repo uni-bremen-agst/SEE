@@ -1,7 +1,11 @@
 {
     "name": "DynamicPanels.Editor",
     "references": [
-        "DynamicPanels.Runtime"
+        "DynamicPanels.Runtime",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

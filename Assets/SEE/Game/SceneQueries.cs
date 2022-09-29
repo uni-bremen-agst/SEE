@@ -242,10 +242,6 @@ namespace SEE.Game
         /// <summary>
         /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
         ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
-        ///
         /// Precondition: Such a game object actually exists.
         /// </summary>
         /// <param name="nodeID">the unique ID of the node to be retrieved</param>
@@ -253,22 +249,17 @@ namespace SEE.Game
         /// <exception cref="Exception">thrown if there is no such object</exception>
         public static GameObject RetrieveGameNode(string nodeID)
         {
-            foreach (GameObject gameNode in AllGameNodesInScene(true, true))
+            GameObject gameObject = GraphElementIDMap.Find(nodeID);
+            if (gameObject == null)
             {
-                if (gameNode.name == nodeID)
-                {
-                    return gameNode;
-                }
+                throw new Exception($"Node named {nodeID} not found.");
             }
-            throw new Exception($"Node named {nodeID} not found.");
+
+            return gameObject;
         }
 
         /// <summary>
         /// Retrieves the game object representing the given <paramref name="node"/>.
-        ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
         ///
         /// Preconditions:
         ///   (1) <paramref name="node"/> is not null.
@@ -277,17 +268,13 @@ namespace SEE.Game
         /// <param name="node">the node to be retrieved</param>
         /// <returns>the game object representing the given <paramref name="node"/></returns>
         /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(Node node)
+        public static GameObject RetrieveGameNode(this Node node)
         {
             return RetrieveGameNode(node.ID);
         }
 
         /// <summary>
         /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
-        ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
         ///
         /// Preconditions:
         /// (1) <paramref name="nodeRef"/> must reference a valid node.

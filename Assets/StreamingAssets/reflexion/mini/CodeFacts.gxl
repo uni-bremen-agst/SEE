@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CodeFacts" edgeids="true">
+    <node id="N4">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>h1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>60714db7-ff10-454d-9eea-b41bbaa7b14d</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>h2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>343fe43c-761b-4446-a01d-8d52174aefff</string>
+      </attr>
+    </node>
+    <node id="NX">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>inner1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>inner1</string>
+      </attr>	  
+    </node>
+    <node id="NY">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>inner2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>inner2</string>
+      </attr>		  
+    </node>
+    <node id="N6">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>h3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>6829025f-60e3-45d6-9f19-7da1ab473522</string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>implementation</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>implementation</string>
+      </attr>
+    </node>
+    <edge id="E3" from="N4" to="N5">
+      <type xlink:href="Call"/>
+    </edge>
+    <edge id="E4" from="N5" to="N6">
+      <type xlink:href="Call"/>
+    </edge>
+    <edge id="E5" from="N4" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N5" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E7" from="N6" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EX" from="NX" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EY" from="NY" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>

@@ -1,7 +1,11 @@
 {
     "name": "UMA_Examples_Editor",
     "references": [
-        "UMA_Examples"
+        "UMA_Examples",
+        "UnityEditor.UI",
+        "UnityEngine.UI",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

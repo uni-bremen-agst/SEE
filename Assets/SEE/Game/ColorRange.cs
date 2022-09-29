@@ -14,28 +14,41 @@ namespace SEE.Game
         /// <summary>
         /// First color in the range.
         /// </summary>
-        public Color lower;
+        [SerializeField]
+        public Color Lower;
         /// <summary>
         /// Last color in the range.
         /// </summary>
-        public Color upper;
+        [SerializeField]
+        public Color Upper;
         /// <summary>
         /// The number of colors in the range.
         /// </summary>
+        [SerializeField]
         public uint NumberOfColors;
 
         public ColorRange(Color lower, Color upper, uint numberOfColors)
         {
-            this.lower = lower;
-            this.upper = upper;
+            Lower = lower;
+            Upper = upper;
             NumberOfColors = numberOfColors;
         }
 
         public ColorRange(Color color)
         {
-            lower = color;
-            upper = color;
+            Lower = color;
+            Upper = color;
             NumberOfColors = 1;
+        }
+
+        /// <summary>
+        /// The default color range that we use if the we cannot find an
+        /// explicit setting by the user.
+        /// </summary>
+        /// <returns>default color range</returns>
+        public static ColorRange Default()
+        {
+            return new ColorRange(Color.white, Color.black, 10);
         }
 
         private const string LowerLabel = "Lower";
@@ -50,8 +63,8 @@ namespace SEE.Game
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(lower, LowerLabel);
-            writer.Save(upper, UpperLabel);
+            writer.Save(Lower, LowerLabel);
+            writer.Save(Upper, UpperLabel);
             writer.Save((int)NumberOfColors, NumberOfColorsLabel);
             writer.EndGroup();
         }
@@ -63,21 +76,24 @@ namespace SEE.Game
         /// </summary>
         /// <param name="attributes">where to look up the values</param>
         /// <param name="label">the key for the lookup</param>
-        internal void Restore(Dictionary<string, object> attributes, string label)
+        /// <returns>true if this <see cref="ColorRange"/> could be restored</returns>
+        internal bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, LowerLabel, ref lower);
-                    ConfigIO.Restore(values, UpperLabel, ref upper);
+                    ConfigIO.Restore(values, LowerLabel, ref Lower);
+                    ConfigIO.Restore(values, UpperLabel, ref Upper);
                     long storedNumberOfColors = 0;
                     if (ConfigIO.Restore(values, NumberOfColorsLabel, ref storedNumberOfColors))
                     {
                         NumberOfColors = (uint)storedNumberOfColors;
                     }
+                    return true;
                 }
             }
+            return false;
         }
     }
 }

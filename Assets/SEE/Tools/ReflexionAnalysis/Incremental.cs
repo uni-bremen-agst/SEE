@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using UnityEngine;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -44,7 +45,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, to));
-            Edge edge = AddEdge(from, to, type);
+            Edge edge = AddEdge(from, to, type, false);
             Notify(new EdgeEvent(edge, ChangeType.Addition, Implementation));
             PropagateAndLiftDependency(edge);
             return edge;
@@ -92,12 +93,12 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge propagated = GetPropagatedDependency(edge);
             if (propagated != null)
             {
-                if (GetState(propagated) != State.Divergent)
+                if (propagated.State() != State.Divergent)
                 {
                     // A convergence exists that must be handled (i.e. by decreasing the matching specified edge's counter).
                     if (!Lift(propagated.Source, propagated.Target, propagated.Type, -GetImplCounter(edge), out Edge _))
                     {
-                        throw new InvalidOperationException($"Since this edge is {GetState(propagated)} and not "
+                        throw new InvalidOperationException($"Since this edge is {propagated.State()} and not "
                                                             + "Divergent, it must have a matching specified edge.");
                     }
                 }
@@ -140,7 +141,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(FullGraph.ContainsNode(to) && to.IsInArchitecture(),
                           () => new NotInSubgraphException(Architecture, to));
             AssertNotRedundant(from, to, type);
-            Edge edge = AddEdge(from, to, type);
+            Edge edge = AddEdge(from, to, type, true);
             SetState(edge, State.Specified);
             Notify(new EdgeEvent(edge, ChangeType.Addition, Architecture));
 
@@ -161,7 +162,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 noneCovered = false;
                 ChangeSpecifiedDependency(edge, GetImplCounter(coveredEdge));
-                Transition(coveredEdge, GetState(coveredEdge), State.Allowed);
+                Transition(coveredEdge, coveredEdge.State(), State.Allowed);
             }
 
             if (noneCovered)
@@ -212,7 +213,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Architecture, edge));
             AssertOrThrow(IsSpecified(edge), () => new ExpectedSpecifiedEdgeException(edge));
 
-            if (GetState(edge) == State.Convergent)
+            if (edge.State() == State.Convergent)
             {
                 // We need to handle the propagated dependencies covered by this specified edge.
 
@@ -228,7 +229,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                                      .Where(IsCoveredEdge);
                 foreach (Edge coveredEdge in coveredEdges)
                 {
-                    Transition(coveredEdge, GetState(coveredEdge), State.Divergent);
+                    Transition(coveredEdge, coveredEdge.State(), State.Divergent);
                 }
             }
 
@@ -240,23 +241,37 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Adds a new Maps_To edge from <paramref name="from"/> to <paramref name="to"/> to the mapping graph and
         /// re-runs the reflexion analysis incrementally.
-        /// Preconditions: <paramref name="from"/> is contained in the implementation graph and not yet mapped
-        /// explicitly and <paramref name="to"/> is contained in the architecture graph.
+        /// Preconditions: <paramref name="from"/> is contained in the implementation graph
+        /// and <paramref name="to"/> is contained in the architecture graph.
+        /// If <paramref name="overrideMapping"/> is false, <paramref name="from"/> must not yet be explicitly mapped.
         /// Postcondition: Created edge is contained in the mapping graph and the reflexion
         ///   graph is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="from">the source of the Maps_To edge to be added to the mapping graph</param>
         /// <param name="to">the target of the Maps_To edge to be added to the mapping graph</param>
+        /// <param name="overrideMapping">whether any existing mapping from <paramref name="from"/> shall be
+        /// replaced by this one</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
         /// <exception cref="AlreadyExplicitlyMappedException">When <paramref name="from"/> is already explicitly
-        /// mapped to an architecture node.</exception>
-        public void AddToMapping(Node from, Node to)
+        /// mapped to an architecture node and <paramref name="overrideMapping"/> is false.</exception>
+        public Edge AddToMapping(Node from, Node to, bool overrideMapping = false)
         {
             AssertOrThrow(from.IsInImplementation(), () => new NotInSubgraphException(Implementation, from));
             AssertOrThrow(to.IsInArchitecture(), () => new NotInSubgraphException(Architecture, to));
-            AssertOrThrow(!IsExplicitlyMapped(from), () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
+
+            if (IsExplicitlyMapped(from))
+            {
+                // Existing mapping is only allowed if it can be overridden
+                AssertOrThrow(overrideMapping, () => new AlreadyExplicitlyMappedException(from, MapsTo(from)));
+                if (MapsTo(from) == to)
+                {
+                    // We don't need to do anything more, since the node is already mapped to the target.
+                    return from.FromTo(MapsTo(from), MapsToType).Single();
+                }
+                DeleteFromMapping(from);
+            }
 
             // all nodes that should be mapped onto 'to', too, as a consequence of
             // mapping 'from'
@@ -274,6 +289,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // adjust implicit mapping
             ChangeMap(subtree, to);
             Map(subtree, to);
+            return from.FromTo(MapsTo(from), MapsToType).Single();
         }
 
         /// <summary>
@@ -289,12 +305,11 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(edge.IsInMapping() && FullGraph.ContainsEdge(edge),
                           () => new NotInSubgraphException(Mapping, edge));
-            DeleteFromMapping(edge.Source, edge.Target);
+            DeleteMapsTo(edge);
         }
 
         /// <summary>
-        /// Removes the Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
-        /// from the mapping graph.
+        /// Removes the Maps_To edge starting from <paramref name="from"/> from the mapping graph.
         /// Precondition: a Maps_To edge between <paramref name="from"/> and <paramref name="to"/>
         /// must be contained in the mapping graph, <paramref name="from"/> is contained in implementation graph
         /// and <paramref name="to"/> is contained in the architecture graph.
@@ -303,23 +318,23 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="from">the source (contained in implementation graph) of the Maps_To edge
         /// to be removed from the mapping graph </param>
-        /// <param name="to">the target (contained in the architecture graph) of the Maps_To edge
-        /// to be removed from the mapping graph </param>
+        /// <param name="ignoreUnmapped">Whether to do nothing when the given node is not explicitly mapped.
+        /// If <c>false</c>, this will throw an exception instead.</param>
         /// <exception cref="NotInSubgraphException">When <paramref name="from"/>
         /// is not contained in the implementation graph or <paramref name="to"/> is not contained in the
         /// architecture graph.</exception>
-        public void DeleteFromMapping(Node from, Node to)
+        /// <exception cref="NotExplicitlyMappedException">When <paramref name="ignoreUnmapped"/> is false
+        /// and the given node is not explicitly mapped.</exception>
+        public void DeleteFromMapping(Node from, bool ignoreUnmapped = false)
         {
             AssertOrThrow(from.IsInImplementation() && FullGraph.ContainsNode(from),
                           () => new NotInSubgraphException(Implementation, from));
-            AssertOrThrow(to.IsInArchitecture() && FullGraph.ContainsNode(to),
-                          () => new NotInSubgraphException(Architecture, to));
 
             // The mapsTo edge in between from mapFrom to mapTo. There should be exactly one such edge.
-            Edge mapsToEdge = from.FromTo(to, MapsToType).SingleOrDefault(x => x.IsInMapping());
-            if (mapsToEdge == null)
+            Edge mapsToEdge = from.Outgoings.SingleOrDefault(x => x.IsInMapping());
+            if (mapsToEdge == null && !ignoreUnmapped)
             {
-                throw new InvalidOperationException($"There must be exactly one mapping in between {from} and {to}.");
+                throw new NotExplicitlyMappedException(from);
             }
 
             // Deletes the unique Maps_To edge.
@@ -557,7 +572,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
 
@@ -565,7 +580,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
 
@@ -573,7 +588,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Allowed);
+                    Transition(edge, edge.State(), State.Allowed);
                 }
             }
         }
@@ -603,7 +618,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -611,7 +626,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -620,7 +635,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _)
                     || Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, GetState(edge), State.Divergent);
+                    Transition(edge, edge.State(), State.Divergent);
                 }
             }
 
@@ -741,11 +756,11 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else if (edge.IsInMapping())
             {
-                DeleteFromMapping(edge.Source, edge.Target);
+                DeleteFromMapping(edge);
             }
             else
             {
-                throw new NotSupportedException("Given edge must be either in architecture, implementation, or mapping graph!");
+                throw new NotSupportedException("Given edge must be in reflexion graph!");
             }
         }
 
@@ -819,7 +834,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="root">Node whose subtree's allowed propagated dependencies shall be returned</param>
         /// <returns>All allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
-        private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Allowed);
+        private static PartitionedDependencies AllowedRefsInSubtree(Node root) => RefsInSubtree(root, e => e.State() == State.Allowed);
 
         /// <summary>
         /// Returns all divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.
@@ -827,7 +842,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="root">Node whose subtree's divergent propagated dependencies shall be returned</param>
         /// <returns>All divergent propagated dependencies of the subtree rooted by <paramref name="root"/>.</returns>
-        private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => GetState(e) == State.Divergent);
+        private static PartitionedDependencies DivergentRefsInSubtree(Node root) => RefsInSubtree(root, e => e.State() == State.Divergent);
 
         /// <summary>
         /// Reverts the effect of the mapping indicated by <paramref name="mapsTo"/>.
