@@ -25,6 +25,7 @@
 /Assets/SEETests/** linguist-generated=false
 /Assets/StreamingAssets/** linguist-generated=false
 /Assets/Trailer/** linguist-generated=false
-/Packages/** linguist-generated=true
+Assets/OfficeArchviz.meta filter=lfs diff=lfs merge=lfs -text
+Assets/OfficeArchviz/** filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text
