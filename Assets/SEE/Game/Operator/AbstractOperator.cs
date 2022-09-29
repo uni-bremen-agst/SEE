@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
@@ -152,13 +153,19 @@ namespace SEE.Game.Operator
         /// Note that the type of the target value <typeparamref name="V"/> still has to be specified.
         /// </summary>
         /// <typeparam name="V">The type of the target value</typeparam>
-        protected class TweenOperation<V> : Operation<Tween, V, TweenCallback>
+        protected class TweenOperation<V> : Operation<IList<Tween>, V, Action>
         {
             public override void KillAnimator(bool complete = false)
             {
-                if (Animator != null && Animator.IsActive())
+                if (Animator != null)
                 {
-                    Animator.Kill(complete);
+                    foreach (Tween tween in Animator)
+                    {
+                        if (tween != null && tween.IsActive())
+                        {
+                            tween.Kill(complete);
+                        }
+                    }
                 }
 
                 base.KillAnimator(complete);
@@ -172,13 +179,16 @@ namespace SEE.Game.Operator
                     // We execute the first step immediately. This way, callers can expect the change to
                     // be implemented when control is returned to them, the same way it would work when
                     // setting the target value manually.
-                    Animator.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                    foreach (Tween tween in Animator)
+                    {
+                        tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                    }
                 }
             }
 
-            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator);
+            protected override IOperationCallback<Action> AnimatorCallback => new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
-            public TweenOperation(Func<V, float, Tween> animateToAction, V targetValue) : base(animateToAction, targetValue)
+            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue) : base(animateToAction, targetValue)
             {
             }
         }

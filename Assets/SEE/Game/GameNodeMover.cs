@@ -27,7 +27,7 @@ namespace SEE.Game
         /// </summary>
         public const float SCALING_FACTOR = 0.2f;
 
-        private const float OUTER_EDGE_MARGIN = 0.03f;
+        private const float OUTER_EDGE_MARGIN = 0.02f;
 
         /// <summary>
         /// Moves the given <paramref name="movingObject"/> on a sphere around the
@@ -87,7 +87,7 @@ namespace SEE.Game
 
                 if (movingObject.IsInArea(newGameParent, OUTER_EDGE_MARGIN))
                 {
-                    ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer edges of other nodes!", log: false);
+                    ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer margins of other nodes!", log: false);
                     parent = null;
                     return false;
                 }

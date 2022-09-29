@@ -68,9 +68,29 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<TweenCallback> ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
+        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
         {
             return color.AnimateTo((newStartColor, newEndColor), duration);
+        }
+
+        /// <summary>
+        /// Fade the alpha property of the edge to the given new <paramref name="alpha"/> value.
+        /// </summary>
+        /// <param name="alpha">The new alpha value for the edge. Must be in interval [0; 1]</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        /// <exception cref="ArgumentException">If the given <paramref name="alpha"/> value is outside the
+        /// range of [0; 1].</exception>
+        public IOperationCallback<Action> FadeTo(float alpha, float duration)
+        {
+            if (alpha < 0 || alpha > 1)
+            {
+                throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
+            }
+
+            (Color start, Color end) = color.TargetValue;
+            return color.AnimateTo((start.WithAlpha(alpha), end.WithAlpha(alpha)), duration);
         }
 
         #endregion
@@ -105,7 +125,7 @@ namespace SEE.Game.Operator
             gameObject.MustGetComponent(out spline);
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
 
-            Tween AnimateToColorAction((Color start, Color end) colors, float d)
+            Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
             {
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
                                               c => spline.GradientColors = (c, spline.GradientColors.end),
@@ -113,10 +133,7 @@ namespace SEE.Game.Operator
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             colors.end, d);
-                Sequence sequence = DOTween.Sequence();
-                sequence.Insert(0, startTween);
-                sequence.Insert(0, endTween);
-                return sequence.Play();
+                return new Tween[] { startTween.Play(), endTween.Play() };
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
