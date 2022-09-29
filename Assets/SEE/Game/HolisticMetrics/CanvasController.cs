@@ -1,22 +1,47 @@
+using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
 {
+    /// <summary>
+    /// This class controls/manages the holistic metrics canvas/board.
+    /// </summary>
     internal class CanvasController : MonoBehaviour
     {
+        /// <summary>
+        /// Each anchor for positioning widgets on the metrics board needs to be added to this list. If you need more
+        /// positions for adding widgets, just add them to this list.
+        /// </summary>
+        [SerializeField] private List<GameObject> anchors;
+        
+        /// <summary>
+        /// This contains references to all the metrics that registered themselves with this controller. This list is
+        /// needed so we can refresh them.
+        /// </summary>
         private readonly List<Metric> metrics = new List<Metric>();
 
         /// <summary>
-        /// This method will be called by every Metric to register itself with this CanvasController.
+        /// If there is still space on the metrics board (there are less than 6 widgets on it), adds the desired widget
+        /// to the board.
         /// </summary>
-        /// <param name="metric"></param>
-        internal void Register(Metric metric)
+        /// <param name="metricType">The type of the metric to use.</param>
+        /// <param name="widget">The widget prefab to use.</param>
+        internal void AddMetric(Type metricType, GameObject widget)
         {
-            metrics.Add(metric);
+            if (metrics.Count < anchors.Count)
+            {
+                GameObject widgetInstance = Instantiate(widget, anchors[metrics.Count].transform);
+                Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
+                metrics.Add(metricInstance);
+            }
+            else
+            {
+                // Show a popup that tells the user the metrics board is full.
+            }
         }
-        
+
         /// <summary>
         /// Whenever a code city changes, this method needs to be called. It will call the Refresh() methods of all
         /// Metrics.
