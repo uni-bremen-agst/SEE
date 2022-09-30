@@ -23,8 +23,8 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
-        private readonly CanvasController _metricsCanvasController =
-            GameObject.Find("MetricsCanvas").GetComponent<CanvasController>();
+        private readonly BoardsManager boardsManager =
+            GameObject.Find("HolisticMetricsManager").GetComponent<BoardsManager>();
         
         /// <summary>
         /// Constructor.
@@ -418,7 +418,11 @@ namespace SEE.Game
                     }
                 }
             }
-            _metricsCanvasController.OnGraphLoad();
+
+            if (boardsManager != null)
+            {
+                boardsManager.OnGraphLoad();    
+            }
         }
 
         /// <summary>
