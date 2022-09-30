@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.HolisticMetrics
 {
     /// <summary>
-    /// This class controls/manages the holistic metrics canvas/board.
+    /// This class controls/manages a holistic metrics board.
     /// </summary>
-    internal class CanvasController : MonoBehaviour
+    internal class BoardController : MonoBehaviour
     {
         /// <summary>
         /// Each anchor for positioning widgets on the metrics board needs to be added to this list. If you need more
@@ -20,8 +21,24 @@ namespace SEE.Game.HolisticMetrics
         /// This contains references to all the metrics that registered themselves with this controller. This list is
         /// needed so we can refresh them.
         /// </summary>
-        private readonly List<Metric> metrics = new List<Metric>();
+        internal readonly List<Metric> metrics = new List<Metric>();
 
+        /// <summary>
+        /// The title of the board that this controller controls.
+        /// </summary>
+        private string title;
+
+        internal string getTitle()
+        {
+            return title;
+        }
+        
+        internal void setTitle(string newTitle)
+        {
+            title = newTitle;
+            gameObject.GetComponentInChildren<Text>().text = newTitle;
+        }
+        
         /// <summary>
         /// If there is still space on the metrics board (there are less than 6 widgets on it), adds the desired widget
         /// to the board.

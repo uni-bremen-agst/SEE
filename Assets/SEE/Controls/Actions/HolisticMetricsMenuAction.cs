@@ -1,4 +1,3 @@
-using System;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Reference to the holistic metrics manager of this scene (if there is one).
         /// </summary>
-        private HolisticMetricsManager holisticMetricsManager;
+        private MenuManager menuManager;
         
         /// <summary>
         /// This is used in this class to ensure the manager reference is not null. By saving this information in a
@@ -31,14 +30,14 @@ namespace SEE.Controls.Actions
             if (holisticMetricsGameObject == null)
             {
                 // This means that the holistic metrics scene component was not even placed in the scene. In this case,
-                // we do not want to also try to get the manager. Therefore, we just return.
+                // we do not want to also try to get the menu manager. Therefore, we just return.
                 return;
             }
             
             // We do not use a try/catch block because if the holistic metrics root game object
-            // ("HolisticMetricsManager") was found but the manager script is not found, this should indeed throw an
-            // exception.
-            holisticMetricsManager = holisticMetricsGameObject.GetComponent<HolisticMetricsManager>();
+            // ("HolisticMetricsManager") was found but the menu manager script is not found, this should indeed throw
+            // an exception.
+            menuManager = holisticMetricsGameObject.GetComponent<MenuManager>();
             managerExists = true;
         }
 
@@ -49,7 +48,7 @@ namespace SEE.Controls.Actions
         {
             if (managerExists && SEEInput.ToggleHolisticMetricsMenu())
             {
-                 holisticMetricsManager.ToggleMenu();
+                 menuManager.ToggleMenu();
             }
         }
     }
