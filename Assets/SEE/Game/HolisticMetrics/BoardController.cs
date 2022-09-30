@@ -28,12 +28,12 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private string title;
 
-        internal string getTitle()
+        internal string GetTitle()
         {
             return title;
         }
         
-        internal void setTitle(string newTitle)
+        internal void GetTitle(string newTitle)
         {
             title = newTitle;
             gameObject.GetComponentInChildren<Text>().text = newTitle;

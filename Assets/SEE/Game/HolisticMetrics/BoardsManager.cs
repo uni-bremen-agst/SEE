@@ -17,8 +17,6 @@ namespace SEE.Game.HolisticMetrics
         {
             string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
             boardPrefab = Resources.Load<GameObject>(pathToBoard);
-            Debug.Log(pathToBoard);
-            Debug.Log(boardPrefab);
         }
 
         /// <summary>
@@ -36,7 +34,7 @@ namespace SEE.Game.HolisticMetrics
         /// board. This must be unique.</param>
         internal void CreateNewBoard(string boardName)
         {
-            bool nameExists = boardControllers.Any(boardController => boardController.getTitle().Equals(boardName)); 
+            bool nameExists = boardControllers.Any(boardController => boardController.GetTitle().Equals(boardName)); 
             if (nameExists)
             {
                 // TODO: Do not throw an exception; rather show user a popup, then return
@@ -44,7 +42,7 @@ namespace SEE.Game.HolisticMetrics
             }
             GameObject newBoard = Instantiate(boardPrefab, gameObject.transform);
             BoardController newBoardController = newBoard.GetComponent<BoardController>();
-            newBoardController.setTitle(boardName);
+            newBoardController.GetTitle(boardName);
             boardControllers.Add(newBoardController);
         }
 
@@ -55,7 +53,7 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>Returns the desired GameObject if it exists or null if it doesn't.</returns>
         internal BoardController FindControllerByName(string boardName)
         {
-            return boardControllers.Find(boardController => boardController.getTitle().Equals(boardName));
+            return boardControllers.Find(boardController => boardController.GetTitle().Equals(boardName));
         }
 
         /// <summary>
@@ -68,7 +66,7 @@ namespace SEE.Game.HolisticMetrics
             string[] names = new string[boardControllers.Count];
             for (int i = 0; i < boardControllers.Count; i++)
             {
-                names[i] = boardControllers[i].getTitle();
+                names[i] = boardControllers[i].GetTitle();
             }
 
             return names;

@@ -23,7 +23,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// All the widgets that should be displayed on this board.
         /// </summary>
-        public List<WidgetConfiguration> WidgetConfigurations;
+        public List<WidgetConfiguration> WidgetConfigurations = new List<WidgetConfiguration>();
     }
 
     /// <summary>
