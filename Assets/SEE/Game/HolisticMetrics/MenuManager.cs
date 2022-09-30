@@ -41,7 +41,7 @@ namespace SEE.Game.HolisticMetrics
         /// Holds a reference to the GameObject with the TMP InputField.
         /// </summary>
         [SerializeField] private GameObject createBoardInputObject;
-        
+
         /// <summary>
         /// Reference to the TMP input field for entering a name under which to create the new metrics board.
         /// </summary>
@@ -83,7 +83,7 @@ namespace SEE.Game.HolisticMetrics
         private void Start()
         {
             boardsManager = GetComponent<BoardsManager>();
-            
+
             metricTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(domainAssembly => domainAssembly.GetTypes())
                 .Where(type => type.IsSubclassOf(typeof(Metric)))
@@ -104,6 +104,7 @@ namespace SEE.Game.HolisticMetrics
 
             saveBoardInputField = saveBoardInputObject.GetComponent<TMP_InputField>();
             createBoardInputField = createBoardInputObject.GetComponent<TMP_InputField>();
+            ToggleMenu();
         }
 
         /// <summary>
@@ -112,15 +113,15 @@ namespace SEE.Game.HolisticMetrics
         internal void ToggleMenu()
         {
             menu.SetActive(!menu.activeInHierarchy);
-            if (selectBoardToSave.dropdownItems != null)
+            if (menu.activeInHierarchy)
             {
                 selectBoardToSave.dropdownItems.Clear();
                 selectBoardOnWhichToAdd.dropdownItems.Clear();
-            }
-            foreach (string boardName in boardsManager.GetNames())
-            {
-                selectBoardToSave.CreateNewItem(boardName, null);
-                selectBoardOnWhichToAdd.CreateNewItem(boardName, null);
+                foreach (string boardName in boardsManager.GetNames())
+                {
+                    selectBoardToSave.CreateNewItem(boardName, null);
+                    selectBoardOnWhichToAdd.CreateNewItem(boardName, null);
+                }    
             }
         }
 
@@ -135,7 +136,7 @@ namespace SEE.Game.HolisticMetrics
             Type selectedMetric = metricTypes[selectMetricToAdd.selectedItemIndex];
             GameObject selectedWidget = widgetPrefabs[selectWidgetToAdd.selectedItemIndex];
             canvasControllerForAdding.AddMetric(selectedMetric, selectedWidget);
-            menu.SetActive(!menu.activeInHierarchy);
+            ToggleMenu();
         }
 
         /// <summary>
@@ -145,9 +146,9 @@ namespace SEE.Game.HolisticMetrics
         public void CreateNewBoard()
         {
             boardsManager.CreateNewBoard(createBoardInputField.text);
-            menu.SetActive(!menu.activeInHierarchy);
+            ToggleMenu();
         }
-        
+
         /// <summary>
         /// Saves the currently selected metrics board (selected in the dropdown menu) to a file.
         /// </summary>
@@ -156,7 +157,7 @@ namespace SEE.Game.HolisticMetrics
             string selectedName = selectBoardToSave.selectedText.text;
             BoardController selectedBoard = boardsManager.FindControllerByName(selectedName);
             ConfigurationManager.SaveBoard(selectedBoard, saveBoardInputField.text);
-            menu.SetActive(!menu.activeInHierarchy);
+            ToggleMenu();
         }
 
         /// <summary>

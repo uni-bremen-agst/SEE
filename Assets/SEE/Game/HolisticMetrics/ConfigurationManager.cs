@@ -39,8 +39,8 @@ namespace SEE.Game.HolisticMetrics
             for (int i = 0; i < fileNames.Length; i++)
             {
                 string fileName = fileNames[i];
-                // Last 4 characters should be ".dat". We do not want these.
-                fileNames[i] = fileName.Substring(0, fileName.Length - 4);
+                // Last 4 characters should be ".json". We do not want these.
+                fileNames[i] = fileName.Substring(0, fileName.Length - 5);
             }
 
             return fileNames;
@@ -54,7 +54,7 @@ namespace SEE.Game.HolisticMetrics
         internal static GameObject LoadDisplay(string fileName)
         {
             EnsureDisplayDirectoryExists();
-            string filePath = Path.Combine(metricsBoardsPath, fileName + ".dat");
+            string filePath = Path.Combine(metricsBoardsPath, fileName + ".json");
             MetricsBoardConfiguration metricsBoardConfiguration =
                 JsonUtility.FromJson<MetricsBoardConfiguration>(filePath);
             return null;
@@ -70,6 +70,7 @@ namespace SEE.Game.HolisticMetrics
             EnsureDisplayDirectoryExists();
             MetricsBoardConfiguration metricsBoardConfiguration = new MetricsBoardConfiguration()
             {
+                title = boardController.GetTitle(),
                 Position = boardController.transform.localPosition
             };
             BoardController canvasController = boardController.GetComponent<BoardController>();
@@ -85,7 +86,7 @@ namespace SEE.Game.HolisticMetrics
             }
 
             string configuration = JsonUtility.ToJson(metricsBoardConfiguration, true);
-            string filePath = Path.Combine(metricsBoardsPath, configurationName + ".dat");
+            string filePath = Path.Combine(metricsBoardsPath, configurationName + ".json");
             File.WriteAllText(filePath, configuration);
         }
     }
