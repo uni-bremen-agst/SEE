@@ -1,4 +1,3 @@
-using System.IO;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
 
@@ -21,19 +20,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Start()
         {
-            // Instantiating the metrics manager here makes development on the branch for the holistic metrics
-            // significantly easier for me, because this means the object is always in the scene when playing, but it
-            // is not in the scene file and I don't have to resolve merge conflicts in that file when it is being
-            // changed by merging master changes into the branch. When I am done developing, what needs to be done is:
-            // TODO: Put HolisticMetricsManager in the scene per default, then only get a reference to it here.
-            string pathToPrefab = Path.Combine(
-                "Prefabs", 
-                "HolisticMetrics", 
-                "SceneComponents", 
-                "HolisticMetricsManager");
-            GameObject holisticMetricsPrefab = Resources.Load<GameObject>(pathToPrefab);
-            GameObject holisticMetricsManager = Instantiate(holisticMetricsPrefab);
-            menuManager = holisticMetricsManager.GetComponent<MenuManager>();
+            menuManager = GameObject.Find("HolisticMetricsManager").GetComponent<MenuManager>();
         }
 
         /// <summary>
