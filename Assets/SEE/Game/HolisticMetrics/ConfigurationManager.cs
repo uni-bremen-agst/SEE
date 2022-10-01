@@ -35,10 +35,12 @@ namespace SEE.Game.HolisticMetrics
         internal static string[] GetSavedFileNames()
         {
             EnsureDisplayDirectoryExists();
-            string[] fileNames = Directory.GetFileSystemEntries(metricsBoardsPath);
-            for (int i = 0; i < fileNames.Length; i++)
+            DirectoryInfo directoryInfo = new DirectoryInfo(metricsBoardsPath);
+            FileInfo[] fileInfos = directoryInfo.GetFiles();
+            string[] fileNames = new string[fileInfos.Length];
+            for (int i = 0; i < fileInfos.Length; i++)
             {
-                string fileName = fileNames[i];
+                string fileName = fileInfos[i].Name;
                 // Last 4 characters should be ".json". We do not want these.
                 fileNames[i] = fileName.Substring(0, fileName.Length - 5);
             }
@@ -47,17 +49,17 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Loads all the metrics displays from a file.
+        /// Loads a metrics board from a file.
         /// </summary>
         /// <param name="fileName">The file name without the extension of the file to load</param>
-        /// <returns>A list of the GameObjects that represent the metrics displays</returns>
-        internal static GameObject LoadDisplay(string fileName)
+        /// <returns>The GameObject that represents the metrics displays</returns>
+        internal static BoardConfiguration LoadBoard(string fileName)
         {
             EnsureDisplayDirectoryExists();
             string filePath = Path.Combine(metricsBoardsPath, fileName + ".json");
-            MetricsBoardConfiguration metricsBoardConfiguration =
-                JsonUtility.FromJson<MetricsBoardConfiguration>(filePath);
-            return null;
+            string configuration = File.ReadAllText(filePath);
+            BoardConfiguration boardConfiguration = JsonUtility.FromJson<BoardConfiguration>(configuration);
+            return boardConfiguration;
         }
 
         /// <summary>
@@ -68,19 +70,21 @@ namespace SEE.Game.HolisticMetrics
         internal static void SaveBoard(BoardController boardController, string configurationName)
         {
             EnsureDisplayDirectoryExists();
-            MetricsBoardConfiguration metricsBoardConfiguration = new MetricsBoardConfiguration()
+            BoardConfiguration metricsBoardConfiguration = new BoardConfiguration()
             {
-                title = boardController.GetTitle(),
+                Title = boardController.GetTitle(),
                 Position = boardController.transform.localPosition
             };
             BoardController canvasController = boardController.GetComponent<BoardController>();
             foreach (Metric metric in canvasController.metrics)
             {
+                string widgetName = metric.gameObject.name;
+                widgetName = widgetName.Substring(0, widgetName.Length - 7);
                 WidgetConfiguration widget = new WidgetConfiguration()
                 {
-                    MetricType = metric.GetType(),
+                    MetricType = metric.GetType().Name,
                     Position = metric.transform.localPosition,
-                    WidgetName = metric.gameObject.name
+                    WidgetName = widgetName
                 };
                 metricsBoardConfiguration.WidgetConfigurations.Add(widget);
             }

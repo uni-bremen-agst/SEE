@@ -8,12 +8,12 @@ namespace SEE.Game.HolisticMetrics
     /// This class can hold all the information that is needed to configure a holistic metrics board.
     /// </summary>
     [Serializable]
-    public class MetricsBoardConfiguration
+    public class BoardConfiguration
     {
         /// <summary>
         /// The title that will be displayed in the top left corner of this display.
         /// </summary>
-        public string title;
+        public string Title;
         
         /// <summary>
         /// The coordinates of where this board should be placed in the scene.
@@ -41,7 +41,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// The metric type that should be displayed.
         /// </summary>
-        public Type MetricType;
+        public string MetricType;
 
         /// <summary>
         /// The name of this widget that will display the metric. This is equivalent to the file name of the widget

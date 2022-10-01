@@ -63,6 +63,11 @@ namespace SEE.Game.HolisticMetrics
         private TMP_InputField saveBoardInputField;
 
         /// <summary>
+        /// Holds a reference to the dropdown menu where the player can select a file from which to load a board.
+        /// </summary>
+        [SerializeField] private CustomDropdown loadBoardDropdown;
+
+        /// <summary>
         /// When Start() is called, this will be filled with the types of all classes that inherit from class "Metric".
         /// </summary>
         private Type[] metricTypes;
@@ -108,20 +113,33 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// This switches the menu's activeInHierarchy field value.
+        /// This switches the menu's activeInHierarchy field value and if the menu is being toggled on, it also reloads
+        /// the values in the dropdowns because they might have changed. However some of the dropdowns should not change
+        /// at runtime (those that list the metric types and the widget types), so we only initialize these in the
+        /// Start() method and then never change them.
         /// </summary>
         internal void ToggleMenu()
         {
             menu.SetActive(!menu.activeInHierarchy);
             if (menu.activeInHierarchy)
             {
+                // Clear all the dropdowns
                 selectBoardToSave.dropdownItems.Clear();
                 selectBoardOnWhichToAdd.dropdownItems.Clear();
+                loadBoardDropdown.dropdownItems.Clear();
+
+                // Reload dropdowns that let the user choose a metrics board
                 foreach (string boardName in boardsManager.GetNames())
                 {
                     selectBoardToSave.CreateNewItem(boardName, null);
                     selectBoardOnWhichToAdd.CreateNewItem(boardName, null);
-                }    
+                }
+                
+                // Reload dropdown that lets the user choose a configuration file
+                foreach (string fileName in ConfigurationManager.GetSavedFileNames())
+                {
+                    loadBoardDropdown.CreateNewItem(fileName, null);
+                }
             }
         }
 
@@ -145,7 +163,11 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         public void CreateNewBoard()
         {
-            boardsManager.CreateNewBoard(createBoardInputField.text);
+            BoardConfiguration boardConfiguration = new BoardConfiguration()
+            {
+                Title = createBoardInputField.text
+            };
+            boardsManager.CreateNewBoard(boardConfiguration);
             ToggleMenu();
         }
 
@@ -157,6 +179,17 @@ namespace SEE.Game.HolisticMetrics
             string selectedName = selectBoardToSave.selectedText.text;
             BoardController selectedBoard = boardsManager.FindControllerByName(selectedName);
             ConfigurationManager.SaveBoard(selectedBoard, saveBoardInputField.text);
+            ToggleMenu();
+        }
+
+        /// <summary>
+        /// Loads the board saved in the file that is currently selected in the corresponding dropdown.
+        /// </summary>
+        public void LoadBoard()
+        {
+            string fileName = loadBoardDropdown.selectedText.text;
+            BoardConfiguration boardConfiguration = ConfigurationManager.LoadBoard(fileName);
+            boardsManager.CreateNewBoard(boardConfiguration);
             ToggleMenu();
         }
 
