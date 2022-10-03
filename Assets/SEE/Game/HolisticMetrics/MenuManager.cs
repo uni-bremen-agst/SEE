@@ -68,6 +68,11 @@ namespace SEE.Game.HolisticMetrics
         [SerializeField] private CustomDropdown loadBoardDropdown;
 
         /// <summary>
+        /// Holds a reference to the notification manager for holistic metrics notifications.
+        /// </summary>
+        [SerializeField] private NotificationManager notificationManager;
+
+        /// <summary>
         /// When Start() is called, this will be filled with the types of all classes that inherit from class "Metric".
         /// </summary>
         private Type[] metricTypes;
@@ -151,10 +156,39 @@ namespace SEE.Game.HolisticMetrics
         {
             string selectedMetricsBoardTitle = selectBoardOnWhichToAdd.selectedText.text;
             BoardController canvasControllerForAdding = boardsManager.FindControllerByName(selectedMetricsBoardTitle);
-            Type selectedMetric = metricTypes[selectMetricToAdd.selectedItemIndex];
-            GameObject selectedWidget = widgetPrefabs[selectWidgetToAdd.selectedItemIndex];
-            canvasControllerForAdding.AddMetric(selectedMetric, selectedWidget);
+            string selectedMetric = metricTypes[selectMetricToAdd.selectedItemIndex].Name;
+            string selectedWidget = widgetPrefabs[selectWidgetToAdd.selectedItemIndex].name;
             ToggleMenu();
+            // TODO: Allow the user to cancel this.
+            Vector3 positionOnBoard = GetPositionOnBoard();
+            WidgetConfiguration widgetConfiguration = new WidgetConfiguration()
+            {
+                Position = positionOnBoard,
+                MetricType = selectedMetric,
+                WidgetName = selectedWidget
+            };
+            canvasControllerForAdding.AddMetric(widgetConfiguration);
+        }
+
+        /// <summary>
+        /// Allows the user to click on the board where he wants to add a widget. This should only be called by the
+        /// AddWidget() method.
+        /// </summary>
+        /// <returns>The position in world coordinates where the user clicked on the board.</returns>
+        private Vector3 GetPositionOnBoard()
+        {
+            // Show the user a popup telling him what to do
+            notificationManager.title = "Hint";
+            notificationManager.description = "Left click on the board where you want to add the widget";
+            notificationManager.OpenNotification();
+            
+            
+            // Get the raycast somehow
+
+            // Close the notification
+            notificationManager.CloseNotification();
+            
+            return Vector3.back;
         }
 
         /// <summary>
@@ -167,8 +201,8 @@ namespace SEE.Game.HolisticMetrics
             {
                 Title = createBoardInputField.text
             };
-            boardsManager.CreateNewBoard(boardConfiguration);
             ToggleMenu();
+            boardsManager.CreateNewBoard(boardConfiguration);
         }
 
         /// <summary>
