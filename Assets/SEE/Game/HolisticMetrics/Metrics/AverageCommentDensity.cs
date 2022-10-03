@@ -7,7 +7,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 {
     internal class AverageCommentDensity : Metric
     {
-        internal override void Refresh()
+        internal override MetricValue Refresh()
         {
             float totalDensity = 0f;
             int totalNodes = 0;
@@ -35,7 +35,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Lower = 0f,
                 Higher = 1f
             };
-            WidgetController.Display(metricValueRange);
+
+            return metricValueRange;
         }
     }
 }

@@ -1,7 +1,3 @@
-// This file contains all the definition for special metric value types. If you need to, you can add any new value type
-// here, but bear in mind that you will also need to add an implementation for this type in each widget that is
-// supposed to be compatible with the new type.
-
 using System.Collections.Generic;
 
 namespace SEE.Game.HolisticMetrics

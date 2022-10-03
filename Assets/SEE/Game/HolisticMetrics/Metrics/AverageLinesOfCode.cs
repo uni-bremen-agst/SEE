@@ -12,7 +12,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
     {
         [SerializeField] private int optimalValue;
         [SerializeField] private int worstValue = 300;
-        internal override void Refresh()
+        
+        internal override MetricValue Refresh()
         {
             int totalNodes = 0;
             float totalLines = 0.0f;
@@ -31,17 +32,32 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 }
             }
 
-            if (totalNodes != 0)
+            MetricValueRange metricValueRange;
+            
+            if (totalNodes == 0)
             {
-                MetricValueRange metricValueRange = new MetricValueRange()
+                Debug.LogError("No nodes were found so the average lines of code metric does not make any " +
+                               " sense");
+                metricValueRange = new MetricValueRange()
+                {
+                    Name = "Average lines of code",
+                    Value = 0,
+                    Higher = worstValue,
+                    Lower = optimalValue
+                };
+            }
+            else
+            {
+                metricValueRange = new MetricValueRange()
                 {
                     Name = "Average lines of code",
                     Value = totalLines / totalNodes,
                     Higher = worstValue,
                     Lower = optimalValue
-                };
-                WidgetController.Display(metricValueRange);
+                };    
             }
+
+            return metricValueRange;
         }
     }
 }

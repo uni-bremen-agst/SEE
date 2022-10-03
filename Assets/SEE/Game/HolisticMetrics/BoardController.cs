@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Game.HolisticMetrics.Metrics;
+using SEE.Game.HolisticMetrics.WidgetControllers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,38 +15,42 @@ namespace SEE.Game.HolisticMetrics
     internal class BoardController : MonoBehaviour
     {
         /// <summary>
-        /// Each anchor for positioning widgets on the metrics board needs to be added to this list. If you need more
-        /// positions for adding widgets, just add them to this list.
+        /// This contains references to all widgets on the board each represented by one WidgetController and one
+        /// Metric. This list is needed so we can refresh the metrics.
         /// </summary>
-        [SerializeField] private List<GameObject> anchors;
-        
-        /// <summary>
-        /// This contains references to all the metrics that registered themselves with this controller. This list is
-        /// needed so we can refresh them.
-        /// </summary>
-        internal readonly List<Metric> metrics = new List<Metric>();
+        internal readonly List<(WidgetController, Metric)> widgets = new List<(WidgetController, Metric)>();
 
         /// <summary>
         /// The title of the board that this controller controls.
         /// </summary>
         private string title;
-        
-        /// <summary>
-        /// The list of all metric types. This is shared between all BoardController instances and is not expected to
-        /// change. 
-        /// </summary>
-        private static readonly Type[] metricTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(domainAssembly => domainAssembly.GetTypes())
-            .Where(type => type.IsSubclassOf(typeof(Metric)))
-            .ToArray();
-        
-        /// <summary>
-        /// The array of all widget prefabs. This is shared by all BoardController instances and is not expected to
-        /// change.
-        /// </summary>
-        private static GameObject[] widgetPrefabs = 
-            Resources.LoadAll<GameObject>(Path.Combine("Prefabs", "HolisticMetrics", "Widgets"));
 
+        /// <summary>
+        /// The list of all available metric types. This is shared between all BoardController instances and is not
+        /// expected to change at runtime. 
+        /// </summary>
+        private Type[] metricTypes;
+
+        /// <summary>
+        /// The array of all available widget prefabs. This is shared by all BoardController instances and is not
+        /// expected to change at runtime.
+        /// </summary>
+        private GameObject[] widgetPrefabs;
+
+        /// <summary>
+        /// Instantiates the metricTypes and widgetPrefabs arrays.
+        /// </summary>
+        private void Awake()
+        {
+            widgetPrefabs = 
+                Resources.LoadAll<GameObject>(Path.Combine("Prefabs", "HolisticMetrics", "Widgets"));
+            
+            metricTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(domainAssembly => domainAssembly.GetTypes())
+                .Where(type => type.IsSubclassOf(typeof(Metric)))
+                .ToArray();
+        }
+        
         internal string GetTitle()
         {
             return title;
@@ -64,35 +69,28 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
         internal void AddMetric(WidgetConfiguration widgetConfiguration)
         {
-            if (metrics.Count < anchors.Count)
+            GameObject widget = Array.Find(widgetPrefabs,
+                element => element.name.Equals(widgetConfiguration.WidgetName));
+            Type metricType = Array.Find(metricTypes,
+                type => type.Name.Equals(widgetConfiguration.MetricType));
+            if (widget is null)
             {
-                GameObject widget = Array.Find(widgetPrefabs,
-                    element => element.name.Equals(widgetConfiguration.WidgetName));
-                Type metricType = Array.Find(metricTypes, 
-                    type => type.Name.Equals(widgetConfiguration.MetricType));
-                if (widget is null)
-                {
-                    Debug.LogError("Could not load widget because the widget name from the configuration" +
-                                   "file matches no existing widget prefab. This could be because the configuration" +
-                                   "file was manually changed.");
-                }
-                else if (metricType is null)
-                {
-                    Debug.LogError("Could not load metric because the metric type from the configuration" +
-                                   "file matches no existing metric type. This could be because the configuration" +
-                                   "file was manually changed.");
-                }
-                else
-                {
-                    // TODO: Do not use the anchors, use the coordinates from the configuration instead.
-                    GameObject widgetInstance = Instantiate(widget, anchors[metrics.Count].transform);
-                    Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
-                    metrics.Add(metricInstance);
-                }
+                Debug.LogError("Could not load widget because the widget name from the configuration " +
+                               "file matches no existing widget prefab. This could be because the configuration " +
+                               "file was manually changed.");
+            }
+            else if (metricType is null)
+            {
+                Debug.LogError("Could not load metric because the metric type from the configuration " +
+                               "file matches no existing metric type. This could be because the configuration " +
+                               "file was manually changed.");
             }
             else
             {
-                // Show a popup that tells the user the metrics board is full.
+                GameObject widgetInstance = Instantiate(widget, transform);
+                WidgetController widgetController = widgetInstance.GetComponent<WidgetController>();
+                Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
+                widgets.Add((widgetController, metricInstance));
             }
         }
 
@@ -102,12 +100,13 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         internal void OnGraphLoad()
         {
-            // Before iterating through the list, ensure no metric is null.
-            metrics.RemoveAll(metric => metric is null);
-            
-            foreach (Metric metric in metrics)
+            foreach ((WidgetController, Metric) tuple in widgets)
             {
-                metric.Refresh();
+                // Recalculate the metric
+                MetricValue metricValue = tuple.Item2.Refresh();
+                
+                // Display the new value on the widget
+                tuple.Item1.Display(metricValue);
             }
         }
     }
