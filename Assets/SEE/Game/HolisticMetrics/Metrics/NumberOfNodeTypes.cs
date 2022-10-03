@@ -11,7 +11,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
         [SerializeField] private int optimalValue;
         [SerializeField] private int worstValue = 10;
         
-        internal override void Refresh()
+        internal override MetricValue Refresh()
         {
             HashSet<string> nodeTypes = new HashSet<string>();
             
@@ -32,8 +32,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Lower = optimalValue,
                 Higher = worstValue
             };
-            
-            WidgetController.Display(metricValueRange);
+
+            return metricValueRange;
         }
     }
 }

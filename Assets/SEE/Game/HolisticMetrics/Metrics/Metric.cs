@@ -1,42 +1,31 @@
 using System.Collections.Generic;
-using SEE.Game.HolisticMetrics.WidgetControllers;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Metrics
 {
     /// <summary>
-    /// This could be any holistic metric (a metric that is calculated on the entire code city, not on individual nodes)
+    /// This could be any holistic metric (a metric that is calculated on the entire code city, not on individual
+    /// nodes). If you want to implement a new metric, just implement this class. Then the new metric will automatically
+    /// be available for adding to a board in the holistic metrics menu in the game.
     /// </summary>
     internal abstract class Metric : MonoBehaviour
     {
         /// <summary>
-        /// The WidgetController that should be attached to the same widget that this Metric is attached to. Use this to
-        /// display your metric's value.
-        /// </summary>
-        protected WidgetController WidgetController;
-
-        /// <summary>
         /// The ICollection of all graph elements currently present in the scene. This is managed by the class
-        /// GraphElementIDMap.
+        /// GraphElementIDMap. When this class is being implemented, this field does not need to be used, but it might
+        /// come in handy.
         /// </summary>
         protected static readonly ICollection<GameObject> GraphElements = 
             GraphElementIDMap.MappingForHolisticMetrics.Values;
 
         /// <summary>
-        /// This method calculates the metric based on the currently loaded code cities
-        /// (TODO: Calculate and display separately for each city)
-        /// and then displays the new value on the Widget property using the Display() method in the widget's
-        /// controller.
+        /// TODO: Calculate for a specified code city, not for all code cities. Would probably require a new parameter.
+        /// If you want to implement a new metric, simply implement this method in the new class. This method will be
+        /// called to retrieve the value you want to display, so just do whatever calculations you need to do and then
+        /// return the value as a MetricValue. If you want to display a single value, use the class MetricValueRange,
+        /// if you want to display multiple values (for example on a bar chart), use MetricValueCollection.
         /// </summary>
-        internal abstract void Refresh();
-
-        /// <summary>
-        /// When this Metric is started, it will retrieve a reference to the WidgetController that should be attached to
-        /// the same GameObject this Metric is attached to.
-        /// </summary>
-        internal void Start()
-        {
-            WidgetController = transform.GetComponent<WidgetController>();
-        }
+        /// <returns>The calculated metric value</returns>
+        internal abstract MetricValue Refresh();
     }
 }

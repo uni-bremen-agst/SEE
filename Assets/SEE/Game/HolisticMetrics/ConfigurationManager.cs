@@ -1,5 +1,6 @@
 using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
+using SEE.Game.HolisticMetrics.WidgetControllers;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
@@ -76,14 +77,14 @@ namespace SEE.Game.HolisticMetrics
                 Position = boardController.transform.localPosition
             };
             BoardController canvasController = boardController.GetComponent<BoardController>();
-            foreach (Metric metric in canvasController.metrics)
+            foreach ((WidgetController, Metric) tuple in canvasController.widgets)
             {
-                string widgetName = metric.gameObject.name;
+                string widgetName = tuple.Item1.gameObject.name;
                 widgetName = widgetName.Substring(0, widgetName.Length - 7);
                 WidgetConfiguration widget = new WidgetConfiguration()
                 {
-                    MetricType = metric.GetType().Name,
-                    Position = metric.transform.localPosition,
+                    MetricType = tuple.Item2.GetType().Name,
+                    Position = tuple.Item1.transform.localPosition,
                     WidgetName = widgetName
                 };
                 metricsBoardConfiguration.WidgetConfigurations.Add(widget);
