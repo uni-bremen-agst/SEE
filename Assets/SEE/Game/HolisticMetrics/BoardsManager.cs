@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
@@ -13,19 +12,11 @@ namespace SEE.Game.HolisticMetrics
     public class BoardsManager : MonoBehaviour
     {
         private GameObject boardPrefab;
-        private GameObject[] widgetPrefabs;
-
-        private Type[] metricTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(domainAssembly => domainAssembly.GetTypes())
-            .Where(type => type.IsSubclassOf(typeof(Metric)))
-            .ToArray();
 
         private void Start()
         {
             string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
-            string pathToWidgets = Path.Combine("Prefabs", "HolisticMetrics", "Widgets");
             boardPrefab = Resources.Load<GameObject>(pathToBoard);
-            widgetPrefabs = Resources.LoadAll<GameObject>(pathToWidgets);
         }
 
         /// <summary>
@@ -58,30 +49,7 @@ namespace SEE.Game.HolisticMetrics
             // Add the widgets to the new board
             foreach (WidgetConfiguration widgetConfiguration in boardConfiguration.WidgetConfigurations)
             {
-                GameObject prefab = Array.Find(widgetPrefabs,
-                    element => element.name.Equals(widgetConfiguration.WidgetName));
-                Type metricType = Array.Find(metricTypes, 
-                    type => type.Name.Equals(widgetConfiguration.MetricType));
-                foreach (Type type in metricTypes)
-                {
-                    Debug.Log($"Type from list {type.Name} does not match given type {widgetConfiguration.MetricType}");
-                }
-                if (prefab is null)
-                {
-                    Debug.LogError("Could not load widget because the widget name from the configuration" +
-                                   "file matches no existing widget prefab. This could be because the configuration" +
-                                   "file was manually changed.");
-                }
-                else if (metricType is null)
-                {
-                    Debug.LogError("Could not load metric because the metric type from the configuration" +
-                                   "file matches no existing metric type. This could be because the configuration" +
-                                   "file was manually changed.");
-                }
-                else
-                {
-                    newBoardController.AddMetric(metricType, prefab);
-                }
+                    newBoardController.AddMetric(widgetConfiguration);
             }
 
             boardControllers.Add(newBoardController);

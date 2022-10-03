@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +29,22 @@ namespace SEE.Game.HolisticMetrics
         /// The title of the board that this controller controls.
         /// </summary>
         private string title;
+        
+        /// <summary>
+        /// The list of all metric types. This is shared between all BoardController instances and is not expected to
+        /// change. 
+        /// </summary>
+        private static readonly Type[] metricTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(domainAssembly => domainAssembly.GetTypes())
+            .Where(type => type.IsSubclassOf(typeof(Metric)))
+            .ToArray();
+        
+        /// <summary>
+        /// The array of all widget prefabs. This is shared by all BoardController instances and is not expected to
+        /// change.
+        /// </summary>
+        private static GameObject[] widgetPrefabs = 
+            Resources.LoadAll<GameObject>(Path.Combine("Prefabs", "HolisticMetrics", "Widgets"));
 
         internal string GetTitle()
         {
@@ -43,15 +61,34 @@ namespace SEE.Game.HolisticMetrics
         /// If there is still space on the metrics board (there are less than 6 widgets on it), adds the desired widget
         /// to the board.
         /// </summary>
-        /// <param name="metricType">The type of the metric to use.</param>
-        /// <param name="widget">The widget prefab to use.</param>
-        internal void AddMetric(Type metricType, GameObject widget)
+        /// <param name="widgetConfiguration">The configuration of the new widget.</param>
+        internal void AddMetric(WidgetConfiguration widgetConfiguration)
         {
             if (metrics.Count < anchors.Count)
             {
-                GameObject widgetInstance = Instantiate(widget, anchors[metrics.Count].transform);
-                Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
-                metrics.Add(metricInstance);
+                GameObject widget = Array.Find(widgetPrefabs,
+                    element => element.name.Equals(widgetConfiguration.WidgetName));
+                Type metricType = Array.Find(metricTypes, 
+                    type => type.Name.Equals(widgetConfiguration.MetricType));
+                if (widget is null)
+                {
+                    Debug.LogError("Could not load widget because the widget name from the configuration" +
+                                   "file matches no existing widget prefab. This could be because the configuration" +
+                                   "file was manually changed.");
+                }
+                else if (metricType is null)
+                {
+                    Debug.LogError("Could not load metric because the metric type from the configuration" +
+                                   "file matches no existing metric type. This could be because the configuration" +
+                                   "file was manually changed.");
+                }
+                else
+                {
+                    // TODO: Do not use the anchors, use the coordinates from the configuration instead.
+                    GameObject widgetInstance = Instantiate(widget, anchors[metrics.Count].transform);
+                    Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
+                    metrics.Add(metricInstance);
+                }
             }
             else
             {
