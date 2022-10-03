@@ -88,6 +88,7 @@ namespace SEE.Game.HolisticMetrics
             else
             {
                 GameObject widgetInstance = Instantiate(widget, transform);
+                widgetInstance.transform.localPosition = widgetConfiguration.Position;
                 WidgetController widgetController = widgetInstance.GetComponent<WidgetController>();
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgets.Add((widgetController, metricInstance));

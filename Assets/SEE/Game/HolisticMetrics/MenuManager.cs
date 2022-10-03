@@ -15,8 +15,11 @@ namespace SEE.Game.HolisticMetrics
     /// </summary>
     internal class MenuManager : MonoBehaviour
     {
-        // Let the user pass a custom name to the metrics and an id so we can delete it easily
-
+        /// <summary>
+        /// Reference to the BoardsManager.
+        /// </summary>
+        [SerializeField] private BoardsManager boardsManager;
+        
         /// <summary>
         /// Reference to the menu GameObject. This is the menu which allows the user to customize the metrics board.
         /// </summary>
@@ -38,14 +41,9 @@ namespace SEE.Game.HolisticMetrics
         [SerializeField] private CustomDropdown selectWidgetToAdd;
 
         /// <summary>
-        /// Holds a reference to the GameObject with the TMP InputField.
-        /// </summary>
-        [SerializeField] private GameObject createBoardInputObject;
-
-        /// <summary>
         /// Reference to the TMP input field for entering a name under which to create the new metrics board.
         /// </summary>
-        private TMP_InputField createBoardInputField;
+        [SerializeField] private TMP_InputField createBoardInputField;
 
         /// <summary>
         /// The dropdown menu that will allow the user to select a metrics board to save.
@@ -53,14 +51,9 @@ namespace SEE.Game.HolisticMetrics
         [SerializeField] private CustomDropdown selectBoardToSave;
 
         /// <summary>
-        /// Holds a reference to the GameObject with the TextMeshPro InputField.
-        /// </summary>
-        [SerializeField] private GameObject saveBoardInputObject;
-
-        /// <summary>
         /// Holds a reference to the TMP input field for entering a name under which to save the selected metrics board.
         /// </summary>
-        private TMP_InputField saveBoardInputField;
+        [SerializeField] private TMP_InputField saveBoardInputField;
 
         /// <summary>
         /// Holds a reference to the dropdown menu where the player can select a file from which to load a board.
@@ -83,7 +76,6 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private GameObject[] widgetPrefabs;
 
-        private BoardsManager boardsManager;
 
         /// <summary>
         /// Dynamically gets types of all classes that inherit from Metric and puts them in an array. Also dynamically
@@ -92,8 +84,8 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private void Start()
         {
-            boardsManager = GetComponent<BoardsManager>();
-
+            menu.SetActive(true);
+            
             metricTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(domainAssembly => domainAssembly.GetTypes())
                 .Where(type => type.IsSubclassOf(typeof(Metric)))
@@ -112,8 +104,6 @@ namespace SEE.Game.HolisticMetrics
                 selectWidgetToAdd.CreateNewItem(widgetPrefab.name, null);
             }
 
-            saveBoardInputField = saveBoardInputObject.GetComponent<TMP_InputField>();
-            createBoardInputField = createBoardInputObject.GetComponent<TMP_InputField>();
             ToggleMenu();
         }
 
@@ -159,36 +149,22 @@ namespace SEE.Game.HolisticMetrics
             string selectedMetric = metricTypes[selectMetricToAdd.selectedItemIndex].Name;
             string selectedWidget = widgetPrefabs[selectWidgetToAdd.selectedItemIndex].name;
             ToggleMenu();
-            // TODO: Allow the user to cancel this.
-            Vector3 positionOnBoard = GetPositionOnBoard();
-            WidgetConfiguration widgetConfiguration = new WidgetConfiguration()
-            {
-                Position = positionOnBoard,
-                MetricType = selectedMetric,
-                WidgetName = selectedWidget
-            };
-            canvasControllerForAdding.AddMetric(widgetConfiguration);
-        }
-
-        /// <summary>
-        /// Allows the user to click on the board where he wants to add a widget. This should only be called by the
-        /// AddWidget() method.
-        /// </summary>
-        /// <returns>The position in world coordinates where the user clicked on the board.</returns>
-        private Vector3 GetPositionOnBoard()
-        {
+            
             // Show the user a popup telling him what to do
             notificationManager.title = "Hint";
             notificationManager.description = "Left click on the board where you want to add the widget";
+            notificationManager.timer = 3f;
+            notificationManager.UpdateUI();
             notificationManager.OpenNotification();
             
-            
-            // Get the raycast somehow
-
-            // Close the notification
-            notificationManager.CloseNotification();
-            
-            return Vector3.back;
+            WidgetConfiguration widgetConfiguration = new WidgetConfiguration()
+            {
+                MetricType = selectedMetric,
+                WidgetName = selectedWidget
+            };
+            WidgetPositionGetter widgetPositionGetter = 
+                canvasControllerForAdding.gameObject.AddComponent<WidgetPositionGetter>();
+            widgetPositionGetter.Setup(widgetConfiguration);
         }
 
         /// <summary>

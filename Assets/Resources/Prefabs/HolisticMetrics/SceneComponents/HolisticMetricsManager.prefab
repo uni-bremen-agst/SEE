@@ -3093,13 +3093,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec74fe6e48a44b81b223542bfe69d4aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boardsManager: {fileID: 3941000953039343832}
   menu: {fileID: 896832428251397338}
   selectBoardOnWhichToAdd: {fileID: 2065137834088653936}
   selectMetricToAdd: {fileID: 896832429068097502}
   selectWidgetToAdd: {fileID: 896832429973679105}
-  createBoardInputObject: {fileID: 1886552382570803151}
+  createBoardInputField: {fileID: 4759423810034218014}
   selectBoardToSave: {fileID: 7441678442704369843}
-  saveBoardInputObject: {fileID: 7759158595544332731}
+  saveBoardInputField: {fileID: 7957868767349013496}
   loadBoardDropdown: {fileID: 1950002793953116514}
   notificationManager: {fileID: 7002679090301487892}
 --- !u!114 &3941000953039343832
@@ -7924,7 +7925,7 @@ RectTransform:
   m_GameObject: {fileID: 5358798707193011810}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.3906, y: 1.3906, z: 1.3906}
   m_Children:
   - {fileID: 638844778918246340}
   - {fileID: 3593378680931381051}
@@ -7936,7 +7937,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 701, y: 412}
+  m_AnchoredPosition: {x: 609, y: 412}
   m_SizeDelta: {x: 400, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5219919061949340441
