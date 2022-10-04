@@ -8,7 +8,7 @@ using SEE.Game.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.HolisticMetrics
+namespace SEE.Game.UI
 {
     /// <summary>
     /// The content of this class is inspired by OpeningDialog.cs because I think it makes sense to implement the menu
@@ -57,9 +57,9 @@ namespace SEE.Game.UI.HolisticMetrics
                     description: "Add a new metrics board to the scene",
                     entryColor: Color.green.Darker()),
                 new MenuEntry(
-                    action: RemoveBoard,
-                    title: "Remove board",
-                    description: "Remove a board from the scene",
+                    action: DeleteBoard,
+                    title: "Delete board",
+                    description: "Delete a board from the scene",
                     entryColor: Color.red.Darker()),
                 new MenuEntry(
                     action: AddWidget,
@@ -75,12 +75,12 @@ namespace SEE.Game.UI.HolisticMetrics
                     action: SaveBoardConfiguration,
                     title: "Save board",
                     description: "Save a board from the scene to a file",
-                    entryColor: Color.blue.Darker()),
+                    entryColor: Color.blue),
                 new MenuEntry(
                     action: LoadBoardConfiguration,
                     title: "Load board",
                     description: "Load a board from a file into the scene",
-                    entryColor: Color.blue.Darker())
+                    entryColor: Color.blue)
             };
         }
 
@@ -98,9 +98,20 @@ namespace SEE.Game.UI.HolisticMetrics
                 "Reason: A board with that name already exists in the scene");
         }
 
-        private void RemoveBoard()
+        private void DeleteBoard()
         {
             menu.ToggleMenu();
+
+            if (boardsManager.GetNames().Any())
+            {
+                new DeleteBoardDialog(boardsManager).Open();
+            }
+            else
+            {
+                ShowNotification.Warn(
+                    "No boards in the scene",
+                    "There are no metrics boards in the scene");
+            }
         }
 
         private void AddWidget()
@@ -116,7 +127,6 @@ namespace SEE.Game.UI.HolisticMetrics
         private void SaveBoardConfiguration()
         {
             menu.ToggleMenu();
-            string[] boardNames;
 
             if (boardsManager.GetNames().Any())
             {

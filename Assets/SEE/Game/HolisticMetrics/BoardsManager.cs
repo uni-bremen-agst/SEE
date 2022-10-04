@@ -55,6 +55,14 @@ namespace SEE.Game.HolisticMetrics
             boardControllers.Add(newBoardController);
         }
 
+        internal void Delete(string boardName)
+        {
+            BoardController boardController = FindControllerByName(boardName);
+            Destroy(boardController.gameObject);
+            boardControllers.Remove(boardController);
+            Destroy(boardController);
+        }
+
         /// <summary>
         /// Finds a MetricsBoard GameObject by its name.
         /// </summary>
