@@ -15,8 +15,6 @@ namespace SEE.Game.UI.PropertyDialog
 
         private SelectionProperty selectedFile;
 
-        private ButtonProperty buttonProperty;
-
         private readonly BoardsManager boardsManager;
 
         public LoadBoardConfigurationDialog(BoardsManager boardsManagerReference)
