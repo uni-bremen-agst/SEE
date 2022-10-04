@@ -1030,7 +1030,7 @@ MonoBehaviour:
   clickEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.HolisticMetricsManager,
           SEE
         m_MethodName: AddWidget
@@ -3056,8 +3056,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 896832429644760971}
-  - component: {fileID: 896832429644760968}
   - component: {fileID: 3941000953039343832}
+  - component: {fileID: 5875178378432454814}
   m_Layer: 0
   m_Name: HolisticMetricsManager
   m_TagString: Untagged
@@ -3081,28 +3081,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &896832429644760968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 896832429644760970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec74fe6e48a44b81b223542bfe69d4aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boardsManager: {fileID: 3941000953039343832}
-  menu: {fileID: 896832428251397338}
-  selectBoardOnWhichToAdd: {fileID: 2065137834088653936}
-  selectMetricToAdd: {fileID: 896832429068097502}
-  selectWidgetToAdd: {fileID: 896832429973679105}
-  createBoardInputField: {fileID: 4759423810034218014}
-  selectBoardToSave: {fileID: 7441678442704369843}
-  saveBoardInputField: {fileID: 7957868767349013496}
-  loadBoardDropdown: {fileID: 1950002793953116514}
-  notificationManager: {fileID: 7002679090301487892}
 --- !u!114 &3941000953039343832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3113,6 +3091,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 724221bb34844fa8b394acfe10c8ad16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5875178378432454814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896832429644760970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b9e9bbaf5394208b9bca40a6a48d928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &896832429724272600
@@ -5209,7 +5199,7 @@ MonoBehaviour:
   m_OnSelect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: ToggleInput
         m_Mode: 1
@@ -5224,7 +5214,7 @@ MonoBehaviour:
   m_OnDeselect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: ToggleInput
         m_Mode: 1
@@ -6374,7 +6364,7 @@ MonoBehaviour:
   clickEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: LoadBoard
         m_Mode: 1
@@ -9516,7 +9506,7 @@ MonoBehaviour:
   clickEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.HolisticMetricsMenuManager,
           SEE
         m_MethodName: SaveBoard
@@ -9840,7 +9830,7 @@ MonoBehaviour:
   clickEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: CreateNewBoard
         m_Mode: 1
@@ -10486,7 +10476,7 @@ MonoBehaviour:
   m_OnSelect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: ToggleInput
         m_Mode: 1
@@ -10501,7 +10491,7 @@ MonoBehaviour:
   m_OnDeselect:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 896832429644760968}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SEE.Game.HolisticMetrics.MenuManager, SEE
         m_MethodName: ToggleInput
         m_Mode: 1
