@@ -3057,7 +3057,6 @@ GameObject:
   m_Component:
   - component: {fileID: 896832429644760971}
   - component: {fileID: 3941000953039343832}
-  - component: {fileID: 5875178378432454814}
   m_Layer: 0
   m_Name: HolisticMetricsManager
   m_TagString: Untagged
@@ -3091,18 +3090,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 724221bb34844fa8b394acfe10c8ad16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5875178378432454814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 896832429644760970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b9e9bbaf5394208b9bca40a6a48d928, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &896832429724272600
@@ -6671,8 +6658,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 200, y: 0}
-  m_SizeDelta: {x: 364, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5592624739100368132
 CanvasRenderer:

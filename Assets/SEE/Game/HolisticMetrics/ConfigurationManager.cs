@@ -67,8 +67,8 @@ namespace SEE.Game.HolisticMetrics
         /// Persist a metrics board to a file.
         /// </summary>
         /// <param name="boardController">The metrics board to save.</param>
-        /// <param name="configurationName">The file name for the configuration.</param>
-        internal static void SaveBoard(BoardController boardController, string configurationName)
+        /// <param name="fileName">The file name for the configuration.</param>
+        internal static void SaveBoard(BoardController boardController, string fileName)
         {
             EnsureDisplayDirectoryExists();
             BoardConfiguration metricsBoardConfiguration = new BoardConfiguration()
@@ -91,7 +91,7 @@ namespace SEE.Game.HolisticMetrics
             }
 
             string configuration = JsonUtility.ToJson(metricsBoardConfiguration, true);
-            string filePath = Path.Combine(metricsBoardsPath, configurationName + ".json");
+            string filePath = Path.Combine(metricsBoardsPath, fileName + ".json");
             File.WriteAllText(filePath, configuration);
         }
     }
