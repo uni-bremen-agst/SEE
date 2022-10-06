@@ -13,17 +13,17 @@ namespace SEE.Game.HolisticMetrics
     {
         private GameObject boardPrefab;
 
-        private void Start()
-        {
-            string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
-            boardPrefab = Resources.Load<GameObject>(pathToBoard);
-        }
-
         /// <summary>
         /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the
         /// scene that are not in this list).
         /// </summary>
         private readonly List<BoardController> boardControllers = new List<BoardController>();
+
+        private void Start()
+        {
+            string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
+            boardPrefab = Resources.Load<GameObject>(pathToBoard);
+        }
 
 
         /// <summary>
@@ -97,6 +97,27 @@ namespace SEE.Game.HolisticMetrics
             foreach (BoardController boardController in boardControllers)
             {
                 boardController.OnGraphLoad();
+            }
+        }
+
+        /// <summary>
+        /// This method can be invoked when you wish to let the user click on a board to add a widget.
+        /// </summary>
+        /// <param name="widgetConfiguration">Information on how the widget to add should be configured</param>
+        internal void PositionWidget(WidgetConfiguration widgetConfiguration)
+        {
+            foreach (BoardController controller in boardControllers)
+            {
+                controller.gameObject.AddComponent<WidgetPositioner>();
+                WidgetPositioner.Setup(widgetConfiguration);
+            }
+        }
+
+        internal void DeleteWidget()
+        {
+            foreach (BoardController boardController in boardControllers)
+            {
+                boardController.GetWidgetToDelete();
             }
         }
     }

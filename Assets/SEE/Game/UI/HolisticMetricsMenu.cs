@@ -87,15 +87,10 @@ namespace SEE.Game.UI
         private void NewBoard()
         {
             menu.ToggleMenu();
-            // Refer to OpeningDialog Settings() !!!!!
+
+            //GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
             
-            // First get the position where the player wants to position the new board
-            
-            // When the player has clicked on the ground, show him a dialog where he can rotate the board with a slider
-            // and where he can enter a name for the board and where he can click ok to add the board.
-            ShowNotification.Error(
-                "Could not add the board", 
-                "Reason: A board with that name already exists in the scene");
+            // The BoardAdder should also open the dialog then. Then the dialog should call some method in BoardsManager
         }
 
         private void DeleteBoard()
@@ -117,11 +112,38 @@ namespace SEE.Game.UI
         private void AddWidget()
         {
             menu.ToggleMenu();
+
+            if (boardsManager.GetNames().Any())
+            {
+                new AddWidgetDialog(boardsManager).Open();
+            }
+            else
+            {
+                ShowNotification.Warn(
+                    "No boards in the scene",
+                    "There are no metrics boards on which you could add a widget");
+            }
         }
 
         private void RemoveWidget()
         {
             menu.ToggleMenu();
+
+            if (boardsManager.GetNames().Any())
+            {
+                // TODO: Also check if any of the boards has any widgets
+                // TODO: Let the player cancel this
+                ShowNotification.Info(
+                    "Select the widget to delete",
+                    "Click on a widget to delete it");
+                boardsManager.DeleteWidget();
+            }
+            else
+            {
+                ShowNotification.Warn(
+                    "No boards in the scene",
+                    "Therefore there cannot be any widgets you could remove");
+            }
         }
 
         private void SaveBoardConfiguration()

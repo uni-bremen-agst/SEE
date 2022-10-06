@@ -14,6 +14,7 @@ namespace SEE.Game.HolisticMetrics
     /// </summary>
     internal class BoardController : MonoBehaviour
     {
+        // TODO: Reference the game object instead of the two things.
         /// <summary>
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
@@ -93,6 +94,23 @@ namespace SEE.Game.HolisticMetrics
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgets.Add((widgetController, metricInstance));
             }
+        }
+
+        internal void GetWidgetToDelete()
+        {
+            foreach ((WidgetController, Metric) tuple in widgets)
+            {
+                tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
+                WidgetDeleter.Setup();
+            }
+        }
+
+        internal void DeleteWidget(GameObject widget)
+        {
+            WidgetController widgetController = widget.GetComponent<WidgetController>();
+            Metric metric = widget.GetComponent<Metric>();
+            widgets.Remove((widgetController, metric));
+            Destroy(widgetController.gameObject);
         }
 
         /// <summary>
