@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 1319088655710949877}
   - component: {fileID: 1319088655710949878}
   - component: {fileID: 8932547233010547649}
+  - component: {fileID: 2350874601786406945}
   m_Layer: 5
   m_Name: CircularProgress
   m_TagString: Untagged
@@ -173,6 +174,19 @@ MonoBehaviour:
   circle: {fileID: 1319088656306546808}
   text: {fileID: 1319088655241679311}
   title: {fileID: 3629768286039884194}
+--- !u!65 &2350874601786406945
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319088655710949872}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 350, y: 410, z: 1}
+  m_Center: {x: 0, y: 30, z: 0}
 --- !u!1 &1319088656306546810
 GameObject:
   m_ObjectHideFlags: 0

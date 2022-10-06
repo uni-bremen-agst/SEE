@@ -162,9 +162,8 @@ namespace SEE.Game.HolisticMetrics
                 MetricType = selectedMetric,
                 WidgetName = selectedWidget
             };
-            WidgetPositionGetter widgetPositionGetter = 
-                canvasControllerForAdding.gameObject.AddComponent<WidgetPositionGetter>();
-            widgetPositionGetter.Setup(widgetConfiguration);
+            canvasControllerForAdding.gameObject.AddComponent<WidgetPositioner>();
+            WidgetPositioner.Setup(widgetConfiguration);
         }
 
         /// <summary>

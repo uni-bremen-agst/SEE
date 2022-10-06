@@ -324,6 +324,7 @@ GameObject:
   - component: {fileID: 8861279454525936654}
   - component: {fileID: 8861279454525936655}
   - component: {fileID: 6677327347117351674}
+  - component: {fileID: 6852049955659394574}
   m_Layer: 5
   m_Name: PercentageBad
   m_TagString: Untagged
@@ -408,6 +409,19 @@ MonoBehaviour:
   valueText: {fileID: 8861279454117817486}
   titleText: {fileID: 8861279452713117316}
   fade: {fileID: 8861279453306250020}
+--- !u!65 &6852049955659394574
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8861279454525936658}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 242, y: 280, z: 1}
+  m_Center: {x: 0, y: -30, z: 0}
 --- !u!1 &8861279454546081204
 GameObject:
   m_ObjectHideFlags: 0

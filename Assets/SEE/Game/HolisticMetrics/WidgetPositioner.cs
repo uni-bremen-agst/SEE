@@ -2,13 +2,16 @@ using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
 {
-    public class WidgetPositionGetter : MonoBehaviour
+    public class WidgetPositioner : MonoBehaviour
     {
-        private WidgetConfiguration widgetConfiguration;
+        private static WidgetConfiguration widgetConfiguration;
+
+        private static bool positioningDone;
         
-        internal void Setup(WidgetConfiguration widgetConfigurationParam)
+        internal static void Setup(WidgetConfiguration widgetConfigurationParam)
         {
             widgetConfiguration = widgetConfigurationParam;
+            positioningDone = false;
         }
         
         private void OnMouseUp()
@@ -22,9 +25,17 @@ namespace SEE.Game.HolisticMetrics
                     Vector3 localPoint = transform.InverseTransformPoint(hit.point);
                     widgetConfiguration.Position = localPoint;
                     GetComponent<BoardController>().AddMetric(widgetConfiguration);
+                    positioningDone = true;
                 }
             }
-            Destroy(this);
+        }
+
+        private void Update()
+        {
+            if (positioningDone)
+            {
+                Destroy(this);    
+            }
         }
     }
 }
