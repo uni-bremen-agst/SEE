@@ -95,7 +95,7 @@ namespace SEE.Game.Operator
 
         #endregion
 
-        private void Awake()
+        private void OnEnable()
         {
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
@@ -133,10 +133,18 @@ namespace SEE.Game.Operator
                 Tween endTween = DOTween.To(() => spline.GradientColors.end,
                                             c => spline.GradientColors = (spline.GradientColors.start, c),
                                             colors.end, d);
-                return new Tween[] { startTween.Play(), endTween.Play() };
+                return new[] { startTween.Play(), endTween.Play() };
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+        }
+
+        private void OnDisable()
+        {
+            morphism.KillAnimator();
+            morphism = null;
+            color.KillAnimator();
+            color = null;
         }
 
         // TODO: Maybe refactor this? Type signature is somewhat complex
