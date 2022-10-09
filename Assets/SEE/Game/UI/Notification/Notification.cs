@@ -19,7 +19,7 @@ namespace SEE.Game.UI.Notification
     /// By default, the notification will be displayed in the upper right corner, but this can be changed
     /// using the <see cref="AnchorMax"/>, <see cref="AnchorMin"/> and <see cref="Pivot"/> fields.
     /// </summary>
-    public class Notification: PlatformDependentComponent
+    public class Notification : PlatformDependentComponent
     {
         /// <summary>
         /// The title displayed in the notification.
@@ -51,6 +51,11 @@ namespace SEE.Game.UI.Notification
         /// Setting this won't have an effect after Start() has been called.
         /// </summary>
         public float Timer = -1f;
+
+        /// <summary>
+        /// Whether the notification shall disappear after <see cref="Timer"/> seconds.
+        /// </summary>
+        public bool TimerEnabled = true;
 
         /// <summary>
         /// The normalized position in the canvas that the upper right corner is anchored to.
@@ -172,7 +177,7 @@ namespace SEE.Game.UI.Notification
             }
             else
             {
-                return Operator.MoveToY(Operator.TargetPositionY-y, ANIMATION_DURATION);   
+                return Operator.MoveToY(Operator.TargetPositionY - y, ANIMATION_DURATION);
             }
         }
 
@@ -185,7 +190,7 @@ namespace SEE.Game.UI.Notification
             ManagedNotification.MustGetComponent(out Operator);
 
             // Setup anchoring
-            RectTransform rectTransform = (RectTransform) ManagedNotification.transform;
+            RectTransform rectTransform = (RectTransform)ManagedNotification.transform;
             rectTransform.pivot = Pivot;
             rectTransform.anchorMax = AnchorMax;
             rectTransform.anchorMin = AnchorMin;
@@ -217,7 +222,7 @@ namespace SEE.Game.UI.Notification
                 manager.description = Text;
                 manager.icon = Icon;
                 manager.timer = Timer;
-                manager.enableTimer = Timer >= 1f;
+                manager.enableTimer = Timer >= 1f && TimerEnabled;
                 manager.destroyAfterPlaying = DestroyAfterPlaying;
                 manager.OpenNotification();
 
