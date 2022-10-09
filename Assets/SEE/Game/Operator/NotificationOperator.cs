@@ -26,7 +26,6 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveToY(float newY, float duration)
         {
-            Debug.Log($"Y: {newY}");
             return PositionY.AnimateTo(newY, duration);
         }
 
