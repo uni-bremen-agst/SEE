@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using SEE.Controls;
 using SEE.Game.HolisticMetrics;
@@ -40,7 +39,7 @@ namespace SEE.Game.UI.PropertyDialog
                 .ToArray();
 
             // Load the widget prefabs
-            string widgetPrefabsPath = Path.Combine("Prefabs", "HolisticMetrics", "Widgets");
+            const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
         }
         
@@ -70,6 +69,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog.Title = "Add widget";
             propertyDialog.Description = "Configure the widget; then hit OK button. Then click on any metrics board" +
                                          "where you want to place the widget.";
+            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
             propertyDialog.AddGroup(group);
             
             propertyDialog.OnConfirm.AddListener(AddWidget);

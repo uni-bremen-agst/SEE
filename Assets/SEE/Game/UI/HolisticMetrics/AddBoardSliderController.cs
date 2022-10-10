@@ -1,4 +1,3 @@
-using System.IO;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
@@ -46,7 +45,7 @@ namespace SEE.Game.UI.HolisticMetrics
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
             
             slider.mainSlider.onValueChanged.AddListener(Rotate);
-            string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
+            const string pathToBoard = "Prefabs/HolisticMetrics/SceneComponents/MetricsBoard";
             GameObject boardPrefab = Resources.Load<GameObject>(pathToBoard);
             dummyBoard = Instantiate(boardPrefab, boardConfiguration.Position, Quaternion.identity);
         }

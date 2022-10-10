@@ -29,6 +29,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Select board";
             propertyDialog.Description = "Select the board you want to delete";
+            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Minus");
             propertyDialog.AddGroup(group);
             
             propertyDialog.OnConfirm.AddListener(DeleteBoard);

@@ -44,7 +44,7 @@ namespace SEE.Game.HolisticMetrics
         private void Awake()
         {
             widgetPrefabs = 
-                Resources.LoadAll<GameObject>(Path.Combine("Prefabs", "HolisticMetrics", "Widgets"));
+                Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics/Widgets");
             
             metricTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(domainAssembly => domainAssembly.GetTypes())
@@ -93,6 +93,7 @@ namespace SEE.Game.HolisticMetrics
                 WidgetController widgetController = widgetInstance.GetComponent<WidgetController>();
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgets.Add((widgetController, metricInstance));
+                widgetController.Display(metricInstance.Refresh());
             }
         }
 
