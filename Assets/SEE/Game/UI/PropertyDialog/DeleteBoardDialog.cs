@@ -6,18 +6,12 @@ namespace SEE.Game.UI.PropertyDialog
 {
     public class DeleteBoardDialog
     {
-        private readonly BoardsManager boardsManager;
         
         private GameObject dialog;
 
         private PropertyDialog propertyDialog;
 
         private SelectionProperty selectedBoardName;
-        
-        internal DeleteBoardDialog(BoardsManager boardsManagerReference)
-        {
-            boardsManager = boardsManagerReference;
-        }
         
         internal void Open()
         {
@@ -28,8 +22,8 @@ namespace SEE.Game.UI.PropertyDialog
             selectedBoardName = dialog.AddComponent<SelectionProperty>();
             selectedBoardName.Name = "Select board";
             selectedBoardName.Description = "Select the board you want to delete";
-            selectedBoardName.AddOptions(boardsManager.GetNames());
-            selectedBoardName.Value = boardsManager.GetNames()[0];
+            selectedBoardName.AddOptions(BoardsManager.GetNames());
+            selectedBoardName.Value = BoardsManager.GetNames()[0];
             group.AddProperty(selectedBoardName);
             
             propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -49,7 +43,7 @@ namespace SEE.Game.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = true;
             
             // Delete the board
-            boardsManager.Delete(selectedBoardName.Value);
+            BoardsManager.Delete(selectedBoardName.Value);
 
             // Destroy the dialog GameObject
             Object.Destroy(dialog);

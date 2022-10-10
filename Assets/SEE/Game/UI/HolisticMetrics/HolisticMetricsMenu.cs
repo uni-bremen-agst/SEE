@@ -17,12 +17,10 @@ namespace SEE.Game.UI.HolisticMetrics
     public class HolisticMetricsMenu : MonoBehaviour
     {
         private SimpleMenu menu;
-        private BoardsManager boardsManager;
 
         private void Start()
         {
             menu = CreateMenu();
-            boardsManager = GameObject.Find("HolisticMetricsManager").GetComponent<BoardsManager>();
         }
         
         private void Update()
@@ -88,16 +86,16 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu.ToggleMenu();
 
-            new AddBoardDialog(boardsManager).Open();
+            new AddBoardDialog().Open();
         }
 
         private void DeleteBoard()
         {
             menu.ToggleMenu();
 
-            if (boardsManager.GetNames().Any())
+            if (BoardsManager.GetNames().Any())
             {
-                new DeleteBoardDialog(boardsManager).Open();
+                new DeleteBoardDialog().Open();
             }
             else
             {
@@ -111,9 +109,9 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu.ToggleMenu();
 
-            if (boardsManager.GetNames().Any())
+            if (BoardsManager.GetNames().Any())
             {
-                new AddWidgetDialog(boardsManager).Open();
+                new AddWidgetDialog().Open();
             }
             else
             {
@@ -127,14 +125,14 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu.ToggleMenu();
 
-            if (boardsManager.GetNames().Any())
+            if (BoardsManager.GetNames().Any())
             {
                 // TODO: Also check if any of the boards has any widgets
                 // TODO: Let the player cancel this
                 ShowNotification.Info(
                     "Select the widget to delete",
                     "Click on a widget to delete it");
-                boardsManager.DeleteWidget();
+                BoardsManager.DeleteWidget();
             }
             else
             {
@@ -148,9 +146,9 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu.ToggleMenu();
 
-            if (boardsManager.GetNames().Any())
+            if (BoardsManager.GetNames().Any())
             {
-                new SaveBoardConfigurationDialog(boardsManager).Open();
+                new SaveBoardConfigurationDialog().Open();
             }
             else
             {
@@ -166,7 +164,7 @@ namespace SEE.Game.UI.HolisticMetrics
             
             if (ConfigurationManager.GetSavedFileNames().Any())
             {
-                new LoadBoardConfigurationDialog(boardsManager).Open();
+                new LoadBoardConfigurationDialog().Open();
             }
             else
             {

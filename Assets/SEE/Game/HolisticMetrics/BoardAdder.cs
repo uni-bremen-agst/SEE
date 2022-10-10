@@ -22,12 +22,6 @@ namespace SEE.Game.HolisticMetrics
         private static bool addingDone;
 
         /// <summary>
-        /// Reference to the BoardsManager being used for adding the new board. This will not be used here, it will
-        /// just be passed on to the rotation dialog.
-        /// </summary>
-        private static BoardsManager boardsManager;
-
-        /// <summary>
         /// The configuration of the board to be created. We should be getting this from the AddBoardDialog and we
         /// expect it to only contain the name so far. In this component, the position will be added to it. Then we will
         /// pass it on to the rotation dialog where the rotation will be added.
@@ -43,14 +37,12 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// This sets up all BoardAdders when they are added to the scene to position a new metrics board.
         /// </summary>
-        /// <param name="boardsManagerReference"></param>
         /// <param name="boardConfigurationReference"></param>
-        internal static void Setup(BoardsManager boardsManagerReference, BoardConfiguration boardConfigurationReference)
+        internal static void Setup(BoardConfiguration boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;
             string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
             boardPrefab = Resources.Load<GameObject>(pathToBoard);
-            boardsManager = boardsManagerReference;
             addingDone = false;
         }
         
@@ -77,7 +69,7 @@ namespace SEE.Game.HolisticMetrics
                             GameObject.Find("UI Canvas").transform, 
                             instantiateInWorldSpace: false)
                         .GetComponent<AddBoardSliderController>()
-                        .Setup(boardConfiguration, boardsManager);
+                        .Setup(boardConfiguration);
                     addingDone = true;
                 }
             }

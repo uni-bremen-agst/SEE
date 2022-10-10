@@ -19,8 +19,6 @@ namespace SEE.Game.UI.PropertyDialog
         private SelectionProperty selectedMetric;
 
         private SelectionProperty selectedWidget;
-        
-        private readonly BoardsManager boardsManager;
 
         /// <summary>
         /// When Start() is called, this will be filled with the types of all classes that inherit from class "Metric".
@@ -33,10 +31,8 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private readonly GameObject[] widgetPrefabs;
 
-        internal AddWidgetDialog(BoardsManager boardsManagerReference)
+        internal AddWidgetDialog()
         {
-            boardsManager = boardsManagerReference;
-
             // Load the metric types
             metricTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(domainAssembly => domainAssembly.GetTypes())
@@ -93,7 +89,7 @@ namespace SEE.Game.UI.PropertyDialog
             };
             
             // Add WidgetPositionGetters to all boards
-            boardsManager.PositionWidget(widgetConfiguration);
+            BoardsManager.PositionWidget(widgetConfiguration);
 
             // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
             
