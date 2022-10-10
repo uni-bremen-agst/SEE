@@ -31,6 +31,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Select file";
             propertyDialog.Description = "Select file to load the board configuration from";
+            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
 
             propertyDialog.OnConfirm.AddListener(LoadBoardConfiguration);

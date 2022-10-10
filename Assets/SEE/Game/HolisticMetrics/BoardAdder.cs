@@ -41,8 +41,7 @@ namespace SEE.Game.HolisticMetrics
         internal static void Setup(BoardConfiguration boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;
-            string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
-            boardPrefab = Resources.Load<GameObject>(pathToBoard);
+            boardPrefab = Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
             addingDone = false;
         }
         
@@ -62,10 +61,8 @@ namespace SEE.Game.HolisticMetrics
 
                     boardConfiguration.Position = newPosition;
 
-                    
-                    string pathToSlider = Path.Combine("Prefabs", "UI", "MetricsBoardRotation");
                     PrefabInstantiator.InstantiatePrefab(
-                            pathToSlider, 
+                            "Prefabs/UI/MetricsBoardRotation", 
                             GameObject.Find("UI Canvas").transform, 
                             instantiateInWorldSpace: false)
                         .GetComponent<AddBoardSliderController>()

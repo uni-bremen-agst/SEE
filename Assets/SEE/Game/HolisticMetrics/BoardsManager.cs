@@ -16,11 +16,8 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// The board prefab we will be instantiating here.
         /// </summary>
-        private static readonly GameObject boardPrefab = Resources.Load<GameObject>(Path.Combine(
-            "Prefabs", 
-            "HolisticMetrics", 
-            "SceneComponents", 
-            "MetricsBoard"));
+        private static readonly GameObject boardPrefab = 
+            Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
 
         /// <summary>
         /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the

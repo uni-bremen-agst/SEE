@@ -37,6 +37,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Specify board configuration";
             propertyDialog.Description = "Select the board to save and give the configuration file a name";
+            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
             
             propertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);

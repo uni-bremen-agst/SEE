@@ -53,32 +53,38 @@ namespace SEE.Game.UI.HolisticMetrics
                     action: NewBoard,
                     title: "New board",
                     description: "Add a new metrics board to the scene",
-                    entryColor: Color.green.Darker()),
+                    entryColor: Color.green.Darker(),
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Plus")),
                 new MenuEntry(
                     action: DeleteBoard,
                     title: "Delete board",
                     description: "Delete a board from the scene",
-                    entryColor: Color.red.Darker()),
+                    entryColor: Color.red.Darker(),
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Minus")),
                 new MenuEntry(
                     action: AddWidget,
                     title: "Add widget",
                     description: "Add a widget to a board",
-                    entryColor: Color.green.Darker()),
+                    entryColor: Color.green.Darker(),
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Plus")),
                 new MenuEntry(
                     action: RemoveWidget,
                     title: "Remove widget",
                     description: "Remove a widget from a board",
-                    entryColor: Color.red.Darker()),
+                    entryColor: Color.red.Darker(),
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Minus")),
                 new MenuEntry(
                     action: SaveBoardConfiguration,
                     title: "Save board",
                     description: "Save a board from the scene to a file",
-                    entryColor: Color.blue),
+                    entryColor: Color.blue,
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Document")),
                 new MenuEntry(
                     action: LoadBoardConfiguration,
                     title: "Load board",
                     description: "Load a board from a file into the scene",
-                    entryColor: Color.blue)
+                    entryColor: Color.blue,
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Document"))
             };
         }
 

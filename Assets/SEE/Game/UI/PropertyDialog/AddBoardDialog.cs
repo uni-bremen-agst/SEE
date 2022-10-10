@@ -29,6 +29,7 @@ namespace SEE.Game.UI.PropertyDialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add board";
             propertyDialog.Description = "Configure the board; then hit OK button.";
+            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
             propertyDialog.AddGroup(group);
 
             propertyDialog.OnConfirm.AddListener(AddBoard);

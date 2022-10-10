@@ -14,8 +14,7 @@ namespace SEE.Game.HolisticMetrics
         /// The path to the folder containing the saved metrics displays. This is saved in a field because multiple
         /// methods of this class use it.
         /// </summary>
-        private static readonly string metricsBoardsPath =
-            Path.Combine(Application.persistentDataPath, "MetricsBoards");
+        private static readonly string metricsBoardsPath = Application.persistentDataPath + "MetricsBoards";
 
         /// <summary>
         /// This method checks whether the directory for the saved metrics displays exists. If not, then it creates
@@ -57,8 +56,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfiguration LoadBoard(string fileName)
         {
             EnsureDisplayDirectoryExists();
-            string filePath = Path.Combine(metricsBoardsPath, fileName + ".json");
-            string configuration = File.ReadAllText(filePath);
+            string configuration = File.ReadAllText(metricsBoardsPath + fileName + ".json");
             BoardConfiguration boardConfiguration = JsonUtility.FromJson<BoardConfiguration>(configuration);
             return boardConfiguration;
         }
@@ -94,7 +92,7 @@ namespace SEE.Game.HolisticMetrics
             }
 
             string configuration = JsonUtility.ToJson(metricsBoardConfiguration, true);
-            string filePath = Path.Combine(metricsBoardsPath, fileName + ".json");
+            string filePath = metricsBoardsPath + fileName + ".json";
             File.WriteAllText(filePath, configuration);
         }
     }
