@@ -23,9 +23,6 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
-        private readonly BoardsManager boardsManager =
-            GameObject.Find("HolisticMetricsManager").GetComponent<BoardsManager>();
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -418,11 +415,8 @@ namespace SEE.Game
                     }
                 }
             }
-
-            if (boardsManager != null)
-            {
-                boardsManager.OnGraphLoad();    
-            }
+            
+            BoardsManager.OnGraphLoad();
         }
 
         /// <summary>

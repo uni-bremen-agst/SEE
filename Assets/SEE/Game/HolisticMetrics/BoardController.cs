@@ -57,7 +57,7 @@ namespace SEE.Game.HolisticMetrics
             return title;
         }
         
-        internal void GetTitle(string newTitle)
+        internal void SetTitle(string newTitle)
         {
             title = newTitle;
             gameObject.GetComponentInChildren<Text>().text = newTitle;

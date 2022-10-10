@@ -14,13 +14,6 @@ namespace SEE.Game.UI.PropertyDialog
 
         private StringProperty fileName;
 
-        private readonly BoardsManager boardsManager;
-
-        internal SaveBoardConfigurationDialog(BoardsManager boardsManagerReference)
-        {
-            boardsManager = boardsManagerReference;
-        }
-
         internal void Open()
         {
             dialog = new GameObject("Save board configuration dialog");
@@ -30,8 +23,8 @@ namespace SEE.Game.UI.PropertyDialog
             selectedBoard = dialog.AddComponent<SelectionProperty>();
             selectedBoard.Name = "Select board";
             selectedBoard.Description = "Select the board of which to save the configuration";
-            selectedBoard.AddOptions(boardsManager.GetNames());
-            selectedBoard.Value = boardsManager.GetNames()[0];
+            selectedBoard.AddOptions(BoardsManager.GetNames());
+            selectedBoard.Value = BoardsManager.GetNames()[0];
             group.AddProperty(selectedBoard);
 
             fileName = dialog.AddComponent<StringProperty>();
@@ -57,7 +50,7 @@ namespace SEE.Game.UI.PropertyDialog
         {
             SEEInput.KeyboardShortcutsEnabled = true;
             
-            BoardController boardController = boardsManager.FindControllerByName(selectedBoard.Value);
+            BoardController boardController = BoardsManager.FindControllerByName(selectedBoard.Value);
             ConfigurationManager.SaveBoard(boardController, fileName.Value);
             
             // Destroy the dialog GameObject

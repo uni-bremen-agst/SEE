@@ -15,13 +15,6 @@ namespace SEE.Game.UI.PropertyDialog
 
         private SelectionProperty selectedFile;
 
-        private readonly BoardsManager boardsManager;
-
-        public LoadBoardConfigurationDialog(BoardsManager boardsManagerReference)
-        {
-            boardsManager = boardsManagerReference;
-        }
-
         public void Open()
         {
             dialog = new GameObject("Load board configuration dialog");
@@ -69,7 +62,7 @@ namespace SEE.Game.UI.PropertyDialog
             Object.Destroy(dialog);
             
             // Create a new board from the loaded configuration
-            boardsManager.CreateNewBoard(boardConfiguration);
+            BoardsManager.CreateNewBoard(boardConfiguration);
         }
 
         private void EnableKeyboardShortcuts()

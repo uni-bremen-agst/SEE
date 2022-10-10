@@ -11,16 +11,9 @@ namespace SEE.Game.UI.PropertyDialog
 
         private PropertyDialog propertyDialog;
 
-        private readonly BoardsManager boardsManager;
-
         private StringProperty boardName;
 
         private static GameObject sliderPrefab;
-
-        internal AddBoardDialog(BoardsManager boardsManagerReference)
-        {
-            boardsManager = boardsManagerReference;
-        }
 
         internal void Open()
         {
@@ -54,7 +47,7 @@ namespace SEE.Game.UI.PropertyDialog
             Object.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
             GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
-            BoardAdder.Setup(boardsManager, boardConfiguration);
+            BoardAdder.Setup(boardConfiguration);
 
             ShowNotification.Info(
                 "Position the board",

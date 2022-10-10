@@ -23,11 +23,6 @@ namespace SEE.Game.UI.HolisticMetrics
         [SerializeField] private WindowDragger windowDragger;
 
         /// <summary>
-        /// The boards manager that will be used for creating the new board.
-        /// </summary>
-        private BoardsManager boardsManager;
-
-        /// <summary>
         /// The board configuration of the board to be created. So far it should already have a title and a position. In
         /// this component, we will add the rotation to it and then create it.
         /// </summary>
@@ -44,11 +39,9 @@ namespace SEE.Game.UI.HolisticMetrics
         /// Also sets up the slider, the window dragger and instantiates the dummy board.
         /// </summary>
         /// <param name="boardConfigurationReference">The BoardConfiguration for the board to be created</param>
-        /// <param name="boardsManagerReference">A reference to the BoardsManager of this scene</param>
-        internal void Setup(BoardConfiguration boardConfigurationReference, BoardsManager boardsManagerReference)
+        internal void Setup(BoardConfiguration boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;
-            boardsManager = boardsManagerReference;
 
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
             
@@ -78,7 +71,7 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
             Destroy(dummyBoard);
-            boardsManager.CreateNewBoard(boardConfiguration);
+            BoardsManager.CreateNewBoard(boardConfiguration);
             Destroy(gameObject);
         }
     }

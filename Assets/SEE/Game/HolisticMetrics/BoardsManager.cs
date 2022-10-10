@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SEE.Game.UI.Notification;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
@@ -9,46 +11,46 @@ namespace SEE.Game.HolisticMetrics
     /// <summary>
     /// This class manages all metrics boards.
     /// </summary>
-    public class BoardsManager : MonoBehaviour
+    public static class BoardsManager
     {
-        // TODO: Make this a singleton so we can get a reference to it easier
-        
-        private GameObject boardPrefab;
+        /// <summary>
+        /// The board prefab we will be instantiating here.
+        /// </summary>
+        private static readonly GameObject boardPrefab = Resources.Load<GameObject>(Path.Combine(
+            "Prefabs", 
+            "HolisticMetrics", 
+            "SceneComponents", 
+            "MetricsBoard"));
 
         /// <summary>
         /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the
         /// scene that are not in this list).
         /// </summary>
-        private readonly List<BoardController> boardControllers = new List<BoardController>();
-
-        private void Start()
-        {
-            string pathToBoard = Path.Combine("Prefabs", "HolisticMetrics", "SceneComponents", "MetricsBoard");
-            boardPrefab = Resources.Load<GameObject>(pathToBoard);
-        }
-
+        private static readonly List<BoardController> boardControllers = new List<BoardController>();
 
         /// <summary>
         /// Creates a new metrics board and puts its BoardController into the list of BoardControllers.
         /// </summary>
         /// <param name="boardConfiguration">The board configuration for the new board.</param>
-        internal void CreateNewBoard(BoardConfiguration boardConfiguration)
+        internal static void CreateNewBoard(BoardConfiguration boardConfiguration)
         {
             bool nameExists = boardControllers.Any(boardController =>
                 boardController.GetTitle().Equals(boardConfiguration.Title));
             if (nameExists)
             {
-                // TODO: Do not throw an exception; rather show user a popup, then return
-                throw new Exception("Name has to be unique!");
+                ShowNotification.Error("Cannot create that board", "The name has to be unique.");
+                return;
             }
 
-            GameObject newBoard = Instantiate(boardPrefab, gameObject.transform);
-            newBoard.transform.position = boardConfiguration.Position;
-            newBoard.transform.rotation = boardConfiguration.Rotation;
+            GameObject newBoard = UnityEngine.Object.Instantiate(
+                boardPrefab, 
+                boardConfiguration.Position, 
+                boardConfiguration.Rotation);
+            
             BoardController newBoardController = newBoard.GetComponent<BoardController>();
 
             // Set the title of the new board
-            newBoardController.GetTitle(boardConfiguration.Title);
+            newBoardController.SetTitle(boardConfiguration.Title);
 
             // Add the widgets to the new board
             foreach (WidgetConfiguration widgetConfiguration in boardConfiguration.WidgetConfigurations)
@@ -59,12 +61,13 @@ namespace SEE.Game.HolisticMetrics
             boardControllers.Add(newBoardController);
         }
 
-        internal void Delete(string boardName)
+        
+        internal static void Delete(string boardName)
         {
             BoardController boardController = FindControllerByName(boardName);
-            Destroy(boardController.gameObject);
+            UnityEngine.Object.Destroy(boardController.gameObject);
             boardControllers.Remove(boardController);
-            Destroy(boardController);
+            UnityEngine.Object.Destroy(boardController);
         }
 
         /// <summary>
@@ -72,7 +75,7 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         /// <param name="boardName">The name to look for.</param>
         /// <returns>Returns the desired GameObject if it exists or null if it doesn't.</returns>
-        internal BoardController FindControllerByName(string boardName)
+        internal static BoardController FindControllerByName(string boardName)
         {
             return boardControllers.Find(boardController => boardController.GetTitle().Equals(boardName));
         }
@@ -82,7 +85,7 @@ namespace SEE.Game.HolisticMetrics
         /// because they have to be unique.
         /// </summary>
         /// <returns>The names of all BoardControllers.</returns>
-        internal string[] GetNames()
+        internal static string[] GetNames()
         {
             string[] names = new string[boardControllers.Count];
             for (int i = 0; i < boardControllers.Count; i++)
@@ -96,7 +99,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Updates all the widgets on all the metrics boards.
         /// </summary>
-        internal void OnGraphLoad()
+        internal static void OnGraphLoad()
         {
             foreach (BoardController boardController in boardControllers)
             {
@@ -108,7 +111,7 @@ namespace SEE.Game.HolisticMetrics
         /// This method can be invoked when you wish to let the user click on a board to add a widget.
         /// </summary>
         /// <param name="widgetConfiguration">Information on how the widget to add should be configured</param>
-        internal void PositionWidget(WidgetConfiguration widgetConfiguration)
+        internal static void PositionWidget(WidgetConfiguration widgetConfiguration)
         {
             foreach (BoardController controller in boardControllers)
             {
@@ -117,7 +120,7 @@ namespace SEE.Game.HolisticMetrics
             }
         }
 
-        internal void DeleteWidget()
+        internal static void DeleteWidget()
         {
             foreach (BoardController boardController in boardControllers)
             {
