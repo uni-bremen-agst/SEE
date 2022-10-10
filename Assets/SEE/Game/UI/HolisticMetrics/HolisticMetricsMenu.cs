@@ -8,7 +8,7 @@ using SEE.Game.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI
+namespace SEE.Game.UI.HolisticMetrics
 {
     /// <summary>
     /// The content of this class is inspired by OpeningDialog.cs because I think it makes sense to implement the menu
@@ -88,9 +88,7 @@ namespace SEE.Game.UI
         {
             menu.ToggleMenu();
 
-            //GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
-            
-            // The BoardAdder should also open the dialog then. Then the dialog should call some method in BoardsManager
+            new AddBoardDialog(boardsManager).Open();
         }
 
         private void DeleteBoard()

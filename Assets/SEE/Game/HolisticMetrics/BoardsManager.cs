@@ -11,6 +11,8 @@ namespace SEE.Game.HolisticMetrics
     /// </summary>
     public class BoardsManager : MonoBehaviour
     {
+        // TODO: Make this a singleton so we can get a reference to it easier
+        
         private GameObject boardPrefab;
 
         /// <summary>
@@ -41,6 +43,8 @@ namespace SEE.Game.HolisticMetrics
             }
 
             GameObject newBoard = Instantiate(boardPrefab, gameObject.transform);
+            newBoard.transform.position = boardConfiguration.Position;
+            newBoard.transform.rotation = boardConfiguration.Rotation;
             BoardController newBoardController = newBoard.GetComponent<BoardController>();
 
             // Set the title of the new board

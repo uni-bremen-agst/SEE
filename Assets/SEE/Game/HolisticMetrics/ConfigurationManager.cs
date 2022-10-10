@@ -71,10 +71,13 @@ namespace SEE.Game.HolisticMetrics
         internal static void SaveBoard(BoardController boardController, string fileName)
         {
             EnsureDisplayDirectoryExists();
+
+            Transform boardTransform = boardController.transform;
             BoardConfiguration metricsBoardConfiguration = new BoardConfiguration()
             {
                 Title = boardController.GetTitle(),
-                Position = boardController.transform.localPosition
+                Position = boardTransform.localPosition,
+                Rotation = boardTransform.rotation
             };
             BoardController canvasController = boardController.GetComponent<BoardController>();
             foreach ((WidgetController, Metric) tuple in canvasController.widgets)
