@@ -15,6 +15,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private TweenOperation<float> PositionY;
 
+        /// <summary>
+        /// The Y position this notification is supposed to be at.
+        /// </summary>
         public float TargetPositionY => PositionY.TargetValue;
 
         /// <summary>
