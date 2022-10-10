@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace SEE.Game.UI.PropertyDialog
 {
-    public class AddWidgetDialog
+    internal class AddWidgetDialog
     {
         private GameObject dialog;
 
@@ -25,13 +25,13 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// When Start() is called, this will be filled with the types of all classes that inherit from class "Metric".
         /// </summary>
-        private Type[] metricTypes;
+        private readonly Type[] metricTypes;
 
         /// <summary>
         /// When Start() is called, this will be filled with all widget prefabs from
         /// Assets/Resources/Prefabs/HolisticMetrics.
         /// </summary>
-        private GameObject[] widgetPrefabs;
+        private readonly GameObject[] widgetPrefabs;
 
         internal AddWidgetDialog(BoardsManager boardsManagerReference)
         {

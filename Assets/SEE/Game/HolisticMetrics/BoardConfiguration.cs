@@ -19,6 +19,11 @@ namespace SEE.Game.HolisticMetrics
         /// The coordinates of where this board should be placed in the scene.
         /// </summary>
         public Vector3 Position;
+
+        /// <summary>
+        /// The orientation of this board.
+        /// </summary>
+        public Quaternion Rotation;
         
         /// <summary>
         /// All the widgets that should be displayed on this board.
