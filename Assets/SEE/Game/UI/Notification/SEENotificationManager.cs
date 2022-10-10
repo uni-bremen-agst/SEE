@@ -7,12 +7,31 @@ using UnityEngine;
 
 namespace SEE.Game.UI.Notification
 {
+    /// <summary>
+    /// Displays notifications in a vertical list.
+    ///
+    /// It behaves as follows:
+    /// <ul>
+    /// <li>New notifications are displayed at the top right. Any existing notifications will be pushed down,
+    /// along with a configurable <see cref="MARGIN"/>.</li>
+    /// <li>Notifications can be closed by clicking on them,
+    /// which will cause below notifications to "slide up" and fill the empty space.</li>
+    /// <li>Movement in both directions is done via the <see cref="NotificationOperator"/>,
+    /// so that animations do not interfere with one another.</li>
+    /// <li>Notifications have a timer associated to them, that is, they close themselves after a configurable
+    /// amount of time. This timer is only applied to the topmost notification, which means that no notification
+    /// below will close automatically (except when reaching the top spot).
+    /// If the notification slides below the top spot, its timer will be cancelled until it again reaches the top spot.
+    /// The reason behind this is that the user should not be overwhelmed by auto-closing notifications and should have
+    /// time to read everything, especially considering that some notifications may be below the screen.</li>
+    /// </ul>
+    /// </summary>
     public class SEENotificationManager : MonoBehaviour
     {
         /// <summary>
-        /// Amount of padding between each notification.
+        /// Size of vertical margin between each notification.
         /// </summary>
-        private const float PADDING = 10f;
+        private const float MARGIN = 10f;
 
         /// <summary>
         /// Notifications managed by this component along with their respective height.
@@ -64,25 +83,33 @@ namespace SEE.Game.UI.Notification
             // We iterate through the list in reverse so we can remove elements without complications.
             for (int i = Notifications.Count - 1; i >= 0; i--)
             {
-                if (Notifications[i].notification == null)
+                if (Notifications[i].Notification == null)
                 {
                     Notifications.RemoveAt(i);
                     continue;
                 }
 
                 // New notification is at the top. We move all others down by the height of this one.
-                Notifications[i].notification.MoveDown(finalHeight + PADDING);
+                Notifications[i].Notification.MoveDown(finalHeight + MARGIN);
                 // This also cancels their timer. Only the notification at the very top will be timed.
-                Notifications[i].token.Cancel();
+                Notifications[i].Token.Cancel();
             }
 
             CancellationTokenSource token = new CancellationTokenSource();
-            Notifications.Add(new NotificationData(notification, finalHeight + PADDING, token));
+            Notifications.Add(new NotificationData(notification, finalHeight + MARGIN, token));
 
-            StartTimer(notification, token).Forget();
+            StartTimer(notification, token.Token).Forget();
         }
 
-        private async UniTaskVoid StartTimer(Notification notification, CancellationTokenSource token)
+        /// <summary>
+        /// Starts the timer for the given <paramref name="notification"/>, attaching the given
+        /// cancellation <paramref name="token"/>.
+        /// After the timer has reached zero <em>and</em> the notification is at the top of the notification list,
+        /// the notification will be closed. Otherwise, nothing will be done.
+        /// </summary>
+        /// <param name="notification">notification whose timer shall be started</param>
+        /// <param name="token">cancellation token with which the timer can be cancelled</param>
+        private async UniTaskVoid StartTimer(Notification notification, CancellationToken token)
         {
             if (notification.Timer <= 0f)
             {
@@ -90,9 +117,9 @@ namespace SEE.Game.UI.Notification
                 return;
             }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(notification.Timer), cancellationToken: token.Token);
+            await UniTask.Delay(TimeSpan.FromSeconds(notification.Timer), cancellationToken: token);
             // If the notification is still active AND at the top of the list, we'll close it
-            if (Notifications.Count > 0 && Notifications.Last().notification == notification)
+            if (Notifications.Count > 0 && Notifications.Last().Notification == notification)
             {
                 notification.Close();
             }
@@ -113,10 +140,10 @@ namespace SEE.Game.UI.Notification
                 // We do nothing until we find our notification, as the ones above do not need to be adjusted.
                 if (!belowRemovedNotification)
                 {
-                    if (entry.notification == notification)
+                    if (entry.Notification == notification)
                     {
                         belowRemovedNotification = true;
-                        height = entry.height;
+                        height = entry.Height;
                     }
                     else
                     {
@@ -126,7 +153,7 @@ namespace SEE.Game.UI.Notification
                 else
                 {
                     // Moving up by inverting the sign
-                    entry.notification.MoveDown(-height);
+                    entry.Notification.MoveDown(-height);
                 }
             }
 
@@ -139,27 +166,41 @@ namespace SEE.Game.UI.Notification
             if (index == Notifications.Count - 1 && Notifications.Count > 1)
             {
                 // Top spot has changed. We start the timer for the new top notification.
-                CancellationTokenSource token = Notifications[index - 1].token = new CancellationTokenSource();
-                StartTimer(Notifications[index - 1].notification, token).Forget();
+                CancellationTokenSource token = Notifications[index - 1].Token = new CancellationTokenSource();
+                StartTimer(Notifications[index - 1].Notification, token.Token).Forget();
             }
 
             // We also need to dispose the token.
-            Notifications[index].token.Cancel();
-            Notifications[index].token.Dispose();
+            Notifications[index].Token.Cancel();
+            Notifications[index].Token.Dispose();
             Notifications.RemoveAt(index);
         }
 
+        /// <summary>
+        /// Encapsulates a notification along with its height and a <see cref="CancellationToken"/> for its timer.
+        /// </summary>
         private class NotificationData
         {
-            public readonly Notification notification;
-            public readonly float height;
-            public CancellationTokenSource token;
+            /// <summary>
+            /// The notification represented by this class.
+            /// </summary>
+            public readonly Notification Notification;
+            
+            /// <summary>
+            /// The height of this notification on the canvas.
+            /// </summary>
+            public readonly float Height;
+            
+            /// <summary>
+            /// The token with which the notification's timer can be cancelled.
+            /// </summary>
+            public CancellationTokenSource Token;
 
             public NotificationData(Notification notification, float height, CancellationTokenSource token)
             {
-                this.notification = notification;
-                this.height = height;
-                this.token = token;
+                Notification = notification;
+                Height = height;
+                Token = token;
             }
         }
     }
