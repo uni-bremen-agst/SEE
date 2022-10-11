@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SEE.Game.UI.Notification
 {
@@ -43,6 +44,25 @@ namespace SEE.Game.UI.Notification
         /// Sprite for the info icon.
         /// </summary>
         private static readonly Sprite InfoIcon = Resources.Load<Sprite>("Materials/Notification/Info");
+
+        /// <summary>
+        /// Lazily initialized notification manager instance. Behaves like a singleton.
+        /// </summary>
+        private static readonly Lazy<SEENotificationManager> Manager = new Lazy<SEENotificationManager>(CreateManager);
+
+        /// <summary>
+        /// Creates a new <see cref="SEENotificationManager"/> along with a corresponding new <see cref="GameObject"/>.
+        /// </summary>
+        /// <returns>the newly created <see cref="SEENotificationManager"/></returns>
+        private static SEENotificationManager CreateManager()
+        {
+            // All other notifications will be children to this manager object.
+            GameObject managerGameObject = new GameObject
+            {
+                name = "Notifications"
+            };
+            return managerGameObject.AddComponent<SEENotificationManager>();
+        }
 
         /// <summary>
         /// Displays an informational message to the user as a notification.
@@ -110,15 +130,7 @@ namespace SEE.Game.UI.Notification
         public static Notification Show(string title, string description, Sprite icon, Color color, 
                                         float duration = DEFAULT_DURATION)
         {
-            GameObject notificationGameObject = new GameObject {name = $"Notification '{title}'"};
-            Notification notification = notificationGameObject.AddComponent<Notification>();
-            notification.Title = title;
-            notification.Text = description;
-            notification.Timer = duration;
-            notification.Icon = icon;
-            notification.Color = color;
-            notification.DestroyAfterPlaying = true;
-            return notification;
+            return Manager.Value.Show(title, description, icon, color, duration);
         }
     }
 }
