@@ -5,7 +5,7 @@ using SEE.Game.UI.Notification;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SEE.Game.UI.PropertyDialog
+namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
     internal class LoadBoardConfigurationDialog
     {

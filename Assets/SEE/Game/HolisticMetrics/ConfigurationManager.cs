@@ -1,6 +1,7 @@
 using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics

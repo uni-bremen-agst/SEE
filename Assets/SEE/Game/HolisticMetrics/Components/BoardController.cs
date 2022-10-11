@@ -8,7 +8,7 @@ using SEE.Game.HolisticMetrics.WidgetControllers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.HolisticMetrics
+namespace SEE.Game.HolisticMetrics.Components
 {
     /// <summary>
     /// This class controls/manages a holistic metrics board.
@@ -38,6 +38,10 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private GameObject[] widgetPrefabs;
 
+        /// <summary>
+        /// The dropdown UI element that allows the player to select a code city for which the metrics should be
+        /// displayed.
+        /// </summary>
         [SerializeField] private CustomDropdown citySelection;
 
         /// <summary>
@@ -51,6 +55,8 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private static Sprite houseIcon;
 
+        [SerializeField] private GameObject boardMover;
+        
         /// <summary>
         /// Instantiates the metricTypes and widgetPrefabs arrays.
         /// </summary>
@@ -178,6 +184,14 @@ namespace SEE.Game.HolisticMetrics
                 throw new Exception();
             }
             return selectedCity;
+        }
+
+        /// <summary>
+        /// This toggles a child object of the board that allows the player to move the board around.
+        /// </summary>
+        internal void ToggleMoving(bool enable)
+        {
+            boardMover.SetActive(enable);
         }
         
         /// <summary>

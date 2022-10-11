@@ -1,8 +1,9 @@
 using SEE.Controls;
 using SEE.Game.HolisticMetrics;
+using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
-namespace SEE.Game.UI.PropertyDialog
+namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
     public class SaveBoardConfigurationDialog
     {

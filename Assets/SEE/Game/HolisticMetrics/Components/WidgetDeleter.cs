@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics
+namespace SEE.Game.HolisticMetrics.Components
 {
     public class WidgetDeleter : MonoBehaviour
     {
