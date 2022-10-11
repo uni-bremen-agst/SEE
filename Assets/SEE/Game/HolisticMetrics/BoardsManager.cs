@@ -100,7 +100,7 @@ namespace SEE.Game.HolisticMetrics
         {
             foreach (BoardController boardController in boardControllers)
             {
-                boardController.OnGraphLoad();
+                boardController.Redraw();
             }
         }
 

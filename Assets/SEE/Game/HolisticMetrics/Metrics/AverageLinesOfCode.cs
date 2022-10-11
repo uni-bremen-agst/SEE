@@ -1,5 +1,6 @@
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 
@@ -13,19 +14,14 @@ namespace SEE.Game.HolisticMetrics.Metrics
         [SerializeField] private int optimalValue;
         [SerializeField] private int worstValue = 300;
         
-        internal override MetricValue Refresh()
+        internal override MetricValue Refresh(SEECity city)
         {
             int totalNodes = 0;
             float totalLines = 0.0f;
 
-            foreach (GameObject node in GraphElements)
+            foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (!node.tag.Equals(Tags.Node))
-                {
-                    continue;
-                }
-                Node graphNode = node.GetComponent<NodeRef>().Value;
-                if (graphNode != null && graphNode.TryGetNumeric("Metric.Lines.LOC", out var lines))
+                if (node.TryGetNumeric("Metric.Lines.LOC", out var lines))
                 {
                     totalLines += lines;
                     totalNodes++;

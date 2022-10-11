@@ -22,8 +22,6 @@ namespace SEE.Game
         /// </summary>
         private static readonly IDictionary<string, GameObject> mapping = new Dictionary<string, GameObject>();
 
-        internal static IDictionary<string, GameObject> MappingForHolisticMetrics => mapping;
-
         /// <summary>
         /// Returns the game object with the given <paramref name="ID"/> or null if there is
         /// no such game object.
