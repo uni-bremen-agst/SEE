@@ -4,7 +4,7 @@ using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog;
+using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -40,7 +40,6 @@ namespace SEE.Game.UI.HolisticMetrics
             actionMenu.Title = "Holistic metrics menu";
             actionMenu.Description = "Add / change the metrics board(s).";
             actionMenu.AddEntries(entries);
-            // TODO: Ask why it is not being hidden when clicking on items
             actionMenu.HideAfterSelection(true);
             return actionMenu;
         }
@@ -55,6 +54,12 @@ namespace SEE.Game.UI.HolisticMetrics
                     description: "Add a new metrics board to the scene",
                     entryColor: Color.green.Darker(),
                     icon: Resources.Load<Sprite>("Materials/ModernUIPack/Plus")),
+                new MenuEntry(
+                    action : MoveBoard,
+                    title: "Move boards",
+                    description: "Toggles the move buttons under the boards",
+                    entryColor: Color.yellow,
+                    icon: Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI")),
                 new MenuEntry(
                     action: DeleteBoard,
                     title: "Delete board",
@@ -94,6 +99,28 @@ namespace SEE.Game.UI.HolisticMetrics
 
             new AddBoardDialog().Open();
         }
+        
+        private void MoveBoard()
+        {
+            menu.ToggleMenu();
+
+            if (BoardsManager.GetNames().Any())
+            {
+                if (BoardsManager.ToggleMoving())  // If true that means that is is now activated
+                {
+                    ShowNotification.Info(
+                        "Move the boards around as desired",
+                        "Click the button under a board to move that board around. Don't forget to " +
+                        " deactivate this mode when done.");   
+                }
+            }
+            else
+            {
+                ShowNotification.Warn(
+                    "No boards in the scene",
+                    "There are not metrics boards that could be moved.");
+            }
+        }
 
         private void DeleteBoard()
         {
@@ -110,7 +137,7 @@ namespace SEE.Game.UI.HolisticMetrics
                     "There are no metrics boards in the scene");
             }
         }
-
+        
         private void AddWidget()
         {
             menu.ToggleMenu();

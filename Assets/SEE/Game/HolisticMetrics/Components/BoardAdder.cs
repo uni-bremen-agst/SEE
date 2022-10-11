@@ -3,7 +3,7 @@ using SEE.Game.UI.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics
+namespace SEE.Game.HolisticMetrics.Components
 {
     /// <summary>
     /// This class can be attached to any GameObject in the scene that you want to add a metrics board onto (probably

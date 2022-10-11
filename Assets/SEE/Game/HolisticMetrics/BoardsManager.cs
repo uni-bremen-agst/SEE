@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using SEE.Game.UI.Notification;
-using SEE.Utils;
 using UnityEngine;
+using SEE.Game.HolisticMetrics.Components;
 
 namespace SEE.Game.HolisticMetrics
 {
@@ -18,6 +16,8 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private static readonly GameObject boardPrefab = 
             Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
+
+        private static bool movingEnabled;
 
         /// <summary>
         /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the
@@ -39,7 +39,7 @@ namespace SEE.Game.HolisticMetrics
                 return;
             }
 
-            GameObject newBoard = UnityEngine.Object.Instantiate(
+            GameObject newBoard = Object.Instantiate(
                 boardPrefab, 
                 boardConfiguration.Position, 
                 boardConfiguration.Rotation);
@@ -57,14 +57,23 @@ namespace SEE.Game.HolisticMetrics
 
             boardControllers.Add(newBoardController);
         }
-
         
         internal static void Delete(string boardName)
         {
             BoardController boardController = FindControllerByName(boardName);
-            UnityEngine.Object.Destroy(boardController.gameObject);
+            Object.Destroy(boardController.gameObject);
             boardControllers.Remove(boardController);
-            UnityEngine.Object.Destroy(boardController);
+            Object.Destroy(boardController);
+        }
+
+        internal static bool ToggleMoving()
+        {
+            movingEnabled = !movingEnabled;
+            foreach (BoardController controller in boardControllers)
+            {
+                controller.ToggleMoving(movingEnabled);
+            }
+            return movingEnabled;
         }
 
         /// <summary>

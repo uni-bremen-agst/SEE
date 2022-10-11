@@ -2,7 +2,7 @@ using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
 
-namespace SEE.Game.UI.PropertyDialog
+namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
     public class DeleteBoardDialog
     {
