@@ -34,7 +34,17 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 fade.fillAmount = percentage;
                 percentage *= 100;
-                valueText.text = percentage.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+                if (metricValue.DecimalPlaces < 2) 
+                {
+                    metricValue.DecimalPlaces = 0;
+                }
+                else
+                {
+                    metricValue.DecimalPlaces -= 2;
+                }
+                // We subtract 2 from the number of decimal places because we shifted all digits to the left by 2 by
+                // multiplying percentage with 100
+                valueText.text = percentage.ToString("F" + metricValue.DecimalPlaces) + "%";
                 titleText.text = metricValueRange.Name;
             }
             else if (metricValue.GetType() == typeof(MetricValueCollection))

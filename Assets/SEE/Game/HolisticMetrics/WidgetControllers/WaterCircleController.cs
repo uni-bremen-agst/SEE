@@ -1,5 +1,3 @@
-using System;
-using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +23,15 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 water.color = color;
                 titleText.text = metricValueRange.Name;
                 percentage *= 100;
-                valueText.text = percentage.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+                if (metricValue.DecimalPlaces < 2) 
+                {
+                    metricValue.DecimalPlaces = 0;
+                }
+                else
+                {
+                    metricValue.DecimalPlaces -= 2;
+                }
+                valueText.text = percentage.ToString("F" + metricValue.DecimalPlaces) + "%";
             }
             else if (metricValue.GetType() == typeof(MetricValueCollection))
             {

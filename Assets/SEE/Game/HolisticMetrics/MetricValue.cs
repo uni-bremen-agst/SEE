@@ -2,12 +2,17 @@ using System.Collections.Generic;
 
 namespace SEE.Game.HolisticMetrics
 {
-    internal class MetricValue
+    internal abstract class MetricValue
     {
         /// <summary>
         /// The name of the metric.
         /// </summary>
         internal string Name;
+
+        /// <summary>
+        /// How many decimal places of the metric value(s) should be displayed.
+        /// </summary>
+        internal byte DecimalPlaces;
     }
 
     /// <summary>

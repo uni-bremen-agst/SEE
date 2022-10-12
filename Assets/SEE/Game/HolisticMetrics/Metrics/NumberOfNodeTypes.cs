@@ -11,7 +11,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Name = "Number of node types",
                 Value = city.LoadedGraph.AllNodeTypes().Count,
                 Lower = 0,
-                Higher = 10
+                Higher = 10,
+                DecimalPlaces = 0
             };
 
             return metricValueRange;

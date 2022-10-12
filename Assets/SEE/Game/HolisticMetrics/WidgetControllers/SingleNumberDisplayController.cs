@@ -14,7 +14,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             if (metricValue.GetType() == typeof(MetricValueRange))
             {
                 MetricValueRange metricValueRange = (MetricValueRange)metricValue;
-                valueText.text = metricValueRange.Value.ToString(CultureInfo.InvariantCulture);
+                valueText.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
                 titleText.text = metricValueRange.Name;
             } 
             else if (metricValue.GetType() == typeof(MetricValueCollection))
