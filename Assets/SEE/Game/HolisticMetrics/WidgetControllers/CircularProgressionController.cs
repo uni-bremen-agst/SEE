@@ -16,7 +16,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             {
                 MetricValueRange metricValueRange = (MetricValueRange)metricValue;
                 title.text = metricValueRange.Name;
-                text.text = metricValueRange.Value.ToString("0.##", CultureInfo.InvariantCulture);
+                text.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 circle.fillAmount = actual / maximum;    

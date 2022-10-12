@@ -39,7 +39,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                     Name = "Average lines of code",
                     Value = 0,
                     Higher = worstValue,
-                    Lower = optimalValue
+                    Lower = optimalValue,
+                    DecimalPlaces = 0
                 };
             }
             else
@@ -49,7 +50,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                     Name = "Average lines of code",
                     Value = totalLines / totalNodes,
                     Higher = worstValue,
-                    Lower = optimalValue
+                    Lower = optimalValue,
+                    DecimalPlaces = 0
                 };    
             }
 

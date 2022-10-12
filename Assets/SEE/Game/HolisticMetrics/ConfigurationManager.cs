@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics
         /// The path to the folder containing the saved metrics displays. This is saved in a field because multiple
         /// methods of this class use it.
         /// </summary>
-        private static readonly string metricsBoardsPath = Application.persistentDataPath + "MetricsBoards";
+        private static readonly string metricsBoardsPath = Application.persistentDataPath + "/MetricsBoards/";
 
         /// <summary>
         /// This method checks whether the directory for the saved metrics displays exists. If not, then it creates

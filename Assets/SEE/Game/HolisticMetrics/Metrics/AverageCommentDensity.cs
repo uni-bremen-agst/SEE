@@ -24,7 +24,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Name = "Average comment density",
                 Value = totalDensity / totalNodes,
                 Lower = 0f,
-                Higher = 1f
+                Higher = 1f,
+                DecimalPlaces = 4
             };
 
             return metricValueRange;
