@@ -416,6 +416,7 @@ GameObject:
   - component: {fileID: 795374008530660812}
   - component: {fileID: 795374008530660815}
   - component: {fileID: 6244877675542156992}
+  - component: {fileID: 5278214866695498449}
   m_Layer: 5
   m_Name: Notification
   m_TagString: Untagged
@@ -477,7 +478,7 @@ MonoBehaviour:
   enableTimer: 0
   timer: 2
   useCustomContent: 0
-  useStacking: 0
+  useStacking: 1
   destroyAfterPlaying: 0
   notificationStyle: 2
 --- !u!225 &795374008530660810
@@ -568,6 +569,18 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &5278214866695498449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 795374008530660800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d2f00cf924f44909dc5f9d59688ceed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &795374008927216950
 GameObject:
   m_ObjectHideFlags: 0
