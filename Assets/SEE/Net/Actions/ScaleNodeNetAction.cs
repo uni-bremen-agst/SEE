@@ -1,12 +1,11 @@
 ﻿using SEE.GO;
-using SEE.Net;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Net
 {
     /// <summary>
-    /// This class is responsible for the scaling nodes via network from one 
-    /// client to all others and to the server. 
+    /// This class is responsible for the scaling nodes via network from one
+    /// client to all others and to the server.
     /// </summary>
     public class ScaleNodeNetAction : AbstractNetAction
     {
