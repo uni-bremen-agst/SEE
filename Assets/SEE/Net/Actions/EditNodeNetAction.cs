@@ -1,10 +1,9 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
-using SEE.Net;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Net
 {
     /// <summary>
     /// This class is responsible for the edit-node process via network from one client
