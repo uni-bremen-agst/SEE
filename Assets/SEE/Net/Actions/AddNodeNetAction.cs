@@ -1,8 +1,7 @@
 ﻿using SEE.Game;
-using SEE.Net;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Net
 {
     /// <summary>
     /// This class is responsible for adding a node via network from one client to all others and
