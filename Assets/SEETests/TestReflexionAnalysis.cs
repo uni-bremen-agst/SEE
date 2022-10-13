@@ -15,7 +15,7 @@ namespace SEE.Tools.Architecture
     /// <summary>
     /// Shared code of unit tests for ReflexionAnalysis.
     /// </summary>
-    internal class TestReflexionAnalysis : Observer
+    internal class TestReflexionAnalysis : IObserver<ChangeEvent>
     {
         // TODO: Test types as well
         protected const string call = "call";
@@ -298,9 +298,20 @@ namespace SEE.Tools.Architecture
         /// state change. Collects the events in the change-event list.
         /// </summary>
         /// <param name="changeEvent">the event that occurred</param>
-        public virtual void HandleChange(ChangeEvent changeEvent)
+        public virtual void OnNext(ChangeEvent changeEvent)
         {
             changes = changes.Incorporate(changeEvent).ToList();
+        }
+
+        public void OnError(Exception error)
+        {
+            throw error;
+        }
+
+        public void OnCompleted()
+        {
+            // Should never be called.
+            throw new NotImplementedException();
         }
     }
 }

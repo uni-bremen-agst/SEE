@@ -137,7 +137,7 @@ namespace SEE.Tools.Architecture
             AddArchitecture();
             AddMapping();
             reflexion = new Reflexion(fullGraph);
-            reflexion.Register(this);
+            reflexion.Subscribe(this);
             SetNodes();
         }
 
