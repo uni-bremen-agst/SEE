@@ -1,9 +1,9 @@
 ﻿using System;
 using SEE.DataModel.DG;
+using SEE.Tools.ReflexionAnalysis;
 
-namespace SEE.Tools.ReflexionAnalysis
+namespace SEE.DataModel
 {
-
     /// <summary>
     /// Type of change to a graph element (node or edge, including "part-of" edges).
     /// </summary>
@@ -13,7 +13,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// The graph element has been added.
         /// </summary>
         Addition,
-        
+
         /// <summary>
         /// The graph element has been removed.
         /// </summary>
@@ -42,9 +42,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// 
         /// If an event can't be clearly traced to a single subgraph, this attribute will be set to
         /// <see cref="ReflexionSubgraph.FullReflexion"/>.
+        /// If an event did not occur in the context of the reflexion analysis, this attribute will be set to
+        /// <see cref="ReflexionSubgraph.None"/>.
         /// </summary>
         public readonly ReflexionSubgraph Affected;
-        
+
         /// <summary>
         /// A textual representation of the event.
         /// Must be human-readable, distinguishable from other <see cref="ChangeEvent"/>s, and
@@ -56,13 +58,13 @@ namespace SEE.Tools.ReflexionAnalysis
 
         public override string ToString() => $"{GetType().Name}: {Description()}";
 
-        protected ChangeEvent(ReflexionSubgraph affectedGraph, ChangeType? change = null)
+        protected ChangeEvent(ReflexionSubgraph? affectedGraph = null, ChangeType? change = null)
         {
             Change = change;
-            Affected = affectedGraph;
+            Affected = affectedGraph ?? ReflexionSubgraph.None;
         }
     }
-    
+
     /// <summary>
     /// A change event fired when the state of an edge changed.
     /// </summary>
@@ -126,82 +128,5 @@ namespace SEE.Tools.ReflexionAnalysis
 
         protected override string Description() =>
             $"edge '{PropagatedEdge.ToShortString()}' has been {(Change == ChangeType.Removal ? "un" : "")}propagated.";
-    }
-
-    /// <summary>
-    /// A change event fired when an edge was added to the reflexion graph or removed from it.
-    /// The specific graph type it was added to/removed from is stored in <see cref="Affected"/>.
-    /// </summary>
-    public class EdgeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The edge added to the graph or removed from it.
-        /// </summary>
-        public readonly Edge Edge;
-
-        /// <summary>
-        /// Constructor preserving the edge added to the graph or removed from it.
-        /// </summary>
-        /// <param name="edge">the edge being added or removed</param>
-        /// <param name="change">the type of change to <paramref name="edge"/></param>
-        /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Edge edge, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
-        {
-            Edge = edge;
-        }
-
-        protected override string Description() => 
-            $"{Affected} edge '{Edge.ToShortString()}' has been {(Change == ChangeType.Addition ? "Added" : "Removed")}.";
-    }
-
-    /// <summary>
-    /// A change event fired when a node is added or removed as a child.
-    /// </summary>
-    public class HierarchyChangeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The parent node, having <see cref="Child"/> as its direct child.
-        /// </summary>
-        public readonly Node Parent;
-        
-        /// <summary>
-        /// The child node, being a direct descendant of <see cref="Parent"/>.
-        /// </summary>
-        public readonly Node Child;
-
-        public HierarchyChangeEvent(Node parent, Node child, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
-        {
-            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
-            {
-                throw new ArgumentException("Only architecture or implementation hierarchy can be changed!");
-            }
-            Parent = parent;
-            Child = child;
-        }
-
-        protected override string Description() => 
-            $"{Affected} node '{Child.ToShortString()}' {(Change == ChangeType.Addition ? "added as child to" : "removed as child from")} parent '{Parent.ToShortString()}'";
-    }
-
-    /// <summary>
-    /// A change event fired when a node is added to or removed from the graph.
-    /// </summary>
-    public class NodeChangeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The node which has either been added to or deleted from the graph.
-        /// </summary>
-        public readonly Node Node;
-
-        public NodeChangeEvent(Node node, ChangeType change, ReflexionSubgraph affectedGraph) : base(affectedGraph, change)
-        {
-            if (affectedGraph != ReflexionSubgraph.Architecture && affectedGraph != ReflexionSubgraph.Implementation)
-            {
-                throw new ArgumentException("Nodes can only be added to architecture or implementation!");
-            }
-            Node = node;
-        }
-
-        protected override string Description() => $"node '{Node.ToShortString()}' {(Change == ChangeType.Addition ? "added to" : "removed from")} {Affected}";
     }
 }
