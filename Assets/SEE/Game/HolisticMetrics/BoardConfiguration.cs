@@ -37,7 +37,8 @@ namespace SEE.Game.HolisticMetrics
     [Serializable]
     public class WidgetConfiguration
     {
-        // Maybe this should rather be the anchor reference...
+        public Guid ID;
+        
         /// <summary>
         /// The x and y coordinate of this widget.
         /// </summary>

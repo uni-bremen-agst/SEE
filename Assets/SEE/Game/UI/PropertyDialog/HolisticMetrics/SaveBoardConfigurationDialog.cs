@@ -52,8 +52,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         {
             SEEInput.KeyboardShortcutsEnabled = true;
             
-            BoardController boardController = BoardsManager.FindControllerByName(selectedBoard.Value);
-            ConfigurationManager.SaveBoard(boardController, fileName.Value);
+            WidgetsManager boardsManager = BoardsManager.GetWidgetsManager(selectedBoard.Value);
+            ConfigurationManager.SaveBoard(boardsManager, fileName.Value);
             
             // Destroy the dialog GameObject
             Object.Destroy(dialog);

@@ -165,7 +165,7 @@ namespace SEE.Game.UI.HolisticMetrics
                 ShowNotification.Info(
                     "Select the widget to delete",
                     "Click on a widget to delete it");
-                BoardsManager.DeleteWidget();
+                BoardsManager.AddWidgetDeleters();
             }
             else
             {

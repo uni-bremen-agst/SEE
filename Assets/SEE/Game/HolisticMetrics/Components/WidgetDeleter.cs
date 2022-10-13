@@ -1,3 +1,5 @@
+using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -19,7 +21,10 @@ namespace SEE.Game.HolisticMetrics.Components
                 if (Physics.Raycast(ray, out _))
                 {
                     deletionDone = true;
-                    transform.parent.GetComponent<BoardController>().DeleteWidget(gameObject);
+                    new DeleteWidgetNetAction(
+                        transform.parent.GetComponent<WidgetsManager>().GetTitle(), 
+                        GetComponent<WidgetController>().ID)
+                        .Execute();
                 }
             }
         }

@@ -1,5 +1,6 @@
 using Michsky.UI.ModernUIPack;
 using SEE.Game.HolisticMetrics;
+using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -70,7 +71,7 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
             Destroy(dummyBoard);
-            BoardsManager.CreateNewBoard(boardConfiguration);
+            new CreateBoardNetAction(boardConfiguration).Execute();
             Destroy(gameObject);
         }
     }
