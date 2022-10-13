@@ -2,6 +2,7 @@ using System;
 using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Notification;
+using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -63,7 +64,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
             
             // Create a new board from the loaded configuration
-            BoardsManager.CreateNewBoard(boardConfiguration);
+            new CreateBoardNetAction(boardConfiguration).Execute();
         }
 
         private void EnableKeyboardShortcuts()

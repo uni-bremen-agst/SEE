@@ -1,8 +1,9 @@
+using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
 {
-    public class WidgetPositioner : MonoBehaviour
+    public class WidgetAdder : MonoBehaviour
     {
         private static WidgetConfiguration widgetConfiguration;
 
@@ -24,7 +25,8 @@ namespace SEE.Game.HolisticMetrics.Components
                     // Create the widget
                     Vector3 localPoint = transform.InverseTransformPoint(hit.point);
                     widgetConfiguration.Position = localPoint;
-                    GetComponent<BoardController>().AddMetric(widgetConfiguration);
+                    string boardName = GetComponent<WidgetsManager>().GetTitle();
+                    new CreateWidgetNetAction(boardName, widgetConfiguration).Execute();
                     positioningDone = true;
                 }
             }

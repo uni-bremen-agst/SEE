@@ -9,27 +9,46 @@ using Object = UnityEngine.Object;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
+    /// <summary>
+    /// This class implements a dialog that allows the player to configure a widget and then add it to a board.
+    /// </summary>
     internal class AddWidgetDialog
     {
+        /// <summary>
+        /// The dialog GameObject of this dialog.
+        /// </summary>
         private GameObject dialog;
 
+        /// <summary>
+        /// The property dialog of this dialog.
+        /// </summary>
         private PropertyDialog propertyDialog;
 
+        /// <summary>
+        /// The selection allowing the player to select the metric that should be displayed by the new widget.
+        /// </summary>
         private SelectionProperty selectedMetric;
 
+        /// <summary>
+        /// The selection allowing the player to select the widget that should be used to display the selected metric.
+        /// </summary>
         private SelectionProperty selectedWidget;
 
         /// <summary>
-        /// When Start() is called, this will be filled with the types of all classes that inherit from class "Metric".
+        /// When this class is constructed, this will be filled with the types of all classes that inherit from class
+        /// "Metric".
         /// </summary>
         private readonly Type[] metricTypes;
 
         /// <summary>
-        /// When Start() is called, this will be filled with all widget prefabs from
+        /// When this class is constructed, this will be filled with all widget prefabs from
         /// Assets/Resources/Prefabs/HolisticMetrics.
         /// </summary>
         private readonly GameObject[] widgetPrefabs;
 
+        /// <summary>
+        /// The constructor. This will fill the metricTypes and widgetPrefabs arrays.
+        /// </summary>
         internal AddWidgetDialog()
         {
             // Load the metric types
@@ -43,6 +62,9 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
         }
         
+        /// <summary>
+        /// This method will display this dialog to the player.
+        /// </summary>
         internal void Open()
         {
             dialog = new GameObject("Add widget dialog");
@@ -79,17 +101,23 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.DialogShouldBeShown = true;
         }
 
+        /// <summary>
+        /// Will be called when the player confirms their selection. This method will close the dialog and then make the
+        /// boards listen for a left click from the user. When that happens, the new widget will be added where the
+        /// player left-clicked on a board.
+        /// </summary>
         private void AddWidget()
         {
             // Create a widget configuration
             WidgetConfiguration widgetConfiguration = new WidgetConfiguration()
             {
+                ID = Guid.NewGuid(),
                 MetricType = selectedMetric.Value,
                 WidgetName = selectedWidget.Value
             };
             
             // Add WidgetPositionGetters to all boards
-            BoardsManager.PositionWidget(widgetConfiguration);
+            BoardsManager.AddWidgetAdders(widgetConfiguration);
 
             // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
             
@@ -102,6 +130,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
                 "Click on a metrics board where you want to position the widget.");
         }
         
+        /// <summary>
+        /// This method needs to be called when the dialog should be closed. It will close the dialog and reenable the
+        /// keyboard shortcuts.
+        /// </summary>
         private void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject

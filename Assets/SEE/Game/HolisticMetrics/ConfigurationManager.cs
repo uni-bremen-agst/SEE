@@ -65,26 +65,26 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Persist a metrics board to a file.
         /// </summary>
-        /// <param name="boardController">The metrics board to save.</param>
+        /// <param name="widgetsManager">The metrics board to save.</param>
         /// <param name="fileName">The file name for the configuration.</param>
-        internal static void SaveBoard(BoardController boardController, string fileName)
+        internal static void SaveBoard(WidgetsManager widgetsManager, string fileName)
         {
             EnsureDisplayDirectoryExists();
 
-            Transform boardTransform = boardController.transform;
+            Transform boardTransform = widgetsManager.transform;
             BoardConfiguration metricsBoardConfiguration = new BoardConfiguration()
             {
-                Title = boardController.GetTitle(),
+                Title = widgetsManager.GetTitle(),
                 Position = boardTransform.localPosition,
                 Rotation = boardTransform.rotation
             };
-            BoardController canvasController = boardController.GetComponent<BoardController>();
-            foreach ((WidgetController, Metric) tuple in canvasController.widgets)
+            foreach ((WidgetController, Metric) tuple in widgetsManager.widgets)
             {
                 string widgetName = tuple.Item1.gameObject.name;
                 widgetName = widgetName.Substring(0, widgetName.Length - 7);
                 WidgetConfiguration widget = new WidgetConfiguration()
                 {
+                    ID = tuple.Item1.ID,
                     MetricType = tuple.Item2.GetType().Name,
                     Position = tuple.Item1.transform.localPosition,
                     WidgetName = widgetName

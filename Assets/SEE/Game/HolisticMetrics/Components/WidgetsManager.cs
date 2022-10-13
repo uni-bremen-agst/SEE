@@ -11,9 +11,9 @@ using UnityEngine.UI;
 namespace SEE.Game.HolisticMetrics.Components
 {
     /// <summary>
-    /// This class controls/manages a holistic metrics board.
+    /// This class manages a holistic metrics board.
     /// </summary>
-    internal class BoardController : MonoBehaviour
+    internal class WidgetsManager : MonoBehaviour
     {
         /// <summary>
         /// This contains references to all widgets on the board each represented by one WidgetController and one
@@ -89,11 +89,10 @@ namespace SEE.Game.HolisticMetrics.Components
         }
         
         /// <summary>
-        /// If there is still space on the metrics board (there are less than 6 widgets on it), adds the desired widget
-        /// to the board.
+        /// Adds the desired widget to the board.
         /// </summary>
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
-        internal void AddMetric(WidgetConfiguration widgetConfiguration)
+        internal void Create(WidgetConfiguration widgetConfiguration)
         {
             GameObject widget = Array.Find(widgetPrefabs,
                 element => element.name.Equals(widgetConfiguration.WidgetName));
@@ -117,12 +116,13 @@ namespace SEE.Game.HolisticMetrics.Components
                 widgetInstance.transform.localPosition = widgetConfiguration.Position;
                 WidgetController widgetController = widgetInstance.GetComponent<WidgetController>();
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
+                widgetController.ID = widgetConfiguration.ID;
                 widgets.Add((widgetController, metricInstance));
                 widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
             }
         }
 
-        internal void GetWidgetToDelete()
+        internal void AddWidgetDeleters()
         {
             foreach ((WidgetController, Metric) tuple in widgets)
             {
@@ -131,11 +131,12 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
-        internal void DeleteWidget(GameObject widget)
+        internal void Delete(Guid widgetID)
         {
-            WidgetController widgetController = widget.GetComponent<WidgetController>();
-            Metric metric = widget.GetComponent<Metric>();
-            widgets.Remove((widgetController, metric));
+            (WidgetController, Metric) widget =
+                widgets.Find(widget => widget.Item1.ID.Equals(widgetID));
+            WidgetController widgetController = widget.Item1;
+            widgets.Remove(widget);
             Destroy(widgetController.gameObject);
         }
 
