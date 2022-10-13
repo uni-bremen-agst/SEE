@@ -117,7 +117,7 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </li>
     /// </ul>
     /// </remarks>
-    public partial class Reflexion : Observable
+    public partial class Reflexion : Observable<ChangeEvent>
     {
         /// <summary>
         /// Constructor for setting up the reflexion analysis.

@@ -63,7 +63,7 @@ namespace SEE.Tools.Architecture
         private void SetupReflexion()
         {
             reflexion = new Reflexion(fullGraph);
-            reflexion.Register(this);
+            reflexion.Subscribe(this);
             // An initial run is necessary to set up the necessary data structures.
             reflexion.Run();
         }

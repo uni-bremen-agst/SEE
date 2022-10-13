@@ -18,7 +18,7 @@ namespace SEE.Game.City
     /// Must be attached to a <see cref="SEECity"/>.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ReflexionVisualization : MonoBehaviour, Observer
+    public class ReflexionVisualization : MonoBehaviour, IObserver<ChangeEvent>
     {
         /// <summary>
         /// Reflexion analysis. Use this to make changes to the graph
@@ -93,7 +93,7 @@ namespace SEE.Game.City
             // Unhandled events should only be handled once the city is drawn.
             while (UnhandledEvents.Count > 0 && CityDrawn)
             {
-                HandleChange(UnhandledEvents.Dequeue());
+                OnNext(UnhandledEvents.Dequeue());
             }
         }
 
@@ -106,7 +106,7 @@ namespace SEE.Game.City
             CityGraph = graph;
             Events.Clear();
             Analysis = new Reflexion(CityGraph);
-            Analysis.Register(this);
+            Analysis.Subscribe(this);
             Analysis.Run();
         }
 
@@ -142,12 +142,25 @@ namespace SEE.Game.City
             }
         }
 
+        public void OnCompleted()
+        {
+            // Should never be called.
+            throw new NotImplementedException();
+        }
+
+        public void OnError(Exception error)
+        {
+            // We simply show the error to the user.
+            ShowNotification.Error("Error in Reflexion Analysis", error.Message, log: false);
+            Debug.LogError(error);
+        }
+
         /// <summary>
         /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
         /// and handles the changes by modifying this city.
         /// </summary>
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
-        public void HandleChange(ChangeEvent changeEvent)
+        public void OnNext(ChangeEvent changeEvent)
         {
             if (!CityDrawn)
             {
