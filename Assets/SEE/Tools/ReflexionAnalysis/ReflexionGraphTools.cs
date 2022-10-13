@@ -69,6 +69,24 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
+        /// Returns a short, human-readable string representation of this <paramref name="subgraph"/>.
+        /// </summary>
+        /// <param name="subgraph">Subgraph type for which a short human-readable string shall be returned</param>
+        /// <returns>Short, human-readable string for this subgraph type</returns>
+        public static string ToShortString(this ReflexionSubgraph subgraph)
+        {
+            return subgraph switch
+            {
+                Implementation => "Implementation",
+                Architecture => "Architecture",
+                Mapping => "Mapping",
+                FullReflexion => "Reflexion Graph",
+                None => "Graph", // we aren't in a reflexion context
+                _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
+            };
+        }
+
+        /// <summary>
         /// "Incorporates" the given <paramref name="newEvent"/> into <paramref name="events"/>.
         ///
         /// For all event types except <see cref="EdgeChange"/> (see below), this means that if
@@ -106,10 +124,10 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 EdgeChange edgeChange => events.Incorporate(edgeChange),
                 EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
-                HierarchyChangeEvent hierarchyChangeEvent =>
+                HierarchyEvent hierarchyChangeEvent =>
                     events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
                                                                   && e.Parent == hierarchyChangeEvent.Parent),
-                NodeChangeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
+                NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
                 PropagatedEdgeEvent propagatedEdgeEvent =>
                     events.Incorporate(propagatedEdgeEvent, e => e.PropagatedEdge == propagatedEdgeEvent.PropagatedEdge),
                 _ => throw new ArgumentOutOfRangeException(nameof(newEvent))

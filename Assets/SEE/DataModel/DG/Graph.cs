@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ICSharpCode.SharpZipLib.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -10,7 +11,7 @@ namespace SEE.DataModel.DG
     /// A graph with nodes and edges representing the data to be visualized
     /// by way of blocks and connections.
     /// </summary>
-    public class Graph : Attributable
+    public partial class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique IDs
         private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
@@ -74,6 +75,7 @@ namespace SEE.DataModel.DG
         {
             Name = name;
             BasePath = basePath;
+            ElementObserver = new GraphElementObserver(this);
         }
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace SEE.DataModel.DG
         ///
         /// Note: This attribute will not be stored in a GXL file.
         /// </summary>
-        public string BasePath { get; set; } = "";
+        public string BasePath { get; set; }
 
         /// Adds a node to the graph.
         /// Preconditions:
@@ -117,6 +119,8 @@ namespace SEE.DataModel.DG
             nodes[node.ID] = node;
             node.ItsGraph = this;
             NodeHierarchyHasChanged = true;
+            Notify(new NodeEvent(node, ChangeType.Addition));
+            node.Subscribe(ElementObserver);
         }
 
         /// <summary>
@@ -151,6 +155,10 @@ namespace SEE.DataModel.DG
 
             if (nodes.Remove(node.ID))
             {
+                
+                // We need to send out this event here, before the node is modified but after it has been removed.
+                Notify(new NodeEvent(node, ChangeType.Removal));
+
                 // The edges of node are stored in the node's data structure as well as
                 // in the node's neighbor's data structure.
                 foreach (Edge outgoing in node.Outgoings)
@@ -159,6 +167,7 @@ namespace SEE.DataModel.DG
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
                     outgoing.ItsGraph = null;
+                    Notify(new EdgeEvent(outgoing, ChangeType.Removal));
                 }
 
                 foreach (Edge incoming in node.Incomings)
@@ -167,8 +176,9 @@ namespace SEE.DataModel.DG
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
                     incoming.ItsGraph = null;
+                    Notify(new EdgeEvent(incoming, ChangeType.Removal));
                 }
-
+                
                 // Adjust the node hierarchy.
                 if (node.NumberOfChildren() > 0)
                 {
@@ -189,7 +199,7 @@ namespace SEE.DataModel.DG
             /// </summary>
             /// <param name="children">children to be re-parented</param>
             /// <param name="parent">new parent of <see cref="children"/></param>
-            void Reparent(Node[] children, Node parent)
+            void Reparent(IEnumerable<Node> children, Node parent)
             {
                 foreach (Node child in children)
                 {
@@ -345,6 +355,7 @@ namespace SEE.DataModel.DG
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
                 edge.Target.AddIncoming(edge);
+                Notify(new EdgeEvent(edge, ChangeType.Addition));
             }
             else
             {
@@ -382,6 +393,7 @@ namespace SEE.DataModel.DG
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
             edge.ItsGraph = null;
+            Notify(new EdgeEvent(edge, ChangeType.Removal));
         }
 
         /// <summary>
@@ -531,18 +543,10 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Dumps the hierarchy for given root. Used for debugging.
-        /// </summary>
-        internal void DumpTree(Node root)
-        {
-            DumpTree(root, 0);
-        }
-
-        /// <summary>
         /// Dumps the hierarchy for given root by adding level many -
         /// as indentation. Used for debugging.
         /// </summary>
-        private static void DumpTree(Node root, int level)
+        private static void DumpTree(Node root, int level = 0)
         {
             string indentation = "";
             for (int i = 0; i < level; i++)
@@ -566,6 +570,8 @@ namespace SEE.DataModel.DG
         {
             edges.Clear();
             nodes.Clear();
+            NotifyComplete();
+            ElementObserver.Reset();
         }
 
         /// <summary>

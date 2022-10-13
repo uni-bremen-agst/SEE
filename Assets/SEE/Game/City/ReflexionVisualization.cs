@@ -180,10 +180,10 @@ namespace SEE.Game.City
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
                     break;
-                case HierarchyChangeEvent hierarchyChangeEvent:
-                    HandleHierarchyChangeEvent(hierarchyChangeEvent);
+                case HierarchyEvent hierarchyEvent:
+                    HandleHierarchyChangeEvent(hierarchyEvent);
                     break;
-                case NodeChangeEvent nodeChangeEvent:
+                case NodeEvent nodeChangeEvent:
                     HandleNodeChangeEvent(nodeChangeEvent);
                     break;
                 case PropagatedEdgeEvent propagatedEdgeEvent:
@@ -297,19 +297,19 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Handles the given <paramref name="hierarchyChangeEvent"/> by modifying the scene accordingly.
+        /// Handles the given <paramref name="hierarchyEvent"/> by modifying the scene accordingly.
         /// </summary>
-        /// <param name="hierarchyChangeEvent">The event which shall be handled.</param>
-        private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
+        /// <param name="hierarchyEvent">The event which shall be handled.</param>
+        private void HandleHierarchyChangeEvent(HierarchyEvent hierarchyEvent)
         {
             // FIXME: Handle event
         }
 
         /// <summary>
-        /// Handles the given <paramref name="nodeChangeEvent"/> by modifying the scene accordingly.
+        /// Handles the given <paramref name="nodeEvent"/> by modifying the scene accordingly.
         /// </summary>
-        /// <param name="nodeChangeEvent">The event which shall be handled.</param>
-        private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent)
+        /// <param name="nodeEvent">The event which shall be handled.</param>
+        private void HandleNodeChangeEvent(NodeEvent nodeEvent)
         {
             // FIXME: Handle event
         }
