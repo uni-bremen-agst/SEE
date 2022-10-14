@@ -36,8 +36,15 @@ namespace SEE.Game.HolisticMetrics
         internal float Value;
     }
     
+    /// <summary>
+    /// A collection of metric values. This can, for example, be useful when displaying multiple metric values on a bar
+    /// chart.
+    /// </summary>
     internal class MetricValueCollection : MetricValue
     {
+        /// <summary>
+        /// All the metrics values that this collection contains.
+        /// </summary>
         internal List<MetricValue> MetricValues;
     }
 }

@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
+    /// <summary>
+    /// For every holistic metrics widget prefab, there needs to be a WidgetController that is attached to it. It takes
+    /// care of displaying values on that widget and has an ID that identifies that widget.
+    /// </summary>
     internal abstract class WidgetController : MonoBehaviour
     {
         /// <summary>
@@ -20,6 +24,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             
         }
         
+        /// <summary>
+        /// Calling this method will display the given MetricValue on the widget that the WidgetController is attached
+        /// to.
+        /// </summary>
+        /// <param name="metricValue">The MetricValue to display</param>
         internal abstract void Display(MetricValue metricValue);
     }
 }

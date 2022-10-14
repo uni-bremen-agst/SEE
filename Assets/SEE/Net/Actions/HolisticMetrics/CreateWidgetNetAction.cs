@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
+    /// <summary>
+    /// This class is responsible for adding a widget on all clients.
+    /// </summary>
     public class CreateWidgetNetAction : AbstractNetAction
     {
         /// <summary>

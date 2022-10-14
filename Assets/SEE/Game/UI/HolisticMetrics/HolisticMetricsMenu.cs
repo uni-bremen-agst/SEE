@@ -11,18 +11,30 @@ using UnityEngine;
 namespace SEE.Game.UI.HolisticMetrics
 {
     /// <summary>
+    /// This class controls the holistic metrics menu that allows the player to add, change, delete and save metrics
+    /// boards.
     /// The content of this class is inspired by OpeningDialog.cs because I think it makes sense to implement the menu
     /// like other menus in the SEE project; I don't think it would help to reinvent the wheel here.
     /// </summary>
     public class HolisticMetricsMenu : MonoBehaviour
     {
+        /// <summary>
+        /// The menu instance that represents the holistic metrics menu
+        /// </summary>
         private SimpleMenu menu;
 
+        /// <summary>
+        /// When this component starts, it will instantiate the menu with all the menu entries and everything.
+        /// </summary>
         private void Start()
         {
             menu = CreateMenu();
         }
         
+        /// <summary>
+        /// In every Update step, we want to check whether the player has pressed the key for toggling the holistic
+        /// metrics menu. In that case, we toggle the menu.
+        /// </summary>
         private void Update()
         {
             if (SEEInput.ToggleHolisticMetricsMenu())
@@ -31,6 +43,10 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method returns a new holistic metrics menu with all the menu entries and everything.
+        /// </summary>
+        /// <returns>A new holistic metrics menu</returns>
         private SimpleMenu CreateMenu()
         {
             GameObject actionMenuGO = new GameObject { name = "Holistic metrics menu" };
@@ -44,6 +60,10 @@ namespace SEE.Game.UI.HolisticMetrics
             return actionMenu;
         }
 
+        /// <summary>
+        /// Returns a list of all menu entries that belong into the holistic metrics menu.
+        /// </summary>
+        /// <returns>The list of menu entries for the holistic metrics menu</returns>
         private IList<MenuEntry> SelectionEntries()
         {
             return new List<MenuEntry>
@@ -93,6 +113,10 @@ namespace SEE.Game.UI.HolisticMetrics
             };
         }
 
+        /// <summary>
+        /// This method gets called when the player clicks on the "New board" button. It will close the menu and open
+        /// the dialog for adding a new board to the scene.
+        /// </summary>
         private void NewBoard()
         {
             menu.ToggleMenu();
@@ -100,6 +124,12 @@ namespace SEE.Game.UI.HolisticMetrics
             new AddBoardDialog().Open();
         }
         
+        /// <summary>
+        /// This method gets called when the player clicks on the "Move boards" button. If there are any boards in the
+        /// scene, it will toggle the moving option for the boards which means that there will be orange buttons under
+        /// the boards with which the boards can be dragged around. If there are no boards, the player will be notified
+        /// about that.
+        /// </summary>
         private void MoveBoard()
         {
             menu.ToggleMenu();
@@ -122,6 +152,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method will be called when the player clicks on the "Delete board" button. If there are any metrics
+        /// boards in the scene, it will open the dialog for deleting a metrics board. Otherwise it will notify the
+        /// player.
+        /// </summary>
         private void DeleteBoard()
         {
             menu.ToggleMenu();
@@ -138,6 +173,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
         
+        /// <summary>
+        /// This method will be called when the player clicks on the "Add widget" button. It will check whether there
+        /// are any metrics boards in the scene. If so, then it will show the dialog for adding a new widget to a board.
+        /// Otherwise, it will notify the player that there are no metrics boards in the scene.
+        /// </summary>
         private void AddWidget()
         {
             menu.ToggleMenu();
@@ -154,6 +194,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method will be called when the player clicks on the "Remove widget" button. It will check if there are
+        /// any boards in the scene and if so, it will add a WidgetDeleter to every widget so it can be clicked and
+        /// deleted. Otherwise, it will notify the player.
+        /// </summary>
         private void RemoveWidget()
         {
             menu.ToggleMenu();
@@ -175,6 +220,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method gets called when the player clicks on the "Save board" button. It will check whether or not
+        /// there are any metrics boards in the scene and if that is true, it will show the dialog for saving a metrics
+        /// board. Otherwise, it will notify the player.
+        /// </summary>
         private void SaveBoardConfiguration()
         {
             menu.ToggleMenu();
@@ -191,6 +241,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method will get called when the player clicks on the "Load board" button. It will check if there are
+        /// any metrics boards configurations saved in the directory for metrics boards configurations. If there are
+        /// any, it will let the player choose one. Otherwise, it will notify the player.
+        /// </summary>
         private void LoadBoardConfiguration()
         {
             menu.ToggleMenu();

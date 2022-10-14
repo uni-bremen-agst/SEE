@@ -3,8 +3,16 @@ using SEE.Game.City;
 
 namespace SEE.Game.HolisticMetrics.Metrics
 {
+    /// <summary>
+    /// This class implements/calculates the average comment density metric.
+    /// </summary>
     internal class AverageCommentDensity : Metric
     {
+        /// <summary>
+        /// Calculates the average comment density for the nodes of the given SEECity.
+        /// </summary>
+        /// <param name="city">The city for which to calculate the average comment density</param>
+        /// <returns>The average comment density of the nodes of the given city</returns>
         internal override MetricValue Refresh(SEECity city)
         {
             float totalDensity = 0f;

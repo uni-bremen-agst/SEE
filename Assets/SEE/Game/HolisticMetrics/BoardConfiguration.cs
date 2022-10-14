@@ -37,6 +37,9 @@ namespace SEE.Game.HolisticMetrics
     [Serializable]
     public class WidgetConfiguration
     {
+        /// <summary>
+        /// The unique ID of this widget.
+        /// </summary>
         public Guid ID;
         
         /// <summary>

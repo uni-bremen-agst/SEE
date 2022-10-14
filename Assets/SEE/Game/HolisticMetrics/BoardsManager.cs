@@ -62,6 +62,10 @@ namespace SEE.Game.HolisticMetrics
             widgetsManagers.Add(newWidgetsManager);
         }
         
+        /// <summary>
+        /// Deletes a metrics board identified by its name.
+        /// </summary>
+        /// <param name="boardName">The name/title of the board to delete</param>
         internal static void Delete(string boardName)
         {
             WidgetsManager widgetsManager = GetWidgetsManager(boardName);
@@ -151,13 +155,16 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="widgetConfiguration">Information on how the widget to add should be configured</param>
         internal static void AddWidgetAdders(WidgetConfiguration widgetConfiguration)
         {
+            WidgetAdder.Setup(widgetConfiguration);
             foreach (WidgetsManager controller in widgetsManagers)
             {
                 controller.gameObject.AddComponent<WidgetAdder>();
-                WidgetAdder.Setup(widgetConfiguration);
             }
         }
 
+        /// <summary>
+        /// Adds WidgetDeleter components to all widgets on all boards.
+        /// </summary>
         internal static void AddWidgetDeleters()
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
