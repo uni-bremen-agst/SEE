@@ -5,16 +5,34 @@ using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
+    /// <summary>
+    /// This class manages the dialog for saving a board from the scene to a configuration file.
+    /// </summary>
     public class SaveBoardConfigurationDialog
     {
+        /// <summary>
+        /// The dialog GameObject.
+        /// </summary>
         private GameObject dialog;
 
+        /// <summary>
+        /// The property dialog.
+        /// </summary>
         private PropertyDialog propertyDialog;
 
+        /// <summary>
+        /// The input field that lets the player select a board from the scene to be saved.
+        /// </summary>
         private SelectionProperty selectedBoard;
 
+        /// <summary>
+        /// The input field that lets the player enter a name for the file in which to save the board configuration.
+        /// </summary>
         private StringProperty fileName;
 
+        /// <summary>
+        /// This method instantiates the dialog and then displays it to the player.
+        /// </summary>
         internal void Open()
         {
             dialog = new GameObject("Save board configuration dialog");
@@ -48,17 +66,21 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.DialogShouldBeShown = true;
         }
 
+        /// <summary>
+        /// This method gets called when the player confirms the dialog. It will save the selected board under the given
+        /// name and then closes the dialog and reenables the keyboard shortcuts.
+        /// </summary>
         private void SaveBoardConfiguration()
         {
-            SEEInput.KeyboardShortcutsEnabled = true;
-            
             WidgetsManager boardsManager = BoardsManager.GetWidgetsManager(selectedBoard.Value);
             ConfigurationManager.SaveBoard(boardsManager, fileName.Value);
-            
-            // Destroy the dialog GameObject
-            Object.Destroy(dialog);
+            EnableKeyboardShortcuts();
         }
 
+        /// <summary>
+        /// This method gets called when the player confirms or cancels the dialog. It will reenable the keyboard
+        /// shortcuts and close the dialog.
+        /// </summary>
         private void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject

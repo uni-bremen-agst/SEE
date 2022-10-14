@@ -1,7 +1,5 @@
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Metrics
@@ -11,9 +9,11 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// </summary>
     internal class AverageLinesOfCode : Metric
     {
-        [SerializeField] private int optimalValue;
-        [SerializeField] private int worstValue = 300;
-        
+        /// <summary>
+        /// Calculates the average lines of code for the nodes of the given SEECity.
+        /// </summary>
+        /// <param name="city">The city for which to calculate the average lines of code</param>
+        /// <returns>The average lines of code of the given city</returns>
         internal override MetricValue Refresh(SEECity city)
         {
             int totalNodes = 0;
@@ -38,8 +38,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 {
                     Name = "Average lines of code",
                     Value = 0,
-                    Higher = worstValue,
-                    Lower = optimalValue,
+                    Higher = 300,
+                    Lower = 0,
                     DecimalPlaces = 0
                 };
             }
@@ -49,8 +49,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 {
                     Name = "Average lines of code",
                     Value = totalLines / totalNodes,
-                    Higher = worstValue,
-                    Lower = optimalValue,
+                    Higher = 300,
+                    Lower = 0,
                     DecimalPlaces = 0
                 };    
             }

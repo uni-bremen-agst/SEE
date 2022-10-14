@@ -6,16 +6,29 @@ using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
+    /// <summary>
+    /// This class manages the dialog for adding a metrics board to the scene.
+    /// </summary>
     internal class AddBoardDialog
     {
+        /// <summary>
+        /// The dialog GameObject.
+        /// </summary>
         private GameObject dialog;
 
+        /// <summary>
+        /// The property dialog.
+        /// </summary>
         private PropertyDialog propertyDialog;
 
+        /// <summary>
+        /// The input field where the player can enter a name for the new board.
+        /// </summary>
         private StringProperty boardName;
 
-        private static GameObject sliderPrefab;
-
+        /// <summary>
+        /// This method instantiates and then displays the dialog to the player.
+        /// </summary>
         internal void Open()
         {
             dialog = new GameObject("Add board dialog");
@@ -40,6 +53,12 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.DialogShouldBeShown = true;
         }
 
+        /// <summary>
+        /// This method gets called when the player confirms the configuration. This method puts the name the player
+        /// entered into a new board configuration and then passes is on to the BoardAdder that it will attach to the
+        /// floor. That BoardAdder will wait for the player to click on the ground and then proceed with creating the
+        /// board.
+        /// </summary>
         private void AddBoard()
         {
             BoardConfiguration boardConfiguration = new BoardConfiguration()
@@ -56,6 +75,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
                 "Left click on the ground where you want to add the board");
         }
 
+        /// <summary>
+        /// This method will be called when the player cancels or confirms the dialog. It will close the dialog and
+        /// reenable the keyboard shortcuts.
+        /// </summary>
         private void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject

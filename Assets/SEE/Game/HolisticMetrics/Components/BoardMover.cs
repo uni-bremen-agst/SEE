@@ -3,12 +3,28 @@ using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
 {
+    /// <summary>
+    /// This class is a component that should be attached to the little button underneath every metrics board. It is
+    /// responsible for moving the board around when the user is dragging the mouse over the button. 
+    /// </summary>
     public class BoardMover : MonoBehaviour
     {
+        /// <summary>
+        /// This plane, represents the floor when calculating the intersection between a ray from the cursor into the
+        /// scene and the floor.
+        /// </summary>
         private static Plane plane = new Plane(Vector3.up, Vector3.zero);
 
+        /// <summary>
+        /// The parent transform of this game object, i.e., the metrics board transform. This will have its position
+        /// and orientation changed.
+        /// </summary>
         private Transform parentTransform;
 
+        /// <summary>
+        /// When this method is called, we will see where on the floor the player's mouse points and move the board
+        /// there. We will also rotate the board so it is facing the camera, but only around the y-axis.
+        /// </summary>
         private void OnMouseDrag()
         {
             if (Camera.main != null)
@@ -32,7 +48,9 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
-        
+        /// <summary>
+        /// When the player releases the mouse, we will transmit the changes to all players/clients.
+        /// </summary>
         private void OnMouseUp()
         {
             parentTransform = transform.parent;

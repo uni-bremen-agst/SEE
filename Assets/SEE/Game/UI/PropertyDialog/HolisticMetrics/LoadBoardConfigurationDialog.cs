@@ -8,14 +8,29 @@ using Object = UnityEngine.Object;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
+    /// <summary>
+    /// This class manages the dialog for loading a board from a configuration file.
+    /// </summary>
     internal class LoadBoardConfigurationDialog
     {
+        /// <summary>
+        /// The dialog GameObject.
+        /// </summary>
         private GameObject dialog;
 
+        /// <summary>
+        /// The property dialog.
+        /// </summary>
         private PropertyDialog propertyDialog;
 
+        /// <summary>
+        /// This input field lets the player pick a file from which to load the board configuration.
+        /// </summary>
         private SelectionProperty selectedFile;
 
+        /// <summary>
+        /// This method instantiates the dialog and then displays it to the player.
+        /// </summary>
         public void Open()
         {
             dialog = new GameObject("Load board configuration dialog");
@@ -42,6 +57,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.DialogShouldBeShown = true;
         }
 
+        /// <summary>
+        /// This method gets called when the player confirms the dialog. It will load the selected board and create it
+        /// in the scene.
+        /// </summary>
         private void LoadBoardConfiguration()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
@@ -67,6 +86,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             new CreateBoardNetAction(boardConfiguration).Execute();
         }
 
+        /// <summary>
+        /// This method will be called when the player confirms or cancels the dialog. It will reenable the keyboard
+        /// shortcuts and close the dialog.
+        /// </summary>
         private void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
+    /// <summary>
+    /// This class is responsible for changing the position and orientation of a metrics board on all clients.
+    /// </summary>
     public class MoveBoardNetAction : AbstractNetAction
     {
         /// <summary>

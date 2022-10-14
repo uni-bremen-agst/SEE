@@ -77,11 +77,19 @@ namespace SEE.Game.HolisticMetrics.Components
             OnCitySelectionClick();
         }
         
+        /// <summary>
+        /// Returns the title of this manager's metrics board.
+        /// </summary>
+        /// <returns>The title of the metrics board of this manager.</returns>
         internal string GetTitle()
         {
             return title;
         }
         
+        /// <summary>
+        /// Sets the title of this manager's metrics board.
+        /// </summary>
+        /// <param name="newTitle">The new title you want to give the metrics board</param>
         internal void SetTitle(string newTitle)
         {
             title = newTitle;
@@ -122,15 +130,22 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        /// <summary>
+        /// Adds a WidgetDeleter component to all widgets managed by this manager.
+        /// </summary>
         internal void AddWidgetDeleters()
         {
+            WidgetDeleter.Setup();
             foreach ((WidgetController, Metric) tuple in widgets)
             {
                 tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
-                WidgetDeleter.Setup();
             }
         }
 
+        /// <summary>
+        /// Deletes the widget with the given ID if it is managed by this manager.
+        /// </summary>
+        /// <param name="widgetID">The ID of the widget to delete</param>
         internal void Delete(Guid widgetID)
         {
             (WidgetController, Metric) widget =

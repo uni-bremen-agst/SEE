@@ -6,7 +6,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// <summary>
     /// This could be any holistic metric (a metric that is calculated on the entire code city, not on individual
     /// nodes). If you want to implement a new metric, just implement this class. Then the new metric will automatically
-    /// be available for adding to a board in the holistic metrics menu in the game.
+    /// be available for adding to a board in the holistic metrics menu in the game. If you need help implementing this
+    /// class, you could, for example, refer to the NumberOfNodeTypes metric - that is pretty much as simple as it gets.
     /// </summary>
     internal abstract class Metric : MonoBehaviour
     {
