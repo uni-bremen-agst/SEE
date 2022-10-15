@@ -37,9 +37,16 @@ namespace SEE.Game.HolisticMetrics.Components
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out _))
                 {
+                    var parentTransform = transform.parent;
+                    
+                    WidgetsManager widgetsManager = parentTransform.GetComponent<WidgetsManager>();
+                    widgetsManager.Delete(GetComponent<WidgetController>().ID);
+                    Debug.LogError("The board to delete the widget from was not found.");
+                    
                     deletionDone = true;
+                    
                     new DeleteWidgetNetAction(
-                        transform.parent.GetComponent<WidgetsManager>().GetTitle(), 
+                        parentTransform.GetComponent<WidgetsManager>().GetTitle(), 
                         GetComponent<WidgetController>().ID)
                         .Execute();
                 }

@@ -30,11 +30,15 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method executes the action on all clients, i.e., it deletes the board on all clients.
+        /// This method executes the action on all clients except the requester, i.e., it deletes the board on all
+        /// clients.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            BoardsManager.Delete(BoardName);
+            if (!IsRequester())
+            {
+                BoardsManager.Delete(BoardName);    
+            }
         }
     }
 }

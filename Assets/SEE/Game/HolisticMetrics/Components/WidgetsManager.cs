@@ -5,6 +5,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -73,7 +74,7 @@ namespace SEE.Game.HolisticMetrics.Components
             houseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI");
             
             citySelection.dropdownEvent.AddListener(Redraw);
-            
+            citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
         }
         
@@ -209,7 +210,46 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             boardMover.SetActive(enable);
         }
-        
+
+        /// <summary>
+        /// This method will be called when the player selects a different city in the dropdown. In that case, we want
+        /// to send a message to all other clients so the selection changes on their boards too.
+        /// </summary>
+        /// <param name="itemIndex">The index of the dropdown item that is now selected</param>
+        private void CitySelectionChanged(int itemIndex)
+        {
+            string cityName = GetSelectedCity().name;
+            new SwitchCityNetAction(title, cityName).Execute();
+        }
+
+        /// <summary>
+        /// This method can be called when another client chose another city in the dropdown in which case we also want
+        /// to change the city selection here. That is what this method tries.
+        /// </summary>
+        /// <param name="cityName">The name of the city to select</param>
+        internal void SwitchCity(string cityName)
+        {
+            // Update the values on the list so they hopefully are synchronous to the list on the requester's machine
+            OnCitySelectionClick();
+            
+            // Try to find the index of the cityName to select
+            int indexInDropdown = citySelection
+                .dropdownItems
+                .FindIndex(city => city.itemName.Equals(cityName));
+            if (indexInDropdown == -1)  // The return value if it was not found
+            {
+                Debug.LogError("From network got a signal to switch the city on a board to a city that " +
+                               " cannot be found here");
+                return;
+            }
+            
+            // Select the new city
+            citySelection.selectedItemIndex = indexInDropdown;
+            
+            // Redraw the board
+            Redraw();
+        }
+
         /// <summary>
         /// Whenever a code city changes, this method needs to be called. It will call the Refresh() methods of all
         /// Metrics and display the results on the widgets.

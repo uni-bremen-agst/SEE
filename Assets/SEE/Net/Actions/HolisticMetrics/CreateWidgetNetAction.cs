@@ -39,19 +39,23 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method executes the action on all clients, i.e., adds the widget on all clients.
+        /// This method executes the action on all clients except the requester, i.e., adds the widget on all clients.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
-            if (widgetsManager != null)
+            if (!IsRequester())
             {
-                widgetsManager.Create(WidgetConfiguration);
+                WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
+                if (widgetsManager != null)
+                {
+                    widgetsManager.Create(WidgetConfiguration);
+                }
+                else
+                {
+                    Debug.LogError("No board found with the given name for adding the widget.");
+                }
             }
-            else
-            {
-                Debug.LogError("No board found with the given name for adding the widget.");
-            }
+            
         }
     }
 }
