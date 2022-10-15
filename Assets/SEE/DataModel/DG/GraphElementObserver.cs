@@ -37,6 +37,7 @@ namespace SEE.DataModel.DG
             public void OnCompleted()
             {
                 // Should never be called.
+                throw new NotImplementedException();
             }
 
             public void OnError(Exception error) => throw error;
