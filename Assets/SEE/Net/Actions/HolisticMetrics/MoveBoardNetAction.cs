@@ -45,11 +45,15 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method executes the action on all clients, i.e., changes the position/rotation of the board.
+        /// This method executes the action on all clients except the requester, i.e., changes the position/rotation of
+        /// the board.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            BoardsManager.Move(BoardName, Position, Rotation);
+            if (!IsRequester())
+            {
+                BoardsManager.Move(BoardName, Position, Rotation);    
+            }
         }
     }
 }

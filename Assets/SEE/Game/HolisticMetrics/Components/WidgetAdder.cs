@@ -47,6 +47,17 @@ namespace SEE.Game.HolisticMetrics.Components
                     Vector3 localPoint = transform.InverseTransformPoint(hit.point);
                     widgetConfiguration.Position = localPoint;
                     string boardName = GetComponent<WidgetsManager>().GetTitle();
+                    
+                    WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(boardName);
+                    if (widgetsManager != null)
+                    {
+                        widgetsManager.Create(widgetConfiguration);
+                    }
+                    else
+                    {
+                        Debug.LogError("No board found with the given name for adding the widget.");
+                    }
+                    
                     new CreateWidgetNetAction(boardName, widgetConfiguration).Execute();
                     
                     positioningDone = true;

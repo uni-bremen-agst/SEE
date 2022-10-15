@@ -31,11 +31,14 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Executes the action on each client, i.e., creates the board on each client.
+        /// Executes the action on each client except the requester, i.e., creates the board on each client.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            BoardsManager.Create(BoardConfiguration);
+            if (!IsRequester())
+            {
+                BoardsManager.Create(BoardConfiguration);   
+            }
         }
     }
 }

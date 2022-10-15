@@ -83,6 +83,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
             
             // Create a new board from the loaded configuration
+            BoardsManager.Create(boardConfiguration);
             new CreateBoardNetAction(boardConfiguration).Execute();
         }
 

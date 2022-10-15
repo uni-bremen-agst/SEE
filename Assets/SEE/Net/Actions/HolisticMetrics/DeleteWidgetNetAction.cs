@@ -27,7 +27,6 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <param name="widgetID">The ID of the widget to delete</param>
         public DeleteWidgetNetAction(string boardName, Guid widgetID)
         {
-            Debug.Log($"The board name were looking for is assigned as {boardName}");
             BoardName = boardName;
             WidgetID = widgetID;
         }
@@ -41,19 +40,21 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Executes the action on all clients, i.e., deletes the widget on all clients.
+        /// Executes the action on all clients except the requester, i.e., deletes the widget on all clients.
         /// </summary>
         protected override void ExecuteOnClient()
         {
-            Debug.Log($"Before execution the boardname is {BoardName}");
-            WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
-            if (widgetsManager != null)
+            if (!IsRequester())
             {
-                widgetsManager.Delete(WidgetID);
-            }
-            else
-            {
-                Debug.LogError("The board to delete the widget from was not found.");
+                WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
+                if (widgetsManager != null)
+                {
+                    widgetsManager.Delete(WidgetID);
+                }
+                else
+                {
+                    Debug.LogError("The board to delete the widget from was not found.");
+                }    
             }
         }
     }
