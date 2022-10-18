@@ -140,6 +140,8 @@ namespace SEE.Utils
         /// <paramref name="b"/> and returns the result. If one component of
         /// <paramref name="b"/> is <c>0</c>, the corresponding component of the resulting
         /// vector is set to <c>0</c> as well.
+        ///
+        /// It is the inverse operation to <see cref="Vector3.Scale"/>.
         /// </summary>
         /// <param name="a">The numerator.</param>
         /// <param name="b">The denominator.</param>
