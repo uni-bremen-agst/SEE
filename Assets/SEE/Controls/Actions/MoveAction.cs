@@ -329,9 +329,10 @@ namespace SEE.Controls.Actions
 
                 ResetHitObjectColor();
             }
-            else if (SEEInput.Drag()) // start or continue moving a grabbed object
+            else if (SEEInput.Drag() && !SEEInput.DragHovered()) // start or continue moving a grabbed object
             {
                 if (!moving && hoveredObject
+                            && hoveredObject.transform != cityRootNode
                             && RaycastPlane(new Plane(Vector3.up, cityRootNode.position), out Vector3 planeHitPoint))
                 {
                     // start movement of the grabbed object
@@ -339,7 +340,8 @@ namespace SEE.Controls.Actions
                     // If SEEInput.Drag() is combined with SEEInput.DragHovered(), the hoveredObject is to
                     // be dragged; otherwise the whole city (city root node). Note: the hoveredObject may in
                     // fact be cityRootNode.
-                    Transform draggedObject = SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode;
+                    // FIXME Transform draggedObject = SEEInput.DragHovered() ? hoveredObject.transform : cityRootNode;
+                    Transform draggedObject = hoveredObject.transform;
                     hit = new Hit(draggedObject);
                     memento = new Memento(draggedObject);
 
@@ -383,7 +385,8 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (moving && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
+                if (moving
+                    && RaycastPlane(hit.Plane, out planeHitPoint)) // continue movement
                 {
                     // FIXME: Doesn't work in certain perspectives, particularly when looking at the horizon.
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), hit.HoveredObject.localScale);
@@ -531,7 +534,7 @@ namespace SEE.Controls.Actions
                         hit.HoveredObject.SetParent(originalParent);
                         nodeOperator.ScaleTo(originalScale, 1f);
                         nodeOperator.MoveTo(originalPosition, 1f);
-                        
+
                         new MoveNodeNetAction(hit.HoveredObject.name, originalPosition).Execute();
                         // The following assignment will override hit.interactableObject; that is why we
                         // stored its value in interactableObjectToBeUngrabbed above.
