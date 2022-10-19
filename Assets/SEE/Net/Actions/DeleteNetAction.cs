@@ -1,7 +1,7 @@
 using SEE.Game;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.

@@ -1,7 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.Game.UI.CodeWindow;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// Synchronizes the code spaces across all clients.

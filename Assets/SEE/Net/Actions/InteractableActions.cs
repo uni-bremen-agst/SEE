@@ -4,7 +4,7 @@ using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// !!! IMPORTANT !!!

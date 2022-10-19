@@ -3,7 +3,7 @@ using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class is responsible for the edit-node process via network from one client

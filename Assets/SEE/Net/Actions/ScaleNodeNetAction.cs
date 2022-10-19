@@ -1,7 +1,7 @@
 ﻿using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class is responsible for the scaling nodes via network from one

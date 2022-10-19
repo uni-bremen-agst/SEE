@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 
@@ -191,7 +192,7 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartTransformPosition += moveState.dragStartOffset;
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
-                    new Net.ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
+                    new ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
                 }
                 else
                 {

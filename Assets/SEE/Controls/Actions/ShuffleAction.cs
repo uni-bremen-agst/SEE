@@ -2,7 +2,7 @@
 using SEE.Game.Operator;
 using SEE.Game.UI3D;
 using SEE.GO;
-using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
