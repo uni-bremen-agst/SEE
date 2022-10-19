@@ -63,7 +63,7 @@ namespace SEE.Tools.Architecture
         private void SetupReflexion()
         {
             reflexion = new Reflexion(fullGraph);
-            reflexion.Register(this);
+            reflexion.Subscribe(this);
             // An initial run is necessary to set up the necessary data structures.
             reflexion.Run();
         }
@@ -478,7 +478,7 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             reflexion.UnparentInImplementation(i[7]);
             Assert.IsTrue(changes
-                          .OfType<HierarchyChangeEvent>()
+                          .OfType<HierarchyEvent>()
                           .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraph.Implementation) == 1);
             Assert.That(IsUnpropagated(a[9], a[2], call));
             Assert.That(IsUnpropagated(a[9], a[9], call));
@@ -490,7 +490,7 @@ namespace SEE.Tools.Architecture
             ResetEvents();
             reflexion.AddChildInImplementation(i[7], i[2]);
             Assert.IsTrue(changes
-                          .OfType<HierarchyChangeEvent>()
+                          .OfType<HierarchyEvent>()
                           .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraph.Implementation) == 1);
             Assert.That(IsPropagated(a[9], a[2], call));
             Assert.That(IsPropagated(a[9], a[9], call));
@@ -562,7 +562,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a2, a3, call));
             Assert.That(IsDivergent(a_2, a_3, call));
             Assert.That(IsDivergent(a_2, a_4, call));
-            AssertEventCountEquals<HierarchyChangeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
             Assert.AreEqual(4, changes.Count);
 
             // Quick diversion: Adding an edge from a'2 to a'3 should work, but then adding a'2 as a child to a2 should
@@ -580,7 +580,7 @@ namespace SEE.Tools.Architecture
             Assert.That(IsConvergent(a2, a3, call));
             Assert.That(IsAllowed(a_2, a_3, call));
             Assert.That(IsAllowed(a_2, a_4, call));
-            AssertEventCountEquals<HierarchyChangeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture);
             Assert.AreEqual(4, changes.Count);
 
             // Now we test some additional error cases.
@@ -868,10 +868,10 @@ namespace SEE.Tools.Architecture
             Assert.That(IsPropagated(a[4], a[1], call));
             // Technically 7 propagated edges, but it's actually 6 where one has a counter of 2
             AssertEventCountEquals<PropagatedEdgeEvent>(6, ChangeType.Addition);
-            AssertEventCountEquals<HierarchyChangeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
-            AssertEventCountEquals<HierarchyChangeEvent>(12, ChangeType.Addition, ReflexionSubgraph.Implementation);
-            AssertEventCountEquals<NodeChangeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Architecture);
-            AssertEventCountEquals<NodeChangeEvent>(17, ChangeType.Addition, ReflexionSubgraph.Implementation);
+            AssertEventCountEquals<HierarchyEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<HierarchyEvent>(12, ChangeType.Addition, ReflexionSubgraph.Implementation);
+            AssertEventCountEquals<NodeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<NodeEvent>(17, ChangeType.Addition, ReflexionSubgraph.Implementation);
             AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
             AssertEventCountEquals<EdgeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Implementation);
         }

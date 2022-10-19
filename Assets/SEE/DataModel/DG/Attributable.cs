@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using static SEE.DataModel.ChangeType;
 
 namespace SEE.DataModel.DG
 {
@@ -27,7 +28,7 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
-    public abstract class Attributable : ICloneable
+    public abstract class Attributable : Observable<GraphEvent>, ICloneable
     {
         public static readonly HashSet<string> NumericAttributeNames = new HashSet<string>();
 
@@ -48,6 +49,7 @@ namespace SEE.DataModel.DG
             if (!toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Add(attributeName);
+                Notify(new AttributeEvent<object>(this, attributeName, null, Addition));
             }
         }
 
@@ -56,6 +58,7 @@ namespace SEE.DataModel.DG
             if (toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Remove(attributeName);
+                Notify(new AttributeEvent<object>(this, attributeName, null, Removal));
             }
         }
 
@@ -73,6 +76,7 @@ namespace SEE.DataModel.DG
         public void SetString(string attributeName, string value)
         {
             StringAttributes[attributeName] = value;
+            Notify(new AttributeEvent<string>(this, attributeName, value, Addition));
         }
 
         public bool TryGetString(string attributeName, out string value)
@@ -102,6 +106,7 @@ namespace SEE.DataModel.DG
         {
             FloatAttributes[attributeName] = value;
             NumericAttributeNames.Add(attributeName);
+            Notify(new AttributeEvent<float>(this, attributeName, value, Addition));
         }
 
         public float GetFloat(string attributeName)
@@ -131,6 +136,7 @@ namespace SEE.DataModel.DG
         {
             IntAttributes[attributeName] = value;
             NumericAttributeNames.Add(attributeName);
+            Notify(new AttributeEvent<int>(this, attributeName, value, Addition));
         }
 
         public int GetInt(string attributeName)
