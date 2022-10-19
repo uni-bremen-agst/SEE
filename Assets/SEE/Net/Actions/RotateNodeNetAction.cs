@@ -1,7 +1,7 @@
 ﻿using SEE.Game;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// Propagates the rotation of a game node through the network.

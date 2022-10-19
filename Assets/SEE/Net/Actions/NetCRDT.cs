@@ -2,7 +2,7 @@ using SEE.Utils;
 using System.Net;
 using static SEE.Utils.CRDT;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class connects the <see cref="CRDT"/> to all clients in the network.

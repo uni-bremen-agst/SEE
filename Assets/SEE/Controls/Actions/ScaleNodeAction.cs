@@ -4,7 +4,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using SEE.Net;
+using SEE.Net.Actions;
 
 namespace SEE.Controls.Actions
 {

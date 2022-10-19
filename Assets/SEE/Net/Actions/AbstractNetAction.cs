@@ -2,7 +2,7 @@
 using System.Net;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// !!! IMPORTANT !!!

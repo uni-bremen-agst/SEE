@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 using SEE.Game;
+using SEE.Net.Actions;
 
 namespace SEE.Controls
 {
@@ -211,7 +212,7 @@ namespace SEE.Controls
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
         /// </summary>
-        public Net.Synchronizer InteractableSynchronizer { get; private set; }
+        public Synchronizer InteractableSynchronizer { get; private set; }
 
         /// <summary>
         /// Will be used to flash the selected object while it is selected.
@@ -359,7 +360,7 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new Net.SetHoverAction(this, hoverFlags).Execute();
+                new SetHoverAction(this, hoverFlags).Execute();
             }
         }
 
@@ -471,7 +472,7 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new Net.SetSelectAction(this, select).Execute();
+                new SetSelectAction(this, select).Execute();
             }
         }
 
@@ -592,10 +593,10 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new Net.SetGrabAction(this, grab).Execute();
+                new SetGrabAction(this, grab).Execute();
                 if (grab)
                 {
-                    InteractableSynchronizer = interactable.gameObject.AddComponent<Net.Synchronizer>();
+                    InteractableSynchronizer = interactable.gameObject.AddComponent<Synchronizer>();
                 }
                 else
                 {
@@ -924,6 +925,5 @@ namespace SEE.Controls
         private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
 
         #endregion
-
     }
 }

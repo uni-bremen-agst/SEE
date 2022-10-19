@@ -1,7 +1,7 @@
 ﻿using SEE.Controls;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// Responsible to synchronize position, rotation and potentially local scale

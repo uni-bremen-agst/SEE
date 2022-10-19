@@ -3,9 +3,8 @@ using System.Net;
 using NetworkCommsDotNet.Connections;
 using UnityEngine.Assertions;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
-
     /// <summary>
     /// This packet can execute various actions.
     /// </summary>

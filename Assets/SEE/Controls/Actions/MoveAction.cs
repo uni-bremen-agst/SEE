@@ -8,7 +8,7 @@ using SEE.Game.Operator;
 using SEE.Game.UI3D;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
-using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using TinySpline;
