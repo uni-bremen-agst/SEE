@@ -465,7 +465,7 @@ namespace SEE.Net
         /// <summary>
         /// Submits a packet for dispatch.
         /// </summary>
-        /// <param name="connection">The connecting, the packet should be sent through.
+        /// <param name="connection">The connection the packet should be sent through.
         /// </param>
         /// <param name="packet">The packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, AbstractPacket packet)
@@ -609,7 +609,7 @@ namespace SEE.Net
 
             void InternalStartHost()
             {
-                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
                 Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
                 try
                 {
