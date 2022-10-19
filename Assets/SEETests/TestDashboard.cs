@@ -12,6 +12,7 @@ namespace SEETests
     /// <summary>
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
     /// </summary>
+    [Category("NonDeterministic")]
     public class TestDashboard
     {
         /**
