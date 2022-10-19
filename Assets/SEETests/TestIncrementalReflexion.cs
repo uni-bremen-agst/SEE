@@ -19,6 +19,7 @@ namespace SEE.Tools.Architecture
     /// "Incremental Reflexion Analysis", Rainer Koschke, Journal on Software Maintenance
     /// and Evolution, 2011, DOI 10.1002 / smr.542 in Figure 8.
     /// </summary>
+    [Explicit("Reflexion tests currently don't work, tracked in #481")]
     internal class TestIncrementalReflexion : TestReflexionAnalysis
     {
         /// <summary>
