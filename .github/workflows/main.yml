@@ -26,8 +26,9 @@ jobs:
         name: Cache Library
         with:
           path: ./Library
-          key: Library-SEE
+          key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
           restore-keys: |
+            Library-SEE-Tests
             Library-SEE
       - uses: game-ci/unity-test-runner@v2
         name: Run Tests
