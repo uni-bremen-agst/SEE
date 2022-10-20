@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace SEE.DataModel.DG
 {
@@ -163,10 +164,38 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// True iff node has no parent.
+        /// Is true, if the node is marked
         /// </summary>
-        /// <returns>true iff node is a root node</returns>
-        public bool IsRoot()
+        private bool isMarked = false;
+
+        /// <summary>
+        /// Is true, if the node is marked
+        /// </summary>
+        public bool IsMarked
+        {
+            get => isMarked;
+            set => isMarked = value;
+        }
+
+        /// <summary>
+        /// The GameObject with which the node was marked
+        /// </summary>
+        private GameObject marking;
+
+        /// <summary>
+        /// The GameObject with which the node was marked
+        /// </summary>
+        public GameObject Marking
+        {
+            get => marking;
+            set => marking = value;
+        }
+
+    /// <summary>
+    /// True iff node has no parent.
+    /// </summary>
+    /// <returns>true iff node is a root node</returns>
+    public bool IsRoot()
         {
             return Parent == null;
         }
