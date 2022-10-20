@@ -62,6 +62,11 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType Mark { get; } =
+            new ActionStateType(10, "Mark", "Mark a block",
+                        Color.cyan.Darker(), "Materials/ModernUIPack/Eye",
+                        MarkAction.CreateReversibleAction);
+        // todo add icon for mark
         #endregion
 
         /// <summary>
