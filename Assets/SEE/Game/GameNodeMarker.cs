@@ -1,7 +1,4 @@
 using System;
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -48,20 +45,13 @@ namespace SEE.Game
                 // create a new marker sphere because there is none currently
                 GameObject newMarkerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-                // FIXME: (?) this is totally not working...
-                // the position of the marker sphere is above the marked node
-                newMarkerSphere.transform.position = new Vector3(0, 0, 0);
+                // the scale of the marker sphere depends on the scale of the marked node
+                newMarkerSphere.transform.localScale = CalculateMarkerSize(targetNode);
 
-                // FIXME: (?) this isn't working either...
                 // the position of the marker sphere is above the marked node
-                newMarkerSphere.transform.position = new Vector3(targetNode.transform.position.x,
-                                                                 targetNode.transform.position.y,
-                                                                 // + targetNode.transform.localScale.y
-                                                                 // + newMarkerSphere.GetComponent<SphereCollider>().radius,
-                                                                 // + 0.1f,
-                                                                 targetNode.transform.position.z);
+                newMarkerSphere.transform.position = CalculateMarkerPosition(targetNode);
 
-                // FIXME: (?) ensure markers are not blocking us from unmarking or marking other nodes
+                // ()FIXME?) ensure markers are not blocking us from unmarking or marking other nodes
                 newMarkerSphere.GetComponent<SphereCollider>().radius = 0;
 
                 newMarkerSphere.SetColor(Color.magenta);
@@ -74,6 +64,36 @@ namespace SEE.Game
 
                 return newMarkerSphere;
             }
+        }
+
+        /// <summary>
+        /// Returns the scale of the marker sphere based on the area of the <paramref name="targetNode"/>.
+        /// </summary>
+        /// <param name="targetNode">The marked node relative to which the marker sphere is positioned and scaled.</param>
+        /// <returns>The scale of the marker sphere.</returns>
+        private static Vector3 CalculateMarkerSize(GameObject targetNode)
+        {
+            // FUTURE REMINDER: base the size on lossyScale, not localScale -.-
+            // calculate the maximum ground area
+            float verticalLength = Math.Min(targetNode.transform.lossyScale.x,
+                                            targetNode.transform.lossyScale.z);
+
+            // return as a cube
+            return Vector3.one * verticalLength;
+        }
+
+        /// <summary>
+        /// Returns the position of the marker sphere based on the position of the <paramref name="targetNode"/>.
+        /// </summary>
+        /// <param name="targetNode">The marked node relative to which the marker sphere is positioned and scaled.</param>
+        /// <returns>The position of the marker sphere.</returns>
+        private static Vector3 CalculateMarkerPosition(GameObject targetNode)
+        {
+            return new Vector3(targetNode.transform.position.x,
+                        targetNode.transform.position.y
+                        + targetNode.transform.lossyScale.y / 2
+                        + CalculateMarkerSize(targetNode).y,
+                        targetNode.transform.position.z);
         }
     }
 }
