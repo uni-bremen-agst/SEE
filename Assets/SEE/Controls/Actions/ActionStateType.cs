@@ -23,45 +23,60 @@ namespace SEE.Controls.Actions
         public static List<ActionStateType> AllTypes { get; } = new List<ActionStateType>();
 
         #region Static Types
+
         public static ActionStateType Move { get; } =
             new ActionStateType(0, "Move", "Move a node within a graph",
-                                Color.red.Darker(), "Materials/Charts/MoveIcon",
-                                MoveAction.CreateReversibleAction);
+                Color.red.Darker(), "Materials/Charts/MoveIcon",
+                MoveAction.CreateReversibleAction);
+
         public static ActionStateType Rotate { get; } =
             new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph",
-                                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                                RotateAction.CreateReversibleAction);
+                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                RotateAction.CreateReversibleAction);
+
         public static ActionStateType Hide { get; } =
             new ActionStateType(2, "Hide", "Hides nodes or edges",
-                       Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
+                Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
 
         public static ActionStateType NewEdge { get; } =
             new ActionStateType(3, "New Edge", "Draw a new edge between two nodes",
-                                Color.green.Darker(), "Materials/ModernUIPack/Minus",
-                                AddEdgeAction.CreateReversibleAction);
+                Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                AddEdgeAction.CreateReversibleAction);
+
         public static ActionStateType NewNode { get; } =
             new ActionStateType(4, "New Node", "Create a new node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                                AddNodeAction.CreateReversibleAction);
+                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                AddNodeAction.CreateReversibleAction);
+
         public static ActionStateType EditNode { get; } =
             new ActionStateType(5, "Edit Node", "Edit a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Settings",
-                                EditNodeAction.CreateReversibleAction);
+                Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                EditNodeAction.CreateReversibleAction);
+
+
         public static ActionStateType ScaleNode { get; } =
             new ActionStateType(6, "Scale Node", "Scale a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Crop",
-                                ScaleNodeAction.CreateReversibleAction);
+                Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                ScaleNodeAction.CreateReversibleAction);
+
         public static ActionStateType Delete { get; } =
             new ActionStateType(7, "Delete", "Delete a node or an edge",
-                                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
-                                DeleteAction.CreateReversibleAction);
+                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                DeleteAction.CreateReversibleAction);
+
         public static ActionStateType ShowCode { get; } =
             new ActionStateType(8, "Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+
         public static ActionStateType Draw { get; } =
             new ActionStateType(9, "Draw", "Draw a line",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawAction.CreateReversibleAction);
+                Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                DrawAction.CreateReversibleAction);
+
+        public static ActionStateType MarkNode { get; } =
+            new ActionStateType(10, "Mark", "Mark a node", Color.magenta, "Materials/ModernUIPack/Pencil",
+                MarkAction.CreateMarkAction);
+
         #endregion
 
         /// <summary>
@@ -128,7 +143,8 @@ namespace SEE.Controls.Actions
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
         /// </exception>
-        private ActionStateType(int value, string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
+        private ActionStateType(int value, string name, string description, Color color, string iconPath,
+            CreateReversibleAction createReversible)
         {
             Value = value;
             Name = name;

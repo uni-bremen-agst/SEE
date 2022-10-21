@@ -31,6 +31,7 @@ namespace SEE.Controls.Actions
                 // The position at which the parent was hit will be the center point of the new node
                 Vector3 position = raycastHit.point;
                 Vector3 scale = FindSize(parent, position);
+                
                 addedGameNode = GameNodeAdder.AddChild(parent, position: position, worldSpaceScale: scale);
                 if (addedGameNode != null)
                 {
