@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
 
                 GameObject markerSphere = GameNodeMarker.TryMarking(targetNode);
 
-                memento = new Memento(markerSphere);
+                memento = new Memento(targetNode);
 
                 new MarkNetAction(markerSphere).Execute();
 

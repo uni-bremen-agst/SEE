@@ -48,13 +48,11 @@ namespace SEE.Game
                 // create a new marker sphere because there is none currently
                 GameObject newMarkerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-                Debug.Log("X is:" + newMarkerSphere.transform.localScale.x);
-                Debug.Log("Y is:" + newMarkerSphere.transform.localScale.y);
-                Debug.Log("Z is:" + newMarkerSphere.transform.localScale.z);
+                // FIXME: (?) this is totally not working...
+                // the position of the marker sphere is above the marked node
+                newMarkerSphere.transform.position = new Vector3(0, 0, 0);
 
-                // the diameter of the is the minimum of the width (x-axis) and depth (y-axis) of the marked node
-                newMarkerSphere.transform.localScale = Math.Min(targetNode.transform.localScale.x, targetNode.transform.localScale.z) * .5f * Vector3.one;
-
+                // FIXME: (?) this isn't working either...
                 // the position of the marker sphere is above the marked node
                 newMarkerSphere.transform.position = new Vector3(targetNode.transform.position.x,
                                                                  targetNode.transform.position.y,
