@@ -33,8 +33,8 @@ namespace SEE.Controls.Actions
                                 RotateAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
             new ActionStateType(2, "Hide", "Hides nodes or edges",
-                       Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
-
+                                Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                                HideAction.CreateReversibleAction);
         public static ActionStateType NewEdge { get; } =
             new ActionStateType(3, "New Edge", "Draw a new edge between two nodes",
                                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
@@ -57,11 +57,16 @@ namespace SEE.Controls.Actions
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
             new ActionStateType(8, "Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+                                Color.black, "Materials/ModernUIPack/Document",
+                                ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
             new ActionStateType(9, "Draw", "Draw a line",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawAction.CreateReversibleAction);
+                                Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                                DrawAction.CreateReversibleAction);
+        public static ActionStateType Mark { get; } =
+            new ActionStateType(10, "Mark", "Mark a node",
+                                Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                                MarkAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
