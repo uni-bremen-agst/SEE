@@ -32,11 +32,11 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Creates a new metrics board and puts its BoardController into the list of BoardControllers.
         /// </summary>
-        /// <param name="boardConfiguration">The board configuration for the new board.</param>
-        internal static void Create(BoardConfiguration boardConfiguration)
+        /// <param name="boardConfig">The board configuration for the new board.</param>
+        internal static void Create(BoardConfig boardConfig)
         {
             bool nameExists = widgetsManagers.Any(boardController =>
-                boardController.GetTitle().Equals(boardConfiguration.Title));
+                boardController.GetTitle().Equals(boardConfig.Title));
             if (nameExists)
             {
                 ShowNotification.Error("Cannot create that board", "The name has to be unique.");
@@ -45,16 +45,16 @@ namespace SEE.Game.HolisticMetrics
 
             GameObject newBoard = Object.Instantiate(
                 boardPrefab, 
-                boardConfiguration.Position, 
-                boardConfiguration.Rotation);
+                boardConfig.Position, 
+                boardConfig.Rotation);
             
             WidgetsManager newWidgetsManager = newBoard.GetComponent<WidgetsManager>();
 
             // Set the title of the new board
-            newWidgetsManager.SetTitle(boardConfiguration.Title);
+            newWidgetsManager.SetTitle(boardConfig.Title);
 
             // Add the widgets to the new board
-            foreach (WidgetConfiguration widgetConfiguration in boardConfiguration.WidgetConfigurations)
+            foreach (WidgetConfig widgetConfiguration in boardConfig.WidgetConfigs)
             {
                     newWidgetsManager.Create(widgetConfiguration);
             }
@@ -68,7 +68,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="boardName">The name/title of the board to delete</param>
         internal static void Delete(string boardName)
         {
-            WidgetsManager widgetsManager = GetWidgetsManager(boardName);
+            WidgetsManager widgetsManager = Find(boardName);
             if (widgetsManager is null)
             {
                 Debug.LogError("Tried to delete a board that does not seem to exist");
@@ -87,7 +87,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="rotation">The new rotation of the board</param>
         internal static void Move(string boardName, Vector3 position, Quaternion rotation)
         {
-            WidgetsManager widgetsManager = GetWidgetsManager(boardName);
+            WidgetsManager widgetsManager = Find(boardName);
             if (widgetsManager == null)
             {
                 Debug.LogError("Tried to move a board that does not seem to exist");
@@ -113,11 +113,11 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Finds a WidgetsManager by its name.
+        /// Finds a board (its widgets manager, actually) by its name.
         /// </summary>
         /// <param name="boardName">The name to look for.</param>
         /// <returns>Returns the desired WidgetsManager if it exists or null if it doesn't.</returns>
-        internal static WidgetsManager GetWidgetsManager(string boardName)
+        internal static WidgetsManager Find(string boardName)
         {
             return widgetsManagers.Find(manager => manager.GetTitle().Equals(boardName));
         }
@@ -153,7 +153,7 @@ namespace SEE.Game.HolisticMetrics
         /// This method can be invoked when you wish to let the user click on a board to add a widget.
         /// </summary>
         /// <param name="widgetConfiguration">Information on how the widget to add should be configured</param>
-        internal static void AddWidgetAdders(WidgetConfiguration widgetConfiguration)
+        internal static void AddWidgetAdders(WidgetConfig widgetConfiguration)
         {
             WidgetAdder.Setup(widgetConfiguration);
             foreach (WidgetsManager controller in widgetsManagers)

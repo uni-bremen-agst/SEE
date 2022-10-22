@@ -46,7 +46,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
+                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
                 if (widgetsManager != null)
                 {
                     widgetsManager.SwitchCity(CityName);    

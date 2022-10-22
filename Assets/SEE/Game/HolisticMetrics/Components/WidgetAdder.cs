@@ -1,3 +1,4 @@
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <summary>
         /// The configuration of the widget to add. We get this from the AddWidgetDialog.
         /// </summary>
-        private static WidgetConfiguration widgetConfiguration;
+        private static WidgetConfig widgetConfiguration;
 
         /// <summary>
         /// Whether or not this class has just added a widget. If this is true, all instances of this class should
@@ -26,7 +27,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// and sets the widgetConfiguration field to the parameter value.
         /// </summary>
         /// <param name="widgetConfigurationParam"></param>
-        internal static void Setup(WidgetConfiguration widgetConfigurationParam)
+        internal static void Setup(WidgetConfig widgetConfigurationParam)
         {
             widgetConfiguration = widgetConfigurationParam;
             positioningDone = false;
@@ -47,18 +48,8 @@ namespace SEE.Game.HolisticMetrics.Components
                     Vector3 localPoint = transform.InverseTransformPoint(hit.point);
                     widgetConfiguration.Position = localPoint;
                     string boardName = GetComponent<WidgetsManager>().GetTitle();
-                    
-                    WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(boardName);
-                    if (widgetsManager != null)
-                    {
-                        widgetsManager.Create(widgetConfiguration);
-                    }
-                    else
-                    {
-                        Debug.LogError("No board found with the given name for adding the widget.");
-                    }
-                    
-                    new CreateWidgetNetAction(boardName, widgetConfiguration).Execute();
+
+                    new CreateWidgetAction(boardName, widgetConfiguration).Execute();
                     
                     positioningDone = true;
                 }

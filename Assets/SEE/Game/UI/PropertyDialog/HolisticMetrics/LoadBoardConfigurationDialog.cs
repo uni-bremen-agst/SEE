@@ -1,5 +1,6 @@
 using System;
 using SEE.Controls;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Notification;
 using SEE.Net.Actions.HolisticMetrics;
@@ -40,8 +41,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             selectedFile = dialog.AddComponent<SelectionProperty>();
             selectedFile.Name = "Select file";
             selectedFile.Description = "Select the file to load the board configuration from";
-            selectedFile.AddOptions(ConfigurationManager.GetSavedFileNames());
-            selectedFile.Value = ConfigurationManager.GetSavedFileNames()[0];
+            selectedFile.AddOptions(ConfigManager.GetSavedFileNames());
+            selectedFile.Value = ConfigManager.GetSavedFileNames()[0];
             group.AddProperty(selectedFile);
 
             propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -66,10 +67,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             SEEInput.KeyboardShortcutsEnabled = true;
             
             // Load the board configuration from the file
-            BoardConfiguration boardConfiguration;
+            BoardConfig boardConfiguration;
             try
             {
-                boardConfiguration = ConfigurationManager.LoadBoard(selectedFile.Value);
+                boardConfiguration = ConfigManager.LoadBoard(selectedFile.Value);
             }
             catch (Exception exception)
             {
@@ -83,8 +84,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
             
             // Create a new board from the loaded configuration
-            BoardsManager.Create(boardConfiguration);
-            new CreateBoardNetAction(boardConfiguration).Execute();
+            new CreateBoardAction(boardConfiguration).Execute();
         }
 
         /// <summary>

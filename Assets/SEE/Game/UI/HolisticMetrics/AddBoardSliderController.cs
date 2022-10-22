@@ -1,4 +1,5 @@
 using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
@@ -26,7 +27,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// The board configuration of the board to be created. So far it should already have a title and a position. In
         /// this component, we will add the rotation to it and then create it.
         /// </summary>
-        private BoardConfiguration boardConfiguration;
+        private BoardConfig boardConfiguration;
 
         /// <summary>
         /// The dummy board GameObject that we will instantiate from this component. Its rotation will determine the
@@ -39,7 +40,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// Also sets up the slider, the window dragger and instantiates the dummy board.
         /// </summary>
         /// <param name="boardConfigurationReference">The BoardConfiguration for the board to be created</param>
-        internal void Setup(BoardConfiguration boardConfigurationReference)
+        internal void Setup(BoardConfig boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;
 
@@ -71,8 +72,9 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
             Destroy(dummyBoard);
-            BoardsManager.Create(boardConfiguration);
-            new CreateBoardNetAction(boardConfiguration).Execute();
+            
+            new CreateBoardAction(boardConfiguration).Execute();
+            
             Destroy(gameObject);
         }
     }

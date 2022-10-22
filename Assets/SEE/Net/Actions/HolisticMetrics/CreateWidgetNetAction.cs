@@ -17,17 +17,17 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// The configuration of the new widget.
         /// </summary>
-        public WidgetConfiguration WidgetConfiguration;
+        public WidgetConfig WidgetConfig;
 
         /// <summary>
         /// The constructor of this class. It only assigns the parameter values to fields.
         /// </summary>
         /// <param name="boardName">The name of the board on which to create the new widget</param>
-        /// <param name="widgetConfiguration">The configuration of the new widget</param>
-        public CreateWidgetNetAction(string boardName, WidgetConfiguration widgetConfiguration)
+        /// <param name="widgetConfig">The configuration of the new widget</param>
+        public CreateWidgetNetAction(string boardName, WidgetConfig widgetConfig)
         {
             BoardName = boardName;
-            WidgetConfiguration = widgetConfiguration;
+            WidgetConfig = widgetConfig;
         }
         
         /// <summary>
@@ -45,10 +45,10 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.GetWidgetsManager(BoardName);
+                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
                 if (widgetsManager != null)
                 {
-                    widgetsManager.Create(WidgetConfiguration);
+                    widgetsManager.Create(WidgetConfig);
                 }
                 else
                 {
