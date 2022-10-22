@@ -21,7 +21,7 @@ namespace SEE.Net
         public Vector3 Position;
 
         /// <summary>
-        /// The scale of the marker's parent.
+        /// The scale of the marker.
         /// </summary>
         public Vector3 Scale;
 
@@ -29,7 +29,7 @@ namespace SEE.Net
         /// Constructor.
         /// </summary>
         /// <param name="parentID">unique ID of the parent which to highlight</param>
-        /// <param name="position">the position for the marker</param>
+        /// <param name="position">the position of the marker's parent</param>
         /// <param name="scale">the scale of the marker in world space</param>
         public MarkNetAction
             (string parentID,
@@ -37,9 +37,9 @@ namespace SEE.Net
              Vector3 scale)
             : base()
         {
-            this.ParentID = parentID;
-            this.Position = position;
-            this.Scale = scale;
+            ParentID = parentID;
+            Position = position;
+            Scale = scale;
         }
 
         protected override void ExecuteOnClient()

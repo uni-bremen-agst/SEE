@@ -60,9 +60,9 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
-                // the hit object is the parent in which to create the new node
+                // the hit object is the parent over which to create the marker
                 GameObject parent = raycastHit.collider.gameObject;
-                // The position at which the parent was hit will be the center point of the new node
+                // The position at which the parent was hit will be the center point of the new marker
                 Vector3 position = parent.transform.position;
                 marker = GameNodeMarker.CreateMarker(parent, position: position, worldSpaceScale: parent.transform.lossyScale);
                 if (marker != null)
@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogError($"Marker could not be created.\n");
+                    Debug.LogError("Marker could not be created.\n");
                 }
             }
             return result;
@@ -127,12 +127,12 @@ namespace SEE.Controls.Actions
             public readonly GameObject Parent;
 
             /// <summary>
-            /// The position of the new node in world space.
+            /// The position of the node the marker is attached to in world space.
             /// </summary>
             public readonly Vector3 Position;
 
             /// <summary>
-            /// The scale of the new node in world space.
+            /// The scale of the marker in world space.
             /// </summary>
             public readonly Vector3 Scale;
 
@@ -140,7 +140,7 @@ namespace SEE.Controls.Actions
             /// Constructor setting the information necessary to re-do this action.
             /// </summary>
             /// <param name="parent">parent of the marker</param>
-            /// <param name="position">position of the marker in world space</param>
+            /// <param name="position">position of the node the marker is attached to in world space</param>
             /// <param name="scale">scale of the marker in world space</param>
             public Memento(GameObject parent, Vector3 position, Vector3 scale)
             {
