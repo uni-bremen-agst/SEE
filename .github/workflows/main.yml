@@ -49,7 +49,7 @@ jobs:
           path: ${{ steps.tests.outputs.artifactsPath }}
       - uses: actions/upload-artifact@v3
         name: Upload coverage results
-        if: always()
+        if: github.ref == 'refs/heads/master'
         with:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
