@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
@@ -61,8 +62,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         private void DeleteBoard()
         {
             // Delete the board
-            BoardsManager.Delete(selectedBoardName.Value);
-            new DeleteBoardNetAction(selectedBoardName.Value).Execute();
+            new DeleteBoardAction(selectedBoardName.Value).Execute();
             
             EnableKeyboardShortcuts();
         }

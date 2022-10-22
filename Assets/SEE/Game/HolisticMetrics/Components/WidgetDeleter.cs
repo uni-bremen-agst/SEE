@@ -1,3 +1,5 @@
+using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
@@ -28,7 +30,7 @@ namespace SEE.Game.HolisticMetrics.Components
         
         /// <summary>
         /// When the mouse is clicked on the widget and then it is released again, we will delete the widget on which
-        /// the cursor was clicked and then delete all WidgetDeleters.
+        /// the cursor was clicked and then delete all WidgetDeleter instances.
         /// </summary>
         private void OnMouseUp()
         {
@@ -38,23 +40,23 @@ namespace SEE.Game.HolisticMetrics.Components
                 if (Physics.Raycast(ray, out _))
                 {
                     var parentTransform = transform.parent;
-                    
-                    WidgetsManager widgetsManager = parentTransform.GetComponent<WidgetsManager>();
-                    widgetsManager.Delete(GetComponent<WidgetController>().ID);
-                    Debug.LogError("The board to delete the widget from was not found.");
-                    
                     deletionDone = true;
                     
-                    new DeleteWidgetNetAction(
-                        parentTransform.GetComponent<WidgetsManager>().GetTitle(), 
-                        GetComponent<WidgetController>().ID)
+                    // A config instance of the widget to delete, so it can be restored if needed
+                    WidgetConfig config = ConfigManager.GetWidgetConfig(
+                        GetComponent<WidgetController>(), 
+                        GetComponent<Metric>());
+                    
+                    new DeleteWidgetAction(
+                            parentTransform.GetComponent<WidgetsManager>().GetTitle(), 
+                            config)
                         .Execute();
                 }
             }
         }
 
         /// <summary>
-        /// When the deletion is done (deletionDone field is true), all WidgetDeleters will delete themselves.
+        /// When the deletion is done (deletionDone field is true), all WidgetDeleter instances will delete themselves.
         /// </summary>
         private void Update()
         {

@@ -61,7 +61,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddBoard()
         {
-            BoardConfiguration boardConfiguration = new BoardConfiguration()
+            BoardConfig boardConfiguration = new BoardConfig()
             {
                 Title = boardName.Value
             };

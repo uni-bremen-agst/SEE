@@ -8,7 +8,7 @@ namespace SEE.Game.HolisticMetrics
     /// This class can hold all the information that is needed to configure a holistic metrics board.
     /// </summary>
     [Serializable]
-    public class BoardConfiguration
+    public class BoardConfig
     {
         /// <summary>
         /// The title that will be displayed in the top left corner of this display.
@@ -28,14 +28,14 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// All the widgets that should be displayed on this board.
         /// </summary>
-        public List<WidgetConfiguration> WidgetConfigurations = new List<WidgetConfiguration>();
+        public List<WidgetConfig> WidgetConfigs = new List<WidgetConfig>();
     }
 
     /// <summary>
     /// This class can hold all the information that is needed to configure a metric widget.
     /// </summary>
     [Serializable]
-    public class WidgetConfiguration
+    public class WidgetConfig
     {
         /// <summary>
         /// The unique ID of this widget.

@@ -7,6 +7,7 @@ using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
+using ActionHistory = SEE.Controls.Actions.HolisticMetrics.ActionHistory;
 
 namespace SEE.Game.UI.HolisticMetrics
 {
@@ -69,6 +70,18 @@ namespace SEE.Game.UI.HolisticMetrics
             return new List<MenuEntry>
             {
                 new MenuEntry(
+                    action: Undo,
+                    title: "Undo last action",
+                    description: "Revert the last holistic metrics action",
+                    entryColor: Color.grey,
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold")),
+                new MenuEntry(
+                    action: Redo,
+                    title: "Redo last action",
+                    description: "Re-does the action that was last undone",
+                    entryColor: Color.grey,
+                    icon: Resources.Load<Sprite>("Materials/ModernUIPack/Arrow Bold reverse")),
+                new MenuEntry(
                     action: NewBoard,
                     title: "New board",
                     description: "Add a new metrics board to the scene",
@@ -113,6 +126,24 @@ namespace SEE.Game.UI.HolisticMetrics
             };
         }
 
+        /// <summary>
+        /// This method repeats the holistic metrics action undone last and closes the menu.
+        /// </summary>
+        private void Redo()
+        {
+            menu.ToggleMenu();
+            ActionHistory.Redo();
+        }
+        
+        /// <summary>
+        /// This method reverts the last holistic metrics action and closes the menu.
+        /// </summary>
+        private void Undo()
+        {
+            menu.ToggleMenu();
+            ActionHistory.Undo();
+        }
+        
         /// <summary>
         /// This method gets called when the player clicks on the "New board" button. It will close the menu and open
         /// the dialog for adding a new board to the scene.
@@ -250,7 +281,7 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu.ToggleMenu();
             
-            if (ConfigurationManager.GetSavedFileNames().Any())
+            if (ConfigManager.GetSavedFileNames().Any())
             {
                 new LoadBoardConfigurationDialog().Open();
             }

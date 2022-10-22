@@ -1,4 +1,4 @@
-using SEE.Net.Actions.HolisticMetrics;
+using SEE.Controls.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -9,11 +9,15 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     public class BoardMover : MonoBehaviour
     {
+        private Vector3 oldPosition;
+
+        private Quaternion oldRotation;
+        
         /// <summary>
-        /// This plane, represents the floor when calculating the intersection between a ray from the cursor into the
+        /// This plane represents the floor when calculating the intersection between a ray from the cursor into the
         /// scene and the floor.
         /// </summary>
-        private static Plane plane = new Plane(Vector3.up, Vector3.zero);
+        private static Plane floor = new Plane(Vector3.up, Vector3.zero);
 
         /// <summary>
         /// The parent transform of this game object, i.e., the metrics board transform. This will have its position
@@ -22,6 +26,17 @@ namespace SEE.Game.HolisticMetrics.Components
         private Transform parentTransform;
 
         /// <summary>
+        /// When the player starts the moving (left mouse button goes down on the button), we will save the old position
+        /// of the metrics board so we can undo the moving action later.
+        /// </summary>
+        private void OnMouseDown()
+        {
+            parentTransform = transform.parent;
+            oldPosition = parentTransform.position;
+            oldRotation = parentTransform.rotation;
+        }
+        
+        /// <summary>
         /// When this method is called, we will see where on the floor the player's mouse points and move the board
         /// there. We will also rotate the board so it is facing the camera, but only around the y-axis.
         /// </summary>
@@ -29,10 +44,9 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             if (Camera.main != null)
             {
-                parentTransform = transform.parent;
                 // Set the new position of the board
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                plane.Raycast(ray, out float enter);
+                floor.Raycast(ray, out float enter);
                 Vector3 enterPoint = ray.GetPoint(enter);
                 Vector3 newPosition = Vector3.zero;
                 newPosition.x = enterPoint.x;
@@ -53,10 +67,11 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            parentTransform = transform.parent;
-            new MoveBoardNetAction(
+            new MoveBoardAction(
                 parentTransform.GetComponent<WidgetsManager>().GetTitle(),
+                oldPosition,
                 parentTransform.position,
+                oldRotation,
                 parentTransform.rotation)
                 .Execute();
         }

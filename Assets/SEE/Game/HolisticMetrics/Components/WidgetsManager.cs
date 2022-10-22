@@ -101,7 +101,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// Adds the desired widget to the board.
         /// </summary>
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
-        internal void Create(WidgetConfiguration widgetConfiguration)
+        internal void Create(WidgetConfig widgetConfiguration)
         {
             GameObject widget = Array.Find(widgetPrefabs,
                 element => element.name.Equals(widgetConfiguration.WidgetName));

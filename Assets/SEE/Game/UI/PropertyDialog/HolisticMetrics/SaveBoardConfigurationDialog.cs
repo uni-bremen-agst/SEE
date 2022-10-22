@@ -72,8 +72,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void SaveBoardConfiguration()
         {
-            WidgetsManager boardsManager = BoardsManager.GetWidgetsManager(selectedBoard.Value);
-            ConfigurationManager.SaveBoard(boardsManager, fileName.Value);
+            WidgetsManager boardsManager = BoardsManager.Find(selectedBoard.Value);
+            ConfigManager.SaveBoard(boardsManager, fileName.Value);
             EnableKeyboardShortcuts();
         }
 

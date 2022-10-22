@@ -26,7 +26,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// expect it to only contain the name so far. In this component, the position will be added to it. Then we will
         /// pass it on to the rotation dialog where the rotation will be added.
         /// </summary>
-        private static BoardConfiguration boardConfiguration;
+        private static BoardConfig boardConfiguration;
 
         /// <summary>
         /// This is only used to know the height at which to create the new board, because the prefab has a certain
@@ -38,7 +38,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This sets up all BoardAdders when they are added to the scene to position a new metrics board.
         /// </summary>
         /// <param name="boardConfigurationReference"></param>
-        internal static void Setup(BoardConfiguration boardConfigurationReference)
+        internal static void Setup(BoardConfig boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;
             boardPrefab = Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");

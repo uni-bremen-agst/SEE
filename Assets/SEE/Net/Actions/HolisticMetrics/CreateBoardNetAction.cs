@@ -11,15 +11,15 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// The board configuration of the new board.
         /// </summary>
-        public BoardConfiguration BoardConfiguration;
+        public BoardConfig BoardConfig;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="boardConfiguration">The configuration of the board to add.</param>
-        public CreateBoardNetAction(BoardConfiguration boardConfiguration)
+        /// <param name="boardConfig">The configuration of the board to add.</param>
+        public CreateBoardNetAction(BoardConfig boardConfig)
         {
-            BoardConfiguration = boardConfiguration;
+            BoardConfig = boardConfig;
         }
         
         /// <summary>
@@ -37,7 +37,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                BoardsManager.Create(BoardConfiguration);   
+                BoardsManager.Create(BoardConfig);   
             }
         }
     }
