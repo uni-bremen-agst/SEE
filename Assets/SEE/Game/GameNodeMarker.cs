@@ -1,12 +1,18 @@
 using UnityEngine;
 
 /// <summary>
-/// Class for creating markers above nodes when using the "Mark Node" action
+/// Class for creating markers above nodes when using the "Mark Node" action.
 /// </summary>
 namespace SEE.Game
 {
     public static class GameNodeMarker
     {
+        /// <summary>
+        /// Creates a marker above a node.
+        /// </summary>
+        /// <param name="parent">The game node which is to be marked.</param>
+        /// <param name="position">The position of the game node which is to be marked.</param>
+        /// <param name="worldSpaceScale">The size of the node which is to be marked.</param>
         public static GameObject CreateMarker(GameObject parent, Vector3 position, Vector3 worldSpaceScale)
         {
             // Create sphere gameobject
