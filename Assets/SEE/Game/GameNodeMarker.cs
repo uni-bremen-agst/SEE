@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Class for creating markers above nodes when using the "Mark Node" action
+/// </summary>
 namespace SEE.Game
 {
     public static class GameNodeMarker
