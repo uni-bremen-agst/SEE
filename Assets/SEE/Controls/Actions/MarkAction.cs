@@ -25,8 +25,8 @@ namespace SEE.Controls.Actions
         public override HashSet<string> GetChangedObjects() =>
             new HashSet<string>(markedNodes.Select(x => x.Item1.ID()).ToList());
 
-        private const string MARKER_NAME_SUFFIX = "-MARKED";
-        
+        internal static string MARKER_NAME_SUFFIX = "-MARKED";
+
         // Tuple for marked nodes (node, markerSphere)
         private List<(GameObject, GameObject)> markedNodes = new List<(GameObject, GameObject)>();
 
@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             var lastAction = undoMarkers.Pop();
-            
+
             // Properly also redundant but also just to make sure. 
             doCleanUpUndoNextTime = true;
 
@@ -112,7 +112,7 @@ namespace SEE.Controls.Actions
             else
             {
                 GameObject node = lastAction.Item1;
-                string sphereTag = node.tag += MARKER_NAME_SUFFIX;
+                string sphereTag = node.name += MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
                 marker.name = sphereTag;
                 markedNodes.Add((node, marker));
@@ -132,9 +132,10 @@ namespace SEE.Controls.Actions
         /// <returns></returns>
         private bool IsNodeMarked(GameObject node)
         {
-            foreach (var i in markedNodes)
+            for (int i = 0; i < node.transform.childCount; i++)
             {
-                if (i.Item1 == node)
+                // When a the child has the tag -MARKED
+                if (node.transform.GetChild(i).name.EndsWith(MARKER_NAME_SUFFIX))
                 {
                     return true;
                 }
@@ -164,7 +165,8 @@ namespace SEE.Controls.Actions
         /// Returns the Marker sphere of a node
         /// </summary>
         /// <param name="node"></param>
-        /// <returns></returns>
+        /// <returns>The marker object of the node.
+        /// Can be null</returns>
         private GameObject GetMarkerOfNode(GameObject node)
         {
             for (int i = 0; i < node.transform.childCount; i++)
@@ -174,14 +176,6 @@ namespace SEE.Controls.Actions
                     return node.transform.GetChild(i).gameObject;
                 }
             }
-            /*
-            foreach (var i in markedNodes)
-            {
-                if (i.Item1 == node)
-                {
-                    return i.Item2;
-                }
-            }*/
 
             return null;
         }
@@ -214,16 +208,18 @@ namespace SEE.Controls.Actions
                     doCleanUpUndoNextTime = false;
                 }
 
+                // When the clicked node wasn't marked until now
                 if (!IsNodeMarked(cnode))
                 {
                     // Extract the code city node.
-                    string sphereTag = cnode.tag += MARKER_NAME_SUFFIX;
+                    string sphereTag = cnode.name += MARKER_NAME_SUFFIX;
                     GameObject marker = GameNodeMarker.CreateMarker(cnode);
                     marker.name = sphereTag;
                     markedNodes.Add((cnode, marker));
 
                     undoMarkers.Push((marker, true));
                 }
+                // When the clicked node was already marked
                 else
                 {
                     GameObject marker = GetMarkerOfNode(cnode) ??
