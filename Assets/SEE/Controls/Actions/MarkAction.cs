@@ -1,16 +1,16 @@
-using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Action to highlight a node for a selected city.
+/// </summary>
 namespace SEE.Controls.Actions
 {
-    /// <summary>
-    /// Action to highlight a node for a selected city.
-    /// </summary>
     internal class MarkAction : AbstractPlayerAction
     {
 
@@ -54,22 +54,22 @@ namespace SEE.Controls.Actions
             return CreateReversibleAction();
         }
 
+        /// <summary>
+        /// Repeated once every frame. Executes the mark node action if a node is selected.
+        /// </summary>
+        /// <returns>True if the action was executed, false otherwise.</returns>
         public override bool Update()
         {
-            bool result = false;
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
-                // the hit object is the parent in which to create the new node
+                // the hit object is the parent in which to create the marker
                 GameObject parent = raycastHit.collider.gameObject;
-                // The position at which the parent was hit will be the center point of the new node
-                Vector3 position = parent.transform.position;
-                marker = GameNodeMarker.CreateMarker(parent, position: position, worldSpaceScale: parent.transform.lossyScale);
+                marker = GameNodeMarker.CreateMarker(parent);
                 if (marker != null)
                 {
-                    memento = new Memento(parent, position: position, scale: marker.transform.lossyScale);
-                    new MarkNetAction(parentID: memento.Parent.name, memento.Position, memento.Scale).Execute();
-                    result = true;
+                    memento = new Memento(parent);
+                    new MarkNetAction(parentID: memento.Parent.name).Execute();
                     currentState = ReversibleAction.Progress.Completed;
                 }
                 else
@@ -77,7 +77,7 @@ namespace SEE.Controls.Actions
                     Debug.LogError($"Marker could not be created.\n");
                 }
             }
-            return result;
+            return currentState.Equals(ReversibleAction.Progress.Completed);
         }
 
         /// <summary>
@@ -100,10 +100,10 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            marker = GameNodeMarker.CreateMarker(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
+            marker = GameNodeMarker.CreateMarker(memento.Parent);
             if (marker != null)
             {
-                new MarkNetAction(parentID: memento.Parent.name, memento.Position, memento.Scale).Execute();
+                new MarkNetAction(parentID: memento.Parent.name).Execute();
             }
         }
 
@@ -127,26 +127,12 @@ namespace SEE.Controls.Actions
             public readonly GameObject Parent;
 
             /// <summary>
-            /// The position of the new node in world space.
-            /// </summary>
-            public readonly Vector3 Position;
-
-            /// <summary>
-            /// The scale of the new node in world space.
-            /// </summary>
-            public readonly Vector3 Scale;
-
-            /// <summary>
             /// Constructor setting the information necessary to re-do this action.
             /// </summary>
             /// <param name="parent">parent of the marker</param>
-            /// <param name="position">position of the marker in world space</param>
-            /// <param name="scale">scale of the marker in world space</param>
-            public Memento(GameObject parent, Vector3 position, Vector3 scale)
+            public Memento(GameObject parent)
             {
                 Parent = parent;
-                Position = position;
-                Scale = scale;
             }
         }
     }

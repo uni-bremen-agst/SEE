@@ -1,8 +1,10 @@
 using SEE.Game;
-using SEE.Net;
 using UnityEngine;
 
-namespace SEE.Net
+/// <summary>
+/// Executes the mark node action on remote clients
+/// </summary>
+namespace SEE.Net.Actions
 {
     public class MarkNetAction : AbstractNetAction
     {
@@ -16,32 +18,19 @@ namespace SEE.Net
         public string ParentID;
 
         /// <summary>
-        /// The position of the marker's parent.
-        /// </summary>
-        public Vector3 Position;
-
-        /// <summary>
-        /// The scale of the marker's parent.
-        /// </summary>
-        public Vector3 Scale;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="parentID">unique ID of the parent which to highlight</param>
-        /// <param name="position">the position for the marker</param>
-        /// <param name="scale">the scale of the marker in world space</param>
         public MarkNetAction
-            (string parentID,
-             Vector3 position,
-             Vector3 scale)
+            (string parentID)
             : base()
         {
             this.ParentID = parentID;
-            this.Position = position;
-            this.Scale = scale;
         }
 
+        /// <summary>
+        /// Executes the mark node action on remote clients
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -51,7 +40,7 @@ namespace SEE.Net
                 {
                     throw new System.Exception($"There is no node with the ID {ParentID}.");
                 }
-                GameNodeMarker.CreateMarker(parent, Position, Scale);
+                GameNodeMarker.CreateMarker(parent);
             }
         }
 
@@ -61,8 +50,6 @@ namespace SEE.Net
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            // intentionally left empty
         }
-
     }
 }
