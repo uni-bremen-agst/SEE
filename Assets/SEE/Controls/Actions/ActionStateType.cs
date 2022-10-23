@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
             new ActionStateType(10, "Mark", "Mark a block",
                         Color.cyan.Darker(), "Materials/ModernUIPack/Eye",
                         MarkAction.CreateReversibleAction);
-        // todo add icon for mark
+        // TODO: add icon for mark
         #endregion
 
         /// <summary>

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Creates a marker above a selected node
+/// Class for creating markers above nodes when using the "Mark Node" action.
 /// </summary>
 namespace SEE.Game
 {

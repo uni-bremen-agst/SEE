@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogError($"Marker could not be created.\n");
+                    Debug.LogError("Marker could not be created.\n");
                 }
             }
             return currentState.Equals(ReversibleAction.Progress.Completed);
