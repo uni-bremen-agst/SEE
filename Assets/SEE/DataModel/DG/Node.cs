@@ -619,6 +619,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// True if node is already marked.
+        /// TODO Fix error in which only new nodes can be marked.
+        /// </summary>
+        private bool isMarked = false;
+        public bool IsMarked   // property
+        {
+            get =>  isMarked;    // get method
+            set => isMarked = value;   // set method
+        }
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
         /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
