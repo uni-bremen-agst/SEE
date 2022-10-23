@@ -69,16 +69,15 @@ namespace SEE.Game
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.name = markID;
 
-            // parents the sphere to the node
+            // moves the sphere on top of the marked object
+            Vector3 lossyScale = node.transform.lossyScale;
+            sphere.transform.position = node.transform.position + new Vector3(0, lossyScale.y/2, 0);
+            
+            // sets the sphere size to minimum of the width and depth of the node
+            float diameter = Mathf.Min(lossyScale.x, lossyScale.z);
+            sphere.transform.localScale = new Vector3(diameter, diameter, diameter);
+            
             sphere.transform.SetParent(node.transform);
-            // FIXME: sphere position
-            Vector3 lossyScale = node.transform.lossyScale / 2;
-            sphere.transform.position = node.transform.position + new Vector3(lossyScale.x, lossyScale.y, lossyScale.z);
-            // FIXME: sphere size
-            Vector3 localScale = node.transform.localScale;
-            float radius = Mathf.Min(localScale.x, localScale.z);
-            sphere.transform.localScale = new Vector3(radius, radius, radius);
-
             sphere.SetColor(node.GetColor().Darker());
 
             // stores that marked node
