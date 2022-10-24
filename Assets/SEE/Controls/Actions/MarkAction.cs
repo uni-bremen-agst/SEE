@@ -12,10 +12,9 @@ namespace SEE.Controls.Actions
 {
     internal class NodeNotFoundException : Exception
     {
-        
     }
-    
-    ///
+
+
     /// <summary>
     /// Author: Hannes Kuss
     /// 
@@ -51,13 +50,9 @@ namespace SEE.Controls.Actions
         // Is set, when the undo/redo stack should be cleaned up next time
         private bool doCleanUpUndoNextTime;
 
-        private (GameObject, bool) lastA;
-        
         public static MarkAction CreateMarkAction() => new MarkAction();
 
         public static ReversibleAction CreateReversibleAction()
-        {
-            return new MarkAction();
         }
 
         public override void Undo()
@@ -133,16 +128,10 @@ namespace SEE.Controls.Actions
             }
         }
 
-        public override ActionStateType GetActionStateType()
-        {
-            throw new System.NotImplementedException();
-        }
+        public override ActionStateType GetActionStateType() => ActionStateType.MarkNode;
 
-        public override ReversibleAction NewInstance()
-        {
-            throw new System.NotImplementedException();
-        }
-        
+        public override ReversibleAction NewInstance() => new MarkAction();
+
         /// <summary>
         /// Checks if a node is marked
         /// </summary>
@@ -150,9 +139,10 @@ namespace SEE.Controls.Actions
         /// <returns></returns>
         private bool IsNodeMarked(GameObject node)
         {
-            foreach (var i in markedNodes)
+            for (int i = 0; i < node.transform.childCount; i++)
             {
-                if (i.Item1 == node)
+                // When a the child has the tag -MARKED
+                if (node.transform.GetChild(i).name.EndsWith(MARKER_NAME_SUFFIX))
                 {
                     return true;
                 }
@@ -161,6 +151,12 @@ namespace SEE.Controls.Actions
             return false;
         }
 
+        /// <summary>
+        /// Removes a node from the marked list if the node exists and was marked.
+        ///
+        /// The marker sphere is untouched in this method.
+        /// </summary>
+        /// <param name="node">The node you want to remove</param>
         private void RemoveNodeFromMarked(GameObject node)
         {
             foreach (var i in markedNodes)
@@ -172,13 +168,19 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Returns the Marker sphere of a node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns>The marker object of the node.
+        /// Can be null</returns>
         private GameObject GetMarkerOfNode(GameObject node)
         {
-            foreach (var i in markedNodes)
+            for (int i = 0; i < node.transform.childCount; i++)
             {
-                if (i.Item1 == node)
+                if (node.transform.GetChild(i).name.EndsWith("MARKED"))
                 {
-                    return i.Item2;
+                    return node.transform.GetChild(i).gameObject;
                 }
             }
 
@@ -189,6 +191,18 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             var ret = true;
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    Redo();
+                }
+                else
+                {
+                    Undo();
+                }
+            }
+
             // When the user clicks the left mouse button and is pointing to a node
             if (Input.GetMouseButtonDown(0) &&
                 Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) ==
@@ -196,25 +210,34 @@ namespace SEE.Controls.Actions
             {
                 GameObject cnode = raycastHit.collider.gameObject;
 
+                if (doCleanUpUndoNextTime)
+                {
+                    undoMarkers.Clear();
+                    redoMarkers.Clear();
+                    doCleanUpUndoNextTime = false;
+                }
+
+                // When the clicked node wasn't marked until now
                 if (!IsNodeMarked(cnode))
                 {
                     currentState = ReversibleAction.Progress.Completed;
                     // Extract the code city node.
-                    string sphereTag = cnode.tag += "-MARKED";
+                    string sphereTag = cnode.name += MARKER_NAME_SUFFIX;
                     GameObject marker = GameNodeMarker.CreateMarker(cnode);
                     marker.name = sphereTag;
                     markedNodes.Add((cnode, marker));
-                    lastA = (cnode, true);
-                    this.undoMarkers.Push((cnode, true));
+
+                    undoMarkers.Push((cnode, true));
                 }
-                }
+                // When the clicked node was already marked
                 else
                 {
-                    currentState = ReversibleAction.Progress.Completed;
                     GameObject marker = GetMarkerOfNode(cnode) ??
                                         throw new ArgumentNullException("GetMarkerOfNode(cnode)");
                     Destroyer.DestroyGameObject(marker);
                     RemoveNodeFromMarked(cnode);
+
+                    undoMarkers.Push((cnode, false));
                 }
             }
 
