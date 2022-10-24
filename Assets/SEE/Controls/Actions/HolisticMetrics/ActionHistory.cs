@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace SEE.Controls.Actions.HolisticMetrics
 {
     /// <summary>

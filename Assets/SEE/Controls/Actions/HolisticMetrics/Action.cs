@@ -17,14 +17,6 @@ namespace SEE.Controls.Actions.HolisticMetrics
         internal Action Child;
 
         /// <summary>
-        /// Whenever a new action is created,
-        /// </summary>
-        internal Action()
-        {
-            ActionHistory.Add(this);
-        }
-
-        /// <summary>
         /// Executes this action and adds it to the history. This should be called when executing the action for the
         /// first time.
         /// </summary>

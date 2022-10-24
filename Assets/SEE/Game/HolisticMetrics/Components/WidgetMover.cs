@@ -25,18 +25,11 @@ namespace SEE.Game.HolisticMetrics.Components
         private Plane plane;
 
         /// <summary>
-        /// The parent transform of this component.
-        /// </summary>
-        private Transform parentTransform;
-
-        /// <summary>
         /// Initializes some fields.
         /// </summary>
         private void Start()
         {
-            parentTransform = transform.parent;
-            boardName = parentTransform.GetComponent<WidgetsManager>().GetTitle();
-            enabled = false;
+            boardName = transform.parent.GetComponent<WidgetsManager>().GetTitle();
         }
         
         /// <summary>
@@ -47,7 +40,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             oldPosition = transform.position;
             oldLocalPosition = transform.localPosition;
-            plane = new Plane(parentTransform.forward, parentTransform.position);
+            plane = new Plane(transform.parent.forward, transform.parent.position);
         }
 
         /// <summary>
