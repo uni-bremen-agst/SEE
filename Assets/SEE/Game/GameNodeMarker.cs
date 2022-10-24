@@ -10,15 +10,10 @@ using UnityEngine;
 
 namespace SEE.Game
 {
-
     public static class GameNodeMarker 
     {
-
-
-        
         public static GameObject addSphere(GameObject parent, Vector3 position, Vector3 worldSpaceScale)
         {
-
             GameObject sphere;
             
             if(parent == null)
@@ -32,18 +27,15 @@ namespace SEE.Game
             else
             {
                 sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere.transform.localScale = new Vector3(0.2f * worldSpaceScale.x, 0.2f * worldSpaceScale.y, 0.2f * worldSpaceScale.z);
+                float diameter = Math.Min(worldSpaceScale.x, worldSpaceScale.y);
+                sphere.transform.localScale = new Vector3(diameter, diameter, diameter);
                 sphere.transform.position = new Vector3(position.x, position.y + 0.1f, position.z);
                 sphere.transform.SetParent(parent.gameObject.transform);
                 sphere.GetComponent<Renderer>().material.color = Color.red;
             }
-
             return sphere;
-
         }
-
-
-
+        
         private static bool deleteExistingSphere(GameObject parent)
         {
             for (int i = 0; i <= parent.transform.childCount - 1; i++)
@@ -54,7 +46,6 @@ namespace SEE.Game
                     return true;
                 }
             }
-
             return false;
         }
     }
