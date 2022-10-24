@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
+using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
@@ -14,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.Components
     /// <summary>
     /// This class manages a holistic metrics board.
     /// </summary>
-    internal class WidgetsManager : MonoBehaviour
+    internal class WidgetsManager : MonoBehaviour, IObserver<GraphEvent>
     {
         /// <summary>
         /// This contains references to all widgets on the board each represented by one WidgetController and one
@@ -57,6 +58,8 @@ namespace SEE.Game.HolisticMetrics.Components
         private static Sprite houseIcon;
 
         [SerializeField] private GameObject boardMover;
+
+        private IDisposable graphUnsubscriber;
         
         /// <summary>
         /// Instantiates the metricTypes and widgetPrefabs arrays.
@@ -76,6 +79,8 @@ namespace SEE.Game.HolisticMetrics.Components
             citySelection.dropdownEvent.AddListener(Redraw);
             citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
+            
+            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
         }
         
         /// <summary>
@@ -208,7 +213,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <returns>The currently selected code city</returns>
         private SEECity GetSelectedCity()
         {
-            var selectedCity = cities.FirstOrDefault(city => city.name.Equals(citySelection.selectedText.text));
+            SEECity selectedCity = cities.FirstOrDefault(city => city.name.Equals(citySelection.selectedText.text));
             if (selectedCity is null)
             {
                 // This should not be possible, so throw an exception if this happens.
@@ -244,8 +249,12 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="itemIndex">The index of the dropdown item that is now selected</param>
         private void CitySelectionChanged(int itemIndex)
         {
-            string cityName = GetSelectedCity().name;
+            SEECity selectedCity = GetSelectedCity();
+            string cityName = selectedCity.name;
             new SwitchCityNetAction(title, cityName).Execute();
+            Redraw();  // TODO: Test if this is necessary
+            graphUnsubscriber.Dispose();
+            graphUnsubscriber = selectedCity.LoadedGraph.Subscribe(this);
         }
 
         /// <summary>
@@ -274,6 +283,10 @@ namespace SEE.Game.HolisticMetrics.Components
             
             // Redraw the board
             Redraw();
+            
+            // Start listening to changes in the newly selected city
+            graphUnsubscriber.Dispose();
+            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
         }
 
         /// <summary>
@@ -292,6 +305,33 @@ namespace SEE.Game.HolisticMetrics.Components
                 // Display the new value on the widget
                 tuple.Item1.Display(metricValue);
             }
+        }
+
+        /// <summary>
+        /// This method does nothing. It is only here because it has to be because we implement the IObserver interface.
+        /// </summary>
+        public void OnCompleted()
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// This method does nothing. It is only here because it has to be because we implement the IObserver interface.
+        /// </summary>
+        /// <param name="error"></param>
+        public void OnError(Exception error)
+        {
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// This method is called when a new GraphEvent occurs on the graph we currently display with this board. It
+        /// will trigger that the metrics get recalculated.
+        /// </summary>
+        /// <param name="value">The GraphEvent that occured. This is not being used.</param>
+        public void OnNext(GraphEvent value)
+        {
+            Redraw();
         }
     }
 }

@@ -172,9 +172,9 @@ namespace SEE.Game.HolisticMetrics
             widgetsMovingEnabled = !widgetsMovingEnabled;
             foreach (WidgetsManager manager in widgetsManagers)
             {
-                manager.ToggleWidgetsMoving(movingEnabled);
+                manager.ToggleWidgetsMoving(widgetsMovingEnabled);
             }
-            return movingEnabled;
+            return widgetsMovingEnabled;
         }
 
         /// <summary>
