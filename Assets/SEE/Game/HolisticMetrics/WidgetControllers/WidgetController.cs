@@ -34,14 +34,16 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The MetricValue to display</param>
         internal abstract void Display(MetricValue metricValue);
 
-        private void Start()
-        {
-            mover = gameObject.AddComponent<WidgetMover>();
-        }
-
         internal void ToggleMoving(bool enable)
         {
-            mover.enabled = enable;
+            if (enable)
+            {
+                mover = gameObject.AddComponent<WidgetMover>();
+            }
+            else
+            {
+                Destroy(mover);
+            }
         }
     }
 }
