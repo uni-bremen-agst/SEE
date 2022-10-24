@@ -1,3 +1,5 @@
+using SEE.Controls.Actions;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -25,6 +27,28 @@ namespace SEE.Game
             newSphere.transform.localPosition = new Vector3(0, yOffset, 0);
             newSphere.transform.localScale = Vector3.one;
             return newSphere;
+        }
+
+        /// <summary>
+        /// Deletes a marker sphere if it's exists
+        /// </summary>
+        /// <param name="node">The node which marker should be deleted</param>
+        /// <returns>Returns true if the passed node has a marker sphere. Otherwise false</returns>
+        public static bool RemoveMarker(GameObject node)
+        {
+            var nodeTran = node.transform;
+            for (int i = 0; i < nodeTran.childCount; i++)
+            {
+                GameObject markerCanidate = nodeTran.GetChild(i).gameObject;
+                // If the child is a marker sphere
+                if (markerCanidate.tag.EndsWith(MarkAction.MARKER_NAME_SUFFIX))
+                {
+                    Destroyer.DestroyGameObject(markerCanidate);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
