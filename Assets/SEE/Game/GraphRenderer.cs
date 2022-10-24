@@ -416,7 +416,7 @@ namespace SEE.Game
                 }
             }
             
-            BoardsManager.OnGraphLoad();
+            BoardsManager.OnGraphDraw();
         }
 
         /// <summary>
