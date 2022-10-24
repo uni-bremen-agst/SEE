@@ -68,13 +68,6 @@ namespace SEE.Controls.Actions
             internal readonly NodeRef node;
         }
 
-        /// <summary>
-        /// The number of degrees in a full circle.
-        /// </summary>
-        private const float FullCircleDegree = 360.0f;
-
-        private const float SnapStepCount = 8;
-        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
         private const float MIN_SPLINE_OFFSET = 0.05f;
         private const float SPLINE_ANIMATION_DURATION = 2f;
         private const bool FOLLOW_RAYCAST_HIT = false;
@@ -379,16 +372,14 @@ namespace SEE.Controls.Actions
                 {
                     if (hit.HoveredObject != cityRootNode)
                     {
-                        // TODO: Adjust for snapping
                         // FIXME: Position is not exact depending on scale. Needs to be reworked.
-
-                        //{
-                        //    // FIXME: HIER WEITER
-                        //    Vector3 newPosition = FOLLOW_RAYCAST_HIT && raycastHit?.point != null ? raycastHit.Value.point : dragStartTransformPosition + totalDragOffsetFromStart;
-                        //    ResetHitObjectColor();
-                        //    nodeOperator.MoveXTo(newPosition.x, 0);
-                        //    nodeOperator.MoveZTo(newPosition.z, 0);
-                        //}
+                        {
+                            Vector3 totalDragOffsetFromStart = Vector3.zero; // FIXME
+                            Vector3 newPosition = FOLLOW_RAYCAST_HIT && raycastHit?.point != null ? raycastHit.Value.point : dragStartTransformPosition + totalDragOffsetFromStart;
+                            ResetHitObjectColor();
+                            nodeOperator.MoveXTo(newPosition.x, 0);
+                            nodeOperator.MoveZTo(newPosition.z, 0);
+                        }
                         gizmo.SetPositions(dragStartTransformPosition + dragStartOffset, hit.HoveredObject.position);
 
                         if (raycastHit.HasValue)
