@@ -18,13 +18,22 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Author: Hannes Kuss
     /// 
-    /// An action for selecting nodes in a code-city.  
+    /// An action for selecting nodes in a code-city.
+    ///
+    /// The selected node are marked with a unity-primitive node.
+    /// The marked nodes can also be deselected with another click.
+    ///
+    ///
+    /// The Action should also keep full track of the users interactions.
+    /// So all actions can be undone/redone
     /// </summary>
     public class MarkAction : AbstractPlayerAction
     {
         public override HashSet<string> GetChangedObjects() =>
             new HashSet<string>(markedNodes.Select(x => x.Item1.ID()).ToList());
 
+        // Internal visibility because GameNodeMarker also uses it.
+        // This suffix is appended to all node markers GameObject names
         internal static string MARKER_NAME_SUFFIX = "-MARKED";
 
         // Tuple for marked nodes (node, markerSphere)
@@ -190,8 +199,10 @@ namespace SEE.Controls.Actions
                 {
                     Redo();
                 }
-
-                Undo();
+                else
+                {
+                    Undo();
+                }
             }
 
             // When the user clicks the left mouse button and is pointing to a node
@@ -217,7 +228,7 @@ namespace SEE.Controls.Actions
                     marker.name = sphereTag;
                     markedNodes.Add((cnode, marker));
 
-                    undoMarkers.Push((marker, true));
+                    undoMarkers.Push((cnode, true));
                 }
                 // When the clicked node was already marked
                 else
@@ -226,6 +237,8 @@ namespace SEE.Controls.Actions
                                         throw new ArgumentNullException("GetMarkerOfNode(cnode)");
                     Destroyer.DestroyGameObject(marker);
                     RemoveNodeFromMarked(cnode);
+
+                    undoMarkers.Push((cnode, false));
                 }
             }
 

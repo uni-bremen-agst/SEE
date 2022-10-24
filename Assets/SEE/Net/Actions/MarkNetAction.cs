@@ -26,7 +26,10 @@ namespace SEE.Net.Actions
             {
                 GameNodeMarker.CreateMarker(Node);
             }
-            throw new System.NotImplementedException();
+            else
+            {
+                GameNodeMarker.RemoveMarker(Node);
+            }
         }
     }
 }
