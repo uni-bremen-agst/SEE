@@ -146,11 +146,11 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Updates all the widgets on all the metrics boards.
         /// </summary>
-        internal static void OnGraphLoad()
+        internal static void OnGraphDraw()
         {
-            foreach (WidgetsManager boardController in widgetsManagers)
+            foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
-                boardController.Redraw();
+                widgetsManager.OnGraphDraw();
             }
         }
 

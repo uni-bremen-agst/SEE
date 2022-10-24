@@ -18,6 +18,17 @@ namespace SEE.Game.HolisticMetrics.Components
     internal class WidgetsManager : MonoBehaviour, IObserver<GraphEvent>
     {
         /// <summary>
+        /// The dropdown UI element that allows the player to select a code city for which the metrics should be
+        /// displayed.
+        /// </summary>
+        [SerializeField] private CustomDropdown citySelection;
+
+        /// <summary>
+        /// The game object that can be clicked to move the board around.
+        /// </summary>
+        [SerializeField] private GameObject boardMover;
+        
+        /// <summary>
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
         /// </summary>
@@ -41,12 +52,6 @@ namespace SEE.Game.HolisticMetrics.Components
         private GameObject[] widgetPrefabs;
 
         /// <summary>
-        /// The dropdown UI element that allows the player to select a code city for which the metrics should be
-        /// displayed.
-        /// </summary>
-        [SerializeField] private CustomDropdown citySelection;
-
-        /// <summary>
         /// The array of code cities in the scene. This is needed because the player can select which code city's
         /// metrics will be displayed on each board.
         /// </summary>
@@ -57,8 +62,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private static Sprite houseIcon;
 
-        [SerializeField] private GameObject boardMover;
-
+        /// <summary>
+        /// This will be used to unsubscribe from the graph we currently listen to.
+        /// </summary>
         private IDisposable graphUnsubscriber;
         
         /// <summary>
@@ -253,7 +259,7 @@ namespace SEE.Game.HolisticMetrics.Components
             string cityName = selectedCity.name;
             new SwitchCityNetAction(title, cityName).Execute();
             Redraw();  // TODO: Test if this is necessary
-            graphUnsubscriber.Dispose();
+            graphUnsubscriber?.Dispose();
             graphUnsubscriber = selectedCity.LoadedGraph.Subscribe(this);
         }
 
@@ -285,17 +291,27 @@ namespace SEE.Game.HolisticMetrics.Components
             Redraw();
             
             // Start listening to changes in the newly selected city
-            graphUnsubscriber.Dispose();
+            graphUnsubscriber?.Dispose();
             graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
         }
 
+        /// <summary>
+        /// This method will be called when a graph has been drawn. In that case, we want to subscribe to that graph.
+        /// </summary>
+        internal void OnGraphDraw()
+        {
+            graphUnsubscriber?.Dispose();
+            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
+            Redraw();
+        }
+        
         /// <summary>
         /// Whenever a code city changes, this method needs to be called. It will call the Refresh() methods of all
         /// Metrics and display the results on the widgets.
         /// </summary>
         /// <param name="index">This parameter will be passed to the method by the dropdown when it is being clicked,
         /// but it is not used and can be ignored when manually calling the method.</param>
-        internal void Redraw(int index = -1)
+        private void Redraw(int index = -1)
         {
             foreach ((WidgetController, Metric) tuple in widgets)
             {
