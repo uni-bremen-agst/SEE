@@ -144,6 +144,20 @@ namespace SEE.Utils
         private Stack<ReversibleAction> RedoHistory { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
+        /// Whether to synchronize the action history over the network.
+        /// </summary>
+        private readonly bool SyncOverNetwork;
+
+        /// <summary>
+        /// Creates a new <see cref="ActionHistory"/> instance.
+        /// </summary>
+        /// <param name="syncOverNetwork">whether to synchronize the action history over the network</param>
+        public ActionHistory(bool syncOverNetwork = true)
+        {
+            SyncOverNetwork = syncOverNetwork;
+        }
+
+        /// <summary>
         /// Checks the invariant that the <see cref="UndoHistory"/> has at most
         /// one action with progress state <see cref="ReversibleAction.Progress.NoEffect"/>
         /// and this action is at the top of <see cref="UndoHistory"/>.
@@ -218,7 +232,10 @@ namespace SEE.Utils
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
-            new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
+            if (SyncOverNetwork)
+            {
+                new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
+            }
         }
 
         /// <summary>
@@ -231,7 +248,10 @@ namespace SEE.Utils
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
         {
             RemoveAction(action.ActionID);
-            new NetActionHistory().Delete(action.ActionID);
+            if (SyncOverNetwork)
+            {
+                new NetActionHistory().Delete(action.ActionID);
+            }
         }
 
         /// <summary>
@@ -245,7 +265,10 @@ namespace SEE.Utils
             {
                 if (globalHistory[i].IsOwner && globalHistory[i].ActionType == HistoryType.UndoneAction)
                 {
-                    new NetActionHistory().Delete(globalHistory[i].ActionID);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Delete(globalHistory[i].ActionID);
+                    }
                     globalHistory.RemoveAt(i);
                     i--;
                 }
@@ -283,7 +306,7 @@ namespace SEE.Utils
         public void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
             globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
-            if (!isNetwork)
+            if (!isNetwork && SyncOverNetwork)
             {
                 new NetActionHistory().Replace(oldItem.ActionID, oldItem.ActionType, oldItem.ChangedObjects,
                                                newItem.ActionType, newItem.ChangedObjects);
@@ -408,7 +431,10 @@ namespace SEE.Utils
 
                     GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                     Push(undoneAction);
-                    new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                    }
                 }
                 // current has been undone and moved on the RedoStack.
                 // We will resume with the next top-element of the stack that
@@ -462,9 +488,15 @@ namespace SEE.Utils
                 {
                     GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                     RemoveAction(lastUndoneAction.ActionID);
-                    new NetActionHistory().Delete(lastUndoneAction.ActionID);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Delete(lastUndoneAction.ActionID);
+                    }
                     Push(redoneAction);
-                    new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                    }
                 }
             }
         }
