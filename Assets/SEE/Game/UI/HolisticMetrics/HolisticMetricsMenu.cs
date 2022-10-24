@@ -106,6 +106,12 @@ namespace SEE.Game.UI.HolisticMetrics
                     entryColor: Color.green.Darker(),
                     icon: Resources.Load<Sprite>("Materials/ModernUIPack/Plus")),
                 new MenuEntry(
+                    action: MoveWidgets,
+                    title: "Move widgets",
+                    description: "Widgets can be dragged around (or deactivates this)",
+                    entryColor: Color.yellow,
+                    icon: Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI")),
+                new MenuEntry(
                     action: RemoveWidget,
                     title: "Remove widget",
                     description: "Remove a widget from a board",
@@ -222,6 +228,19 @@ namespace SEE.Game.UI.HolisticMetrics
                 ShowNotification.Warn(
                     "No boards in the scene",
                     "There are no metrics boards on which you could add a widget");
+            }
+        }
+
+        private void MoveWidgets()
+        {
+            menu.ToggleMenu();
+
+            if (BoardsManager.ToggleWidgetsMoving())
+            {
+                ShowNotification.Info(
+                    "Click hold widget",
+                    "Click and hold on a widget, then move the cursor to move the widget. Don't" +
+                    " forget to deactivate this move when done.");
             }
         }
 

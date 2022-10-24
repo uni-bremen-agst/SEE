@@ -132,6 +132,20 @@ namespace SEE.Game.HolisticMetrics.Components
         }
 
         /// <summary>
+        /// Moves a widget to a new position.
+        /// </summary>
+        /// <param name="widgetID">The ID of the widget to move</param>
+        /// <param name="position">The position to which the widget should be moved</param>
+        internal void Move(Guid widgetID, Vector3 position)
+        {
+            WidgetController controller = 
+                widgets
+                .Find(widget => widget.Item1.ID.Equals(widgetID))
+                .Item1;
+            controller.transform.position = position;
+        }
+        
+        /// <summary>
         /// Adds a WidgetDeleter component to all widgets managed by this manager.
         /// </summary>
         internal void AddWidgetDeleters()
@@ -209,6 +223,18 @@ namespace SEE.Game.HolisticMetrics.Components
         internal void ToggleMoving(bool enable)
         {
             boardMover.SetActive(enable);
+        }
+
+        /// <summary>
+        /// This method can be invoked to toggle the move-ability of the widgets.
+        /// </summary>
+        /// <param name="enable">Whether or not the widgets should be move-able now</param>
+        internal void ToggleWidgetsMoving(bool enable)
+        {
+            foreach ((WidgetController, Metric) widget in widgets)
+            {
+                widget.Item1.ToggleMoving(enable);
+            }
         }
 
         /// <summary>

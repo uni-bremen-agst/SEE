@@ -1,7 +1,6 @@
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
-using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -20,8 +19,8 @@ namespace SEE.Game.HolisticMetrics.Components
         private static bool deletionDone;
 
         /// <summary>
-        /// Sets the deletionDone field to false so the WidgetDeleters won't delete themselves at the next Update()
-        /// step.
+        /// Sets the deletionDone field to false so the WidgetDeleter instances won't delete themselves at the next
+        /// Update() step.
         /// </summary>
         internal static void Setup()
         {

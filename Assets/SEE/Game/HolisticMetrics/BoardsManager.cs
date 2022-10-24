@@ -24,6 +24,11 @@ namespace SEE.Game.HolisticMetrics
         private static bool movingEnabled;
 
         /// <summary>
+        /// This field remembers whether or not the widgets can be moved currently.
+        /// </summary>
+        private static bool widgetsMovingEnabled;
+
+        /// <summary>
         /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the
         /// scene that are not in this list).
         /// </summary>
@@ -160,6 +165,16 @@ namespace SEE.Game.HolisticMetrics
             {
                 controller.gameObject.AddComponent<WidgetAdder>();
             }
+        }
+
+        internal static bool ToggleWidgetsMoving()
+        {
+            widgetsMovingEnabled = !widgetsMovingEnabled;
+            foreach (WidgetsManager manager in widgetsManagers)
+            {
+                manager.ToggleWidgetsMoving(movingEnabled);
+            }
+            return movingEnabled;
         }
 
         /// <summary>
