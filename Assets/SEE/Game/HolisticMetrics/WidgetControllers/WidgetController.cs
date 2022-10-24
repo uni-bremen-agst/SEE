@@ -1,4 +1,5 @@
 using System;
+using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
@@ -9,6 +10,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal abstract class WidgetController : MonoBehaviour
     {
+        private WidgetMover mover;
+
         /// <summary>
         /// The field that saves the ID of this widget.
         /// </summary>
@@ -30,5 +33,15 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// </summary>
         /// <param name="metricValue">The MetricValue to display</param>
         internal abstract void Display(MetricValue metricValue);
+
+        private void Start()
+        {
+            mover = gameObject.AddComponent<WidgetMover>();
+        }
+
+        internal void ToggleMoving(bool enable)
+        {
+            mover.enabled = enable;
+        }
     }
 }
