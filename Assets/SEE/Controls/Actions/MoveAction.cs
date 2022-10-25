@@ -74,6 +74,10 @@ namespace SEE.Controls.Actions
                     nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
                     originalPositionOfGrabbedObject = gameObject.transform.position;
                     IsGrabbed = true;
+                    if (gameObject.TryGetComponent(out InteractableObject interactableObject))
+                    {
+                        interactableObject.SetGrab(true, true);
+                    }
                 }
                 else
                 {
@@ -94,6 +98,10 @@ namespace SEE.Controls.Actions
                 else
                 {
                     IsGrabbed = false;
+                    if (gameObject.TryGetComponent(out InteractableObject interactableObject))
+                    {
+                        interactableObject.SetGrab(false, true);
+                    }
                     // Note: We do not set gameObject to null because we may need its
                     // value later for Undo/Redo.
                 }
