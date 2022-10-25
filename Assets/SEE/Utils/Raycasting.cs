@@ -259,7 +259,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// A ray from the user's mouse.
+        /// A ray from the user's pointing device (mouse in a desktop environment,
+        /// controller in VR).
         /// </summary>
         /// <returns>ray from the user's mouse</returns>
         public static Ray UserPointsTo()
