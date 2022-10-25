@@ -7,8 +7,23 @@ namespace SEE.Game
     /// <summary>
     /// Author: Hannes Kuss
     ///
-    /// Allows to create marking-spheres for code city nodes 
+    /// Allows to create marking-spheres for code city nodes and also to delete them.
     /// </summary>
+    /// <example>
+    ///     This Example shows how to create a marker for a node 
+    ///     <code>
+    ///        GameObject node = ...;
+    ///        GameNodeMarker.CreateMarker(node);
+    ///     </code>
+    ///     To Delete a marker of a node you need to do something like this:
+    ///     <code>
+    ///         GameObject node = ...;
+    ///         GameNodeMarker.RemoveMarker(node);
+    ///     </code>
+    ///     <code>
+    ///         
+    ///     </code>
+    /// </example>
     public static class GameNodeMarker
     {
         /// <summary>
