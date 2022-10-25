@@ -526,7 +526,6 @@ namespace SEE.GO
             {
                 node = nodeRef.Value;
             }
-
             return node != null;
         }
 
@@ -538,6 +537,8 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose Node is requested</param>
         /// <returns>the correponding graph node (will never be null)</returns>
+        /// <exception cref="NullReferenceException">thrown if <paramref name="gameObject"/> has
+        /// no valid <see cref="NodeRef"/> or <see cref="Node"/></exception>
         public static Node GetNode(this GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))
