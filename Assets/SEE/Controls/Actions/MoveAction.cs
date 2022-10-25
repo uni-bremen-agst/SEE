@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -54,6 +55,12 @@ namespace SEE.Controls.Actions
             private GameObject gameObject;
 
             /// <summary>
+            /// The node operator to move <see cref="gameObject"/>. Different from null only
+            /// if <see cref="gameObject"/> is different from null.
+            /// </summary>
+            private NodeOperator nodeOperator;
+
+            /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
@@ -63,6 +70,7 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     this.gameObject = gameObject;
+                    nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
                     originalPositionOfGrabbedObject = gameObject.transform.position;
                     IsGrabbed = true;
                 }
@@ -139,6 +147,12 @@ namespace SEE.Controls.Actions
             private Vector3 currentPositionOfGrabbedObject;
 
             /// <summary>
+            /// The duration of any animation to move the grabbed object for Undo/Redo
+            /// in seconds.
+            /// </summary>
+            private const float AnimationTime = 1.0f;
+
+            /// <summary>
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will called for Undo.
             /// </summary>
@@ -148,7 +162,7 @@ namespace SEE.Controls.Actions
                 /// would also update <see cref="currentPositionOfGrabbedObject"/>.
                 if (gameObject)
                 {
-                    gameObject.transform.position = originalPositionOfGrabbedObject;
+                    nodeOperator.MoveTo(originalPositionOfGrabbedObject, AnimationTime);
                 }
             }
 
@@ -159,18 +173,19 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void MoveToLastUserRequestedPosition()
             {
-                MoveTo(currentPositionOfGrabbedObject);
+                MoveTo(currentPositionOfGrabbedObject, AnimationTime);
             }
 
             /// <summary>
             /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
             /// </summary>
             /// <param name="targetPosition"></param>
-            internal void MoveTo(Vector3 targetPosition)
+            /// <param name="duration">the duration of the animation for moving the grabbed object in seconds</param>
+            internal void MoveTo(Vector3 targetPosition, float duration = 0)
             {
                 if (gameObject)
                 {
-                    gameObject.transform.position = targetPosition;
+                    nodeOperator.MoveTo(targetPosition, duration);
                     currentPositionOfGrabbedObject = targetPosition;
                 }
             }
