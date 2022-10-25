@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// An action to move nodes.
+    /// An action to grab and move nodes.
     /// </summary>
     internal class MoveAction : AbstractPlayerAction
     {
@@ -28,10 +28,10 @@ namespace SEE.Controls.Actions
         /// Returns the set of IDs of all game objects changed by this action.
         /// <see cref="ReversibleAction.GetChangedObjects"/>
         /// </summary>
-        /// <returns>empty set because this action does not change anything</returns>
+        /// <returns>returns the ID of the currently grabbed object if any; otherwise the empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>();
+            return grabbedObject.IsGrabbed ? new HashSet<string> { grabbedObject.Name } : new HashSet<string>();
         }
 
         /// Returns the <see cref="ActionStateType"/> of this action.
