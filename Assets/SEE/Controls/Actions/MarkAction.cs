@@ -56,10 +56,7 @@ namespace SEE.Controls.Actions
             if (lastAction.Item2)
             {
                 GameObject node = lastAction.Item1;
-                GameObject marker = GetMarkerOfNode(node) ?? throw new ArgumentNullException("GetMarkerOfNode(node)");
-                // Destroy marker
-                Destroyer.DestroyGameObject(marker);
-
+                GameNodeMarker.RemoveMarker(node);
             }
             // When the last action was, to unmark a node, then the node should be marked again
             else
@@ -142,18 +139,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             var ret = true;
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                if (Input.GetKeyDown(KeyCode.LeftShift))
-                {
-                    Redo();
-                }
-                else
-                {
-                    Undo();
-                }
-            }
-
+    
             // When the user clicks the left mouse button and is pointing to a node
             if (Input.GetMouseButtonDown(0) &&
                 Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) ==
