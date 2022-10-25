@@ -20,8 +20,9 @@ namespace SEE.Controls.Actions
     /// 
     /// An action for selecting nodes in a code-city.
     ///
-    /// The selected node are marked with a unity-primitive node.
+    /// The selected node are marked with a unity-primitive sphere.
     /// The marked nodes can also be deselected with another click.
+    /// To do this this class is using <see cref="GameNodeMarker"/>.
     ///
     /// </summary>
     public class MarkAction : AbstractPlayerAction
@@ -32,16 +33,26 @@ namespace SEE.Controls.Actions
                 lastAction.Item1.name, GetMarkerOfNode(lastAction.Item1).name
             };
 
-        // Internal visibility because GameNodeMarker also uses it.
-        // This suffix is appended to all node markers GameObject names
+
+        /// <summary>
+        /// Internal visibility because GameNodeMarker also uses it.
+        /// This suffix is appended to all node markers GameObject names
+        /// </summary>
         internal static string MARKER_NAME_SUFFIX = "-MARKED";
 
-        // A tuple representing the last action (node, marked)
-        // node os the GameObject which the user interacted with.
-        // marked is true when the node was marked and is false when the node was unmarked
-        private (GameObject, bool) lastAction;
-        
 
+        /// <summary>
+        /// A tuple representing the last action (node, marked)
+        /// node os the GameObject which the user interacted with.
+        /// marked is true when the node was marked and is false when the node was unmarked
+        /// </summary>
+        private (GameObject, bool) lastAction;
+
+
+        /// <summary>
+        /// Returns a new instance of <see cref="MarkAction"/>
+        /// </summary>
+        /// <returns></returns>
         public static MarkAction CreateMarkAction() => new MarkAction();
 
         public static ReversibleAction CreateReversibleAction()
@@ -65,7 +76,6 @@ namespace SEE.Controls.Actions
                 string sphereTag = node.name += MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
                 marker.name = sphereTag;
-        
             }
         }
 
@@ -80,7 +90,6 @@ namespace SEE.Controls.Actions
                 GameObject marker = GetMarkerOfNode(node) ?? throw new ArgumentNullException("GetMarkerOfNode(node)");
                 // Destroy marker
                 Destroyer.DestroyGameObject(marker);
-                
             }
             // When the last action was, to unmark a node, then the node should be marked again
             else
@@ -89,7 +98,6 @@ namespace SEE.Controls.Actions
                 string sphereTag = node.name += MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
                 marker.name = sphereTag;
-
             }
         }
 
@@ -112,9 +120,10 @@ namespace SEE.Controls.Actions
                     return true;
                 }
             }
+
             return false;
         }
-        
+
 
         /// <summary>
         /// Returns the Marker sphere of a node
@@ -139,7 +148,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             var ret = true;
-    
+
             // When the user clicks the left mouse button and is pointing to a node
             if (Input.GetMouseButtonDown(0) &&
                 Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) ==
