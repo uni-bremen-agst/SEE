@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SEE.DataModel.DG;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
@@ -237,7 +238,8 @@ namespace SEE.Controls.Actions
                 {
                     // User is starting dragging.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
-                    if (hoveredObject && hoveredObject.gameObject.HasNodeRef())
+                    // An object to be grabbed must be representing a node that is not the root.
+                    if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
