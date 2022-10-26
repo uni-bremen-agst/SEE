@@ -23,7 +23,7 @@ namespace SEE.Game
         /// <param name="worldSpaceScale">the scale in world space of the new marker</param>
         /// <returns>new marker game object or null if none could be created or a marker already exists</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="parent"/> is <c>null</c>.</exception>
-        public static GameObject addSphere(GameObject parent, Vector3 position, Vector3 worldSpaceScale)
+        public static GameObject AddSphere(GameObject parent, Vector3 position, Vector3 worldSpaceScale)
         {
             GameObject sphere;
             
@@ -31,7 +31,7 @@ namespace SEE.Game
             {
                 throw new ArgumentNullException(nameof(parent));
             }
-            else if (deleteExistingSphere(parent))
+            else if (DeleteExistingSphere(parent))
             {
                 sphere = null;
             }
@@ -53,7 +53,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">the game object to be checked for existing sphere marker</param>
         /// <returns>true if marker exists</returns>
-        private static bool deleteExistingSphere(GameObject parent)
+        private static bool DeleteExistingSphere(GameObject parent)
         {
             foreach (Transform child in parent.transform)
             {

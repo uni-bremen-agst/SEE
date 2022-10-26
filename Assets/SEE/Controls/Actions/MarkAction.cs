@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
                 // The position at which the parent was hit will be the center point of the new node marker
                 Vector3 position = parent.transform.position;
                 Vector3 scale = parent.transform.lossyScale;
-                addedSphere = GameNodeMarker.addSphere(parent, position: position, worldSpaceScale: scale);
+                addedSphere = GameNodeMarker.AddSphere(parent, position: position, worldSpaceScale: scale);
                 if (addedSphere != null)
                 {
                     memento = new Memento(parent, position: position, scale: scale);
@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedSphere = GameNodeMarker.addSphere(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
+            addedSphere = GameNodeMarker.AddSphere(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale);
             if (addedSphere != null)
             {
                 new MarkNetAction(parentID: memento.Parent.name,memento.Position, memento.Scale).Execute();

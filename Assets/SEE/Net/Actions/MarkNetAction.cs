@@ -65,7 +65,7 @@ namespace SEE.Net.Actions
                 {
                     throw new System.Exception($"There is no node with the ID {ParentID}.");
                 }
-                GameNodeMarker.addSphere(parent, Position, Scale);
+                GameNodeMarker.AddSphere(parent, Position, Scale);
             }
         }
     }
