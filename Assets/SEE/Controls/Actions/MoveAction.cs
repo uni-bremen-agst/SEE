@@ -338,6 +338,26 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
+
+            /// <summary>
+            /// Restores the original state of the grabbed object just before it was grabbed.
+            /// </summary>
+            internal void Undo()
+            {
+                MoveToOrigin();
+                // FIXME: We also neet to reset the parent in the graph.
+                gameObject.transform.SetParent(originalParent);
+                // FIXME: MoveToOrigin() and ReparentNetAction both move the node.
+                new ReparentNetAction(gameObject.name, originalParent.name, originalPositionOfGrabbedObject).Execute();
+            }
+
+            /// <summary>
+            /// Reverts <see cref="Undo"/>.
+            /// </summary>
+            internal void Redo()
+            {
+                MoveToLastUserRequestedPosition();
+            }
         }
 
         /// <summary>
@@ -450,7 +470,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            grabbedObject.MoveToOrigin();
+            grabbedObject.Undo();
         }
 
         /// <summary>
@@ -459,7 +479,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            grabbedObject.MoveToLastUserRequestedPosition();
+            grabbedObject.Redo();
         }
     }
 }
