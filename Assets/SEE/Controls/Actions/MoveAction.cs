@@ -6,6 +6,7 @@ using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
+using SEE.Net.Actions;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -41,6 +42,7 @@ namespace SEE.Controls.Actions
             return grabbedObject.IsGrabbed ? new HashSet<string> { grabbedObject.Name } : new HashSet<string>();
         }
 
+        /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns><see cref="ActionStateType.Move"/></returns>
@@ -127,14 +129,67 @@ namespace SEE.Controls.Actions
                     {
                         interactableObject.SetGrab(false, true);
                     }
+                    if (originalPositionOfGrabbedObject != currentPositionOfGrabbedObject)
+                    {
+                        // The grabbed object has actually been moved.
+                        Finalize();
+                    }
                     // Note: We do not set gameObject to null because we may need its
                     // value later for Undo/Redo.
-                    // -------------------------------------------------------------------
-                    // FIXME: When moving the grabbed node, we move its connecting edges
-                    // along with it. To do that they are morphed into splines. When the
-                    // movement has come to an end, the edges should be morphed back
-                    // again into to their original layout.
-                    // -------------------------------------------------------------------
+                }
+            }
+
+            /// <summary>
+            /// Memorizes the new parent of <see cref="gameObject"/> after it was moved.
+            /// Can be the original parent. Relevant for <see cref="Redo"/>.
+            /// </summary>
+            private GameObject newParent;
+
+            /// <summary>
+            /// The original parent of <see cref="gameObject"/> before it was grabbed.
+            /// </summary>
+            private Transform originalParent;
+
+            /// <summary>
+            /// The original scale of <see cref="gameObject"/> before it was grabbed.
+            /// </summary>
+            private Vector3 originalScale;
+
+            /// <summary>
+            /// Called when the grabbed object has reached a new final destination.
+            /// It will finalize its position.
+            /// </summary>
+            private void Finalize()
+            {
+                // -------------------------------------------------------------------
+                // FIXME: When moving the grabbed node, we move its connecting edges
+                // along with it. To do that they are morphed into splines. When the
+                // movement has come to an end, the edges should be morphed back
+                // again into to their original layout.
+                // -------------------------------------------------------------------
+
+                bool movementAllowed = GameNodeMover.FinalizePosition(gameObject, out GameObject parent);
+                if (movementAllowed)
+                {
+                    if (parent != null)
+                    {
+                        // The node has been re-parented.
+                        new ReparentNetAction(gameObject.name, parent.name, gameObject.transform.position).Execute();
+                        newParent = parent;
+                    }
+                    currentPositionOfGrabbedObject = gameObject.transform.position;
+                }
+                else
+                {
+                    // An attempt was made to move the hovered object illegally.
+                    // We need to reset it to its original position. And then we start from scratch.
+                    // TODO: Instead of manually restoring the position like this, we can maybe use the memento
+                    //       or ReversibleActions for resetting.
+                    gameObject.transform.SetParent(originalParent);
+                    nodeOperator.ScaleTo(originalScale, AnimationTime);
+                    nodeOperator.MoveTo(originalPositionOfGrabbedObject, AnimationTime);
+
+                    new MoveNodeNetAction(gameObject.name, originalPositionOfGrabbedObject).Execute();
                 }
             }
 
@@ -235,7 +290,7 @@ namespace SEE.Controls.Actions
             private void MoveTo(Vector3 targetPosition, float duration)
             {
                 // FIXME: This code must be factored out into a helper class that can be called
-                // from the corresponding network move action.
+                // from the corresponding network move action. It should be handled by GameNodeMover.
                 nodeOperator.MoveTo(targetPosition, duration);
                 MorphEdgesToSplines(duration);
                 // TODO: Propagate to clients.
