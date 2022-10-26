@@ -47,26 +47,25 @@ namespace SEE.Controls.Actions
             new ActionStateType(5, "Edit Node", "Edit a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                                 EditNodeAction.CreateReversibleAction);
+        public static ActionStateType MarkNode { get; } =
+            new ActionStateType(6, "Mark Node", "Marks a node.",
+                Color.green.Darker(), "Materials/ModernUIPack/Settings", 
+                MarkAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new ActionStateType(6, "Scale Node", "Scale a node",
+            new ActionStateType(7, "Scale Node", "Scale a node",
                                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new ActionStateType(7, "Delete", "Delete a node or an edge",
+            new ActionStateType(8, "Delete", "Delete a node or an edge",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
-            new ActionStateType(8, "Show Code", "Display the source code of a node.",
+            new ActionStateType(9, "Show Code", "Display the source code of a node.",
                                 Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
-            new ActionStateType(9, "Draw", "Draw a line",
+            new ActionStateType(10, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
-        
-        public static ActionStateType MarkNode { get; } =
-            new ActionStateType(10, "Mark Node", "Marks the selected node.",
-                                Color.black, "Materials/ModernUIPack/Document", 
-                                MarkAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
