@@ -79,9 +79,14 @@ namespace SEE.Game
             }
             else
             {
-                //Destroys the marker TODO Needs fix -> to be done by 24.10.22 
-                DestroyChild(marker);
-                throw new Exception("Sphere is already there.");
+                parent.IsMarked = false;
+                //Destroys the marker //FIXME: Doesnt find the ID
+                if (marker != null)
+                {
+                    new DeleteNetAction(marker.ID).Execute();
+                    Destroyer.DestroyGameObject(marker.RetrieveGameNode());
+                    parent.IsMarked = false;
+                }
             }
         }
 
@@ -103,59 +108,25 @@ namespace SEE.Game
             SEECity city = parent.ContainingCity() as SEECity;
             if (city != null)
             {
-                Node node = NewGraphNode(markerID);
-                AddNodeToGraph(parent.GetNode(), node);
-                position = FindPlace(parent.transform.position, position);
+                Node marker = NewGraphNode(markerID);
+                AddNodeToGraph(parent.GetNode(), marker);
+                position = GameNodeAdder.FindPlace(parent.transform.position, position);
 
                 //create sphere
                 GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-                result.transform.localScale = worldSpaceScale*3;
+                result.transform.localScale = worldSpaceScale * 3;
                 result.transform.position = new Vector3(
                     position.x,
                     position.y + 0.1f,
                     position.z);
                 result.transform.SetParent(parent.transform);
                 Portal.SetPortal(city.gameObject, gameObject: result);
-                result.GetComponent<Renderer>().material.color = Color.yellow;
+                result.GetComponent<Renderer>().material.color = Color.white;
                 return result;
             }
-            else
-            {
-                throw new Exception($"Parent node {parent.name} is not contained in a code city.");
-            }
-        }
 
-        /// <summary>
-        /// Destroys the specified marker at the
-        /// given <paramref name="position"/> 
-        /// </summary>
-        /// <param name="sphere">sphere to be destroyed</param>
-        public static void DestroyChild(Node sphere)
-        {
-            new DeleteNetAction(sphere.ID).Execute();
-            Destroyer.DestroyGameObject(sphere.RetrieveGameNode());
-            sphere = null;
-            
-            //set boolean is marked to false.
-            sphere.IsMarked = false;
-        }
-
-        /// <summary>
-        /// Returns the position inbetween <paramref name="start"/> and <paramref name="end"/>.
-        /// More precisely, let L be the line from <paramref name="start"/> to <paramref name="end"/>.
-        /// Then the point on L is returned whose distance to <paramref name="start"/> equals the
-        /// distance to <paramref name="end"/>.
-        ///
-        /// TODO Delete this copy and reroute to GameNodeAdder 
-        /// 
-        /// </summary>
-        /// <param name="start">start position</param>
-        /// <param name="end">end position</param>
-        /// <returns>mid point inbetween <paramref name="start"/> and <paramref name="end"/></returns>
-        private static Vector3 FindPlace(Vector3 start, Vector3 end)
-        {
-            return start + 0.5f * (end - start);
+            throw new Exception($"Parent node {parent.name} is not contained in a code city.");
         }
     }
 }
