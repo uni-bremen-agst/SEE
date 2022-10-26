@@ -41,6 +41,8 @@ namespace SEE.Game
             newSphere.transform.parent = node.transform;
             newSphere.transform.localPosition = new Vector3(0, yOffset, 0);
             newSphere.transform.localScale = Vector3.one;
+            string sphereName = node.name + MarkAction.MARKER_NAME_SUFFIX;
+            newSphere.name = sphereName;
             return newSphere;
         }
 
@@ -56,7 +58,7 @@ namespace SEE.Game
             {
                 GameObject markerCanidate = nodeTran.GetChild(i).gameObject;
                 // If the child is a marker sphere
-                if (markerCanidate.tag.EndsWith(MarkAction.MARKER_NAME_SUFFIX))
+                if (markerCanidate.name.EndsWith(MarkAction.MARKER_NAME_SUFFIX))
                 {
                     Destroyer.DestroyGameObject(markerCanidate);
                     return true;

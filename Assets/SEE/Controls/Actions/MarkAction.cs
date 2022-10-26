@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Dissonance;
 using SEE.Game;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 
@@ -30,7 +32,7 @@ namespace SEE.Controls.Actions
         public override HashSet<string> GetChangedObjects() =>
             new HashSet<string>
             {
-                lastAction.Item1.name, GetMarkerOfNode(lastAction.Item1).name
+                lastAction.Item1.name
             };
 
 
@@ -60,23 +62,28 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
+
         public override void Undo()
         {
             //base.Undo();
+            GameObject node = lastAction.Item1;
+            bool nodeAdded = false;
+
             // When the last action was, to mark a node, then the node should be unmarked
             if (lastAction.Item2)
             {
-                GameObject node = lastAction.Item1;
                 GameNodeMarker.RemoveMarker(node);
             }
             // When the last action was, to unmark a node, then the node should be marked again
             else
             {
-                GameObject node = lastAction.Item1;
-                string sphereTag = node.name += MARKER_NAME_SUFFIX;
+                nodeAdded = true;
+                string sphereName = node.name += MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
-                marker.name = sphereTag;
+                marker.name = sphereName;
             }
+
+            new MarkNetAction(node.name, nodeAdded).Execute();
         }
 
         public override void Redo()
@@ -84,9 +91,10 @@ namespace SEE.Controls.Actions
             // Properly also redundant but also just to make sure. 
 
             // When the last action was, to mark a node, then the node should be unmarked
+            GameObject node = lastAction.Item1;
+            bool nodeAdded = false;
             if (lastAction.Item2)
             {
-                GameObject node = lastAction.Item1;
                 GameObject marker = GetMarkerOfNode(node) ?? throw new ArgumentNullException("GetMarkerOfNode(node)");
                 // Destroy marker
                 Destroyer.DestroyGameObject(marker);
@@ -94,11 +102,13 @@ namespace SEE.Controls.Actions
             // When the last action was, to unmark a node, then the node should be marked again
             else
             {
-                GameObject node = lastAction.Item1;
-                string sphereTag = node.name += MARKER_NAME_SUFFIX;
+                nodeAdded = true;
+                string sphereName = node.name += MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
-                marker.name = sphereTag;
+                marker.name = sphereName;
             }
+
+            new MarkNetAction(node.name, nodeAdded).Execute();
         }
 
         public override ActionStateType GetActionStateType() => ActionStateType.MarkNode;
@@ -114,7 +124,7 @@ namespace SEE.Controls.Actions
         {
             for (int i = 0; i < node.transform.childCount; i++)
             {
-                // When a the child has the tag -MARKED
+                // When a the child has the name suffix -MARKED
                 if (node.transform.GetChild(i).name.EndsWith(MARKER_NAME_SUFFIX))
                 {
                     return true;
@@ -147,7 +157,8 @@ namespace SEE.Controls.Actions
 
         public override bool Update()
         {
-            var ret = true;
+            bool ret = true;
+            bool nodeAdded = false;
 
             // When the user clicks the left mouse button and is pointing to a node
             if (Input.GetMouseButtonDown(0) &&
@@ -162,9 +173,8 @@ namespace SEE.Controls.Actions
                 {
                     currentState = ReversibleAction.Progress.Completed;
                     // Extract the code city node.
-                    string sphereTag = cnode.name += MARKER_NAME_SUFFIX;
                     GameObject marker = GameNodeMarker.CreateMarker(cnode);
-                    marker.name = sphereTag;
+                    nodeAdded = true;
                 }
                 // When the clicked node was already marked
                 else
@@ -173,6 +183,8 @@ namespace SEE.Controls.Actions
                                         throw new ArgumentNullException("GetMarkerOfNode(cnode)");
                     Destroyer.DestroyGameObject(marker);
                 }
+
+               new MarkNetAction(cnode.name, nodeAdded).Execute();
             }
 
             return ret;
