@@ -163,7 +163,12 @@ namespace SEE.Net
         /// <param name="connection">The established connection.</param>
         private static void OnConnectionEstablished(Connection connection)
         {
-            UnityEngine.Assertions.Assert.IsNotNull(connection);
+            if (connection == null)
+            {
+                // Connection can be null under certain circumstances,
+                // in which case no network connection actually exists.
+                return;
+            }
             UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo);
             UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo.LocalEndPoint);
             bool connectionListenerInitialized = false;
