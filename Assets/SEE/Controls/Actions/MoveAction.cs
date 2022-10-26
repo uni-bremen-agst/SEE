@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
+using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -62,6 +67,24 @@ namespace SEE.Controls.Actions
             private NodeOperator nodeOperator;
 
             /// <summary>
+            /// The list of <see cref="SEESpline"/>s of the incoming and outgoing edges
+            /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
+            /// whether the edge is outgoing (if it is false, the edge is incoming).
+            /// </summary>
+            private IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
+
+            /// <summary>
+            /// The animation duration for morphing edges in seconds.
+            /// FIXME: Why should that be different from <see cref="AnimationTime"/>?
+            /// </summary>
+            private const float SplineAnimationDuration = 2f;
+            /// <summary>
+            /// The duration of any animation to move the grabbed object for Undo/Redo
+            /// in seconds.
+            /// </summary>
+            private const float AnimationTime = 1.0f;
+
+            /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
@@ -73,6 +96,8 @@ namespace SEE.Controls.Actions
                     this.gameObject = gameObject;
                     nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
                     originalPositionOfGrabbedObject = gameObject.transform.position;
+                    ConnectedEdges = GetConnectedEdges(gameObject);
+                    MorphEdgesToSplines(SplineAnimationDuration);
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
@@ -104,6 +129,12 @@ namespace SEE.Controls.Actions
                     }
                     // Note: We do not set gameObject to null because we may need its
                     // value later for Undo/Redo.
+                    // -------------------------------------------------------------------
+                    // FIXME: When moving the grabbed node, we move its connecting edges
+                    // along with it. To do that they are morphed into splines. When the
+                    // movement has come to an end, the edges should be morphed back
+                    // again into to their original layout.
+                    // -------------------------------------------------------------------
                 }
             }
 
@@ -156,12 +187,6 @@ namespace SEE.Controls.Actions
             private Vector3 currentPositionOfGrabbedObject;
 
             /// <summary>
-            /// The duration of any animation to move the grabbed object for Undo/Redo
-            /// in seconds.
-            /// </summary>
-            private const float AnimationTime = 1.0f;
-
-            /// <summary>
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will called for Undo.
             /// </summary>
@@ -182,7 +207,24 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void MoveToLastUserRequestedPosition()
             {
-                MoveTo(currentPositionOfGrabbedObject, AnimationTime);
+                if (gameObject)
+                {
+                    MoveTo(currentPositionOfGrabbedObject, AnimationTime);
+                }
+            }
+
+            /// <summary>
+            /// Moves the grabbed object to <paramref name="targetPosition"/> in world space
+            /// immediately, that is, without any animation.
+            /// </summary>
+            /// <param name="targetPosition"></param>
+            internal void MoveTo(Vector3 targetPosition)
+            {
+                if (gameObject)
+                {
+                    currentPositionOfGrabbedObject = targetPosition;
+                    MoveTo(targetPosition, 0);
+                }
             }
 
             /// <summary>
@@ -190,12 +232,55 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="targetPosition"></param>
             /// <param name="duration">the duration of the animation for moving the grabbed object in seconds</param>
-            internal void MoveTo(Vector3 targetPosition, float duration = 0)
+            private void MoveTo(Vector3 targetPosition, float duration)
             {
-                if (gameObject)
+                // FIXME: This code must be factored out into a helper class that can be called
+                // from the corresponding network move action.
+                nodeOperator.MoveTo(targetPosition, duration);
+                MorphEdgesToSplines(duration);
+                // TODO: Propagate to clients.
+            }
+
+            /// <summary>
+            /// Morphs the incoming and outgoing edges of <see cref="gameObject"/> to simple splines.
+            /// </summary>
+            /// <param name="duration">the duration of the morphing animation in seconds</param>
+            private void MorphEdgesToSplines(float duration)
+            {
+                // The minimal y offset for the point in between the start and end
+                // of a spline through which the spline should pass.
+                const float MinimalSplineOffset = 0.05f;
+
+                // We will also "stick" the connected edges to the moved node during its movement.
+                // In order to do this, we need to modify the splines of each one.
+                // --------------------------------------------------------------------------------
+                // FIXME: This is too simplistic. It does not handle the case of moving an inner
+                // node whose descendants have connecting edges. The descendants will be moved
+                // along with the inner node, but not their edges.
+                // --------------------------------------------------------------------------------
+                foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in ConnectedEdges)
                 {
-                    nodeOperator.MoveTo(targetPosition, duration);
-                    currentPositionOfGrabbedObject = targetPosition;
+                    Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                    BSpline spline;
+                    if (hitEdge.nodeIsSource)
+                    {
+                        spline = SplineEdgeLayout.CreateSpline(gameObject.transform.position,
+                                                               edge.Target.RetrieveGameNode().transform.position,
+                                                               true,
+                                                               MinimalSplineOffset);
+                    }
+                    else
+                    {
+                        spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position,
+                                                               gameObject.transform.position,
+                                                               true,
+                                                               MinimalSplineOffset);
+                    }
+
+                    if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
+                    {
+                        edgeOperator.MorphTo(spline, duration);
+                    }
                 }
             }
         }
@@ -217,6 +302,29 @@ namespace SEE.Controls.Actions
         /// Index of the left mouse button.
         /// </summary>
         private const int LeftMouseButton = 0;
+
+        /// <summary>
+        /// Returns the list of <see cref="SEESpline"/>s of the incoming and outgoing edges
+        /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
+        /// whether the edge is outgoing (if it is false, the edge is incoming).
+        /// </summary>
+        private static IList<(SEESpline, bool nodeIsSource)> GetConnectedEdges(GameObject gameNode)
+        {
+            IList<(SEESpline, bool nodeIsSource)> ConnectedEdges = new List<(SEESpline, bool)>();
+            if (gameNode.TryGetNode(out Node node))
+            {
+                foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                {
+                    GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                    Assert.IsNotNull(gameEdge);
+                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                    {
+                        ConnectedEdges.Add((spline, node == edge.Source));
+                    }
+                }
+            }
+            return ConnectedEdges;
+        }
 
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
