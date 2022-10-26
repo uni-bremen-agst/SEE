@@ -22,14 +22,14 @@ namespace SEE.Game
         /// <param name="position">the position in world space for the center point of the new marker </param>
         /// <param name="worldSpaceScale">the scale in world space of the new marker</param>
         /// <returns>new marker game object or null if none could be created or a marker already exists</returns>
-        /// <exception cref="Exception"></exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="parent"/> is <c>null</c>.</exception>
         public static GameObject addSphere(GameObject parent, Vector3 position, Vector3 worldSpaceScale)
         {
             GameObject sphere;
             
             if(parent == null)
             {
-                throw new Exception("GameObject must not be null.");
+                throw new ArgumentNullException(nameof(parent));
             }
             else if (deleteExistingSphere(parent))
             {
@@ -48,21 +48,20 @@ namespace SEE.Game
         }
         
         /// <summary>
-        /// This function searches all children of <param name="parent"></param> for existing childs with the name
+        /// This function searches all children of <paramref name="parent"/> for existing children with the name
         /// "Sphere". If a sphere marker is already present it will be destroyed.
         /// </summary>
         /// <param name="parent">the game object to be checked for existing sphere marker</param>
         /// <returns>true if marker exists</returns>
         private static bool deleteExistingSphere(GameObject parent)
         {
-            for (int i = 0; i <= parent.transform.childCount - 1; i++)
+            foreach (Transform child in parent.transform)
             {
-                if (parent.transform.GetChild(i).transform.name == "Sphere" && parent.transform.childCount > 0)
+                if (child.name == "Sphere")
                 {
-                    GameObject sphere = parent.transform.GetChild(i).gameObject;
                     //FIXME: network operation for deleting an existing marker not working properly
                     //new DeleteNetAction(sphere.name).Execute();
-                    Destroyer.DestroyGameObject(parent.transform.GetChild(i).gameObject);
+                    Destroyer.DestroyGameObject(child.gameObject);
                     return true;
                 }
             }
