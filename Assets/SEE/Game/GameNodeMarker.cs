@@ -14,9 +14,9 @@ namespace SEE.Game
     public static class GameNodeMarker 
     {
         /// <summary>
-        /// Creates and returns a new sphere game object as child of <param name="parent"></param> at the
-        /// given <param name="position"></param>. The diameter of the sphere is the minimum of the width (x axis)
-        /// and depth (y axis) of <param name="worldSpaceScale"></param>.
+        /// Creates and returns a new sphere game object as child of <paramref name="parent"/> at the
+        /// given <paramref name="position"/>. The diameter of the sphere is the minimum of the width (x axis)
+        /// and depth (y axis) of <paramref name="worldSpaceScale"/>.
         /// </summary>
         /// <param name="parent">The node that should be the parent of new marker</param>
         /// <param name="position">the position in world space for the center point of the new marker </param>
