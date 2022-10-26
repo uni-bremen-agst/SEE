@@ -266,7 +266,7 @@ namespace SEE.Game
                 case EdgeLayoutKind.Straight:
                     return new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
                 case EdgeLayoutKind.Spline:
-                    return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
+                    return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
                 case EdgeLayoutKind.Bundling:
                     return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance,
                                                  Settings.EdgeLayoutSettings.Tension, rdp);
