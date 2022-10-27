@@ -2,6 +2,7 @@ using System;
 using SEE.Game;
 using UnityEngine;
 
+
 namespace SEE.Net.Actions
 {
     /// <summary>
@@ -15,7 +16,9 @@ namespace SEE.Net.Actions
     public class MarkNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The node which was changed
+        /// The id of the node which was changed.
+        /// With this id the code city node that was marked can then be find on the client's side and their node
+        /// can be marked too.
         /// </summary>
         public string NodeId;
 
@@ -25,9 +28,9 @@ namespace SEE.Net.Actions
         public bool Added;
 
         /// <summary>
-        /// Default and only constructor of the <see cref="MarkNetAction"/>.
+        /// Default constructor of the <see cref="MarkNetAction"/>.
         /// </summary>
-        /// <param name="node">The node which the user interacted with</param>
+        /// <param name="nodeid">The node which the user interacted with</param>
         /// <param name="added">True if the clicked node was marked and false then the clicked node was unmarked</param>
         public MarkNetAction(string nodeid, bool added)
         {
