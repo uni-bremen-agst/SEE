@@ -379,5 +379,16 @@ namespace SEE.Controls
         internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
         
         #endregion
+        
+        //-----------------------------------------------------
+        #region Notifications
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Closes all open notifications.
+        /// </summary>
+        internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
+
+        #endregion
     }
 }
