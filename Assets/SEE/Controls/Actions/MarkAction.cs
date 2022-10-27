@@ -25,13 +25,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class MarkAction : AbstractPlayerAction
     {
-        public override HashSet<string> GetChangedObjects() =>
-            new HashSet<string>
-            {
-                lastAction.Item1.name
-            };
-
-
         /// <summary>
         /// Internal visibility because GameNodeMarker also uses it.
         /// This suffix is appended to all node markers GameObject names
@@ -58,6 +51,11 @@ namespace SEE.Controls.Actions
             throw new NotImplementedException();
         }
 
+        public override HashSet<string> GetChangedObjects() =>
+            new HashSet<string>
+            {
+                lastAction.Item1.name
+            };
 
         public override void Undo()
         {
@@ -74,7 +72,7 @@ namespace SEE.Controls.Actions
             else
             {
                 nodeAdded = true;
-                string sphereName = node.name += MARKER_NAME_SUFFIX;
+                string sphereName = node.name + MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
                 marker.name = sphereName;
             }
@@ -99,7 +97,7 @@ namespace SEE.Controls.Actions
             else
             {
                 nodeAdded = true;
-                string sphereName = node.name += MARKER_NAME_SUFFIX;
+                string sphereName = node.name + MARKER_NAME_SUFFIX;
                 GameObject marker = GameNodeMarker.CreateMarker(node);
                 marker.name = sphereName;
             }
