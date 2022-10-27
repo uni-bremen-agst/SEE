@@ -676,7 +676,7 @@ namespace SEE.Controls
         /// </summary>
         public static bool CloseAllNotifications()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings)
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
         }
         
         #endregion
