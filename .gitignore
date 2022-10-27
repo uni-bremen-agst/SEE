@@ -117,6 +117,7 @@ ConnectionKeepAlivePollError*.txt
 Error*.txt
 ManagedThreadPoolCallBackError*.txt
 PacketHandlerErrorGlobal*.txt
+GlobalConnectionShutdownDelegate*.txt
 
 # Custom entries
 LinuxPlayer_s.debug
@@ -132,3 +133,4 @@ UnityPlayer_s.debug
 # For Odin Inspector:  But keep the demo packages themselves.
 !/Assets/Plugins/Sirenix/Demos/*.unitypackage 
 Data/Vcs2See/target/
+

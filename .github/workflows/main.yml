@@ -1,0 +1,90 @@
+name: Tests
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+
+jobs:
+  test:
+    name: Editmode tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    steps:
+      - name: Fix permissions
+        shell: bash
+        run: sudo /mnt/scripts/set-work-permissions.sh
+      - uses: actions/checkout@v3
+        name: Checkout Repository
+        with:
+          lfs: true
+      - uses: actions/cache@v3
+        name: Cache Library
+        with:
+          path: ./Library
+          key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: |
+            Library-SEE-Tests
+            Library-SEE
+      - uses: game-ci/unity-test-runner@v2
+        name: Run Tests
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ${{ matrix.os }} Test Results
+          testMode: EditMode  # PlayMode tests get stuck in batchmode
+          customParameters: -testCategory "!NonDeterministic"
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
+      - uses: actions/upload-artifact@v3
+        name: Upload test results
+        if: always()
+        with:
+          name: Test results for ${{ matrix.os }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
+      - uses: actions/upload-artifact@v3
+        name: Upload coverage results
+        if: github.ref == 'refs/heads/master'
+        with:
+          name: Coverage results
+          path: ${{ steps.tests.outputs.coveragePath }}
+      - name: Kill Unity
+        if: always()
+        shell: bash
+        run: ./.github/scripts/stop-docker.sh
+      - name: Fix permissions
+        if: always()
+        shell: bash
+        run: sudo /mnt/scripts/set-work-permissions.sh
+
+# TODO: Implement build generation and style checking.
+# 
+#  build:
+#    needs: test
+#    runs-on: self-hosted
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        targetPlatform:
+#          #- StandaloneLinux64
+#          #- StandaloneOSX
+#          - StandaloneWindows64
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          lfs: true
+#      - uses: game-ci/unity-builder@v2
+#        env:
+#          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+#        with:
+#          chownFilesTo: ubuntu:ubuntu
+#          targetPlatform: ${{ matrix.targetPlatform }}
+#      - name: Clean Up
+#        if: always()
+#        shell: bash
+#        run: sudo /mnt/scripts/set-work-permissions.sh

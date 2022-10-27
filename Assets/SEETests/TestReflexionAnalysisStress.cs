@@ -8,6 +8,7 @@ using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
+    [Explicit("Reflexion tests currently don't work, tracked in #481")]
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {
         /// <summary>
