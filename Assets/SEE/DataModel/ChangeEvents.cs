@@ -89,9 +89,10 @@ namespace SEE.DataModel
         /// Constructor for a change of an edge event.
         /// </summary>
         /// <param name="edge">edge being changed</param>
-        /// <param name="old_state">the old state of the edge</param>
-        /// <param name="new_state">the new state of the edge after the change</param>
-        public EdgeChange(Edge edge, State oldState, State newState) : base(ReflexionSubgraph.Architecture)
+        /// <param name="oldState">the old state of the edge</param>
+        /// <param name="newState">the new state of the edge after the change</param>
+        /// <param name="subgraph">the subgraph the edge is contained in</param>
+        public EdgeChange(Edge edge, State oldState, State newState, ReflexionSubgraph subgraph = ReflexionSubgraph.Architecture) : base(subgraph)
         {
             Edge = edge;
             OldState = oldState;

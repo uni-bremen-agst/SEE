@@ -211,13 +211,6 @@ namespace SEE.Game.City
             }
 
             GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
-            if (edge == null)
-            {
-                // If no such edge can be found, the given edge must be propagated
-                string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
-                edge = edgeId != null ? GraphElementIDMap.Find(edgeId) : null;
-            }
-
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
