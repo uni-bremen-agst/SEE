@@ -609,7 +609,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    1: UNITY_CCU;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;CT_RTV;CT_PROC;CMS_SALSA;AMPLIFY_SHADER_EDITOR
+    1: UNITY_CCU;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;UNITY_POST_PROCESSING_STACK_V2;ODIN_INSPECTOR;ODIN_INSPECTOR_3;CT_RTV;CT_PROC;CMS_SALSA;AMPLIFY_SHADER_EDITOR;CURVEDUI_UNITY_XR
     4: CT_RTV;CT_PROC
     7: UNITY_POST_PROCESSING_STACK_V2;CT_RTV;CT_PROC
     13: UNITY_POST_PROCESSING_STACK_V2;CT_RTV;CT_PROC
@@ -721,7 +721,7 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
