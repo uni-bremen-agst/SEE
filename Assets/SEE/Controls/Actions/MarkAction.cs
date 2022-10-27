@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Dissonance;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -184,7 +180,7 @@ namespace SEE.Controls.Actions
                     Destroyer.DestroyGameObject(marker);
                 }
 
-               new MarkNetAction(cnode.name, nodeAdded).Execute();
+                new MarkNetAction(cnode.name, nodeAdded).Execute();
             }
 
             return ret;
