@@ -8,13 +8,13 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to visually mark/unmark a node as selected via a floating sphere above it.
+    /// Action to visually mark/unmark a node as selected via a sphere floating above it.
     /// </summary>
     internal class MarkAction : AbstractPlayerAction
     {
         /// <summary>
         /// If the user clicks with the mouse hitting a game object representing a graph node,
-        /// the graphs selection status is toggled. Being selected means a sphere is floating above the node.
+        /// the node's marking status is toggled. Being marked means a sphere is floating above the node.
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
-            // FIXME: Needs adaptation for VR where no mouse is available. (applies here too)
+            // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
@@ -33,10 +33,12 @@ namespace SEE.Controls.Actions
 
                 memento = new Memento(targetNode);
 
+                // propagate the MarkAction to other clients
                 new MarkNetAction(markerSphere).Execute();
 
-                // propagate (MarkNetAction)
+                // MarkAction completed successfully
                 result = true;
+
                 currentState = ReversibleAction.Progress.Completed;
 
             }
@@ -44,7 +46,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Memento capturing the data necessary to re-do this action.
+        /// Memento capturing the data necessary to re-do this marking action.
         /// </summary>
         private Memento memento;
 

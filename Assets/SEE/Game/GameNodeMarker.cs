@@ -51,15 +51,17 @@ namespace SEE.Game
                 // the position of the marker sphere is above the marked node
                 newMarkerSphere.transform.position = CalculateMarkerPosition(targetNode);
 
-                // ()FIXME?) ensure markers are not blocking us from unmarking or marking other nodes
+                // FIXME: check back with lead devs whether this consitutes desired behaviour
+                // ensure markers are not blocking us from unmarking or marking other nodes
                 newMarkerSphere.GetComponent<SphereCollider>().radius = 0;
 
-                newMarkerSphere.SetColor(Color.magenta);
+                // FIXME: marker color could be a configuration option
+                newMarkerSphere.SetColor(Color.green);
 
                 // marker spheres can be recognized by their name-prefix "MarkerSphere"
                 newMarkerSphere.name = "MarkerSphere" + targetNode.name;
 
-                // assign the marker sphere to the node it marks
+                // assign the marker sphere to the node it is marking
                 newMarkerSphere.transform.SetParent(targetNode.transform);
 
                 return newMarkerSphere;
@@ -73,12 +75,11 @@ namespace SEE.Game
         /// <returns>The scale of the marker sphere.</returns>
         private static Vector3 CalculateMarkerSize(GameObject targetNode)
         {
-            // FUTURE REMINDER: base the size on lossyScale, not localScale -.-
             // calculate the maximum ground area
             float verticalLength = Math.Min(targetNode.transform.lossyScale.x,
                                             targetNode.transform.lossyScale.z);
 
-            // return as a cube
+            // return the marker size as a cube
             return Vector3.one * verticalLength;
         }
 
