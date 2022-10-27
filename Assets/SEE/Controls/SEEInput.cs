@@ -666,5 +666,19 @@ namespace SEE.Controls
         }
         
         #endregion
+        
+        //----------------------------------------------------
+        #region Notifications
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to close all notifications.
+        /// </summary>
+        public static bool CloseAllNotifications()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings)
+        }
+        
+        #endregion
     }
 }
