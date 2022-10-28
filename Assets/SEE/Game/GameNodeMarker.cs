@@ -71,7 +71,7 @@ namespace SEE.Game
 
             // moves the sphere on top of the marked object
             Vector3 lossyScale = node.transform.lossyScale;
-            sphere.transform.position = node.transform.position + new Vector3(0, lossyScale.y/2, 0);
+            sphere.transform.position += new Vector3(0, GetHeightOffset(node), 0);
             
             // sets the sphere size to minimum of the width and depth of the node
             float diameter = Mathf.Min(lossyScale.x, lossyScale.z);
@@ -82,6 +82,22 @@ namespace SEE.Game
 
             // stores that marked node
             markedNodes[node.name] = sphere;
+        }
+        
+        /// <summary>
+        /// Calculates the height offset of the sphere, so it appears on top of the children.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <returns>The height offset.</returns>
+        private static float GetHeightOffset(GameObject node)
+        {
+            float nodeHeight = node.transform.position.y;
+            float height = node.transform.lossyScale.y / 2;
+            foreach (Transform transform in node.GetComponentsInChildren<Transform>())
+            {
+                height = Math.Max(height, transform.position.y - nodeHeight + transform.lossyScale.y / 2);
+            }
+            return height;
         }
     }
 }
