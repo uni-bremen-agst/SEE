@@ -10,7 +10,7 @@ namespace SEE.DataModel
     /// Observables may also emit errors or notify observers of completion, but this is not necessarily implemented.
     /// </summary>
     /// <typeparam name="T">the type of the event that is emitted to observers</typeparam>
-    public abstract class Observable<T>: IObservable<T>
+    public abstract partial class Observable<T>: IObservable<T>
     {
         /// <summary>
         /// The list of currently registered observers that need to be notified upon a change of the state.
