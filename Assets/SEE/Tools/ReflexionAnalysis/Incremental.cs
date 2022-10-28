@@ -285,6 +285,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 Unmap(subtree, oldTarget);
             }
 
+            // FIXME: If below operation fails, we are in an inconsistent state.
             AddToMappingGraph(from, to);
             // adjust explicit mapping
             explicitMapsToTable[from.ID] = to;
