@@ -19,13 +19,17 @@ namespace SEE.DataModel.DG
         // The list of graph edges indexed by their unique IDs.
         private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();
 
-        // The (view) name of the graph.
-
         /// <summary>
         /// Name of the artificial node type used for artificial root nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string UnknownType = "UNKNOWNTYPE";
+        
+        /// <summary>
+        /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
+        /// propagated through the graph's own observable implementation.
+        /// </summary>
+        private readonly ProxyObserver ElementObserver;
 
         /// <summary>
         /// Indicates whether the node hierarchy has changed and, hence,
@@ -75,7 +79,7 @@ namespace SEE.DataModel.DG
         {
             Name = name;
             BasePath = basePath;
-            ElementObserver = new GraphElementObserver(this);
+            ElementObserver = new ProxyObserver(this);
         }
 
         /// <summary>
@@ -120,7 +124,7 @@ namespace SEE.DataModel.DG
             node.ItsGraph = this;
             NodeHierarchyHasChanged = true;
             Notify(new NodeEvent(node, ChangeType.Addition));
-            node.Subscribe(ElementObserver);
+            ElementObserver.AddDisposable(node.Subscribe(ElementObserver));
         }
 
         /// <summary>
@@ -356,6 +360,7 @@ namespace SEE.DataModel.DG
                 edge.Source.AddOutgoing(edge);
                 edge.Target.AddIncoming(edge);
                 Notify(new EdgeEvent(edge, ChangeType.Addition));
+                ElementObserver.AddDisposable(edge.Subscribe(ElementObserver));
             }
             else
             {
