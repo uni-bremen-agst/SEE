@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -103,6 +103,8 @@ namespace SEE.Tools.ReflexionAnalysis
                     }
                 }
 
+                bool implRemoved = propagationTable[propagated.ID].Remove(edge);
+                Assert.IsTrue(implRemoved, "Originating edge must be present in propagation table!");
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
 
@@ -825,8 +827,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
             return new PartitionedDependencies(oc, ic, i);
         }
-
-        // TODO: What about ImplicitlyAllowed and AllowedAbsence?
         
         /// <summary>
         /// Returns all allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.
@@ -905,7 +905,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// (if it exists)</param>
         /// <returns>the edge in the architecture graph propagated from <paramref name="implementationEdge"/>
         /// with given type; null if there is no such edge</returns>
-        private Edge GetPropagatedDependency(Edge implementationEdge)
+        public Edge GetPropagatedDependency(Edge implementationEdge)
         {
             AssertOrThrow(implementationEdge.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, implementationEdge));
