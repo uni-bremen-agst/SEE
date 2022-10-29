@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Windows.Speech;
@@ -12,7 +13,8 @@ namespace SEE.Controls
     /// a microphone to talk. The recognized input is shown on the console
     /// for inspection.
     /// </summary>
-    class TextDictationInput
+    [Category("NonDeterministic")]
+    internal class TextDictationInput
     {
         [UnityTest]
         public IEnumerator TestDialog()
@@ -40,7 +42,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="text">phrase recognized</param>
         /// <param name="confidence">confidence level of the recognition</param>
-        private void OnDictationResult(string text, ConfidenceLevel confidence)
+        private static void OnDictationResult(string text, ConfidenceLevel confidence)
         {
             Debug.Log($"Dictation result: '{text}' with confidence {confidence}.\n");
         }
@@ -50,7 +52,7 @@ namespace SEE.Controls
         /// Could be registered for recognizer.DictationHypothesis.
         /// </summary>
         /// <param name="text">the currently understood text (subject to change)</param>
-        private void OnDictationHypothesis(string text)
+        private static void OnDictationHypothesis(string text)
         {
             Debug.Log($"Dictation hypothesis: '{text}'\n");
         }

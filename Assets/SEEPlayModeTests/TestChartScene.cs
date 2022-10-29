@@ -12,7 +12,8 @@ namespace SEE.Game.Charts
     ///     Tests for charts. Need a working scene with charts in it and a <see cref="GameObject" /> with a
     ///     <see cref="TestHelper" /> on it. A city will be loaded by the tests.
     /// </summary>
-    public class ChartSceneTest
+    [Explicit("ChartsTest scene no longer exists. Tracked in #483.")]
+    public class TestChartScene
     {
         private const string ChartString = "Chart(Clone)";
         private const string DataString = "DataPanel";

@@ -158,7 +158,7 @@ namespace SEE.Utils
             Assert.AreEqual("HAL !", test.PrintString());
             try
             {
-                test.RemoteDeleteChar(new Identifier[] { new Identifier(22, "22"), new Identifier(11, "11"), new Identifier(33, "33") });
+                test.RemoteDeleteChar(new[] { new Identifier(22, "22"), new Identifier(11, "11"), new Identifier(33, "33") });
                 Assert.Fail();
             }
             catch (RemoteDeleteNotPossibleException)
@@ -167,7 +167,7 @@ namespace SEE.Utils
         }
 
         [Test]
-        public void RemoteAndAddCharSameTimePos0()
+        public void TestRemoteAndAddCharSameTimePos0()
         {
             CRDT crdt1 = new CRDT("1", "test");
             CRDT crdt2 = new CRDT("2", "test");
@@ -181,7 +181,7 @@ namespace SEE.Utils
 
             crdt2.RemoteAddChar('A', crdt1.GetCRDT()[0].GetIdentifier());
             crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier());
-            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[1].GetIdentifier());
+            crdt1.RemoteAddChar('a', crdt2.GetCRDT()[2].GetIdentifier());
             Assert.AreEqual("Aaa", crdt1.PrintString());
             Assert.AreEqual("Aaa", crdt2.PrintString());
         }
@@ -220,9 +220,9 @@ namespace SEE.Utils
             Print(crdt2);
         }
 
-        private void Print(CRDT crdt)
+        private static void Print(CRDT crdt)
         {
-            Debug.Log("CRDT: " + crdt.ToString());
+            Debug.Log($"CRDT: {crdt}");
             Debug.Log(crdt.PrintString());
         }
     }

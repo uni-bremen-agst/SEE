@@ -8,6 +8,9 @@ using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
+    /// <summary>
+    /// Stress tests for the reflexion analysis, using the minilax graph as a basis.
+    /// </summary>
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {
         /// <summary>
@@ -95,7 +98,7 @@ namespace SEE.Tools.Architecture
 
         private void LoadAll(string folderName, out Graph impl, out Graph arch, out Graph mapping)
         {
-            string path = Application.dataPath + "/../Data/GXL/reflexion/" + folderName + "/";
+            string path = Application.streamingAssetsPath + "/reflexion/" + folderName + "/";
             Performance p = Performance.Begin("Loading graphs");
             impl = Load(path + "CodeFacts.gxl");
             arch = Load(path + "Architecture.gxl");
