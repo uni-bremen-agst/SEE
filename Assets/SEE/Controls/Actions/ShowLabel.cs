@@ -247,11 +247,13 @@ namespace SEE.Controls.Actions
             }
             currentlyDestroying = false;
             string shownText = node.SourceName;
-            Vector3 roof = gameObject.transform.position;
-            roof.y += gameObject.transform.lossyScale.y / 2;
-            // Now we create the label.
+
+            // The text of the label appears above the hull of the labeled game object
+            // which is including the heights of its children. A line will be drawn from the
+            // roof of the game object excluding its children to the label text.
+            // First we create the label.
             // We define starting and ending positions for the animation.
-            Vector3 startLabelPosition = roof;
+            Vector3 startLabelPosition = gameObject.GetTop();
             nodeLabel = TextFactory.GetTextWithSize(
                 shownText,
                 startLabelPosition,
@@ -263,8 +265,8 @@ namespace SEE.Controls.Actions
 
             SetOutline();
 
-            // Add connecting line between "roof" of object and text.
-            Vector3 startLinePosition = roof;
+            // Second, add connecting line between "roof" of the game object and the text.
+            Vector3 startLinePosition = gameObject.GetRoofCenter();
             edge = new GameObject();
             LineFactory.Draw(edge, new[] {startLinePosition, startLinePosition}, 0.01f,
                              Materials.New(Materials.ShaderType.TransparentLine, Color.black));
