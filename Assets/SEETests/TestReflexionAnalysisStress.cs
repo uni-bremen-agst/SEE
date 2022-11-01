@@ -8,6 +8,9 @@ using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
+    /// <summary>
+    /// Stress tests for the reflexion analysis, using the minilax graph as a basis.
+    /// </summary>
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {
         /// <summary>
@@ -26,7 +29,7 @@ namespace SEE.Tools.Architecture
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
             reflexion = new Reflexion(impl, arch, mapping);
             fullGraph = reflexion.FullGraph;
-            reflexion.Register(this);
+            reflexion.Subscribe(this);
             reflexion.Run();
             p.End();
         }
@@ -48,7 +51,7 @@ namespace SEE.Tools.Architecture
             // Passing the empty graph as mapping argument to reflexion.
             reflexion = new Reflexion(impl, arch, new Graph("DUMMYBASEPATH"));
             fullGraph = reflexion.FullGraph;
-            reflexion.Register(this);
+            reflexion.Subscribe(this);
             reflexion.Run(); // from scratch
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
@@ -95,7 +98,7 @@ namespace SEE.Tools.Architecture
 
         private void LoadAll(string folderName, out Graph impl, out Graph arch, out Graph mapping)
         {
-            string path = Application.dataPath + "/../Data/GXL/reflexion/" + folderName + "/";
+            string path = Application.streamingAssetsPath + "/reflexion/" + folderName + "/";
             Performance p = Performance.Begin("Loading graphs");
             impl = Load(path + "CodeFacts.gxl");
             arch = Load(path + "Architecture.gxl");

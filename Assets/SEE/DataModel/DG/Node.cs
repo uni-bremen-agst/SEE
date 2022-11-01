@@ -105,7 +105,6 @@ namespace SEE.DataModel.DG
                 }
                 return level;
             }
-            set => level = value;
         }
 
         /// <summary>
@@ -114,12 +113,12 @@ namespace SEE.DataModel.DG
         ///
         /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
-        internal void SetLevel(int level)
+        internal void SetLevel(int newLevel)
         {
-            this.level = level;
+            level = newLevel;
             foreach (Node child in children)
             {
-                child.SetLevel(level + 1);
+                child.SetLevel(newLevel + 1);
             }
         }
 
@@ -138,7 +137,30 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent { get; set; }
+        private Node parent;
+
+        /// <summary>
+        /// The ancestor of the node in the hierarchy. May be null if the node is a root.
+        /// </summary>
+        public Node Parent { 
+            get => parent;
+            private set
+            {
+                Node oldParent = parent;
+                parent = value;
+                switch (value)
+                {
+                    case null when parent == null: // Nothing to be done.
+                        break;
+                    case null: // value is null while parent is not, so the parent has been removed.
+                        Notify(new HierarchyEvent(oldParent, this, ChangeType.Removal));
+                        break;
+                    default: // value != null, so the parent has been added or changed
+                        Notify(new HierarchyEvent(value, this, ChangeType.Addition));
+                        break;
+                }
+            }
+        }
 
         /// <summary>
         /// True iff node has no parent.
@@ -280,7 +302,7 @@ namespace SEE.DataModel.DG
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using the ID which is intended to be unique
+            // we are using the ID, which is intended to be unique
             return ID.GetHashCode();
         }
 

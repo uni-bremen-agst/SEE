@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
@@ -103,6 +103,8 @@ namespace SEE.Tools.ReflexionAnalysis
                     }
                 }
 
+                bool implRemoved = propagationTable[propagated.ID].Remove(edge);
+                Assert.IsTrue(implRemoved, "Originating edge must be present in propagation table!");
                 ChangePropagatedDependency(propagated, -GetImplCounter(edge));
             }
 
@@ -356,7 +358,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
             node.SetInArchitecture();
             FullGraph.AddNode(node);
-            Notify(new NodeChangeEvent(node, ChangeType.Addition, Architecture));
+            Notify(new NodeEvent(node, ChangeType.Addition, Architecture));
             // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
@@ -381,7 +383,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 Delete(connected);
             }
 
-            Notify(new NodeChangeEvent(node, ChangeType.Removal, Architecture));
+            Notify(new NodeEvent(node, ChangeType.Removal, Architecture));
             FullGraph.RemoveNode(node, false);
         }
 
@@ -399,7 +401,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(!FullGraph.ContainsNode(node), () => new AlreadyContainedException(node));
             node.SetInImplementation();
             FullGraph.AddNode(node);
-            Notify(new NodeChangeEvent(node, ChangeType.Addition, Implementation));
+            Notify(new NodeEvent(node, ChangeType.Addition, Implementation));
             // No reflexion data has to be updated, as adding an unmapped and unconnected node has no effect.
         }
 
@@ -422,7 +424,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 Delete(connected);
             }
 
-            Notify(new NodeChangeEvent(node, ChangeType.Removal, Implementation));
+            Notify(new NodeEvent(node, ChangeType.Removal, Implementation));
             FullGraph.RemoveNode(node, false);
         }
 
@@ -453,7 +455,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Implementation, parent));
 
             parent.AddChild(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, Implementation));
+            Notify(new HierarchyEvent(parent, child, ChangeType.Addition, Implementation));
             if (!IsExplicitlyMapped(child))
             {
                 // An implicit mapping will only be created if child wasn't already explicitly mapped.
@@ -490,7 +492,7 @@ namespace SEE.Tools.ReflexionAnalysis
                           () => new NotInSubgraphException(Implementation, child));
 
             Node formerTarget = MapsTo(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, Implementation));
+            Notify(new HierarchyEvent(parent, child, ChangeType.Removal, Implementation));
             child.Reparent(null);
             if (formerTarget != null && !IsExplicitlyMapped(child))
             {
@@ -566,7 +568,7 @@ namespace SEE.Tools.ReflexionAnalysis
             PartitionedDependencies divergent = DivergentRefsInSubtree(child);
             // New relationship needs to be present for lifting, so we'll add it first
             parent.AddChild(child);
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Addition, Architecture));
+            Notify(new HierarchyEvent(parent, child, ChangeType.Addition, Architecture));
 
             foreach (Edge edge in divergent.OutgoingCross)
             {
@@ -639,7 +641,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
             }
 
-            Notify(new HierarchyChangeEvent(parent, child, ChangeType.Removal, Architecture));
+            Notify(new HierarchyEvent(parent, child, ChangeType.Removal, Architecture));
             child.Reparent(null);
         }
 
@@ -825,8 +827,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
             return new PartitionedDependencies(oc, ic, i);
         }
-
-        // TODO: What about ImplicitlyAllowed and AllowedAbsence?
         
         /// <summary>
         /// Returns all allowed propagated dependencies of the subtree rooted by <paramref name="root"/>.
@@ -905,7 +905,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// (if it exists)</param>
         /// <returns>the edge in the architecture graph propagated from <paramref name="implementationEdge"/>
         /// with given type; null if there is no such edge</returns>
-        private Edge GetPropagatedDependency(Edge implementationEdge)
+        public Edge GetPropagatedDependency(Edge implementationEdge)
         {
             AssertOrThrow(implementationEdge.IsInImplementation(),
                           () => new NotInSubgraphException(Implementation, implementationEdge));
