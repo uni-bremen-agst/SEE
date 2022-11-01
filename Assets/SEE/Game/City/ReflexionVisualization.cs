@@ -18,7 +18,7 @@ namespace SEE.Game.City
     /// Must be attached to a <see cref="SEECity"/>.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ReflexionVisualization : MonoBehaviour, Observer
+    public class ReflexionVisualization : MonoBehaviour, IObserver<ChangeEvent>
     {
         /// <summary>
         /// Reflexion analysis. Use this to make changes to the graph
@@ -93,7 +93,7 @@ namespace SEE.Game.City
             // Unhandled events should only be handled once the city is drawn.
             while (UnhandledEvents.Count > 0 && CityDrawn)
             {
-                HandleChange(UnhandledEvents.Dequeue());
+                OnNext(UnhandledEvents.Dequeue());
             }
         }
 
@@ -106,7 +106,7 @@ namespace SEE.Game.City
             CityGraph = graph;
             Events.Clear();
             Analysis = new Reflexion(CityGraph);
-            Analysis.Register(this);
+            Analysis.Subscribe(this);
             Analysis.Run();
         }
 
@@ -142,12 +142,25 @@ namespace SEE.Game.City
             }
         }
 
+        public void OnCompleted()
+        {
+            // Should never be called.
+            throw new NotImplementedException();
+        }
+
+        public void OnError(Exception error)
+        {
+            // We simply show the error to the user.
+            ShowNotification.Error("Error in Reflexion Analysis", error.Message, log: false);
+            Debug.LogError(error);
+        }
+
         /// <summary>
         /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
         /// and handles the changes by modifying this city.
         /// </summary>
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
-        public void HandleChange(ChangeEvent changeEvent)
+        public void OnNext(ChangeEvent changeEvent)
         {
             if (!CityDrawn)
             {
@@ -167,10 +180,10 @@ namespace SEE.Game.City
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
                     break;
-                case HierarchyChangeEvent hierarchyChangeEvent:
-                    HandleHierarchyChangeEvent(hierarchyChangeEvent);
+                case HierarchyEvent hierarchyEvent:
+                    HandleHierarchyChangeEvent(hierarchyEvent);
                     break;
-                case NodeChangeEvent nodeChangeEvent:
+                case NodeEvent nodeChangeEvent:
                     HandleNodeChangeEvent(nodeChangeEvent);
                     break;
                 case PropagatedEdgeEvent propagatedEdgeEvent:
@@ -198,13 +211,6 @@ namespace SEE.Game.City
             }
 
             GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
-            if (edge == null)
-            {
-                // If no such edge can be found, the given edge must be propagated
-                string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
-                edge = edgeId != null ? GraphElementIDMap.Find(edgeId) : null;
-            }
-
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
@@ -249,7 +255,6 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been removed.</param>
         private void HandleRemovedMapping(Edge mapsToEdge)
         {
-            ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.", duration: 3f);
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
             implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
@@ -261,8 +266,6 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been added.</param>
         private void HandleNewMapping(Edge mapsToEdge)
         {
-            ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
-                                                        + $"onto '{mapsToEdge.Target.ToShortString()}'.", duration: 3f);
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);
 
@@ -284,19 +287,19 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Handles the given <paramref name="hierarchyChangeEvent"/> by modifying the scene accordingly.
+        /// Handles the given <paramref name="hierarchyEvent"/> by modifying the scene accordingly.
         /// </summary>
-        /// <param name="hierarchyChangeEvent">The event which shall be handled.</param>
-        private void HandleHierarchyChangeEvent(HierarchyChangeEvent hierarchyChangeEvent)
+        /// <param name="hierarchyEvent">The event which shall be handled.</param>
+        private void HandleHierarchyChangeEvent(HierarchyEvent hierarchyEvent)
         {
             // FIXME: Handle event
         }
 
         /// <summary>
-        /// Handles the given <paramref name="nodeChangeEvent"/> by modifying the scene accordingly.
+        /// Handles the given <paramref name="nodeEvent"/> by modifying the scene accordingly.
         /// </summary>
-        /// <param name="nodeChangeEvent">The event which shall be handled.</param>
-        private void HandleNodeChangeEvent(NodeChangeEvent nodeChangeEvent)
+        /// <param name="nodeEvent">The event which shall be handled.</param>
+        private void HandleNodeChangeEvent(NodeEvent nodeEvent)
         {
             // FIXME: Handle event
         }

@@ -37,6 +37,7 @@ using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
+using UnityEngine.Assertions;
 using static SEE.Game.GraphRenderer;
 using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
@@ -54,12 +55,12 @@ namespace SEE.Tools.ReflexionAnalysis
         Undefined = 0,
 
         /// <summary>
-        /// Allowed propagated dependency towards a convergence; only for implementation dependencies.
+        /// Allowed implementation dependency towards a convergence.
         /// </summary>
         Allowed = 1,
 
         /// <summary>
-        /// Disallowed propagated dependency (divergence); only for implementation dependencies.
+        /// Disallowed implementation dependency (divergence).
         /// </summary>
         Divergent = 2,
 
@@ -88,12 +89,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Tags an architecture edge that was created by the architect,
         /// i.e., is a specified edge; this is the initial state of a specified
-        /// architecture dependency; only for architecture dependencies
+        /// architecture dependency; only for architecture dependencies.
         /// </summary>
         Specified = 7,
         
         /// <summary>
-        /// Tags an implementation edge that has not yet been mapped; only for implementation dependencies.
+        /// Tags an implementation edge that has not yet been mapped.
         /// </summary>
         Unmapped = 8
     }
@@ -117,7 +118,7 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </li>
     /// </ul>
     /// </remarks>
-    public partial class Reflexion : Observable
+    public partial class Reflexion : Observable<ChangeEvent>
     {
         /// <summary>
         /// Constructor for setting up the reflexion analysis.
@@ -190,7 +191,6 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Sets the state of <paramref name="edge"/> to <paramref name="newState"/>.
-        /// Precondition: <paramref name="edge"/> has a state attribute.
         /// </summary>
         /// <param name="edge">edge whose state is to be set</param>
         /// <param name="newState">the state to be set</param>
@@ -202,6 +202,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Transfers edge from its <paramref name="oldState"/> to <paramref name="newState"/>;
         /// notifies all observers if <paramref name="oldState"/> and <paramref name="newState"/> actually differ.
+        /// Note that, if <paramref name="edge"/> is a propagated edge, <see cref="Transition"/> will be recursively
+        /// called on each originating edge, and no notification will be sent for the propagated edge.
         /// </summary>
         /// <param name="edge">edge being changed</param>
         /// <param name="oldState">the old state of the edge</param>
@@ -211,13 +213,27 @@ namespace SEE.Tools.ReflexionAnalysis
             if (oldState != newState)
             {
                 SetState(edge, newState);
-                Notify(new EdgeChange(edge, oldState, newState));
+                if (edge.IsInArchitecture() && !IsSpecified(edge))
+                {
+                    // If this is in fact a propagated edge, we transition the originating implementation edges too.
+                    // Observers won't be notified of this propagated edge, we instead tell them about each 
+                    // of these originating edges.
+                    AssertOrThrow(propagationTable.ContainsKey(edge.ID), () => new ExpectedPropagatedEdgeException(edge));
+                    foreach (Edge originatingEdge in GetOriginatingEdges(edge))
+                    {
+                        Transition(originatingEdge, oldState, newState);
+                    }
+                }
+                else
+                {
+                    Notify(new EdgeChange(edge, oldState, newState, edge.GetSubgraph()));
+                }
             }
         }
 
         /// <summary>
         /// Returns true if <paramref name="edge"/> is a specified edge in the architecture (has one of the
-        /// following states: specified, convergent, absent).
+        /// following states: specified, convergent, absent, allowed absent).
         /// Precondition: <paramref name="edge"/> must be in the architecture graph.
         /// </summary>
         /// <param name="edge">architecture dependency</param>
@@ -226,7 +242,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             State state = edge.State();
-            return state == State.Specified || state == State.Convergent || state == State.Absent;
+            return state == State.Specified || state == State.Convergent || state == State.Absent || state == State.AllowedAbsent;
         }
 
         #endregion
@@ -279,7 +295,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
         /// <returns>the counter of <paramref name="edge"/></returns>
-        public static int GetArchCounter(Edge edge)
+        private static int GetArchCounter(Edge edge)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             return edge.TryGetInt(CounterAttribute, out int value) ? value : 0;
@@ -291,7 +307,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">an architecture or implementation dependency whose counter is to be retrieved</param>
         /// <returns>the counter of <paramref name="edge"/></returns>
-        public static int GetCounter(Edge edge)
+        private static int GetCounter(Edge edge)
         {
             if (edge.IsInArchitecture())
             {
@@ -326,6 +342,8 @@ namespace SEE.Tools.ReflexionAnalysis
             // TODO(falko17): Figure 5.b on page 10 also describes a state change to 'allowed'.
             if (newValue <= 0)
             {
+                // This will also send notifications about all originating implementation dependencies which
+                // are now unmapped.
                 Transition(edge, edge.State(), State.Unmapped);
                 // We can drop this edge; it is no longer needed.
                 SetCounter(edge, 0);
@@ -516,10 +534,15 @@ namespace SEE.Tools.ReflexionAnalysis
                     ChangePropagatedDependency(propagatedEdge, counter);
                     if (GetCounter(propagatedEdge) > 0)
                     {
-                        Transition(propagatedEdge, propagatedEdge.State(), State.Unmapped);
+                        // We need to remove the implementation edge from the propagation table, because it's no longer
+                        // mapped to the propagated edge.
+                        bool implRemoved = propagationTable[propagatedEdge.ID].Remove(implementationDependency);
+                        Assert.IsTrue(implRemoved, "Originating edge should have been present in propagation table!");
+                        // Not every originating dependency has been unmapped, only the one passed in here.
+                        Transition(implementationDependency, implementationDependency.State(), State.Unmapped);
                     }
-                    // Edge has been removed. We shall not call `Transition` in this case,
-                    // because the edge no longer exists.
+                    // Otherwise, edge has been removed. We shall not call `Transition` in this case,
+                    // because the propagated edge no longer exists.
                 }
             }
         }
@@ -790,26 +813,26 @@ namespace SEE.Tools.ReflexionAnalysis
         #region DG Utilities
 
         /// <summary>
-        /// Map from IDs of propagated edges to their originating edge, i.e., the edge they were propagated from.
+        /// Map from IDs of propagated edges to their originating edges, i.e., the edges they were propagated from.
+        /// The list that is mapped to is never empty.
         /// </summary>
-        private readonly IDictionary<string, Edge> propagationTable = new Dictionary<string, Edge>();
+        private readonly IDictionary<string, IList<Edge>> propagationTable = new Dictionary<string, IList<Edge>>();
 
         /// <summary>
-        /// Returns the edge from which the given <paramref name="propagatedEdge"/> was propagated or <c>null</c>
-        /// if no such edge exists.
+        /// Returns the edges from which the given <paramref name="propagatedEdge"/> was propagated.
         ///
         /// Pre-conditions:
         /// - Given <paramref name="propagatedEdge"/> is in the architecture graph.
         ///
         /// Post-conditions:
-        /// - Returned edge is in the implementation graph or null.
+        /// - Returned edges are in the implementation graph. Note that the returned list may be empty.
         /// </summary>
-        /// <param name="propagatedEdge">Propagated edge whose originating edge shall be returned</param>
-        /// <returns>Edge from which <paramref name="propagatedEdge"/> was propagated or null</returns>
-        public Edge GetOriginatingEdge(Edge propagatedEdge)
+        /// <param name="propagatedEdge">Propagated edge whose originating edges shall be returned</param>
+        /// <returns>Edges from which <paramref name="propagatedEdge"/> was propagated</returns>
+        public IList<Edge> GetOriginatingEdges(Edge propagatedEdge)
         {
             AssertOrThrow(propagatedEdge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, propagatedEdge));
-            return propagationTable.TryGetValue(propagatedEdge.ID, out Edge edge) ? edge : null;
+            return propagationTable.TryGetValue(propagatedEdge.ID, out IList<Edge> edges) ? edges : new List<Edge>();
         }
 
         /// <summary>
@@ -1039,9 +1062,10 @@ namespace SEE.Tools.ReflexionAnalysis
                               () => new NotInSubgraphException(Architecture, architectureDependency.Source));
                 AssertOrThrow(architectureDependency.Target.IsInArchitecture(),
                               () => new NotInSubgraphException(Architecture, architectureDependency.Target));
-                Lift(architectureDependency.Source, architectureDependency.Target,
-                     implType, implCounter, out allowingEdge);
+                propagationTable[architectureDependency.ID].Add(implementationDependency);
+                Lift(architectureDependency.Source, architectureDependency.Target, implType, implCounter, out allowingEdge);
                 ChangePropagatedDependency(architectureDependency, implCounter);
+                Transition(implementationDependency, implementationDependency.State(), architectureDependency.State());
             }
             // TODO: keep a trace of dependency propagation
             //causing.insert(std::pair<Edge*, Edge*>
@@ -1169,6 +1193,8 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 result.SetToggle(Edge.IsVirtualToggle);
             }
+            
+            SetState(result, State.Undefined);
 
             FullGraph.AddEdge(result);
             return result;
@@ -1216,7 +1242,8 @@ namespace SEE.Tools.ReflexionAnalysis
             Edge propagatedArchitectureDep = AddEdge(archSource, archTarget, edgeType, true);
             // propagatedArchitectureDep is a propagated dependency in the architecture graph
             SetCounter(propagatedArchitectureDep, counter);
-            propagationTable[propagatedArchitectureDep.ID] = originatingEdge;
+            IList<Edge> propagated = propagationTable[propagatedArchitectureDep.ID] = new List<Edge>();
+            propagated.Add(originatingEdge);
 
             // propagatedArchitectureDep is a dependency propagated from the implementation onto the architecture;
             // it was just created and, hence, has no state yet (which means it is State.undefined);
