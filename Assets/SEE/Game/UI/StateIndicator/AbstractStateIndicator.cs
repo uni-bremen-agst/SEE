@@ -3,7 +3,9 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+#if !UNITY_STANDALONE_OSX
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -50,10 +52,12 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         protected Image ModePanelImage;
 
+#if !UNITY_STANDALONE_OSX
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
         protected Color StartColor = Color.gray.ColorWithAlpha(0.5f);
+#endif
 
         /// <summary>
         /// The text of the state indicator after it has been instantiated.
@@ -67,6 +71,7 @@ namespace SEE.Game.UI.StateIndicator
         /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text, Color color)
         {
+#if !UNITY_STANDALONE_OSX
             if (HasStarted)
             {
                 ModePanelImage.color = color.ColorWithAlpha(0.5f);
@@ -78,6 +83,7 @@ namespace SEE.Game.UI.StateIndicator
                 StartColor = color.ColorWithAlpha(0.5f);
                 StartText = text;
             }
+#endif
         }
 
         protected GameObject StartDesktopInit()
@@ -93,7 +99,9 @@ namespace SEE.Game.UI.StateIndicator
 
             if (indicator.TryGetComponentOrLog(out ModePanelImage))
             {
+#if !UNITY_STANDALONE_OSX
                 ModePanelImage.color = StartColor;
+#endif
             }
 
             if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
@@ -104,6 +112,7 @@ namespace SEE.Game.UI.StateIndicator
             {
                 Debug.LogError("Couldn't find ModeText game object in ModePanel\n");
             }
+
             return indicator;
         }
 

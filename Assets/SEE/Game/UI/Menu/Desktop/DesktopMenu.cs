@@ -222,9 +222,12 @@ namespace SEE.Game.UI.Menu
                 else
                 {
                     buttonManager.useRipple = false;
+#if !UNITY_STANDALONE_OSX
+
                     buttonImage.color = entry.DisabledColor;
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();
                     iconImage.color = entry.DisabledColor.IdealTextColor();
+#endif
                 }
 
                 ButtonManagers.Add(buttonManager);

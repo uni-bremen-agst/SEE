@@ -20,12 +20,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Game.Charts;
+#if !UNITY_STANDALONE_OSX
 using Valve.VR;
+#endif
 
 namespace SEE.Controls.Actions
 {
     public class XRChartAction : ChartAction
     {
+#if !UNITY_STANDALONE_OSX
         private readonly SteamVR_Action_Vector2 moveAction =
             SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
 
@@ -37,11 +40,12 @@ namespace SEE.Controls.Actions
 
         private readonly SteamVR_Action_Boolean createAction =
             SteamVR_Input.GetBooleanAction(XRInput.DefaultActionSetName, XRInput.CreateChartActionName);
-
+#endif
         private bool _lastClick;
 
         private void Update()
         {
+#if !UNITY_STANDALONE_OSX
             if (resetAction.stateDown)
             {
                 ChartManager.ResetPosition();
@@ -67,6 +71,7 @@ namespace SEE.Controls.Actions
                 clickUp = true;
             }
             _lastClick = clickAction.state;
+#endif
         }
     }
 }
