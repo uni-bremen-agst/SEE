@@ -72,6 +72,18 @@ namespace SEE.GO
         private BSpline spline;
 
         /// <summary>
+        /// The start knot of the subspline for the build-up animation
+        /// </summary>
+        [SerializeField]
+        private float lowerKnot = 0.0f;
+
+        /// <summary>
+        /// The end knot of the subspline for the build-up animation
+        /// </summary>
+        [SerializeField]
+        private float upperKnot = 1.0f;
+
+        /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
         /// copy of <see cref="spline"/>. Hence, treat it well and don't
         /// forget to set this property after modifying the returned instance.
@@ -249,8 +261,34 @@ namespace SEE.GO
         {
             if (needsUpdate)
             {
-                UpdateLineRenderer();
-                UpdateMesh();
+                if (BSpline.KnotsEqual(lowerKnot, upperKnot))
+                {
+                    if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+                    {
+                        lineRenderer.enabled = false;
+                    }
+                    if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
+                    {
+                        meshRenderer.enabled = false;
+                    }
+                }
+                else
+                {
+                    if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+                    {
+                        lineRenderer.enabled = true;
+                    }
+                    if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
+                    {
+                        meshRenderer.enabled = true;
+                    }
+
+                    BSpline subSpline = spline;
+
+                    /// TODO UpdateLineRenderer, UpdateMesh mit subSpline
+                    UpdateLineRenderer();
+                    UpdateMesh();
+                }
                 needsUpdate = false;
             }
         }
