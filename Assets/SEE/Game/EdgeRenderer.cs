@@ -229,7 +229,7 @@ namespace SEE.Game
                 return new List<GameObject>();
             }
 #if UNITY_EDITOR
-            Performance p = Performance.Begin("edge layout " + layout.Name);
+            //Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
             EdgeFactory edgeFactory = new EdgeFactory(layout, Settings.EdgeLayoutSettings.EdgeWidth);
             // The resulting game objects representing the edges.
@@ -245,9 +245,9 @@ namespace SEE.Game
             AddLOD(result);
 
 #if UNITY_EDITOR
-            p.End();
-            Debug.Log($"Calculated \"  {Settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
-                      + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
+            //p.End();
+            //Debug.Log($"Calculated \"  {Settings.EdgeLayoutSettings.Kind} \" edge layout for {gameNodes.Count}"
+            //          + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
 #endif
             return result;
         }
