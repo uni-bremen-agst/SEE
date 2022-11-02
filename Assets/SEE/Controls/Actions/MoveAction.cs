@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
@@ -87,6 +89,11 @@ namespace SEE.Controls.Actions
             private const float AnimationTime = 1.0f;
 
             /// <summary>
+            /// TODO: Documentation.
+            /// </summary>
+            private SEEReflexionCity reflexionCity;
+
+            /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
@@ -97,6 +104,7 @@ namespace SEE.Controls.Actions
                 {
                     this.gameObject = gameObject;
                     nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                    KillActiveAnimations(nodeOperator);
                     originalPositionOfGrabbedObject = gameObject.transform.position;
                     ConnectedEdges = GetConnectedEdges(gameObject);
                     MorphEdgesToSplines(SplineAnimationDuration);
@@ -105,15 +113,32 @@ namespace SEE.Controls.Actions
                     {
                         interactableObject.SetGrab(true, true);
                     }
+                    // We need the reflexion city for later.
+                    reflexionCity = gameObject.ContainingCity<SEEReflexionCity>();
                 }
                 else
                 {
                     throw new ArgumentNullException("Parameter must not be null");
                 }
+
+                void KillActiveAnimations(NodeOperator nodeOperator)
+                {
+                    if (gameObject.TryGetNodeRef(out NodeRef node))
+                    {
+                        // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
+                        if (node.Value.IsInImplementation() || node.Value.IsInArchitecture())
+                        {
+                            // TODO: Instead of just killing animations here with this trick,
+                            //       handle all movement inside the NodeOperator.
+                            nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
+                        }
+                    }
+                }
             }
 
             /// <summary>
-            /// The currently grabbed object is considered to be ungrabbed.
+            /// The currently grabbed object is considered to be ungrabbed and its movement
+            /// is to be finalized.
             /// </summary>
             /// <exception cref="InvalidOperationException">thrown if not object is currently grabbed</exception>
             public void UnGrab()
@@ -124,7 +149,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    IsGrabbed = false;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
                         interactableObject.SetGrab(false, true);
@@ -132,8 +156,9 @@ namespace SEE.Controls.Actions
                     if (originalPositionOfGrabbedObject != currentPositionOfGrabbedObject)
                     {
                         // The grabbed object has actually been moved.
-                        Finalize();
+                        //Finalize();
                     }
+                    IsGrabbed = false;
                     // Note: We do not set gameObject to null because we may need its
                     // value later for Undo/Redo.
                 }
@@ -229,6 +254,15 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// The node reference associated with the grabbed object. May be null if no
+            /// node is associated with the grabbed object.
+            /// </summary>
+            public NodeRef Node
+            {
+                get => gameObject.TryGetNodeRef(out NodeRef result) ? result : null;
+            }
+
+            /// <summary>
             /// The original position of <see cref="GameObject"/> when it was grabbed.
             /// Required to return it to is original position when the action is canceled
             /// or undone.
@@ -247,11 +281,9 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void MoveToOrigin()
             {
-                /// Note: We cannot call <see cref="MoveTo(Vector3)"/> because that
-                /// would also update <see cref="currentPositionOfGrabbedObject"/>.
                 if (gameObject)
                 {
-                    nodeOperator.MoveTo(originalPositionOfGrabbedObject, AnimationTime);
+                    MoveTo(originalPositionOfGrabbedObject, AnimationTime);
                 }
             }
 
@@ -291,6 +323,7 @@ namespace SEE.Controls.Actions
             {
                 // FIXME: This code must be factored out into a helper class that can be called
                 // from the corresponding network move action. It should be handled by GameNodeMover.
+                // MorphEdgesToSplines() must be moved into this helper class, too.
                 nodeOperator.MoveTo(targetPosition, duration);
                 MorphEdgesToSplines(duration);
                 // TODO: Propagate to clients.
@@ -358,6 +391,121 @@ namespace SEE.Controls.Actions
             {
                 MoveToLastUserRequestedPosition();
             }
+
+            /// <summary>
+            /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
+            /// </summary>
+            private Edge temporaryMapsTo;
+
+            internal void TemporaryMapTo(GameObject mappingTarget)
+            {
+                // The mapping is only possible if we are in a reflexion city and if the
+                // mapping target is actually a node.
+                if (reflexionCity != null && mappingTarget.TryGetNode(out Node target))
+                {
+                    // The source of the mapping
+                    Node source = gameObject.GetNode();
+
+                    if (source.ItsGraph != target.ItsGraph)
+                    {
+                        Debug.LogError("For a mapping, both nodes must be in the same graph.\n");
+                        return;
+                    }
+
+                    // implementation -> architecture
+                    if (source.IsInImplementation() && target.IsInArchitecture())
+                    {
+                        // If there is a previous mapping that already mapped the node
+                        // on the current target, nothing needs to be done.
+                        // If there is a previous mapping that mapped the node onto
+                        // another target, the previous mapping must be reverted and the
+                        // node must be mapped onto the new target.
+
+                        if (temporaryMapsTo == null)
+                        {
+                            // If there is no previous mapping, we can just map the node.
+                            MapTo(source, mappingTarget, target);
+                        }
+                        else // If there is a previous mapping.
+                        {
+                            Assert.IsTrue(reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo));
+                            // A temporary mapping exists already. This mapping can only be from an implementation
+                            // node onto an architecture node.
+                            Assert.IsTrue(temporaryMapsTo.Source == source);
+                            // If the mapping hasn't changed, there is nothing to do.
+                            if (temporaryMapsTo.Target != target)
+                            {
+                                // The grabbed object was previously temporarily mapped onto another target.
+                                // The temporary mapping must be reverted.
+                                reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                                MapTo(source, mappingTarget, target);
+                            }
+                        }
+                    }
+                    // implementation -> implementation
+                    else if (source.IsInImplementation() && target.IsInImplementation())
+                    {
+                        // This changes the node hierarchy in the implementation only.
+                        PutOn(mappingTarget);
+                        reflexionCity.Analysis.UnparentInImplementation(source);
+                        reflexionCity.Analysis.AddChildInImplementation(source, target);
+                    }
+                    // architecture -> architecture
+                    else if (source.IsInArchitecture() && target.IsInArchitecture())
+                    {
+                        // This changes the node hierarchy in the implementation only.
+                        PutOn(mappingTarget);
+                        reflexionCity.Analysis.UnparentInArchitecture(source);
+                        reflexionCity.Analysis.AddChildInArchitecture(source, target);
+                    }
+                    // architecture -> implementation: forbidden
+                    else
+                    {
+                        // nothing to be done
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Puts the <see cref="grabbedObject"/> onto <paramref name="mappingTarget"/> graphically.
+            /// Adds a mapping from <paramref name="source"/> to <paramref name="target"/> to the
+            /// reflexion analysis overriding any existing mapping.
+            /// </summary>
+            /// <param name="source">the source node of the maps-to edge</param>
+            /// <param name="mappingTarget">the game node onto which to put <see cref="gameObject"/></param>
+            /// <param name="target">the target node of the maps-to edge</param>
+            private void MapTo(Node source, GameObject mappingTarget, Node target)
+            {
+                // If we are in a reflexion city, we will simply
+                // trigger the incremental reflexion analysis here.
+                // That way, the relevant code is in one place
+                // and edges will be colored on hover (#451).
+                PutOn(mappingTarget);
+                temporaryMapsTo = reflexionCity.Analysis.AddToMapping(source, target, overrideMapping: true);
+            }
+
+            /// <summary>
+            /// Puts <see cref="gameObject"/> onto <paramref name="mappingTarget"/> graphically.
+            /// No change to the underlying graph is made.
+            /// </summary>
+            /// <param name="mappingTarget">the game node onto which to put <see cref="gameObject"/></param>
+            private void PutOn(GameObject mappingTarget)
+            {
+                GameNodeMover.PutOn(gameObject.transform, mappingTarget, scaleDown: true);
+            }
+
+            internal void TemporaryUnMap()
+            {
+                if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                {
+                    // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                    // We'll change its parent so it becomes a root node in the implementation city.
+                    // The user will have to drop it on another node to re-parent it.
+                    gameObject.transform.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
+                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                    temporaryMapsTo = null;
+                }
+            }
         }
 
         /// <summary>
@@ -372,6 +520,47 @@ namespace SEE.Controls.Actions
         /// an object.
         /// </summary>
         private float distanceToUser;
+
+        #region HitColor
+
+        /// <summary>
+        /// Original color of the object the user hovered over.
+        /// </summary>
+        private Color hitObjectColor;
+
+        /// <summary>
+        /// Material of the object the user hovered over.
+        /// </summary>
+        private Material hitObjectMaterial;
+
+        /// <summary>
+        /// Inverts the color of the hit object (and saves its original one to be able to revert
+        /// this color change later).
+        /// </summary>
+        /// <param name="hitObject">the object that was hit</param>
+        void SetHitObjectColor(Transform hitObject)
+        {
+            hitObjectMaterial = hitObject.GetComponent<Renderer>().material;
+            // We persist hoveredObjectColor in case we want to use something different than simple
+            // inversion in the future, such as a constant color (we would then need the original color).
+            hitObjectColor = hitObjectMaterial.color;
+            hitObjectMaterial.color = hitObjectColor.Invert();
+        }
+
+        /// <summary>
+        /// Restores the color of <see cref="hitObjectMaterial"/> to <see cref="hitObjectColor"/>.
+        /// Attribute <see cref="hitObjectMaterial"/> will be <c>null</c> afterwards.
+        /// </summary>
+        void ResetHitObjectColor()
+        {
+            if (hitObjectMaterial != null)
+            {
+                hitObjectMaterial.color = hitObjectColor;
+            }
+            hitObjectMaterial = null;
+        }
+
+        #endregion HitColor
 
         /// <summary>
         /// Index of the left mouse button.
@@ -409,47 +598,56 @@ namespace SEE.Controls.Actions
         {
             if (SEEInput.Cancel()) // cancel movement
             {
-                Debug.Log("Dragging cancelled.\n");
                 if (grabbedObject.IsGrabbed)
                 {
-                    Debug.Log($"Dragged object {grabbedObject.Name} returned to its location.\n");
-
-                    // The grabbed object needs to be returned to its original location.
-                    grabbedObject.MoveToOrigin();
+                    Debug.Log("Dragging cancelled.\n");
+                    Debug.Log($"Dragged object {grabbedObject.Name} will be returned to its original location.\n");
 
                     // Reset action.
-                    grabbedObject.UnGrab();
+                    grabbedObject.Undo();
                     currentState = ReversibleAction.Progress.NoEffect;
                 }
-
+                ResetHitObjectColor();
             }
-            else if (Input.GetMouseButton(LeftMouseButton)) // start or continue moving a grabbed object
+            else if (Input.GetMouseButton(LeftMouseButton)) // start to grab the object or continue to move the grabbed object
             {
                 if (!grabbedObject.IsGrabbed)
                 {
-                    // User is starting dragging.
+                    // User is starting dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
                     // An object to be grabbed must be representing a node that is not the root.
                     if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
+                        // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         currentState = ReversibleAction.Progress.InProgress;
                         Debug.Log($"Starting dragging of {grabbedObject.Name} at distance {distanceToUser}.\n");
                     }
                     else
                     {
-                        Debug.Log("Nothing to be dragged.\n");
+                        // Debug.Log("Nothing to be dragged.\n");
                     }
                 }
-                else
+                else // continue moving the grabbed object
                 {
                     // Assert: grabbedObject != null
+                    // The grabbed object will be moved on the surface of a sphere with
+                    // radius distanceToUser in the direction the user is pointing to.
                     Ray ray = Raycasting.UserPointsTo();
                     Vector3 targetPosition = ray.origin + distanceToUser * ray.direction;
-                    // User is continuing dragging.
                     Debug.Log($"Continuing dragging {grabbedObject.Name} to {targetPosition}.\n");
                     grabbedObject.MoveTo(targetPosition);
+                }
+
+                // The grabbed node is not yet at its final destination. The user is still moving
+                // it. We will run a what-if reflexion analysis to give immediate feedback on the
+                // consequences if the user were putting the grabbed node onto the node the user
+                // is currently aiming at.
+                if (grabbedObject.IsGrabbed)
+                {
+                    ResetHitObjectColor();
+                    TemporaryUpdateReflexion();
                 }
             }
             else if (grabbedObject.IsGrabbed) // dragging has ended
@@ -458,10 +656,42 @@ namespace SEE.Controls.Actions
                 // Finalize the action with the grabbed object.
                 grabbedObject.UnGrab();
                 // Action is finished.
+                ResetHitObjectColor();
                 currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Runs a what-if reflexion analysis to give immediate feedback on the
+        /// consequences if the user were putting the grabbed node onto the node the user
+        /// is currently aiming at. (if any). The what-if analysis will update the reflexion
+        /// analysis and show its results. The mapping, however, is considered only
+        /// temporary, that is, the modifications and visualizations will be finalized
+        /// only if the user actually drops the grabbed object.
+        /// </summary>
+        /// <remarks>Precondition: a node is grabbed.</remarks>
+        private void TemporaryUpdateReflexion()
+        {
+            Assert.IsTrue(grabbedObject.IsGrabbed);
+            if (Raycasting.RaycastLowestNode(out RaycastHit? raycastHit, out Node _, grabbedObject.Node))
+            {
+                // Note: the root node can never be grabbed. See above.
+                if (raycastHit.HasValue)
+                {
+                    // The user is currently aiming at a node. The grabbed node is mapped onto
+                    // this aimed node.
+                    grabbedObject.TemporaryMapTo(raycastHit.Value.transform.gameObject);
+                    SetHitObjectColor(raycastHit.Value.transform);
+                }
+                else
+                {
+                    // The user is currently not aiming at a node. The temporary mapping
+                    // of the grabbed must be reverted.
+                    grabbedObject.TemporaryUnMap();
+                }
+            }
         }
 
         /// <summary>
