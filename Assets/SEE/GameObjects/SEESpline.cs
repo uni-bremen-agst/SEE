@@ -72,6 +72,13 @@ namespace SEE.GO
         private BSpline spline;
 
         /// <summary>
+        /// A subspline from <see cref="lowerKnot"/> 
+        /// from <see cref="lowerKnot"/> to <see cref="upperKnot"/>
+        /// </summary>
+        [SerializeField]
+        private BSpline subSpline;
+
+        /// <summary>
         /// The start knot of the subspline for the build-up animation
         /// </summary>
         [SerializeField]
@@ -283,9 +290,9 @@ namespace SEE.GO
                         meshRenderer.enabled = true;
                     }
 
-                    BSpline subSpline = spline;
+                    // TODO
+                    subSpline = spline;
 
-                    /// TODO UpdateLineRenderer, UpdateMesh mit subSpline
                     UpdateLineRenderer();
                     UpdateMesh();
                 }
@@ -322,9 +329,14 @@ namespace SEE.GO
         /// The poly line can be visualized with a <see cref="LineRenderer"/>.
         /// </summary>
         /// <param name="num">Number of vertices in the poly line</param>
+        /// <param name="useSubSpline"> Use the current <see cref="subSpline"/> instead of <see cref="Spline"/></param>
         /// <returns>A poly line approximating <see cref="Spline"/></returns>
-        public Vector3[] PolyLine(int num = 100)
+        public Vector3[] PolyLine(int num = 100, bool useSubSpline = false)
         {
+            if (useSubSpline)
+            {
+                return TinySplineInterop.ListToVectors(subSpline.Sample((uint)num));
+            }
             return TinySplineInterop.ListToVectors(Spline.Sample((uint)num));
         }
 
@@ -342,7 +354,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                Vector3[] polyLine = PolyLine(lr.positionCount);
+                Vector3[] polyLine = PolyLine(lr.positionCount, true);
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
                 lr.startColor = gradientColors.start;
@@ -370,8 +382,8 @@ namespace SEE.GO
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            IList<double> rv = Spline.UniformKnotSeq((uint)tubularSegments + 1);
-            FrameSeq frames = Spline.ComputeRMF(rv);
+            IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = subSpline.ComputeRMF(rv);
 
             // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
