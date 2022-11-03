@@ -84,6 +84,15 @@ namespace SEE.GO
         private float upperKnot = 1.0f;
 
         /// <summary>
+        /// TODO:
+        /// </summary>
+        public float UpperKnot
+        {
+            get => upperKnot;
+            set => upperKnot = value;
+        }
+
+        /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
         /// copy of <see cref="spline"/>. Hence, treat it well and don't
         /// forget to set this property after modifying the returned instance.
@@ -317,19 +326,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Approximates <paramref name="s"/> as poly line. The greater
-        /// <paramref name="num"/>, the more accurate the approximation.
-        /// The poly line can be visualized with a <see cref="LineRenderer"/>.
-        /// </summary>
-        /// <param name="s">Spline that should be approximated</param>
-        /// <param name="num">Number of vertices in the poly line</param>
-        /// <returns>A poly line approximating <see cref="Spline"/></returns>
-        public Vector3[] PolyLine(BSpline s, int num = 100)
-        {
-            return TinySplineInterop.ListToVectors(s.Sample((uint)num));
-        }
-
-        /// <summary>
         /// Updates the <see cref="LineRenderer"/> of the
         /// <see cref="GameObject"/> this component is attached to
         /// (<see cref="Component.gameObject"/>) and marks the internal state
@@ -344,7 +340,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                Vector3[] polyLine = PolyLine(s, lr.positionCount);
+                Vector3[] polyLine = TinySplineInterop.ListToVectors(s.Sample());
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
                 lr.startColor = gradientColors.start;
@@ -532,13 +528,15 @@ namespace SEE.GO
         /// </summary>
         /// <param name="s">Spline to be rendered</param>
         /// <returns>A mesh approximating <see cref="Spline"/></returns>
-        public Mesh CreateMesh(BSpline s)
+        public Mesh CreateMesh()
         {
             if (gameObject.TryGetComponent(out MeshFilter filter))
             {
                 return filter.mesh;
             }
-            Mesh mesh = CreateOrUpdateMesh(s);
+
+            BSpline subSpline = spline;
+            Mesh mesh = CreateOrUpdateMesh(subSpline);
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
                 // Glow effect depends on materials staying the same. We need to fully refresh it.

@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ShowEdges : InteractableObjectAction
     {
-        // TODO: Perhaps edges being hidden should be a city setting? The setting would simply need to set the 
+        // TODO: Perhaps edges being hidden should be a city setting? The setting would simply need to set the
         //       `Edge.IsHiddenToggle` on all edges the user wishes to hide. Such edges will then only be shown
         //        when hovering or selecting connected nodes. This is currently the case for all reflexion edges
         //        except absences and divergences.
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions
             }
 
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.FadeTo(0f, EDGE_FADE_DURATION);
+            @operator.Destruct(EDGE_FADE_DURATION);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions
             }
 
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.FadeTo(1f, EDGE_FADE_DURATION);
+            @operator.Construct(EDGE_FADE_DURATION);
         }
 
         private void On()

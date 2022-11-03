@@ -4,6 +4,7 @@ using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO
@@ -123,7 +124,7 @@ namespace SEE.GO
 
             // Draw spline as poly line.
             SEESpline spline = gameEdge.GetComponent<SEESpline>();
-            Vector3[] positions = spline.PolyLine(spline.Spline);
+            Vector3[] positions = TinySplineInterop.ListToVectors(spline.Spline.Sample());
             line.positionCount = positions.Length; // number of vertices
             line.SetPositions(positions);
 
