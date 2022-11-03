@@ -4,6 +4,7 @@ using System.Linq;
 using ICSharpCode.SharpZipLib.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.XR;
 
 namespace SEE.DataModel.DG
 {
@@ -24,6 +25,11 @@ namespace SEE.DataModel.DG
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string UnknownType = "UNKNOWNTYPE";
+
+        /// <summary>
+        /// A toggle marking artificial root nodes as such.
+        /// </summary>
+        public const string RootToggle = "Root";
         
         /// <summary>
         /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
@@ -83,6 +89,16 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// (Deep) copy constructor.
+        /// </summary>
+        /// <param name="graph">The graph to copy from. Note that this will be a deep copy.</param>
+        public Graph(Graph copyFrom)
+        {
+            ElementObserver = new ProxyObserver(this);
+            copyFrom.HandleCloned(this);
+        }
+
+        /// <summary>
         /// The base path of this graph. It will be prepended to the
         /// <see cref="GraphElement.AbsolutePlatformPath()"/>.
         /// It should be set platform dependent.
@@ -98,7 +114,7 @@ namespace SEE.DataModel.DG
         ///   (3) a node with node.ID must not have been added before
         ///   (4) node must not be contained in another graph
         /// </summary>
-        public void AddNode(Node node)
+        public virtual void AddNode(Node node)
         {
             if (node == null)
             {
@@ -140,7 +156,7 @@ namespace SEE.DataModel.DG
         /// <param name="node">node to be removed</param>
         /// <param name="orphansBecomeRoots">if true, the children of <paramref name="node"/> become root nodes;
         /// otherwise they become children of the parent of <paramref name="node"/> (if any)</param>
-        public void RemoveNode(Node node, bool orphansBecomeRoots = true)
+        public virtual void RemoveNode(Node node, bool orphansBecomeRoots = false)
         {
             if (node == null)
             {
@@ -167,20 +183,20 @@ namespace SEE.DataModel.DG
                 // in the node's neighbor's data structure.
                 foreach (Edge outgoing in node.Outgoings)
                 {
+                    Notify(new EdgeEvent(outgoing, ChangeType.Removal));
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
                     outgoing.ItsGraph = null;
-                    Notify(new EdgeEvent(outgoing, ChangeType.Removal));
                 }
 
                 foreach (Edge incoming in node.Incomings)
                 {
+                    Notify(new EdgeEvent(incoming, ChangeType.Removal));
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
                     incoming.ItsGraph = null;
-                    Notify(new EdgeEvent(incoming, ChangeType.Removal));
                 }
                 
                 // Adjust the node hierarchy.
@@ -263,7 +279,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="name">ID of new root node</param>
         /// <param name="type">type of new root node</param>
-        public void AddSingleRoot(string name, string type)
+        public virtual void AddSingleRoot(string name, string type)
         {
             List<Node> roots = GetRoots();
             if (roots.Count > 0)
@@ -322,11 +338,24 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Adds a non-hierarchical edge to the graph.
         /// Preconditions:
+        /// (1) from and to must not be null.
+        /// (2) from and to must be in the graph already.
+        /// </summary>
+        public virtual Edge AddEdge(Node from, Node to, string type)
+        {
+            Edge edge = new Edge(from, to, type);
+            AddEdge(edge);
+            return edge;
+        }
+
+        /// <summary>
+        /// Adds a non-hierarchical edge to the graph.
+        /// Preconditions:
         /// (1) edge must not be null.
         /// (2) its source and target nodes must be in the graph already
         /// (3) the edge must not be in any other graph
         /// </summary>
-        public void AddEdge(Edge edge)
+        public virtual void AddEdge(Edge edge)
         {
             if (ReferenceEquals(edge, null))
             {
@@ -372,7 +401,7 @@ namespace SEE.DataModel.DG
         /// Removes the given edge from the graph.
         /// </summary>
         /// <param name="edge">edge to be removed</param>
-        public void RemoveEdge(Edge edge)
+        public virtual void RemoveEdge(Edge edge)
         {
             if (ReferenceEquals(edge, null))
             {
@@ -394,11 +423,11 @@ namespace SEE.DataModel.DG
                 throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
             }
 
+            Notify(new EdgeEvent(edge, ChangeType.Removal));
             edge.Source.RemoveOutgoing(edge);
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
             edge.ItsGraph = null;
-            Notify(new EdgeEvent(edge, ChangeType.Removal));
         }
 
         /// <summary>
@@ -632,9 +661,10 @@ namespace SEE.DataModel.DG
         /// <param name="other">The graph whose attributes, nodes and edges are to be copied into this one</param>
         /// <param name="nodeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's nodes</param>
         /// <param name="edgeIdSuffix">String suffixed to the ID of the <paramref name="other"/> graph's edges</param>
+        /// <typeparam name="T">Type of the graph.</typeparam>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
-        public Graph MergeWith(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null)
+        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T: Graph
         {
             if (other == null)
             {
@@ -643,7 +673,7 @@ namespace SEE.DataModel.DG
 
             // We need to create two copies because we'll mess with the graph's nodes and edges,
             // and don't want to leave a mangled mess.
-            Graph mergedGraph = Clone() as Graph;
+            T mergedGraph = Clone() as T;
             Assert.IsNotNull(mergedGraph);
             Graph otherGraph = other.Clone() as Graph;
             Assert.IsNotNull(otherGraph);
@@ -824,6 +854,7 @@ namespace SEE.DataModel.DG
             base.HandleCloned(clone);
             Graph target = (Graph)clone;
             target.Name = Name;
+            target.BasePath = BasePath;
             target.Path = Path;
             target.nodes = null;
             CopyNodesTo(target);
@@ -1499,6 +1530,45 @@ namespace SEE.DataModel.DG
             }
             return result;
         }
+        
+        /// <summary>
+        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
+        /// an artificial root is created and added to the <paramref name="graph"/>
+        /// All true roots of <paramref name="graph"/> will
+        /// become children of this artificial root.
+        /// </summary>
+        /// <param name="graph">graph where a unique root node should be added</param>
+        /// <returns>the new artificial root or null if <paramref name="graph"/> has
+        /// already a single root</returns>
+        public Node AddRootNodeIfNecessary()
+        {
+            // Note: Because this method is called only when a hierarchical layout is to
+            // be applied (and then both leaves and inner nodes were added to nodeMap), we
+            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
+            // a difference. If -- for any reason --, we decide not to create a game object
+            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
+            ICollection<Node> graphRoots = GetRoots();
+
+            if (graphRoots.Count > 1)
+            {
+                Node artificialRoot = new Node
+                {
+                    ID = $"{Name}#ROOT",
+                    SourceName = $"{Name} (Root)",
+                    Type = graphRoots.First().Type
+                };
+                SetToggle(RootToggle);
+                AddNode(artificialRoot);
+                foreach (Node root in graphRoots)
+                {
+                    artificialRoot.AddChild(root);
+                }
+                return artificialRoot;
+            }
+
+            return null;
+        }
+
 
         public static implicit operator bool(Graph graph)
         {

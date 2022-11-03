@@ -44,31 +44,21 @@ namespace SEE.Game.City
         public string CityName = "Reflexion Analysis";
 
         /// <summary>
-        /// Reflexion analysis. Use this to make changes to the graph
-        /// (such as mappings, hierarchies, and so on), <b>do not modify
-        /// the underlying Graph directly!</b>
+        /// Reflexion analysis graph. Note that this simply casts <see cref="LoadedGraph"/>,
+        /// to make it easier to call reflexion-specific methods.
+        /// May be <c>null</c> if the graph has not yet been loaded.
         /// </summary>
-        public Reflexion Analysis => Visualization != null ? Visualization.Analysis : null;
+        public ReflexionGraph ReflexionGraph => LoadedGraph as ReflexionGraph;
 
         /// <summary>
         /// Root node of the implementation subgraph.
         /// </summary>
-        private Node implementationRoot;
+        public Node ImplementationRoot => ReflexionGraph.ArchitectureRoot;
 
         /// <summary>
         /// Root node of the architecture subgraph.
         /// </summary>
-        private Node architectureRoot;
-
-        /// <summary>
-        /// Root node of the implementation subgraph.
-        /// </summary>
-        public Node ImplementationRoot => implementationRoot;
-
-        /// <summary>
-        /// Root node of the architecture subgraph.
-        /// </summary>
-        public Node ArchitectureRoot => architectureRoot;
+        public Node ArchitectureRoot => ReflexionGraph.ArchitectureRoot;
 
         /// <summary>
         /// The <see cref="ReflexionVisualization"/> responsible for handling reflexion analysis changes.
@@ -139,7 +129,7 @@ namespace SEE.Game.City
 
                 await UniTask.WhenAll(tasks);
 
-                LoadedGraph = Assemble(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName, out architectureRoot, out implementationRoot);
+                LoadedGraph = new ReflexionGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
                 Visualization.StartFromScratch(LoadedGraph);
@@ -181,7 +171,7 @@ namespace SEE.Game.City
             else
             {
                 string hierarchicalType = HierarchicalEdges.First();
-                (Graph implementation, Graph architecture, Graph mapping) = LoadedGraph.Disassemble();
+                (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
                 GraphWriter.Save(GxlArchitecturePath.Path, architecture, hierarchicalType);
                 Debug.Log($"Architecture graph saved at {GxlArchitecturePath.Path}.\n");
                 GraphWriter.Save(GXLPath.Path, implementation, hierarchicalType);
