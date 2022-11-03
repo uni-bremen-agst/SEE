@@ -69,7 +69,7 @@ namespace SEE.Game.City
             selection = selectionSettings.AssertNotNull("selectionSettings");
             Graph graph = cityGraph.AssertNotNull("City Graph");
             graph.Subscribe(this);
-            
+
             // When we're initialized, we also convert all existing edges into meshes first.
             graph.Edges().ForEach(edges.Enqueue);
         }
@@ -143,7 +143,7 @@ namespace SEE.Game.City
                     spline.RadialSegments = selection.RadialSegments;
                 }
 
-                spline.CreateMesh();
+                spline.CreateMesh(spline.Spline);
             }
         }
 
@@ -164,7 +164,7 @@ namespace SEE.Game.City
                 // If this is an added edge, we are going to need to turn it into a mesh.
                 edges.Enqueue(edgeEvent.Edge);
             }
-            
+
             // We don't care about other event types.
         }
     }
