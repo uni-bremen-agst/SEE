@@ -123,7 +123,7 @@ namespace SEE.GO
 
             // Draw spline as poly line.
             SEESpline spline = gameEdge.GetComponent<SEESpline>();
-            Vector3[] positions = spline.PolyLine();
+            Vector3[] positions = spline.PolyLine(spline.Spline);
             line.positionCount = positions.Length; // number of vertices
             line.SetPositions(positions);
 

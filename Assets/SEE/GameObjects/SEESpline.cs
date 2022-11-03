@@ -58,7 +58,7 @@ namespace SEE.GO
         /// updated (as a result of setting one of the public properties).
         /// </summary>
         private bool needsUpdate = false;
-        
+
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
         /// Will not cause an update on its own, use <see cref="needsUpdate"/> for that.
@@ -70,13 +70,6 @@ namespace SEE.GO
         /// </summary>
         [NonSerialized]
         private BSpline spline;
-
-        /// <summary>
-        /// A subspline from <see cref="lowerKnot"/> 
-        /// from <see cref="lowerKnot"/> to <see cref="upperKnot"/>
-        /// </summary>
-        [SerializeField]
-        private BSpline subSpline;
 
         /// <summary>
         /// The start knot of the subspline for the build-up animation
@@ -291,10 +284,10 @@ namespace SEE.GO
                     }
 
                     // TODO
-                    subSpline = spline;
+                    BSpline subSpline = spline;
 
-                    UpdateLineRenderer();
-                    UpdateMesh();
+                    UpdateLineRenderer(subSpline);
+                    UpdateMesh(subSpline);
                 }
                 needsUpdate = false;
             }
@@ -324,20 +317,16 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Approximates <see cref="Spline"/> as poly line. The greater
+        /// Approximates <paramref name="s"/> as poly line. The greater
         /// <paramref name="num"/>, the more accurate the approximation.
         /// The poly line can be visualized with a <see cref="LineRenderer"/>.
         /// </summary>
+        /// <param name="s">Spline that should be approximated</param>
         /// <param name="num">Number of vertices in the poly line</param>
-        /// <param name="useSubSpline"> Use the current <see cref="subSpline"/> instead of <see cref="Spline"/></param>
         /// <returns>A poly line approximating <see cref="Spline"/></returns>
-        public Vector3[] PolyLine(int num = 100, bool useSubSpline = false)
+        public Vector3[] PolyLine(BSpline s, int num = 100)
         {
-            if (useSubSpline)
-            {
-                return TinySplineInterop.ListToVectors(subSpline.Sample((uint)num));
-            }
-            return TinySplineInterop.ListToVectors(Spline.Sample((uint)num));
+            return TinySplineInterop.ListToVectors(s.Sample((uint)num));
         }
 
         /// <summary>
@@ -350,11 +339,12 @@ namespace SEE.GO
         /// <see cref="Component.gameObject"/> has no
         /// <see cref="LineRenderer"/> attached to it.
         /// </summary>
-        private void UpdateLineRenderer()
+        /// <param name="s">Spline to be rendered</param>
+        private void UpdateLineRenderer(BSpline s)
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                Vector3[] polyLine = PolyLine(lr.positionCount, true);
+                Vector3[] polyLine = PolyLine(s, lr.positionCount);
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
                 lr.startColor = gradientColors.start;
@@ -368,8 +358,9 @@ namespace SEE.GO
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
+        /// <param name="s">Spline to be rendered</param>
         /// <returns>The created or updated mesh</returns>
-        private Mesh CreateOrUpdateMesh()
+        private Mesh CreateOrUpdateMesh(BSpline s)
         {
             List<Vector3> vertices = new List<Vector3>();
             List<Vector3> normals = new List<Vector3>();
@@ -382,8 +373,8 @@ namespace SEE.GO
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
-            FrameSeq frames = subSpline.ComputeRMF(rv);
+            IList<double> rv = s.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = s.ComputeRMF(rv);
 
             // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
@@ -467,7 +458,7 @@ namespace SEE.GO
                              mesh.tangents.Length != tangents.Count ||
                              mesh.uv.Length != uvs.Count ||
                              needsColorUpdate; // Or the color of the mesh has been changed.
-            
+
             if (updateMaterial)
             {
                 mesh.Clear();
@@ -505,12 +496,12 @@ namespace SEE.GO
                 meshRenderer.sharedMaterial = defaultMaterial;
                 Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
             }
-            
+
             if (!gameObject.TryGetComponent(out MeshFilter filter) || meshRenderer == null)
             {
                 return;
             }
-            
+
             if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
             {
                 // Don't re-color non-default material.
@@ -539,14 +530,15 @@ namespace SEE.GO
         /// is then applied in the next frame (via <see cref="Update"/>). Or
         /// use <see cref="UpdateMesh"/> to update the mesh immediately.
         /// </summary>
+        /// <param name="s">Spline to be rendered</param>
         /// <returns>A mesh approximating <see cref="Spline"/></returns>
-        public Mesh CreateMesh()
+        public Mesh CreateMesh(BSpline s)
         {
             if (gameObject.TryGetComponent(out MeshFilter filter))
             {
                 return filter.mesh;
             }
-            Mesh mesh = CreateOrUpdateMesh();
+            Mesh mesh = CreateOrUpdateMesh(s);
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
                 // Glow effect depends on materials staying the same. We need to fully refresh it.
@@ -565,11 +557,12 @@ namespace SEE.GO
         /// attached to <see cref="Component.gameObject"/>; see
         /// <see cref="CreateMesh"/> for more details).
         /// </summary>
-        public void UpdateMesh()
+        /// <param name="s">Spline to be rendered</param>
+        public void UpdateMesh(BSpline s)
         {
             if (gameObject.TryGetComponent(out MeshFilter _))
             {
-                CreateOrUpdateMesh();
+                CreateOrUpdateMesh(s);
             }
             needsUpdate = false;
         }
