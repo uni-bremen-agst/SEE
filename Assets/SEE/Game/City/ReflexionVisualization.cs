@@ -26,7 +26,7 @@ namespace SEE.Game.City
         /// the underlying Graph directly!</b>
         /// </summary>
         [NonSerialized]
-        public Reflexion Analysis;
+        public ReflexionGraph Analysis;
 
         // TODO: Is this assumption (cities' child count > 0 <=> city drawn) alright to make?
         //       Or perhaps there's a better way to check whether a given city has been drawn?
@@ -105,7 +105,7 @@ namespace SEE.Game.City
         {
             CityGraph = graph;
             Events.Clear();
-            Analysis = new Reflexion(CityGraph);
+            Analysis = new ReflexionGraph(CityGraph);
             Analysis.Subscribe(this);
             Analysis.Run();
         }
@@ -179,15 +179,6 @@ namespace SEE.Game.City
                     break;
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
-                    break;
-                case HierarchyEvent hierarchyEvent:
-                    HandleHierarchyChangeEvent(hierarchyEvent);
-                    break;
-                case NodeEvent nodeChangeEvent:
-                    HandleNodeChangeEvent(nodeChangeEvent);
-                    break;
-                case PropagatedEdgeEvent propagatedEdgeEvent:
-                    HandlePropagatedEdgeEvent(propagatedEdgeEvent);
                     break;
             }
 
@@ -284,33 +275,6 @@ namespace SEE.Game.City
             NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
             nodeOperator.MoveYTo(newPosition.y, ANIMATION_DURATION);
             nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
-        }
-
-        /// <summary>
-        /// Handles the given <paramref name="hierarchyEvent"/> by modifying the scene accordingly.
-        /// </summary>
-        /// <param name="hierarchyEvent">The event which shall be handled.</param>
-        private void HandleHierarchyChangeEvent(HierarchyEvent hierarchyEvent)
-        {
-            // FIXME: Handle event
-        }
-
-        /// <summary>
-        /// Handles the given <paramref name="nodeEvent"/> by modifying the scene accordingly.
-        /// </summary>
-        /// <param name="nodeEvent">The event which shall be handled.</param>
-        private void HandleNodeChangeEvent(NodeEvent nodeEvent)
-        {
-            // FIXME: Handle event
-        }
-
-        /// <summary>
-        /// Handles the given <paramref name="propagatedEdgeEvent"/> by modifying the scene accordingly.
-        /// </summary>
-        /// <param name="propagatedEdgeEvent">The event which shall be handled.</param>
-        private void HandlePropagatedEdgeEvent(PropagatedEdgeEvent propagatedEdgeEvent)
-        {
-            // Since this is an internal event, there is nothing to be done.
         }
     }
 }

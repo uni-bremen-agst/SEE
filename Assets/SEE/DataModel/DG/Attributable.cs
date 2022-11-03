@@ -43,13 +43,18 @@ namespace SEE.DataModel.DG
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
         public ISet<string> ToggleAttributes => toggleAttributes;
-
+        
+        /// <summary>
+        /// Unit type consisting of a single value.
+        /// </summary>
+        public enum UnitType {Unit}
+        
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Add(attributeName);
-                Notify(new AttributeEvent<object>(this, attributeName, null, Addition));
+                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Addition));
             }
         }
 
@@ -58,7 +63,7 @@ namespace SEE.DataModel.DG
             if (toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Remove(attributeName);
-                Notify(new AttributeEvent<object>(this, attributeName, null, Removal));
+                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Removal));
             }
         }
 
