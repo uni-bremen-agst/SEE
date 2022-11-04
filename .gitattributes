@@ -29,3 +29,5 @@ Assets/OfficeArchviz.meta filter=lfs diff=lfs merge=lfs -text
 Assets/OfficeArchviz/** filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/** filter=lfs diff=lfs merge=lfs -text
