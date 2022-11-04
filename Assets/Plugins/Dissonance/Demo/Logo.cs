@@ -1,19 +1,3 @@
-﻿using UnityEngine;
-
-namespace Dissonance.Demo
-{
-    public class Logo : MonoBehaviour
-    {
-        private Texture2D _logo;
-
-        public void Awake()
-        {
-            _logo = Resources.Load<Texture2D>("dissonance_logo");
-        }
-
-        private void OnGUI()
-        {
-            GUI.DrawTexture(new Rect(Screen.width - _logo.width - 10, 10, _logo.width, _logo.height), _logo);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:a930035af063add94ec69386ae36c18bbf67ad9e13d232c5f530c6dbba829653
+size 410

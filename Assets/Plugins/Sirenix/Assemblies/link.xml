@@ -1,6 +1,3 @@
-<linker>
-       <assembly fullname="Sirenix.OdinInspector.Attributes" preserve="all"/>
-       <assembly fullname="Sirenix.Serialization.Config" preserve="all"/>
-       <assembly fullname="Sirenix.Serialization" preserve="all"/>
-       <assembly fullname="Sirenix.Utilities" preserve="all"/>
-</linker>
+version https://git-lfs.github.com/spec/v1
+oid sha256:98fbd9042c83343d6e7f3a829f5a299c9c5c0e15ee2c9f71a74eaa7d35ccbc60
+size 300

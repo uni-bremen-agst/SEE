@@ -1,9 +1,3 @@
-﻿// Author: Daniele Giardini - http://www.demigiant.com
-// Created: 2015/03/27 19:02
-// 
-// License Copyright (c) Daniele Giardini.
-// This work is subject to the terms at http://dotween.demigiant.com/license.php
-
-
-#if false // MODULE_MARKER
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:55f6f632cb7a0c7ac9038f3f0a7d2b6b00511d46d22ad6e7a13807932b1f6fff
+size 251

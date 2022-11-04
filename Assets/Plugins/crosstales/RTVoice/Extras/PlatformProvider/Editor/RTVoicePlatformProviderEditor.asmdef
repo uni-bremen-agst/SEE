@@ -1,24 +1,3 @@
-{
-    "name": "RTVoicePlatformProviderEditor",
-    "rootNamespace": "",
-    "references": [
-        "GUID:c00c533428eef954f9aa7467f0bdf431",
-        "GUID:cfc897057ea71444ab297d7b917690c5",
-        "GUID:ca76ebd8bc3e2d44ba5e232fcd7b5fc0",
-        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
-        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
-        "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:27619889b8ba8c24980f49ee34dbb44a"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:1f647118c25f7e2076c348da988c039d21e668f0380f5b69323e547f25c176cd
+size 731

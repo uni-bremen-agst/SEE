@@ -1,25 +1,3 @@
-﻿using Dissonance.Audio.Capture;
-using JetBrains.Annotations;
-
-namespace Dissonance
-{
-    /// <summary>
-    /// A collection of channels to rooms
-    /// </summary>
-    /// ReSharper disable once InheritdocConsiderUsage
-    public sealed class RoomChannels
-        : Channels<RoomChannel, string>
-    {
-        internal RoomChannels([NotNull] IChannelPriorityProvider priorityProvider)
-            : base(priorityProvider)
-        {
-            OpenedChannel += (id, _) => Log.Debug("Opened channel to room '{0}'", id);
-            ClosedChannel += (id, _) => Log.Debug("Closed channel to room '{0}'", id);
-        }
-
-        protected override RoomChannel CreateChannel(ushort subscriptionId, string channelId, ChannelProperties properties)
-        {
-            return new RoomChannel(subscriptionId, channelId, this, properties);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:932f0e9d8b740f432a8e3d36834f1ad64895e89e27a5fa529f2f7a711dcc2008
+size 853

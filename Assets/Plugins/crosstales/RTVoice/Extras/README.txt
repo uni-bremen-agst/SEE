@@ -1,7 +1,3 @@
-﻿# Extras
-
-## Description
-The packages in this folder enhance the functions of RT-Voice.
-They are all optional and can be removed whenever you do not need them.
-
-Please see the README inside a package to get more information.
+version https://git-lfs.github.com/spec/v1
+oid sha256:8db351907bacda7ce08bbbf3d161193396fe5ebc26bb148bfcf1de8069d39d23
+size 228

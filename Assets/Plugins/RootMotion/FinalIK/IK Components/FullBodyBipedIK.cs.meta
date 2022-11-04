@@ -1,16 +1,3 @@
-fileFormatVersion: 2
-guid: a70e525c82ce9413fa4d940ad7fcf1db
-labels:
-- InverseKinematics
-- IK
-- FullBodyIK
-timeCreated: 1519038538
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 9999
-  icon: {fileID: 2800000, guid: 89e0c79ada10847639ab1754e12413a7, type: 3}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:a2536adc33dbae887248c9c556000152284e5206dacf749b3a12be8f76d99b90
+size 364

@@ -1,30 +1,3 @@
-﻿namespace Dissonance
-{
-    public enum LogLevel
-    {
-        /// <summary>
-        /// Per-frame diagnostic events.
-        /// </summary>
-        Trace = 0,
-
-        /// <summary>
-        /// Significant diagnostic events.
-        /// </summary>
-        Debug = 1,
-
-        /// <summary>
-        /// Significant events which occur under normal operation.
-        /// </summary>
-        Info = 2,
-
-        /// <summary>
-        /// Non-critical errors, which deserve investigation.
-        /// </summary>
-        Warn = 3,
-
-        /// <summary>
-        /// Critical errors caused by external factors, outside of missuse or bugs.
-        /// </summary>
-        Error = 4
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:04a37d2e57c5a8a2307d7ca0eb64a335be68c5aeac99bb7d10e285edad01bca0
+size 683

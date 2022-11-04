@@ -1,27 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-
-namespace RootMotion.FinalIK {
-
-	// Custom inspector for IKExecutionOrder
-	[CustomEditor(typeof(IKExecutionOrder))]
-	public class IKExecutionOrderInspector : Editor {
-
-		private IKExecutionOrder script { get { return target as IKExecutionOrder; }}
-
-		private MonoScript monoScript;
-
-		void OnEnable() {
-			if (serializedObject == null) return;
-			
-			// Changing the script execution order
-			if (!Application.isPlaying) {
-				int executionOrder = 9996;
-				monoScript = MonoScript.FromMonoBehaviour(script);
-				int currentExecutionOrder = MonoImporter.GetExecutionOrder(monoScript);
-				if (currentExecutionOrder != executionOrder) MonoImporter.SetExecutionOrder(monoScript, executionOrder);
-			}
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d8082329e4eb4d56fe9608a43275f684b5d4d3be1f630cc457aee81373d8dabe
+size 776

@@ -1,4 +1,3 @@
-{
-	"name": "DOTween.Modules",
-	"references":[ "GUID:2bafac87e7f4b9b418d9448d219b01ab", "GUID:343deaaf83e0cee4ca978e7df0b80d21" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d11df79937efc35908b452b818ef0fd9e11c78c99be27d063bd0c68ca18d76ec
+size 131

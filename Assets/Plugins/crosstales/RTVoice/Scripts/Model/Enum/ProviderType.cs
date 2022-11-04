@@ -1,16 +1,3 @@
-﻿namespace Crosstales.RTVoice.Model.Enum
-{
-   /// <summary>Available provider types.</summary>
-   public enum ProviderType
-   {
-      Windows,
-      macOS,
-      Android,
-      iOS,
-      WSA,
-      Linux,
-      Custom, //TODO not used atm
-      Any
-   }
-}
-// © 2017-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:4c6983ffe30fd434062a86a6888c94058a3084fac5d27fcc25a28755f76cdcec
+size 318

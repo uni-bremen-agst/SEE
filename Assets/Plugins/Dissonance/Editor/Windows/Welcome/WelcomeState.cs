@@ -1,27 +1,3 @@
-﻿using System;
-using JetBrains.Annotations;
-using UnityEngine;
-
-namespace Dissonance.Editor.Windows.Welcome
-{
-    [Serializable]
-    internal class WelcomeState
-    {
-        [SerializeField, UsedImplicitly] private string _shownForVersion;
-
-        public string ShownForVersion
-        {
-            get { return _shownForVersion; }
-        }
-
-        public WelcomeState(string version)
-        {
-            _shownForVersion = version;
-        }
-
-        public override string ToString()
-        {
-            return _shownForVersion;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6644a21550fd875bf8373da7c95b8dd1d680d354247d3e022931252495161f8d
+size 560

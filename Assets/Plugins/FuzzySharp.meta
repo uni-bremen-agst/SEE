@@ -1,12 +1,3 @@
-fileFormatVersion: 2
-<<<<<<< HEAD:Assets/Plugins/FuzzySharp.meta
-guid: f039bda2471d6914294c972fb26eb701
-folderAsset: yes
-=======
-guid: aa13e8065a755a745bd1c8e933432dd3
->>>>>>> origin/master:Assets/Parser/GenerateLexerCode.bat.meta
-DefaultImporter:
-  externalObjects: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:0d47d843b2f89e4b6fcdde429c1814449a18420b1f737ef964d3a9056d949fa5
+size 326

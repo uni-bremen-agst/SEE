@@ -1,15 +1,3 @@
-﻿var CTOpenWindowPlugin = {
-    ctOpenWindow: function(link)
-    {
-    	var url = Pointer_stringify(link);
-        //document.onmouseup = function()
-        //{
-        	window.open(url);
-        //	document.onmouseup = null;
-        //}
-    }
-};
-
-mergeInto(LibraryManager.library, CTOpenWindowPlugin);
-
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:3ee8501058d350e6b3342885f91bdd99c49256f989a70270319dbeb519117504
+size 365

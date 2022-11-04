@@ -1,24 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-
-namespace Dissonance.Extensions
-{
-    public static class IEnumerableExtensions
-    {
-        [NotNull] public static IEnumerable<T> Concat<T>([NotNull] this IEnumerable<T> enumerable, T tail)
-        {
-            if (enumerable == null)
-                throw new ArgumentNullException("enumerable");
-
-            return ConcatUnsafe(enumerable, tail);
-        }
-
-        [NotNull] private static IEnumerable<T> ConcatUnsafe<T>([NotNull] this IEnumerable<T> enumerable, T tail)
-        {
-            foreach (var item in enumerable)
-                yield return item;
-            yield return tail;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:89b2437ed1bd2f796a4ff93ab9746e58fbbdb1d2b5c227a4210c21fb400a2ad8
+size 699

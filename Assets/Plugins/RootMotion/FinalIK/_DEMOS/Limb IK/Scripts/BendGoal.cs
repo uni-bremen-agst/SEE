@@ -1,27 +1,3 @@
-using UnityEngine;
-using System.Collections;
-using RootMotion.FinalIK;
-
-namespace RootMotion.Demos {
-
-	/// <summary>
-	/// Bend goal for LimbIK. Attach this to a GameObject that you want the limb to bend towards.
-	/// </summary>
-	public class BendGoal : MonoBehaviour {
-
-		public LimbIK limbIK; // reference to the LimbIK component
-		[Range(0f, 1f)]
-		public float weight = 1f;
-
-		void Start() {
-			Debug.Log("BendGoal is deprecated, you can now a bend goal from the custom inspector of the LimbIK component.");
-		}
-
-		void LateUpdate () {
-			if (limbIK == null) return;
-
-			// Set LimbIK bend goal position to myself
-			limbIK.solver.SetBendGoalPosition(transform.position, weight);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:137a70902ebefee8972408d680ca1a0d8a1127e06c02466baada45c3d99b5263
+size 692

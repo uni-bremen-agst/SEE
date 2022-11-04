@@ -1,23 +1,3 @@
-﻿using System;
-using NAudio.Wave;
-
-namespace Dissonance.Audio.Capture
-{
-    /// <summary>
-    /// Interface for things which receive microphone data
-    /// </summary>
-    public interface IMicrophoneSubscriber
-    {
-        /// <summary>
-        /// Receives PCM data from the microphone
-        /// </summary>
-        /// <param name="buffer">A buffer of PCM data</param>
-        /// <param name="format">The format of the data in the buffer</param>
-        void ReceiveMicrophoneData(ArraySegment<float> buffer, WaveFormat format);
-
-        /// <summary>
-        /// Reset the subscriber (ending the last stream of data, preparing to start a new one)
-        /// </summary>
-        void Reset();
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:8d01bd7b8972d04bdb86d4141c102a02f868ec864cb0ec5138a79d2101316434
+size 709

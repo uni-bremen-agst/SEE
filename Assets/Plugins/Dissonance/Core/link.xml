@@ -1,5 +1,3 @@
-﻿<linker>
-  <!-- Unity automatically strips out some of the date formatters in System.Globalization even when they're required. This
-       causes the logging system to fail in those locales (e.g. Thailand & Argentina). Force Unity to include that assembly. -->
-  <assembly fullname="System.Globalization" preserve="all"/>
-</linker>
+version https://git-lfs.github.com/spec/v1
+oid sha256:4c5871d586ae819964c5d173a68b25a544dd97889ea20b5af9dd8cd2bc5ab509
+size 334

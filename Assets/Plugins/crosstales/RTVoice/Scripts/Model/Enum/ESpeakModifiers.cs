@@ -1,21 +1,3 @@
-﻿namespace Crosstales.RTVoice.Model.Enum
-{
-   /// <summary>The modifiers for eSpeak voices (m1-m6 = male, f1-f4 = female).</summary>
-   public enum ESpeakModifiers
-   {
-      none,
-      m1,
-      m2,
-      m3,
-      m4,
-      m5,
-      m6,
-      f1,
-      f2,
-      f3,
-      f4,
-      croak,
-      whisper
-   }
-}
-// © 2018-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:3c3d31c6d1637b2a59db3a6f1ebc5d9aad2c8da78a94399bc8c3ff84f7f0bf1e
+size 376
