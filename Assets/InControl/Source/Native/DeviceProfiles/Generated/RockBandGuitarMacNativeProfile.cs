@@ -1,31 +1,3 @@
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
-{
-	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class RockBandGuitarMacNativeProfile : Xbox360DriverMacNativeProfile
-	{
-		public override void Define()
-		{
-			base.Define();
-
-			DeviceName = "Rock Band Guitar";
-			DeviceNotes = "Rock Band Guitar on Mac";
-
-			Matchers = new[]
-			{
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.HID,
-					VendorID = 0x1bad,
-					ProductID = 0x0002,
-				},
-			};
-		}
-	}
-
-	// @endcond
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:07f5a522d701f6cc21cfa3c43adea861f0bd9bd1003f052bd84367087b3214a0
+size 686

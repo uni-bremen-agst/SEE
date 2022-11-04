@@ -1,31 +1,3 @@
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
-{
-	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class MicrosoftXboxOneEliteControllerMacNativeProfile : XboxOneDriverMacNativeProfile
-	{
-		public override void Define()
-		{
-			base.Define();
-
-			DeviceName = "Microsoft Xbox One Elite Controller";
-			DeviceNotes = "Microsoft Xbox One Elite Controller on Mac";
-
-			Matchers = new[]
-			{
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.HID,
-					VendorID = 0x045e,
-					ProductID = 0x02e3,
-				},
-			};
-		}
-	}
-
-	// @endcond
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f80e96cbb36a6af9a5b973280c990e21c32011a76f48596ac42283b18685d6ce
+size 741

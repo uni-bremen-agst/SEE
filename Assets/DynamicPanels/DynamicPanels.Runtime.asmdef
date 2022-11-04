@@ -1,4 +1,3 @@
-﻿{
-	"name": "DynamicPanels.Runtime",
-	"references":[ "GUID:2bafac87e7f4b9b418d9448d219b01ab", "GUID:343deaaf83e0cee4ca978e7df0b80d21" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6270ef0378bf7eb16a083df8f972d5ddd1e5d01a6892e3ec7e76aa98d06b85b1
+size 144

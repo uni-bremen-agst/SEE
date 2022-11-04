@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: M_Feet_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: e7c8290369e5f724e8e185a77240e37e, type: 2}
-  _serializedFlags:
-  - flags: ffffffffffffffffffffffffffffffffffffffffffff3f90f94376fcffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff07feda7c19bffaffffffffff
-    Count: 768
+version https://git-lfs.github.com/spec/v1
+oid sha256:d1bbded3094624212fb4d8a251d7a17565efeebb73a6656ce00b744cd0fdcc54
+size 699

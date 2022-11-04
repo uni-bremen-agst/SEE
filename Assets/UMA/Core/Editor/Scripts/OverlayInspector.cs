@@ -1,27 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace UMA.Editors
-{
-	[CustomEditor(typeof(OverlayData))]
-	public class OverlayInspector : Editor 
-	{
-#if UMA_HOTKEYS
-		[MenuItem("Assets/Create/UMA/Core/Overlay Asset %#o")]
-#else
-	    [MenuItem("Assets/Create/UMA/Core/Overlay Asset")]
-#endif
-	    public static void CreateOverlayMenuItem()
-	    {
-	        CustomAssetUtility.CreateAsset<OverlayDataAsset>();
-	    }
-
-
-	    public override void OnInspectorGUI()
-	    {
-	        base.OnInspectorGUI();
-	    }
-	    
-	}
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:bab89c93dbd0c75b6abb1a753d772687b61acfb1f16d5c9f9c42afeda70bffb1
+size 544

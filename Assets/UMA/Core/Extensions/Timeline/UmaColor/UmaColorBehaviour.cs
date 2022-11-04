@@ -1,15 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaColorBehaviour : PlayableBehaviour
-    {
-        public string sharedColorName = "";
-        public Color color = Color.white;
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:534a1985c182f004658a91e590cdb66ee910d18e022b7ae53dfd20f3204b9c81
+size 311

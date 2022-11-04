@@ -1,27 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-using System;
-using UnityEngine.UI;
-
-namespace Michsky.UI.ModernUIPack
-{
-    [CustomEditor(typeof(UIManagerProgressBarLoop))]
-    public class UIManagerProgressBarLoopEditor : Editor
-    {
-        override public void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-            var UIManagerProgressBarLoop = target as UIManagerProgressBarLoop;
-
-            using (var group = new EditorGUILayout.FadeGroupScope(Convert.ToSingle(UIManagerProgressBarLoop.hasBackground == true)))
-            {
-                if (group.visible == true)
-                {
-                    UIManagerProgressBarLoop.background = EditorGUILayout.ObjectField("Background", UIManagerProgressBarLoop.background, typeof(Image), true) as Image;
-                }
-            }
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:be9c6250c061b6bbe4c695c94a1d161edefc29f3db8e7d633b3fc280a160f77c
+size 877

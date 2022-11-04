@@ -1,13 +1,3 @@
-﻿namespace InControl
-{
-	// TODO: This interface is probably not necessary and can be removed at some point.
-	public interface IInputControl
-	{
-		// TODO: Maybe add HasInput?
-		bool HasChanged { get; }
-		bool IsPressed { get; }
-		bool WasPressed { get; }
-		bool WasReleased { get; }
-		void ClearInputState();
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4b30695797ebce8a03982a493c98bdccddc919fdc4a8208c61426b7910f6774b
+size 315

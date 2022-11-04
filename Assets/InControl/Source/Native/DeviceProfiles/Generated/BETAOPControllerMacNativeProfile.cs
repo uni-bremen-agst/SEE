@@ -1,31 +1,3 @@
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
-{
-	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class BETAOPControllerMacNativeProfile : Xbox360DriverMacNativeProfile
-	{
-		public override void Define()
-		{
-			base.Define();
-
-			DeviceName = "BETAOP Controller";
-			DeviceNotes = "BETAOP Controller on Mac";
-
-			Matchers = new[]
-			{
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.HID,
-					VendorID = 0x11c0,
-					ProductID = 0x5506,
-				},
-			};
-		}
-	}
-
-	// @endcond
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:56d1edaba4c8292654329bfda5a74fd64a6cce57f21e39b8228ee55af0b153b6
+size 690

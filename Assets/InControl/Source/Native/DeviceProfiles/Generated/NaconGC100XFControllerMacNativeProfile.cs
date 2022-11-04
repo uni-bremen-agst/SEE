@@ -1,31 +1,3 @@
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
-{
-	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class NaconGC100XFControllerMacNativeProfile : Xbox360DriverMacNativeProfile
-	{
-		public override void Define()
-		{
-			base.Define();
-
-			DeviceName = "Nacon GC-100XF Controller";
-			DeviceNotes = "Nacon GC-100XF Controller on Mac";
-
-			Matchers = new[]
-			{
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.HID,
-					VendorID = 0x11c9,
-					ProductID = 0x55f0,
-				},
-			};
-		}
-	}
-
-	// @endcond
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ef1bcce44346a2fb29a91381f53fa91d158908ec0a931fe4029ee2924a036fbc
+size 712

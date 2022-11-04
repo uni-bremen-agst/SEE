@@ -1,31 +1,3 @@
-// ReSharper disable StringLiteralTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedType.Global
-namespace InControl.NativeDeviceProfiles
-{
-	// @cond nodoc
-	[Preserve, NativeInputDeviceProfile]
-	public class InjusticeFightStickMacNativeProfile : Xbox360DriverMacNativeProfile
-	{
-		public override void Define()
-		{
-			base.Define();
-
-			DeviceName = "Injustice Fight Stick";
-			DeviceNotes = "Injustice Fight Stick on Mac";
-
-			Matchers = new[]
-			{
-				new InputDeviceMatcher
-				{
-					DriverType = InputDeviceDriverType.HID,
-					VendorID = 0x0e6f,
-					ProductID = 0x0125,
-				},
-			};
-		}
-	}
-
-	// @endcond
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4bc7f568e2bce1d6e50b9aaec346ed6625cf28dcadd02a3fd0baec4d1814963a
+size 701

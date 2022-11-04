@@ -1,11 +1,3 @@
-We, the copyright holders of this work, hereby release it into the
-public domain. This applies worldwide.
-
-In case this is not legally possible,
-
-We grant any entity the right to use this work for any purpose, without
-any conditions, unless such conditions are required by law.
-
-Thatcher Ulrich <tu@tulrich.com> http://tulrich.com
-Karoly Barta bartakarcsi@gmail.com
-Michael Evans http://www.evertype.com
+version https://git-lfs.github.com/spec/v1
+oid sha256:90c74683aa1f9a8234cabc0fec76fd24cd9172e170450ba9881ff79a924e244b
+size 415

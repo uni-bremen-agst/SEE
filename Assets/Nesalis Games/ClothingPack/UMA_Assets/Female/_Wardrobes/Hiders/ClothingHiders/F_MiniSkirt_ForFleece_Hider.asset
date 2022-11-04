@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: F_MiniSkirt_ForFleece_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: ed037fe6783cf2c46aa195290bb76e58, type: 2}
-  _serializedFlags:
-  - flags: ffffffffffff1f9107feff7ff8ffffffff9f0100000000000000ff0000000000000000000000fcffffffffff01ffffff00ffffcf7dcf7bffffffffff7f80ff7ccc3800007800003e000000fc1ffc87878101f7dcffffffffff03ffffffffff0000000000
-    Count: 800
+version https://git-lfs.github.com/spec/v1
+oid sha256:d6dc4ed65c90baa422ada0ea5bdcf0e805fabb873bdfae6fbf081b3f855ae08d
+size 722

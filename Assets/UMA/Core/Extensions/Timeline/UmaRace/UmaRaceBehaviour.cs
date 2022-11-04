@@ -1,32 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using UMA.CharacterSystem;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaRaceBehaviour : PlayableBehaviour
-    {
-        public string raceToChangeTo = "";
-
-        [HideInInspector]
-        public bool isAdded = false;
-
-        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
-        {
-            DynamicCharacterAvatar avatar = playerData as DynamicCharacterAvatar;
-
-            if (avatar == null)
-                return;
-
-            if (string.IsNullOrEmpty(raceToChangeTo))
-                return;
-
-            if(avatar.activeRace.name != raceToChangeTo)
-                avatar.ChangeRace(raceToChangeTo);
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:6bce7b13bca25927add93d8113447921065c0f500d2e784c79cbd6a18f593ff4
+size 819

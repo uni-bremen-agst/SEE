@@ -1,24 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using System.Collections.Generic;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaDnaBehaviour : PlayableBehaviour
-    {
-        [Serializable]
-        public struct DnaTuple
-        {
-            public string Name;
-            [Range(0f, 1f)]
-            public float Value;
-        }
-
-        public bool rebuildImmediately = true;
-        public List<DnaTuple> dnaValues = new List<DnaTuple>();
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:02be3fbd017f39a4b96f8a88663530fd885f8b693148d6be3bcaf368d40d80e4
+size 544

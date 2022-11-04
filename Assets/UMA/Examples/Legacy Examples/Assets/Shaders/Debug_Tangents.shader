@@ -1,31 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "!Debug/Tangents" {
-SubShader {
-    Pass {
-        Fog { Mode Off }
-CGPROGRAM
-#pragma vertex vert
-#pragma fragment frag
-
-// vertex input: position, tangent
-struct appdata {
-    float4 vertex : POSITION;
-    float4 tangent : TANGENT;
-};
-
-struct v2f {
-    float4    pos : SV_POSITION;
-    fixed4    color : COLOR;
-};
-v2f vert (appdata v) {
-    v2f o;
-    o.pos = UnityObjectToClipPos( v.vertex );
-    o.color = v.tangent * 0.5 + 0.5;
-    return o;
-}
-fixed4 frag (v2f i) : COLOR0 { return i.color; }
-ENDCG
-    }
-}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ff49789f1b8eab82a7bf89307afccfde58818d74cb3550ae0515be61c32e3a57
+size 633

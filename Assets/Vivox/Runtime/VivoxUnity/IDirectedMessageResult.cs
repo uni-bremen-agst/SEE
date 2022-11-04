@@ -1,34 +1,3 @@
-﻿/*
-Copyright (c) 2014-2018 by Mercer Road Corp
-
-Permission to use, copy, modify or distribute this software in binary or source form
-for any purpose is allowed only under explicit prior consent in writing from Mercer Road Corp
-
-THE SOFTWARE IS PROVIDED "AS IS" AND MERCER ROAD CORP DISCLAIMS
-ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL MERCER ROAD CORP
-BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
-DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
-SOFTWARE.
-*/
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace VivoxUnity
-{
-    /// <summary>
-    /// Result of a directed message (user to user message).
-    /// </summary>
-    public interface IDirectedMessageResult
-    {
-        /// <summary>
-        /// Request ID of the directed message.
-        /// </summary>
-        string RequestId { get; }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4f32c4d7f8be96d67e419b2f0b44217fec95b78d27b950917c07bb6d9116e53c
+size 1160

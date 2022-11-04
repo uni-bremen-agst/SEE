@@ -1,25 +1,3 @@
-﻿
-using System;
-using System.Diagnostics;
-
-//Used in this project:
-//[assembly: CurvedUI.OptionalDependency("TMPro.TextMeshProUGUI", "CURVEDUI_TMP")]
-//[assembly: CurvedUI.OptionalDependency("Valve.VR.InteractionSystem.Player", "CURVEDUI_STEAMVR_INT")]
-//[assembly: CurvedUI.OptionalDependency("UnityEngine.InputSystem.UI.InputSystemUIInputModule", "CURVEDUI_NEW_INPUT_SYSTEM")]
-
-namespace CurvedUI
-{
-    [Conditional("UNITY_CCU")]
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class OptionalDependencyAttribute : Attribute
-    {
-        public string dependentClass;
-        public string define;
-
-        public OptionalDependencyAttribute(string dependentClass, string define)
-        {
-            this.dependentClass = dependentClass;
-            this.define = define;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e6e9bb16485def85c99fe4dd66edd3789108824517af9678dcad59767e3b4eea
+size 852

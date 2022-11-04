@@ -1,25 +1,3 @@
-#if UNITY_IOS || UNITY_TVOS || UNITY_EDITOR
-namespace InControl
-{
-	using System;
-
-
-	[Flags]
-	public enum ICadeState
-	{
-		None = 0x000,
-		DPadUp = 0x001,
-		DPadRight = 0x002,
-		DPadDown = 0x004,
-		DPadLeft = 0x008,
-		Button1 = 0x010,
-		Button2 = 0x020,
-		Button3 = 0x040,
-		Button4 = 0x080,
-		Button5 = 0x100,
-		Button6 = 0x200,
-		Button7 = 0x400,
-		Button8 = 0x800,
-	};
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:4032d39324e844032d86c483d593ed5e5d2a44f65ab2fe30fcff2c83e49a0467
+size 404

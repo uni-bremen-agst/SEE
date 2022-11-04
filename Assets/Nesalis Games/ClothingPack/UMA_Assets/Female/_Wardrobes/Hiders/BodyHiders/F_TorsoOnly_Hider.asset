@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: F_TorsoOnly_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 4e9cc6816f5c700409fef511dd2dd2d1, type: 2}
-  _serializedFlags:
-  - flags: 80cb5fccffffffffffffd7ffffffffffffff7f90ffc7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3fb1c7fff7ff7ff0ffffdfff9fa704fcffffffffffffffffffffffffffffffffffffffffffff0f0000000000000000000000000000000000000000c0ffffffffbf7f3efffff81f003408fe09fcf9f9ff3f38c13f0100000000000000c0ff03000000000000000000000000000000000000000000000000000000000000fcffffffffff031ff6ff0b
-    Count: 1628
+version https://git-lfs.github.com/spec/v1
+oid sha256:ab3cffd3d070944897419278d542d57fb4538fb3a31706dfcf35ffdec2fab603
+size 921

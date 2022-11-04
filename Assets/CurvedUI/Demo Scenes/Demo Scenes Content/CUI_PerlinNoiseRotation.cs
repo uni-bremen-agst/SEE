@@ -1,28 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace CurvedUI
-{
-    public class CUI_PerlinNoiseRotation : MonoBehaviour
-    {
-
-        public float samplingSpeed = 1;
-
-        public float maxrotation = 60;
-
-        RectTransform rectie;
-
-        // Use this for initialization
-        void Start()
-        {
-            rectie = transform as RectTransform;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            rectie.localEulerAngles = new Vector3(0, 0, Mathf.PerlinNoise(Time.time * samplingSpeed, Time.time * samplingSpeed).Remap(0, 1, -maxrotation, maxrotation));
-
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:a24515c15f65563dc2808d7cc243e73d7a93666cdaab1c510bd184e0df44e1c5
+size 667

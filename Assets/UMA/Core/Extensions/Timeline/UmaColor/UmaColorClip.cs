@@ -1,26 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaColorClip : PlayableAsset, ITimelineClipAsset
-    {
-        public UmaColorBehaviour template = new UmaColorBehaviour();
-
-        public ClipCaps clipCaps
-        {
-            get { return ClipCaps.Blending; }
-        }
-
-        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
-        {
-            var playable = ScriptPlayable<UmaColorBehaviour>.Create(graph, template);
-            return playable;
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:67cecefdcdd455e889bc4041f294a6f8065d7541b9a8e52b0f74a1855e55cba1
+size 669

@@ -1,31 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class CUI_MoveHeartbeat : MonoBehaviour {
-
-	public float speed;
-	public bool wrapAroundParent = true;
-
-
-	RectTransform rectie;
-	RectTransform parentRectie;
-
-	void Start(){
-		rectie = (transform as RectTransform);
-		parentRectie = transform.parent as RectTransform;
-
-	}
-
-	// Update is called once per frame
-	void Update () {
-	
-		rectie.anchoredPosition = new Vector2(rectie.anchoredPosition.x - speed * Time.deltaTime,
-			rectie.anchoredPosition.y);
-
-		if(wrapAroundParent){
-				if(rectie.anchoredPosition.x + rectie.rect.width < 0 )
-					rectie.anchoredPosition = new Vector2(parentRectie.rect.width, rectie.anchoredPosition.y);
-
-			}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d05ac8e7c533c20ad407f605cf4e3972095a167bef830c8b276594cac2d8f963
+size 727

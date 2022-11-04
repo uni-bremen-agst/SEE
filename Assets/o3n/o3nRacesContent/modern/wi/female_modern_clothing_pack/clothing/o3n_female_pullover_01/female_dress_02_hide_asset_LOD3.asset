@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: female_dress_02_hide_asset_LOD3
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 9c7f8b0825cd6c642a6ab786e0537e46, type: 2}
-  _assetSlotName: o3n_female_dress_02_LOD3
-  _serializedFlags:
-  - flags: 0000000000f0bf0631f2bf7f00000000000000000000000000000000000000fcffffffffffffffffffffffffffff03000000000000fcff0ffeffffff0f000000feff1f0000000000c0fef3ffc1ffffff0700000000000000
-    Count: 680
+version https://git-lfs.github.com/spec/v1
+oid sha256:3a0c355a7b9feb6c8daefb202f1b2a782f00380d638fa7c36ad54d8146eab3cc
+size 746

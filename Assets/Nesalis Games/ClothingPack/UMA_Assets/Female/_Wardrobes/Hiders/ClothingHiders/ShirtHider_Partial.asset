@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: ShirtHider_Partial
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: a94c3dd4cb7ec8440a50656b909e8484, type: 2}
-  _serializedFlags:
-  - flags: ffffffffffffffffffc10100000ffc070302000000c0e31f000080ffffef0000fcfcfffffffffffffffffffffffffffffffc011ee0f11fffcffffbffffffffffffffffff3f87ffff0700000060f8f7ffffffffffffffffffffffffff11f8ff1f000080ffffffffffffffffffffff7c80ffffffffffffefff1fffffffff01ceffffffff07ffffffff0000000000000000
-    Count: 1128
+version https://git-lfs.github.com/spec/v1
+oid sha256:57899e9c837ee0f273a1eac44fe1d198678c45c916072819ff8288b545a9bc39
+size 802

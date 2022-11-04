@@ -1,36 +1,3 @@
-﻿using Unity.Netcode;
-using UnityEngine;
-
-namespace Dissonance.Integrations.Unity_NFGO.Demo
-{
-    public class NfgoPlayerController
-        : NetworkBehaviour
-    {
-        private CharacterController _controller;
-        private Transform _transform;
-
-        private void OnEnable()
-        {
-            _controller = GetComponent<CharacterController>();
-            _transform = GetComponent<Transform>();
-        }
-
-        private void Update()
-        {
-            if (!IsLocalPlayer || !_controller)
-                return;
-
-            var rotation = Input.GetAxis("Horizontal") * Time.deltaTime * 150.0f;
-            var speed = Input.GetAxis("Vertical") * 3.0f;
-            
-            _transform.Rotate(0, rotation, 0);
-            _controller.SimpleMove(_transform.TransformDirection(Vector3.forward) * speed);
-
-            if (_transform.position.y < -3)
-            {
-                _transform.position = Vector3.zero;
-                _transform.rotation = Quaternion.identity;
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:12c0863b4e780aa277467f6d4412d9c1074a06a99604e2679e670bcfa6d36d00
+size 1064

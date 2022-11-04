@@ -1,21 +1,3 @@
-{
-    "name": "ModernUIPackEditor",
-    "references": [
-        "GUID:bf06a4913aa6be5409beddfe58700866",
-        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
-        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
-        "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:27619889b8ba8c24980f49ee34dbb44a"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:1016b012783f12bab90b9c79417d4f2d68f568d6e79b17f723056bc6c633e0ee
+size 617

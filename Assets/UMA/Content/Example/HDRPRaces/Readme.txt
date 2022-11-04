@@ -1,10 +1,3 @@
-Please be familiar with HDRP before attempting to use the UMA HDRP package. 
-
-To use the UMA HDRP races, you must import the HDRP package from the package manager. 
-Then, import the HDRP-Races unity package.
-
-This package contains only the base races (HumanMaleHD, HumanFemalHD). 
-To use any clothing, you will need to modify/convert the materials, update their UMAMaterials, 
-and possibly edit/modify the mask textures as needed.
-
-Thanks to Kenamis for supplying the HDRP races.
+version https://git-lfs.github.com/spec/v1
+oid sha256:cc0cdb121d472c9e5c02c7a8349c2b9bfd0a575e6c50cc2f27618ca68b736f32
+size 488

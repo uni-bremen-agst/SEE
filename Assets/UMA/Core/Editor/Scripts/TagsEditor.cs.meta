@@ -1,14 +1,3 @@
-fileFormatVersion: 2
-guid: b68aa1e905736ca4bbe77d3ac0148c00
-labels:
-- UMA_Text
-timeCreated: 1528225562
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:35c5ef85bcb9afc7b95a436cc749fc88639aad18d5f6e53f889fbb3bc23c62fe
+size 297

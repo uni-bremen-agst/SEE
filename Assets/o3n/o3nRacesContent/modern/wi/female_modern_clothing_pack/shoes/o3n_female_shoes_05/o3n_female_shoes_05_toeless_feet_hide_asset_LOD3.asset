@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: o3n_female_shoes_05_toeless_feet_hide_asset_LOD3
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 6fbd4d4d2aa9adf49a825cd0df06e565, type: 2}
-  _assetSlotName: o3n_female_feet_toeless_LOD3
-  _serializedFlags:
-  - flags: 8c0f40c29ff0018b03448703
-    Count: 90
+version https://git-lfs.github.com/spec/v1
+oid sha256:52f7b7438d2749feadae74ad57e7906b7f5e4f53742b0c847c33e52818fcd7fd
+size 614

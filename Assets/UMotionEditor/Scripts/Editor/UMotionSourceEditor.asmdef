@@ -1,14 +1,3 @@
-{
-    "name": "UMotionSourceEditor",
-    "references": [
-        "UMotionSourceApplication",
-        "UnityEditor.UI",
-        "UnityEngine.UI",
-        "UnityEditor.TestRunner",
-        "UnityEngine.TestRunner"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": []
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:86e68cd473bb8a3f6dfaad5b65c374cc6a44909a5a9eae8ca7ec76184da51beb
+size 310

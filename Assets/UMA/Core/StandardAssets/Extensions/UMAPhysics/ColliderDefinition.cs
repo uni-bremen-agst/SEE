@@ -1,26 +1,3 @@
-﻿using UnityEngine;
-
-namespace UMA.Dynamics
-{
-	[System.Serializable]
-	public class ColliderDefinition
-	{
-		[System.Serializable]
-		public enum ColliderType {Box, Sphere, Capsule}
-		public ColliderType colliderType;
-		public Vector3 colliderCentre;
-
-		//Box Collider Only
-		[Tooltip("The size of the box collider")]
-		public Vector3 boxDimensions;
-
-		//Sphere Collider Only
-		public float sphereRadius;
-
-		//Capsule Collider Only
-		public float capsuleRadius;
-		public float capsuleHeight;
-		public enum Direction {X,Y,Z}
-		public Direction capsuleAlignment;
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ce3d4eb4ab4425e6107724e06e9de53ba8e1be53606598df1eced25c77be6ec4
+size 589

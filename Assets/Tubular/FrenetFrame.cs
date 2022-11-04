@@ -1,22 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Curve {
-
-	public class FrenetFrame {
-		public Vector3 Tangent { get { return tangent; } }
-		public Vector3 Normal { get { return normal; } }
-		public Vector3 Binormal { get { return binormal; } }
-
-		Vector3 tangent, normal, binormal;
-
-		public FrenetFrame(Vector3 t, Vector3 n, Vector3 bn) {
-			tangent = t;
-			normal = n;
-			binormal = bn;
-		}
-	}
-		
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:a92c25c51a554169aa95fda1ca20376151c8a977cec64c612c07988b96c5d8c0
+size 469
