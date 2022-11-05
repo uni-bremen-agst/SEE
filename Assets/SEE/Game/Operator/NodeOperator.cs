@@ -121,7 +121,8 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Scales the node to the given <paramref name="newScale"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newScale">the desired new target scale</param>
+        /// <param name="newScale">the desired new target scale, more precisely, factor by which the game object
+        /// should be scaled relative to its parent in</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
