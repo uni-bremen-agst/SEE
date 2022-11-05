@@ -158,7 +158,7 @@ namespace SEE.Game.Operator
         {
             public override void KillAnimator(bool complete = false)
             {
-                if (Animator.IsActive())
+                if (Animator != null && Animator.IsActive())
                 {
                     Animator.tween.Kill();
                     Destroy(Animator);
