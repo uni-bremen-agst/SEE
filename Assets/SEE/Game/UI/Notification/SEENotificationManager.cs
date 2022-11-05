@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using UnityEngine;
 
 namespace SEE.Game.UI.Notification
@@ -174,6 +175,17 @@ namespace SEE.Game.UI.Notification
             Notifications[index].Token.Cancel();
             Notifications[index].Token.Dispose();
             Notifications.RemoveAt(index);
+        }
+
+        private void Update()
+        {
+            if (SEEInput.CloseAllNotifications())
+            {
+                for (int i = Notifications.Count - 1; i >= 0; i--)
+                {
+                    Notifications[i].Notification.Close();
+                }
+            }
         }
 
         /// <summary>

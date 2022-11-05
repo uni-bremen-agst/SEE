@@ -211,13 +211,6 @@ namespace SEE.Game.City
             }
 
             GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
-            if (edge == null)
-            {
-                // If no such edge can be found, the given edge must be propagated
-                string edgeId = Analysis.GetOriginatingEdge(edgeChange.Edge)?.ID;
-                edge = edgeId != null ? GraphElementIDMap.Find(edgeId) : null;
-            }
-
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
@@ -262,7 +255,6 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been removed.</param>
         private void HandleRemovedMapping(Edge mapsToEdge)
         {
-            ShowNotification.Info("Reflexion Analysis", $"Unmapping node '{mapsToEdge.Source.ToShortString()}'.", duration: 3f);
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
             implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
@@ -274,8 +266,6 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been added.</param>
         private void HandleNewMapping(Edge mapsToEdge)
         {
-            ShowNotification.Info("Reflexion Analysis", $"Mapping node '{mapsToEdge.Source.ToShortString()}' "
-                                                        + $"onto '{mapsToEdge.Target.ToShortString()}'.", duration: 3f);
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);
 
