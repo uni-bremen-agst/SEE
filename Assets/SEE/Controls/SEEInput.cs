@@ -20,7 +20,7 @@ namespace SEE.Controls
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
         //-----------------------------------------------------
-        // General key bindings
+        #region General key bindings
         //-----------------------------------------------------
 
         /// <summary>
@@ -219,9 +219,11 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
         }
+        
+        #endregion
 
         //-----------------------------------------------------
-        // Camera path recording and playing
+        #region Camera path recording and playing
         //-----------------------------------------------------
 
         /// <summary>
@@ -242,8 +244,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.TogglePathPlaying);
         }
 
+        #endregion
+        
         //-----------------------------------------------------
-        // Metric charts
+        #region Metric charts
         //-----------------------------------------------------
 
         /// <summary>
@@ -264,8 +268,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleMetricHoveringSelection);
         }
 
+        #endregion
+        
         //-----------------------------------------------------
-        // Manipulating nodes
+        #region Manipulating nodes
         //-----------------------------------------------------
 
         /// <summary>
@@ -277,8 +283,10 @@ namespace SEE.Controls
             return Input.GetMouseButton(0);
         }
 
+        #endregion
+        
         //-----------------------------------------------------
-        // Navigation in a code city
+        #region Navigation in a code city
         //-----------------------------------------------------
 
         /// <summary>
@@ -354,8 +362,10 @@ namespace SEE.Controls
             return Input.GetMouseButton(MiddleMouseButton);
         }
 
+        #endregion
+        
         //-----------------------------------------------------
-        // Player (camera) movements.
+        #region Player (camera) movements.
         //-----------------------------------------------------
 
         /// <summary>
@@ -449,8 +459,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Pointing);
         }
 
+        #endregion
+        
         //--------------------------
-        // Evolution
+        #region Evolution
         //--------------------------
 
         /// <summary>
@@ -501,9 +513,13 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases);
         }
+        
+        #endregion
+        
         //----------------------------------------------------
-        // Animation speed (shared by Debugging and Evolution)
+        #region Animation speed (shared by Debugging and Evolution)
         //----------------------------------------------------
+        
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -521,8 +537,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed);
         }
 
+        #endregion
+        
         //--------------------------
-        // Debugging
+        #region Debugging
         //--------------------------
 
         /// <summary>
@@ -574,8 +592,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.FirstStatement);
         }
 
+        #endregion
+        
         //--------------------
-        // Source-code viewer
+        #region Source-code viewer
         //--------------------
 
         /// <summary>
@@ -587,8 +607,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu);
         }
 
+        #endregion
+        
         //-------------------
-        // Selection
+        #region Selection
         //-------------------
 
         /// <summary>
@@ -610,8 +632,10 @@ namespace SEE.Controls
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
         }
 
+        #endregion
+        
         //----------------------------------------------------
-        // Chat
+        #region Chat
         //----------------------------------------------------
 
         /// <summary>
@@ -640,6 +664,22 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
         }
+        
+        #endregion
+        
+        //----------------------------------------------------
+        #region Notifications
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to close all notifications.
+        /// </summary>
+        public static bool CloseAllNotifications()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
+        }
+        
+        #endregion
 
         public static bool ToggleHolisticMetricsMenu()
         {
