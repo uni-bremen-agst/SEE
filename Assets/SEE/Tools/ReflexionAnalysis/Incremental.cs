@@ -201,9 +201,9 @@ namespace SEE.Tools.ReflexionAnalysis
             // We don't care about order, but O(1) `Contains` is nice to have here, hence the Set
             ISet<Node> targetKids = new HashSet<Node>(edge.Target.PostOrderDescendants());
 
-            bool IsCoveredEdge(Edge e) => !IsSpecified(e)
-                                          && targetKids.Contains(e.Target)
-                                          && e.HasSupertypeOf(edge.Type);
+            // TODO: This should also check the type, but the examples in StreamingAssets need to be updated.
+            //       Also, other places in the reflexion analysis should make sure that the type conforms.
+            bool IsCoveredEdge(Edge e) => !IsSpecified(e) && targetKids.Contains(e.Target);
 
             IEnumerable<Edge> coveredEdges = edge.Source.PostOrderDescendants()
                                                  .SelectMany(x => x.Outgoings)
@@ -428,7 +428,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(node.IsInArchitecture() && ContainsNode(node),
                           () => new NotInSubgraphException(Architecture, node));
-            foreach (Edge connected in node.Incomings.Union(node.Outgoings))
+            foreach (Edge connected in node.Incomings.Union(node.Outgoings).Where(x => !x.IsInArchitecture() || IsSpecified(x)).ToList())
             {
                 RemoveEdge(connected);
             }
@@ -474,7 +474,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AssertOrThrow(node.IsInImplementation() && ContainsNode(node),
                           () => new NotInSubgraphException(Implementation, node));
-            foreach (Edge connected in node.Incomings.Union(node.Outgoings))
+            foreach (Edge connected in node.Incomings.Union(node.Outgoings).ToList())
             {
                 RemoveEdge(connected);
             }
@@ -794,6 +794,7 @@ namespace SEE.Tools.ReflexionAnalysis
             List<Node> subtree = MappedSubtree(mapsTo.Source);
             Unmap(subtree, mapsTo.Target);
             Node implSourceParent = mapsTo.Source.Parent;
+            
             if (implSourceParent == null)
             {
                 // If mapsTo.Source has no parent, all nodes in subtree are not mapped at all any longer.
@@ -807,8 +808,9 @@ namespace SEE.Tools.ReflexionAnalysis
                 if (implicitMapsToTable.TryGetValue(implSourceParent.ID, out Node newTarget))
                 {
                     // newTarget is the architecture node onto which the parent of mapsTo.Source is mapped.
-                    ChangeMap(subtree, newTarget);
+                    // However, if newTarget doesn't exist, we should still unmap subtree.
                 }
+                ChangeMap(subtree, newTarget);
 
                 if (newTarget != null)
                 {

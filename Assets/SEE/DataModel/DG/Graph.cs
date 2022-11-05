@@ -1555,9 +1555,9 @@ namespace SEE.DataModel.DG
                 {
                     ID = $"{Name}#ROOT",
                     SourceName = $"{Name} (Root)",
-                    Type = graphRoots.First().Type
+                    Type = graphRoots.First().Type,
+                    ToggleAttributes = { RootToggle }
                 };
-                SetToggle(RootToggle);
                 AddNode(artificialRoot);
                 foreach (Node root in graphRoots)
                 {

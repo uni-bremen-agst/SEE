@@ -152,7 +152,9 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            return mergedGraph.MergeWith<ReflexionGraph>(MappingGraph, suffix);
+            mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(MappingGraph, suffix);
+            mergedGraph.AddRootNodeIfNecessary();
+            return mergedGraph;
 
             #region Local Functions
 
