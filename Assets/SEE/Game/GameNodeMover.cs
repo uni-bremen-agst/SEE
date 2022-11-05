@@ -61,10 +61,10 @@ namespace SEE.Game
         /// associated with the target parent and <paramref name="movingObject"/> becomes
         /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
         /// must be in sync). That target node is returned.
-        /// 
+        ///
         /// If no such target node can be identified, neither the graph-node hierarchy
         /// nor the game-node hierarchy will be changed and null will be returned.
-        /// 
+        ///
         /// The assumption is that <paramref name="movingObject"/> is not the root node
         /// of a code city.
         /// </summary>
@@ -171,7 +171,8 @@ namespace SEE.Game
 
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
-        /// assuming <paramref name="scaleDown"/> is true.
+        /// assuming <paramref name="scaleDown"/> is true. This method makes sure that <paramref name="child"/>
+        /// will be contained within the area of the roof of <paramref name="parent"/>.
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
@@ -194,21 +195,62 @@ namespace SEE.Game
             }
 
             NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
-            Vector3 oldScale = child.localScale;
+            Vector3 oldLocalScale = child.localScale;
             if (scaleDown)
             {
+                // TODO: We need a strategy to scale down a node to the maximal size that is still
+                // fitting into the area where the nodes has been placed.
                 nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
             }
+            // ScaleTo with animation duration = 0 has immediate effect.
+            Vector3 newWorldScale = child.lossyScale;
 
+            // Where to move the child.
+            Vector3 targetWorldPosition = child.position;
             float parentRoof = parent.GetRoof();
-            nodeOperator.MoveYTo(parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, 0);
+            targetWorldPosition.y = parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y;
+
             if (targetXZ.HasValue)
             {
-                nodeOperator.MoveXTo(targetXZ.Value.x, 0);
-                nodeOperator.MoveZTo(targetXZ.Value.y, 0);
+                targetWorldPosition.x = targetXZ.Value.x;
+                targetWorldPosition.z = targetXZ.Value.y;
             }
 
-            return oldScale;
+            // Make sure mappingTarget stays within the roof of parent. We do not
+            // not work with local position here because we cannot assume that child
+            // is actually a game-object child of parent (only if setParent were true,
+            // we could assume that).
+            {
+                Vector3 parentWorldExtent = parent.transform.lossyScale / 2;
+                Vector3 childWorldExtent = newWorldScale / 2;
+
+                // Fit child into x range of parent.
+                if (targetWorldPosition.x + childWorldExtent.x > parent.transform.position.x + parentWorldExtent.x)
+                {
+                    // Right corner of child must not be farther than right corner of parent.
+                    targetWorldPosition.x = parent.transform.position.x + parentWorldExtent.x - childWorldExtent.x;
+                }
+                else if (targetWorldPosition.x - childWorldExtent.x < parent.transform.position.x - parentWorldExtent.x)
+                {
+                    // Left corner of child must be right from right corner of parent.
+                    targetWorldPosition.x = parent.transform.position.x - parentWorldExtent.x + childWorldExtent.x;
+                }
+
+                // Fit child into z range of parent.
+                if (targetWorldPosition.z + childWorldExtent.z > parent.transform.position.z + parentWorldExtent.z)
+                {
+                    // Front edge of child must not be farther than back edge of parent.
+                    targetWorldPosition.z = parent.transform.position.z + parentWorldExtent.z - childWorldExtent.z;
+                }
+                else if (targetWorldPosition.z - childWorldExtent.z < parent.transform.position.z - parentWorldExtent.z)
+                {
+                    // Front edge of child must not be before front edge of parent.
+                    targetWorldPosition.z = parent.transform.position.z - parentWorldExtent.z + childWorldExtent.z;
+                }
+            }
+
+            nodeOperator.MoveTo(targetWorldPosition, 0);
+            return oldLocalScale;
         }
 
         /// <summary>
