@@ -293,13 +293,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the world-space position of the roof of this <paramref name="gameObject"/>.
+        /// Returns the world-space y position of the roof of this <paramref name="gameObject"/>.
         /// </summary>
         /// <param name="gameObject">game object whose roof has to be determined</param>
-        /// <returns>world-space position of the roof of this <paramref name="gameObject"/></returns>
+        /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
         public static float GetRoof(this GameObject gameObject)
         {
             return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+        }
+
+        /// <summary>
+        /// Returns the world-space center position of the roof of this <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">game object whose roof has to be determined</param>
+        /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
+        public static Vector3 GetRoofCenter(this GameObject gameObject)
+        {
+            Vector3 result = gameObject.transform.position;
+            result.y += gameObject.WorldSpaceScale().y / 2.0f;
+            return result;
         }
 
         /// <summary>
@@ -336,6 +348,26 @@ namespace SEE.GO
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the maximal world-space center position of hull of
+        /// this <paramref name="gameObject"/>. The hull includes <paramref name="gameObject"/>
+        /// and any of its active descendants.
+        /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
+        /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
+        ///
+        /// Note: only descendants that are currently active in the scene are
+        /// considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
+        /// </returns>
+        public static Vector3 GetTop(this GameObject gameObject)
+        {
+            Vector3 result = gameObject.transform.position;
+            result.y = gameObject.GetMaxY();
+            return result;
         }
 
         /// <summary>
