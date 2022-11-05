@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
@@ -20,14 +21,6 @@ namespace SEE.Game.City
     [DisallowMultipleComponent]
     public class ReflexionVisualization : MonoBehaviour, IObserver<ChangeEvent>
     {
-        /// <summary>
-        /// Reflexion analysis. Use this to make changes to the graph
-        /// (such as mappings, hierarchies, and so on), <b>do not modify
-        /// the underlying Graph directly!</b>
-        /// </summary>
-        [NonSerialized]
-        public ReflexionGraph Analysis;
-
         // TODO: Is this assumption (cities' child count > 0 <=> city drawn) alright to make?
         //       Or perhaps there's a better way to check whether a given city has been drawn?
         /// <summary>
@@ -44,7 +37,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The graph used for the reflexion analysis.
         /// </summary>
-        private Graph CityGraph;
+        private ReflexionGraph CityGraph;
 
         /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
@@ -101,13 +94,12 @@ namespace SEE.Game.City
         /// Starts the reflexion analysis from scratch, clearing any existing events.
         /// </summary>
         /// <param name="graph">The graph on which the reflexion analysis shall run</param>
-        public void StartFromScratch(Graph graph)
+        public void StartFromScratch(ReflexionGraph graph)
         {
             CityGraph = graph;
             Events.Clear();
-            Analysis = new ReflexionGraph(CityGraph);
-            Analysis.Subscribe(this);
-            Analysis.Run();
+            graph.Subscribe(this);
+            graph.Run();
         }
 
         /// <summary>
@@ -175,7 +167,7 @@ namespace SEE.Game.City
             switch (changeEvent)
             {
                 case EdgeChange edgeChange:
-                    HandleEdgeChange(edgeChange);
+                    HandleEdgeChange(edgeChange).Forget();
                     break;
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
@@ -189,7 +181,7 @@ namespace SEE.Game.City
         /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeChange">The event which shall be handled.</param>
-        private void HandleEdgeChange(EdgeChange edgeChange)
+        private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
             if (HiddenEdgeStates.Contains(edgeChange.NewState))
@@ -202,6 +194,17 @@ namespace SEE.Game.City
             }
 
             GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
+
+            if (edge == null)
+            {
+                // If edge was just recently added, we have to wait until its GameObject is created.
+                // This should be the case by the end of this frame.
+                // TODO: In the future, the GraphRenderer should be an observer to the Graph,
+                //       so that these cases are handled properly.
+                await UniTask.WaitForEndOfFrame();
+                edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
+            }
+
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
@@ -218,25 +221,18 @@ namespace SEE.Game.City
         /// Handles the given <paramref name="edgeEvent"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeEvent">The event which shall be handled.</param>
-        private void HandleEdgeEvent(EdgeEvent edgeEvent)
+        private static void HandleEdgeEvent(EdgeEvent edgeEvent)
         {
-            if (edgeEvent.Change == ChangeType.Addition)
+            // We only care about new mappings here, since the nodes will have to visually show that they've been
+            // mapped. Other additions or removals are of no relevance here and are handled as usual.
+            switch (edgeEvent.Change, edgeEvent.Affected)
             {
-                if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
-                {
+                case (ChangeType.Addition, ReflexionSubgraph.Mapping):
                     HandleNewMapping(edgeEvent.Edge);
-                }
-                else
-                {
-                    // FIXME: Handle edge additions other than new mapping
-                }
-            }
-            else if (edgeEvent.Change == ChangeType.Removal)
-            {
-                if (edgeEvent.Affected == ReflexionSubgraph.Mapping)
-                {
+                    break;
+                case (ChangeType.Removal, ReflexionSubgraph.Mapping):
                     HandleRemovedMapping(edgeEvent.Edge);
-                }
+                    break;
             }
         }
 
@@ -244,10 +240,15 @@ namespace SEE.Game.City
         /// Handles the given removed <paramref name="mapsToEdge"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="mapsToEdge">The edge which has been removed.</param>
-        private void HandleRemovedMapping(Edge mapsToEdge)
+        private static void HandleRemovedMapping(Edge mapsToEdge)
         {
             Node implNode = mapsToEdge.Source;
             GameObject implGameNode = implNode.RetrieveGameNode();
+
+            // Node's original parent should be restored.
+            implGameNode.transform.SetParent(implNode.Parent.RetrieveGameNode().transform);
+
+            // The layout of all attached edges need to be updated as well.
             implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
         }
 
@@ -255,7 +256,7 @@ namespace SEE.Game.City
         /// Handles the given new <paramref name="mapsToEdge"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="mapsToEdge">The edge which has been added.</param>
-        private void HandleNewMapping(Edge mapsToEdge)
+        private static void HandleNewMapping(Edge mapsToEdge)
         {
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);

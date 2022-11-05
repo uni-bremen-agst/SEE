@@ -129,10 +129,11 @@ namespace SEE.Game.City
 
                 await UniTask.WhenAll(tasks);
 
-                LoadedGraph = new ReflexionGraph(ArchitectureGraph, ImplementationGraph, MappingGraph, CityName);
+                ReflexionGraph reflexionGraph = new ReflexionGraph(ImplementationGraph, ArchitectureGraph, MappingGraph, CityName);
+                LoadedGraph = reflexionGraph;
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
-                Visualization.StartFromScratch(LoadedGraph);
+                Visualization.StartFromScratch(reflexionGraph);
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 
