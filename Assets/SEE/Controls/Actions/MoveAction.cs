@@ -491,7 +491,9 @@ namespace SEE.Controls.Actions
             /// <param name="mappingTarget">the game node onto which to put <see cref="gameObject"/></param>
             private void PutOn(GameObject mappingTarget)
             {
-                GameNodeMover.PutOn(gameObject.transform, mappingTarget, scaleDown: true);
+                // FIXME: If gameObject is moved onto its original parent, we do not want to shrink it.
+                bool scaleDown = mappingTarget != originalParent;
+                GameNodeMover.PutOn(gameObject.transform, mappingTarget, scaleDown: scaleDown);
             }
 
             internal void TemporaryUnMap()
