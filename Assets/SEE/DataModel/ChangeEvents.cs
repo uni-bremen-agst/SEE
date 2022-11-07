@@ -104,30 +104,4 @@ namespace SEE.DataModel
             return $"edge '{Edge.ToShortString()}' changed from {OldState} to {NewState}.";
         }
     }
-
-    /// <summary>
-    /// A change event fired when an implementation dependency was either propagated to
-    /// the architecture or unpropagated from the architecture.
-    /// </summary>
-    public class PropagatedEdgeEvent : ChangeEvent
-    {
-        /// <summary>
-        /// The implementation dependency propagated from the implementation to the architecture.
-        /// </summary>
-        public readonly Edge PropagatedEdge;
-
-        /// <summary>
-        /// Constructor preserving the implementation dependency that is or was
-        /// propagated to the architecture graph.
-        /// </summary>
-        /// <param name="propagatedEdge">the propagated edge</param>
-        /// <param name="change">the type of change to <paramref name="propagatedEdge"/></param>
-        public PropagatedEdgeEvent(Edge propagatedEdge, ChangeType change) : base(ReflexionSubgraph.Architecture, change)
-        {
-            PropagatedEdge = propagatedEdge;
-        }
-
-        protected override string Description() =>
-            $"edge '{PropagatedEdge.ToShortString()}' has been {(Change == ChangeType.Removal ? "un" : "")}propagated.";
-    }
 }

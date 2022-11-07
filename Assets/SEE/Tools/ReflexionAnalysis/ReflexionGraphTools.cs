@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game;
-using UnityEngine;
-using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
@@ -123,16 +120,28 @@ namespace SEE.Tools.ReflexionAnalysis
             newEvent switch
             {
                 EdgeChange edgeChange => events.Incorporate(edgeChange),
+                GraphElementTypeEvent typeEvent => events.Incorporate(typeEvent),
                 EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
                 HierarchyEvent hierarchyChangeEvent =>
                     events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
                                                                   && e.Parent == hierarchyChangeEvent.Parent),
                 NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
-                PropagatedEdgeEvent propagatedEdgeEvent =>
-                    events.Incorporate(propagatedEdgeEvent, e => e.PropagatedEdge == propagatedEdgeEvent.PropagatedEdge),
-                _ => throw new ArgumentOutOfRangeException(nameof(newEvent))
+                AttributeEvent<string> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                AttributeEvent<int> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                AttributeEvent<float> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                AttributeEvent<Attributable.UnitType> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
+                _ => throw new ArgumentOutOfRangeException(nameof(newEvent), newEvent.GetType(), "Unknown event type!")
             };
 
+        private static IList<ChangeEvent> IncorporateAttributeEvent<T>(this IList<ChangeEvent> events, AttributeEvent<T> attributeEvent)
+        {
+            // If there were any previous attribute events for this same attribute and same attributable,
+            // we remove them and simply retain the most recent event.
+            return events.Where(x => !(x is AttributeEvent<T> a
+                                       && a.AttributeName == attributeEvent.AttributeName
+                                       && a.Attributable == attributeEvent.Attributable)).Append(attributeEvent).ToList();
+        }
+        
         /// <summary>
         /// Removes all EdgeChange events with the same edge as <paramref name="edgeChange"/>
         /// from <paramref name="events"/> and adds a modified version of
@@ -151,6 +160,16 @@ namespace SEE.Tools.ReflexionAnalysis
             EdgeChange newEvent = new EdgeChange(edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
             // Now we just have to filter out previous EdgeChange events and add the new one.
             return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
+        }
+
+        /// <summary>
+        /// Similar to the above method (Incorporate for <see cref="EdgeChange"/> events), refer to it for context.
+        /// </summary>
+        private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, GraphElementTypeEvent typeEvent)
+        {
+            string oldType = events.OfType<GraphElementTypeEvent>().FirstOrDefault(x => x.Element == typeEvent.Element)?.OldType;
+            GraphElementTypeEvent newEvent = new GraphElementTypeEvent(oldType ?? typeEvent.OldType, typeEvent.NewType, typeEvent.Element);
+            return events.Where(x => !(x is GraphElementTypeEvent e && e.Element == typeEvent.Element)).Append(newEvent).ToList();
         }
 
         /// <summary>
@@ -213,19 +232,19 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
-        /// </summary>
-        public const string MapsToType = "Maps_To";
-
-        /// <summary>
         /// Returns all subgraphs this <paramref name="element"/> is in.
         /// Use <c>Enum.HasFlag</c> to check the resulting value.
         /// </summary>
-        public static ReflexionSubgraph GetSubgraph(this GraphElement element) =>
+        public static ReflexionSubgraph GetSubgraphs(this GraphElement element) =>
             Enum.GetValues(typeof(ReflexionSubgraph))
                 .Cast<ReflexionSubgraph>()
                 .Where(element.IsIn)
                 .Aggregate(None, (acc, x) => acc & x);
+
+        public static ReflexionSubgraph GetSubgraph(this GraphElement element) =>
+            Enum.GetValues(typeof(ReflexionSubgraph))
+                .Cast<ReflexionSubgraph>()
+                .First(element.IsIn);
 
         /// <summary>
         /// Returns true if this <paramref name="element"/> is in the given <paramref name="subgraph"/> type.
@@ -243,6 +262,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 return false;
             }
+
             switch (subgraph)
             {
                 case Implementation:
@@ -250,7 +270,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     return element.HasToggle(subgraph.GetLabel());
                 case Mapping:
                     // Either a "Maps_To" edge or a node connected to such an edge
-                    return (element is Edge edge && edge.HasSupertypeOf(MapsToType))
+                    return (element is Edge edge && edge.HasSupertypeOf(ReflexionGraph.MapsToType))
                            || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping));
                 case FullReflexion:
                     return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
@@ -331,112 +351,12 @@ namespace SEE.Tools.ReflexionAnalysis
         public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => markRootNode || node.HasToggle(GraphRenderer.RootToggle))
+                                                           .Where(node => markRootNode || node.HasToggle(Graph.RootToggle))
                                                            .Concat<GraphElement>(graph.Edges());
             foreach (GraphElement graphElement in graphElements)
             {
                 graphElement.SetIn(subgraph);
             }
-        }
-
-        /// <summary>
-        /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
-        /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
-        /// the result. Note that the name of the three graphs may be modified.
-        ///
-        /// Pre-condition: <see cref="ImplementationGraph"/>, <see cref="ArchitectureGraph"/> and
-        /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
-        /// </summary>
-        /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        public static Graph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name,
-                                     out Node ArchitectureRoot, out Node ImplementationRoot)
-        {
-            if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
-            {
-                throw new ArgumentException("All three sub-graphs must be loaded before generating "
-                                            + "the full graph.");
-            }
-
-            // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            ArchitectureRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ArchitectureGraph) ?? ArchitectureGraph.GetRoots().FirstOrDefault();
-            ImplementationRoot = GraphRenderer.AddGraphRootNodeIfNecessary(ImplementationGraph) ?? ImplementationGraph.GetRoots().FirstOrDefault();
-
-            // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
-            // automatically belongs to it
-            ArchitectureGraph.MarkGraphNodesIn(Architecture);
-            ImplementationGraph.MarkGraphNodesIn(Implementation);
-
-            // We need to set all Maps_To edges as virtual so they don't get drawn.
-            // (Mapping is indicated by moving the implementation node, not by a separate edge.)
-            foreach (Edge mapsTo in MappingGraph.Edges())
-            {
-                Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
-                mapsTo.SetToggle(Edge.IsVirtualToggle);
-            }
-
-            // We set the name for the implementation graph, because its name will be used for the merged graph.
-            ImplementationGraph.Name = Name;
-
-            // We merge architecture and implementation first.
-            // Duplicate node IDs between architecture and implementation are not allowed.
-            // Any duplicate nodes in the mapping graph are merged into the full graph.
-            // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
-            List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            string suffix = null;
-            if (nodesOverlap.Count > 0)
-            {
-                throw new ArgumentException($"Overlapping node IDs found: {string.Join(", ", nodesOverlap)}");
-            }
-
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-A";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-
-            Graph mergedGraph = ImplementationGraph.MergeWith(ArchitectureGraph, edgeIdSuffix: suffix);
-
-            // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
-            edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
-            suffix = null;
-            if (edgesOverlap.Count > 0)
-            {
-                suffix = "-M";
-                Debug.LogWarning($"Overlapping edge IDs found, will append '{suffix}' suffix."
-                                 + $"Offending elements: {string.Join(", ", edgesOverlap)}");
-            }
-
-            return mergedGraph.MergeWith(MappingGraph, suffix);
-
-            #region Local Functions
-
-            // Returns the intersection of the node IDs of the two graphs.
-            IEnumerable<string> NodeIntersection(Graph aGraph, Graph anotherGraph)
-                => aGraph.Nodes().Select(x => x.ID).Intersect(anotherGraph.Nodes().Select(x => x.ID));
-
-            // Returns the intersection of the edge IDs of the two graphs.
-            IEnumerable<string> EdgeIntersection(Graph aGraph, Graph anotherGraph)
-                => aGraph.Edges().Select(x => x.ID).Intersect(anotherGraph.Edges().Select(x => x.ID));
-
-            #endregion
-        }
-
-        /// <summary>
-        /// Disassembles the given <paramref name="FullGraph"/> into implementation, architecture, and mapping graphs,
-        /// and returns them in this order.
-        ///
-        /// Pre-condition: The given graph must have been assembled by <see cref="Assemble"/>.
-        /// </summary>
-        /// <param name="FullGraph">Graph generated by <see cref="Assemble"/></param>
-        /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
-        public static (Graph implementation, Graph architecture, Graph mapping) Disassemble(this Graph FullGraph)
-        {
-            Graph ImplementationGraph = FullGraph.SubgraphBy(IsInImplementation);
-            Graph ArchitectureGraph = FullGraph.SubgraphBy(IsInArchitecture);
-            Graph MappingGraph = FullGraph.SubgraphBy(IsInMapping);
-            return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
     }
 }
