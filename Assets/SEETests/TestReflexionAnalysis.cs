@@ -9,7 +9,9 @@ using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
 using Assert = UnityEngine.Assertions.Assert;
+using Edge = SEE.DataModel.DG.Edge;
 
 namespace SEE.Tools.Architecture
 {
@@ -21,8 +23,7 @@ namespace SEE.Tools.Architecture
     {
         // TODO: Test types as well
         protected const string call = "call";
-        protected Graph fullGraph;
-        protected Reflexion reflexion;
+        protected ReflexionGraph graph;
         protected SEELogger logger = new SEELogger();
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace SEE.Tools.Architecture
         {
             return HasNewState(source, target, edgeType, State.ImplicitlyAllowed);
         }
-        
+
         /// <summary>
         /// Equivalent to: HasNewState(source, target, edgeType, State.Unmapped).
         /// </summary>
@@ -187,7 +188,7 @@ namespace SEE.Tools.Architecture
 
         /// <summary>
         /// Returns true if an edge from <paramref name="from"/> to <paramref name="to"/> with given <paramref name="edgeType"/>
-        /// is contained in <paramref name="propagatedEdges"/>.
+        /// is contained in the propagated edges.
         /// </summary>
         /// <param name="from">source of the propagated edge</param>
         /// <param name="to">target of the propagated edge</param>
@@ -196,9 +197,9 @@ namespace SEE.Tools.Architecture
         /// <returns>true if such an edge is contained in <paramref name="propagatedEdges"/></returns>
         protected bool IsContained(Node from, Node to, string edgeType, ChangeType change)
         {
-            return changes.OfType<PropagatedEdgeEvent>().Any(edge => from.ID == edge.PropagatedEdge.Source.ID &&
-                                                                     to.ID == edge.PropagatedEdge.Target.ID &&
-                                                                     edgeType == edge.PropagatedEdge.Type && change == edge.Change);
+            return changes.OfType<EdgeEvent>().Any(edge => from.ID == edge.Edge.Source.ID && !IsSpecified(edge.Edge) &&
+                                                           to.ID == edge.Edge.Target.ID &&
+                                                           edgeType == edge.Edge.Type && change == edge.Change);
         }
 
         protected bool IsNotContained(Node from, Node to, string edgeType)
@@ -221,7 +222,7 @@ namespace SEE.Tools.Architecture
         /// <param name="ignoreVirtual">Whether to ignore <see cref="EdgeChange"/> events
         /// for virtual (e.g., propagated) edges</param>
         /// <typeparam name="T">Type of events that should be counted</typeparam>
-        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraph? affectedGraph = null, bool ignoreVirtual = false) where T : ChangeEvent
+        protected void AssertEventCountEquals<T>(int expected, ChangeType? change = null, ReflexionSubgraph? affectedGraph = null, bool ignoreVirtual = false, bool ignorePropagated = true) where T : ChangeEvent
         {
             Assert.AreEqual(expected, changes.OfType<T>().Count(EventIncluded));
 
@@ -229,8 +230,9 @@ namespace SEE.Tools.Architecture
             // See method documentation for details.
             bool EventIncluded(T @event)
             {
-                return (change == null || @event.Change == change) 
-                       && (affectedGraph == null || @event.Affected == affectedGraph) 
+                return (change == null || @event.Change == change)
+                       && (affectedGraph == null || @event.Affected == affectedGraph)
+                       && !(ignorePropagated && @event is EdgeEvent { Affected: ReflexionSubgraph.Architecture } edgeEvent && !IsSpecified(edgeEvent.Edge))
                        && !(ignoreVirtual && @event is EdgeChange edgeChange && edgeChange.Edge.HasToggle(Edge.IsVirtualToggle));
             }
         }
@@ -268,7 +270,7 @@ namespace SEE.Tools.Architecture
         protected virtual void Setup()
         {
             HierarchicalEdges = HierarchicalEdgeTypes();
-            fullGraph = new Graph("DUMMYBASEPATH");
+            graph = new ReflexionGraph("DUMMYBASEPATH");
             ResetEvents();
         }
 
@@ -284,8 +286,8 @@ namespace SEE.Tools.Architecture
                 // In case the tests failed, it helps to see the events:
                 DumpEvents();
             }
-            fullGraph = null;
-            reflexion = null;
+
+            graph = null;
             HierarchicalEdges = null;
             logger = null;
             changes = null;
@@ -308,19 +310,22 @@ namespace SEE.Tools.Architecture
                 result.SetInImplementation();
             }
 
-            fullGraph.AddNode(result);
+            graph.AddNode(result);
             return result;
         }
 
         protected Edge NewEdge(Node from, Node to, string type)
         {
             Edge result = new Edge(from, to, type);
-            if (type == ReflexionGraphTools.MapsToType)
+            if (type == MapsToType)
             {
                 Assert.IsTrue(from.IsInImplementation());
                 Assert.IsTrue(to.IsInArchitecture());
-            }
-            else if (from.IsInImplementation())
+                if (graph.AnalysisInitialized)
+                {
+                    return graph.AddToMapping(from, to);
+                }
+            } else if (from.IsInImplementation())
             {
                 Assert.IsTrue(to.IsInImplementation());
                 result.SetInImplementation();
@@ -331,7 +336,7 @@ namespace SEE.Tools.Architecture
                 result.SetInArchitecture();
             }
 
-            fullGraph.AddEdge(result);
+            graph.AddEdge(result);
             return result;
         }
 
@@ -342,6 +347,12 @@ namespace SEE.Tools.Architecture
         /// <param name="changeEvent">the event that occurred</param>
         public virtual void OnNext(ChangeEvent changeEvent)
         {
+            if (changeEvent is IAttributeEvent)
+            {
+                // We don't care about these.
+                return;
+            }
+
             changes = changes.Incorporate(changeEvent).ToList();
         }
 

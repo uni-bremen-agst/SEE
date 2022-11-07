@@ -28,7 +28,7 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Specifies and implements attributable objects with named toggle, int, float, and string attributes.
     /// </summary>
-    public abstract class Attributable : Observable<GraphEvent>, ICloneable
+    public abstract class Attributable : Observable<ChangeEvent>, ICloneable
     {
         public static readonly HashSet<string> NumericAttributeNames = new HashSet<string>();
 
@@ -38,18 +38,23 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The set of toggle attributes. A toggle is set if it is contained in this
-        /// list, otherwise it is unset. Conceptionally, toggleAttributes is a HashSet,
+        /// list, otherwise it is unset. Conceptually, toggleAttributes is a HashSet,
         /// but HashSets are not serialized by Unity. That is why we use List instead.
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
         public ISet<string> ToggleAttributes => toggleAttributes;
-
+        
+        /// <summary>
+        /// Unit type consisting of a single value.
+        /// </summary>
+        public enum UnitType {Unit}
+        
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Add(attributeName);
-                Notify(new AttributeEvent<object>(this, attributeName, null, Addition));
+                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Addition));
             }
         }
 
@@ -58,7 +63,7 @@ namespace SEE.DataModel.DG
             if (toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Remove(attributeName);
-                Notify(new AttributeEvent<object>(this, attributeName, null, Removal));
+                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Removal));
             }
         }
 
