@@ -3,12 +3,10 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
@@ -62,10 +60,9 @@ namespace SEE.Tools.Architecture
 
         private void SetupReflexion()
         {
-            reflexion = new Reflexion(fullGraph);
-            reflexion.Subscribe(this);
+            graph.Subscribe(this);
             // An initial run is necessary to set up the necessary data structures.
-            reflexion.Run();
+            graph.Run();
         }
 
         [TearDown]
@@ -81,7 +78,7 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected void SaveGraphs()
         {
-            (Graph implementation, Graph architecture, Graph mapping) = fullGraph.Disassemble();
+            (Graph implementation, Graph architecture, Graph mapping) = graph.Disassemble();
             Save(implementation, architecture, mapping);
         }
 
@@ -229,7 +226,7 @@ namespace SEE.Tools.Architecture
         public void TestMappingToSameComponentA()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("DUMMYBASEPATH");
+            graph = new ReflexionGraph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 
@@ -241,18 +238,19 @@ namespace SEE.Tools.Architecture
             Edge e = NewEdge(i1, i2, call);
 
             // i1 -> a1
-            reflexion.Add(i1, a1);
+            graph.AddEdge(i1, a1);
             AssertMapped(i1, a1);
             ResetEvents();
 
             // i2 -> a1
-            reflexion.Add(i2, a1);
+            graph.AddEdge(i2, a1);
             AssertMapped(i2, a1);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ignorePropagated: true);
             Assert.That(IsPropagated(a1, a1, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsImplicitlyAllowed(i1, i2, call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
         }
 
@@ -265,7 +263,7 @@ namespace SEE.Tools.Architecture
         public void TestMappingToSameComponentB()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("DUMMYBASEPATH");
+            graph = new ReflexionGraph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 
@@ -277,18 +275,18 @@ namespace SEE.Tools.Architecture
             Edge e = NewEdge(i1, i2, call);
 
             // i2 -> a1
-            reflexion.Add(i2, a1);
+            graph.AddEdge(i2, a1);
             AssertMapped(i2, a1);
             ResetEvents();
 
             // i1 -> a1
-            reflexion.Add(i1, a1);
+            graph.AddEdge(i1, a1);
             AssertMapped(i1, a1);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
             Assert.That(IsPropagated(a1, a1, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsImplicitlyAllowed(i1, i2, call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
         }
 
@@ -296,7 +294,7 @@ namespace SEE.Tools.Architecture
         public void TestRemapping()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("DUMMYBASEPATH");
+            graph = new ReflexionGraph("DUMMYBASEPATH");
             SetupReflexion();
             ResetEvents();
 
@@ -308,45 +306,45 @@ namespace SEE.Tools.Architecture
             Edge e = NewEdge(i1, i2, call);
 
             // i1 -> a1
-            reflexion.Add(i1, a1);
+            graph.AddEdge(i1, a1);
             AssertMapped(i1, a1);
             ResetEvents();
 
             // i2 -> a2
-            reflexion.Add(i2, a2);
+            graph.AddEdge(i2, a2);
             AssertMapped(i2, a2);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
             Assert.That(IsPropagated(a1, a2, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsDivergent(i1, i2, call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
             ResetEvents();
 
             // unmap i1
-            reflexion.DeleteFromMapping(i1);
+            graph.RemoveFromMapping(i1);
             AssertUnmapped(i1, a1);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ignorePropagated: false);
             Assert.That(IsUnpropagated(a1, a2, call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsUnmapped(i1, i2, call));
             ResetEvents();
 
             // i1 -> a2
-            reflexion.Add(i1, a2);
+            graph.AddEdge(i1, a2);
             AssertMapped(i1, a2);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
             Assert.That(IsPropagated(a2, a2, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsImplicitlyAllowed(i1, i2, call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
         }
 
         [Test]
         public void TestSimpleImplEdgeChange()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("");
+            graph = new ReflexionGraph("");
             SetupReflexion();
             ResetEvents();
 
@@ -369,21 +367,21 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a_1, a_2, call));
 
             ResetEvents();
-            reflexion.Add(i_1, a1);
-            reflexion.Add(i_2, a2);
-            reflexion.Add(i1, a1);
-            reflexion.Add(i2, a2);
+            graph.AddEdge(i_1, a1);
+            graph.AddEdge(i_2, a2);
+            graph.AddEdge(i1, a1);
+            graph.AddEdge(i2, a2);
 
             // Test addition
 
             ResetEvents();
-            reflexion.Add(i1, i2, call);
+            graph.AddEdge(i1, i2, call);
             Assert.That(IsConvergent(a_1, a_2, call));
             Assert.That(IsPropagated(a1, a2, call));
             Assert.That(IsAllowed(i1, i2, call));
 
             ResetEvents();
-            reflexion.Add(i_1, i_2, call);
+            graph.AddEdge(i_1, i_2, call);
             Assert.That(IsNotContained(a_1, a_2, call));
             Assert.That(IsNotContained(a1, a2, call));
             Assert.That(IsAllowed(i_1, i_2, call));
@@ -391,12 +389,12 @@ namespace SEE.Tools.Architecture
             // Test deletion
 
             ResetEvents();
-            reflexion.DeleteFromImplementation(i_1, i_2, call);
+            graph.RemoveFromImplementation(i_1, i_2, call);
             Assert.That(IsNotContained(a_1, a_2, call));
             Assert.That(IsNotContained(a1, a2, call));
 
             ResetEvents();
-            reflexion.DeleteFromImplementation(i1, i2, call);
+            graph.RemoveFromImplementation(i1, i2, call);
             Assert.That(IsAbsent(a_1, a_2, call));
             Assert.That(IsUnpropagated(a1, a2, call));
         }
@@ -405,7 +403,7 @@ namespace SEE.Tools.Architecture
         public void TestSimpleIncrementalArchEdgeChange()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("");
+            graph = new ReflexionGraph("");
             SetupReflexion();
 
             // Example taken from Figure 7 of "Incremental Reflexion Analysis" (Koschke, 2011).
@@ -423,15 +421,15 @@ namespace SEE.Tools.Architecture
             Edge ea12 = AddToGraph(call, a1, a2);
             ResetEvents();
             SetupReflexion();
-            reflexion.Add(i1, a_1);
-            reflexion.Add(i2, a_2);
+            graph.AddEdge(i1, a_1);
+            graph.AddEdge(i2, a_2);
             Assert.That(IsAbsent(a1, a2, call));
             AssertEventCountEquals<EdgeChange>(1);
             AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraph.Mapping);
             Assert.AreEqual(3, changes.Count);
 
             ResetEvents();
-            reflexion.Delete(ea12);
+            graph.RemoveEdge(ea12);
             AssertEventCountEquals<EdgeChange>(0); // no matching propagated edge exists
             Assert.AreEqual(1, changes.Count);
             Assert.IsTrue(changes.OfType<EdgeEvent>().Single(x => x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraph.Architecture).Edge.Equals(ea12));
@@ -439,24 +437,23 @@ namespace SEE.Tools.Architecture
             // We will now check the "left side" scenario of the figure.
             // We will restore the "left side" state by using the incremental operations.
             ResetEvents();
-            reflexion.Add(a1, a2, call);
+            graph.AddEdge(a1, a2, call);
             Assert.That(IsAbsent(a1, a2, call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.AreEqual(1, changes.OfType<EdgeEvent>().Count(x => x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraph.Architecture));
             Assert.AreEqual(2, changes.Count);
 
             ResetEvents();
-            reflexion.Add(i1, i2, call);
+            graph.AddEdge(i1, i2, call);
             Assert.That(IsConvergent(a1, a2, call));
             Assert.That(IsAllowed(i1, i2, call));
             AssertEventCountEquals<EdgeChange>(2);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Implementation);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ignorePropagated: false);
             Assert.AreEqual(4, changes.Count);
 
             // Now we can check what happens once we remove ea12 (an allowed edge should become divergent).
             ResetEvents();
-            reflexion.DeleteFromArchitecture(a1, a2, call);
+            graph.RemoveFromArchitecture(a1, a2, call);
             Assert.That(IsDivergent(i1, i2, call));
             AssertEventCountEquals<EdgeChange>(1);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
@@ -464,7 +461,7 @@ namespace SEE.Tools.Architecture
 
             // And one last time, we add it back to check the `Add` operation.
             ResetEvents();
-            reflexion.Add(a1, a2, call);
+            graph.AddEdge(a1, a2, call);
             Assert.That(IsConvergent(a1, a2, call));
             Assert.That(IsAllowed(i1, i2, call));
             AssertEventCountEquals<EdgeChange>(2);
@@ -478,7 +475,7 @@ namespace SEE.Tools.Architecture
             // We set up the reflexion graph as described in Figure 9 of the paper.
             MapIncrementally();
             ResetEvents();
-            reflexion.UnparentInImplementation(i[7]);
+            graph.UnparentInImplementation(i[7]);
             Assert.AreEqual(changes
                           .OfType<HierarchyEvent>()
                           .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraph.Implementation), 1);
@@ -494,7 +491,7 @@ namespace SEE.Tools.Architecture
 
             // Now, we add the relationship back.
             ResetEvents();
-            reflexion.AddChildInImplementation(i[7], i[2]);
+            graph.AddChildInImplementation(i[7], i[2]);
             Assert.AreEqual(changes
                           .OfType<HierarchyEvent>()
                           .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Addition && x.Affected == ReflexionSubgraph.Implementation), 1);
@@ -507,15 +504,15 @@ namespace SEE.Tools.Architecture
             Assert.That(IsDivergent(i[12], i[9], call));
             Assert.That(IsImplicitlyAllowed(i[9], i[8], call));
             Assert.AreEqual(changes.Count, 9);
-            Assert.Throws<NotAnOrphanException>(() => reflexion.AddChildInImplementation(i[7], i[2]));
-            Assert.Throws<CyclicHierarchyException>(() => reflexion.AddChildInImplementation(i[2], i[7]));
+            Assert.Throws<NotAnOrphanException>(() => graph.AddChildInImplementation(i[7], i[2]));
+            Assert.Throws<CyclicHierarchyException>(() => graph.AddChildInImplementation(i[2], i[7]));
         }
 
         [Test]
         public void TestIncrementalArchHierarchyChange()
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("");
+            graph = new ReflexionGraph("");
             SetupReflexion();
 
             // Example taken from Figure 10 of "Incremental Reflexion Analysis" (Koschke, 2011).
@@ -546,44 +543,45 @@ namespace SEE.Tools.Architecture
             AddToGraph(call, i2, i4);
 
             // And finally, we setup the mapping:
-            AddToGraph(MapsToType, i1, a_1);
-            AddToGraph(MapsToType, i2, a_2);
-            AddToGraph(MapsToType, i3, a_3);
-            AddToGraph(MapsToType, i4, a_4);
+            AddToGraph(ReflexionGraph.MapsToType, i1, a_1);
+            AddToGraph(ReflexionGraph.MapsToType, i2, a_2);
+            AddToGraph(ReflexionGraph.MapsToType, i3, a_3);
+            AddToGraph(ReflexionGraph.MapsToType, i4, a_4);
 
             ResetEvents();
-            reflexion.Run();
+            graph.Run();
             Assert.That(IsAbsent(a2, a1, call));
             Assert.That(IsConvergent(a2, a3, call));
             Assert.That(IsDivergent(i1, i2, call));
             Assert.That(IsAllowed(i2, i3, call));
             Assert.That(IsAllowed(i2, i4, call));
             AssertEventCountEquals<EdgeChange>(5);
-            AssertEventCountEquals<PropagatedEdgeEvent>(3, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(3, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Mapping);
-            Assert.AreEqual(12, changes.Count);
+            AssertEventCountEquals<EdgeEvent>(3, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            Assert.AreEqual(15, changes.Count);
 
             // Now we start testing what we actually want to check: Incremental changes to the arch hierarchy.
             ResetEvents();
-            reflexion.UnparentInArchitecture(a_2);
+            graph.UnparentInArchitecture(a_2);
             Assert.That(IsAbsent(a2, a3, call));
             Assert.That(IsDivergent(i2, i3, call));
             Assert.That(IsDivergent(i2, i4, call));
-            AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
+            AssertEventCountEquals<HierarchyEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
             Assert.AreEqual(4, changes.Count);
 
             // Quick diversion: Adding an edge from a'2 to a'3 should work, but then adding a'2 as a child to a2 should
             // result in a redundant specified edge.
             ResetEvents();
-            reflexion.Add(a_2, a_3, call);
+            graph.AddEdge(a_2, a_3, call);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture);
-            Assert.Throws<RedundantSpecifiedEdgeException>(() => reflexion.AddChildInArchitecture(a_2, a2));
+            Assert.Throws<RedundantSpecifiedEdgeException>(() => graph.AddChildInArchitecture(a_2, a2));
             ResetEvents();
-            reflexion.DeleteFromArchitecture(a_2, a_3, call);
+            graph.RemoveFromArchitecture(a_2, a_3, call);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture);
 
             ResetEvents();
-            reflexion.AddChildInArchitecture(a_2, a2);
+            graph.AddChildInArchitecture(a_2, a2);
             Assert.That(IsConvergent(a2, a3, call));
             Assert.That(IsAllowed(i2, i3, call));
             Assert.That(IsAllowed(i2, i4, call));
@@ -591,10 +589,10 @@ namespace SEE.Tools.Architecture
             Assert.AreEqual(4, changes.Count);
 
             // Now we test some additional error cases.
-            Assert.Throws<NotAnOrphanException>(() => reflexion.AddChildInArchitecture(a_2, a2));
-            Assert.Throws<CyclicHierarchyException>(() => reflexion.AddChildInArchitecture(a2, a_2));
-            Assert.Throws<NotInSubgraphException>(() => reflexion.AddChildInArchitecture(a2, i2));
-            Assert.Throws<RedundantSpecifiedEdgeException>(() => reflexion.Add(a_2, a_3, call));
+            Assert.Throws<NotAnOrphanException>(() => graph.AddChildInArchitecture(a_2, a2));
+            Assert.Throws<CyclicHierarchyException>(() => graph.AddChildInArchitecture(a2, a_2));
+            Assert.Throws<NotInSubgraphException>(() => graph.AddChildInArchitecture(a2, i2));
+            Assert.Throws<RedundantSpecifiedEdgeException>(() => graph.AddEdge(a_2, a_3, call));
         }
 
         /// <summary>
@@ -603,43 +601,46 @@ namespace SEE.Tools.Architecture
         public void MapIncrementally()
         {
             ResetEvents();
-            reflexion.Add(i[17], a[6]);
+            graph.AddEdge(i[17], a[6]);
             AssertEventCountEquals<EdgeChange>(0);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping);
             AssertMapped(i[17], a[6]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[16], a[6]);
+            graph.AddEdge(i[16], a[6]);
             AssertEventCountEquals<EdgeChange>(0);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             AssertMapped(i[16], a[6]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[3], a[3]);
+            graph.AddEdge(i[3], a[3]);
             AssertEventCountEquals<EdgeChange>(3);
             Assert.That(IsConvergent(a[3], a[7], call));
             Assert.That(IsAllowed(i[5], i[17], call));
             Assert.That(IsAllowed(i[4], i[16], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[3], a[6], call));
             AssertMapped(i[3], a[3]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[15], a[5]);
+            graph.AddEdge(i[15], a[5]);
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsAllowed(i[3], i[15], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[3], a[5], call));
             AssertMapped(i[15], a[5]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[1], a[1]);
+            graph.AddEdge(i[1], a[1]);
             AssertMapped(i[1], a[1]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[1], a[3], call));
             Assert.That(IsPropagated(a[1], a[1], call));
             AssertEventCountEquals<EdgeChange>(7);
@@ -650,25 +651,27 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAllowed(i[12], i[10], call));
             Assert.That(IsConvergent(a[1], a[3], call));
             Assert.That(IsConvergent(a[8], a[8], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[14], a[4]);
+            graph.AddEdge(i[14], a[4]);
             AssertMapped(i[14], a[4]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[4], a[1], call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsDivergent(i[14], i[13], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
 
             ResetEvents();
-            reflexion.Add(i[2], a[9]);
+            graph.AddEdge(i[2], a[9]);
             AssertMapped(i[2], a[9]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(3, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(3, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[9], a[3], call));
             Assert.That(IsPropagated(a[1], a[9], call));
             Assert.That(IsPropagated(a[9], a[9], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ignorePropagated: false);
             Assert.That(IsUnpropagated(a[1], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[1], call));
             AssertEventCountEquals<EdgeChange>(7);
@@ -681,16 +684,17 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[8], a[8], call));
 
             ResetEvents();
-            reflexion.Add(i[10], a[2]);
+            graph.AddEdge(i[10], a[2]);
             AssertMapped(i[10], a[2]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[1], a[2], call));
             Assert.That(IsPropagated(a[9], a[2], call));
             AssertEventCountEquals<EdgeChange>(3);
             Assert.That(IsAllowed(i[12], i[10], call));
             Assert.That(IsDivergent(i[9], i[10], call));
             Assert.That(IsConvergent(a[8], a[8], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ignorePropagated: false);
         }
 
         [Test]
@@ -704,8 +708,8 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[8], a[8], call));
             Assert.That(IsAbsent(a[2], a[4], call));
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Mapping);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Implementation);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Implementation);
 
@@ -715,22 +719,24 @@ namespace SEE.Tools.Architecture
             // incremental unmapping
             //----------------------
             ResetEvents();
-            reflexion.DeleteFromMapping(i[10]);
+            graph.RemoveFromMapping(i[10]);
             AssertUnmapped(i[10], a[2]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsUnpropagated(a[1], a[2], call));
             Assert.That(IsUnpropagated(a[9], a[2], call));
             AssertEventCountEquals<EdgeChange>(3);
             Assert.That(IsAbsent(a[8], a[8], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[2]);
+            graph.RemoveFromMapping(i[2]);
             AssertUnmapped(i[2], a[9]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsPropagated(a[1], a[3], call));
             Assert.That(IsPropagated(a[1], a[1], call));
-            AssertEventCountEquals<PropagatedEdgeEvent>(3, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(3, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
             Assert.That(IsUnpropagated(a[9], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[9], call));
             Assert.That(IsUnpropagated(a[9], a[9], call));
@@ -744,19 +750,21 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAllowed(i[12], i[10], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[14]);
+            graph.RemoveFromMapping(i[14]);
             AssertUnmapped(i[14], a[4]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsUnpropagated(a[4], a[1], call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsUnmapped(i[14], i[13], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[1]);
+            graph.RemoveFromMapping(i[1]);
             AssertUnmapped(i[1], a[1]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(2, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(2, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Mapping, ignorePropagated: true);
             Assert.That(IsUnpropagated(a[1], a[3], call));
             Assert.That(IsUnpropagated(a[1], a[1], call));
             AssertEventCountEquals<EdgeChange>(7);
@@ -769,19 +777,21 @@ namespace SEE.Tools.Architecture
             Assert.That(IsUnmapped(i[12], i[10], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[15]);
+            graph.RemoveFromMapping(i[15]);
             AssertUnmapped(i[15], a[5]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
             Assert.That(IsUnpropagated(a[3], a[5], call));
             AssertEventCountEquals<EdgeChange>(1);
             Assert.That(IsUnmapped(i[3], i[15], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[3]);
+            graph.RemoveFromMapping(i[3]);
             AssertUnmapped(i[3], a[3]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
             Assert.That(IsUnpropagated(a[3], a[6], call));
             AssertEventCountEquals<EdgeChange>(3);
             Assert.That(IsAbsent(a[3], a[7], call));
@@ -789,17 +799,19 @@ namespace SEE.Tools.Architecture
             Assert.That(IsUnmapped(i[5], i[17], call));
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[16]);
+            graph.RemoveFromMapping(i[16]);
             AssertUnmapped(i[16], a[6]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
             AssertEventCountEquals<EdgeChange>(0);
 
             ResetEvents();
-            reflexion.DeleteFromMapping(i[17]);
+            graph.RemoveFromMapping(i[17]);
             AssertUnmapped(i[17], a[6]);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ignorePropagated: true);
             AssertEventCountEquals<EdgeChange>(0);
         }
 
@@ -815,13 +827,13 @@ namespace SEE.Tools.Architecture
             Assert.That(IsAbsent(a[8], a[8], call));
             Assert.That(IsAbsent(a[2], a[4], call));
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Mapping);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Addition);
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Addition, ReflexionSubgraph.Implementation);
             AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Implementation);
 
             ResetEvents();
-            reflexion.DeleteFromImplementation(ie[(14, 13)]);
+            graph.RemoveFromImplementation(ie[(14, 13)]);
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Removal, ReflexionSubgraph.Implementation);
             Assert.AreEqual(1, changes.Count);
         }
@@ -847,7 +859,7 @@ namespace SEE.Tools.Architecture
         public void TestBigIncremental(IList<int> order)
         {
             // We want to start with fresh empty graphs (Setup creates filled ones)
-            fullGraph = new Graph("");
+            graph = new ReflexionGraph("");
             SetupReflexion();
 
             // Now we recreate Figure 3 from the paper, but we do it fully incrementally.
@@ -890,13 +902,13 @@ namespace SEE.Tools.Architecture
             Assert.That(IsPropagated(a[1], a[1], call));
             Assert.That(IsPropagated(a[1], a[2], call));
             Assert.That(IsPropagated(a[4], a[1], call));
-            // Technically 7 propagated edges, but it's actually 6 where one has a counter of 2
-            AssertEventCountEquals<PropagatedEdgeEvent>(6, ChangeType.Addition);
             AssertEventCountEquals<HierarchyEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
             AssertEventCountEquals<HierarchyEvent>(12, ChangeType.Addition, ReflexionSubgraph.Implementation);
             AssertEventCountEquals<NodeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Architecture);
             AssertEventCountEquals<NodeEvent>(17, ChangeType.Addition, ReflexionSubgraph.Implementation);
-            AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture);
+            // Technically 7 propagated edges, but it's actually 6 where one has a counter of 2.
+            // (Plus 4 other added architecture edges.)
+            AssertEventCountEquals<EdgeEvent>(10, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
             AssertEventCountEquals<EdgeEvent>(9, ChangeType.Addition, ReflexionSubgraph.Implementation);
         }
 
@@ -904,14 +916,14 @@ namespace SEE.Tools.Architecture
 
         private void AddMapping()
         {
-            reflexion.Add(i[17], a[6]);
-            reflexion.Add(i[16], a[6]);
-            reflexion.Add(i[3], a[3]);
-            reflexion.Add(i[15], a[5]);
-            reflexion.Add(i[1], a[1]);
-            reflexion.Add(i[14], a[4]);
+            graph.AddEdge(i[17], a[6]);
+            graph.AddEdge(i[16], a[6]);
+            graph.AddEdge(i[3], a[3]);
+            graph.AddEdge(i[15], a[5]);
+            graph.AddEdge(i[1], a[1]);
+            graph.AddEdge(i[14], a[4]);
             // Only in Figure 8: reflexion.Add(i[2], a[9]);
-            reflexion.Add(i[10], a[2]);
+            graph.AddEdge(i[10], a[2]);
         }
 
         private void AddImplEdges()
@@ -920,27 +932,27 @@ namespace SEE.Tools.Architecture
             {
                 (3, 15), (4, 16), (5, 17), (8, 6), (9, 8), (9, 10), (12, 10), (12, 9), (14, 13)
             };
-            ie = implEdgesFromTo.ToDictionary(x => x, x => reflexion.AddToImplementation(i[x.Item1], i[x.Item2], call));
+            ie = implEdgesFromTo.ToDictionary(x => x, x => graph.AddToImplementation(i[x.Item1], i[x.Item2], call));
         }
 
         private void AddImplHierarchy()
         {
-            reflexion.AddChildInImplementation(i[2], i[1]);
-            reflexion.AddChildInImplementation(i[11], i[1]);
+            graph.AddChildInImplementation(i[2], i[1]);
+            graph.AddChildInImplementation(i[11], i[1]);
 
-            reflexion.AddChildInImplementation(i[3], i[2]);
-            reflexion.AddChildInImplementation(i[7], i[2]);
+            graph.AddChildInImplementation(i[3], i[2]);
+            graph.AddChildInImplementation(i[7], i[2]);
 
-            reflexion.AddChildInImplementation(i[4], i[3]);
-            reflexion.AddChildInImplementation(i[5], i[3]);
-            reflexion.AddChildInImplementation(i[6], i[3]);
+            graph.AddChildInImplementation(i[4], i[3]);
+            graph.AddChildInImplementation(i[5], i[3]);
+            graph.AddChildInImplementation(i[6], i[3]);
 
-            reflexion.AddChildInImplementation(i[8], i[7]);
-            reflexion.AddChildInImplementation(i[9], i[7]);
-            reflexion.AddChildInImplementation(i[10], i[7]);
+            graph.AddChildInImplementation(i[8], i[7]);
+            graph.AddChildInImplementation(i[9], i[7]);
+            graph.AddChildInImplementation(i[10], i[7]);
 
-            reflexion.AddChildInImplementation(i[12], i[11]);
-            reflexion.AddChildInImplementation(i[13], i[11]);
+            graph.AddChildInImplementation(i[12], i[11]);
+            graph.AddChildInImplementation(i[13], i[11]);
         }
 
         private void AddImplNodes()
@@ -954,7 +966,7 @@ namespace SEE.Tools.Architecture
                     SourceName = "i" + j,
                     Type = "Component"
                 };
-                reflexion.AddToImplementation(i[j]);
+                graph.AddToImplementation(i[j]);
             }
         }
 
@@ -964,15 +976,15 @@ namespace SEE.Tools.Architecture
             {
                 (3, 7), (1, 3), (8, 8), (2, 4)
             };
-            ae = archEdgesFromTo.ToDictionary(x => x, x => reflexion.AddToArchitecture(a[x.Item1], a[x.Item2], call));
+            ae = archEdgesFromTo.ToDictionary(x => x, x => graph.AddToArchitecture(a[x.Item1], a[x.Item2], call));
         }
 
         private void AddArchHierarchy()
         {
-            reflexion.AddChildInArchitecture(a[6], a[7]);
-            reflexion.AddChildInArchitecture(a[5], a[7]);
-            reflexion.AddChildInArchitecture(a[1], a[8]);
-            reflexion.AddChildInArchitecture(a[2], a[8]);
+            graph.AddChildInArchitecture(a[6], a[7]);
+            graph.AddChildInArchitecture(a[5], a[7]);
+            graph.AddChildInArchitecture(a[1], a[8]);
+            graph.AddChildInArchitecture(a[2], a[8]);
         }
 
         private void AddArchNodes()
@@ -986,7 +998,7 @@ namespace SEE.Tools.Architecture
                     SourceName = "a" + j,
                     Type = "Component"
                 };
-                reflexion.AddToArchitecture(a[j]);
+                graph.AddToArchitecture(a[j]);
             }
         }
 

@@ -108,8 +108,8 @@ namespace SEE.Game
                 {
                     // We are moving an already mapped node back to its implementation city, so we should unmap it.
                     SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
-                    Reflexion analysis = reflexionCity.Analysis;
-                    analysis.DeleteFromMapping(movingNode);
+                    ReflexionGraph analysis = reflexionCity.ReflexionGraph;
+                    analysis.RemoveFromMapping(movingNode);
                 }
                 else if (!movingNode.IsInImplementation())
                 {
@@ -137,8 +137,8 @@ namespace SEE.Game
                     if (movingNode.IsInMapping())
                     {
                         // If the node was already mapped, we'll unmap it again.
-                        Reflexion analysis = reflexionCity.Analysis;
-                        analysis.DeleteFromMapping(movingNode);
+                        ReflexionGraph analysis = reflexionCity.ReflexionGraph;
+                        analysis.RemoveFromMapping(movingNode);
                     }
                 }
 

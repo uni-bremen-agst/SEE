@@ -305,7 +305,7 @@ namespace SEE.Controls.Actions
                 {
                     // The Maps-To edge will have to be deleted once the node no longer hovers over it.
                     hit.HoveredObject.SetParent(originalParent);
-                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                    reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
                     temporaryMapsTo = null;
                 }
 
@@ -395,13 +395,13 @@ namespace SEE.Controls.Actions
                                     // trigger the incremental reflexion analysis here.
                                     // That way, the relevant code is in one place
                                     // and edges will be colored on hover (#451).
-                                    temporaryMapsTo = reflexionCity.Analysis.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
+                                    temporaryMapsTo = reflexionCity.ReflexionGraph.AddToMapping(hit.node.Value, newParentNode, overrideMapping: true);
                                 }
                                 else if (temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
                                 {
                                     // The Maps-To edge will have to be deleted once the node no longer hovers over it.
                                     hit.HoveredObject.SetParent(raycastHit.Value.collider.transform);
-                                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                                    reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
                                     temporaryMapsTo = null;
                                 }
                                 else if (hit.node.Value.IsInImplementation() && newParentNode.IsInImplementation())
@@ -418,7 +418,7 @@ namespace SEE.Controls.Actions
                             // We'll change its parent so it becomes a root node in the implementation city.
                             // The user will have to drop it on another node to re-parent it.
                             hit.HoveredObject.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
-                            reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                            reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
                             temporaryMapsTo = null;
                         }
                     }

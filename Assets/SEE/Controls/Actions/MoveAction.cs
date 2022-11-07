@@ -437,7 +437,7 @@ namespace SEE.Controls.Actions
                             {
                                 // The grabbed object was previously temporarily mapped onto another target.
                                 // The temporary mapping must be reverted.
-                                reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                                reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
                                 MapTo(source, mappingTarget, target);
                             }
                         }
@@ -447,16 +447,16 @@ namespace SEE.Controls.Actions
                     {
                         // This changes the node hierarchy in the implementation only.
                         PutOn(mappingTarget);
-                        reflexionCity.Analysis.UnparentInImplementation(source);
-                        reflexionCity.Analysis.AddChildInImplementation(source, target);
+                        reflexionCity.ReflexionGraph.UnparentInImplementation(source);
+                        reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
                     }
                     // architecture -> architecture
                     else if (source.IsInArchitecture() && target.IsInArchitecture())
                     {
                         // This changes the node hierarchy in the implementation only.
                         PutOn(mappingTarget);
-                        reflexionCity.Analysis.UnparentInArchitecture(source);
-                        reflexionCity.Analysis.AddChildInArchitecture(source, target);
+                        reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
+                        reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
                     }
                     // architecture -> implementation: forbidden
                     else
@@ -481,7 +481,7 @@ namespace SEE.Controls.Actions
                 // That way, the relevant code is in one place
                 // and edges will be colored on hover (#451).
                 PutOn(mappingTarget);
-                temporaryMapsTo = reflexionCity.Analysis.AddToMapping(source, target, overrideMapping: true);
+                temporaryMapsTo = reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
             }
 
             /// <summary>
@@ -504,7 +504,7 @@ namespace SEE.Controls.Actions
                     // We'll change its parent so it becomes a root node in the implementation city.
                     // The user will have to drop it on another node to re-parent it.
                     gameObject.transform.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
-                    reflexionCity.Analysis.DeleteFromMapping(temporaryMapsTo);
+                    reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
                     temporaryMapsTo = null;
                 }
             }

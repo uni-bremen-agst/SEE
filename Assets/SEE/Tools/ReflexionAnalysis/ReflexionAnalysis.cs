@@ -6,6 +6,7 @@ Initially written in C++ on Jul 24, 2011.
 Rewritten in C# on Jan 14, 2020.
 Refactored to work on a single graph on Feb 17, 2022.
 Incremental Reflexion Analysis operations implemented in April 2022.
+Refactored to work as a subclass of the graph in November 2022.
 
 Purpose:
 Implements incremental reflexion analysis. For detailed documentation refer to
@@ -34,6 +35,7 @@ mapping graph simply consists of all Maps_To edges and their connected nodes.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
@@ -118,45 +120,8 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </li>
     /// </ul>
     /// </remarks>
-    public partial class Reflexion : Observable<ChangeEvent>
+    public partial class ReflexionGraph : Graph
     {
-        /// <summary>
-        /// Constructor for setting up the reflexion analysis.
-        /// NOTE: The three given graphs will be copied and assembled into <see cref="FullGraph"/>.
-        /// Any further modifications to those three graphs will not be taken into account.
-        /// </summary>
-        /// <param name="implementation">the implementation graph</param>
-        /// <param name="architecture">the architecture model</param>
-        /// <param name="mapping">the mapping of implementation nodes onto architecture nodes</param>
-        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
-        /// <remarks>
-        /// This does not really run the reflexion analysis. Use
-        /// method Run() to start the analysis.
-        /// </remarks>
-        public Reflexion(Graph implementation, Graph architecture, Graph mapping,
-                         bool allowDependenciesToParents = true)
-        {
-            FullGraph = Assemble(architecture, implementation, mapping, "Reflexion Graph", out _, out _);
-            AllowDependenciesToParents = allowDependenciesToParents;
-        }
-
-        /// <summary>
-        /// Constructor for setting up the reflexion analysis.
-        /// </summary>
-        /// <param name="fullGraph">
-        /// The graph containing nodes and edges for implementation, architecture and mapping, labeled
-        /// using the toggle attributes <see cref="ReflexionGraphTools.ImplementationLabel"/> and
-        /// <see cref="ReflexionGraphTools.ArchitectureLabel"/>.
-        /// </param>
-        /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
-        /// <remarks>
-        /// This does not really run the reflexion analysis. Use <see cref="Run"/> to start the analysis.
-        /// </remarks>
-        public Reflexion(Graph fullGraph, bool allowDependenciesToParents = true)
-        {
-            FullGraph = fullGraph;
-            AllowDependenciesToParents = allowDependenciesToParents;
-        }
 
         /// <summary>
         /// Runs the reflexion analysis. If an observer has registered before,
@@ -164,23 +129,23 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public void Run()
         {
+            AnalysisInitialized = true;
             ConstructTransitiveMapping();
             FromScratch();
             //DumpResults();
         }
 
-        #region Graphs
-
         /// <summary>
-        /// The reflexion graph for which the reflexion data is calculated.
-        /// Implementation and architecture nodes and edges are distinguished by the toggle attributes
-        /// <see cref="ReflexionGraphTools.ImplementationLabel"/> and
-        /// <see cref="ReflexionGraphTools.ArchitectureLabel"/>, whereas mapping edges have none of these attributes.
+        /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
         /// </summary>
-        public Graph FullGraph { get; }
-
-        #endregion
-
+        public const string MapsToType = "Maps_To";
+        
+        /// <summary>
+        /// Whether the reflexion analysis has already been initialized / run.
+        /// If this is false, incremental events like <see cref="AddNode"/> will only modify the graph
+        /// and not run the reflexion analysis.
+        /// </summary>
+        public bool AnalysisInitialized = false;
 
         #region State Edge Attribute
 
@@ -226,7 +191,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
                 else
                 {
-                    Notify(new EdgeChange(edge, oldState, newState, edge.GetSubgraph()));
+                    Notify(new EdgeChange(edge, oldState, newState, edge.GetSubgraphs()));
                 }
             }
         }
@@ -238,7 +203,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">architecture dependency</param>
         /// <returns>true if edge is a specified architecture dependency</returns>
-        private static bool IsSpecified(Edge edge)
+        public static bool IsSpecified(Edge edge)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
             State state = edge.State();
@@ -347,9 +312,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 Transition(edge, edge.State(), State.Unmapped);
                 // We can drop this edge; it is no longer needed.
                 SetCounter(edge, 0);
-                Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
                 propagationTable.Remove(edge.ID);
-                FullGraph.RemoveEdge(edge);
+                base.RemoveEdge(edge);
             }
             else
             {
@@ -632,7 +596,7 @@ namespace SEE.Tools.ReflexionAnalysis
             string[] stateNames = Enum.GetNames(typeof(State));
             int[] summary = new int[stateNames.Length];
 
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
+            foreach (Edge edge in Edges().Where(x => x.IsInArchitecture()))
             {
                 summary[(int)edge.State()] += GetArchCounter(edge);
             }
@@ -696,19 +660,6 @@ namespace SEE.Tools.ReflexionAnalysis
             // source and target are relevant.
         }
 
-        /// <summary>
-        /// Returns true if the given <paramref name="edge"/> has been propagated.
-        ///
-        /// Pre-condition: <paramref name="edge"/> is contained in the implementation.
-        /// </summary>
-        /// <param name="edge">The edge which should be checked</param>
-        /// <returns>True iff <paramref name="edge"/> has been propagated</returns>
-        private bool IsPropagated(Edge edge)
-        {
-            AssertOrThrow(edge.IsInImplementation(), () => new NotInSubgraphException(Implementation, edge));
-            return MapsTo(edge.Source) != null && MapsTo(edge.Target) != null;
-        }
-
         #endregion
 
         #region Mapping
@@ -745,7 +696,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // to first create the explicit mapping and can only then map the otherwise
             // unmapped children
             explicitMapsToTable = new Dictionary<string, Node>();
-            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.IsInMapping()))
+            foreach (Edge mapsTo in Edges().Where(x => x.IsInMapping()))
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
@@ -757,7 +708,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
             implicitMapsToTable = new Dictionary<string, Node>();
 
-            foreach (Edge mapsTo in FullGraph.Edges().Where(x => x.IsInMapping()))
+            foreach (Edge mapsTo in Edges().Where(x => x.IsInMapping()))
             {
                 Node source = mapsTo.Source;
                 Node target = mapsTo.Target;
@@ -767,6 +718,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 
                 // We'll now also notify our observer's that a "new" mapping edge exists.
                 Notify(new EdgeEvent(mapsTo, ChangeType.Addition, Mapping));
+                // TODO: Unsure whether we still need the above notification?
+                //       Graph sends it out on creation of the edge anyway.
             }
         }
 
@@ -890,7 +843,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         private void ResetImplementation()
         {
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInImplementation()))
+            foreach (Edge edge in Edges().Where(x => x.IsInImplementation()))
             {
                 Transition(edge, edge.State(), State.Unmapped);
             }
@@ -905,7 +858,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             List<Edge> toBeRemoved = new List<Edge>();
 
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
+            foreach (Edge edge in Edges().Where(x => x.IsInArchitecture()))
             {
                 State state = edge.State();
                 switch (state)
@@ -926,9 +879,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     case State.ImplicitlyAllowed:
                     case State.AllowedAbsent:
                         // The edge is a left-over from a previous analysis and should be
-                        // removed. Before we actually do that, we need to notify all observers.
-                        Notify(new PropagatedEdgeEvent(edge, ChangeType.Removal));
-                        // No need to delete from propagationTable, as we clear that at the end anyway.
+                        // removed. No need to delete from propagationTable, as we clear that at the end anyway.
                         toBeRemoved.Add(edge);
                         break;
                     default:
@@ -944,7 +895,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // because the loop iterates on architecture.Edges().
             foreach (Edge edge in toBeRemoved)
             {
-                FullGraph.RemoveEdge(edge);
+                base.RemoveEdge(edge);
             }
         }
 
@@ -958,7 +909,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // propagate and lift their dependencies in the architecture
             foreach (KeyValuePair<string, Node> mapsTo in implicitMapsToTable)
             {
-                Node sourceNode = FullGraph.GetNode(mapsTo.Key);
+                Node sourceNode = GetNode(mapsTo.Key);
                 AssertOrThrow(sourceNode.IsInImplementation(), () => new NotInSubgraphException(Implementation, sourceNode));
                 if (IsRelevant(sourceNode))
                 {
@@ -977,7 +928,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // after CalculateConvergesAndDivergences() all
             // architectural dependencies not marked as 'convergent'
             // are 'absent' (unless the architecture edge is marked 'optional')
-            foreach (Edge edge in FullGraph.Edges().Where(x => x.IsInArchitecture()))
+            foreach (Edge edge in Edges().Where(x => x.IsInArchitecture()))
             {
                 State state = edge.State();
                 if (IsSpecified(edge) && state != State.Convergent)
@@ -1166,8 +1117,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="to">the target of the edge</param>
         /// <param name="itsType">the type of the edge</param>
         /// <param name="isVirtual">whether the new edge should be drawn in the scene</param>
+        /// <param name="addToGraph">whether the newly created edge shall be added to the graph</param>
         /// <returns>the new edge</returns>
-        private Edge AddEdge(Node from, Node to, string itsType, bool isVirtual)
+        private Edge AddEdge(Node from, Node to, string itsType, bool isVirtual, bool addToGraph = true)
         {
             // Note: a propagated edge between the same two architectural entities may be specified as well;
             // hence, we may have multiple edges in between.
@@ -1196,7 +1148,10 @@ namespace SEE.Tools.ReflexionAnalysis
             
             SetState(result, State.Undefined);
 
-            FullGraph.AddEdge(result);
+            if (addToGraph)
+            {
+                base.AddEdge(result);
+            }
             return result;
         }
 
@@ -1232,7 +1187,7 @@ namespace SEE.Tools.ReflexionAnalysis
             AssertOrThrow(archSource.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archSource));
             AssertOrThrow(archTarget.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archTarget));
             AssertOrThrow(originatingEdge.IsInImplementation(), () => new NotInSubgraphException(Implementation, originatingEdge));
-            Edge alreadyPropagated = FullGraph.Edges().FirstOrDefault(x => x.Source == archSource
+            Edge alreadyPropagated = Edges().FirstOrDefault(x => x.Source == archSource
                                                                            && x.Target == archTarget
                                                                            && x.Type == edgeType
                                                                            && x.IsInArchitecture() && !IsSpecified(x));
@@ -1246,9 +1201,7 @@ namespace SEE.Tools.ReflexionAnalysis
             propagated.Add(originatingEdge);
 
             // propagatedArchitectureDep is a dependency propagated from the implementation onto the architecture;
-            // it was just created and, hence, has no state yet (which means it is State.undefined);
-            // because it has just come into existence, we need to let our observers know about it
-            Notify(new PropagatedEdgeEvent(propagatedArchitectureDep, ChangeType.Addition));
+            // it was just created and, hence, has no state yet (which means it is State.undefined).
 
             if (Lift(archSource, archTarget, edgeType, counter, out allowingEdgeOut))
             {

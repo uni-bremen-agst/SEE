@@ -4,7 +4,6 @@ using SEE.DataModel.DG.IO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 
 namespace SEE.Tools.Architecture
 {
@@ -27,10 +26,9 @@ namespace SEE.Tools.Architecture
         {
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
-            reflexion = new Reflexion(impl, arch, mapping);
-            fullGraph = reflexion.FullGraph;
-            reflexion.Subscribe(this);
-            reflexion.Run();
+            graph = new ReflexionGraph(impl, arch, mapping);
+            graph.Subscribe(this);
+            graph.Run();
             p.End();
         }
 
@@ -49,20 +47,19 @@ namespace SEE.Tools.Architecture
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running incremental reflexion analysis");
             // Passing the empty graph as mapping argument to reflexion.
-            reflexion = new Reflexion(impl, arch, new Graph("DUMMYBASEPATH"));
-            fullGraph = reflexion.FullGraph;
-            reflexion.Subscribe(this);
-            reflexion.Run(); // from scratch
+            graph = new ReflexionGraph(impl, arch, new Graph("DUMMYBASEPATH"));
+            graph.Subscribe(this);
+            graph.Run(); // from scratch
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
             {
-                Node source = fullGraph.GetNode(map.Source.ID);
+                Node source = graph.GetNode(map.Source.ID);
                 Assert.IsTrue(source.IsInImplementation());
-                Node target = fullGraph.GetNode(map.Target.ID);
+                Node target = graph.GetNode(map.Target.ID);
                 Assert.IsTrue(target.IsInArchitecture());
                 Assert.NotNull(source);
                 Assert.NotNull(target);
-                reflexion.AddToMapping(source, target);
+                graph.AddToMapping(source, target);
             }
             p.End();
         }
@@ -75,11 +72,11 @@ namespace SEE.Tools.Architecture
         {
             const string folderName = "minilax";
             NonIncrementally(folderName);
-            int[] incrementally = reflexion.Summary();
+            int[] incrementally = graph.Summary();
             Teardown();
             Setup();
             Incrementally(folderName);
-            int[] nonIncrementally = reflexion.Summary();
+            int[] nonIncrementally = graph.Summary();
             Assert.AreEqual(incrementally, nonIncrementally);
         }
 

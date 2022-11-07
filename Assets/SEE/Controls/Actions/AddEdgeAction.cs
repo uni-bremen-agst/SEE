@@ -155,14 +155,11 @@ namespace SEE.Controls.Actions
                 memento = new Memento(from, to, DefaultEdgeType);
                 createdEdge = CreateEdge(memento);
 
-                if (createdEdge != null)
-                {
-                    // action is completed (successfully or not; it does not matter)
-                    from = null;
-                    to = null;
-                    result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                }
+                // action is completed (successfully or not; it does not matter)
+                from = null;
+                to = null;
+                result = createdEdge != null;
+                currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())
