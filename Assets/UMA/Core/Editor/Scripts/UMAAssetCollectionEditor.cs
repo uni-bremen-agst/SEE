@@ -1,31 +1,3 @@
-﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-
-namespace UMA.Editors
-{
-	[CustomEditor(typeof(UMAAssetCollection), true)]
-	public class UMAAssetCollectionEditor : Editor 
-	{
-		public override void OnInspectorGUI()
-		{
-			var context = UMAContextBase.Instance;
-			EditorGUI.BeginDisabledGroup(context == null);
-			if (GUILayout.Button("Add to Scene Context"))
-			{
-				var collection = target as UMAAssetCollection;
-				collection.AddToContext(context);
-			}
-			EditorGUI.EndDisabledGroup();
-
-			base.OnInspectorGUI();
-		}
-
-		[MenuItem("Assets/Create/UMA/Core/Asset Collection")]
-		public static void CreateUMAAssetCollection()
-		{
-			UMA.CustomAssetUtility.CreateAsset<UMAAssetCollection>();
-		}
-	}
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:d318c6dd3c62a8f48f18cb3526eefef31f1d58da64c8d8f236c7d2b34f61d558
+size 750

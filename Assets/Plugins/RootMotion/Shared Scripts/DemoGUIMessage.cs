@@ -1,18 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace RootMotion {
-
-	// Just for displaying a GUI text in the Game View.
-	public class DemoGUIMessage : MonoBehaviour {
-
-		public string text;
-		public Color color = Color.white;
-
-		void OnGUI() {
-			GUI.color = color;
-			GUILayout.Label(text);
-			GUI.color = Color.white;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c190020fe9ecbe2d524320e36dfc139f2fc5c156885df380c7939403245698c1
+size 335

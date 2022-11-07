@@ -1,13 +1,3 @@
-{
-    "name": "VivoxUnity",
-    "references": ["GUID:2bafac87e7f4b9b418d9448d219b01ab","GUID:343deaaf83e0cee4ca978e7df0b80d21"],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": true,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6153ceaa0802bbe49854e95792c21fc19425b172729161f3591b0afb2ccd4dd8
+size 408

@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: o3n_female_pullover_shirt_04_hide_asset_LOD1
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 099b6a7466c1cf544af8ea0a83962cbd, type: 2}
-  _assetSlotName: 
-  _serializedFlags:
-  - flags: 000000f83e806ffcffffffffffffffc79d010000deffffffbfffffffffffffffffffffffffc9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3f000000c07fe00f000300d0e3ff3f00000000e0ffffffffffffffffffffffffffffffffffffffff7f6f933fffff010080bfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff03e0ffffffffef07000000
-    Count: 1315
+version https://git-lfs.github.com/spec/v1
+oid sha256:aaddfc4bffc7c0b2b58f570734dfa8d109fafa31a5f44a83a766a18a3fb6890f
+size 896

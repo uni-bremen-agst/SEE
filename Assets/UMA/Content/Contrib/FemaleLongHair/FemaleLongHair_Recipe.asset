@@ -1,31 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
-  m_Name: FemaleLongHair_Recipe
-  m_EditorClassIdentifier: 
-  recipeType: Wardrobe
-  DisplayValue: FemaleLongHair
-  compatibleRaces:
-  - HumanFemale
-  - HumanFemaleDCS
-  wardrobeRecipeThumbs:
-  - race: HumanFemale
-    filename: 
-    thumb: {fileID: 0}
-  - race: HumanFemaleDCS
-    filename: 
-    thumb: {fileID: 0}
-  wardrobeSlot: Hair
-  Hides: []
-  suppressWardrobeSlots: []
-  activeWardrobeSet: []
-  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"FemaleLongHair","scale":100,"copyIdx":-1,"overlays":[{"id":"FemaleLongHair_Overlay","colorIdx":0,"rect":[0,0,0,0],"data":[]}]}],"colors":[],"fColors":[{"name":"Hair","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":1,"race":"","packedDna":[]}'
-  replaces: Nothing
+version https://git-lfs.github.com/spec/v1
+oid sha256:8fd9781f725c11b85631fd2e94998686a142efb9c2a500b61725237b3bd4a4fb
+size 1149

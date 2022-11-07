@@ -1,30 +1,3 @@
-using UnityEngine;
-using System.Collections;
-using RootMotion.FinalIK;
-
-namespace RootMotion.Demos {
-
-	/// <summary>
-	/// Bend goal for FullBodyBipedIK.
-	/// </summary>
-	public class FBIKBendGoal: MonoBehaviour {
-		
-		public FullBodyBipedIK ik; // Refernce to the FBBIK component
-		public FullBodyBipedChain chain; // Which limb is this bend goal for?
-		
-		public float weight; // Bend goal weight
-
-		void Start() {
-			Debug.Log("FBIKBendGoal is deprecated, you can now a bend goal from the custom inspector of the FullBodyBipedIK component.");
-		}
-
-		void Update() {
-			if (ik == null) return;
-
-			ik.solver.GetBendConstraint(chain).bendGoal = transform;
-			ik.solver.GetBendConstraint(chain).weight = weight;
-		}
-	}
-}
-	
-	
+version https://git-lfs.github.com/spec/v1
+oid sha256:581614f82b835c758cfc31fd7cdf782fa57ea3d11c7b37ec15fa93d973f7fafd
+size 724

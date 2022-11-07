@@ -1,14 +1,3 @@
-fileFormatVersion: 2
-guid: 98b9a1a9e9a934b23a7db351dd9ec69e
-labels:
-- InverseKinematics
-- IK
-- CCD
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 9997
-  icon: {fileID: 2800000, guid: 79450243724744b44820e5468e418048, type: 3}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:d2d5a52d7747ec03dd4c0f3119158b7db54e8dfc91314495f9581dd64fa26cc4
+size 314

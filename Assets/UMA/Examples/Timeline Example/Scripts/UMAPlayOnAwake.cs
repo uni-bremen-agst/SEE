@@ -1,27 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using UnityEngine;
-using UMA.CharacterSystem;
-using UnityEngine.Playables;
-
-namespace UMA.Examples
-{
-    public class UMAPlayOnAwake : MonoBehaviour
-    {
-        public PlayableDirector playableDirector;
-
-        DynamicCharacterAvatar avatar;
-
-        // Use this for initialization
-        void Start()
-        {
-            avatar = GetComponent<DynamicCharacterAvatar>();
-            avatar.CharacterCreated.AddListener(OnCharacterCreated);
-        }
-
-        public void OnCharacterCreated(UMAData umaData)
-        {
-            playableDirector.Play();
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:de1eb4a96ccd9322f80272c7526d2ffc18ba07b45a68a1278eee98dbfb497be1
+size 641

@@ -1,12 +1,3 @@
-fileFormatVersion: 2
-guid: 3b71c5a4eb1a42d408fb6e152589f97b
-timeCreated: 1482855108
-licenseType: Store
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:66fba5cbfc5b17925c2a7d15c0e5f00d734be695505562b556154d1b3d19fe0e
+size 264

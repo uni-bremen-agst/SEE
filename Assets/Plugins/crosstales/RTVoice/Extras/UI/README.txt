@@ -1,8 +1,3 @@
-﻿# UI
-
-## Description
-This package contains classes to speak UI elements like Text and InputField.
-
-
-## Note
-If "TextMesh Pro" is used, please uncomment line 4 in "SpeakUITMPText.cs" and "SpeakUITMPInputField.cs"
+version https://git-lfs.github.com/spec/v1
+oid sha256:e16eebca02e0ba82fe958acedeef9b90f317f800b5869836c6868b4c424b4876
+size 214

@@ -1,35 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace RootMotion
-{
-
-    /// <summary>
-    /// The base abstract Singleton class.
-    /// </summary>
-    public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
-    {
-
-        private static T sInstance = null;
-
-        public static T instance
-        {
-            get
-            {
-                return sInstance;
-            }
-        }
-
-        public static void Clear()
-        {
-            sInstance = null;
-        }
-
-        protected virtual void Awake()
-        {
-            if (sInstance != null) Debug.LogError(name + "error: already initialized", this);
-
-            sInstance = (T)this;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:807202ae5b03415049011fdd6f14fedcee590836fa18e68ba5061b69164380af
+size 695

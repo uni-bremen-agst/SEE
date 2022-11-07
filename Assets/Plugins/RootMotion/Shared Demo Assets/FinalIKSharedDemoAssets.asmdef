@@ -1,18 +1,3 @@
-{
-    "name": "FinalIKSharedDemoAssets",
-    "rootNamespace": "",
-    "references": [
-        "GUID:46a21e0309a070340b48841dea4af81b",
-        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
-        "GUID:343deaaf83e0cee4ca978e7df0b80d21"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6062b50aeb54f7fb0e2428c8a96c2ae2c3125e7f30b3a073fc8d00cebdbd100a
+size 507

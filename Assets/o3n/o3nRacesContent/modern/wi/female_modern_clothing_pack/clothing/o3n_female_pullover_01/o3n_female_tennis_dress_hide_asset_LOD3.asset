@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: o3n_female_tennis_dress_hide_asset_LOD3
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 45d3ba2a17510bb4ab69e4c9aa58a4ea, type: 2}
-  _assetSlotName: o3n_female_dress_01_LOD3
-  _serializedFlags:
-  - flags: ffffffffffff07000000f2ff00007880f8ffcfffff0f00ff01008001f10100ff02003f00
-    Count: 278
+version https://git-lfs.github.com/spec/v1
+oid sha256:dec397df21e5ed6ecd393b5bdd316099abc44a073a73c72a13b19e3980b5effd
+size 650

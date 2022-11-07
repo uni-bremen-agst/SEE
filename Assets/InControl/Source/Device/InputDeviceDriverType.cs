@@ -1,31 +1,3 @@
-// ReSharper disable InconsistentNaming
-namespace InControl
-{
-	using UnityEngine;
-
-	public enum InputDeviceDriverType : ushort
-	{
-		Unknown = 0,
-		HID = 1,
-		USB = 2,
-		Bluetooth = 3,
-
-		[InspectorName( "XInput" )]
-		XInput = 4,
-
-		[InspectorName( "DirectInput" )]
-		DirectInput = 5,
-
-		[InspectorName( "RawInput" )]
-		RawInput = 6,
-
-		[InspectorName( "AppleGameController" )]
-		AppleGameController = 7,
-
-		[InspectorName( "SDLJoystick" )]
-		SDLJoystick = 8,
-
-		[InspectorName( "SDLController" )]
-		SDLController = 9,
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d99e61b33dcd4ca058ba59ded7faf473eb65b26b0142be02f50bfae107eb64a7
+size 554

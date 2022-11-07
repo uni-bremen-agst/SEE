@@ -1,11 +1,3 @@
-{
-    "name": "Sirenix.OdinInspector.Modules.UnityMathematics",
-    "references": [ "Unity.Mathematics", "Sirenix.OdinInspector.Attributes", "Sirenix.OdinInspector.Editor", "Sirenix.Utilities", "Sirenix.Utilities.Editor", "UnityEditor.UI", "UnityEngine.UI", "UnityEditor.TestRunner", "UnityEngine.TestRunner" ],
-    "includePlatforms": [ "Editor" ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": true,
-    "autoReferenced": true,
-    "overrideReferences": false,
-    "precompiledReferences": [ "Sirenix.Utilities.dll", "Sirenix.Utilities.Editor.dll", "Sirenix.OdinInspector.Attributes.dll", "Sirenix.OdinInspector.Editor.dll", "Sirenix.Serialization.dll" ],
-    "defineConstraints": []
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:2075ededc7f6b5709f1d006650ec426c5fede37797f250072b2621b284ba6e6b
+size 692

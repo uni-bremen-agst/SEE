@@ -1,30 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-
-namespace UMA
-{
-    [Serializable]
-    public class CamSaver
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-        
-        public CamSaver(Transform t)
-        {
-            position = t.position;
-            rotation = t.localRotation;
-        }
-
-        public override string ToString()
-        {
-            return JsonUtility.ToJson(this);
-        }
-
-        public static CamSaver FromString(string s)
-        {
-           return JsonUtility.FromJson<CamSaver>(s);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e4de4997fea787267512bccf15a178521ddf5d2ecdd069ea9e43fcde16cfc007
+size 646

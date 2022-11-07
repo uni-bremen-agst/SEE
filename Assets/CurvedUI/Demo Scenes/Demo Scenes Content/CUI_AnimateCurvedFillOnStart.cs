@@ -1,35 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
-
-namespace CurvedUI
-{
-    public class CUI_AnimateCurvedFillOnStart : MonoBehaviour
-    {
-
-        // Update is called once per frame
-        void Update()
-        {
-
-            CurvedUISettings set = this.GetComponent<CurvedUISettings>();
-            Text textie = this.GetComponentInChildren<Text>();
-
-            if (Time.time < 1.5f)
-            {
-
-                set.RingFill = Mathf.PerlinNoise(Time.time * 30.23234f, Time.time * 30.2313f) * 0.15f;
-                textie.text = "Accesing Mainframe...";
-
-            }
-            else if (Time.time < 2.5f)
-            {
-
-                set.RingFill = Mathf.Clamp(set.RingFill + Time.deltaTime * 3, 0, 1);
-                textie.text = "Mainframe Active";
-
-            }
-
-
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:fc0a030285a268231b4ad921d25e022d06c32256ccc1f8ca7463c58dfac8c19c
+size 856

@@ -1,23 +1,3 @@
-fileFormatVersion: 2
-guid: 0e606767f2f03204fb289d21d2696684
-labels:
-- Tween
-- Tweening
-- Animation
-- HOTween
-- Paths
-- VisualScripting
-- VisualEditor
-- iTween
-- DFTween
-- LeanTween
-- Ease
-- Easing
-- Shake
-- Punch
-- 2DToolkit
-- TextMeshPro
-- Text
-folderAsset: yes
-DefaultImporter:
-  userData: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:84b89c091484d108ff2d95d49fc8b3e8994ce71deb0b30b94468881757bc22a2
+size 293

@@ -1,14 +1,3 @@
-{
-    "name": "VivoxEditor",
-    "references": ["GUID:343deaaf83e0cee4ca978e7df0b80d21","GUID:2bafac87e7f4b9b418d9448d219b01ab","GUID:0acc523941302664db1f4e527237feb3","GUID:27619889b8ba8c24980f49ee34dbb44a"],
-    "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": []
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4bba5a97167f78cb79157375d3f1c3b450950b239207235fa7a0b68485bae9c4
+size 489

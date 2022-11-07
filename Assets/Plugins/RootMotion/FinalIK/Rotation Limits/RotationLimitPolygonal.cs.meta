@@ -1,13 +1,3 @@
-fileFormatVersion: 2
-guid: dae00b1bdc58d499396776ce508a5078
-labels:
-- Turrets
-- RotationLimits
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {fileID: 2800000, guid: 03a93cc74a1364909b1ddd071896ad75, type: 3}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:e832f30dc62063e8976854633ebb9997271322e119530a04285ea421236b0295
+size 307

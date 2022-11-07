@@ -1,7 +1,3 @@
-The purpose of these Demo scenes is to demonstrate one way of using UMA with multiplayer games.
-It's not the only way, but an example of what it might look like.
-
-Some things to note:
- - You need to add both scenes to the player settings before playing.
- - You start by running the "UMA Core Demo - Networking Menu" scene.
- - The current text based save format is not meant for real word use in a networked game.
+version https://git-lfs.github.com/spec/v1
+oid sha256:1c59a4ebdb6f01ff0ca5dca00229b9f98ad60d2a29d147aef5cee0c0f3b58feb
+size 418

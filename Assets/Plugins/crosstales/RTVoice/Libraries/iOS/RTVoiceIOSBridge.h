@@ -1,24 +1,3 @@
-//
-//  RTVoiceIOSBridge.h
-//  Version 2022.1.0
-//
-//  © 2016-2022 crosstales LLC (https://www.crosstales.com)
-//
-#ifndef RTVoiceIOSBridge_h
-#define RTVoiceIOSBridge_h
-#import <AVFoundation/AVFoundation.h>
-
-@interface RTVoiceIOSBridge:NSObject<AVSpeechSynthesizerDelegate>
-+ (void)setVoices;
-+ (void)speak:(NSString *)id text:(NSString *)text rate:(float)rate pitch:(float)pitch volume:(float)volume;
-+ (void)stop;
-@end
-
-
-#ifdef __cplusplus
-extern "C" {
-    void UnitySendMessage(const char *, const char *, const char *);
-}
-#endif
-
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:300959c90909f2148b15948ed8ceaa87f9de94c75b9579d6ea0b5a9c200bdc8e
+size 540

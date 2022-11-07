@@ -1,28 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaRaceClip : PlayableAsset, ITimelineClipAsset
-    {
-        public string raceToChangeTo = "";
-
-        public ClipCaps clipCaps
-        {
-            get { return ClipCaps.None; }
-        }
-
-        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
-        {
-            var playable = ScriptPlayable<UmaRaceBehaviour>.Create(graph);
-            playable.GetBehaviour().raceToChangeTo = raceToChangeTo;
-            return playable;
-        }
-
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:bd8b6f67e85af9a9374ffc94acb9d91d41b8ad769bfa097eb70c2fd30825d197
+size 697

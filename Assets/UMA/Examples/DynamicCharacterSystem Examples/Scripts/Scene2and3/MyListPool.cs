@@ -1,25 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-
-// @cond doxygen ignore
-namespace UnityEngine.UI
-{
-    public static class MyListPool<T>
-    {
-        private static readonly MyObjectPool<List<T>> s_ListPool = new MyObjectPool<List<T>>(null, delegate (List<T> l)
-        {
-            l.Clear();
-        });
-
-        public static List<T> Get()
-        {
-            return MyListPool<T>.s_ListPool.Get();
-        }
-
-        public static void Release(List<T> toRelease)
-        {
-            MyListPool<T>.s_ListPool.Release(toRelease);
-        }
-    }
-}
-// @endcond
+version https://git-lfs.github.com/spec/v1
+oid sha256:f9981642da85555fd91f02973efd3e77beea8a8404d22be2bd15d0797ce654dd
+size 595

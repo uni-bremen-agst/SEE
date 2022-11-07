@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: M_High_Legs_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 7e3217f7c0af3aa489cb18e2de8ac888, type: 2}
-  _serializedFlags:
-  - flags: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff013ff6c0ffc0ffc03ff00ffcffc0ffffffffffffffffffffffffff0f000000000000000000ecc0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1b0c0030fc1f1f00000000f6003ff0033ff0c0f1ffffffffffffffffffffff0f000000000000f8ffffffffffffffffffffffffffffffff7f000000f8ffffffffffffffffffffffffffff0fff
-    Count: 3544
+version https://git-lfs.github.com/spec/v1
+oid sha256:5e306fb9b10ffa06a48d6d64ad07d0772a8170cd7276341a16fb1f53933acbb3
+size 1401

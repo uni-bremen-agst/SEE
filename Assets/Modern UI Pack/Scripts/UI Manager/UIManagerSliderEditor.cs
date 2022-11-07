@@ -1,31 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-using System;
-using TMPro;
-
-namespace Michsky.UI.ModernUIPack
-{
-    [CustomEditor(typeof(UIManagerSlider))]
-    public class UIManagerSliderEditor : Editor
-    {
-        override public void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-            var UIManagerSlider = target as UIManagerSlider;
-
-            using (var group = new EditorGUILayout.FadeGroupScope(Convert.ToSingle(UIManagerSlider.hasLabel == true)))
-            {
-                if (group.visible == true)
-                    UIManagerSlider.label = EditorGUILayout.ObjectField("Label", UIManagerSlider.label, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
-            }
-
-            using (var group = new EditorGUILayout.FadeGroupScope(Convert.ToSingle(UIManagerSlider.hasPopupLabel == true)))
-            {
-                if (group.visible == true)
-                    UIManagerSlider.popupLabel = EditorGUILayout.ObjectField("Popup Label", UIManagerSlider.popupLabel, typeof(TextMeshProUGUI), true) as TextMeshProUGUI;
-            }
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:b781693da249079aa4f88c56249c173e203733fb26b226b329781d90a5ccdf61
+size 1140

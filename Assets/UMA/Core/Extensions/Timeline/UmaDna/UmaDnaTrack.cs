@@ -1,21 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-using UMA.CharacterSystem;
-
-namespace UMA.Timeline
-{
-    [TrackColor(0.2f, 0.8f, 0.2f)]
-    [TrackClipType(typeof(UmaDnaClip))]
-    [TrackBindingType(typeof(DynamicCharacterAvatar))]
-    public class UmaDnaTrack : TrackAsset
-    {
-        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
-        {
-            var mixer = ScriptPlayable<UmaDnaMixerBehaviour>.Create(graph, inputCount);
-            return mixer;
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:d392959698d28167bbcbef39ed4125fab68e1c8ff4a6e38cd42540ee262dbabf
+size 608

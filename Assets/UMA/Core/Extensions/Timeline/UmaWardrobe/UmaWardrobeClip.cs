@@ -1,26 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-
-namespace UMA.Timeline
-{
-    [Serializable]
-    public class UmaWardrobeClip : PlayableAsset, ITimelineClipAsset
-    {
-        public UmaWardrobeBehaviour template = new UmaWardrobeBehaviour();
-
-        public ClipCaps clipCaps
-        {
-            get { return ClipCaps.None; }
-        }
-
-        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
-        {
-            var playable = ScriptPlayable<UmaWardrobeBehaviour>.Create(graph, template);
-            return playable;
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:c5a6c28cda8060a49ee6838646ab1d2026389c10c224a90f2e5ae47c7fbc0755
+size 675

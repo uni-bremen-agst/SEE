@@ -1,17 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace Crosstales.RTVoice.EditorIntegration
-{
-   /// <summary>Editor component for the "Hierarchy"-menu.</summary>
-   public static class TextFileSpeakerGameObject
-   {
-      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/TextFileSpeaker", false, Crosstales.RTVoice.EditorUtil.EditorHelper.GO_ID + 6)]
-      private static void AddTextFileSpeaker()
-      {
-         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("TextFileSpeaker", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/TextFileSpeaker/Resources/Prefabs/");
-      }
-   }
-}
-#endif
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:b172ded8e4f173cf9c7c05267b64c0c3025bac2567db0f53ed8697e92152b2f3
+size 700

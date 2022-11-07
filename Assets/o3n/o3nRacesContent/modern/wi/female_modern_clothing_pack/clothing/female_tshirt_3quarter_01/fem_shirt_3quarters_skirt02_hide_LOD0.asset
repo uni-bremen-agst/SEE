@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: fem_shirt_3quarters_skirt02_hide_LOD0
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 7f323669d4374a04db3ae02ca1b7fcff, type: 2}
-  _assetSlotName: o3n_female_skirt_02_LOD0
-  _serializedFlags:
-  - flags: ffff66f2fffc34000000000000000000000000000000000070e0ff01e0fff1c3ff0300d831801fc77ffc00f80d30008c0183ff07fef9e70f0000000000000085fffffff9e3fffff71b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020b3ffffffe783000000007ae0ffff1ff3030032ffffff1f03000000000000000000000000000000000000000030000000000000000040c6ffffffff7f090040604000000000000000000000000000a0fffffeff070000000000000000000000000038f2ffffff0f000000000000000000000000f8000e00003410
-    Count: 1920
+version https://git-lfs.github.com/spec/v1
+oid sha256:d9485b156c280812b25b7c0859a09d0dcffcb13b1df9c573e205a4b33c4c92a7
+size 1057

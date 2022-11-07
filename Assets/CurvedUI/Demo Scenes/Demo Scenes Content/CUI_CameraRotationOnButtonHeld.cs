@@ -1,35 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace CurvedUI
-{
-    public class CUI_CameraRotationOnButtonHeld : MonoBehaviour {
-
-#pragma warning disable 414
-        //references
-        [SerializeField]
-        float Sensitivity = 0.5f;
-#pragma warning restore 414
-        
-        //variables
-        private Vector2 _oldMousePos;
-
-        void Start () {
-            _oldMousePos = CurvedUIInputModule.MousePosition;
-        }
-
-#if UNITY_EDITOR && !CURVEDUI_UNITY_XR
-        void Update() {
-        
-            if (Input.GetButton("Fire2"))
-            {
-                var mouseDelta = CurvedUIInputModule.MousePosition - _oldMousePos;
-                this.transform.eulerAngles += new Vector3(mouseDelta.y, -mouseDelta.x, 0) * Sensitivity;
-            }
-
-            _oldMousePos = CurvedUIInputModule.MousePosition;
-        }
-#endif
-    }  
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:8bfb5ddab5dfa6898d554029f3fb30b274b45c0d3ca88f900dd4a8cbe8981ff6
+size 894

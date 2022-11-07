@@ -1,29 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-using RootMotion.FinalIK;
-
-namespace RootMotion.Demos {
-
-	/// <summary>
-	/// Just for testing out the Recoil script.
-	/// </summary>
-	public class RecoilTest : MonoBehaviour {
-
-		public float magnitude = 1f;
-
-		private Recoil recoil;
-
-		void Start() {
-			recoil = GetComponent<Recoil>();
-		}
-
-		void Update() {
-			if (Input.GetKeyDown(KeyCode.R) || Input.GetMouseButtonDown(0)) recoil.Fire(magnitude);
-		}
-
-		void OnGUI() {
-			GUILayout.Label("Press R or LMB for procedural recoil.");
-		}
-
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:582cdbdb7cf6107d29728be51e9e54d3b146ddda21ff71f4f447543c58b603bc
+size 543

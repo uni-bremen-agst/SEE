@@ -1,21 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01b68d44e3ab744b98027a983d66b345, type: 3}
-  m_Name: HeadUp
-  m_EditorClassIdentifier: 
-  poses:
-  - bone: Head
-    hash: 130111906
-    position: {x: 1.11758709e-07, y: -2.66453526e-15, z: -7.4505806e-09}
-    rotation: {x: -1.95567651e-08, y: -.259037167, z: 2.30854002e-15, w: .966023505}
-    scale: {x: 1, y: 1, z: 1}
-  tweenPoses: []
-  tweenWeights: []
+version https://git-lfs.github.com/spec/v1
+oid sha256:3981a026e05d0ef8c147e94a403e6b7f074144499eaeb7e9baa300945ac7eed6
+size 648

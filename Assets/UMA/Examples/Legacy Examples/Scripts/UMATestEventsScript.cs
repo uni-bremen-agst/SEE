@@ -1,28 +1,3 @@
-using UnityEngine;
-using System.Collections;
-
-namespace UMA.Examples
-{
-	/// <summary>
-	/// Examples of the character building callbacks.
-	/// </summary>
-	public class UMATestEventsScript : MonoBehaviour
-	{
-		public void CreatedEvent(UMA.UMAData data)
-		{
-			Debug.Log(data.name + " Created", data.gameObject);
-		}
-		public void DestroyedEvent(UMA.UMAData data)
-		{
-			Debug.Log(data.name + " Destoyed", data.gameObject);
-		}
-		public void UpdatedEvent(UMA.UMAData data)
-		{
-			Debug.Log(data.name + " Updated", data.gameObject);
-		}
-		public void SlotAtlasEvent(UMA.UMAData umaData, UMA.SlotData slotData, Material material, Rect atlasRect)
-		{
-			Debug.Log(umaData.name + " got slot " + slotData.asset.slotName);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:79dd5c4e29389593d7570ec347fc7a73f5879a378fb63d729f300eacee1b2d3d
+size 751

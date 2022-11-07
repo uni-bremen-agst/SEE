@@ -1,19 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class CUI_MoveAlong : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		(transform as RectTransform).anchoredPosition = new Vector2((transform as RectTransform).anchoredPosition.x + (transform as RectTransform).anchoredPosition.x / 100.0f, (transform as RectTransform).anchoredPosition.y);
-
-		if((transform as RectTransform).anchoredPosition.x > (transform.parent as RectTransform).rect.width)
-			(transform as RectTransform).anchoredPosition = new Vector2(20, (transform as RectTransform).anchoredPosition.y);
-			
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:872b35f168c947b74bc55d8ca71871d521ebdba651e50c6bf70ffbcf6e951db6
+size 674

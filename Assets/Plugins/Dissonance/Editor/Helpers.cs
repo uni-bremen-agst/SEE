@@ -1,23 +1,3 @@
-﻿using System;
-
-namespace Dissonance.Editor
-{
-    internal static class Helpers
-    {
-        public const float MinDecibels = -60;
-
-        public static float ToDecibels(float multiplier)
-        {
-            if (multiplier <= 0)
-                return MinDecibels;
-            return (float)(20 * Math.Log10(multiplier));
-        }
-
-        public static float FromDecibels(float db)
-        {
-            if (db <= MinDecibels)
-                return 0;
-            return (float)Math.Pow(10, db / 20);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e62782231b5cb1db3fe3a36dc571c8c34d1455c47694c9934078c56cafbe1df5
+size 528

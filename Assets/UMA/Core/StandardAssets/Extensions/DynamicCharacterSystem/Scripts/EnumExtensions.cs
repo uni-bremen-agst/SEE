@@ -1,20 +1,3 @@
-using System;
-
-namespace UMA.CharacterSystem
-{
-	public static class EnumExtensions
-	{
-		public static bool HasFlagSet(this Enum self, Enum flag)
-		{
-			if (self.GetType() != flag.GetType())
-			{
-				throw new ArgumentException("HasFlag : Flag is not of the type of Enum");
-			}
-
-			var selfValue = Convert.ToUInt64(self);
-			var flagValue = Convert.ToUInt64(flag);
-
-			return (selfValue & flagValue) == flagValue;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:db5d46ba15e10a756b06017b326ed26ac5de0c6a8ffa519e661d7d1f7709d46b
+size 443

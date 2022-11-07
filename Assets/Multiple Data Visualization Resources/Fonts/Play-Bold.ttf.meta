@@ -1,22 +1,3 @@
-fileFormatVersion: 2
-guid: 77aa69b439f2986418d559dd5ff86b9c
-TrueTypeFontImporter:
-  externalObjects: {}
-  serializedVersion: 4
-  fontSize: 16
-  forceTextureCase: -2
-  characterSpacing: 0
-  characterPadding: 1
-  includeFontData: 1
-  fontName: Play
-  fontNames:
-  - Play
-  fallbackFontReferences: []
-  customCharacters: 
-  fontRenderingMode: 0
-  ascentCalculationMode: 1
-  useLegacyBoundsCalculation: 0
-  shouldRoundAdvanceValue: 1
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:7522771816ed07f300f200d1ee081c32f6e5f859e5b72e7c15425ff8802811f9
+size 508

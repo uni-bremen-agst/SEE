@@ -1,22 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace UMA.Examples
-{
-	public class UMADnaTweaker : MonoBehaviour
-	{
-		public string dnaToTweak;
-		public UMACustomization customizer;
-
-		public void TweakDNA(float newValue)
-		{
-
-			if (string.IsNullOrEmpty(dnaToTweak))
-				return;
-			if (customizer == null)
-				return;
-			customizer.PerformDNAChange(dnaToTweak, newValue);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:10de72dfe541ee50ed0df250cd3cf90a988bdd2cde0020a08ae107782b818490
+size 443
