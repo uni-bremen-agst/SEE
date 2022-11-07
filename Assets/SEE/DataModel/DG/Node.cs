@@ -150,7 +150,7 @@ namespace SEE.DataModel.DG
                 parent = value;
                 switch (value)
                 {
-                    case null when parent == null: // Nothing to be done.
+                    case null when oldParent == null: // Nothing to be done.
                         break;
                     case null: // value is null while parent is not, so the parent has been removed.
                         Notify(new HierarchyEvent(oldParent, this, ChangeType.Removal));
