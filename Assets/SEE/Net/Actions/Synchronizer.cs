@@ -28,7 +28,7 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// The number of update cycles this component waits until it assumes
-        /// that the <see cref="SynchronizeInteractableAction"/> message sent
+        /// that the <see cref="SynchronizeInteractableNetAction"/> message sent
         /// to all clients has not been received. If no <see cref="NotifyJustReceivedUpdate"/>
         /// has been received, the data is sent again to all clients.
         /// </summary>
@@ -64,7 +64,7 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Let's this component know that the <see cref="SynchronizeInteractableAction"/>
+        /// Let's this component know that the <see cref="SynchronizeInteractableNetAction"/>
         /// originally sent by this component has been received by a client.
         ///
         /// Resets <see cref="updateTimeout"/>.
@@ -77,7 +77,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// If an update should be sent (indicated by <see cref="sendUpdate"/>
         /// and <see cref="updateTimeout"/> is greater than zero), a
-        /// <see cref="SynchronizeInteractableAction"/> is sent to all clients with
+        /// <see cref="SynchronizeInteractableNetAction"/> is sent to all clients with
         /// the <see cref="interactable"/> object as parameter.
         ///
         /// This method is invoked periodically while this component is active.
@@ -94,7 +94,7 @@ namespace SEE.Net.Actions
                 else
                 {
                     sendUpdate = false;
-                    new SynchronizeInteractableAction(interactable, false).Execute();
+                    new SynchronizeInteractableNetAction(interactable, false).Execute();
                 }
             }
         }

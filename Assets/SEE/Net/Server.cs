@@ -203,15 +203,15 @@ namespace SEE.Net
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {
-                            new SetGrabAction(interactableObject, true).Execute(recipient);
+                            new SetGrabNetAction(interactableObject, true).Execute(recipient);
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.SelectedObjects)
                         {
-                            new SetSelectAction(interactableObject, true).Execute(recipient);
+                            new SetSelectNetAction(interactableObject, true).Execute(recipient);
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.HoveredObjects)
                         {
-                            new SetHoverAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
+                            new SetHoverNetAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
                         }
                     }
 
@@ -245,29 +245,29 @@ namespace SEE.Net
 
                     IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
 
-                    if (SetGrabAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
+                    if (SetGrabNetAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
                     {
                         foreach (Controls.InteractableObject grabbedInteractable in grabbedInteractables)
                         {
-                            SetGrabAction action = new SetGrabAction(grabbedInteractable, false);
+                            SetGrabNetAction action = new SetGrabNetAction(grabbedInteractable, false);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
                     }
-                    if (SetSelectAction.SelectedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> selectedInteractables))
+                    if (SetSelectNetAction.SelectedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> selectedInteractables))
                     {
                         foreach (Controls.InteractableObject selectedInteractable in selectedInteractables)
                         {
-                            SetSelectAction action = new SetSelectAction(selectedInteractable, false);
+                            SetSelectNetAction action = new SetSelectNetAction(selectedInteractable, false);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
                     }
-                    if (SetHoverAction.HoveredObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> hoveredInteractables))
+                    if (SetHoverNetAction.HoveredObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> hoveredInteractables))
                     {
                         foreach (Controls.InteractableObject hoveredInteractable in hoveredInteractables)
                         {
-                            SetHoverAction action = new SetHoverAction(hoveredInteractable, 0);
+                            SetHoverNetAction action = new SetHoverNetAction(hoveredInteractable, 0);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
