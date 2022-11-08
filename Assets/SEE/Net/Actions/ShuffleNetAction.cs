@@ -4,9 +4,9 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Propagates the movement of a game node through the network.
+    /// Propagates the movement/shuffling of a game node through the network.
     /// </summary>
-    internal class MoveNodeNetAction : AbstractNetAction
+    internal class ShuffleNetAction : AbstractNetAction
     {
         /// <summary>
         /// The unique name of the gameObject of a node that needs to be moved.
@@ -23,7 +23,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectID">the unique game-object name of the game object to be moved</param>
         /// <param name="position">the new position of the game object</param>
-        public MoveNodeNetAction(string gameObjectID, Vector3 position)
+        public ShuffleNetAction(string gameObjectID, Vector3 position)
         {
             GameObjectID = gameObjectID;
             Position = position;

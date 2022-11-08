@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions
                 {
                     GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
                     nodeOperator.MoveTo(plane.CenterTop, ResetAnimationDuration);
-                    new MoveNodeNetAction(cityRootNode.name, plane.CenterTop).Execute();
+                    new ShuffleNetAction(cityRootNode.name, plane.CenterTop).Execute();
                     gizmo.gameObject.SetActive(false);
 
                     synchronize = false; // We just called MoveNodeNetAction for the synchronization.
@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new MoveNodeNetAction(cityRootNode.name, cityRootNode.position).Execute();
+                new ShuffleNetAction(cityRootNode.name, cityRootNode.position).Execute();
             }
         }
     }
