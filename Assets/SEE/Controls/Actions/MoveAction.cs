@@ -183,44 +183,6 @@ namespace SEE.Controls.Actions
             private Vector3 originalLocalScale;
 
             /// <summary>
-            /// Called when the grabbed object has reached a new final destination.
-            /// It will finalize its position.
-            /// </summary>
-            //private void Finalize()
-            //{
-            //    // -------------------------------------------------------------------
-            //    // FIXME: When moving the grabbed node, we move its connecting edges
-            //    // along with it. To do that they are morphed into splines. When the
-            //    // movement has come to an end, the edges should be morphed back
-            //    // again into to their original layout.
-            //    // -------------------------------------------------------------------
-
-            //    bool movementAllowed = GameNodeMover.FinalizePosition(gameObject, out GameObject parent);
-            //    if (movementAllowed)
-            //    {
-            //        if (parent != null)
-            //        {
-            //            // The node has been re-parented.
-            //            new ReparentNetAction(gameObject.name, parent.name, gameObject.transform.position).Execute();
-            //            newParent = parent;
-            //        }
-            //        currentPositionOfGrabbedObject = gameObject.transform.position;
-            //    }
-            //    else
-            //    {
-            //        // An attempt was made to move the hovered object illegally.
-            //        // We need to reset it to its original position. And then we start from scratch.
-            //        // TODO: Instead of manually restoring the position like this, we can maybe use the memento
-            //        //       or ReversibleActions for resetting.
-            //        gameObject.transform.SetParent(originalParent);
-            //        nodeOperator.ScaleTo(originalScale, AnimationTime);
-            //        nodeOperator.MoveTo(originalPositionOfGrabbedObject, AnimationTime);
-
-            //        new MoveNodeNetAction(gameObject.name, originalPositionOfGrabbedObject).Execute();
-            //    }
-            //}
-
-            /// <summary>
             /// Whether an object has been grabbed.
             /// </summary>
             /// <returns>true if an object has been grabbed</returns>
@@ -294,7 +256,7 @@ namespace SEE.Controls.Actions
             /// to its origin via <see cref="MoveToOrigin"/>.
             /// This method will called for Redo.
             /// </summary>
-            internal void MoveToLastUserRequestedPosition()
+            private void MoveToLastUserRequestedPosition()
             {
                 if (gameObject)
                 {
@@ -382,8 +344,6 @@ namespace SEE.Controls.Actions
                 MoveToOrigin();
                 // FIXME: We also neet to reset the parent in the graph.
                 gameObject.transform.SetParent(originalParent);
-                // FIXME: MoveToOrigin() and ReparentNetAction both move the node.
-                new ReparentNetAction(gameObject.name, originalParent.name, originalWorldPosition).Execute();
             }
 
             /// <summary>
