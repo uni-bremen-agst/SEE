@@ -360,7 +360,7 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new SetHoverAction(this, hoverFlags).Execute();
+                new SetHoverNetAction(this, hoverFlags).Execute();
             }
         }
 
@@ -472,7 +472,7 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new SetSelectAction(this, select).Execute();
+                new SetSelectNetAction(this, select).Execute();
             }
         }
 
@@ -593,7 +593,7 @@ namespace SEE.Controls
 
             if (isInitiator)
             {
-                new SetGrabAction(this, grab).Execute();
+                new SetGrabNetAction(this, grab).Execute();
                 if (grab)
                 {
                     InteractableSynchronizer = interactable.gameObject.AddComponent<Synchronizer>();

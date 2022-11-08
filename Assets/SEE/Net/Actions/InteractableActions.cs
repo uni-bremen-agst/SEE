@@ -10,7 +10,7 @@ namespace SEE.Net.Actions
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetHoverAction : AbstractNetAction
+    public class SetHoverNetAction : AbstractNetAction
     {
         /// <summary>
         /// Every hovered object of the end point of every client. This is only used by
@@ -34,7 +34,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="interactable">The interactable to be (un)hovered.</param>
         /// <param name="hoverFlags">The hover flags of the interactable.</param>
-        public SetHoverAction(InteractableObject interactable, uint hoverFlags)
+        public SetHoverNetAction(InteractableObject interactable, uint hoverFlags)
         {
             Assert.IsNotNull(interactable);
 
@@ -100,7 +100,7 @@ namespace SEE.Net.Actions
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetSelectAction : AbstractNetAction
+    public class SetSelectNetAction : AbstractNetAction
     {
         /// <summary>
         /// Every selected object of the end point of every client. This is only used by
@@ -124,7 +124,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="interactable">The interactable to be (de)selected.</param>
         /// <param name="select">Whether the interactable should be selected.</param>
-        public SetSelectAction(InteractableObject interactable, bool select)
+        public SetSelectNetAction(InteractableObject interactable, bool select)
         {
             Assert.IsNotNull(interactable);
 
@@ -190,7 +190,7 @@ namespace SEE.Net.Actions
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetGrabAction : AbstractNetAction
+    public class SetGrabNetAction : AbstractNetAction
     {
         /// <summary>
         /// Every grabbed object of the end point of every client. This is only used by
@@ -214,7 +214,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="interactable">The interactable to be (un)grabbed.</param>
         /// <param name="grab">Whether the interactable should be grabbed.</param>
-        public SetGrabAction(InteractableObject interactable, bool grab)
+        public SetGrabNetAction(InteractableObject interactable, bool grab)
         {
             Assert.IsNotNull(interactable);
 
@@ -283,7 +283,7 @@ namespace SEE.Net.Actions
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SynchronizeInteractableAction : AbstractNetAction
+    public class SynchronizeInteractableNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the interactable.
@@ -312,7 +312,7 @@ namespace SEE.Net.Actions
         /// <param name="interactable">The interactable to be synchronized.</param>
         /// <param name="syncLocalScale">Whether the local scale is to be synchronized.
         /// </param>
-        public SynchronizeInteractableAction(InteractableObject interactable, bool syncLocalScale)
+        public SynchronizeInteractableNetAction(InteractableObject interactable, bool syncLocalScale)
         {
             Assert.IsNotNull(interactable);
 
