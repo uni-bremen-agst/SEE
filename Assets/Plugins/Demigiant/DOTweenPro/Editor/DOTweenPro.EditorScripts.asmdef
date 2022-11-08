@@ -1,16 +1,3 @@
-{
-	"name": "DOTweenPro.EditorScripts",
-	"references": [
-		"Unity.TextMeshPro",
-		"DOTween.Modules",
-		"DOTweenPro.Scripts",
-		"UnityEditor.UI",
-		"UnityEngine.UI",
-		"UnityEditor.TestRunner",
-		"UnityEngine.TestRunner"
-	],
-	"includePlatforms": [
-		"Editor"
-	],
-	"autoReferenced": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ba4a8ff7669bf6b93138548fa699cc84bbda439af0e521984f875f73082a9dc2
+size 288

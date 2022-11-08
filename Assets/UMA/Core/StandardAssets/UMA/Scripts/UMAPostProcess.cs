@@ -1,32 +1,3 @@
-﻿using UnityEngine;
-
-namespace UMA
-{
-    [CreateAssetMenu(menuName = "UMA/Rendering/PostProcess")]
-    public class UMAPostProcess : ScriptableObject
-    {
-        public Shader shader;
-
-        Material material;
-
-        public void Process(RenderTexture source, RenderTexture destination)
-        {
-            if (shader == null)
-            {
-                if (Debug.isDebugBuild)
-                    Debug.LogError("UMAPostProcess: " + name + " has no shader assigned!");
-                return;
-            }
-
-            // RenderTexture.active is set here, and sometimes left active.
-            RenderTexture backup = RenderTexture.active;
-            if (material == null)
-                material = new Material(shader);
-#if UNITY_ANDROID || UMA_IOS
-            destination.DiscardContents();
-#endif
-            Graphics.Blit(source, destination, material);
-            RenderTexture.active = backup;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:480d6183910decc1a79c3195b32f352e5ca356a41478f84bfd12875addf71e01
+size 965

@@ -1,32 +1,3 @@
-﻿// Source: http://wiki.unity3d.com/index.php/VertexColorUnlit
-Shader "UMotion Editor/Vertex Color Unlit"
-{
-	Properties
-	{
-		_MainTex ("Texture", 2D) = "white" {}
-	}
-	 
-	Category
-	{
-		Tags { "RenderType"="Opaque" "IgnoreProjector"="True" }
-		Lighting Off
-
-		BindChannels 
-		{
-			Bind "Color", color
-			Bind "Vertex", vertex
-			Bind "TexCoord", texcoord
-		}
-	 
-		SubShader
-		{
-			Pass
-			{
-				SetTexture [_MainTex]
-				{
-					Combine texture * primary DOUBLE
-				}
-			}
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:de781f41fd384bf8c9a97e305283a9765056cf2453725a782c9d906c986d4d5a
+size 511

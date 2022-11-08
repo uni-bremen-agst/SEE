@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: M_LongTShirt_ForCoat_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 0fb2b63fe18d13241a285a6b329e1cba, type: 2}
-  _serializedFlags:
-  - flags: 40fcf0ffffffffffff0f0060c0fb9fff2fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff070fc0000030e0ff1fc0f0ffffffffffff0f000082ffff0f006c001e60fe0f1e3f0000003cf330fcffffff3f0001c003fcffffffffffffffffffffffffffffffffffffff072000fcfff8ffffffffff00000000e0ff8083f703ffffffffffffffff
-    Count: 1160
+version https://git-lfs.github.com/spec/v1
+oid sha256:aa7ad1fdd09f9a4e95a950775fd8872a6a6b55c23eeda7a552639b18c62bccee
+size 818

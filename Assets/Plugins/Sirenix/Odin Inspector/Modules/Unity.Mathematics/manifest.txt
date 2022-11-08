@@ -1,8 +1,3 @@
-ManifestVersion: 1
-ModuleID: Unity.Mathematics
-ModuleVersion: 1.0.1.0
-ModuleFiles:
-  MathematicsDrawers.cs
-  MathematicsDrawers.cs.meta
-  Sirenix.OdinInspector.Modules.UnityMathematics.asmdef
-  Sirenix.OdinInspector.Modules.UnityMathematics.asmdef.meta
+version https://git-lfs.github.com/spec/v1
+oid sha256:09e18a063cbede978ef4702634126ce4864b1feadd03ce6054a8da9aebd4fcea
+size 253

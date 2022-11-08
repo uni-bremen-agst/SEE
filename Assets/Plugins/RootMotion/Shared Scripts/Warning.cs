@@ -1,29 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace RootMotion {
-
-	/// <summary>
-	/// Manages warning messages.
-	/// </summary>
-	public static class Warning {
-		
-		public static bool logged;
-		
-		public delegate void Logger(string message);
-		
-		public static void Log(string message, Logger logger, bool logInEditMode = false) {
-			if (!logInEditMode && !Application.isPlaying) return;
-			if (logged) return;
-			if (logger != null) logger(message);
-			logged = true;
-		}
-		
-		public static void Log(string message, Transform context, bool logInEditMode = false) {
-			if (!logInEditMode && !Application.isPlaying) return;
-			if (logged) return;
-			Debug.LogWarning(message, context);
-			logged = true;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e539c6bc8e8e8618b3ff07a359a2061be6a5a5c746ce2c5c64ea3fd05f1be2ec
+size 718

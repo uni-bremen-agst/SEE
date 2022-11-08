@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: M_Fleece_ForCoat_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 498ef3a6a1af2c44d8afd34d8e23e0f4, type: 2}
-  _serializedFlags:
-  - flags: 40fcf0ffffffffffffffffffff3f8007f807807f66fe1ff8ffff01800dc003cc7f000080671e86ffffffff0f0060c0fbff00f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0fc000f8dfffff0000f80000ff7f007e2300ff1804000002f8ff07ffffffffffff3f00fffcffffc300000000ffff0000
-    Count: 1264
+version https://git-lfs.github.com/spec/v1
+oid sha256:7b223981c9e784c2efe4a1107d035803f2f12b1fc8ac5c5cb0f898fb1da5c111
+size 838

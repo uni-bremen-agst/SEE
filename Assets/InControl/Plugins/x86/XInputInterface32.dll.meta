@@ -1,34 +1,3 @@
-fileFormatVersion: 2
-guid: 8f1806e5d71b44fdea333f04b0c37508
-PluginImporter:
-  externalObjects: {}
-  serializedVersion: 2
-  iconMap: {}
-  executionOrder: {}
-  defineConstraints: []
-  isPreloaded: 0
-  isOverridable: 0
-  isExplicitlyReferenced: 0
-  validateReferences: 1
-  platformData:
-  - first:
-      Any: 
-    second:
-      enabled: 0
-      settings: {}
-  - first:
-      Editor: Editor
-    second:
-      enabled: 1
-      settings:
-        CPU: x86
-        DefaultValueInitialized: true
-        OS: Windows
-  - first:
-      Standalone: Win
-    second:
-      enabled: 1
-      settings: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:b309f76e3b66b0a4c56abb9d6fb5ef5b2594a5b971c1f4fae1698c038a5754fb
+size 644

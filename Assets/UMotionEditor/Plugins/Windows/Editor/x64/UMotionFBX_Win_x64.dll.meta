@@ -1,19 +1,3 @@
-fileFormatVersion: 2
-guid: c82a003de87344f429e62b0511fd0931
-PluginImporter:
-  serializedVersion: 1
-  iconMap: {}
-  executionOrder: {}
-  isPreloaded: 0
-  platformData:
-    Editor:
-      enabled: 1
-      settings:
-        CPU: x86_64
-        DefaultValueInitialized: true
-    first:
-      enabled: 0
-      settings: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:921f4d73f3c7d9099a5162ccf178022ddc9ded0e23cc5bff13727729eea37754
+size 392

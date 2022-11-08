@@ -1,32 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
-  m_Name: o3n_female_shoes_04_Recipe
-  m_EditorClassIdentifier: 
-  recipeType: Wardrobe
-  DisplayValue: Shoes 04
-  compatibleRaces:
-  - o3n Female
-  wardrobeRecipeThumbs:
-  - race: o3n Female
-    filename: 
-    thumb: {fileID: 21300000, guid: b72a143bd81631a41949fdfa8fc650fd, type: 3}
-  wardrobeSlot: Feet
-  Hides: []
-  suppressWardrobeSlots: []
-  activeWardrobeSet: []
-  MeshHideAssets:
-  - {fileID: 11400000, guid: 9f57ae8fc0d071f40b6a0a129a02cbc7, type: 2}
-  - {fileID: 11400000, guid: e97fb4d74f7d04c4e896444b8015948b, type: 2}
-  - {fileID: 11400000, guid: e83d004ec6a83a44ba9e054abc174fc5, type: 2}
-  - {fileID: 11400000, guid: a7b15a979345fb041abdabf96c0b44f6, type: 2}
-  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"o3n_female_shoes_04_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_04_Overlay","colorIdx":0,"rect":[0,0,0,0],"data":[]}]},{"id":"o3n_female_feet_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_female_shoes_04_alpha_mask_Overlay","colorIdx":1,"rect":[0,0,0,0],"data":[]}]},{"id":"","scale":1,"copyIdx":-1,"overlays":[]}],"colors":[],"fColors":[{"name":"Footwear01","colors":[118,51,51,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"-","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":1,"race":"","packedDna":[]}'
-  replaces: Nothing
+version https://git-lfs.github.com/spec/v1
+oid sha256:1fb59e9dec464f475e9199eee433d768d011ebad6e53d6e1104a67c58eff4f10
+size 1864

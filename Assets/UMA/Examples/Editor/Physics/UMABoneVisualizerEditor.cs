@@ -1,16 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-
-[CustomEditor(typeof(UMABoneVisualizer))]
-public class Example : Editor
-{
-    static GUIContent Warning = new GUIContent("This is a helper component and should be removed before your final build. It has no runtime functionality.");
-    public override void OnInspectorGUI()
-    {
-        UMABoneVisualizer targetPlayer = (UMABoneVisualizer)target;
-        Rect labelRect = GUILayoutUtility.GetRect(Warning, "box");
-        GUI.Box(labelRect, Warning);
-        DrawDefaultInspector();
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d29dfc526dde8e044fa038154249e1a5b0762bcacb830e2f201cb6cf43f469ad
+size 574

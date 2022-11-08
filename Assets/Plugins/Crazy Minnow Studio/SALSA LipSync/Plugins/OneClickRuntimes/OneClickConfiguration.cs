@@ -1,24 +1,3 @@
-using System.Collections.Generic;
-
-namespace CrazyMinnow.SALSA.OneClicks
-{
-    public class OneClickConfiguration
-    {
-        public ConfigType type;
-        public List<string> smrSearches = new List<string>();
-        public List<OneClickExpression> oneClickExpressions = new List<OneClickExpression>();
-
-        public enum ConfigType
-        {
-            Salsa,
-            Emoter
-        }
-
-        public OneClickConfiguration(ConfigType type)
-        {
-            this.type = type;
-            smrSearches.Clear();
-            oneClickExpressions.Clear();
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f60441016a681a8f023f32ae712d791721b765d37fec0619a60d004b04099047
+size 584

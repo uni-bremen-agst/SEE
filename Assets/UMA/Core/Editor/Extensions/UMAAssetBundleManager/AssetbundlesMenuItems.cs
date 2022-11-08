@@ -1,28 +1,3 @@
-using UnityEngine;
-using UnityEditor;
-using System.Collections;
-
-namespace UMA.AssetBundles
-{
-	public class AssetBundlesMenuItems
-	{
-		const string kSimulationMode = "Assets/AssetBundles/Simulation Mode";
-
-		[MenuItem("Assets/AssetBundles/Build AssetBundles")]
-		static public void BuildAssetBundles()
-		{
-			BuildScript.BuildAssetBundles();
-		}
-		//DOS NOTE This was added in the latest pull requests but I dont understand what its for...
-		/*[MenuItem("Assets/AssetBundles/Build Player (for use with engine code stripping)")]
-        static public void BuildPlayer()
-        {
-            BuildScript.BuildPlayer();
-        }*/
-		[MenuItem("Assets/AssetBundles/Build Player (using LocalAssetServer if enabled)")]
-		static public void BuildPlayer()
-		{
-			BuildScript.BuildAndRunPlayer(false);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5fc78fdf69e4c7217451f391f404ae4721e2345f316b876ec7bbfc2c8216e92e
+size 832

@@ -1,17 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace Crosstales.RTVoice.EditorIntegration
-{
-   /// <summary>Editor component for the "Tools"-menu.</summary>
-   public static class SequencerMenu
-   {
-      [MenuItem("Tools/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/Prefabs/Sequencer", false, Crosstales.RTVoice.EditorUtil.EditorHelper.MENU_ID + 80)]
-      private static void AddSequencer()
-      {
-         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("Sequencer", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/Sequencer/Resources/Prefabs/");
-      }
-   }
-}
-#endif
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:6b069bad1e93655e8407e25b48551e2df6eb48efad02e102622a5498167d4d7c
+size 666

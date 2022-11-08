@@ -1,1 +1,3 @@
-		public System.Byte {0:FieldName};
+version https://git-lfs.github.com/spec/v1
+oid sha256:a86ba0913aa515b2d7e83c70bdb9659878946efc4978b3fd13f7291dfffa8120
+size 37

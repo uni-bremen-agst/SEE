@@ -1,25 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace RootMotion {
-
-	/// <summary>
-	/// Forwards collider OnTrigger.. events.
-	/// </summary>
-	public class TriggerEventBroadcaster : MonoBehaviour {
-	
-		public GameObject target;
-		
-		void OnTriggerEnter(Collider collider) {
-			if (target != null) target.SendMessage("OnTriggerEnter", collider, SendMessageOptions.DontRequireReceiver);
-		}
-		
-		void OnTriggerStay(Collider collider) {
-			if (target != null) target.SendMessage("OnTriggerStay", collider, SendMessageOptions.DontRequireReceiver);
-		}
-		
-		void OnTriggerExit(Collider collider) {
-			if (target != null) target.SendMessage("OnTriggerExit", collider, SendMessageOptions.DontRequireReceiver);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:db350cf8908a02978e54090119c742f515635c0f621658d090d41c27d0c0f4db
+size 717

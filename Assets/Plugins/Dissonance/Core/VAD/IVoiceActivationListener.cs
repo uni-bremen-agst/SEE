@@ -1,18 +1,3 @@
-namespace Dissonance.VAD
-{
-    /// <summary>
-    /// Listens for events from the voice detector
-    /// </summary>
-    public interface IVoiceActivationListener
-    {
-        /// <summary>
-        /// Indicates that voice activation has begun detecting voice
-        /// </summary>
-        void VoiceActivationStart();
-
-        /// <summary>
-        /// Indicates that voice activation has stopped detecting voice
-        /// </summary>
-        void VoiceActivationStop();
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:24ed36014958b3f0e2f7d19ff1bdaedc6484f01664bf8558b88f212f4301a5c5
+size 480

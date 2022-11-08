@@ -1,25 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class ResetPosition : MonoBehaviour
-{
-    public float distanceToReset = 5;
-
-    private Vector3 startPosition;
-
-	// Use this for initialization
-	void Start ()
-    {
-        startPosition = transform.position;
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-        if (Vector3.Distance(startPosition, transform.position) >= distanceToReset)
-        {
-            transform.position = startPosition;
-        }
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:33be6117b07c9c8fe2a3383fcfb92cec4e2d655b8b41b81cd57473326b903ed0
+size 545

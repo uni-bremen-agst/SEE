@@ -1,14 +1,3 @@
-fileFormatVersion: 2
-guid: 6fb82f19cc3ce412892b525300de1141
-labels:
-- InverseKinematics
-- IK
-- FABRIK
-MonoImporter:
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 9997
-  icon: {fileID: 2800000, guid: 55f7720fb239042f08656d4ab294f5c5, type: 3}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+version https://git-lfs.github.com/spec/v1
+oid sha256:b074c4144541de32a18fbaa78849a381515bab5a2339c8453989eab66c030d52
+size 317

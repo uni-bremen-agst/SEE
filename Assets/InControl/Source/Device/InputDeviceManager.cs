@@ -1,13 +1,3 @@
-namespace InControl
-{
-	using System.Collections.Generic;
-
-
-	public abstract class InputDeviceManager
-	{
-		protected readonly List<InputDevice> devices = new List<InputDevice>();
-
-		public abstract void Update( ulong updateTick, float deltaTime );
-		public virtual void Destroy() {}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d61a2e9849e1fb5c0a06923283663347b43a1326fcd041dd29f53a5ffcb881ff
+size 287

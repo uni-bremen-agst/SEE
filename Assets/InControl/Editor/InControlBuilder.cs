@@ -1,30 +1,3 @@
-#if UNITY_EDITOR
-namespace InControl
-{
-	using UnityEditor;
-	using UnityEngine;
-
-
-	static class InControlBuilder
-	{
-		[MenuItem( "GameObject/InControl/Manager", false, 100 )]
-		static void CreateInputManager()
-		{
-			MonoBehaviour component;
-			if (component = GameObject.FindObjectOfType<InControlManager>())
-			{
-				Selection.activeGameObject = component.gameObject;
-
-				Debug.LogError( "InControlManager component is already attached to selected object." );
-				return;
-			}
-
-			var gameObject = GameObject.Find( "InControl" ) ?? new GameObject( "InControl" );
-			gameObject.AddComponent<InControlManager>();
-			Selection.activeGameObject = gameObject;
-
-			Debug.Log( "InControl manager object has been created." );
-		}
-	}
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:f423f3bd09074cbc727484d7ea1b83331cc41376598e9c9d9454ec8846cdaa74
+size 736

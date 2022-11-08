@@ -1,17 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace Crosstales.RTVoice.EditorIntegration
-{
-   /// <summary>Editor component for the "Tools"-menu.</summary>
-   public static class LoudspeakerMenu
-   {
-      [MenuItem("Tools/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/Prefabs/Loudspeaker", false, Crosstales.RTVoice.EditorUtil.EditorHelper.MENU_ID + 120)]
-      private static void AddLoudspeaker()
-      {
-         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("Loudspeaker", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/Loudspeaker/Resources/Prefabs/");
-      }
-   }
-}
-#endif
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:abf049ed30ce7d52b56aa7f31560ab63eb202c1e85f10a35f92e3f8a900ad2e2
+size 677

@@ -1,34 +1,3 @@
-using UnityEngine;
-using System.Collections;
-
-namespace RootMotion.FinalIK {
-
-	/// <summary>
-	/// %Constraints to rotation in world space
-	/// </summary>
-	[System.Serializable]
-	public class ConstraintRotation : Constraint {
-		
-		#region Main Interface
-		
-		/// <summary>
-		/// The target rotation.
-		/// </summary>
-		public Quaternion rotation;
-		
-		public override void UpdateConstraint() {
-			if (weight <= 0) return;
-			if (!isValid) return;
-			
-			// Slerping to target rotation
-			transform.rotation = Quaternion.Slerp(transform.rotation, rotation, weight);
-		}
-		
-		#endregion Main Interface
-		
-		public ConstraintRotation() {}
-		public ConstraintRotation(Transform transform) {
-			this.transform = transform;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:96f77292ee67ba602ca09975c3594faf53e41cb108cd1a04c678ee747c3b7fa0
+size 725

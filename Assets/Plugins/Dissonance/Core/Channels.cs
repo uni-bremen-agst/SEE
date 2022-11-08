@@ -1,2 +1,3 @@
-﻿// The contents of this file were removed 2017-07-19
-// Empty file left to ensure update process work properly
+version https://git-lfs.github.com/spec/v1
+oid sha256:e94d319f02120a778fc974cb979a67b31efb393add1b7c38e6460768e2e1dcd8
+size 113

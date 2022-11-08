@@ -1,20 +1,3 @@
-﻿using JetBrains.Annotations;
-
-namespace Dissonance.Networking
-{
-    internal struct TextPacket
-    {
-        public readonly ushort Sender;
-        public readonly ChannelType RecipientType;
-        public readonly ushort Recipient;
-        [CanBeNull] public readonly string Text;
-
-        public TextPacket(ushort sender, ChannelType recipientType, ushort recipient, [CanBeNull] string text)
-        {
-            Sender = sender;
-            RecipientType = recipientType;
-            Recipient = recipient;
-            Text = text;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:72603f43fd673e1c499b02502c6630fc32ae7f62df0bcc1a268ad84a3df79be1
+size 556

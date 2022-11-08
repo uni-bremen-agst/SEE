@@ -1,28 +1,3 @@
-﻿namespace Dissonance
-{
-    /// <summary>
-    /// Describes the tradeoff of latency and bandwidth
-    /// </summary>
-    public enum FrameSize
-    {
-        /// <summary>
-        /// Lowest latency, but extreme bandwidth overhead (only suitable for LAN)
-        /// </summary>
-        Tiny = -1,
-
-        /// <summary>
-        /// Low latency, but highest bandwidth overhead
-        /// </summary>
-        Small = 0,
-
-        /// <summary>
-        /// Average latency, average bandwidth usage
-        /// </summary>
-        Medium = 1,
-
-        /// <summary>
-        /// Worst latency, but minimal bandwidth overhead
-        /// </summary>
-        Large = 2
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:cc54c481268670dc3f12fcd36f87ebb815d409f7af21afb70598c697b2b67b0d
+size 667

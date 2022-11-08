@@ -1,1 +1,3 @@
-		res.{0:FieldName} = (System.Byte)(dna.{0:FieldName} * 255f+0.5f);
+version https://git-lfs.github.com/spec/v1
+oid sha256:27b70009e71c4304b4afa4c99b336143dd0e53b0c4b3ee881e9592fc92a4b498
+size 69

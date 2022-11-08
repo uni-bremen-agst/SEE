@@ -1,26 +1,3 @@
-namespace BasicExample
-{
-	using InControl;
-	using UnityEngine;
-
-
-	public class BasicExample : MonoBehaviour
-	{
-		void Update()
-		{
-			// Use last device which provided input.
-			var inputDevice = InputManager.ActiveDevice;
-
-			// Rotate target object with left stick.
-			transform.Rotate( Vector3.down, 500.0f * Time.deltaTime * inputDevice.LeftStickX, Space.World );
-			transform.Rotate( Vector3.right, 500.0f * Time.deltaTime * inputDevice.LeftStickY, Space.World );
-
-			// Get two colors based on two action buttons.
-			var color1 = inputDevice.Action1.IsPressed ? Color.red : Color.white;
-			var color2 = inputDevice.Action2.IsPressed ? Color.green : Color.white;
-
-			// Blend the two colors together to color the object.
-			GetComponent<Renderer>().material.color = Color.Lerp( color1, color2, 0.5f );
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e435f99d86c8e7d4773c72789c1488fcde4adc70bd3a37a56601154eb364ae81
+size 842

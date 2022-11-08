@@ -1,19 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-
-namespace RootMotion {
-
-	/*
-	 * Serialized content is used for caching serialized properties and their respective GUIContent and enforcing unified GUI layout.
-	 * */
-	public struct SerializedContent {
-		public SerializedProperty prop;
-		public GUIContent guiContent;
-		
-		public SerializedContent(SerializedProperty prop, GUIContent guiContent) {
-			this.prop = prop;
-			this.guiContent = guiContent;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:b9ee2eeb93416ef1a6814a70e25401011a35a13dc26626364e7767f311ae9938
+size 478

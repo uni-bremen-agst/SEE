@@ -1,29 +1,3 @@
-﻿using JetBrains.Annotations;
-using NAudio.Wave;
-
-namespace Dissonance.Audio.Capture
-{
-    internal class EmptyPreprocessingPipeline
-        : BasePreprocessingPipeline
-    {
-        public EmptyPreprocessingPipeline([NotNull] WaveFormat inputFormat)
-            : base(inputFormat, 480, 48000, 480, 48000)
-        {
-        }
-
-        public override bool IsOutputMuted
-        {
-            set { }
-        }
-
-        protected override bool VadIsSpeechDetected
-        {
-            get { return true; }
-        }
-
-        protected override void PreprocessAudioFrame(float[] frame)
-        {
-            SendSamplesToSubscribers(frame);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5e494402ebf79ce3b666e60de78fe792dbbb33f042bcd6ea757eebe5d4ce7a69
+size 661

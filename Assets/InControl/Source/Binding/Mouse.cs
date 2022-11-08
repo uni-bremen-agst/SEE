@@ -1,28 +1,3 @@
-using System;
-
-namespace InControl
-{
-	public enum Mouse : int
-	{
-		None,
-		LeftButton,
-		RightButton,
-		MiddleButton,
-		NegativeX,
-		PositiveX,
-		NegativeY,
-		PositiveY,
-		PositiveScrollWheel,
-		NegativeScrollWheel,
-		Button4,
-		Button5,
-		Button6,
-		Button7,
-
-		[Obsolete( "Mouse.Button8 is no longer supported and will be removed in a future version." )]
-		Button8,
-
-		[Obsolete( "Mouse.Button9 is no longer supported and will be removed in a future version." )]
-		Button9
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f0424312205d8f92df992bcbc7d12a56e11a787af59065577a425f412722b6b9
+size 508

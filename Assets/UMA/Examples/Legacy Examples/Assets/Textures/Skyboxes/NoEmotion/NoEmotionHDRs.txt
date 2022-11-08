@@ -1,2 +1,3 @@
-The HDR sky textures in the package are from NoEmotionHDRs (Peter Sanitra - http://www.psanitra.com/) 
-/ CC BY-ND 4.0 - http://creativecommons.org/licenses/by-nd/4.0/. Used without modification.
+version https://git-lfs.github.com/spec/v1
+oid sha256:352583fa373b64b5504871881bc26bc813573ce5999275074c72a54547442bc0
+size 195

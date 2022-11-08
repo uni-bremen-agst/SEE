@@ -1,24 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using System.Reflection;
-
-
-namespace CurvedUI
-{
-    [CustomEditor(typeof(CurvedUIHandSwitcher))]
-    public class CurvedUIHandSwitcherEditor : Editor
-    {
-        override public void OnInspectorGUI()
-        {
-
-            EditorGUILayout.HelpBox("This script moves the Laser Beam to the proper hand of OculusVR or SteamVR rig. Keep it active on the scene.", MessageType.Info);
-            EditorGUILayout.HelpBox("The Laser Beam is just a visual guide - it does not handle interactions.", MessageType.Info);
-
-            CurvedUIHandSwitcher manager = (CurvedUIHandSwitcher)target;
-
-            DrawDefaultInspector();
-        }
-    }
-
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:64f30687249c90aff452158acf07f1213bc7d695271d3a7919610034affcb328
+size 732

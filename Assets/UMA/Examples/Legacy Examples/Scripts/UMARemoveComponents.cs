@@ -1,28 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace UMA.Examples
-{
-	/// <summary>
-	/// Removes or disables components during character update callback.
-	/// </summary>
-	public class UMARemoveComponents : MonoBehaviour
-	{
-		public string[] removeComponentNames;
-		public string[] disableComponentNames;
-
-		public void OnCharacterUpdate(UMA.UMAData data)
-		{
-			foreach (var componentName in removeComponentNames)
-			{
-				var component = data.animator.GetComponent(componentName);
-				UMAUtils.DestroySceneObject(component);
-			}
-			foreach (var componentName in disableComponentNames)
-			{
-				var behavior = (data.animator.GetComponent(componentName) as Behaviour);
-				if (behavior != null) behavior.enabled = false;
-			}
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:eb4dcb591d251dff4a4e80eb21497df9f75e690175781a755e489622f79caaaa
+size 766
