@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -18,37 +17,9 @@ namespace SEE.Game
     public static class GameNodeMover
     {
         /// <summary>
-        /// The speed by which to move a selected object.
-        /// </summary>
-        private const float MOVING_SPEED = 1.0f;
-
-        /// <summary>
         /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
         /// </summary>
         public const float SCALING_FACTOR = 0.2f;
-
-        private const float OUTER_EDGE_MARGIN = 0.02f;
-
-        /// <summary>
-        /// Moves the given <paramref name="movingObject"/> on a sphere around the
-        /// camera. The radius sphere of this sphere is the original distance
-        /// from the <paramref name="movingObject"/> to the camera. The point
-        /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
-        ///
-        /// This method is expected to be called at every Update().
-        /// </summary>
-        /// <param name="movingObject">the object to be moved.</param>
-        public static void MoveTo(GameObject movingObject)
-        {
-            float step = MOVING_SPEED * Time.deltaTime;
-            // FIXME regarding 'target': currently, the tip of the ray is of a fixed distance from
-            // the ray starting position into the ray direction. it would be better if we did a
-            // raycast into the scene, see what we hit and use that as the tip. the result feels
-            // way better and it also prevents intersection with other objects.
-            Vector3 target = TipOfRayPosition(movingObject);
-            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
-        }
 
         /// <summary>
         /// Finalizes the position of the <paramref name="movingObject"/>. If the current
@@ -72,8 +43,12 @@ namespace SEE.Game
         /// <param name="parent">Will be set to the new parent of <paramref name="movingObject"/> (may be null)</param>
         /// <returns>Whether the movement shall be actually implemented.
         /// Will be false if, e.g., the movement was illegal—in such a case, the movement must be cancelled.</returns>
+        [Obsolete("This method is no longer used. It will be deleted soon.")]
         public static bool FinalizePosition(GameObject movingObject, out GameObject parent)
         {
+            const float OuterPadding = 0.02f;
+
+            // FIXME: This method can be deleted. However, we may want to re-use the padding.
             // The underlying graph node of the moving object.
             NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
             Node movingNode = movingNodeRef.Value;
@@ -85,7 +60,7 @@ namespace SEE.Game
                 // The new parent of the movingNode in the game-object hierarchy.
                 GameObject newGameParent = raycastHit.Value.collider.gameObject;
 
-                if (movingObject.IsInArea(newGameParent, OUTER_EDGE_MARGIN))
+                if (movingObject.IsInArea(newGameParent, OuterPadding))
                 {
                     ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer margins of other nodes!", log: false);
                     parent = null;
@@ -251,65 +226,6 @@ namespace SEE.Game
 
             nodeOperator.MoveTo(targetWorldPosition, 0);
             return oldLocalScale;
-        }
-
-        /// <summary>
-        /// Moves the given <paramref name="movingObject"/> on a sphere around the
-        /// camera. The radius of this sphere is the original distance
-        /// from the <paramref name="movingObject"/> to the camera. The point
-        /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
-        ///
-        /// This method is expected to be called at every Update().
-        ///
-        /// You can lock any of the three axes.
-        /// </summary>
-        /// <param name="movingObject">the object to be moved</param>
-        /// <param name="lockX">whether the movement should be locked on this axis</param>
-        /// <param name="lockY">whether the movement should be locked on this axis</param>
-        /// <param name="lockZ">whether the movement should be locked on this axis</param>
-        public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
-        {
-            float step = MOVING_SPEED * Time.deltaTime;
-            Vector3 target = TipOfRayPosition(movingObject);
-            Vector3 movingObjectPos = movingObject.transform.position;
-
-            if (!lockX)
-            {
-                target.x = movingObjectPos.x;
-            }
-
-            if (!lockY)
-            {
-                target.y = movingObjectPos.y;
-            }
-
-            if (!lockZ)
-            {
-                target.z = movingObjectPos.z;
-            }
-
-            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
-        }
-
-        // -------------------------------------------------------------
-        // User input
-        // -------------------------------------------------------------
-
-        /// <summary>
-        /// Returns the position of the tip of the ray drawn from the camera towards
-        /// the position the user is currently pointing to. The distance of that
-        /// point along this ray is the distance between the camera from which the
-        /// ray originated and the position of the given <paramref name="selectedObject"/>.
-        ///
-        /// That means, the selected object moves on a sphere around the camera
-        /// at the distance of the selected object.
-        /// </summary>
-        /// <param name="selectedObject">the selected object currently moved around</param>
-        /// <returns>tip of the ray</returns>
-        private static Vector3 TipOfRayPosition(GameObject selectedObject)
-        {
-            return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
         }
     }
 }
