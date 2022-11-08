@@ -103,9 +103,11 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     this.gameObject = gameObject;
+                    originalParent = gameObject.transform.parent;
+                    originalLocalScale = gameObject.transform.localScale;
+                    originalWorldPosition = gameObject.transform.position;
                     nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
                     KillActiveAnimations(nodeOperator);
-                    originalPositionOfGrabbedObject = gameObject.transform.position;
                     ConnectedEdges = GetConnectedEdges(gameObject);
                     MorphEdgesToSplines(SplineAnimationDuration);
                     IsGrabbed = true;
@@ -153,7 +155,7 @@ namespace SEE.Controls.Actions
                     {
                         interactableObject.SetGrab(false, true);
                     }
-                    if (originalPositionOfGrabbedObject != currentPositionOfGrabbedObject)
+                    if (originalWorldPosition != currentPositionOfGrabbedObject)
                     {
                         // The grabbed object has actually been moved.
                         //Finalize();
@@ -178,7 +180,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The original scale of <see cref="gameObject"/> before it was grabbed.
             /// </summary>
-            private Vector3 originalScale;
+            private Vector3 originalLocalScale;
 
             /// <summary>
             /// Called when the grabbed object has reached a new final destination.
@@ -267,7 +269,7 @@ namespace SEE.Controls.Actions
             /// Required to return it to is original position when the action is canceled
             /// or undone.
             /// </summary>
-            private Vector3 originalPositionOfGrabbedObject;
+            private Vector3 originalWorldPosition;
 
             /// <summary>
             /// The current position of <see cref="GameObject"/> in world space. More precisely, the
@@ -283,7 +285,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject)
                 {
-                    MoveTo(originalPositionOfGrabbedObject, AnimationTime);
+                    MoveTo(originalWorldPosition, AnimationTime);
                 }
             }
 
@@ -381,7 +383,7 @@ namespace SEE.Controls.Actions
                 // FIXME: We also neet to reset the parent in the graph.
                 gameObject.transform.SetParent(originalParent);
                 // FIXME: MoveToOrigin() and ReparentNetAction both move the node.
-                new ReparentNetAction(gameObject.name, originalParent.name, originalPositionOfGrabbedObject).Execute();
+                new ReparentNetAction(gameObject.name, originalParent.name, originalWorldPosition).Execute();
             }
 
             /// <summary>
@@ -491,8 +493,13 @@ namespace SEE.Controls.Actions
             /// <param name="mappingTarget">the game node onto which to put <see cref="gameObject"/></param>
             private void PutOn(GameObject mappingTarget)
             {
-                // FIXME: If gameObject is moved onto its original parent, we do not want to shrink it.
-                bool scaleDown = mappingTarget != originalParent;
+                bool scaleDown = mappingTarget != originalParent.gameObject;
+                if (!scaleDown)
+                {
+                    // The gameObject may have already been scaled down, hence,
+                    // we need to restore its original scale.
+                    nodeOperator.ScaleTo(originalLocalScale, 0);
+                }
                 GameNodeMover.PutOn(gameObject.transform, mappingTarget, scaleDown: scaleDown);
             }
 
