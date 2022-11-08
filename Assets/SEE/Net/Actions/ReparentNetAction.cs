@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using System;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -6,6 +7,7 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Propagates the re-parenting of a game node through the network.
     /// </summary>
+    [Obsolete("This class is no longer used. It will be deleted soon.")]
     internal class ReparentNetAction : AbstractNetAction
     {
         /// <summary>
