@@ -71,13 +71,6 @@ namespace SEE.Controls.Actions
             private NodeOperator nodeOperator;
 
             /// <summary>
-            /// The list of <see cref="SEESpline"/>s of the incoming and outgoing edges
-            /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
-            /// whether the edge is outgoing (if it is false, the edge is incoming).
-            /// </summary>
-            private IList<(SEESpline, bool nodeIsSource)> ConnectedEdges;
-
-            /// <summary>
             /// The animation duration for morphing edges in seconds.
             /// FIXME: Why should that be different from <see cref="AnimationTime"/>?
             /// </summary>
@@ -107,9 +100,6 @@ namespace SEE.Controls.Actions
                     originalLocalScale = gameObject.transform.localScale;
                     originalWorldPosition = gameObject.transform.position;
                     nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                    KillActiveAnimations(nodeOperator);
-                    ConnectedEdges = GetConnectedEdges(gameObject);
-                    MorphEdgesToSplines(SplineAnimationDuration);
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
@@ -121,20 +111,6 @@ namespace SEE.Controls.Actions
                 else
                 {
                     throw new ArgumentNullException("Parameter must not be null");
-                }
-
-                void KillActiveAnimations(NodeOperator nodeOperator)
-                {
-                    if (gameObject.TryGetNodeRef(out NodeRef node))
-                    {
-                        // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
-                        if (node.Value.IsInImplementation() || node.Value.IsInArchitecture())
-                        {
-                            // TODO: Instead of just killing animations here with this trick,
-                            //       handle all movement inside the NodeOperator.
-                            nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
-                        }
-                    }
                 }
             }
 
@@ -285,55 +261,7 @@ namespace SEE.Controls.Actions
             /// <param name="duration">the duration of the animation for moving the grabbed object in seconds</param>
             private void MoveTo(Vector3 targetPosition, float duration)
             {
-                // FIXME: This code must be factored out into a helper class that can be called
-                // from the corresponding network move action. It should be handled by GameNodeMover.
-                // MorphEdgesToSplines() must be moved into this helper class, too.
-                nodeOperator.MoveTo(targetPosition, duration);
-                MorphEdgesToSplines(duration);
-                // TODO: Propagate to clients.
-            }
-
-            /// <summary>
-            /// Morphs the incoming and outgoing edges of <see cref="gameObject"/> to simple splines.
-            /// </summary>
-            /// <param name="duration">the duration of the morphing animation in seconds</param>
-            private void MorphEdgesToSplines(float duration)
-            {
-                // The minimal y offset for the point in between the start and end
-                // of a spline through which the spline should pass.
-                const float MinimalSplineOffset = 0.05f;
-
-                // We will also "stick" the connected edges to the moved node during its movement.
-                // In order to do this, we need to modify the splines of each one.
-                // --------------------------------------------------------------------------------
-                // FIXME: This is too simplistic. It does not handle the case of moving an inner
-                // node whose descendants have connecting edges. The descendants will be moved
-                // along with the inner node, but not their edges.
-                // --------------------------------------------------------------------------------
-                foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in ConnectedEdges)
-                {
-                    Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
-                    BSpline spline;
-                    if (hitEdge.nodeIsSource)
-                    {
-                        spline = SplineEdgeLayout.CreateSpline(gameObject.transform.position,
-                                                               edge.Target.RetrieveGameNode().transform.position,
-                                                               true,
-                                                               MinimalSplineOffset);
-                    }
-                    else
-                    {
-                        spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position,
-                                                               gameObject.transform.position,
-                                                               true,
-                                                               MinimalSplineOffset);
-                    }
-
-                    if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
-                    {
-                        edgeOperator.MorphTo(spline, duration);
-                    }
-                }
+                Mover.MoveTo(gameObject, targetPosition, duration);
             }
 
             /// <summary>
@@ -537,29 +465,6 @@ namespace SEE.Controls.Actions
         private const int LeftMouseButton = 0;
 
         /// <summary>
-        /// Returns the list of <see cref="SEESpline"/>s of the incoming and outgoing edges
-        /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
-        /// whether the edge is outgoing (if it is false, the edge is incoming).
-        /// </summary>
-        private static IList<(SEESpline, bool nodeIsSource)> GetConnectedEdges(GameObject gameNode)
-        {
-            IList<(SEESpline, bool nodeIsSource)> ConnectedEdges = new List<(SEESpline, bool)>();
-            if (gameNode.TryGetNode(out Node node))
-            {
-                foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
-                {
-                    GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
-                    Assert.IsNotNull(gameEdge);
-                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
-                    {
-                        ConnectedEdges.Add((spline, node == edge.Source));
-                    }
-                }
-            }
-            return ConnectedEdges;
-        }
-
-        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -679,6 +584,99 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
             grabbedObject.Redo();
+        }
+    }
+
+    internal static class Mover
+    {
+        internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float duration)
+        {
+            if (gameObject.TryGetComponent(out NodeOperator nodeOperator))
+            {
+                KillActiveAnimations(nodeOperator);
+                nodeOperator.MoveTo(targetPosition, duration);
+                MorphEdgesToSplines(gameObject, duration);
+            }
+
+            void KillActiveAnimations(NodeOperator nodeOperator)
+            {
+                if (gameObject.TryGetNodeRef(out NodeRef node))
+                {
+                    // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
+                    if (node.Value.IsInImplementation() || node.Value.IsInArchitecture())
+                    {
+                        // TODO: Instead of just killing animations here with this trick,
+                        //       handle all movement inside the NodeOperator.
+                        nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Morphs the incoming and outgoing edges of <see cref="gameObject"/> to simple splines.
+        /// </summary>
+        /// <param name="duration">the duration of the morphing animation in seconds</param>
+        private static void MorphEdgesToSplines(GameObject gameObject, float duration)
+        {
+            // The minimal y offset for the point in between the start and end
+            // of a spline through which the spline should pass.
+            const float MinimalSplineOffset = 0.05f;
+
+            // We will also "stick" the connected edges to the moved node during its movement.
+            // In order to do this, we need to modify the splines of each one.
+            // --------------------------------------------------------------------------------
+            // FIXME: This is too simplistic. It does not handle the case of moving an inner
+            // node whose descendants have connecting edges. The descendants will be moved
+            // along with the inner node, but not their edges.
+            // --------------------------------------------------------------------------------
+            foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in GetConnectedEdges(gameObject))
+            {
+                Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                BSpline spline;
+                if (hitEdge.nodeIsSource)
+                {
+                    spline = SplineEdgeLayout.CreateSpline(gameObject.transform.position,
+                                                           edge.Target.RetrieveGameNode().transform.position,
+                                                           true,
+                                                           MinimalSplineOffset);
+                }
+                else
+                {
+                    spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position,
+                                                           gameObject.transform.position,
+                                                           true,
+                                                           MinimalSplineOffset);
+                }
+
+                if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
+                {
+                    edgeOperator.MorphTo(spline, duration);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of <see cref="SEESpline"/>s of the incoming and outgoing edges
+        /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
+        /// whether the edge is outgoing (if it is false, the edge is incoming).
+        /// </summary>
+        private static IList<(SEESpline, bool nodeIsSource)> GetConnectedEdges(GameObject gameNode)
+        {
+            IList<(SEESpline, bool nodeIsSource)> ConnectedEdges = new List<(SEESpline, bool)>();
+            if (gameNode.TryGetNode(out Node node))
+            {
+                foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                {
+                    GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                    Assert.IsNotNull(gameEdge);
+                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                    {
+                        ConnectedEdges.Add((spline, node == edge.Source));
+                    }
+                }
+            }
+            return ConnectedEdges;
         }
     }
 }
