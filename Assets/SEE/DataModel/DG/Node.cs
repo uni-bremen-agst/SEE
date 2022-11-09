@@ -142,7 +142,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent { 
+        public Node Parent {
             get => parent;
             private set
             {
@@ -382,6 +382,17 @@ namespace SEE.DataModel.DG
         /// The outgoing edges of this node.
         /// </summary>
         public ISet<Edge> Outgoings { get; private set; } = new HashSet<Edge>();
+
+        /// <summary>
+        /// Returns all outgoing edges of given node that have exactly the given <paramref name="edgeType"/>.
+        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all outgoing edges are returned.
+        /// </summary>
+        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
+        /// <returns>all outgoing edges of <paramref name="edgeType"/></returns>
+        public IEnumerable<Edge> OutgoingsOfType(string edgeType)
+        {
+            return Outgoings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
+        }
 
         /// <summary>
         /// Resets this node, i.e., removes all incoming and outgoing edges
