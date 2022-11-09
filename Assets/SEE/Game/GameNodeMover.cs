@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Utils.Raycasting;
 
 namespace SEE.Game
 {
