@@ -122,28 +122,29 @@ namespace SEE.Game
         //}
 
         /// <summary>
-        /// Sets the new parent for <paramref name="child"/> to the game node with <paramref name="parentName"/>
-        /// at the given <paramref name="position"/> in world space.
+        /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
+        /// game-object hierarchy and in the underlying graph. If <paramref name="newParent"/>
+        /// is null, the <paramref name="child"/> becomes a root in the underlying graph
+        /// and will have <c>null</c> as its game-object parent.
+        ///
+        /// Precondition: <paramref name="child"/> and <paramref name="newParent"/> must
+        /// be game nodes associated with a graph node.
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
-        /// <param name="parentName">the new parent's name (assumed to be unique)</param>
-        /// <param name="position">new position</param>
-        //[Obsolete("This method is no longer used. It will be deleted soon.")]
-        //public static void Reparent(GameObject child, string parentName, Vector3 position)
-        //{
-        //    GameObject parent = GraphElementIDMap.Find(parentName);
-        //    if (parent != null)
-        //    {
-        //        child.transform.position = position;
-        //        PutOn(child.transform, parent, parent.transform.position.XZ());
-        //        child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
-        //        child.transform.SetParent(parent.transform);
-        //    }
-        //    else
-        //    {
-        //        throw new Exception($"No parent found with name {parentName}.");
-        //    }
-        //}
+        /// <param name="newParent">new parent</param>
+        public static void SetParent(GameObject child, GameObject newParent)
+        {
+            if (newParent != null)
+            {
+                child.GetComponent<NodeRef>().Value.Reparent(newParent.GetComponent<NodeRef>().Value);
+                child.transform.SetParent(newParent.transform);
+            }
+            else
+            {
+                child.GetComponent<NodeRef>().Value.Reparent(null);
+                child.transform.SetParent(null);
+            }
+        }
 
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
