@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
-using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -292,7 +289,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void Undo()
             {
-                ResetParent();
+                RestoreOriginalAppearance();
             }
 
             /// <summary>
@@ -304,13 +301,11 @@ namespace SEE.Controls.Actions
                 // TODO: Map or reparent gameObject.
             }
 
-            /// <summary>
-            /// Temporary Maps-To edge which will have to be deleted if the node isn't finalized.
-            /// </summary>
-            private Edge temporaryMapsTo;
+            private bool grabbedObjectWasMapped;
 
             internal void Reparent(GameObject mappingTarget)
             {
+                newParent = mappingTarget;
                 GameNodeMover.PutOnAndFit(gameObject.transform, mappingTarget, originalParent.gameObject, originalLocalScale);
                 UnmarkAsTarget();
                 MarkAsTarget(mappingTarget.transform);
@@ -318,11 +313,13 @@ namespace SEE.Controls.Actions
                 // The mapping is only possible if we are in a reflexion city.
                 if (withinReflexionCity)
                 {
-                    temporaryMapsTo = ReflexionMapper.MapTo(gameObject, mappingTarget);
+                    ReflexionMapper.MapTo(gameObject, mappingTarget);
+                    grabbedObjectWasMapped = true;
                 }
                 else
                 {
-                    // TODO: Ordinary hierarchical restructuring.
+                    GameNodeMover.SetParent(gameObject, mappingTarget);
+                    grabbedObjectWasMapped = false;
                 }
             }
 
@@ -331,33 +328,29 @@ namespace SEE.Controls.Actions
                 UnmarkAsTarget();
                 if (withinReflexionCity)
                 {
-                    if (temporaryMapsTo != null)
+                    if (grabbedObjectWasMapped)
                     {
-                        // The Maps-To edge will have to be deleted once the node no longer hovers over it.
                         ReflexionMapper.Unmap(gameObject);
-                        // The unmapped node should return to its original parent in the node
-                        // hierarchy of the implementation graph.
-                        temporaryMapsTo = null;
                     }
                 }
                 else
                 {
-                    // TODO: Ordinary hierarchical restructuring.
+                    GameNodeMover.SetParent(gameObject, originalParent.gameObject);
                 }
-                ResetParent();
+                RestoreOriginalAppearance();
             }
 
             /// <summary>
-            /// Resets the <see cref="originalParent"/> of <see cref="gameObject"/>
-            /// and returns it to its <see cref="originalWorldPosition"/> and restores
+            /// Resets the marking of the target node and moves <see cref="gameObject"/>
+            /// back ot its <see cref="originalWorldPosition"/> and restores
             /// its <see cref="originalLocalScale"/>.
+            ///
+            /// No changes are made to the game-node hierarchy or graph-node hierarchy.
             /// </summary>
-            private void ResetParent()
+            private void RestoreOriginalAppearance()
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                // FIXME: We also neet to reset the parent in the graph.
-                gameObject.transform.SetParent(originalParent);
                 if (gameObject.TryGetComponent(out NodeOperator nodeOperator))
                 {
                     nodeOperator.ScaleTo(originalLocalScale, AnimationTime);
