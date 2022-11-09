@@ -68,3 +68,5 @@ Assets/WispySky/** filter=lfs diff=lfs merge=lfs -text
 Assets/YughuesFreeMetalMaterials/** filter=lfs diff=lfs merge=lfs -text
 Assets/XR/** filter=lfs diff=lfs merge=lfs -text
 Assets/XRI/** filter=lfs diff=lfs merge=lfs -text
+Assets/HighlightPlusBundle/** filter=lfs diff=lfs merge=lfs -text
+Assets/HighlightPlus/** filter=lfs diff=lfs merge=lfs -text
