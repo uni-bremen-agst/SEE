@@ -301,8 +301,20 @@ namespace SEE.Controls.Actions
                 // TODO: Map or reparent gameObject.
             }
 
+            /// <summary>
+            /// Whether the <see cref="gameObject"/> was mapped for the reflexion analysis.
+            /// If <c>false</c>, the <see cref="gameObject"/> was put onto a new parent
+            /// as a child.
+            /// </summary>
             private bool grabbedObjectWasMapped;
 
+            /// <summary>
+            /// Moves <paramref name="mappingTarget"/> onto the roof of <see cref="gameObject"/>
+            /// visually and unmarks it as target. If <see cref="withinReflexionCity"/>,
+            /// <see cref="gameObject"/> will be mapped onto <paramref name="mappingTarget"/> using <see cref="ReflexionMapper.MapTo"/>; otherwise it
+            /// will be p
+            /// </summary>
+            /// <param name="mappingTarget"></param>
             internal void Reparent(GameObject mappingTarget)
             {
                 newParent = mappingTarget;
@@ -323,6 +335,12 @@ namespace SEE.Controls.Actions
                 }
             }
 
+            /// <summary>
+            /// Unmaps the <see cref="gameObject"/>, i.e., unmarks the current target
+            /// and restores its original position and scale. If <see cref="withinReflexionCity"/>,
+            /// its explicit architecture mapping will be removed; otherwise its
+            /// <see cref="originalParent"/> will be restored.
+            /// </summary>
             internal void UnReparent()
             {
                 UnmarkAsTarget();
