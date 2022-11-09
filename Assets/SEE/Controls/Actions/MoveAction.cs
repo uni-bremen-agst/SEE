@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -67,9 +68,9 @@ namespace SEE.Controls.Actions
             private const float AnimationTime = 1.0f;
 
             /// <summary>
-            /// TODO: Documentation.
+            /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
             /// </summary>
-            private SEEReflexionCity reflexionCity;
+            private bool withinReflexionCity;
 
             /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
@@ -90,7 +91,7 @@ namespace SEE.Controls.Actions
                         interactableObject.SetGrab(true, true);
                     }
                     // We need the reflexion city for later.
-                    reflexionCity = gameObject.ContainingCity<SEEReflexionCity>();
+                    withinReflexionCity = gameObject.ContainingCity<SEEReflexionCity>() != null;
                 }
                 else
                 {
@@ -291,10 +292,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void Undo()
             {
-                UnmarkAsTarget();
-                MoveToOrigin();
-                // FIXME: We also neet to reset the parent in the graph.
-                gameObject.transform.SetParent(originalParent);
+                ResetParent();
             }
 
             /// <summary>
@@ -303,6 +301,7 @@ namespace SEE.Controls.Actions
             internal void Redo()
             {
                 MoveToLastUserRequestedPosition();
+                // TODO: Map or reparent gameObject.
             }
 
             /// <summary>
@@ -312,116 +311,56 @@ namespace SEE.Controls.Actions
 
             internal void Reparent(GameObject mappingTarget)
             {
-                PutOn(mappingTarget);
+                GameNodeMover.PutOnAndFit(gameObject.transform, mappingTarget, originalParent.gameObject, originalLocalScale);
                 UnmarkAsTarget();
                 MarkAsTarget(mappingTarget.transform);
 
-                if (mappingTarget == gameObject.transform.parent.gameObject)
+                // The mapping is only possible if we are in a reflexion city.
+                if (withinReflexionCity)
                 {
-                    return;
+                    temporaryMapsTo = ReflexionMapper.MapTo(gameObject, mappingTarget);
                 }
-
-                // The mapping is only possible if we are in a reflexion city and if the
-                // mapping target is actually a node.
-                if (reflexionCity != null && mappingTarget.TryGetNode(out Node target))
+                else
                 {
-                    // The source of the mapping
-                    Node source = gameObject.GetNode();
-
-                    if (source.ItsGraph != target.ItsGraph)
-                    {
-                        Debug.LogError("For a mapping, both nodes must be in the same graph.\n");
-                        return;
-                    }
-
-                    // implementation -> architecture
-                    if (source.IsInImplementation() && target.IsInArchitecture())
-                    {
-                        // If there is a previous mapping that already mapped the node
-                        // on the current target, nothing needs to be done.
-                        // If there is a previous mapping that mapped the node onto
-                        // another target, the previous mapping must be reverted and the
-                        // node must be mapped onto the new target.
-
-                        if (temporaryMapsTo == null)
-                        {
-                            // If there is no previous mapping, we can just map the node.
-                            MapTo(source, target);
-                        }
-                        else // If there is a previous mapping.
-                        {
-                            Assert.IsTrue(reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo));
-                            // A temporary mapping exists already. This mapping can only be from an implementation
-                            // node onto an architecture node.
-                            Assert.IsTrue(temporaryMapsTo.Source == source);
-                            // If the mapping hasn't changed, there is nothing to do.
-                            if (temporaryMapsTo.Target != target)
-                            {
-                                // The grabbed object was previously temporarily mapped onto another target.
-                                // The temporary mapping must be reverted.
-                                reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
-                                MapTo(source, target);
-                            }
-                        }
-                    }
-                    // implementation -> implementation
-                    else if (source.IsInImplementation() && target.IsInImplementation())
-                    {
-                        // This changes the node hierarchy in the implementation only.
-                        reflexionCity.ReflexionGraph.UnparentInImplementation(source);
-                        reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
-                    }
-                    // architecture -> architecture
-                    else if (source.IsInArchitecture() && target.IsInArchitecture())
-                    {
-                        // This changes the node hierarchy in the implementation only.
-                        reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
-                        reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
-                    }
-                    // architecture -> implementation: forbidden
-                    else
-                    {
-                        // nothing to be done
-                    }
+                    // TODO: Ordinary hierarchical restructuring.
                 }
-            }
-
-            /// <summary>
-            /// Adds a mapping from <paramref name="source"/> to <paramref name="target"/> to the
-            /// reflexion analysis overriding any existing mapping.
-            /// </summary>
-            /// <param name="source">the source node of the maps-to edge</param>
-            /// <param name="target">the target node of the maps-to edge</param>
-            private void MapTo(Node source, Node target)
-            {
-                // If we are in a reflexion city, we will simply
-                // trigger the incremental reflexion analysis here.
-                // That way, the relevant code is in one place
-                // and edges will be colored on hover (#451).
-                temporaryMapsTo = reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
-            }
-
-            /// <summary>
-            /// Puts <see cref="gameObject"/> onto <paramref name="mappingTarget"/> graphically.
-            /// No change to the underlying graph is made.
-            /// </summary>
-            /// <param name="mappingTarget">the game node onto which to put <see cref="gameObject"/></param>
-            private void PutOn(GameObject mappingTarget)
-            {
-                GameNodeMover.PutOnAndFit(gameObject.transform, mappingTarget, originalParent.gameObject, originalLocalScale);
             }
 
             internal void UnReparent()
             {
                 UnmarkAsTarget();
-                if (reflexionCity != null && temporaryMapsTo != null && reflexionCity.LoadedGraph.ContainsEdge(temporaryMapsTo))
+                if (withinReflexionCity)
                 {
-                    // The Maps-To edge will have to be deleted once the node no longer hovers over it.
-                    // We'll change its parent so it becomes a root node in the implementation city.
-                    // The user will have to drop it on another node to re-parent it.
-                    gameObject.transform.SetParent(reflexionCity.ImplementationRoot.RetrieveGameNode().transform);
-                    reflexionCity.ReflexionGraph.RemoveFromMapping(temporaryMapsTo);
-                    temporaryMapsTo = null;
+                    if (temporaryMapsTo != null)
+                    {
+                        // The Maps-To edge will have to be deleted once the node no longer hovers over it.
+                        ReflexionMapper.Unmap(gameObject);
+                        // The unmapped node should return to its original parent in the node
+                        // hierarchy of the implementation graph.
+                        temporaryMapsTo = null;
+                    }
+                }
+                else
+                {
+                    // TODO: Ordinary hierarchical restructuring.
+                }
+                ResetParent();
+            }
+
+            /// <summary>
+            /// Resets the <see cref="originalParent"/> of <see cref="gameObject"/>
+            /// and returns it to its <see cref="originalWorldPosition"/> and restores
+            /// its <see cref="originalLocalScale"/>.
+            /// </summary>
+            private void ResetParent()
+            {
+                UnmarkAsTarget();
+                MoveToOrigin();
+                // FIXME: We also neet to reset the parent in the graph.
+                gameObject.transform.SetParent(originalParent);
+                if (gameObject.TryGetComponent(out NodeOperator nodeOperator))
+                {
+                    nodeOperator.ScaleTo(originalLocalScale, AnimationTime);
                 }
             }
         }
