@@ -1,29 +1,3 @@
-﻿using UnityEditor;
-
-namespace Michsky.UI.ModernUIPack
-{
-    public class InitMUIP
-    {
-        [InitializeOnLoad]
-        public class InitOnLoad
-        {
-            static InitOnLoad()
-            {
-                if (!EditorPrefs.HasKey("MUIPv4.Installed"))
-                {
-                    EditorPrefs.SetInt("MUIPv4.Installed", 1);
-                    EditorUtility.DisplayDialog("Hello there!", "Thank you for purchasing Modern UI Pack." +
-                        "\r\rFirst of all, import TextMesh Pro from Package Manager if you haven't already." +
-                        "\r\rTo change UI element values, go to Window > Tools > Modern UI Pack > Show UI Manager." +
-                        "\r\rYou can contact me at support@michsky.com for support.", "Got it!");
-                }
-
-                if (!EditorPrefs.HasKey("MUIP.ObjectCreator.Upgraded"))
-                {
-                    EditorPrefs.SetInt("MUIP.ObjectCreator.Upgraded", 1);
-                    EditorPrefs.SetString("UIManager.RootFolder", "Modern UI Pack/Prefabs/");
-                }
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4d5440849f71f712056ae084e307e2a3950b361c1fb3dedb96d9abd0fbce78ac
+size 1138

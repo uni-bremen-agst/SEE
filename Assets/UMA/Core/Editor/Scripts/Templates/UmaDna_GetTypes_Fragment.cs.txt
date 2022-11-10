@@ -1,2 +1,3 @@
-
-				typeof({0:ClassName}),
+version https://git-lfs.github.com/spec/v1
+oid sha256:99c49ef2a038abdd9ed2fe66774784a8fa27c2baf3d8cacb70cd34a231b3607b
+size 28

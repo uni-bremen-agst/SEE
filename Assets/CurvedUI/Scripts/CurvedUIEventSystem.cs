@@ -1,31 +1,3 @@
-﻿using UnityEngine.EventSystems;
-
-namespace CurvedUI
-{
-    /// <summary>
-    /// Fixes the issue where UI input would stop working in VR if the game window looses focus.
-    /// </summary>
-    public class CurvedUIEventSystem : EventSystem
-    {
-        public static CurvedUIEventSystem instance;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            instance = this;
-        }
-
-#if !CURVEDUI_UNITY_XR
-        protected override void OnApplicationFocus(bool hasFocus)
-        {
-            base.OnApplicationFocus(true);
-        }
-#endif
-    }
-
-}
-
-
-
-
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:1109e9274a26edb24e040a595547367c07119c66d6236b74025f3f49cd756065
+size 621

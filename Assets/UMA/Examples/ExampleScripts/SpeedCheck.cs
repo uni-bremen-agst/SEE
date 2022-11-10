@@ -1,17 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UMA;
-using UnityEngine;
-
-public class SpeedCheck : MonoBehaviour
-{
-    // Start is called before the first frame update
-    public UMAGeneratorBuiltin Generator;
-    public Rect ScreenLoc;
-
-    private void OnGUI()
-    {
-        int ms = Mathf.FloorToInt(Generator.ElapsedTicks / 10000.0f);
-        GUI.Label(ScreenLoc,"Speed: " + ms+"ms");
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:2875ba65f209daf1923d5e540af9f1f9d544cc64127d289842383897042863cb
+size 435

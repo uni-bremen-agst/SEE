@@ -1,10 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!1011 &101100000
-AvatarMask:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: UMA_Toon_Head_Mask
-  m_Mask: 00000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-  m_Elements: []
+version https://git-lfs.github.com/spec/v1
+oid sha256:89b829a5299359dc950681035429e0c33ae727e9f7373fc6336c4f54a217674a
+size 338

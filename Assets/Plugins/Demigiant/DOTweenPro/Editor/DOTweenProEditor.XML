@@ -1,18 +1,3 @@
-<?xml version="1.0"?>
-<doc>
-    <assembly>
-        <name>DOTweenProEditor</name>
-    </assembly>
-    <members>
-        <member name="T:DG.DOTweenEditor.Core.ColorPalette.Custom">
-            <summary>
-            Custom colors
-            </summary>
-        </member>
-        <member name="M:DG.DOTweenEditor.Core.StylePalette.Custom.Init">
-            <summary>
-            Needs to be overridden in order to initialize new styles added from inherited classes
-            </summary>
-        </member>
-    </members>
-</doc>
+version https://git-lfs.github.com/spec/v1
+oid sha256:514225ed9918f71ab50277d35748e31df391dfac3b7c13dca076e31d073f5dc1
+size 524

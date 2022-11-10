@@ -1,1 +1,3 @@
-			{0:FieldName} = value[{0:Index}];
+version https://git-lfs.github.com/spec/v1
+oid sha256:f4523dfb056bda4ce17a660888a2c83dd3ff35b083a6a676babb7ae80481858c
+size 38

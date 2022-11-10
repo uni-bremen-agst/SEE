@@ -1,36 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-namespace CurvedUI
-{
-    public class CUI_TMPChecker : MonoBehaviour
-    {
-
-#pragma warning disable 0649
-        [SerializeField]
-        GameObject testMsg;
-
-        [SerializeField]
-        GameObject enabledMsg;
-
-        [SerializeField]
-        GameObject disabledMsg;
-#pragma warning restore 0649
-
-        // Use this for initialization
-        void Start()
-        {
-            testMsg.gameObject.SetActive(false);
-
-#if CURVEDUI_TMP || TMP_PRESENT
-            enabledMsg.gameObject.SetActive(true);
-            disabledMsg.gameObject.SetActive(false);
-#else
-            enabledMsg.gameObject.SetActive(false);
-            disabledMsg.gameObject.SetActive(true);
-#endif
-        }
-
-
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:1499d73a011cf5f395538a1df11a88472bd0ce0550a341b8f676106cd1f24688
+size 781

@@ -1,14 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using UnityEngine.Timeline;
-using UMA.CharacterSystem;
-
-namespace UMA.Timeline
-{
-    [TrackColor(0.2f, 0.0f, 0.2f)]
-    [TrackClipType(typeof(UmaWardrobeClip))]
-    [TrackBindingType(typeof(DynamicCharacterAvatar))]
-    public class UmaWardrobeTrack : TrackAsset
-    {
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:af1f7d9808e63046182a5ea3df5d32049c5409b36f410ce8a0313842a13b19c8
+size 325

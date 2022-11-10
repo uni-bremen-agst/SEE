@@ -1,27 +1,3 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-
-[RequireComponent(typeof(Text))]
-public class TextColorControl : MonoBehaviour,IPointerEnterHandler,IPointerExitHandler
-{
-    public Color normalColor;
-    public Color highlightColor;
-
-    public void Start()
-    {
-        normalColor = GetComponent<Text>().color;
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        GetComponent<Text>().color = highlightColor;
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-       GetComponent<Text>().color = normalColor ;
-    }
-
- 
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:027435342bb66e6a42fe9f55d0f73e1893e51257cc0711844f0abe7093e5bf69
+size 627

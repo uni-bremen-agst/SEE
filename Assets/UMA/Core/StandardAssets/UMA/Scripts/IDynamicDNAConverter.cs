@@ -1,14 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace UMA
-{
-	//IDNAConverters dont need to have a DynamicUMADnaAsset (their names are hard coded)
-	//IDynamicDNAConverters do have dna assets.
-	//we could get rid of this shit if we finally ditched the legacy hard coded converters
-	public interface IDynamicDNAConverter
-	{
-		DynamicUMADnaAsset dnaAsset { get; }
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:8d2bdc66e49464cb710817a8d7fe3a38360a8c1e7d5959122389e12a02540ead
+size 418

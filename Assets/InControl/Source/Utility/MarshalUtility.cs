@@ -1,19 +1,3 @@
-namespace InControl
-{
-	using System;
-	using System.Runtime.InteropServices;
-
-
-	public static class MarshalUtility
-	{
-		static Int32[] buffer = new Int32[32];
-
-
-		public static void Copy( IntPtr source, UInt32[] destination, int length )
-		{
-			Utility.ArrayExpand( ref buffer, length );
-			Marshal.Copy( source, buffer, 0, length );
-			Buffer.BlockCopy( buffer, 0, destination, 0, sizeof(UInt32) * length );
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:7d4291e528cdc92352c7eeecdee8f10b7059366fa1246a41c06a34a80aadd80d
+size 436

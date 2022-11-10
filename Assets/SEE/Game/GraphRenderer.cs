@@ -173,11 +173,6 @@ namespace SEE.Game
         private const float GroundLevel = 0.0f;
 
         /// <summary>
-        /// A toggle marking artificial root nodes as such.
-        /// </summary>
-        public const string RootToggle = "Root";
-
-        /// <summary>
         /// The graphs to be rendered.
         /// </summary>
         private IList<Graph> graphs;
@@ -337,7 +332,7 @@ namespace SEE.Game
 
             GameObject AddGameRootNodeIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
             {
-                Node artificialRoot = AddGraphRootNodeIfNecessary(graph);
+                Node artificialRoot = graph.AddRootNodeIfNecessary();
                 if (artificialRoot != null)
                 {
                     nodeMap[artificialRoot] = DrawNode(artificialRoot);
@@ -613,45 +608,6 @@ namespace SEE.Game
                 allNodes.AddRange(WithAllChildren(node));
             }
             return allNodes;
-        }
-
-        /// <summary>
-        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
-        /// an artificial root is created and added to the <paramref name="graph"/>
-        /// All true roots of <paramref name="graph"/> will
-        /// become children of this artificial root.
-        /// Note: This method is the counterpart to RemoveRootIfNecessary.
-        /// </summary>
-        /// <param name="graph">graph where a unique root node should be added</param>
-        /// <returns>the new artificial root or null if <paramref name="graph"/> has
-        /// already a single root</returns>
-        public static Node AddGraphRootNodeIfNecessary(Graph graph)
-        {
-            // Note: Because this method is called only when a hierarchical layout is to
-            // be applied (and then both leaves and inner nodes were added to nodeMap), we
-            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
-            // a difference. If -- for any reason --, we decide not to create a game object
-            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
-            ICollection<Node> roots = graph.GetRoots();
-
-            if (roots.Count > 1)
-            {
-                Node artificialRoot = new Node
-                {
-                    ID = graph.Name + "#ROOT",
-                    SourceName = graph.Name + " (Root)",
-                    Type = roots.First().Type
-                };
-                graph.SetToggle(RootToggle);
-                graph.AddNode(artificialRoot);
-                foreach (Node root in roots)
-                {
-                    artificialRoot.AddChild(root);
-                }
-                return artificialRoot;
-            }
-
-            return null;
         }
 
         /// <summary>

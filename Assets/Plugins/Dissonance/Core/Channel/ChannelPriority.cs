@@ -1,30 +1,3 @@
-﻿namespace Dissonance
-{
-    public enum ChannelPriority
-    {
-        /// <summary>
-        /// No priority assigned
-        /// </summary>
-        None = -2,
-
-        /// <summary>
-        /// Low priority (will be muted by voices at the default priority)
-        /// </summary>
-        Low = -1,
-
-        /// <summary>
-        /// Default priority (will be muted by medium and high priority)
-        /// </summary>
-        Default = 0,
-
-        /// <summary>
-        /// Medium priority (will be muted by high priority)
-        /// </summary>
-        Medium = 1,
-
-        /// <summary>
-        /// High priority (will not be muted by any other voice)
-        /// </summary>
-        High = 2
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:7ea5c384cfbcf33c931f5961f3f9f578bcc85b5928b1e88f10ce77a9d1ee0a30
+size 703

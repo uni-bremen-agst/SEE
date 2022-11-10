@@ -1,22 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
-
-namespace RootMotion {
-
-	// Just making sure the camera controller updates last
-	[CustomEditor(typeof(CameraController))]
-	public class CameraControllerInspector : Editor {
-
-		private CameraController script { get { return target as CameraController; }}
-		private MonoScript monoScript;
-
-		void OnEnable() {
-			if (!Application.isPlaying) {
-				monoScript = MonoScript.FromMonoBehaviour(script);
-				int currentExecutionOrder = MonoImporter.GetExecutionOrder(monoScript);
-				if (currentExecutionOrder != 10200) MonoImporter.SetExecutionOrder(monoScript, 10200);
-			}
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:cf3d4539be1ef3f12dc78366af78597fbec77512dd6d157f854d15c13b1af7bf
+size 645

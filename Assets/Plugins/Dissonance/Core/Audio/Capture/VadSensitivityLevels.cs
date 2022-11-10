@@ -1,17 +1,3 @@
-﻿namespace Dissonance.Audio.Capture
-{
-    /// <summary>
-    /// Levels specifying how sensitive the Voice Activation Detector (VAD) is.
-    /// This is a direct tradeoff: higher levels are more likely to classify a frame of audio as speech, which means they will let through more non-speech audio.
-    /// </summary>
-    public enum VadSensitivityLevels
-    {
-        // Implementation note - these specific values are important - the WebRtcPreprocessor uses these exact same
-        // int values. Don't change them without also changing them there and recompiling on all platforms!
-
-        LowSensitivity = 0,
-        MediumSensitivity = 1,
-        HighSensitivity = 2,
-        VeryHighSensitivity = 3
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3174a61e3409682340819c6543ddae945e1bd99fce6d603e44d56e393db93e89
+size 715

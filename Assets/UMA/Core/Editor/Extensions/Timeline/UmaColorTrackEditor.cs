@@ -1,22 +1,3 @@
-﻿#if UNITY_2017_1_OR_NEWER
-using UnityEditor;
-using UMA.Timeline;
-
-namespace UMA.Editors
-{
-    [CustomEditor(typeof(UmaColorTrack))]
-    public class UmaColorTrackEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            serializedObject.Update();
-
-            SerializedProperty timeStep = serializedObject.FindProperty("timeStep");
-
-            EditorGUILayout.PropertyField(timeStep);
-
-            serializedObject.ApplyModifiedProperties();
-        }
-    }
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:d100eb326c755601e2e41510f444e6371e921132ab52282bb33bc693d4dc731e
+size 526

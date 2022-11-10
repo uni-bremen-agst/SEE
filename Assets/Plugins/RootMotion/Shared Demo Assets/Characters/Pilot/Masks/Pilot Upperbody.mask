@@ -1,10 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!319 &101100000
-AvatarMask:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Pilot Upperbody
-  m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000100000001000000
-  m_Elements: []
+version https://git-lfs.github.com/spec/v1
+oid sha256:39e51e87b1b83f1bb6c03239849c9f2a2a05196e01f5bd608a8231adaf49c7e7
+size 324

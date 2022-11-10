@@ -1,18 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28add7ad4625f8748a81d045544985b2, type: 3}
-  m_Name: OverweightMale_DNAAsset
-  m_EditorClassIdentifier: 
-  dnaTypeHash: 504143768
-  lastKnownAssetPath: 
-  lastKnownDuplicateAssetPath: 
-  lastKnownInstanceID: 0
-  Names: []
+version https://git-lfs.github.com/spec/v1
+oid sha256:9a3404895b6c9dbfd8760f7d62b454c745e6a59de50cae963a12c1fcc32f1e41
+size 511

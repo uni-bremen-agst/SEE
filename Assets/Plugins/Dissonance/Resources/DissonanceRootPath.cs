@@ -1,20 +1,3 @@
-﻿
-// ReSharper disable once CheckNamespace (Justification: Don't want to create a Dissonance.Resources namespace)
-namespace Dissonance
-{
-    internal static class DissonanceRootPath
-    {
-        //--------------------------------------------------------------------------------------------------
-        //
-        // The two lines after the magic GUID will be adjusted automatically to the correct project path.
-        // Any changes you make will be overwritten by this!
-        //
-        //--------------------------------------------------------------------------------------------------
-
-        // Magic GUID: 6e445e37-4c7a-43ce-9f2d-068dd0a2413d
-        // internal const string BasePath = "{{PATH}}";
-        internal const string BasePath = "Assets/Plugins/Dissonance";
-
-        internal const string BaseResourcePath = BasePath + "/Resources";
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:891affc8a40ec6aa8d9f20fc486a6cec2c95fc6ed5d2e63ea91d101010903266
+size 867

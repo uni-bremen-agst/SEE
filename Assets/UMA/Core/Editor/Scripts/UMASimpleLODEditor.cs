@@ -1,27 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UMA.Examples;
-
-namespace UMA.Editors
-{
-    [CustomEditor(typeof(UMASimpleLOD))]
-    public class UMASimpleLODEditor : Editor
-    {
-
-        public override void OnInspectorGUI()
-        {
-            serializedObject.Update();
-
-            if(Application.isPlaying)
-            {
-                EditorGUILayout.LabelField("Current LOD", ((UMASimpleLOD)target).CurrentLOD.ToString());
-            }
-
-            DrawDefaultInspector();
-
-            serializedObject.ApplyModifiedProperties();
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:40fca01ccf0af622e9df89d693b0555150edd5d700d99e2f3aa8db0180062b51
+size 645

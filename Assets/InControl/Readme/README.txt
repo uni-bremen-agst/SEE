@@ -1,8 +1,3 @@
-## InControl (version 1.8.8 build 9375)
-
-Documentation and additional information is available online at:
-http://www.gallantgames.com/incontrol
-
-## JavaScript
-
-InControl is written in C#, but it can also be used with JavaScript. To access it from JavaScript, create a folder under the 'Assets' folder named 'Plugins' and move the 'InControl' folder inside. You will also need to add 'import InControl;' to the top of your JavaScript files. For projects using InControl from C#, none of this is necessary. For more information, please see the [Unity documentation on Special Folders and Script Compilation Order at http://docs.unity3d.com/Documentation/Manual/ScriptCompileOrderFolders.html
+version https://git-lfs.github.com/spec/v1
+oid sha256:c8e9cb0b6b11d11f3c2058c468e187ed703b4ad02b4592c265fa9603ffcc6e54
+size 696

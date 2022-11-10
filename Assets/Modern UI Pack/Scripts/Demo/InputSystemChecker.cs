@@ -1,23 +1,3 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
-#endif
-
-namespace Michsky.UI.ModernUIPack
-{
-    public class InputSystemChecker : MonoBehaviour
-    {
-        void Awake()
-        {
-#if ENABLE_INPUT_SYSTEM
-            StandaloneInputModule tempModule = gameObject.GetComponent<StandaloneInputModule>();
-            Destroy(tempModule);
-            InputSystemUIInputModule newModule = gameObject.AddComponent<InputSystemUIInputModule>();
-            newModule.enabled = false;
-            newModule.enabled = true;
-#endif
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d5893037b4920f383223afb52a5fd886d2d9eabc45eab75678518feae3d93a1f
+size 655

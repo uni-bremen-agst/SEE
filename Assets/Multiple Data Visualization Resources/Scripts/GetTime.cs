@@ -1,20 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
- 
-public class GetTime : MonoBehaviour
-{
-    public Text text;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        text.text = System.DateTime.Now.ToString();
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:98ce50269e4d3182542c3169d3dc5164b399c5b34a03620eede7672b7bbb6e97
+size 394

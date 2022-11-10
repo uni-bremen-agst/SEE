@@ -1,3 +1,3 @@
-
-			if( dnaType == typeof({0:ClassName}))
-				return {0:ClassName}.LoadInstance(data);
+version https://git-lfs.github.com/spec/v1
+oid sha256:562dd52dd78b82038010499e084c4ea3bb4d99788abb731405b8d87245c69119
+size 88

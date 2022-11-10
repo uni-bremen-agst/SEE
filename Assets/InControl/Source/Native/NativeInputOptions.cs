@@ -1,15 +1,3 @@
-namespace InControl
-{
-	using System;
-	using System.Runtime.InteropServices;
-
-
-	[StructLayout( LayoutKind.Sequential, CharSet = CharSet.Ansi )]
-	public struct NativeInputOptions
-	{
-		public UInt16 updateRate;
-		public Int32 enableXInput;
-		public Int32 enableMFi;
-		public Int32 preventSleep;
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:a7c4fdd8efba47896c719d05e7deb6588bbbd8c4a570e46fe5c60b03a5fa7feb
+size 297

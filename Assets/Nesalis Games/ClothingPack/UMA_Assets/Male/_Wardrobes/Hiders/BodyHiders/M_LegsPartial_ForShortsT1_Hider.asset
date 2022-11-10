@@ -1,17 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c86f7fb3ea5bac04a857e5f4a0b30077, type: 3}
-  m_Name: M_LegsPartial_ForShortsT1_Hider
-  m_EditorClassIdentifier: 
-  _asset: {fileID: 11400000, guid: 2041a0dad0ad3894ea9590072acacf65, type: 2}
-  _serializedFlags:
-  - flags: ffffffffffffffffffffffffffffffffffffffffffffffffffffff6f0c000000000000c02c000000000000000000000000000000008007f8ffffffffffffffffffffffffffffffffffffffffffc301f8c03f1c00000000000080070000000000000000000000000000fcfffffedf0900
-    Count: 884
+version https://git-lfs.github.com/spec/v1
+oid sha256:e15eb676ee053cc1a6f99a85322408e073cb6ea8e71752a036a08a4885df1e85
+size 750

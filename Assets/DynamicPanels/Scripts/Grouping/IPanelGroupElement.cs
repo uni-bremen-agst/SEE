@@ -1,21 +1,3 @@
-﻿using UnityEngine;
-
-namespace DynamicPanels
-{
-	public interface IPanelGroupElement
-	{
-		DynamicPanelsCanvas Canvas { get; }
-		PanelGroup Group { get; }
-
-		Vector2 Position { get; }
-		Vector2 Size { get; }
-		Vector2 MinSize { get; }
-
-		void ResizeTo( Vector2 newSize, Direction horizontalDir = Direction.Right, Direction verticalDir = Direction.Bottom );
-
-		void DockToRoot( Direction direction );
-		void DockToPanel( IPanelGroupElement anchor, Direction direction );
-
-		IPanelGroupElement GetSurroundingElement( Direction direction );
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:27fe14b907513c6b45cb29ba44931f969c0368e497dd8c527ca4112ebc136c3b
+size 562

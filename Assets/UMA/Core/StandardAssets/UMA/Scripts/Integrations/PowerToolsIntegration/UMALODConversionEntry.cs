@@ -1,24 +1,3 @@
-﻿using System;
-
-namespace UMA.Integrations.PowerTools
-{
-	[Serializable]
-	public class UMALODConversionEntry
-	{
-		public string SourcePieceName;
-		public string DestinationPieceName;
-		public int LODLevel;
-		public int groupInt;
-		public ConversionGroup group
-		{
-			get { return (ConversionGroup)groupInt; }
-			set { groupInt = (int)value; }
-		}
-		public enum ConversionGroup
-		{
-			SlotData,
-			OverlayData,
-			RaceData
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:488ea59c44e8825d0901acb1a473255b58ca06689ff7a2523ee50175418edb20
+size 454

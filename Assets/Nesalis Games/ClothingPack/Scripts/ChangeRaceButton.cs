@@ -1,29 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UMA.CharacterSystem;
-using UnityEngine;
-using UnityEngine.UI;
-
-namespace NesalisGames
-{
-    namespace ClothingPack
-    {
-        public class ChangeRaceButton : MonoBehaviour
-        {
-            public DynamicCharacterAvatar Avatar;
-            public Text ActiveRace;
-            public List<UMA.RaceData> Races = new List<UMA.RaceData>();
-
-            private int index = 1;
-
-            public void ChangeRaceClick()
-            {
-                Avatar.ChangeRace(Races[index]);
-                ActiveRace.text = "Active race: " + Races[index].raceName;
-
-                index++;
-                if (index > Races.Count - 1) index = 0;
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4a436d1547a64e2365ff6d509f3d02628d85a5f6634ccef31dc91e5ffd2e3ded
+size 772

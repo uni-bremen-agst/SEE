@@ -1,29 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
-  m_Name: o3n_male_pants_03_classic_Recipe
-  m_EditorClassIdentifier: 
-  recipeType: Wardrobe
-  DisplayValue: Pants 03 Classic
-  compatibleRaces:
-  - o3n Male
-  wardrobeRecipeThumbs:
-  - race: o3n Male
-    filename: 
-    thumb: {fileID: 21300000, guid: 32b05e1dd8d03d34c814a9b124d18b27, type: 3}
-  wardrobeSlot: Legs
-  Hides:
-  - o3n_male_legs_LOD1
-  suppressWardrobeSlots: []
-  activeWardrobeSet: []
-  MeshHideAssets: []
-  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"o3n_male_pants_03_classic_LOD1","scale":100,"copyIdx":-1,"overlays":[{"id":"o3n_male_pants_03_classic_Overlay","colorIdx":0,"rect":[0,0,0,0],"data":[]}]}],"colors":[],"fColors":[{"name":"ClothingBottom01","colors":[107,100,88,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"ClothingWaist01","colors":[67,37,12,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]},{"name":"ClothingWaist02","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":3,"race":"","packedDna":[]}'
-  replaces: Nothing
+version https://git-lfs.github.com/spec/v1
+oid sha256:ba42515ea847aceda99301c360de3379ddbca5782ae0961c003303d1f693c39e
+size 1518

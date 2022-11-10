@@ -1,13 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-
-namespace RootMotion.FinalIK {
-
-	public class GroundingInspector : Editor {
-
-		public static void Visualize(Grounding grounding, Transform root, Transform foot) {
-			Inspector.SphereCap (0, foot.position + root.forward * grounding.footCenterOffset, root.rotation, grounding.footRadius * 2f);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:9770903dca1755266a59026796197052faa4e7bba6536811e08e37cc1eb41876
+size 369

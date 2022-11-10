@@ -1,17 +1,3 @@
-﻿namespace Crosstales.Common.Model.Enum
-{
-   /// <summary>All available platforms.</summary>
-   public enum Platform
-   {
-      Windows,
-      OSX,
-      Linux,
-      IOS,
-      Android,
-      WSA,
-      Web,
-      Unsupported
-      //MaryTTS
-   }
-}
-// © 2016-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:08d5a38116049993c09c1be83a550d52753b44fa899ec1d2269d446e91fcc339
+size 311

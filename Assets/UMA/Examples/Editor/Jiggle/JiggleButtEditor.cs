@@ -1,31 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UMA.Examples;
-
-[CustomEditor(typeof(UMA_JiggleButt))]
-public class JiggleButtEditor : Editor {
-
-	public override void OnInspectorGUI() {
-		var myScript = target as UMA_JiggleButt;
-		GUILayout.Label("");
-		GUILayout.Label("Buttocks:");
-		myScript._buttStiffness = EditorGUILayout.FloatField("Buttock Stiffness (0-1):", Mathf.Clamp(myScript._buttStiffness, 0, 1));
-		myScript._buttMass = EditorGUILayout.FloatField("Buttock Mass (0-1 recommended):", myScript._buttMass);
-		myScript._buttDamping = EditorGUILayout.FloatField("Buttock damping (0-1):", Mathf.Clamp(myScript._buttDamping, 0, 1));
-		myScript._buttGravity = EditorGUILayout.FloatField("Buttock gravity (0-1 recommended):", myScript._buttGravity);
-		myScript._buttSquashAndStretch = GUILayout.Toggle(myScript._buttSquashAndStretch, "Do you want buttock stretching?");
-		if (myScript._buttSquashAndStretch) {
-			myScript._buttFrontStretch = EditorGUILayout.FloatField("Buttock Rear Stretch (0-1):", Mathf.Clamp(myScript._buttFrontStretch, 0, 1));
-			myScript._buttSideStretch = EditorGUILayout.FloatField("Buttock Side Stretch (0-1):", Mathf.Clamp(myScript._buttSideStretch, 0, 1));
-		}
-		if (GUI.changed) {
-			for (int i = 0; i < myScript._jigglers.Count; i++) {
-				myScript.UpdateJiggleBone(myScript._jigglers[i]);
-			}
-			EditorUtility.SetDirty(target);
-		}
-	}
-
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4dd9725c1ce7e3571fcb1361a6ffe459af2795ce84df592ea25e03ed8a92cd5f
+size 1463

@@ -1,25 +1,3 @@
-namespace Dissonance
-{
-    public enum CommActivationMode
-    {
-        /// <summary>
-        ///     The transmitter will never transmit.
-        /// </summary>
-        None,
-
-        /// <summary>
-        ///     The transmisster will automatically activate when it detects the user speaking.
-        /// </summary>
-        VoiceActivation,
-
-        /// <summary>
-        ///     The transmitter will activate when the specified input axis is active.
-        /// </summary>
-        PushToTalk,
-
-        /// <summary>
-        ///     The transmitter will constantly transmit.
-        /// </summary>
-        Open
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:768f0c4d3f3252ca282eadb4c8817db24a65c8835f4548fcd812d60689ac4f39
+size 621

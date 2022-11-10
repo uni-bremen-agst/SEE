@@ -1,36 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0188188c253e0c4bb9b46e19fa7312e, type: 3}
-  m_Name: F_CropTop_2
-  m_EditorClassIdentifier: 
-  recipeType: Wardrobe
-  DisplayValue: 
-  compatibleRaces:
-  - HumanFemaleHighPoly
-  - HumanFemale
-  - HumanFemaleDCS
-  wardrobeRecipeThumbs:
-  - race: HumanFemaleHighPoly
-    filename: 
-    thumb: {fileID: 0}
-  - race: HumanFemale
-    filename: 
-    thumb: {fileID: 0}
-  - race: HumanFemaleDCS
-    filename: 
-    thumb: {fileID: 0}
-  wardrobeSlot: Chest
-  Hides: []
-  suppressWardrobeSlots: []
-  activeWardrobeSet: []
-  MeshHideAssets: []
-  recipeString: '{"version":3,"packedSlotDataList":[],"slotsV2":[],"slotsV3":[{"id":"","scale":1,"copyIdx":-1,"overlays":[]},{"id":"F_CropTop_l","scale":100,"copyIdx":-1,"overlays":[{"id":"F_CropTop_l_Overlay_2","colorIdx":0,"rect":[0,0,0,0]}]}],"colors":[],"fColors":[{"name":"Shirt","colors":[255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0,255,255,255,255,0,0,0,0]}],"sharedColorCount":1,"race":"","packedDna":[]}'
-  replaces: Nothing
+version https://git-lfs.github.com/spec/v1
+oid sha256:5a19fb09e3895f2943e0cb5ce963978dfd7505ecc6404ac090355ad8458c849e
+size 1278

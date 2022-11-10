@@ -1,24 +1,3 @@
-﻿#if UNITY_EDITOR
-namespace InControl
-{
-	using System.IO;
-	using UnityEngine;
-	using UnityEditor;
-
-
-	// This file exists so editor scripts can find the plugin path.
-	// @cond nodoc
-	public class InControlPluginsPath : ScriptableObject
-	{
-		public static string Get()
-		{
-			var instance = CreateInstance<InControlPluginsPath>();
-			var pluginsPath = Path.GetDirectoryName( AssetDatabase.GetAssetPath( MonoScript.FromScriptableObject( instance ) ) );
-			DestroyImmediate( instance );
-			return pluginsPath;
-		}
-	}
-
-	// @endcond
-}
-#endif
+version https://git-lfs.github.com/spec/v1
+oid sha256:588191efae733a228562d1dca08be9fcc93874346ff5204b9d253f453d945c2b
+size 538

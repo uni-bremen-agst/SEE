@@ -1,34 +1,3 @@
-﻿using UnityEngine;
-
-namespace Crosstales.RTVoice.Util
-{
-   /// <summary>Setup the project to use RT-Voice.</summary>
-#if UNITY_EDITOR
-   [UnityEditor.InitializeOnLoadAttribute]
-#endif
-   public class SetupProject
-   {
-      #region Constructor
-
-      static SetupProject()
-      {
-         setup();
-      }
-
-      #endregion
-
-
-      #region Public methods
-
-      [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-      private static void setup()
-      {
-         Crosstales.Common.Util.Singleton<Speaker>.PrefabPath = "Prefabs/RTVoice";
-         Crosstales.Common.Util.Singleton<Speaker>.GameObjectName = "RTVoice";
-         Crosstales.Common.Util.Singleton<GlobalCache>.PrefabPath = "Prefabs/GlobalCache";
-      }
-
-      #endregion
-   }
-}
-// © 2020-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:5cd73507561d836497e964caab77a2e955638031ee89652389c03ccd358b26d4
+size 828

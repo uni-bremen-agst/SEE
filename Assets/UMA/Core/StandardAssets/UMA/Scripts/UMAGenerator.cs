@@ -1,26 +1,3 @@
-using UnityEngine;
-
-namespace UMA
-{
-	public class UMAGenerator : UMAGeneratorBuiltin 
-	{
-		public override void Awake()
-		{
-			base.Awake();
-		}
-
-		public override void addDirtyUMA(UMAData umaToAdd)
-		{
-			if (!gameObject.activeInHierarchy)
-			{
-				if (Debug.isDebugBuild)
-				{
-					Debug.LogError("Adding Dirty UMA to a Generator that is not an active scene object, UMA generators must be active scene objects!", gameObject);
-					Debug.LogError("UMA Data ", umaToAdd.gameObject);
-				}
-				return;
-			}
-			base.addDirtyUMA(umaToAdd);
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ec50537995c106b8a4a98be00ea637fb44244fa20c2391eca2b95a97322cbe84
+size 573

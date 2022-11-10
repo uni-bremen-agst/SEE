@@ -1,1 +1,3 @@
-		res.{0:FieldName} = {0:FieldName} * (1f / 255f);
+version https://git-lfs.github.com/spec/v1
+oid sha256:f0d369ce0e7004d5d8b08a31df2d10e75b895453f452af904aac08e257f0e7dc
+size 52

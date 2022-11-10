@@ -1,29 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using UnityEngine;
-
-namespace CurvedUI
-{
-	public class CUI_ChangeColor : MonoBehaviour
-	{
-	
-		public void ChangeColorToBlue()
-		{
-			this.GetComponent<Renderer>().material.color = Color.blue;
-		}
-	
-		public void ChangeColorToCyan()
-		{
-			this.GetComponent<Renderer>().material.color = Color.cyan;
-		}
-	
-		public void ChangeColorToWhite()
-		{
-			this.GetComponent<Renderer>().material.color = Color.white;
-		}
-	
-
-	}
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:af850af8fa1dd32d54f2560deea4ecea79ea339e315d730333e5ac8e22d18067
+size 535

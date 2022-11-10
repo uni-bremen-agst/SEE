@@ -1,23 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace Crosstales.RTVoice.EditorIntegration
-{
-   /// <summary>Editor component for the "Hierarchy"-menu.</summary>
-   public static class PlatformProviderGameObject
-   {
-      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/PlatformProvider", false, Crosstales.RTVoice.EditorUtil.EditorHelper.GO_ID + 9)]
-      private static void AddPlatformProvider()
-      {
-         Crosstales.RTVoice.EditorUtil.EditorHelper.InstantiatePrefab("PlatformProvider", $"{Crosstales.RTVoice.EditorUtil.EditorConfig.ASSET_PATH}Extras/PlatformProvider/Resources/Prefabs/");
-      }
-
-      [MenuItem("GameObject/" + Crosstales.RTVoice.Util.Constants.ASSET_NAME + "/PlatformProvider", true)]
-      private static bool AddPlatformProviderValidator()
-      {
-         return !Crosstales.RTVoice.EditorExtension.PlatformProviderEditor.isPrefabInScene;
-      }
-   }
-}
-#endif
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:5213303896669fb1b1d87fffecfa77964345c30163c166998a4d713dc032cbb1
+size 978

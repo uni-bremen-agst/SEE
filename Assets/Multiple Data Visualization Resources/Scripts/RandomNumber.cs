@@ -1,30 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-
-public class RandomNumber : MonoBehaviour
-{
-    public Text numText;
-
-    public float interval;
-    public float initInterval;
-    // Start is called before the first frame update
-    void Start()
-    {
-        initInterval = Random.Range(0.2f, 0.5f);
-        numText = GetComponent<Text>();
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        interval -= Time.deltaTime;
-        if(interval<=0f)
-        {
-            numText.text = Random.Range(0, 10).ToString();
-            interval = initInterval;
-        }
-
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:1c0dda1cea44d3eb501d46e86279478533d52bf283b7cb685b53b02df55f41a4
+size 688

@@ -1,16 +1,3 @@
-﻿namespace Dissonance.Audio.Capture
-{
-    public enum AecmRoutingMode
-    {
-        // Implementation note - these specific values are important - the WebRtcPreprocessor uses these exact same
-        // int values. Don't change them without also changing them there and recompiling on all platforms!
-
-        Disabled = -1,
-
-        QuietEarpieceOrHeadset = 0,
-        Earpiece = 1,
-        LoudEarpiece = 2,
-        Speakerphone = 3,
-        LoudSpeakerphone = 4
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f3a5e69ac05486bb2a8a28e13768651beac9482b3146cae918986eb61b14cbf7
+size 474

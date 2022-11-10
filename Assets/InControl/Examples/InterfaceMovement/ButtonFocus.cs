@@ -1,17 +1,3 @@
-﻿namespace InterfaceMovement
-{
-	using UnityEngine;
-
-
-	public class ButtonFocus : MonoBehaviour
-	{
-		void Update()
-		{
-			// Get focused button.
-			var focusedButton = transform.parent.GetComponent<ButtonManager>().focusedButton;
-
-			// Move toward same position as focused button.
-			transform.position = Vector3.MoveTowards( transform.position, focusedButton.transform.position, Time.deltaTime * 10.0f );
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:195a59cda5e66e42f580ecf8e80680d202f69fd59450f87397541d2169050926
+size 434

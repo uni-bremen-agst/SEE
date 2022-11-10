@@ -1,12 +1,3 @@
-{
-    "name": "InControl.Examples",
-    "references": [
-        "InControl",
-        "UnityEngine.UI",
-        "UnityEditor.UI"
-    ],
-    "optionalUnityReferences": [],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3b39f97fd637b4c4c7348d922798379c43d5fcdf307ab64241293f5f482ba348
+size 267

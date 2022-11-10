@@ -1,19 +1,3 @@
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-namespace Crosstales.Common.Util
-{
-   /// <summary>Adds "CT_PROC" define symbol to PlayerSettings define symbols.</summary>
-   [InitializeOnLoad]
-   public class CTPCompileDefines : Crosstales.Common.EditorTask.BaseCompileDefines
-   {
-      private const string symbol = "CT_PROC";
-
-      static CTPCompileDefines()
-      {
-         addSymbolsToAllTargets(symbol);
-      }
-   }
-}
-#endif
-// © 2021-2022 crosstales LLC (https://www.crosstales.com)
+version https://git-lfs.github.com/spec/v1
+oid sha256:21d297dba9fd9f71ad5266cb3bfd8bc2272dae3373a7c87931cb353f4feedc0a
+size 486
