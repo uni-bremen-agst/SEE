@@ -55,6 +55,12 @@ namespace SEE.GO
         /// updated (as a result of setting one of the public properties).
         /// </summary>
         private bool needsUpdate = false;
+        
+        /// <summary>
+        /// Indicates whether the color of <see cref="spline"/> must be updated.
+        /// Will not cause an update on its own, use <see cref="needsUpdate"/> for that.
+        /// </summary>
+        private bool needsColorUpdate = false;
 
         /// <summary>
         /// The shaping spline.
@@ -170,8 +176,14 @@ namespace SEE.GO
             {
                 gradientColors = value;
                 needsUpdate = true;
+                needsColorUpdate = true;
             }
         }
+
+        /// <summary>
+        /// The mesh renderer behind this spline. May be null if this spline uses a line renderer.
+        /// </summary>
+        private MeshRenderer meshRenderer;
 
         /// <summary>
         /// The default material to be used for splines whose
@@ -180,6 +192,31 @@ namespace SEE.GO
         /// </summary>
         [SerializeField]
         private Material defaultMaterial;
+
+        /// <summary>
+        /// The material this edge uses, if it uses a mesh renderer.
+        /// If it does not, using this property causes a mesh to be created.
+        /// </summary>
+        public Material meshMaterial
+        {
+            get
+            {
+                if (meshRenderer == null)
+                {
+                    CreateMesh();
+                }
+
+                return meshRenderer.sharedMaterial;
+            }
+            set
+            {
+                if (meshMaterial != value)
+                {
+                    meshRenderer.sharedMaterial = value;
+                    UpdateMaterial();
+                }
+            }
+        }
 
         /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
@@ -254,7 +291,7 @@ namespace SEE.GO
         /// <see cref="GameObject"/> this component is attached to
         /// (<see cref="Component.gameObject"/>) and marks the internal state
         /// as clean (i.e., <see cref="needsUpdate"/> is set to false) so that
-        /// <see cref="Update"/> doesn't update the renderer again in the next
+        /// <see cref="Update"/> doesn't update the meshRenderer again in the next
         /// frame. Calling this method doesn't fail if
         /// <see cref="Component.gameObject"/> has no
         /// <see cref="LineRenderer"/> attached to it.
@@ -370,11 +407,13 @@ namespace SEE.GO
             }
             mesh = filter.mesh;
             updateMaterial = updateMaterial // Implies new mesh.
-                || // Or the geometrics of the mesh have changed.
-                mesh.vertices.Length != vertices.Count ||
-                mesh.normals.Length  != normals.Count  ||
-                mesh.tangents.Length != tangents.Count ||
-                mesh.uv.Length != uvs.Count;
+                             || // Or the geometrics of the mesh have changed.
+                             mesh.vertices.Length != vertices.Count ||
+                             mesh.normals.Length != normals.Count ||
+                             mesh.tangents.Length != tangents.Count ||
+                             mesh.uv.Length != uvs.Count ||
+                             needsColorUpdate; // Or the color of the mesh has been changed.
+            
             if (updateMaterial)
             {
                 mesh.Clear();
@@ -384,16 +423,16 @@ namespace SEE.GO
             mesh.tangents = tangents.ToArray();
             mesh.uv       = uvs.ToArray();
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-            if (!gameObject.TryGetComponent(out MeshRenderer _))
+            if (!gameObject.TryGetComponent(out meshRenderer))
             {
-                gameObject.AddComponent<MeshRenderer>();
+                meshRenderer = gameObject.AddComponent<MeshRenderer>();
             }
             if (updateMaterial)
             {
                 UpdateMaterial();
             }
 
-            // Remove line renderer.
+            // Remove line meshRenderer.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 Destroy(lineRenderer);
@@ -403,21 +442,20 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Update the material of the <see cref="MeshRenderer"/> created by
-        /// <see cref="CreateOrUpdateMesh"/>.
+        /// Update the material of the <see cref="MeshRenderer"/> created by <see cref="CreateOrUpdateMesh"/>.
         /// </summary>
         protected virtual void UpdateMaterial()
         {
-            if (!gameObject.TryGetComponent(out MeshFilter filter) ||
-                !gameObject.TryGetComponent(out MeshRenderer meshRenderer))
-            {
-                return;
-            }
-
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
             }
+            
+            if (!gameObject.TryGetComponent(out MeshFilter filter) || meshRenderer == null)
+            {
+                return;
+            }
+            
             if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
             {
                 // Don't re-color non-default material.
@@ -429,6 +467,8 @@ namespace SEE.GO
                     colors[i] = Color.Lerp(gradientColors.start, gradientColors.end, uv[i].y);
                 }
                 mesh.colors = colors;
+
+                needsColorUpdate = false;
             }
         }
 
