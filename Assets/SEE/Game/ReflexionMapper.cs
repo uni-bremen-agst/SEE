@@ -14,7 +14,7 @@ namespace SEE.Game
     ///
     /// Used by user actions.
     /// </summary>
-    static class ReflexionMapper
+    internal static class ReflexionMapper
     {
         /// <summary>
         /// Maps <paramref name="mappingSource"/> onto <paramref name="mappingTarget"/> distinguishing
@@ -111,21 +111,19 @@ namespace SEE.Game
         /// <param name="mapsToEdge">the outgoing maps-to edge of <paramref name="node"/> or null</param>
         /// <returns>true if and only if <paramref name="node"/> has a single
         /// outgoing maps-to edge</returns>
-        /// <exception cref="Exception">thrown in case <paramref name="node"/> has more
+        /// <exception cref="InvalidOperationException">thrown in case <paramref name="node"/> has more
         /// than one outgoing maps-to edge</exception>
         private static bool TryGetMapsToEdge(Node node, out Edge mapsToEdge)
         {
-            IEnumerable<Edge> mapsToEdges = node.OutgoingsOfType(ReflexionGraph.MapsToType);
-            switch (mapsToEdges.Count())
+            try
             {
-                case 0:
-                    mapsToEdge = null;
-                    return false;
-                case 1:
-                    mapsToEdge = mapsToEdges.First();
-                    return true;
-                default:
-                    throw new Exception($"The node {node.ID} has {mapsToEdges.Count()} mapping(s).");
+                mapsToEdge = node.OutgoingsOfType(ReflexionGraph.MapsToType).SingleOrDefault();
+                return mapsToEdge != null;
+            }
+            catch (InvalidOperationException)
+            {
+                // Rethrow with more helpful error message.
+                throw new InvalidOperationException($"The node {node.ID} has more than one mapping.");
             }
         }
     }

@@ -15,17 +15,20 @@ namespace SEE.Game.City
         /// Layout for drawing edges.
         /// </summary>
         public EdgeLayoutKind Kind = EdgeLayoutKind.Bundling;
+
         /// <summary>
         /// The width of an edge (drawn as line).
         /// </summary>
         [Range(0.0f, float.MaxValue)]
         public float EdgeWidth = 0.01f;
+
         /// <summary>
         /// Orientation of the edges;
         /// if false, the edges are drawn below the houses;
         /// if true, the edges are drawn above the houses.
         /// </summary>
         public bool EdgesAboveBlocks = true;
+
         /// <summary>
         /// Determines the strength of the tension for bundling edges. This value may
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
@@ -33,6 +36,7 @@ namespace SEE.Game.City
         /// </summary>
         [Range(0.0f, 1.0f)]
         public float Tension = 0.85f;
+
         /// <summary>
         /// Determines to which extent the polylines of the generated splines are
         /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,

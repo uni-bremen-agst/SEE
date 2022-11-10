@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using SEE.Game.Operator;
 using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -492,6 +493,11 @@ namespace SEE.GO
                 return filter.mesh;
             }
             Mesh mesh = CreateOrUpdateMesh();
+            if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
+            {
+                // Glow effect depends on materials staying the same. We need to fully refresh it.
+                edgeOperator.RefreshGlow(true).Forget();
+            }
             needsUpdate = false; // apparently
             return mesh;
         }

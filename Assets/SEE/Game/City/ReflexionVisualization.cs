@@ -66,12 +66,13 @@ namespace SEE.Game.City
 
         private void Start()
         {
-            // We have to set an initial color for the edges.
+            // We have to set an initial color for the edges, and we have to convert them to meshes.
             foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
             {
                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
+                    spline.CreateMesh();
                     spline.GradientColors = GetEdgeGradient(edge);
                 }
                 else
@@ -136,8 +137,7 @@ namespace SEE.Game.City
 
         public void OnCompleted()
         {
-            // Should never be called.
-            throw new NotImplementedException();
+            Events.Clear();
         }
 
         public void OnError(Exception error)
@@ -181,7 +181,7 @@ namespace SEE.Game.City
         /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeChange">The event which shall be handled.</param>
-        private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
+        private static async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
             if (HiddenEdgeStates.Contains(edgeChange.NewState))
@@ -208,7 +208,8 @@ namespace SEE.Game.City
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
-                edge.AddOrGetComponent<EdgeOperator>().ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
+                EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
+                edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
             }
             else
             {
