@@ -289,7 +289,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void Undo()
             {
-                RestoreOriginalAppearance();
+                UnReparent();
             }
 
             /// <summary>
@@ -298,7 +298,7 @@ namespace SEE.Controls.Actions
             internal void Redo()
             {
                 MoveToLastUserRequestedPosition();
-                // TODO: Map or reparent gameObject.
+                Reparent(newParent);
             }
 
             /// <summary>
@@ -311,8 +311,10 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Moves <paramref name="mappingTarget"/> onto the roof of <see cref="gameObject"/>
             /// visually and unmarks it as target. If <see cref="withinReflexionCity"/>,
-            /// <see cref="gameObject"/> will be mapped onto <paramref name="mappingTarget"/> using <see cref="ReflexionMapper.MapTo"/>; otherwise it
-            /// will be p
+            /// <see cref="gameObject"/> will be mapped onto <paramref name="mappingTarget"/>
+            /// using <see cref="ReflexionMapper.MapTo"/>; otherwise it will become a child
+            /// of <paramref name="mappingTarget"/> in both the game-node hierarchy and
+            /// graph-node hierarchy.
             /// </summary>
             /// <param name="mappingTarget"></param>
             internal void Reparent(GameObject mappingTarget)
