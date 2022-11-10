@@ -18,10 +18,20 @@ jobs:
       - name: Fix permissions
         shell: bash
         run: sudo /mnt/scripts/set-work-permissions.sh
+      - name: Setup GitLab LFS
+        run: |
+          echo "$CREDENTIALS" > ~/.git-credentials
+          git config --global credential.helper store
+          git config --global lfs.url ${CREDENTIALS}project-see/see-lfs.git/info/lfs
+        env:
+          # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
+          CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
       - uses: actions/checkout@v3
         name: Checkout Repository
         with:
           lfs: true
+      - name: Confirm LFS pull
+        run: git lfs pull
       - uses: actions/cache@v3
         name: Cache Library
         with:

@@ -1,37 +1,31 @@
 using System;
 using System.Collections.Generic;
-using VivoxUnity.Properties;
 
-namespace SEE.DataModel.DG
+namespace SEE.DataModel
 {
-    public partial class Graph
+    public abstract partial class Observable<T>
     {
         /// <summary>
-        /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
-        /// propagated through the graph's own observable implementation.
+        /// An observer which acts as a proxy for a <see cref="BaseObservable"/>.
+        ///
+        /// This observer can subscribe to other observables of the same type as the <see cref="BaseObservable"/>,
+        /// and transparently route all of their events as a notification to the <see cref="BaseObservable"/>.
         /// </summary>
-        private readonly GraphElementObserver ElementObserver;
-
-        /// <summary>
-        /// A wrapper class for the observer functionality, as we need to observe graph elements.
-        /// We don't implement <see cref="IObserver{T}"/> on <see cref="Graph"/> because its methods should not be
-        /// accessible from the outside.
-        /// </summary>
-        private class GraphElementObserver : IObserver<GraphEvent>
+        protected class ProxyObserver : IObserver<T>
         {
             /// <summary>
             /// Set of all disposables associated with the observables this observer observes.
             /// </summary>
             private readonly ISet<IDisposable> Disposables = new HashSet<IDisposable>();
-            
-            /// <summary>
-            /// The graph this observer belongs to.
-            /// </summary>
-            private readonly Graph Graph;
 
-            public GraphElementObserver(Graph graph)
+            /// <summary>
+            /// The observable this observer belongs to.
+            /// </summary>
+            private readonly Observable<T> BaseObservable;
+
+            public ProxyObserver(Observable<T> baseObservable)
             {
-                Graph = graph;
+                BaseObservable = baseObservable;
             }
 
             public void OnCompleted()
@@ -42,7 +36,7 @@ namespace SEE.DataModel.DG
 
             public void OnError(Exception error) => throw error;
 
-            public void OnNext(GraphEvent value) => Graph.Notify(value);
+            public void OnNext(T value) => BaseObservable.Notify(value);
 
             /// <summary>
             /// Disposes all <see cref="Disposables"/>, thereby unsubscribing from all observables.
@@ -53,6 +47,7 @@ namespace SEE.DataModel.DG
                 {
                     disposable.Dispose();
                 }
+
                 Disposables.Clear();
             }
 

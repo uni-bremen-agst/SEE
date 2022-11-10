@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
 namespace SEE.Game
@@ -64,9 +66,19 @@ namespace SEE.Game
                 else
                 {
                     MorphParentIfNecessary(deletedObject);
+                    if (deletedNode.IsInArchitecture())
+                    {
+                        // We first need to remove any mapping that exists to this architecture node.
+                        // This triggers the `ReflexionVisualization` observer.
+                        // If we didn't do this, the implementation node (whose GameObject descends deletedObject)
+                        // would also get deleted along with the architecture node.
+                        deletedNode.Incomings.Where(x => x.HasSupertypeOf(ReflexionGraph.MapsToType)).ToList()
+                                   .ForEach(deletedNode.ItsGraph.RemoveEdge);
+                    }
                     // Note: DeleteTree(deletedObject) assumes that the nodes are still
                     // in the underlying graph, that is why we must call deletedNode.DeleteTree()
                     // after DeleteTree(deletedObject).
+                    // TODO: Rather than call DeleteTree, this executor should subscribe as an observer to the Graph.
                     ISet<GameObject> deletedGameObjects = DeleteTree(deletedObject);
                     SubgraphMemento subgraphMemento = deletedNode.DeleteTree();
                     return (subgraphMemento, deletedGameObjects);

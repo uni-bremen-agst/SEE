@@ -34,7 +34,7 @@ namespace SEE.DataModel
         /// <param name="edge">the edge being added or removed</param>
         /// <param name="change">the type of change to <paramref name="edge"/></param>
         /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph, change)
+        public EdgeEvent(Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? edge.GetSubgraph(), change)
         {
             Edge = edge;
         }
@@ -60,7 +60,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Child;
 
-        public HierarchyEvent(Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph, change)
+        public HierarchyEvent(Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? child.GetSubgraph(), change)
         {
             if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
             {
@@ -87,7 +87,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Node;
 
-        public NodeEvent(Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph, change)
+        public NodeEvent(Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? node.GetSubgraph(), change)
         {
             if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
             {
@@ -103,19 +103,47 @@ namespace SEE.DataModel
     /// <summary>
     /// An event fired when an attribute in a graph element is changed.
     /// </summary>
-    /// <typeparam name="T">type of the attribute value</typeparam>
-    public class AttributeEvent<T> : GraphEvent
+    public interface IAttributeEvent
     {
         /// <summary>
         /// The attributable (i.e., graph element) whose attribute was changed.
         /// </summary>
-        public readonly Attributable Attributable;
+        public Attributable Attributable
+        {
+            get;
+        }
 
         /// <summary>
         /// The name of the attribute that was changed.
         /// </summary>
-        public readonly string AttributeName;
+        public string AttributeName
+        {
+            get;
+        }
+    }
 
+    /// <summary>
+    /// An event fired when an attribute in a graph element is changed.
+    /// </summary>
+    /// <typeparam name="T">type of the attribute value</typeparam>
+    public class AttributeEvent<T> : GraphEvent, IAttributeEvent
+    {
+        /// <summary>
+        /// The attributable (i.e., graph element) whose attribute was changed.
+        /// </summary>
+        public Attributable Attributable
+        {
+            get;
+        }
+
+        /// <summary>
+        /// The name of the attribute that was changed.
+        /// </summary>
+        public string AttributeName
+        {
+            get;
+        }
+        
         /// <summary>
         /// The value of the changed attribute.
         /// Will be <c>null</c> either if the attribute has been unset, or if it is a toggle attribute.

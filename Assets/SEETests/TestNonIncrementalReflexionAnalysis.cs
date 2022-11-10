@@ -2,7 +2,7 @@
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
+using static SEE.Tools.ReflexionAnalysis.ReflexionGraph;
 
 namespace SEE.Tools.Architecture
 {
@@ -82,21 +82,21 @@ namespace SEE.Tools.Architecture
         private void SetNodes()
         {
             // implementation nodes
-            n1 = fullGraph.GetNode("n1");
-            n1_c1 = fullGraph.GetNode("n1_c1");
-            n1_c2 = fullGraph.GetNode("n1_c2");
-            n1_c1_c1 = fullGraph.GetNode("n1_c1_c1");
-            n1_c1_c2 = fullGraph.GetNode("n1_c1_c2");
-            n2 = fullGraph.GetNode("n2");
-            n2_c1 = fullGraph.GetNode("n2_c1");
-            n3 = fullGraph.GetNode("n3");
+            n1 = graph.GetNode("n1");
+            n1_c1 = graph.GetNode("n1_c1");
+            n1_c2 = graph.GetNode("n1_c2");
+            n1_c1_c1 = graph.GetNode("n1_c1_c1");
+            n1_c1_c2 = graph.GetNode("n1_c1_c2");
+            n2 = graph.GetNode("n2");
+            n2_c1 = graph.GetNode("n2_c1");
+            n3 = graph.GetNode("n3");
             // architecture nodes
-            N1 = fullGraph.GetNode("N1");
-            N1_C1 = fullGraph.GetNode("N1_C1");
-            N1_C2 = fullGraph.GetNode("N1_C2");
-            N2 = fullGraph.GetNode("N2");
-            N2_C1 = fullGraph.GetNode("N2_C1");
-            N3 = fullGraph.GetNode("N3");
+            N1 = graph.GetNode("N1");
+            N1_C1 = graph.GetNode("N1_C1");
+            N1_C2 = graph.GetNode("N1_C2");
+            N2 = graph.GetNode("N2");
+            N2_C1 = graph.GetNode("N2_C1");
+            N3 = graph.GetNode("N3");
         }
 
         /// <summary>
@@ -136,8 +136,7 @@ namespace SEE.Tools.Architecture
             AddImplementationNodeHierarchy();
             AddArchitecture();
             AddMapping();
-            reflexion = new Reflexion(fullGraph);
-            reflexion.Subscribe(this);
+            graph.Subscribe(this);
             SetNodes();
         }
 
@@ -256,9 +255,9 @@ namespace SEE.Tools.Architecture
         private void AddCallGraph()
         {
             AddImplementationNodeHierarchy();
-            n1 = fullGraph.GetNode("n1");
-            n2 = fullGraph.GetNode("n2");
-            n3 = fullGraph.GetNode("n3");
+            n1 = graph.GetNode("n1");
+            n2 = graph.GetNode("n2");
+            n3 = graph.GetNode("n3");
             NewEdge(n1, n2, call);
             NewEdge(n2, n3, call);
             NewEdge(n2, n3, call);
@@ -271,7 +270,7 @@ namespace SEE.Tools.Architecture
         private void CommonImplicitlyAllowed(Node fromImpl, Node toImpl)
         {
             // 1 propagated edge
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 1 implicitly allowed propagated dependency
             Assert.That(IsImplicitlyAllowed(fromImpl, toImpl, call));
@@ -284,7 +283,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -292,7 +291,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency between siblings not mapped
             NewEdge(n1_c1_c1, n1_c1_c2, call);
-            reflexion.Run();
+            graph.Run();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1_c2);
         }
@@ -302,7 +301,7 @@ namespace SEE.Tools.Architecture
         {
             // self dependency for node not mapped
             NewEdge(n1_c1_c1, n1_c1_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1_c1);
         }
@@ -312,7 +311,7 @@ namespace SEE.Tools.Architecture
         {
             // self dependency for node mapped
             NewEdge(n1_c1, n1_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             CommonImplicitlyAllowed(n1_c1, n1_c1);
         }
@@ -322,7 +321,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency to parent where source is not mapped and target is mapped
             NewEdge(n1_c1_c1, n1_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1);
         }
@@ -334,7 +333,7 @@ namespace SEE.Tools.Architecture
         private void CommonHierarchyAccess()
         {
             // 1 propagated edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 4 absences
             Assert.That(IsAbsent(N2, N1, call));
@@ -345,7 +344,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -353,7 +352,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency to parent where source and target are mapped explicitly
             NewEdge(n1_c1, n1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1, n1, call));
@@ -366,7 +365,7 @@ namespace SEE.Tools.Architecture
             // dependency to parent where source is not mapped explicitly but
             // target is mapped explicitly
             NewEdge(n1_c1_c1, n1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1_c1, n1, call));
@@ -378,7 +377,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency from parent to child where both are mapped explicitly
             NewEdge(n1_c1, n1_c1_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1, n1_c1_c1, call));
@@ -390,7 +389,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency from parent to child where both are mapped explicitly
             NewEdge(n1, n1_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 disallowed propagated dependencies
             Assert.That(IsDivergent(n1, n1_c1, call));
@@ -411,10 +410,10 @@ namespace SEE.Tools.Architecture
             NewEdge(n2, n1_c2, call);
             NewEdge(n3, n2_c1, call);
             NewEdge(n3, n1_c2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 4 propagated edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(4, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 4 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -434,17 +433,17 @@ namespace SEE.Tools.Architecture
             
             AssertEventCountEquals<EdgeChange>(9);
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         [Test]
         public void TestConvergences2()
         {
             NewEdge(n2, n1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 propagated edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 1 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -457,13 +456,13 @@ namespace SEE.Tools.Architecture
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         private void CommonTestConvergences345()
         {
             // 1 propagated edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 1 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -474,14 +473,14 @@ namespace SEE.Tools.Architecture
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         [Test]
         public void TestConvergences3()
         {
             NewEdge(n2_c1, n1_c2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1_c2, call));
@@ -493,7 +492,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences4()
         {
             NewEdge(n2_c1, n1_c1_c2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1_c1_c2, call));
@@ -505,7 +504,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences5()
         {
             NewEdge(n2_c1, n1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1, call));
@@ -520,7 +519,7 @@ namespace SEE.Tools.Architecture
         private void CommonAbsences(int divergences = 1)
         {
             // 1 propagated edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(1, ChangeType.Addition);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
 
             // 4 absences
             Assert.That(IsAbsent(N2, N1, call));
@@ -531,14 +530,14 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(4 + divergences);
 
             // 0 removed edges
-            AssertEventCountEquals<PropagatedEdgeEvent>(0, ChangeType.Removal);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
         }
 
         [Test]
         public void TestDivergences1()
         {
             NewEdge(n1, n2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1, n2, call));
@@ -550,7 +549,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences2()
         {
             NewEdge(n1_c1, n2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c1, n2, call));
@@ -563,7 +562,7 @@ namespace SEE.Tools.Architecture
         {
             NewEdge(n1_c1_c1, n2, call);
             NewEdge(n1_c1_c2, n2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 2 divergent propagated dependencies
             Assert.That(IsDivergent(n1_c1_c1, n2, call));
@@ -576,7 +575,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences4()
         {
             NewEdge(n1, n2_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1, n2_c1, call));
@@ -588,7 +587,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences5()
         {
             NewEdge(n1_c2, n2_c1, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c2, n2_c1, call));
@@ -601,7 +600,7 @@ namespace SEE.Tools.Architecture
         {
             NewEdge(n1_c1_c1, n1_c2, call);
             NewEdge(n1_c1_c2, n1_c2, call);
-            reflexion.Run();
+            graph.Run();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c1_c1, n1_c2, call));
