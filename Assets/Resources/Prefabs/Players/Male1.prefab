@@ -219,6 +219,193 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &4684311457949691341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3644073781139563347}
+  - component: {fileID: 3302195401949089034}
+  m_Layer: 0
+  m_Name: UMARenderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3644073781139563347
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4684311457949691341}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5742082173774747445}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!137 &3302195401949089034
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4684311457949691341}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 3
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_SkinnedMotionVectors: 1
+  m_Mesh: {fileID: 0}
+  m_Bones:
+  - {fileID: 8404349698061127485}
+  - {fileID: 8404349697971345942}
+  - {fileID: 8404349699348169182}
+  - {fileID: 8404349698153359833}
+  - {fileID: 8404349698697664529}
+  - {fileID: 8404349697627523535}
+  - {fileID: 8404349698206741245}
+  - {fileID: 8404349698442971210}
+  - {fileID: 8404349699369202696}
+  - {fileID: 8404349698926719683}
+  - {fileID: 8404349699049783373}
+  - {fileID: 8404349698482461594}
+  - {fileID: 8404349698852964198}
+  - {fileID: 8404349697760262535}
+  - {fileID: 8404349697880001097}
+  - {fileID: 8404349697376183441}
+  - {fileID: 8404349698349972246}
+  - {fileID: 8404349697692146953}
+  - {fileID: 8404349697287574741}
+  - {fileID: 8404349699058344045}
+  - {fileID: 8404349697563041714}
+  - {fileID: 8404349697484394648}
+  - {fileID: 8404349697688961273}
+  - {fileID: 8404349699146017551}
+  - {fileID: 8404349697881603392}
+  - {fileID: 8404349697606265339}
+  - {fileID: 8404349698765713811}
+  - {fileID: 8404349698724243356}
+  - {fileID: 8404349697261002381}
+  - {fileID: 8404349699067256996}
+  - {fileID: 8404349699179918077}
+  - {fileID: 8404349697597072787}
+  - {fileID: 8404349698936031637}
+  - {fileID: 8404349698537255885}
+  - {fileID: 8404349697278163275}
+  - {fileID: 8404349698073049538}
+  - {fileID: 8404349699063291485}
+  - {fileID: 8404349697779816725}
+  - {fileID: 8404349698113556132}
+  - {fileID: 8404349698533100300}
+  - {fileID: 8404349699361809912}
+  - {fileID: 8404349697600719436}
+  - {fileID: 8404349698140624526}
+  - {fileID: 8404349697796999264}
+  - {fileID: 8404349698974655911}
+  - {fileID: 8404349698196598584}
+  - {fileID: 8404349697621878712}
+  - {fileID: 8404349699313090920}
+  - {fileID: 8404349697767289027}
+  - {fileID: 8404349698105499794}
+  - {fileID: 8404349697646395999}
+  - {fileID: 8404349698926262030}
+  - {fileID: 8404349697870496076}
+  - {fileID: 8404349698648084774}
+  - {fileID: 8404349697837383135}
+  - {fileID: 8404349699295090235}
+  - {fileID: 8404349697445358221}
+  - {fileID: 8404349698342861577}
+  - {fileID: 8404349698949714455}
+  - {fileID: 8404349697931105701}
+  - {fileID: 8404349698064715941}
+  - {fileID: 8404349697853246909}
+  - {fileID: 8404349698775276827}
+  - {fileID: 8404349697287108136}
+  - {fileID: 8404349697387774952}
+  - {fileID: 8404349697842802812}
+  - {fileID: 8404349698210435243}
+  - {fileID: 8404349697771599041}
+  - {fileID: 8404349697394243533}
+  - {fileID: 8404349699057201379}
+  - {fileID: 8404349698804980617}
+  - {fileID: 8404349699277378466}
+  - {fileID: 8404349698770947991}
+  - {fileID: 8404349698845486962}
+  - {fileID: 8404349699334116787}
+  - {fileID: 8404349698846694692}
+  - {fileID: 8404349697597157022}
+  - {fileID: 8404349698870711568}
+  - {fileID: 8404349698089622902}
+  - {fileID: 8404349697267946966}
+  - {fileID: 8404349699189940281}
+  - {fileID: 8404349697736080520}
+  - {fileID: 8404349697534768302}
+  - {fileID: 8404349698459792278}
+  - {fileID: 8404349698261884432}
+  - {fileID: 8404349699237317569}
+  - {fileID: 8404349698733313082}
+  - {fileID: 8404349698238641550}
+  - {fileID: 8404349697849231959}
+  - {fileID: 8404349699365757542}
+  - {fileID: 8404349698819314412}
+  - {fileID: 8404349698391482984}
+  - {fileID: 8404349699382962825}
+  - {fileID: 8404349697658758796}
+  - {fileID: 8404349698024742443}
+  - {fileID: 8404349698878044648}
+  - {fileID: 8404349699142923724}
+  - {fileID: 8404349698286352056}
+  - {fileID: 8404349698499262399}
+  - {fileID: 8404349698288735012}
+  - {fileID: 8404349697326063770}
+  - {fileID: 8404349697280948485}
+  - {fileID: 8404349699003204962}
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 0}
+  m_AABB:
+    m_Center: {x: 0.020773932, y: 0.845868, z: 0.16055913}
+    m_Extent: {x: 0.37678474, y: 0.9712465, z: 0.5293873}
+  m_DirtyAABB: 0
 --- !u!1 &5742082173775082023
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,7 +438,8 @@ GameObject:
   - component: {fileID: 3788740111477233866}
   - component: {fileID: 3531842660520793191}
   - component: {fileID: 3766411869251678112}
-  - component: {fileID: 5301299954215587370}
+  - component: {fileID: 7020772196844016858}
+  - component: {fileID: 7589102976768347017}
   m_Layer: 0
   m_Name: Male1
   m_TagString: Untagged
@@ -272,7 +460,7 @@ Transform:
   m_Children:
   - {fileID: 8404349698636673230}
   - {fileID: 6027063460069805855}
-  - {fileID: 835195348295637816}
+  - {fileID: 3644073781139563347}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -289,7 +477,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   context: {fileID: 0}
-  umaData: {fileID: 5301299954215587370}
+  umaData: {fileID: 7020772196844016858}
   defaultRendererAsset: {fileID: 0}
   umaRecipe: {fileID: 11400000, guid: 812bdfd823b789145a41e3e5a7997d33, type: 2}
   umaAdditionalRecipes: []
@@ -898,6 +1086,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -938,6 +1127,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1184,6 +1374,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1224,6 +1415,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1264,6 +1456,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1304,6 +1497,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1344,6 +1538,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1384,6 +1579,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1424,6 +1620,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1464,6 +1661,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1504,6 +1702,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1706,6 +1905,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1746,6 +1946,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1786,6 +1987,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1826,6 +2028,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1866,6 +2069,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1906,6 +2110,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1946,6 +2151,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2126,6 +2332,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2166,6 +2373,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2206,6 +2414,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2246,6 +2455,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2286,6 +2496,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2326,6 +2537,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2440,6 +2652,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2480,6 +2693,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2520,6 +2734,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2722,6 +2937,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2762,6 +2978,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2802,6 +3019,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2842,6 +3060,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2882,6 +3101,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2922,6 +3142,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2962,6 +3183,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3142,6 +3364,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3182,6 +3405,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3222,6 +3446,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3262,6 +3487,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3302,6 +3528,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3342,6 +3569,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3490,6 +3718,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3530,6 +3759,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3570,6 +3800,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3715,6 +3946,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3755,6 +3987,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3795,6 +4028,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3835,6 +4069,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3958,6 +4193,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3998,6 +4234,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4038,6 +4275,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4161,6 +4399,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4201,6 +4440,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4241,6 +4481,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4364,6 +4605,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4404,6 +4646,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4444,6 +4687,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4545,6 +4789,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4585,6 +4830,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4686,6 +4932,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4726,6 +4973,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4871,6 +5119,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4911,6 +5160,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4951,6 +5201,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4991,6 +5242,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5033,7 +5285,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -5228,6 +5480,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5299,6 +5552,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5380,6 +5634,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5451,6 +5706,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5639,7 +5895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 5742082173775082021}
---- !u!114 &5301299954215587370
+--- !u!114 &7020772196844016858
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5652,7 +5908,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderers:
-  - {fileID: 6791955751993965844}
+  - {fileID: 3302195401949089034}
   umaGenerator: {fileID: 0}
   atlasResolutionScale: 1
   isMeshDirty: 0
@@ -5890,193 +6146,20 @@ MonoBehaviour:
   characterHeight: 2
   characterRadius: 0.25
   characterMass: 50
---- !u!1 &5841545217062042637
-GameObject:
+--- !u!114 &7589102976768347017
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 835195348295637816}
-  - component: {fileID: 6791955751993965844}
-  m_Layer: 0
-  m_Name: UMARenderer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &835195348295637816
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5841545217062042637}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 5742082173774747445}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &6791955751993965844
-SkinnedMeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5841545217062042637}
+  m_GameObject: {fileID: 5742082173775082023}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 3
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 0}
-  - {fileID: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  serializedVersion: 2
-  m_Quality: 0
-  m_UpdateWhenOffscreen: 0
-  m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 0}
-  m_Bones:
-  - {fileID: 8404349698061127485}
-  - {fileID: 8404349697971345942}
-  - {fileID: 8404349699348169182}
-  - {fileID: 8404349698153359833}
-  - {fileID: 8404349698697664529}
-  - {fileID: 8404349697627523535}
-  - {fileID: 8404349698206741245}
-  - {fileID: 8404349698442971210}
-  - {fileID: 8404349699369202696}
-  - {fileID: 8404349698926719683}
-  - {fileID: 8404349699049783373}
-  - {fileID: 8404349698482461594}
-  - {fileID: 8404349698852964198}
-  - {fileID: 8404349697760262535}
-  - {fileID: 8404349697880001097}
-  - {fileID: 8404349697376183441}
-  - {fileID: 8404349698349972246}
-  - {fileID: 8404349697692146953}
-  - {fileID: 8404349697287574741}
-  - {fileID: 8404349699058344045}
-  - {fileID: 8404349697563041714}
-  - {fileID: 8404349697484394648}
-  - {fileID: 8404349697688961273}
-  - {fileID: 8404349699146017551}
-  - {fileID: 8404349697881603392}
-  - {fileID: 8404349697606265339}
-  - {fileID: 8404349698765713811}
-  - {fileID: 8404349698724243356}
-  - {fileID: 8404349697261002381}
-  - {fileID: 8404349699067256996}
-  - {fileID: 8404349699179918077}
-  - {fileID: 8404349697597072787}
-  - {fileID: 8404349698936031637}
-  - {fileID: 8404349698537255885}
-  - {fileID: 8404349697278163275}
-  - {fileID: 8404349698073049538}
-  - {fileID: 8404349699063291485}
-  - {fileID: 8404349697779816725}
-  - {fileID: 8404349698113556132}
-  - {fileID: 8404349698533100300}
-  - {fileID: 8404349699361809912}
-  - {fileID: 8404349697600719436}
-  - {fileID: 8404349698140624526}
-  - {fileID: 8404349697796999264}
-  - {fileID: 8404349698974655911}
-  - {fileID: 8404349698196598584}
-  - {fileID: 8404349697621878712}
-  - {fileID: 8404349699313090920}
-  - {fileID: 8404349697767289027}
-  - {fileID: 8404349698105499794}
-  - {fileID: 8404349697646395999}
-  - {fileID: 8404349698926262030}
-  - {fileID: 8404349697870496076}
-  - {fileID: 8404349698648084774}
-  - {fileID: 8404349697837383135}
-  - {fileID: 8404349699295090235}
-  - {fileID: 8404349697445358221}
-  - {fileID: 8404349698342861577}
-  - {fileID: 8404349698949714455}
-  - {fileID: 8404349697931105701}
-  - {fileID: 8404349698064715941}
-  - {fileID: 8404349697853246909}
-  - {fileID: 8404349698775276827}
-  - {fileID: 8404349697287108136}
-  - {fileID: 8404349697387774952}
-  - {fileID: 8404349697842802812}
-  - {fileID: 8404349698210435243}
-  - {fileID: 8404349697771599041}
-  - {fileID: 8404349697394243533}
-  - {fileID: 8404349699057201379}
-  - {fileID: 8404349698804980617}
-  - {fileID: 8404349699277378466}
-  - {fileID: 8404349698770947991}
-  - {fileID: 8404349698845486962}
-  - {fileID: 8404349699334116787}
-  - {fileID: 8404349698846694692}
-  - {fileID: 8404349697597157022}
-  - {fileID: 8404349698870711568}
-  - {fileID: 8404349698089622902}
-  - {fileID: 8404349697267946966}
-  - {fileID: 8404349699189940281}
-  - {fileID: 8404349697736080520}
-  - {fileID: 8404349697534768302}
-  - {fileID: 8404349698459792278}
-  - {fileID: 8404349698261884432}
-  - {fileID: 8404349699237317569}
-  - {fileID: 8404349698733313082}
-  - {fileID: 8404349698238641550}
-  - {fileID: 8404349697849231959}
-  - {fileID: 8404349699365757542}
-  - {fileID: 8404349698819314412}
-  - {fileID: 8404349698391482984}
-  - {fileID: 8404349699382962825}
-  - {fileID: 8404349697658758796}
-  - {fileID: 8404349698024742443}
-  - {fileID: 8404349698878044648}
-  - {fileID: 8404349699142923724}
-  - {fileID: 8404349698286352056}
-  - {fileID: 8404349698499262399}
-  - {fileID: 8404349698288735012}
-  - {fileID: 8404349697326063770}
-  - {fileID: 8404349697280948485}
-  - {fileID: 8404349699003204962}
-  m_BlendShapeWeights: []
-  m_RootBone: {fileID: 0}
-  m_AABB:
-    m_Center: {x: 0.020773932, y: 0.845868, z: 0.16055913}
-    m_Extent: {x: 0.37678474, y: 0.9712465, z: 0.5293873}
-  m_DirtyAABB: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f6d745d46210a49a0df9fe7d0d1102, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnableLip: 1
+  EnableLipVersion: 1
 --- !u!1 &8404349697261002380
 GameObject:
   m_ObjectHideFlags: 0
