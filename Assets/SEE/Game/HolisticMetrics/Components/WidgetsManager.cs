@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.Components
     /// <summary>
     /// This class manages a holistic metrics board.
     /// </summary>
-    internal class WidgetsManager : MonoBehaviour, IObserver<GraphEvent>
+    internal class WidgetsManager : MonoBehaviour, IObserver<ChangeEvent>
     {
         /// <summary>
         /// The dropdown UI element that allows the player to select a code city for which the metrics should be
@@ -345,7 +345,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// will trigger that the metrics get recalculated.
         /// </summary>
         /// <param name="value">The GraphEvent that occured. This is not being used.</param>
-        public void OnNext(GraphEvent value)
+        public void OnNext(ChangeEvent value)
         {
             Redraw();
         }
