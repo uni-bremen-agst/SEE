@@ -153,8 +153,7 @@ namespace SEE.Controls
                 cameraState.Yaw += x;
                 cameraState.Pitch -= y;
                 // locks the camera, so the player can look up and down, but can't fully rotate the camera.
-                if (cameraState.Pitch > 90) cameraState.Pitch = 90;
-                if (cameraState.Pitch < -90) cameraState.Pitch = -90;
+                cameraState.Pitch = Mathf.Clamp(cameraState.Pitch, -90, 90);
             }
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;
