@@ -302,38 +302,33 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Whether the <see cref="gameObject"/> was mapped for the reflexion analysis.
-            /// If <c>false</c>, the <see cref="gameObject"/> was put onto a new parent
-            /// as a child.
-            /// </summary>
-            private bool grabbedObjectWasMapped;
-
-            /// <summary>
             /// Moves <paramref name="mappingTarget"/> onto the roof of <see cref="gameObject"/>
             /// visually and unmarks it as target. If <see cref="withinReflexionCity"/>,
             /// <see cref="gameObject"/> will be mapped onto <paramref name="mappingTarget"/>
-            /// using <see cref="ReflexionMapper.MapTo"/>; otherwise it will become a child
+            /// using <see cref="ReflexionMapper.SetParent"/>; otherwise it will become a child
             /// of <paramref name="mappingTarget"/> in both the game-node hierarchy and
             /// graph-node hierarchy.
             /// </summary>
             /// <param name="mappingTarget"></param>
             internal void Reparent(GameObject mappingTarget)
             {
-                newParent = mappingTarget;
                 GameNodeMover.PutOnAndFit(gameObject.transform, mappingTarget, originalParent.gameObject, originalLocalScale);
                 UnmarkAsTarget();
                 MarkAsTarget(mappingTarget.transform);
 
-                // The mapping is only possible if we are in a reflexion city.
-                if (withinReflexionCity)
+                if (mappingTarget != newParent)
                 {
-                    ReflexionMapper.MapTo(gameObject, mappingTarget);
-                    grabbedObjectWasMapped = true;
-                }
-                else
-                {
-                    GameNodeMover.SetParent(gameObject, mappingTarget);
-                    grabbedObjectWasMapped = false;
+                    newParent = mappingTarget;
+                    // The mapping is only possible if we are in a reflexion city
+                    // and the mapping target is not the root of the graph.
+                    if (withinReflexionCity && !mappingTarget.IsRoot())
+                    {
+                        ReflexionMapper.SetParent(gameObject, mappingTarget);
+                    }
+                    else
+                    {
+                        GameNodeMover.SetParent(gameObject, mappingTarget);
+                    }
                 }
             }
 
@@ -346,16 +341,16 @@ namespace SEE.Controls.Actions
             internal void UnReparent()
             {
                 UnmarkAsTarget();
-                if (withinReflexionCity)
+                if (gameObject.transform.parent.gameObject != originalParent.gameObject)
                 {
-                    if (grabbedObjectWasMapped)
+                    if (withinReflexionCity)
                     {
-                        ReflexionMapper.Unmap(gameObject);
+                        ReflexionMapper.SetParent(gameObject, originalParent.gameObject);
                     }
-                }
-                else
-                {
-                    GameNodeMover.SetParent(gameObject, originalParent.gameObject);
+                    else
+                    {
+                        GameNodeMover.SetParent(gameObject, originalParent.gameObject);
+                    }
                 }
                 RestoreOriginalAppearance();
             }
@@ -440,9 +435,7 @@ namespace SEE.Controls.Actions
                     // The grabbed object will be moved on the surface of a sphere with
                     // radius distanceToUser in the direction the user is pointing to.
                     Ray ray = Raycasting.UserPointsTo();
-                    Vector3 targetPosition = ray.origin + distanceToUser * ray.direction;
-                    Debug.Log($"Continuing dragging {grabbedObject.Name} to {targetPosition}.\n");
-                    grabbedObject.MoveTo(targetPosition);
+                    grabbedObject.MoveTo(ray.origin + distanceToUser * ray.direction);
                 }
 
                 // The grabbed node is not yet at its final destination. The user is still moving
@@ -453,7 +446,6 @@ namespace SEE.Controls.Actions
             }
             else if (grabbedObject.IsGrabbed) // dragging has ended
             {
-                Debug.Log($"Dragging of {grabbedObject.Name} finalized.\n");
                 // Finalize the action with the grabbed object.
                 grabbedObject.UnGrab();
                 // Action is finished.
