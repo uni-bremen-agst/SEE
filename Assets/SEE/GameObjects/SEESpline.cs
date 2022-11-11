@@ -292,11 +292,8 @@ namespace SEE.GO
                         meshRenderer.enabled = true;
                     }
 
-                    // TODO
-                    BSpline subSpline = spline;
-
-                    UpdateLineRenderer(subSpline);
-                    UpdateMesh(subSpline);
+                    UpdateLineRenderer();
+                    UpdateMesh();
                 }
                 needsUpdate = false;
             }
@@ -335,12 +332,13 @@ namespace SEE.GO
         /// <see cref="Component.gameObject"/> has no
         /// <see cref="LineRenderer"/> attached to it.
         /// </summary>
-        /// <param name="s">Spline to be rendered</param>
-        private void UpdateLineRenderer(BSpline s)
+        private void UpdateLineRenderer()
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                Vector3[] polyLine = TinySplineInterop.ListToVectors(s.Sample());
+                BSpline subSpline = CalculateSubSpline();
+                Vector3[] polyLine = TinySplineInterop.ListToVectors(subSpline.Sample());
+
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
                 lr.startColor = gradientColors.start;
@@ -354,9 +352,8 @@ namespace SEE.GO
         /// <see cref="LineRenderer"/> with the necessary mesh components
         /// (<see cref="MeshFilter"/>, <see cref="MeshCollider"/> etc.).
         /// </summary>
-        /// <param name="s">Spline to be rendered</param>
         /// <returns>The created or updated mesh</returns>
-        private Mesh CreateOrUpdateMesh(BSpline s)
+        private Mesh CreateOrUpdateMesh()
         {
             List<Vector3> vertices = new List<Vector3>();
             List<Vector3> normals = new List<Vector3>();
@@ -369,8 +366,9 @@ namespace SEE.GO
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            IList<double> rv = s.UniformKnotSeq((uint)tubularSegments + 1);
-            FrameSeq frames = s.ComputeRMF(rv);
+            BSpline subSpline = CalculateSubSpline();
+            IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = subSpline.ComputeRMF(rv);
 
             // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
@@ -454,15 +452,14 @@ namespace SEE.GO
                              mesh.tangents.Length != tangents.Count ||
                              mesh.uv.Length != uvs.Count ||
                              needsColorUpdate; // Or the color of the mesh has been changed.
-
             if (updateMaterial)
             {
                 mesh.Clear();
             }
             mesh.vertices = vertices.ToArray();
-            mesh.normals  = normals.ToArray();
+            mesh.normals = normals.ToArray();
             mesh.tangents = tangents.ToArray();
-            mesh.uv       = uvs.ToArray();
+            mesh.uv = uvs.ToArray();
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             if (!gameObject.TryGetComponent(out meshRenderer))
             {
@@ -526,7 +523,6 @@ namespace SEE.GO
         /// is then applied in the next frame (via <see cref="Update"/>). Or
         /// use <see cref="UpdateMesh"/> to update the mesh immediately.
         /// </summary>
-        /// <param name="s">Spline to be rendered</param>
         /// <returns>A mesh approximating <see cref="Spline"/></returns>
         public Mesh CreateMesh()
         {
@@ -535,8 +531,8 @@ namespace SEE.GO
                 return filter.mesh;
             }
 
-            BSpline subSpline = spline;
-            Mesh mesh = CreateOrUpdateMesh(subSpline);
+
+            Mesh mesh = CreateOrUpdateMesh();
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
                 // Glow effect depends on materials staying the same. We need to fully refresh it.
@@ -544,6 +540,23 @@ namespace SEE.GO
             }
             needsUpdate = false; // apparently
             return mesh;
+        }
+
+        /// <summary>
+        /// </summary>
+        private BSpline CalculateSubSpline()
+        {
+            // both knots at their final position
+            if (BSpline.KnotsEqual(0.0f, lowerKnot) &&
+                BSpline.KnotsEqual(upperKnot, 1.0f))
+            {
+                return spline;
+            }
+            else
+            {
+                // calculate subSpline
+                return spline;
+            }
         }
 
         /// <summary>
@@ -555,12 +568,11 @@ namespace SEE.GO
         /// attached to <see cref="Component.gameObject"/>; see
         /// <see cref="CreateMesh"/> for more details).
         /// </summary>
-        /// <param name="s">Spline to be rendered</param>
-        public void UpdateMesh(BSpline s)
+        public void UpdateMesh()
         {
             if (gameObject.TryGetComponent(out MeshFilter _))
             {
-                CreateOrUpdateMesh(s);
+                CreateOrUpdateMesh();
             }
             needsUpdate = false;
         }

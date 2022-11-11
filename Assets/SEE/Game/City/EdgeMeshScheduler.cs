@@ -143,7 +143,7 @@ namespace SEE.Game.City
                     spline.RadialSegments = selection.RadialSegments;
                 }
 
-                spline.CreateMesh(spline.Spline);
+                spline.CreateMesh();
             }
         }
 
