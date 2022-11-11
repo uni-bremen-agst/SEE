@@ -5119,7 +5119,6 @@ GameObject:
   - component: {fileID: 1325778995376249289}
   - component: {fileID: 1666691904679797262}
   - component: {fileID: 751018180438396974}
-  - component: {fileID: 5218295152278504058}
   m_Layer: 0
   m_Name: Male3
   m_TagString: Untagged
@@ -10946,20 +10945,6 @@ MonoBehaviour:
   characterHeight: 2
   characterRadius: 0.25
   characterMass: 50
---- !u!114 &5218295152278504058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7839154548958412681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41f6d745d46210a49a0df9fe7d0d1102, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EnableLip: 1
-  EnableLipVersion: 1
 --- !u!1 &9190443540630866186
 GameObject:
   m_ObjectHideFlags: 0

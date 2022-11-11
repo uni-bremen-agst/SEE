@@ -33,7 +33,6 @@ GameObject:
   - component: {fileID: 7545113140716339952}
   - component: {fileID: 7922671637628041527}
   - component: {fileID: 5778124897571073209}
-  - component: {fileID: 217412969417097626}
   m_Layer: 0
   m_Name: Female1
   m_TagString: Untagged
@@ -5793,20 +5792,6 @@ MonoBehaviour:
   characterHeight: 2
   characterRadius: 0.25
   characterMass: 50
---- !u!114 &217412969417097626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1592577805375857840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41f6d745d46210a49a0df9fe7d0d1102, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EnableLip: 1
-  EnableLipVersion: 1
 --- !u!1 &3248291353055371814
 GameObject:
   m_ObjectHideFlags: 0
