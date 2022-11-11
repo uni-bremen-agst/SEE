@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -21,17 +20,26 @@ namespace SEE.Game
         /// Maps <paramref name="mappingSource"/> onto <paramref name="mappingTarget"/> distinguishing
         /// the following four cases regarding to which domains <paramref name="mappingSource"/>
         /// and <paramref name="mappingTarget"/> belong to:
-        /// (1) implementation -> architecture: interpreted as an architecture mapping
+        /// (1) implementation -> architecture: interpreted as an architecture mapping,
+        /// i.e., <paramref name="mappingSource"/> is mapped onto <paramref name="mappingTarget"/>
+        /// in the architecture.
         /// (2) implementation -> implementation: interpreted as a restructuring in the implementation
         /// (3) architecture -> architecture: interpreted as a restructuring in the architecture
         /// (4) architecture -> implementation: makes no sense; will be ignored
+        ///
+        /// In cases (2)-(3), <paramref name="mappingSource"/> becomes a child graph node of
+        /// <paramref name="mappingTarget"/> in the underlying graph.
+        /// In cases (1)-(3), <paramref name="mappingSource"/> becomes a child game object of
+        /// <paramref name="mappingTarget"/>. In all theses cases, the reflexion data is updated.
         /// </summary>
         /// <param name="mappingSource">the node to be mapped</param>
         /// <param name="mappingTarget">the target which <paramref name="mappingSource"/> is mapped onto</param>
-        internal static void MapTo(GameObject mappingSource, GameObject mappingTarget)
+        /// <exception cref="Exception">thrown if <paramref name="mappingSource"/>
+        /// is not contained in a <see cref="SEEReflexionCity"/> of the graph nodes associated
+        /// with <paramref name="mappingSource"/> and <paramref name="mappingTarget"/> are not
+        /// contained in the same graph</exception>
+        internal static void SetParent(GameObject mappingSource, GameObject mappingTarget)
         {
-            Debug.Log($"MapTo({mappingSource.name} -> {mappingTarget.name})\n");
-
             SEEReflexionCity reflexionCity = mappingSource.ContainingCity<SEEReflexionCity>();
             if (reflexionCity == null)
             {
@@ -46,7 +54,7 @@ namespace SEE.Game
 
                 if (source.ItsGraph != target.ItsGraph)
                 {
-                    Debug.LogError("For a mapping, both nodes must be in the same graph.\n");
+                    throw new Exception("For a mapping, both nodes must be in the same graph.");
                 }
 
                 // implementation -> architecture
@@ -58,86 +66,46 @@ namespace SEE.Game
                     // another target, the previous mapping must be reverted and the
                     // node must be mapped onto the new target.
 
-                    if (!TryGetMapsToEdge(source, out Edge mapsToEdge))
-                    {
-                        // If there is no previous mapping, we can just map the node.
-                        Debug.Log($"Mapped {source.ID} onto {target.ID} as new.\n");
-                        reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
-                    }
-                    else // If there is a previous mapping.
-                    {
-                        // If the mapping hasn't changed, there is nothing to do.
-                        if (mapsToEdge.Target != target)
-                        {
-                            Debug.Log($"Remapped {source.ID} from {mapsToEdge.Target.ID} onto {target.ID} as new.\n");
-                            // The grabbed object was previously temporarily mapped onto another target.
-                            // The temporary mapping must be reverted.
-                            reflexionCity.ReflexionGraph.RemoveFromMapping(mapsToEdge);
-                            reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
-                        }
-                        else
-                        {
-                            Debug.Log($"Node {source.ID} was already mapped onto {target.ID}.\n");
-                        }
-                    }
+                    reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
+                    mappingSource.transform.SetParent(mappingTarget.transform);
                 }
                 // implementation -> implementation
                 else if (source.IsInImplementation() && target.IsInImplementation())
                 {
-                    Debug.Log($"Re-parenting {source.ID} onto {target.ID} in implementation.\n");
                     // This changes the node hierarchy in the implementation only.
                     reflexionCity.ReflexionGraph.UnparentInImplementation(source);
                     reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
+                    mappingSource.transform.SetParent(mappingTarget.transform);
                 }
                 // architecture -> architecture
                 else if (source.IsInArchitecture() && target.IsInArchitecture())
                 {
-                    Debug.Log($"Re-parenting {source.ID} onto {target.ID} in architecture.\n");
-                    // This changes the node hierarchy in the implementation only.
+                    // This changes the node hierarchy in the architecture only.
                     reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
                     reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
+                    mappingSource.transform.SetParent(mappingTarget.transform);
                 }
                 // architecture -> implementation: forbidden
                 else
                 {
-                    Debug.LogError($"Re-parenting architecture component {source.ID} onto implementation component {target.ID} is forbidden.\n");
+                    // Nothing to be done.
                 }
             }
         }
 
         /// <summary>
-        /// Removes the architecture mapping for <paramref name="gameNode"/>.
+        /// Returns true if there is an outgoing maps-to edge of
+        /// <paramref name="node"/>.  That edge will be set in the out
+        /// parameter <paramref name="mapsToEdge"/>. If no such edge
+        /// exists, <c>false</c> is returned and <paramref name="mapsToEdge"/>
+        /// will be <c>null</c>.
         /// </summary>
-        /// <param name="gameNode">a game object representing an implementation node that was
-        /// explicitly mapped onto an architecture node and whose mapping is to be removed</param>
-        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> is not contained
-        /// in a <see cref="SEEReflexionCity"/> or if does not represent a node or if has
-        /// zero or more than one explicit mappings</exception>
-        internal static void Unmap(GameObject gameNode)
-        {
-            Debug.Log($"Unmap({gameNode.name})\n");
-            SEEReflexionCity reflexionCity = gameNode.ContainingCity<SEEReflexionCity>();
-            if (reflexionCity == null)
-            {
-                throw new Exception($"The node {gameNode.name} to be unmapped is not contained in a {nameof(SEEReflexionCity)}.");
-            }
-            if (gameNode.TryGetNode(out Node node))
-            {
-                if (TryGetMapsToEdge(node, out Edge mapsTo))
-                {
-                    reflexionCity.ReflexionGraph.RemoveFromMapping(mapsTo);
-                }
-                else
-                {
-                    throw new Exception($"The node {node.ID} is not mapped.");
-                }
-            }
-            else
-            {
-                throw new Exception($"The object {gameNode.name} does not represent a node.");
-            }
-        }
-
+        /// <param name="node">node whose outgoing maps-to edge is requested</param>
+        /// <param name="mapsToEdge">the outgoing maps-to edge of <paramref name="node"/> or null</param>
+        /// <returns>true if and only if <paramref name="node"/> has a single
+        /// outgoing maps-to edge</returns>
+        /// <exception cref="Exception">thrown in case <paramref name="node"/> has more
+        /// than one outgoing maps-to edge</exception>
         private static bool TryGetMapsToEdge(Node node, out Edge mapsToEdge)
         {
             IEnumerable<Edge> mapsToEdges = node.OutgoingsOfType(ReflexionGraph.MapsToType);
