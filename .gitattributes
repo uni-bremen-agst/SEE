@@ -54,6 +54,7 @@ Assets/Nesalis[[:space:]]Games/** filter=lfs diff=lfs merge=lfs -text
 Assets/o3n/** filter=lfs diff=lfs merge=lfs -text
 Assets/Odin[[:space:]]Inspector/** filter=lfs diff=lfs merge=lfs -text
 Assets/OpenCVForUnity/** filter=lfs diff=lfs merge=lfs -text
+Assets/OpenCVForUnity/OpenCVForUnity.meta filter=lfs diff=lfs merge=lfs -text
 Assets/TextMesh[[:space:]]Pro/** filter=lfs diff=lfs merge=lfs -text
 Assets/TinySpline.dll/** filter=lfs diff=lfs merge=lfs -text
 Assets/Trailer/** filter=lfs diff=lfs merge=lfs -text
@@ -68,3 +69,4 @@ Assets/WispySky/** filter=lfs diff=lfs merge=lfs -text
 Assets/YughuesFreeMetalMaterials/** filter=lfs diff=lfs merge=lfs -text
 Assets/XR/** filter=lfs diff=lfs merge=lfs -text
 Assets/XRI/** filter=lfs diff=lfs merge=lfs -text
+
