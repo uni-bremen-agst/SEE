@@ -23,6 +23,7 @@
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using UnityEngine;
 using Valve.VR;
 using PlayerSettings = SEE.Controls.PlayerSettings;
@@ -53,7 +54,17 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Start()
         {
-            openAction = SteamVR_Actions._default?.OpenSettingsMenu;
+            if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
+            {
+                try
+                {
+                    openAction = SteamVR_Actions._default?.OpenSettingsMenu;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"VR is not working: {e.Message} {e.StackTrace}\n");
+                }
+            }
         }
 
         /// <summary>
