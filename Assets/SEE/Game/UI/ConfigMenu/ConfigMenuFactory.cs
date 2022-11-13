@@ -31,8 +31,9 @@ using PlayerSettings = SEE.Controls.PlayerSettings;
 namespace SEE.Game.UI.ConfigMenu
 {
     /// <summary>
-    /// The script responsible for constructing a config menu and modifying its runtime behavior,
-    /// e.g. hotkey handling to show/hide the menu.
+    /// The script is responsible for constructing a config menu to allow
+    /// the user to configure code cities. In addition, its runtime behavior
+    /// is modified, e.g. ,hotkey handling to show/hide the menu.
     ///
     /// This gets usually attached to a player (currently VR/Desktop).
     /// </summary>
@@ -45,9 +46,9 @@ namespace SEE.Game.UI.ConfigMenu
 
         private GameObject configMenuPrefab;
         private ConfigMenu configMenu;
+
         private void Awake()
         {
-
             configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
             BuildConfigMenu(ConfigMenu.DefaultEditableInstance(), false);
         }
@@ -104,7 +105,7 @@ namespace SEE.Game.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
+                    throw new NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
             }
         }
 
