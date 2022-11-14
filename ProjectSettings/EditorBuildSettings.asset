@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Empty.unity
     guid: 67f0e197243711742bebaeb3faad1a3c
   m_configObjects:
-    Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 351bfecbc61689d4c9c773c5d7ecb666, type: 2}
-    Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 6c0adfe4412ec65478203550e4aa7823, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ab503467b672b944faf19db21f3c55cc, type: 2}
+    Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 351bfecbc61689d4c9c773c5d7ecb666,
+      type: 2}
+    Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 6c0adfe4412ec65478203550e4aa7823,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ab503467b672b944faf19db21f3c55cc,
+      type: 2}

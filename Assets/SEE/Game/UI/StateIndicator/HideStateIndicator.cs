@@ -16,7 +16,7 @@ namespace SEE.Game.UI.StateIndicator
     public class HideStateIndicator : AbstractStateIndicator
     {
         /// <summary>
-        /// Sets the <see cref="Title"/>, <see cref="PREFAB"/>, and <see cref="StartText"/> 
+        /// Sets the <see cref="Title"/>, <see cref="PREFAB"/>, and <see cref="StartText"/>
         /// of this state indicator.
         /// </summary>
         private void Awake()
@@ -147,6 +147,7 @@ namespace SEE.Game.UI.StateIndicator
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeDone));
             pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(DescriptionDone));
+            pointerHelper.ExitEvent.AddListener(() => tooltipDone.Hide());
         }
 
         /// <summary>
@@ -168,7 +169,7 @@ namespace SEE.Game.UI.StateIndicator
             {
                 return;
             }
-            
+
             if(iconSpriteBack != null)
             {
                 buttonManager.buttonIcon = iconSpriteBack;
@@ -181,6 +182,7 @@ namespace SEE.Game.UI.StateIndicator
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeBack));
             pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(DescriptionBack));
+            pointerHelper.ExitEvent.AddListener(() => tooltipBack.Hide());
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace SEE.Game.UI.StateIndicator
         }
 
         /// <summary>
-        /// Sets <see cref="ConfirmCancel"/> to decide whether the selection was confirmed or cancelled. 
+        /// Sets <see cref="ConfirmCancel"/> to decide whether the selection was confirmed or cancelled.
         /// Then calls <see cref="Clicked"/> to trigger the listener.
         /// </summary>
         /// <param name="selectionType"></param>

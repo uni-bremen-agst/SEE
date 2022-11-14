@@ -119,7 +119,10 @@ namespace SEE.Controls
                 transform.position += velocity;
 
                 HandleRotation();
-                transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+                // Players Yaw
+                transform.rotation = Quaternion.Euler(0.0f, cameraState.Yaw, 0.0f);
+                // Cameras Pitch and Yaw
+                Camera.main.transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
             }
         }
 
@@ -149,6 +152,8 @@ namespace SEE.Controls
 
                 cameraState.Yaw += x;
                 cameraState.Pitch -= y;
+                // locks the camera, so the player can look up and down, but can't fully rotate the camera.
+                cameraState.Pitch = Mathf.Clamp(cameraState.Pitch, -90, 90);
             }
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;
