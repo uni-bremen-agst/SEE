@@ -132,5 +132,10 @@ UnityPlayer_s.debug
 
 # For Odin Inspector:  But keep the demo packages themselves.
 !/Assets/Plugins/Sirenix/Demos/*.unitypackage 
+
+# Git LFS
+lfs
+
+# Our own local files to be ignored.
 Data/Vcs2See/target/
 
