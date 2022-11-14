@@ -160,7 +160,7 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// If <paramref name="enable"/> is true, the user can close this menu
-        /// by not making any selectiion, that is, this menu can be closed by
+        /// by not making any selection, that is, this menu can be closed by
         /// the built-in mechanisms without triggering any action.
         /// Note: by default the user is offered a way to get out of this menu without
         /// making any selection.
