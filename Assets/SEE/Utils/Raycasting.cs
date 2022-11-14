@@ -189,7 +189,7 @@ namespace SEE.Utils
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
         ///
-        /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fails
+        /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fail
         /// and <c>false</c> will be returned.
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
@@ -198,11 +198,12 @@ namespace SEE.Utils
             InputSystemUIInputModule inputModule = EventSystem.current.currentInputModule as InputSystemUIInputModule;
             if (inputModule == null)
             {
-                Debug.LogError("Could not find input system UI module! Falling back to old detection for now.");
+                Debug.LogError("Could not find input system UI module! Falling back to old detection for now.\n");
                 return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
             }
             else
             {
+                Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
                 return lastGameObject != null && lastGameObject.layer == UI_LAYER
                                               && !ignoredUINames.Contains(lastGameObject.name);
