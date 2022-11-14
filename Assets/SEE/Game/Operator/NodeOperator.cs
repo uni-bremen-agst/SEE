@@ -119,17 +119,17 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Scales the node to the given <paramref name="newScale"/>, taking <paramref name="duration"/> seconds.
+        /// Scales the node to the given <paramref name="newLocalScale"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newScale">the desired new target scale, more precisely, factor by which the game object
+        /// <param name="newLocalScale">the desired new target scale, more precisely, factor by which the game object
         /// should be scaled relative to its parent (i.e., local scale)</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newScale, float duration)
+        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration)
         {
             updateEdgeLayoutDuration = duration;
-            return Scale.AnimateTo(newScale, duration);
+            return Scale.AnimateTo(newLocalScale, duration);
         }
 
         /// <summary>
