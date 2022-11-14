@@ -392,23 +392,40 @@ namespace SEE.Controls.Actions
                 new MoveNetAction(grabbedObject.name, targetPosition, duration).Execute();
             }
 
+            /// <summary>
+            /// Runs <see cref="GameNodeMover.PutOnAndFit"/> and propagates it to all clients.
+            /// </summary>
+            /// <param name="child">the child to be put on <paramref name="newParent"/></param>
+            /// <param name="newParent">new parent of <paramref name="child"/></param>
+            /// <param name="originalParent">original parent of <paramref name="child"/></param>
+            /// <param name="originalLocalScale">original local scale of <paramref name="child"/></param>
             private static void PutOnAndFit(GameObject child, GameObject newParent, GameObject originalParent, Vector3 originalLocalScale)
             {
                 GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, originalLocalScale);
                 new PutOnAndFitNetAction(child.name, newParent.name, originalParent.name, originalLocalScale).Execute();
             }
 
+            /// <summary>
+            /// Runs <see cref="ReflexionMapper.SetParent"/> and propagates it to all clients.
+            /// </summary>
+            /// <param name="child">the child to be put on <paramref name="parent"/></param>
+            /// <param name="parent">new parent of <paramref name="child"/></param>
             private static void ReflexionMapperSetParent(GameObject child, GameObject parent)
             {
                 ReflexionMapper.SetParent(child, parent);
-                // FIXME Net action
+                new SetParentNetAction(child.name, parent.name, true).Execute();
 
             }
 
+            /// <summary>
+            /// Runs <see cref="GameNodeMover.SetParent"/> and propagates it to all clients.
+            /// </summary>
+            /// <param name="child">the child to be put on <paramref name="parent"/></param>
+            /// <param name="parent">new parent of <paramref name="child"/></param>
             private static void GameNodeMoverSetParent(GameObject child, GameObject parent)
             {
                 GameNodeMover.SetParent(child, parent);
-                // FIXME Net action
+                new SetParentNetAction(child.name, parent.name, false).Execute();
             }
 
             #endregion Basic Scene Manipulators Propagated to all Clients
