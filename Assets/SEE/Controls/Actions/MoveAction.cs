@@ -5,9 +5,9 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions
             {
                 if (grabbedObject)
                 {
-                    MoveTo(originalWorldPosition, AnimationTime);
+                    MoveTo(grabbedObject, originalWorldPosition, AnimationTime);
                 }
             }
 
@@ -218,7 +218,7 @@ namespace SEE.Controls.Actions
             {
                 if (grabbedObject)
                 {
-                    MoveTo(currentPositionOfGrabbedObject, AnimationTime);
+                    MoveTo(grabbedObject, currentPositionOfGrabbedObject, AnimationTime);
                 }
             }
 
@@ -233,21 +233,8 @@ namespace SEE.Controls.Actions
                 if (grabbedObject)
                 {
                     currentPositionOfGrabbedObject = targetPosition;
-                    MoveTo(targetPosition, 0);
+                    MoveTo(grabbedObject, targetPosition, 0);
                 }
-            }
-
-            /// <summary>
-            /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
-            /// </summary>
-            /// <param name="targetPosition">the position where the grabbed object
-            /// should be moved in world space</param>
-            /// <param name="duration">the duration of the animation for moving the grabbed
-            /// object in seconds</param>
-            /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
-            private void MoveTo(Vector3 targetPosition, float duration)
-            {
-                GameNodeMover.MoveTo(grabbedObject, targetPosition, duration);
             }
 
             #region HitColor
@@ -344,7 +331,7 @@ namespace SEE.Controls.Actions
             /// <param name="target">the target node of the re-parenting</param>
             internal void Reparent(GameObject target)
             {
-                GameNodeMover.PutOnAndFit(grabbedObject.transform, target, originalParent.gameObject, originalLocalScale);
+                PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
                 UnmarkAsTarget();
                 MarkAsTarget(target.transform);
 
@@ -355,11 +342,11 @@ namespace SEE.Controls.Actions
                     // and the mapping target is not the root of the graph.
                     if (withinReflexionCity && !target.IsRoot())
                     {
-                        ReflexionMapper.SetParent(grabbedObject, target);
+                        ReflexionMapperSetParent(grabbedObject, target);
                     }
                     else
                     {
-                        GameNodeMover.SetParent(grabbedObject, target);
+                        GameNodeMoverSetParent(grabbedObject, target);
                     }
                 }
             }
@@ -379,15 +366,52 @@ namespace SEE.Controls.Actions
                 {
                     if (withinReflexionCity)
                     {
-                        ReflexionMapper.SetParent(grabbedObject, originalParent.gameObject);
+                        ReflexionMapperSetParent(grabbedObject, originalParent.gameObject);
                     }
                     else
                     {
-                        GameNodeMover.SetParent(grabbedObject, originalParent.gameObject);
+                        GameNodeMoverSetParent(grabbedObject, originalParent.gameObject);
                     }
                 }
                 RestoreOriginalAppearance();
             }
+
+            #region Basic Scene Manipulators Propagated to all Clients
+
+            /// <summary>
+            /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
+            /// </summary>
+            /// <param name="targetPosition">the position where the grabbed object
+            /// should be moved in world space</param>
+            /// <param name="duration">the duration of the animation for moving the grabbed
+            /// object in seconds</param>
+            /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
+            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float duration)
+            {
+                GameNodeMover.MoveTo(grabbedObject, targetPosition, duration);
+                new MoveNetAction(grabbedObject.name, targetPosition, duration).Execute();
+            }
+
+            private static void PutOnAndFit(GameObject child, GameObject newParent, GameObject originalParent, Vector3 originalLocalScale)
+            {
+                GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, originalLocalScale);
+                new PutOnAndFitNetAction(child.name, newParent.name, originalParent.name, originalLocalScale).Execute();
+            }
+
+            private static void ReflexionMapperSetParent(GameObject child, GameObject parent)
+            {
+                ReflexionMapper.SetParent(child, parent);
+                // FIXME Net action
+
+            }
+
+            private static void GameNodeMoverSetParent(GameObject child, GameObject parent)
+            {
+                GameNodeMover.SetParent(child, parent);
+                // FIXME Net action
+            }
+
+            #endregion Basic Scene Manipulators Propagated to all Clients
 
             /// <summary>
             /// Resets the marking of the target node and moves <see cref="grabbedObject"/>
@@ -403,6 +427,7 @@ namespace SEE.Controls.Actions
                 if (grabbedObject.TryGetComponent(out NodeOperator nodeOperator))
                 {
                     nodeOperator.ScaleTo(originalLocalScale, AnimationTime);
+                    // FIXME Net action
                 }
             }
         }
