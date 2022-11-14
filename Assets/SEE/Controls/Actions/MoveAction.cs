@@ -7,6 +7,7 @@ using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -292,6 +293,15 @@ namespace SEE.Controls.Actions
             internal void Undo()
             {
                 UnReparent();
+                /// The initial state is that the <see cref="grabbedObject"/>:
+                /// (1) has its <see cref="originalWorldPosition"/>
+                /// (2) has its <see cref="originalLocalScale"/>
+                /// (3) has its <see cref="originalParent"/>
+                /// (4) all side effects of re-parenting have been undone
+                Assert.AreEqual(originalWorldPosition, grabbedObject.transform.position);
+                Assert.AreEqual(originalLocalScale, grabbedObject.transform.localScale);
+                Assert.AreEqual(originalParent, grabbedObject.transform.parent);
+                Assert.AreEqual(originalParent.gameObject.GetNode(), grabbedObject.GetNode().Parent);
             }
 
             /// <summary>
