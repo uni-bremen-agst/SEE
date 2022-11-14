@@ -21,7 +21,7 @@ namespace SEE.Net.Actions
         public string NewParentID;
 
         /// <summary>
-        /// The unique name of the gameObject that becomes the new parent of the child.
+        /// The unique name of the gameObject that was the original parent of the child.
         /// Must be known to <see cref="GraphElementIDMap"/>.
         /// </summary>
         public string OriginalParentID;
@@ -32,29 +32,26 @@ namespace SEE.Net.Actions
         /// </summary>
         public Vector3 OriginalLocalScale;
 
-
-        /// <param name="child">game object to be put onto <paramref name="newParent"/></param>
-        /// <param name="newParent">where to put <paramref name="child"/></param>
-        /// <param name="originalParent">the original <paramref name="originalParent"/> of <paramref name="child"/></param>
-        /// <param name="originalLocalScale">original local scale of <paramref name="child"/> relative to
-        /// <paramref name="originalParent"/>; used to restore this scale if <paramref name="newParent"/>
-        /// and <paramref name="originalParent"/> are the same</param>
-        ///
-        /// <summary>
-        /// The duration of the movement animation in seconds.
-        /// </summary>
-        public float Duration;
-
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="childID">the unique game-object name of the game object to be moved;
+        /// <param name="childID">the unique game-object name of the game object of the child to
+        /// be put and fit onto the <paramref name="newParentID"/>;
         /// must be known to <see cref="GraphElementIDMap"/></param>
-        public PutOnAndFitNetAction(string childID, Vector3 originalLocalScale, float animationDuration)
+        /// <param name="newParentID">the unique game-object name of the game object becoming the
+        /// new parent of <paramref name="childID"/>;
+        /// must be known to <see cref="GraphElementIDMap"/></param>
+        /// <param name="originalParentID">the unique name of the gameObject that was the original
+        /// parent of the child;
+        /// must be known to <see cref="GraphElementIDMap"/>.</param>
+        /// <param name="originalLocalScale">the original local scale of <paramref name="childID"/>
+        /// relative to <paramref name="originalParentID"/></param>
+        public PutOnAndFitNetAction(string childID, string newParentID, string originalParentID, Vector3 originalLocalScale)
         {
             ChildID = childID;
+            NewParentID = newParentID;
+            OriginalParentID = originalParentID;
             OriginalLocalScale = originalLocalScale;
-            Duration = animationDuration;
         }
 
         /// <summary>
