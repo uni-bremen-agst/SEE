@@ -395,7 +395,7 @@ namespace SEE.Controls.Actions
             private static void PutOnAndFit(GameObject child, GameObject newParent, GameObject originalParent, Vector3 originalLocalScale)
             {
                 GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, originalLocalScale);
-                // FIXME net action
+                new PutOnAndFitNetAction(child.name, newParent.name, originalParent.name, originalLocalScale).Execute();
             }
 
             private static void ReflexionMapperSetParent(GameObject child, GameObject parent)
