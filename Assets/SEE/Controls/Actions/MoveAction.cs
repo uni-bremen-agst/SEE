@@ -289,23 +289,44 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Restores the original state of the grabbed object just before it was grabbed.
+            ///
+            /// The new state of <see cref="grabbedObject"/> after this call is its inital
+            /// state at the point in time when it was grabbed, i.e.
+            /// (1) has its <see cref="originalWorldPosition"/>
+            /// (2) has its <see cref="originalLocalScale"/>
+            /// (3) has its <see cref="originalParent"/>
+            /// (4) all side effects of re-parenting have been undone (e.g.,
+            /// the parent of the graph node associated with <see cref="grabbedObject"/>
+            /// is the graph node associated with <see cref="originalParent"/>;
+            /// there may be additional side effects of re-parenting, however,
+            /// triggered by the reflexion analysis; all of these are reverted).
+            ///
+            /// Important note: Some of these changes do not come into effect immediately.
+            /// They may be delayed by an animation duration.
             /// </summary>
             internal void Undo()
             {
                 UnReparent();
-                /// The initial state is that the <see cref="grabbedObject"/>:
-                /// (1) has its <see cref="originalWorldPosition"/>
-                /// (2) has its <see cref="originalLocalScale"/>
-                /// (3) has its <see cref="originalParent"/>
-                /// (4) all side effects of re-parenting have been undone
-                Assert.AreEqual(originalWorldPosition, grabbedObject.transform.position);
-                Assert.AreEqual(originalLocalScale, grabbedObject.transform.localScale);
-                Assert.AreEqual(originalParent, grabbedObject.transform.parent);
-                Assert.AreEqual(originalParent.gameObject.GetNode(), grabbedObject.GetNode().Parent);
             }
 
             /// <summary>
             /// Reverts <see cref="Undo"/>.
+            ///
+            /// The new state of <see cref="grabbedObject"/> after this call is its
+            /// state at the point in time just before <see cref="Undo"/> was called, i.e.
+            ///
+            /// (1) is put on the roof of <see cref="newParent"/> possibly scaled down to fit
+            /// at the world-space position <see cref="currentPositionOfGrabbedObject"/>
+            /// (2) has <see cref="newParent"/> as its game-object parent
+            /// (4) all side effects of re-parenting have been are in place (e.g.,
+            /// the parent of the graph node associated with <see cref="grabbedObject"/>
+            /// is the graph node associated with <see cref="newParent"/>
+            /// if both game nodes represent implementation entities; there may be other
+            /// side effects of re-parenting, however, triggered by the reflexion analysis;
+            /// all of these are in place).
+            ///
+            /// Important note: Some of these changes do not come into effect immediately.
+            /// They may be delayed by an animation duration.
             /// </summary>
             internal void Redo()
             {
@@ -370,7 +391,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Resets the marking of the target node and moves <see cref="grabbedObject"/>
-            /// back ot its <see cref="originalWorldPosition"/> and restores
+            /// back to its <see cref="originalWorldPosition"/> and restores
             /// its <see cref="originalLocalScale"/>.
             ///
             /// No changes are made to the game-node hierarchy or graph-node hierarchy.
