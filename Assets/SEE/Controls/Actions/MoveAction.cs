@@ -268,7 +268,7 @@ namespace SEE.Controls.Actions
                 if (markedGameObject)
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
-                    new HighlightNetAction(markedGameObject.name, false);
+                    new HighlightNetAction(markedGameObject.name, false).Execute();
                 }
             }
 
@@ -445,7 +445,7 @@ namespace SEE.Controls.Actions
                 {
                     float animationTime = AnimationTime;
                     nodeOperator.ScaleTo(originalLocalScale, animationTime);
-                    new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime);
+                    new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime).Execute();
                 }
             }
         }
