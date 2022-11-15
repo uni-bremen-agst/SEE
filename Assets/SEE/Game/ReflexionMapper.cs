@@ -38,6 +38,9 @@ namespace SEE.Game
         /// is not contained in a <see cref="SEEReflexionCity"/> of the graph nodes associated
         /// with <paramref name="mappingSource"/> and <paramref name="mappingTarget"/> are not
         /// contained in the same graph</exception>
+        /// <remarks>This method changes only the parentship in the game-object hierarchy
+        /// and the graph-node hierarchy and updates the reflexion data. It does not change
+        /// any visual attribute of either of the two nodes.</remarks>
         internal static void SetParent(GameObject mappingSource, GameObject mappingTarget)
         {
             SEEReflexionCity reflexionCity = mappingSource.ContainingCity<SEEReflexionCity>();
