@@ -132,6 +132,9 @@ namespace SEE.Game
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
         /// <param name="newParent">new parent</param>
+        /// <remarks>This method changes only the parentship in the game-object hierarchy
+        /// and the graph-node hierarchy. It does not change any visual attribute
+        /// of either of the two nodes.</remarks>
         public static void SetParent(GameObject child, GameObject newParent)
         {
             if (newParent != null)
@@ -270,9 +273,11 @@ namespace SEE.Game
         {
             if (gameObject.TryGetComponent(out NodeOperator nodeOperator))
             {
-                KillActiveAnimations(nodeOperator);
+                // FIXME: Why is this killing necessary. Do we need to re-enable it?
+                // KillActiveAnimations(nodeOperator);
                 nodeOperator.MoveTo(targetPosition, duration);
-                MorphEdgesToSplines(gameObject, duration);
+                // FIXME: Isn't that meanwhile handled by the NodeOperator? Do we need to re-enable it?
+                //MorphEdgesToSplines(gameObject, duration);
             }
 
             void KillActiveAnimations(NodeOperator nodeOperator)
