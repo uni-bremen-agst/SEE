@@ -47,7 +47,7 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Finds the GameObject on the Client and sets its scale and position
+        /// Finds the GameObject on the Client and sets its scale.
         /// </summary>
         protected override void ExecuteOnClient()
         {
