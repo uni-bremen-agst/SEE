@@ -198,11 +198,13 @@ namespace SEE.Game.Operator
                 //       having to use SEESpline as a wrapper.
                 Destroy(newEdge);
                 edgeOperator.MorphTo(targetSpline, duration);
+
+                // FIXME: We need to recurse into the children so that their edges are considered, too.
             }
 
             // Once we're done, we reset the gameObject to its original position.
             transform.position = oldPosition;
-            transform.localScale = oldScale;  // FIXME: This is suspicious. What if the node is scaled at the same time?
+            transform.localScale = oldScale;
         }
 
         private void OnEnable()
