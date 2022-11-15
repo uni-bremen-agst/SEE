@@ -202,7 +202,7 @@ namespace SEE.Game.Operator
 
             // Once we're done, we reset the gameObject to its original position.
             transform.position = oldPosition;
-            transform.localScale = oldScale;
+            transform.localScale = oldScale;  // FIXME: This is suspicious. What if the node is scaled at the same time?
         }
 
         private void OnEnable()
