@@ -59,6 +59,8 @@ Assets/OpenCVForUnity/** filter=lfs diff=lfs merge=lfs -text
 Assets/OpenCVForUnity/OpenCVForUnity.meta filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins/** filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/Sirenix/Odin[[:space:]]Validator/** filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/Sirenix/Odin[[:space:]]Validator.meta filter=lfs diff=lfs merge=lfs -text
 Assets/TextMesh[[:space:]]Pro/** filter=lfs diff=lfs merge=lfs -text
 Assets/TinySpline.dll/** filter=lfs diff=lfs merge=lfs -text
 Assets/Trailer/** filter=lfs diff=lfs merge=lfs -text
