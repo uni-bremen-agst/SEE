@@ -199,7 +199,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Returns the grabbed object to its original position when it was grabbed.
-            /// This method will called for Undo.
+            /// This method will be called for Undo.
             /// </summary>
             internal void MoveToOrigin()
             {
@@ -212,7 +212,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Returns the grabbed object to its last position before it was returned
             /// to its origin via <see cref="MoveToOrigin"/>.
-            /// This method will called for Redo.
+            /// This method will be called for Redo.
             /// </summary>
             private void MoveToLastUserRequestedPosition()
             {
@@ -257,7 +257,7 @@ namespace SEE.Controls.Actions
                 // (change its parent or attach it to another object), you need to call effect.Refresh()
                 // to make Highlight Plus update its internal data.
                 Highlighter.SetHighlight(markedGameObject, true);
-                // TODO: Propagate to all clients.
+                new HighlightNetAction(markedGameObject.name, true);
             }
 
             /// <summary>
@@ -268,7 +268,7 @@ namespace SEE.Controls.Actions
                 if (markedGameObject)
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
-                    // TODO: Propagate to all clients.
+                    new HighlightNetAction(markedGameObject.name, false);
                 }
             }
 
@@ -443,8 +443,9 @@ namespace SEE.Controls.Actions
                 MoveToOrigin();
                 if (grabbedObject.TryGetComponent(out NodeOperator nodeOperator))
                 {
-                    nodeOperator.ScaleTo(originalLocalScale, AnimationTime);
-                    // FIXME Net action
+                    float animationTime = AnimationTime;
+                    nodeOperator.ScaleTo(originalLocalScale, animationTime);
+                    new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime);
                 }
             }
         }
