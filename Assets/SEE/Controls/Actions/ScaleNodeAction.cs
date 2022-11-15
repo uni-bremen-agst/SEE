@@ -6,6 +6,7 @@ using System;
 using UnityEngine;
 using SEE.Net.Actions;
 using static SEE.Utils.Raycasting;
+using SEE.Game.Operator;
 
 namespace SEE.Controls.Actions
 {
@@ -176,8 +177,11 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be restored</param>
             public void Revert(GameObject gameObject)
             {
-                gameObject.SetScale(Scale);
-                gameObject.transform.position = Position;
+                if (gameObject.TryGetComponentOrLog(out NodeOperator nodeOperator))
+                {
+                    nodeOperator.ScaleTo(Scale, 0);
+                    nodeOperator.MoveTo(Position, 0);
+                }
             }
         }
 
@@ -209,7 +213,13 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             beforeAction.Revert(objectToScale);
-            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+            MoveAndScale();
+        }
+
+        private void MoveAndScale()
+        {
+            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
+            new MoveNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
         }
 
         /// <summary>
@@ -224,7 +234,7 @@ namespace SEE.Controls.Actions
                 // we need to re-do the action.
                 base.Redo();
                 afterAction.Revert(objectToScale);
-                new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+                MoveAndScale();
             }
         }
 
@@ -554,9 +564,8 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
+            MoveAndScale();
             currentState = ReversibleAction.Progress.InProgress;
-
-            new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
         /// <summary>
