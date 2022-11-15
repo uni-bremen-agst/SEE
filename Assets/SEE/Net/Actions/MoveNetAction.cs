@@ -45,15 +45,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-                if (gameObject != null)
-                {
-                    GameNodeMover.MoveTo(gameObject, TargetPosition, Duration);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-                }
+                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, Duration);
             }
         }
 
