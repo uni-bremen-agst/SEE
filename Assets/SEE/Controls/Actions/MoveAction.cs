@@ -89,7 +89,7 @@ namespace SEE.Controls.Actions
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
-                        interactableObject.SetGrab(true, true);
+                        interactableObject.SetGrab(grab: true, isInitiator: true);
                     }
                     // We need to know whether we are in a reflexion city in order to
                     // interpret the re-parenting of a node properly.
@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
                     UnmarkAsTarget();
                     if (grabbedObject.TryGetComponent(out InteractableObject interactableObject))
                     {
-                        interactableObject.SetGrab(false, true);
+                        interactableObject.SetGrab(grab: false, isInitiator: true) ;
                     }
                     IsGrabbed = false;
                     // Note: We do not set grabbedObject to null because we may need its
