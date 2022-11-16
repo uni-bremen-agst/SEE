@@ -6,7 +6,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for creating a new metrics board on all clients.
     /// </summary>
-    public class CreateBoardNetAction : AbstractNetAction
+    public class CreateBoardNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The board configuration of the new board.

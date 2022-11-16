@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for sending a request to all clients to change the city selection on a metrics board.
     /// </summary>
-    public class SwitchCityNetAction : AbstractNetAction
+    public class SwitchCityNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The name of the board on which to change the selection.
@@ -46,16 +46,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
-                if (widgetsManager != null)
-                {
-                    widgetsManager.SwitchCity(CityName);    
-                }
-                else
-                {
-                    Debug.LogError($"Could not find the metrics board with the name {BoardName}, so " +
-                                   "cannot change the city selection on it.\n");
-                }    
+                Find(BoardName).SwitchCity(CityName);
             }
         }
     }

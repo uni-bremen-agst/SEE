@@ -6,7 +6,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for changing the position and orientation of a metrics board on all clients.
     /// </summary>
-    public class MoveBoardNetAction : AbstractNetAction
+    public class MoveBoardNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The name of the board to move (this is unique and can identify a board).
