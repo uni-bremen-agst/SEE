@@ -24,7 +24,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         {
             get => id.GetValueOrDefault();
             set => id ??= value;  // In C# 9 this could be replaced by "init;".
-            
         }
         
         /// <summary>
@@ -34,6 +33,10 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The MetricValue to display</param>
         internal abstract void Display(MetricValue metricValue);
 
+        /// <summary>
+        /// Toggles that this widget can be moved.
+        /// </summary>
+        /// <param name="enable">Whether the moving should be enabled or disabled</param>
         internal void ToggleMoving(bool enable)
         {
             if (enable)

@@ -12,13 +12,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class implements a dialog that allows the player to configure a widget and then add it to a board.
     /// </summary>
-    internal class AddWidgetDialog
+    internal class AddWidgetDialog : HolisticMetricsDialog
     {
-        /// <summary>
-        /// The dialog GameObject of this dialog.
-        /// </summary>
-        private GameObject dialog;
-
         /// <summary>
         /// The property dialog of this dialog.
         /// </summary>
@@ -128,18 +123,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             ShowNotification.Info(
                 "Position the widget",
                 "Click on a metrics board where you want to position the widget.");
-        }
-        
-        /// <summary>
-        /// This method needs to be called when the dialog should be closed. It will close the dialog and reenable the
-        /// keyboard shortcuts.
-        /// </summary>
-        private void EnableKeyboardShortcuts()
-        {
-            // Destroy the dialog GameObject
-            Object.Destroy(dialog);
-            
-            SEEInput.KeyboardShortcutsEnabled = true;
         }
     }
 }
