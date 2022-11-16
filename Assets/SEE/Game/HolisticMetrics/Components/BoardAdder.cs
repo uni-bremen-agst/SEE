@@ -1,5 +1,5 @@
-using System.IO;
 using SEE.Game.UI.HolisticMetrics;
+using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -22,9 +22,10 @@ namespace SEE.Game.HolisticMetrics.Components
         private static bool addingDone;
 
         /// <summary>
-        /// The configuration of the board to be created. We should be getting this from the AddBoardDialog and we
-        /// expect it to only contain the name so far. In this component, the position will be added to it. Then we will
-        /// pass it on to the rotation dialog where the rotation will be added.
+        /// The configuration of the board to be created. We should be getting this from the
+        /// <see cref="AddBoardDialog"/> and we expect it to only contain the name so far. In this component, the
+        /// position will be added to it. Then we will pass it on to the rotation dialog where the rotation will be
+        /// added.
         /// </summary>
         private static BoardConfig boardConfiguration;
 
@@ -37,7 +38,8 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <summary>
         /// This sets up all BoardAdders when they are added to the scene to position a new metrics board.
         /// </summary>
-        /// <param name="boardConfigurationReference"></param>
+        /// <param name="boardConfigurationReference">The configuration of the board to be created, should only be the
+        /// name of the board at this point</param>
         internal static void Setup(BoardConfig boardConfigurationReference)
         {
             boardConfiguration = boardConfigurationReference;

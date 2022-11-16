@@ -167,6 +167,10 @@ namespace SEE.Game.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Toggles the move-ability of all widgets.
+        /// </summary>
+        /// <returns>Whether or not moving is activated now</returns>
         internal static bool ToggleWidgetsMoving()
         {
             widgetsMovingEnabled = !widgetsMovingEnabled;
@@ -178,7 +182,7 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Adds WidgetDeleter components to all widgets on all boards.
+        /// Adds <see cref="WidgetDeleter"/> components to all widgets on all boards.
         /// </summary>
         internal static void AddWidgetDeleters()
         {
