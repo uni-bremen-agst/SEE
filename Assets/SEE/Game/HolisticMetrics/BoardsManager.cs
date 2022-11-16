@@ -76,7 +76,7 @@ namespace SEE.Game.HolisticMetrics
             WidgetsManager widgetsManager = Find(boardName);
             if (widgetsManager is null)
             {
-                Debug.LogError("Tried to delete a board that does not seem to exist");
+                Debug.LogError($"Tried to delete a board named {boardName} that does not seem to exist\n");
                 return;
             }
             Object.Destroy(widgetsManager.gameObject);
@@ -95,7 +95,7 @@ namespace SEE.Game.HolisticMetrics
             WidgetsManager widgetsManager = Find(boardName);
             if (widgetsManager == null)
             {
-                Debug.LogError("Tried to move a board that does not seem to exist");
+                Debug.LogError($"Tried to move a board named {boardName} that does not seem to exist\n");
                 return;
             }
             Transform boardTransform = widgetsManager.transform;

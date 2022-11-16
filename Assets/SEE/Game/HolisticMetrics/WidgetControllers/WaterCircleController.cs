@@ -74,7 +74,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         {
             if (percentage < 0f)
             {
-                Debug.LogError("Percentage can't be less than 0");
+                Debug.LogError("Percentage can't be less than 0\n");
                 return Color.white;
             }
 
@@ -103,7 +103,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 return Color.red;
             }
 
-            Debug.LogError("Percentage can't be more than 100");
+            Debug.LogError("Percentage can't be more than 100\n");
             return Color.white;
         }
     }

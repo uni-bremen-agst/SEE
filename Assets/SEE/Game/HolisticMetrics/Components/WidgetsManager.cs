@@ -122,13 +122,13 @@ namespace SEE.Game.HolisticMetrics.Components
             {
                 Debug.LogError("Could not load widget because the widget name from the configuration " +
                                "file matches no existing widget prefab. This could be because the configuration " +
-                               "file was manually changed.");
+                               "file was manually changed.\n");
             }
             else if (metricType is null)
             {
                 Debug.LogError("Could not load metric because the metric type from the configuration " +
                                "file matches no existing metric type. This could be because the configuration " +
-                               "file was manually changed.");
+                               "file was manually changed.\n");
             }
             else
             {
@@ -280,7 +280,7 @@ namespace SEE.Game.HolisticMetrics.Components
             if (indexInDropdown == -1)  // The return value if it was not found
             {
                 Debug.LogError("From network got a signal to switch the city on a board to a city that " +
-                               " cannot be found here");
+                               " cannot be found here\n");
                 return;
             }
             
