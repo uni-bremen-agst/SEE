@@ -49,7 +49,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
             else
             {
-                Debug.LogError("Tried to delete a widget from a board that could not be found.");
+                Debug.LogError($"Tried to delete a widget from a board named {boardName} that could not be " +
+                               "found.\n");
             }
         }
 
@@ -67,7 +68,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
             else
             {
-                Debug.LogError("Tried to create a widget on a board that could not be found.");
+                Debug.LogError($"Tried to create a widget on a board named {boardName} that could not be " +
+                               "found.\n");
             }
         }
     }

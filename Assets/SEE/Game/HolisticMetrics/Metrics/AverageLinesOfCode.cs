@@ -33,7 +33,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
             if (totalNodes == 0)
             {
                 Debug.LogError("No nodes were found so the average lines of code metric does not make any " +
-                               " sense");
+                               " sense\n");
                 metricValueRange = new MetricValueRange()
                 {
                     Name = "Average lines of code",

@@ -39,12 +39,12 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 float percentage = actual / maximum;
                 if (percentage > 100)
                 {
-                    Debug.LogError("Percentage must not be greater than 100");
+                    Debug.LogError("Percentage must not be greater than 100\n");
                     return;
                 }
                 if (percentage < 0)
                 {
-                    Debug.LogError("Percentage must not be less than 0");
+                    Debug.LogError("Percentage must not be less than 0\n");
                     return;
                 }
                 if (percentage > 1)  // Assume that the caller meant it as a percentage between 0 and 100.
