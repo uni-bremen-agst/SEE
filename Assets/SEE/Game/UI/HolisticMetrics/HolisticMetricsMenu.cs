@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
-using ActionHistory = SEE.Controls.Actions.HolisticMetrics.ActionHistory;
 
 namespace SEE.Game.UI.HolisticMetrics
 {
@@ -138,7 +138,7 @@ namespace SEE.Game.UI.HolisticMetrics
         private void Redo()
         {
             menu.ToggleMenu();
-            ActionHistory.Redo();
+            HolisticMetricsActionHistory.Redo();
         }
         
         /// <summary>
@@ -147,7 +147,7 @@ namespace SEE.Game.UI.HolisticMetrics
         private void Undo()
         {
             menu.ToggleMenu();
-            ActionHistory.Undo();
+            HolisticMetricsActionHistory.Undo();
         }
         
         /// <summary>
