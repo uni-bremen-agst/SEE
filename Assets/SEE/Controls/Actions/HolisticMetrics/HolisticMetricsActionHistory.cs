@@ -1,11 +1,9 @@
-using UnityEngine;
-
 namespace SEE.Controls.Actions.HolisticMetrics
 {
     /// <summary>
     /// This class records a history of holistic metric actions so we can revert them.
     /// </summary>
-    internal static class ActionHistory
+    internal static class HolisticMetricsActionHistory
     {
         /// <summary>
         /// Points to the action last executed.
