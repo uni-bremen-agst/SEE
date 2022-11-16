@@ -8,13 +8,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for saving a board from the scene to a configuration file.
     /// </summary>
-    public class SaveBoardConfigurationDialog
+    internal class SaveBoardConfigurationDialog : HolisticMetricsDialog
     {
-        /// <summary>
-        /// The dialog GameObject.
-        /// </summary>
-        private GameObject dialog;
-
         /// <summary>
         /// The property dialog.
         /// </summary>
@@ -75,18 +70,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             WidgetsManager boardsManager = BoardsManager.Find(selectedBoard.Value);
             ConfigManager.SaveBoard(boardsManager, fileName.Value);
             EnableKeyboardShortcuts();
-        }
-
-        /// <summary>
-        /// This method gets called when the player confirms or cancels the dialog. It will reenable the keyboard
-        /// shortcuts and close the dialog.
-        /// </summary>
-        private void EnableKeyboardShortcuts()
-        {
-            // Destroy the dialog GameObject
-            Object.Destroy(dialog);
-            
-            SEEInput.KeyboardShortcutsEnabled = true;
         }
     }
 }

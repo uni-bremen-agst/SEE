@@ -9,13 +9,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for adding a metrics board to the scene.
     /// </summary>
-    internal class AddBoardDialog
+    internal class AddBoardDialog : HolisticMetricsDialog
     {
-        /// <summary>
-        /// The dialog GameObject.
-        /// </summary>
-        private GameObject dialog;
-
         /// <summary>
         /// The property dialog.
         /// </summary>
@@ -73,18 +68,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             ShowNotification.Info(
                 "Position the board",
                 "Left click on the ground where you want to add the board");
-        }
-
-        /// <summary>
-        /// This method will be called when the player cancels or confirms the dialog. It will close the dialog and
-        /// reenable the keyboard shortcuts.
-        /// </summary>
-        private void EnableKeyboardShortcuts()
-        {
-            // Destroy the dialog GameObject
-            Object.Destroy(dialog);
-
-            SEEInput.KeyboardShortcutsEnabled = true;
         }
     }
 }
