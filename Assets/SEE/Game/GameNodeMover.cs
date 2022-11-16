@@ -178,9 +178,7 @@ namespace SEE.Game
             Vector3 oldLocalScale = child.localScale;
             if (scaleDown)
             {
-                // TODO: We need a strategy to scale down a node to the maximal size that is still
-                // fitting into the area where the nodes has been placed.
-                nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
+                nodeOperator.ScaleTo(ScaleDown(child, parent), 0);
             }
             // ScaleTo with animation duration = 0 has immediate effect.
             Vector3 newWorldScale = child.lossyScale;
@@ -231,6 +229,17 @@ namespace SEE.Game
 
             nodeOperator.MoveTo(targetWorldPosition, 0);
             return oldLocalScale;
+
+            // Returns the target local scale of child relative to parent when child is to be put onto parent.
+            static Vector3 ScaleDown(Transform child, GameObject parent)
+            {
+                // TODO: We need a strategy to scale down a node to the maximal size that is still
+                // fitting into the area where the nodes has been placed.
+                // We want to shrink only the ground area, but maintain the height.
+                float localHeight = parent.transform.lossyScale.y == 0 ?
+                    0 : child.transform.lossyScale.y / parent.transform.lossyScale.y;
+                return new Vector3(SCALING_FACTOR, localHeight, SCALING_FACTOR);
+            }
         }
 
         /// <summary>
