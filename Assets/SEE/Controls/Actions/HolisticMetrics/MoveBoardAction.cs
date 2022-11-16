@@ -10,14 +10,29 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class MoveBoardAction : Action
     {
+        /// <summary>
+        /// The name of the board that will be moved.
+        /// </summary>
         private readonly string boardName;
         
+        /// <summary>
+        /// The old position of the board so we can revert this action.
+        /// </summary>
         private readonly Vector3 oldPosition;
 
+        /// <summary>
+        /// The position to which the board is to be moved by this action.
+        /// </summary>
         private readonly Vector3 newPosition;
 
+        /// <summary>
+        /// The old rotation that the board had, so we can revert this action.
+        /// </summary>
         private readonly Quaternion oldRotation;
 
+        /// <summary>
+        /// The new rotation to which the board will be set.
+        /// </summary>
         private readonly Quaternion newRotation;
 
         /// <summary>
