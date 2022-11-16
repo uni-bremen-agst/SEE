@@ -17,6 +17,8 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         private static readonly string metricsBoardsPath = Application.persistentDataPath + "/MetricsBoards/";
 
+        private const string fileNameExtension = ".json";
+
         /// <summary>
         /// This method checks whether the directory for the saved metrics boards exists. If not, then it creates
         /// that directory.
@@ -43,7 +45,7 @@ namespace SEE.Game.HolisticMetrics
             {
                 string fileName = fileInfos[i].Name;
                 // Last 4 characters should be ".json". We do not want these.
-                fileNames[i] = fileName.Substring(0, fileName.Length - 5);
+                fileNames[i] = fileName.Substring(0, fileName.Length - 1 - fileNameExtension.Length);
             }
 
             return fileNames;
@@ -57,7 +59,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
-            string configuration = File.ReadAllText(metricsBoardsPath + fileName + ".json");
+            string configuration = File.ReadAllText(metricsBoardsPath + fileName + fileNameExtension);
             BoardConfig boardConfiguration = JsonUtility.FromJson<BoardConfig>(configuration);
             return boardConfiguration;
         }
@@ -74,7 +76,7 @@ namespace SEE.Game.HolisticMetrics
             BoardConfig config = GetBoardConfig(widgetsManager);
 
             string configuration = JsonUtility.ToJson(config, true);
-            string filePath = metricsBoardsPath + fileName + ".json";
+            string filePath = metricsBoardsPath + fileName + fileNameExtension;
             File.WriteAllText(filePath, configuration);
         }
 
