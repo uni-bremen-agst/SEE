@@ -52,7 +52,7 @@ namespace SEE.Net.Actions.HolisticMetrics
                 }
                 else
                 {
-                    Debug.LogError("No board found with the given name for adding the widget.");
+                    Debug.LogError($"No board found with the given name {BoardName} for adding the widget.\n");
                 }
             }
             

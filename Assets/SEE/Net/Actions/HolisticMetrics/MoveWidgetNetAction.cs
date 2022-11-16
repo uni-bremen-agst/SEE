@@ -51,7 +51,8 @@ namespace SEE.Net.Actions.HolisticMetrics
                 }
                 else
                 {
-                    Debug.LogError("Tried to move a widget, but the correlating board was not found");
+                    Debug.LogError($"Tried to move a widget, but the correlating board named {BoardName} " +
+                                   "was not found\n");
                 }
             }
         }

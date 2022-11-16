@@ -53,7 +53,7 @@ namespace SEE.Net.Actions.HolisticMetrics
                 }
                 else
                 {
-                    Debug.LogError("The board to delete the widget from was not found.");
+                    Debug.LogError($"The board to delete the widget from, named {BoardName}, was not found.\n");
                 }    
             }
         }
