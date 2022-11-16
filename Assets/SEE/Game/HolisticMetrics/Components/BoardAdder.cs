@@ -79,7 +79,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void Update()
         {
-            if(addingDone)
+            if (addingDone)
             {
                 Destroy(this);
             }

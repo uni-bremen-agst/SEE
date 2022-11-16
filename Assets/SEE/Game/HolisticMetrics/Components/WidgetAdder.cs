@@ -1,5 +1,4 @@
 using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components

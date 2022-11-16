@@ -9,8 +9,16 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     public class BoardMover : MonoBehaviour
     {
+        /// <summary>
+        /// The position of the board when the player initially clicks the move button underneath it. This is needed
+        /// so we can revert the move action.
+        /// </summary>
         private Vector3 oldPosition;
 
+        /// <summary>
+        /// The rotation of the board when the player initially clicks the move button underneath it. This is needed so
+        /// we can revert the move action.
+        /// </summary>
         private Quaternion oldRotation;
         
         /// <summary>
