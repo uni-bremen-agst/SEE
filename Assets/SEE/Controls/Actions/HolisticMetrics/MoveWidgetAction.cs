@@ -53,8 +53,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         internal override void Do()
         {
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
-            widgetsManager.Move(widgetID, newPosition);
-            new MoveWidgetNetAction(boardName, widgetID, newPosition).Execute();
+            if (widgetsManager != null)
+            {
+                widgetsManager.Move(widgetID, newPosition);
+                new MoveWidgetNetAction(boardName, widgetID, newPosition).Execute();
+            }
+            else
+            {
+                Debug.LogError($"Could not find the board {boardName} for moving a widget on it.\n");
+            }
         }
 
         /// <summary>
