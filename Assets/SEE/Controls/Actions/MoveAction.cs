@@ -91,6 +91,7 @@ namespace SEE.Controls.Actions
                     {
                         interactableObject.SetGrab(grab: true, isInitiator: true);
                     }
+
                     // We need to know whether we are in a reflexion city in order to
                     // interpret the re-parenting of a node properly.
                     withinReflexionCity = gameObject.ContainingCity<SEEReflexionCity>() != null;
@@ -119,6 +120,7 @@ namespace SEE.Controls.Actions
                     {
                         interactableObject.SetGrab(grab: false, isInitiator: true) ;
                     }
+                    ShowLabel.Off(grabbedObject);
                     IsGrabbed = false;
                     // Note: We do not set grabbedObject to null because we may need its
                     // value later for Undo/Redo.
