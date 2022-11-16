@@ -242,6 +242,9 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been removed.</param>
         private static void HandleRemovedMapping(Edge mapsToEdge)
         {
+            // FIXME: This code is currently commented out. If we are confident that it is really
+            // not needed, we need to remove it.
+
             //Node implNode = mapsToEdge.Source;
             //GameObject implGameNode = implNode.RetrieveGameNode();
 
@@ -260,6 +263,9 @@ namespace SEE.Game.City
         {
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);
+
+            // FIXME: This code is currently commented out. If we are confident that it is really
+            // not needed, we need to remove it.
 
             //Node implNode = mapsToEdge.Source;
             //GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
