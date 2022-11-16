@@ -9,12 +9,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// The parent action of this action, meaning the action that was executed before this action.
         /// </summary>
-        internal Action Parent;
+        internal Action Predecessor;
 
         /// <summary>
         /// The child action of this action, meaning the action that comes after this in the history.
         /// </summary>
-        internal Action Child;
+        internal Action Successor;
 
         /// <summary>
         /// Executes this action and adds it to the history. This should be called when executing the action for the

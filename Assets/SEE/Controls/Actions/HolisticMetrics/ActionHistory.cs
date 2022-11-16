@@ -21,8 +21,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             if (lastAction != null)
             {
-                lastAction.Child = action;
-                action.Parent = lastAction;
+                lastAction.Successor = action;
+                action.Predecessor = lastAction;
             }
 
             lastAction = action;
@@ -36,7 +36,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (lastAction != null)
             {
                 lastAction.Undo();
-                lastAction = lastAction.Parent;
+                lastAction = lastAction.Predecessor;
             }
         }
 
@@ -45,10 +45,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         internal static void Redo()
         {
-            if (lastAction != null && lastAction.Child != null)
+            if (lastAction != null && lastAction.Successor != null)
             {
-                lastAction.Child.Do();
-                lastAction = lastAction.Child;
+                lastAction.Successor.Do();
+                lastAction = lastAction.Successor;
             }
         }
     }
