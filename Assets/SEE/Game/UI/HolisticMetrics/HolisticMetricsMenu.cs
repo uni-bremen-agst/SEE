@@ -157,7 +157,6 @@ namespace SEE.Game.UI.HolisticMetrics
         private void NewBoard()
         {
             menu.ToggleMenu();
-
             new AddBoardDialog().Open();
         }
         
@@ -231,6 +230,11 @@ namespace SEE.Game.UI.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method will be called when the player clicks on the "Move widgets" button. It toggles that the widgets
+        /// can be moved. When the moving has been activated now (not deactivated), a notification will be shown to the
+        /// player that contains instructions for how to move widgets.
+        /// </summary>
         private void MoveWidgets()
         {
             menu.ToggleMenu();
