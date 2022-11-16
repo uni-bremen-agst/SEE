@@ -8,7 +8,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for deleting a widget on all clients.
     /// </summary>
-    public class DeleteWidgetNetAction : AbstractNetAction
+    public class DeleteWidgetNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The name of the board from which to delete the widget.
@@ -46,15 +46,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
-                if (widgetsManager != null)
-                {
-                    widgetsManager.Delete(WidgetID);
-                }
-                else
-                {
-                    Debug.LogError($"The board to delete the widget from, named {BoardName}, was not found.\n");
-                }    
+                Find(BoardName).Delete(WidgetID);   
             }
         }
     }

@@ -1,6 +1,4 @@
 using System;
-using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
@@ -8,7 +6,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class handles the execution of the MoveWidgetAction on all other clients except the requester.
     /// </summary>
-    public class MoveWidgetNetAction : AbstractNetAction
+    public class MoveWidgetNetAction : HolisticMetricsNetAction
     {
         public string BoardName;
 
@@ -44,16 +42,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
-                if (widgetsManager != null)
-                {
-                    widgetsManager.Move(WidgetID, Position);    
-                }
-                else
-                {
-                    Debug.LogError($"Tried to move a widget, but the correlating board named {BoardName} " +
-                                   "was not found\n");
-                }
+                Find(BoardName).Move(WidgetID, Position);
             }
         }
     }

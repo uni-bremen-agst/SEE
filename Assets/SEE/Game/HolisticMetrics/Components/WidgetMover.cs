@@ -15,8 +15,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private Vector3 oldPosition;
 
-        private Vector3 oldLocalPosition;
-
+        /// <summary>
+        /// The name of the board which the widget to be moved is attached to.
+        /// </summary>
         private string boardName;
 
         /// <summary>
@@ -39,7 +40,6 @@ namespace SEE.Game.HolisticMetrics.Components
         private void OnMouseDown()
         {
             oldPosition = transform.position;
-            oldLocalPosition = transform.localPosition;
             plane = new Plane(transform.parent.forward, transform.parent.position);
         }
 
@@ -55,7 +55,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 Vector3 enterPoint = ray.GetPoint(enter);
                 transform.position = enterPoint;
                 Vector3 localPositionTemp = transform.localPosition;
-                localPositionTemp.z = oldLocalPosition.z;
+                localPositionTemp.z = oldPosition.z;
                 transform.localPosition = localPositionTemp;
             }
         }

@@ -5,7 +5,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for deleting a metrics board on all clients.
     /// </summary>
-    public class DeleteBoardNetAction : AbstractNetAction
+    public class DeleteBoardNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The name of the board to delete. This is unique and can identify a board.

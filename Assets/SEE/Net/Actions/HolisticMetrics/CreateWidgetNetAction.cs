@@ -7,7 +7,7 @@ namespace SEE.Net.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for adding a widget on all clients.
     /// </summary>
-    public class CreateWidgetNetAction : AbstractNetAction
+    public class CreateWidgetNetAction : HolisticMetricsNetAction
     {
         /// <summary>
         /// The name of the board on which to create the new widget.
@@ -45,15 +45,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                WidgetsManager widgetsManager = BoardsManager.Find(BoardName);
-                if (widgetsManager != null)
-                {
-                    widgetsManager.Create(WidgetConfig);
-                }
-                else
-                {
-                    Debug.LogError($"No board found with the given name {BoardName} for adding the widget.\n");
-                }
+                Find(BoardName).Create(WidgetConfig);
             }
             
         }
