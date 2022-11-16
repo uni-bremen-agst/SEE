@@ -29,19 +29,20 @@ namespace SEE.Game.HolisticMetrics
         private static bool widgetsMovingEnabled;
 
         /// <summary>
-        /// List of all the BoardControllers that this manager manages (there should not be any BoardControllers in the
-        /// scene that are not in this list).
+        /// List of all the <see cref="WidgetsManager"/>s that this manager manages (there should not be any
+        /// <see cref="WidgetsManager"/>s in the scene that are not in this list).
         /// </summary>
         private static readonly List<WidgetsManager> widgetsManagers = new List<WidgetsManager>();
 
         /// <summary>
-        /// Creates a new metrics board and puts its BoardController into the list of BoardControllers.
+        /// Creates a new metrics board and puts its <see cref="WidgetsManager"/> into the list of
+        /// <see cref="WidgetsManager"/>s.
         /// </summary>
         /// <param name="boardConfig">The board configuration for the new board.</param>
         internal static void Create(BoardConfig boardConfig)
         {
-            bool nameExists = widgetsManagers.Any(boardController =>
-                boardController.GetTitle().Equals(boardConfig.Title));
+            bool nameExists = widgetsManagers.Any(widgetsManager =>
+                widgetsManager.GetTitle().Equals(boardConfig.Title));
             if (nameExists)
             {
                 ShowNotification.Error("Cannot create that board", "The name has to be unique.");
@@ -118,20 +119,20 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Finds a board (its widgets manager, actually) by its name.
+        /// Finds a board (its <see cref="WidgetsManager"/>, actually) by its name.
         /// </summary>
         /// <param name="boardName">The name to look for.</param>
-        /// <returns>Returns the desired WidgetsManager if it exists or null if it doesn't.</returns>
+        /// <returns>Returns the desired <see cref="WidgetsManager"/> if it exists or null if it doesn't.</returns>
         internal static WidgetsManager Find(string boardName)
         {
             return widgetsManagers.Find(manager => manager.GetTitle().Equals(boardName));
         }
 
         /// <summary>
-        /// Returns the names of all BoardControllers. The names can also be used to identify the BoardControllers
-        /// because they have to be unique.
+        /// Returns the names of all <see cref="WidgetsManager"/>s. The names can also be used to identify the
+        /// <see cref="WidgetsManager"/>s because they have to be unique.
         /// </summary>
-        /// <returns>The names of all BoardControllers.</returns>
+        /// <returns>The names of all <see cref="WidgetsManager"/>s.</returns>
         internal static string[] GetNames()
         {
             string[] names = new string[widgetsManagers.Count];

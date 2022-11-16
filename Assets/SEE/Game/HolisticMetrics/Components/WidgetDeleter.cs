@@ -38,7 +38,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out _))
                 {
-                    var parentTransform = transform.parent;
+                    Transform parentTransform = transform.parent;
                     deletionDone = true;
                     
                     // A config instance of the widget to delete, so it can be restored if needed
