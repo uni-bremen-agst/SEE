@@ -28,6 +28,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         ///  The prefab for the points that will be drawn in the coordinate system.
         /// </summary>
         [SerializeField] private GameObject pointPrefab;
+        
+        /// <summary>
+        /// The length of the x axis of this coordinate system.
+        /// </summary>
+        private const float xAxisLength = 900f;
 
         /// <summary>
         /// Sets the title of the widget, the labels on the y axis and draws all the values as points.
@@ -55,7 +60,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 float xDistance = 0f;
                 if (metricValues.Count > 1)
                 {
-                    xDistance = 900f / (metricValues.Count - 1);    
+                    xDistance = xAxisLength / (metricValues.Count - 1);    
                 }
                 
                 // Before we can start, we need to find out the largest and smallest metric value for scaling the
