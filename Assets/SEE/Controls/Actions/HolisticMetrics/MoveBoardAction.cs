@@ -10,15 +10,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class MoveBoardAction : Action
     {
-        private readonly string BoardName;
+        private readonly string boardName;
         
-        private readonly Vector3 OldPosition;
+        private readonly Vector3 oldPosition;
 
-        private readonly Vector3 NewPosition;
+        private readonly Vector3 newPosition;
 
-        private readonly Quaternion OldRotation;
+        private readonly Quaternion oldRotation;
 
-        private readonly Quaternion NewRotation;
+        private readonly Quaternion newRotation;
 
         /// <summary>
         /// Initializes the fields of this instance.
@@ -35,11 +35,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
             Quaternion oldRotation,
             Quaternion newRotation)
         {
-            BoardName = boardName;
-            OldPosition = oldPosition;
-            NewPosition = newPosition;
-            OldRotation = oldRotation;
-            NewRotation = newRotation;
+            this.boardName = boardName;
+            this.oldPosition = oldPosition;
+            this.newPosition = newPosition;
+            this.oldRotation = oldRotation;
+            this.newRotation = newRotation;
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         internal override void Do()
         {
-            BoardsManager.Move(BoardName, NewPosition, NewRotation);
-            new MoveBoardNetAction(BoardName, NewPosition, NewRotation).Execute();
+            BoardsManager.Move(boardName, newPosition, newRotation);
+            new MoveBoardNetAction(boardName, newPosition, newRotation).Execute();
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         internal override void Undo()
         {
-            BoardsManager.Move(BoardName, OldPosition, OldRotation);
-            new MoveBoardNetAction(BoardName, OldPosition, OldRotation).Execute();
+            BoardsManager.Move(boardName, oldPosition, oldRotation);
+            new MoveBoardNetAction(boardName, oldPosition, oldRotation).Execute();
         }
     }
 }
