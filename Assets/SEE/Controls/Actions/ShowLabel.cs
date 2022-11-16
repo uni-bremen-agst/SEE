@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -440,6 +441,19 @@ namespace SEE.Controls.Actions
             }
 
             currentlyDestroying = false;
+        }
+
+        /// <summary>
+        /// If <paramref name="gameObject"/> has a label attached to it, that label
+        /// will be turned off.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        public static void Off(GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out ShowLabel showLabel))
+            {
+                showLabel.Off();
+            }
         }
     }
 }
