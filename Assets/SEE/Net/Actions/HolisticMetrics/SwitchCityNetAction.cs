@@ -53,8 +53,8 @@ namespace SEE.Net.Actions.HolisticMetrics
                 }
                 else
                 {
-                    Debug.LogError("Could not find the metrics board with the given name, so cannot change the" +
-                                   " city selection on it.");
+                    Debug.LogError($"Could not find the metrics board with the name {BoardName}, so " +
+                                   "cannot change the city selection on it.\n");
                 }    
             }
         }
