@@ -58,8 +58,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Here we redo the moving action by moving the board to the new position on this client and all other
-        /// clients. This method should only be called from the history and is also called from this class.
+        /// Here we execute the moving action by moving the board to the new position on this client and all other
+        /// clients. This method should only be called from the history and is also called from the base class of this
+        /// class.
         /// </summary>
         internal override void Do()
         {
