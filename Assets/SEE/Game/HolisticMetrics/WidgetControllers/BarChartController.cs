@@ -29,6 +29,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// The prefab of the bar that will be instantiated for each element whose metric value will be displayed.
         /// </summary>
         [SerializeField] private GameObject barPrefab;
+
+        /// <summary>
+        /// The length of the x axis of the coordinate system underlying the bar chart.
+        /// </summary>
+        private const float xAxisLength = 870f;
         
         internal override void Display(MetricValue metricValue)
         {
@@ -72,14 +77,12 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 float barDistance = 0f;
                 if (metricValues.Count > 1)
                 {
-                    barDistance = 870f / (metricValues.Count - 1);
+                    barDistance = xAxisLength / (metricValues.Count - 1);
                 }
                 for (int i = 0; i < metricValues.Count; i++)
                 {
                     GameObject bar = Instantiate(barPrefab, barsAnchor.transform);
-                    Vector3 coordinates = new Vector3(
-                        barDistance * i,
-                        0f);
+                    Vector3 coordinates = new Vector3(barDistance * i, 0f);
                     bar.transform.localPosition = coordinates;
                     bar.GetComponent<Image>().fillAmount = metricValues[i].Value / maximum;
                 }

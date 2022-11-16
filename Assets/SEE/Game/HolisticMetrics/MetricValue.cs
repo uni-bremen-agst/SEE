@@ -2,6 +2,10 @@ using System.Collections.Generic;
 
 namespace SEE.Game.HolisticMetrics
 {
+    /// <summary>
+    /// Base class for both the <see cref="MetricValueRange"/> and the <see cref="MetricValueCollection"/>. Instances
+    /// of this class will be passed to the widgets so they can display the values.
+    /// </summary>
     internal abstract class MetricValue
     {
         /// <summary>
