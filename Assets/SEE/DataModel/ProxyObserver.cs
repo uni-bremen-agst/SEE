@@ -23,9 +23,22 @@ namespace SEE.DataModel
             /// </summary>
             private readonly Observable<T> BaseObservable;
 
-            public ProxyObserver(Observable<T> baseObservable)
+            /// <summary>
+            /// Function which is used to map the received event to a new one.
+            /// If not given, this is the identity function.
+            /// </summary>
+            private readonly Func<T, T> MapEvent;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="baseObservable">the observable this observer belongs to</param>
+            /// <param name="modifyEvent">function which maps from received event to a new one
+            /// (default: identity function)</param>
+            public ProxyObserver(Observable<T> baseObservable, Func<T, T> modifyEvent = null)
             {
                 BaseObservable = baseObservable;
+                MapEvent = modifyEvent ?? (item => item);
             }
 
             public void OnCompleted()
@@ -36,7 +49,7 @@ namespace SEE.DataModel
 
             public void OnError(Exception error) => throw error;
 
-            public void OnNext(T value) => BaseObservable.Notify(value);
+            public void OnNext(T value) => BaseObservable.Notify(MapEvent(value));
 
             /// <summary>
             /// Disposes all <see cref="Disposables"/>, thereby unsubscribing from all observables.
