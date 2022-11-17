@@ -60,8 +60,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             {
                 Title = boardName.Value
             };
-            Object.Destroy(dialog);
-            SEEInput.KeyboardShortcutsEnabled = true;
+            EnableKeyboardShortcuts();
             GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
             BoardAdder.Setup(boardConfiguration);
 

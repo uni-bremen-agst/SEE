@@ -45,7 +45,7 @@ namespace SEE.Game.HolisticMetrics
             {
                 string fileName = fileInfos[i].Name;
                 // Last 4 characters should be ".json". We do not want these.
-                fileNames[i] = fileName.Substring(0, fileName.Length - 1 - fileNameExtension.Length);
+                fileNames[i] = fileName.Substring(0, fileName.Length - fileNameExtension.Length);
             }
 
             return fileNames;

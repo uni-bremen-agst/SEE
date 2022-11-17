@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace SEE.Controls.Actions.HolisticMetrics
 {
     /// <summary>
@@ -6,24 +8,38 @@ namespace SEE.Controls.Actions.HolisticMetrics
     internal static class HolisticMetricsActionHistory
     {
         /// <summary>
-        /// Points to the action last executed.
+        /// Points to the action that will be undone next if the player clicks undo in the game. If there is nothing
+        /// to undo, it is set to -1.
         /// </summary>
-        private static Action lastAction;
+        private static int lastAction = -1;
+
+        /// <summary>
+        /// The history of actions, where the one at index 0 is the oldest and the one at the highest index is the
+        /// newest.
+        /// </summary>
+        private static readonly List<Action> actionHistory = new List<Action>();
 
         /// <summary>
         /// Adds a new action to the history after the action that the history currently points to. If any actions were
-        /// reverted before, those will be forgotten.
+        /// reverted before (meaning they have a higher index than what the action currently pointed to), those will be
+        /// forgotten.
         /// </summary>
         /// <param name="action">The action to add to the history</param>
         internal static void Add(Action action)
         {
-            if (lastAction != null)
-            {
-                lastAction.Successor = action;
-                action.Predecessor = lastAction;
-            }
+            lastAction++;  // Position at which we will add the new action.
 
-            lastAction = action;
+            // Calculate if there is anything to delete at the end.
+            int numberToDelete = actionHistory.Count - lastAction;
+
+            // If there is anything to delete, delete it
+            if (numberToDelete > 0)
+            {
+                actionHistory.RemoveRange(lastAction, numberToDelete);
+            }
+            
+            // Append the new action at the end of the list.
+            actionHistory.Add(action);
         }
 
         /// <summary>
@@ -31,10 +47,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         internal static void Undo()
         {
-            if (lastAction != null)
+            if (lastAction >= 0)
             {
-                lastAction.Undo();
-                lastAction = lastAction.Predecessor;
+                actionHistory[lastAction].Undo();
+                lastAction--;
             }
         }
 
@@ -43,10 +59,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         internal static void Redo()
         {
-            if (lastAction != null && lastAction.Successor != null)
+            if (lastAction + 1 < actionHistory.Count)  // Check if there is anything to redo.
             {
-                lastAction.Successor.Do();
-                lastAction = lastAction.Successor;
+                actionHistory[++lastAction].Do();
             }
         }
     }
