@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ICSharpCode.SharpZipLib.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.XR;
 
 namespace SEE.DataModel.DG
 {
@@ -12,7 +10,7 @@ namespace SEE.DataModel.DG
     /// A graph with nodes and edges representing the data to be visualized
     /// by way of blocks and connections.
     /// </summary>
-    public partial class Graph : Attributable
+    public class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique IDs
         private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
@@ -85,7 +83,7 @@ namespace SEE.DataModel.DG
         {
             Name = name;
             BasePath = basePath;
-            ElementObserver = new ProxyObserver(this);
+            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
         }
 
         /// <summary>
@@ -94,7 +92,7 @@ namespace SEE.DataModel.DG
         /// <param name="graph">The graph to copy from. Note that this will be a deep copy.</param>
         public Graph(Graph copyFrom)
         {
-            ElementObserver = new ProxyObserver(this);
+            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
             copyFrom.HandleCloned(this);
         }
 
@@ -139,7 +137,7 @@ namespace SEE.DataModel.DG
             nodes[node.ID] = node;
             node.ItsGraph = this;
             NodeHierarchyHasChanged = true;
-            Notify(new NodeEvent(node, ChangeType.Addition));
+            Notify(new NodeEvent(version, node, ChangeType.Addition));
             ElementObserver.AddDisposable(node.Subscribe(ElementObserver));
         }
 
@@ -177,13 +175,13 @@ namespace SEE.DataModel.DG
             {
                 
                 // We need to send out this event here, before the node is modified but after it has been removed.
-                Notify(new NodeEvent(node, ChangeType.Removal));
+                Notify(new NodeEvent(version, node, ChangeType.Removal));
 
                 // The edges of node are stored in the node's data structure as well as
                 // in the node's neighbor's data structure.
                 foreach (Edge outgoing in node.Outgoings)
                 {
-                    Notify(new EdgeEvent(outgoing, ChangeType.Removal));
+                    Notify(new EdgeEvent(version, outgoing, ChangeType.Removal));
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
@@ -192,7 +190,7 @@ namespace SEE.DataModel.DG
 
                 foreach (Edge incoming in node.Incomings)
                 {
-                    Notify(new EdgeEvent(incoming, ChangeType.Removal));
+                    Notify(new EdgeEvent(version, incoming, ChangeType.Removal));
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
@@ -388,7 +386,7 @@ namespace SEE.DataModel.DG
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
                 edge.Target.AddIncoming(edge);
-                Notify(new EdgeEvent(edge, ChangeType.Addition));
+                Notify(new EdgeEvent(version, edge, ChangeType.Addition));
                 ElementObserver.AddDisposable(edge.Subscribe(ElementObserver));
             }
             else
@@ -423,7 +421,7 @@ namespace SEE.DataModel.DG
                 throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
             }
 
-            Notify(new EdgeEvent(edge, ChangeType.Removal));
+            Notify(new EdgeEvent(version, edge, ChangeType.Removal));
             edge.Source.RemoveOutgoing(edge);
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
