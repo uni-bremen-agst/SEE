@@ -90,7 +90,7 @@ namespace SEE.Audio
         /// </summary>
         enum SoundEffect
         {
-            // todo
+            CLICK_SOUND, JOINED_GAME, MENU_POPPED_UP, MOVE, ROTATE, HIDE, NEW_EDGE, NEW_NODE, EDIT_NODE, SCALE_NODE, DELETE, SHOW_CODE, DRAW 
         }
     }
 }

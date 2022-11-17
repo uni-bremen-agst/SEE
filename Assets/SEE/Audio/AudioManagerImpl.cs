@@ -1,16 +1,13 @@
-using SEE.Audio;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static SEE.Audio.AudioManager;
 
-namespace See.Audio
+namespace SEE.Audio
 {
     public class AudioManagerImpl : MonoBehaviour, AudioManager
     {
-        /// <summary>
-        /// Audio manager singleton instace.
-        /// </summary>
-        private static AudioManager instance = null;
+        public AudioClip lobbyMusic;
+        public AudioClip clickSoundEffect;
 
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
@@ -20,17 +17,17 @@ namespace See.Audio
         /// <summary>
         /// The player's GameObject, used to play music (which is in an ambient environment, rather than being directional).
         /// </summary>
-        public readonly GameObject playerObject;
+        public GameObject playerObject;
 
         /// <summary>
         /// Publicly accessible default for music volume. Can be set by Unity properties.
         /// </summary>
-        public readonly int defaultMusicVolume;
+        public int defaultMusicVolume;
 
         /// <summary>
         /// Publicly accessible default for sound effect volume. Can be set by Unity properties.
         /// </summary>
-        public readonly int defaultSoundEffectVolume;
+        public int defaultSoundEffectVolume;
 
         /// <summary>
         /// Memento that stores the music volume before the music was muted.
@@ -77,12 +74,56 @@ namespace See.Audio
         /// <summary>
         /// Queue of music tracks to be played by the audio manager.
         /// </summary>
-        private readonly Queue musicQueue = new Queue();
+        private readonly Queue<AudioClip> musicQueue = new Queue<AudioClip>();
 
-        public AudioManager GetAudioManager()
+        /// <summary>
+        /// Our global music player.
+        /// </summary>
+        private AudioSource musicPlayer;
+
+        private static AudioManagerImpl instance = null;
+
+        public static AudioManagerImpl GetAudioManager()
         {
-            if (instance == null) instance = new AudioManagerImpl();
             return instance;
+        }
+
+        public static void SetAudioManager(AudioManagerImpl audioManagerImpl)
+        {
+            instance = audioManagerImpl;
+        }
+
+        void Start()
+        {
+            this.playerObject.AddComponent<AudioSource>();
+            this.musicPlayer = this.playerObject.GetComponent<AudioSource>();
+            SetAudioManager(this);
+            GetAudioManager().QueueLobbyMusic(GameState.CONNECTING); // todo remove
+        }
+
+        void Update()
+        {
+            // todo should loop as long as scene doesnt change
+            if (!GetAudioManager().musicPlayer.isPlaying)
+            {
+                GetAudioManager().musicPlayer.clip = musicQueue.Dequeue();
+                GetAudioManager().musicPlayer.Play();
+            }
+            HashSet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
+            foreach (AudioGameObject audioGameObject in soundEffectGameObjects) {
+                if (audioGameObject.ParentObject == null || audioGameObject.EmptyQueue())
+                {
+                    removedElements.Add(audioGameObject);
+                }
+                else
+                {
+                    audioGameObject.Update();
+                }
+            }
+            foreach (AudioGameObject removedElement in removedElements)
+            {
+                soundEffectGameObjects.Remove(removedElement);
+            }
         }
 
         /// <summary>
@@ -90,7 +131,11 @@ namespace See.Audio
         /// </summary>
         private void TriggerVolumeChanges()
         {
-            // todo
+            musicPlayer.volume = musicVolume;
+            foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
+            {
+                audioGameObject.ChangeVolume(soundEffectVolume);
+            }
         }
 
         public void DecreaseMusicVolume()
@@ -139,21 +184,53 @@ namespace See.Audio
 
         public void PauseMusic()
         {
-            throw new System.NotImplementedException();
+            if (musicPlayer.isPlaying)
+            {
+                musicPlayer.Pause();
+            }
         }
 
-        public void QueueLobbyMusic(AudioManager.GameState gameState)
+        public void QueueLobbyMusic(GameState gameState)
         {
-            throw new System.NotImplementedException();
+            switch (gameState)
+            {
+                case GameState.LOBBY:
+                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.LobbyMusic));
+                    break;
+                case GameState.CONNECTING:
+                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.ConnectingMusic));
+                    break;
+                case GameState.IN_GAME:
+                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.InGameMusic));
+                    break;
+            }
         }
 
-        public void QueueSoundEffect(AudioManager.SoundEffect soundEffect, GameObject sourceObject)
+        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject)
         {
+            AudioGameObject controlObject = null;
+            foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
+            {
+                if (audioGameObject.EqualsGameObject(sourceObject))
+                {
+                    controlObject = audioGameObject;
+                    break;
+                }
+            }
+            if(controlObject == null)
+            {
+                controlObject = new AudioGameObject(sourceObject);
+                soundEffectGameObjects.Add(controlObject);
+            }
+            controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
         }
 
         public void ResumeMusic()
         {
-            throw new System.NotImplementedException();
+            if (!musicPlayer.isPlaying)
+            {
+                musicPlayer.Play();
+            }
         }
 
         public void UnmuteMusic()
@@ -170,5 +247,14 @@ namespace See.Audio
             soundEffectVolumeBeforeMute = 0;
             TriggerVolumeChanges();
         }
+
+        private AudioClip GetAudioClipFromMusicName(string MusicName)
+        {
+            return lobbyMusic; // todo
+        } 
+        private AudioClip GetAudioClipFromSoundEffectName(SoundEffect SoundEffect)
+        {
+            return clickSoundEffect; // todo
+        } 
     }
 }
