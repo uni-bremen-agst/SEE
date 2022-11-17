@@ -238,6 +238,15 @@ namespace SEE.Game.Operator
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+
+            Tween[] ConstructAction(bool extending, float duration)
+            {
+                return new[] { DOTween.To(() => spline.SubsplineEndT,
+                                          u => spline.SubsplineEndT = u,
+                                          extending ? 1.0f : 0.0f,
+                                          duration).Play() };
+            }
+            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
         }
 
         private void OnDisable()

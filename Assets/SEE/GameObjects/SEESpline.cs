@@ -72,25 +72,34 @@ namespace SEE.GO
         private BSpline spline;
 
         /// <summary>
-        /// The start knot of the subspline for the build-up animation
+        /// The start position of the subspline for the build-up animation, element of [0,1]
         /// </summary>
         [SerializeField]
-        private float lowerKnot = 0.0f;
+        private float subsplineStartT = 0.0f;
 
         /// <summary>
-        /// The end knot of the subspline for the build-up animation
+        /// The end position of the subspline for the build-up animation, element of [0,1]
         /// </summary>
         [SerializeField]
-        private float upperKnot = 1.0f;
+        private float subsplineEndT = 0.0f;
 
         /// <summary>
-        /// TODO:
+        /// Property of <see cref="subsplineEndT"/>.
         /// </summary>
-        public float UpperKnot
+        public float SubsplineEndT
         {
-            get => upperKnot;
-            set => upperKnot = value;
+            get => subsplineEndT;
+            set {
+                    subsplineEndT = value;
+                    needsUpdate = true;
+                }
         }
+
+        /// <summary>
+        /// used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
+        /// chordLengths is set in Property <see cref="Spline"/>.
+        /// </summary>
+        private ChordLengths chordLengths = null;
 
         /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
@@ -103,6 +112,7 @@ namespace SEE.GO
             set
             {
                 spline = value;
+                chordLengths = value.ChordLenghts();
                 needsUpdate = true;
             }
         }
@@ -270,31 +280,9 @@ namespace SEE.GO
         {
             if (needsUpdate)
             {
-                if (BSpline.KnotsEqual(lowerKnot, upperKnot))
-                {
-                    if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-                    {
-                        lineRenderer.enabled = false;
-                    }
-                    if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
-                    {
-                        meshRenderer.enabled = false;
-                    }
-                }
-                else
-                {
-                    if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-                    {
-                        lineRenderer.enabled = true;
-                    }
-                    if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
-                    {
-                        meshRenderer.enabled = true;
-                    }
+                UpdateLineRenderer();
+                UpdateMesh();
 
-                    UpdateLineRenderer();
-                    UpdateMesh();
-                }
                 needsUpdate = false;
             }
         }
@@ -543,19 +531,42 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// create the subspline for the build-up animation
         /// </summary>
         private BSpline CalculateSubSpline()
         {
-            // both knots at their final position
-            if (BSpline.KnotsEqual(0.0f, lowerKnot) &&
-                BSpline.KnotsEqual(upperKnot, 1.0f))
+            if (chordLengths == null)
+            {
+                chordLengths = spline.ChordLenghts();
+            }
+
+            double lowerKnot = chordLengths.TToKnot(subsplineStartT);
+            double upperKnot = chordLengths.TToKnot(subsplineEndT);
+
+            bool domainIsEmpty =  BSpline.KnotsEqual(lowerKnot, upperKnot);
+
+            // if domain is empty, then subspline has 0 length,
+            // but this subspline cant be calculated
+            // so we just disable the lineRenderer and meshRenderer
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.enabled = !domainIsEmpty;
+            }
+            if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                meshRenderer.enabled = !domainIsEmpty;
+            }
+
+            // empty domain or full 0 to 1 domain
+            if (domainIsEmpty ||
+                (BSpline.KnotsEqual(0.0f, lowerKnot) &&
+                 BSpline.KnotsEqual(upperKnot, 1.0f)))
             {
                 return spline;
             }
             else
             {
-                // calculate subSpline
-                return spline;
+                return spline.SubSpline(lowerKnot, upperKnot);
             }
         }
 
