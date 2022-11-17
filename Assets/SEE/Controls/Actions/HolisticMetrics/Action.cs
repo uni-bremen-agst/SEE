@@ -7,16 +7,6 @@ namespace SEE.Controls.Actions.HolisticMetrics
     internal abstract class Action
     {
         /// <summary>
-        /// The parent action of this action, meaning the action that was executed before this action.
-        /// </summary>
-        internal Action Predecessor;
-
-        /// <summary>
-        /// The child action of this action, meaning the action that comes after this in the history.
-        /// </summary>
-        internal Action Successor;
-
-        /// <summary>
         /// Executes this action and adds it to the history. This should be called when executing the action for the
         /// first time.
         /// </summary>
