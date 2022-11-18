@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.Avatars
 {
@@ -169,9 +170,15 @@ namespace SEE.Game.Avatars
         private void PrepareForXR()
         {
             GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
-            vrPlayer.name = PlayerInputType.DesktopPlayer.ToString();
+            vrPlayer.name = PlayerInputType.VRPlayer.ToString();
+            gameObject.transform.position = vrPlayer.transform.position;
+            gameObject.transform.rotation = vrPlayer.transform.rotation;
             vrPlayer.transform.SetParent(gameObject.transform);
-            gameObject.AddComponent<XRPlayerMovement>();
+            //vrPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
+            //vrPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
+            XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
+            movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
+            movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
         }
 
         /// <summary>
