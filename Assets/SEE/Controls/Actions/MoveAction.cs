@@ -259,7 +259,7 @@ namespace SEE.Controls.Actions
                 // (change its parent or attach it to another object), you need to call effect.Refresh()
                 // to make Highlight Plus update its internal data.
                 Highlighter.SetHighlight(markedGameObject, true);
-                new HighlightNetAction(markedGameObject.name, true);
+                new HighlightNetAction(markedGameObject.name, true).Execute();
             }
 
             /// <summary>
