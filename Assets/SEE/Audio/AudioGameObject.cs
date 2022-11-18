@@ -46,7 +46,7 @@ namespace SEE.Audio
             }
         }
 
-        public void ChangeVolume(int volume){
+        public void ChangeVolume(float volume){
             this.parentObject.GetComponent<AudioSource>().volume = volume;
         }
 
@@ -72,10 +72,11 @@ namespace SEE.Audio
         /// Default Constructor
         /// </summary>
         /// <param name="parentObject">The game object this audio management object is attached to.</param>
-        public AudioGameObject(GameObject parentObject)
+        public AudioGameObject(GameObject parentObject, float defaultVolume = 1.0f)
         {
             this.parentObject = parentObject;
             this.parentObject.AddComponent<AudioSource>();
+            this.parentObject.GetComponent<AudioSource>().volume = defaultVolume;
         }
 
         public bool EmptyQueue()

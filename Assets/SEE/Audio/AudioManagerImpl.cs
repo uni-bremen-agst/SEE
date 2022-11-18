@@ -22,37 +22,39 @@ namespace SEE.Audio
         /// <summary>
         /// Publicly accessible default for music volume. Can be set by Unity properties.
         /// </summary>
-        public int defaultMusicVolume;
+        [Range(0,1)]
+        public float defaultMusicVolume;
 
         /// <summary>
         /// Publicly accessible default for sound effect volume. Can be set by Unity properties.
         /// </summary>
-        public int defaultSoundEffectVolume;
+        [Range(0, 1)]
+        public float defaultSoundEffectVolume;
 
         /// <summary>
         /// Memento that stores the music volume before the music was muted.
         /// </summary>
-        private int musicVolumeBeforeMute = 0;
+        private float musicVolumeBeforeMute = 0;
 
         /// <summary>
         /// Memento that stores the sound effects volume before sound effects were muted.
         /// </summary>
-        private int soundEffectVolumeBeforeMute = 0;
+        private float soundEffectVolumeBeforeMute = 0;
 
         /// <summary>
         /// Current music volume.
         /// </summary>
-        private int musicVolume = 0;
+        private float musicVolume;
 
         /// <summary>
         /// Current sound effects volume.
         /// </summary>
-        private int soundEffectVolume = 0;
+        private float soundEffectVolume;
 
         /// <summary>
         /// Get the current music volume.
         /// </summary>
-        public virtual int MusicVolume
+        public virtual float MusicVolume
         {
             get
             {
@@ -63,7 +65,7 @@ namespace SEE.Audio
         /// <summary>
         /// Get the current sound effects volume.
         /// </summary>
-        public virtual int SoundEffectVolume
+        public virtual float SoundEffectVolume
         {
             get
             {
@@ -97,6 +99,9 @@ namespace SEE.Audio
         {
             this.playerObject.AddComponent<AudioSource>();
             this.musicPlayer = this.playerObject.GetComponent<AudioSource>();
+            this.musicVolume = this.defaultMusicVolume;
+            this.soundEffectVolume = this.defaultSoundEffectVolume;
+            this.musicPlayer.volume = this.musicVolume;
             SetAudioManager(this);
             GetAudioManager().QueueLobbyMusic(GameState.CONNECTING); // todo remove
         }
@@ -110,7 +115,8 @@ namespace SEE.Audio
                 GetAudioManager().musicPlayer.Play();
             }
             HashSet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
-            foreach (AudioGameObject audioGameObject in soundEffectGameObjects) {
+            foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
+            {
                 if (audioGameObject.ParentObject == null || audioGameObject.EmptyQueue())
                 {
                     removedElements.Add(audioGameObject);
@@ -140,14 +146,22 @@ namespace SEE.Audio
 
         public void DecreaseMusicVolume()
         {
-            musicVolume--;
-            TriggerVolumeChanges();
+            if (musicVolume > 0.1f)
+            {
+                musicVolume -= 0.1f;
+                TriggerVolumeChanges();
+            }
         }
 
         public void DecreaseSoundEffectVolume()
         {
-            soundEffectVolume--;
-            TriggerVolumeChanges();
+            if (soundEffectVolume > 0.1f)
+            {
+                soundEffectVolume-= 0.1f;
+                TriggerVolumeChanges();
+
+            }
+           
         }
 
         public void GameStateChanged(AudioManager.GameState gameState)
@@ -157,14 +171,22 @@ namespace SEE.Audio
 
         public void IncreaseMusicVolume()
         {
-            musicVolume++;
-            TriggerVolumeChanges();
+            if (musicVolume <= 0.9f)
+            {
+                musicVolume+= 0.1f;
+                TriggerVolumeChanges();
+            }
+            
         }
 
         public void IncreaseSoundEffectVolume()
         {
-            soundEffectVolume++;
-            TriggerVolumeChanges();
+            if (soundEffectVolume <= 0.9f)
+            {
+                soundEffectVolume+= 0.1f;
+                TriggerVolumeChanges();
+            }
+            
         }
 
         public void MuteMusic()
@@ -185,6 +207,7 @@ namespace SEE.Audio
         public void PauseMusic()
         {
             if (musicPlayer.isPlaying)
+            
             {
                 musicPlayer.Pause();
             }
@@ -217,9 +240,9 @@ namespace SEE.Audio
                     break;
                 }
             }
-            if(controlObject == null)
+            if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject);
+                controlObject = new AudioGameObject(sourceObject, soundEffectVolume);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
@@ -251,10 +274,10 @@ namespace SEE.Audio
         private AudioClip GetAudioClipFromMusicName(string MusicName)
         {
             return lobbyMusic; // todo
-        } 
+        }
         private AudioClip GetAudioClipFromSoundEffectName(SoundEffect SoundEffect)
         {
             return clickSoundEffect; // todo
-        } 
+        }
     }
 }
