@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject != null)
                 {
-                    this.grabbedObject = gameObject;
+                    grabbedObject = gameObject;
                     originalParent = gameObject.transform.parent;
                     originalLocalScale = gameObject.transform.localScale;
                     originalWorldPosition = gameObject.transform.position;
