@@ -466,7 +466,7 @@ namespace SEE.Controls.Actions
         private float distanceToUser;
 
         /// <summary>
-        /// Re-acts to the user interactions. An object can be grabbed by and moved
+        /// Reacts to the user interactions. An object can be grabbed and moved
         /// around. If it is put onto another node, it will be re-parented onto this
         /// node. If we are operating in a <see cref="SEEReflexionCity"/>, re-parenting
         /// may be a mapping of an implementation node onto an architecture node
