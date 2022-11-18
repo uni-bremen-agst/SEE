@@ -493,10 +493,6 @@ namespace SEE.Controls.Actions
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         currentState = ReversibleAction.Progress.InProgress;
                     }
-                    else
-                    {
-                        // Debug.Log("Nothing to be dragged.\n");
-                    }
                 }
                 else // continue moving the grabbed object
                 {
