@@ -98,7 +98,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    throw new ArgumentNullException("Parameter must not be null");
+                    throw new ArgumentNullException(nameof(gameObject));
                 }
             }
 
