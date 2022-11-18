@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal string Name
             {
-                get => grabbedObject != null ? grabbedObject.name : String.Empty;
+                get => grabbedObject?.name ?? String.Empty;
             }
 
             /// <summary>
