@@ -254,7 +254,7 @@ namespace SEE.Game
         /// <paramref name="newParent"/> equals <paramref name="originalParent"/>.</remarks>
         /// <param name="child">game object to be put onto <paramref name="newParent"/></param>
         /// <param name="newParent">where to put <paramref name="child"/></param>
-        /// <param name="originalParent">the original <paramref name="originalParent"/> of <paramref name="child"/></param>
+        /// <param name="originalParent">the <paramref name="originalParent"/> of <paramref name="child"/></param>
         /// <param name="originalLocalScale">original local scale of <paramref name="child"/> relative to
         /// <paramref name="originalParent"/>; used to restore this scale if <paramref name="newParent"/>
         /// and <paramref name="originalParent"/> are the same</param>
