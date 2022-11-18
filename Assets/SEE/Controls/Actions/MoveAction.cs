@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
-            /// Required to return it to is original position when the action is undone.
+            /// Required to return it to its original position when the action is undone.
             /// </summary>
             private Vector3 originalWorldPosition;
 
