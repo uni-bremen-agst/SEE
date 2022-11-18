@@ -195,7 +195,7 @@ namespace SEE.Game
             }
 
             // Make sure mappingTarget stays within the roof of parent. We do not
-            // not work with local position here because we cannot assume that child
+            // work with local position here because we cannot assume that child
             // is actually a game-object child of parent (only if setParent were true,
             // we could assume that).
             {
