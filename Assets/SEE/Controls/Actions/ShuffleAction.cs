@@ -173,7 +173,7 @@ namespace SEE.Controls.Actions
                     new ShuffleNetAction(cityRootNode.name, plane.CenterTop).Execute();
                     gizmo.gameObject.SetActive(false);
 
-                    synchronize = false; // We just called MoveNodeNetAction for the synchronization.
+                    synchronize = false; // We just called ShuffleNetAction for the synchronization.
                 }
             }
             else if (shuffling)
