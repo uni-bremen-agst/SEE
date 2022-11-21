@@ -49,7 +49,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             if (metricValue.GetType() == typeof(MetricValueCollection))
             {
                 // Cast the metric value so we can use its collection feature
-                List<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
+                IList<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
              
                 // Set the title of the widget
                 titleText.text = metricValues[0].Name;
