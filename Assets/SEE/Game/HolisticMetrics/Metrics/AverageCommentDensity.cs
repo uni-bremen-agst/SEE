@@ -9,6 +9,11 @@ namespace SEE.Game.HolisticMetrics.Metrics
     internal class AverageCommentDensity : Metric
     {
         /// <summary>
+        /// We will try to get this attribute for each node. Should be the comment density for each node.
+        /// </summary>
+        private const string attributeName = "Metric.Comment.Density";
+        
+        /// <summary>
         /// Calculates the average comment density for the nodes of the given SEECity.
         /// </summary>
         /// <param name="city">The city for which to calculate the average comment density</param>
@@ -20,7 +25,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (node.TryGetNumeric("Metric.Comment.Density", out float density))
+                if (node.TryGetNumeric(attributeName, out float density))
                 {
                     totalDensity += density;
                     totalNodes++;

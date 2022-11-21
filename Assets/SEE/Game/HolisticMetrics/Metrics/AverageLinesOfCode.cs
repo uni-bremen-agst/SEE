@@ -10,6 +10,11 @@ namespace SEE.Game.HolisticMetrics.Metrics
     internal class AverageLinesOfCode : Metric
     {
         /// <summary>
+        /// This const contains the name of the attribute we will try to get for each node, the lines of code metric.
+        /// </summary>
+        private const string attributeName = "Metric.Lines.LOC";
+        
+        /// <summary>
         /// Calculates the average lines of code for the nodes of the given SEECity.
         /// </summary>
         /// <param name="city">The city for which to calculate the average lines of code</param>
@@ -21,7 +26,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (node.TryGetNumeric("Metric.Lines.LOC", out var lines))
+                if (node.TryGetNumeric(attributeName, out var lines))
                 {
                     totalLines += lines;
                     totalNodes++;
