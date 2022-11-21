@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8861279452713117317}
   - component: {fileID: 8861279452713117319}
   - component: {fileID: 8861279452713117316}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 8861279453182977454}
   - component: {fileID: 8861279453182977448}
   - component: {fileID: 8861279453182977449}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PercentTextLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 8861279453306250026}
   - component: {fileID: 8861279453306250023}
   - component: {fileID: 8861279453306250020}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: ColorFadeBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 8861279454117817487}
   - component: {fileID: 8861279454117817481}
   - component: {fileID: 8861279454117817486}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +325,7 @@ GameObject:
   - component: {fileID: 8861279454525936655}
   - component: {fileID: 6677327347117351674}
   - component: {fileID: 7920977125530942507}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PercentageGood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -433,7 +433,7 @@ GameObject:
   - component: {fileID: 8861279454546081207}
   - component: {fileID: 8861279454546081201}
   - component: {fileID: 8861279454546081206}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: PercentTextRIght
   m_TagString: Untagged
   m_Icon: {fileID: 0}

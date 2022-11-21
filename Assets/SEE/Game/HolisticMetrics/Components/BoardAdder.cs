@@ -53,24 +53,20 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            if (Camera.main != null)
+            if (MainCamera.Camera != null && Raycasting.RaycastAnything(out RaycastHit hit))
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit))
-                {
-                    Vector3 newPosition = hit.point;
-                    newPosition.y += boardPrefab.transform.position.y;
+                Vector3 newPosition = hit.point;
+                newPosition.y += boardPrefab.transform.position.y;
 
-                    boardConfiguration.Position = newPosition;
+                boardConfiguration.Position = newPosition;
 
-                    PrefabInstantiator.InstantiatePrefab(
-                            "Prefabs/UI/MetricsBoardRotation", 
-                            GameObject.Find("UI Canvas").transform, 
-                            instantiateInWorldSpace: false)
-                        .GetComponent<AddBoardSliderController>()
-                        .Setup(boardConfiguration);
-                    addingDone = true;
-                }
+                PrefabInstantiator.InstantiatePrefab(
+                        "Prefabs/UI/MetricsBoardRotation",
+                        GameObject.Find("UI Canvas").transform,
+                        instantiateInWorldSpace: false)
+                    .GetComponent<AddBoardSliderController>()
+                    .Setup(boardConfiguration);
+                addingDone = true;
             }
         }
 

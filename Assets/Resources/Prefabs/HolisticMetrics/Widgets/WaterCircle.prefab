@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6714071094934931891}
   - component: {fileID: 6714071094934931893}
   - component: {fileID: 6714071094934931890}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 6714071095090805079}
   - component: {fileID: 6714071095090805076}
   - component: {fileID: 6714071095090805077}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 6714071095621901487}
   - component: {fileID: 6714071095621901473}
   - component: {fileID: 6714071095621901486}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 6714071095664549335}
   - component: {fileID: 7465856157475594687}
   - component: {fileID: 1389258225729052906}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: WaterCircle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -369,7 +369,7 @@ GameObject:
   - component: {fileID: 6714071096624689578}
   - component: {fileID: 6714071096624689579}
   - component: {fileID: 6714071096624689576}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,4 +1,5 @@
 using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -38,10 +39,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            if (Camera.main != null)
+            if (MainCamera.Camera != null)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                if (Raycasting.RaycastAnything(out RaycastHit hit))
                 {
                     // Create the widget
                     Vector3 localPoint = transform.InverseTransformPoint(hit.point);

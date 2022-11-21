@@ -1,4 +1,5 @@
 using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -50,10 +51,10 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseDrag()
         {
-            if (Camera.main != null)
+            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI())
             {
                 // Set the new position of the board
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray ray = Raycasting.UserPointsTo();
                 floor.Raycast(ray, out float enter);
                 Vector3 enterPoint = ray.GetPoint(enter);
                 Vector3 newPosition = Vector3.zero;
@@ -64,7 +65,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 
                 // Rotate the board to look in the direction of the player (except on the y-axis - we do not wish to
                 // tilt the board)
-                Vector3 facingDirection = newPosition - Camera.main.gameObject.transform.position;
+                Vector3 facingDirection = newPosition - MainCamera.Camera.gameObject.transform.position;
                 facingDirection.y = 0;
                 parentTransform.rotation = Quaternion.LookRotation(facingDirection);
             }

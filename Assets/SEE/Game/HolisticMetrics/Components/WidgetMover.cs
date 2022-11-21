@@ -1,5 +1,6 @@
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -48,9 +49,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseDrag()
         {
-            if (Camera.main != null)
+            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI())
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray ray = Raycasting.UserPointsTo();
                 plane.Raycast(ray, out float enter);
                 Vector3 enterPoint = ray.GetPoint(enter);
                 transform.position = enterPoint;
