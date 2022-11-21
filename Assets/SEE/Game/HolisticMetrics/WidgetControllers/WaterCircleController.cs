@@ -64,37 +64,37 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <summary>
         /// for a percentage between [0, 1], gives a Color that represents that percentage.
         /// </summary>
-        /// <param name="percentage">The percentage to be color-coded</param>
+        /// <param name="fraction">The percentage to be color-coded</param>
         /// <returns>The color that represents the given percentage</returns>
-        private static Color MapPercentToColor(float percentage)
+        private static Color MapPercentToColor(float fraction)
         {
-            if (percentage < 0f)
+            if (fraction < 0f)
             {
                 Debug.LogError("Percentage can't be less than 0\n");
                 return Color.white;
             }
 
-            if (percentage < 0.2f)
+            if (fraction < 0.2f)
             {
                 return Color.green;
             }
 
-            if (percentage < 0.4f)
+            if (fraction < 0.4f)
             {
                 return Color.cyan;
             }
 
-            if (percentage < 0.6f)
+            if (fraction < 0.6f)
             {
                 return Color.blue;
             }
 
-            if (percentage < 0.8f)
+            if (fraction < 0.8f)
             {
                 return Color.magenta;
             }
 
-            if (percentage <= 1.0f)
+            if (fraction <= 1.0f)
             {
                 return Color.red;
             }
