@@ -9,16 +9,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     internal class SingleNumberDisplayController : WidgetController
     {
         /// <summary>
-        /// The text containing the value of the metric.
-        /// </summary>
-        [SerializeField] private Text valueText;
-        
-        /// <summary>
-        /// The text stating what metric is being displayed.
-        /// </summary>
-        [SerializeField] private Text titleText;
-
-        /// <summary>
         /// Displays the given metric value on the single number display widget.
         /// </summary>
         /// <param name="metricValue">The metric value to display</param>

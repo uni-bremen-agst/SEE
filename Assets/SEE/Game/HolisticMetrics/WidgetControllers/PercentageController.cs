@@ -8,15 +8,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal class PercentageController : WidgetController
     {
-        /// <summary>
-        /// The text displaying the percentage of the given metric value.
-        /// </summary>
-        [SerializeField] private Text valueText;
-        
-        /// <summary>
-        /// The title text stating what metric is being displayed by the widget.
-        /// </summary>
-        [SerializeField] private Text titleText;
         
         /// <summary>
         /// The image that goes around the widget. We will only display a certain percentage of this that correlates to
