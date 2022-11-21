@@ -258,7 +258,6 @@ namespace SEE.Game.HolisticMetrics.Components
             SEECity selectedCity = GetSelectedCity();
             string cityName = selectedCity.name;
             new SwitchCityNetAction(title, cityName).Execute();
-            Redraw();  // TODO: Test if this is necessary
             graphUnsubscriber?.Dispose();
             graphUnsubscriber = selectedCity.LoadedGraph.Subscribe(this);
         }
