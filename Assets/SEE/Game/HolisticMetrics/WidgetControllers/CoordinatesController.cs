@@ -9,10 +9,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal class CoordinatesController : WidgetController
     {
-        /// <summary>
-        /// The title text. This will contain the name of the metric being displayed.
-        /// </summary>
-        [SerializeField] private Text titleText;
         
         /// <summary>
         /// The labels on the y axis. The one at index 0 is the lowest, the one at index 5 is the highest.

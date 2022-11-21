@@ -13,16 +13,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// be visible.
         /// </summary>
         [SerializeField] private Image circle;
-        
-        /// <summary>
-        /// The text that shows the percentage of the given metric value.
-        /// </summary>
-        [SerializeField] private Text text;
-        
-        /// <summary>
-        /// The title stating what metric this widget displays.
-        /// </summary>
-        [SerializeField] private Text title;
 
         /// <summary>
         /// Displays the given metric value which means setting how far around the widget the color fade goes and what
@@ -34,8 +24,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             if (metricValue.GetType() == typeof(MetricValueRange))
             {
                 MetricValueRange metricValueRange = (MetricValueRange)metricValue;
-                title.text = metricValueRange.Name;
-                text.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
+                titleText.text = metricValueRange.Name;
+                valueText.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 circle.fillAmount = actual / maximum;    

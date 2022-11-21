@@ -19,16 +19,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// The water texture that will have its color changed.
         /// </summary>
         [SerializeField] private Image water;
-        
-        /// <summary>
-        /// The name of the metric being displayed.
-        /// </summary>
-        [SerializeField] private Text titleText;
-        
-        /// <summary>
-        /// The text showing the percentage value of the metric.
-        /// </summary>
-        [SerializeField] private Text valueText;
 
         /// <summary>
         /// Displays the given metric value on the water circle widget, means that we will change the color of the water

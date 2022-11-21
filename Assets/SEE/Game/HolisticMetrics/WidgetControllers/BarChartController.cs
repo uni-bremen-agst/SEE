@@ -21,11 +21,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         [SerializeField] private Text[] yLabels;
 
         /// <summary>
-        /// This text will contain the name of the metric being displayed.
-        /// </summary>
-        [SerializeField] private Text titleText;
-
-        /// <summary>
         /// The prefab of the bar that will be instantiated for each element whose metric value will be displayed.
         /// </summary>
         [SerializeField] private GameObject barPrefab;

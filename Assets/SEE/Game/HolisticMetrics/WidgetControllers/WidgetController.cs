@@ -1,6 +1,7 @@
 using System;
 using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.Game.HolisticMetrics.WidgetControllers
 {
@@ -11,7 +12,17 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     internal abstract class WidgetController : MonoBehaviour
     {
         private WidgetMover mover;
-
+        
+        /// <summary>
+        /// The title text stating what metric is being displayed by the widget.
+        /// </summary>
+        [SerializeField] protected Text titleText;
+        
+        /// <summary>
+        /// The text showing the value of the metric.
+        /// </summary>
+        [SerializeField] protected Text valueText;
+        
         /// <summary>
         /// The field that saves the ID of this widget.
         /// </summary>
