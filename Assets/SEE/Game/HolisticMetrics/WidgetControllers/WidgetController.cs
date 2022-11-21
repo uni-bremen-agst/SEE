@@ -48,5 +48,17 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 Destroy(mover);
             }
         }
+
+        /// <summary>
+        /// Destroys all child GameObjects of a given Transform.
+        /// </summary>
+        /// <param name="parent">The transform whose children are to be destroyed</param>
+        protected static void DestroyChildren(Transform parent)
+        {
+            for (int i = parent.childCount -1; i >= 0; i--)
+            {
+                Destroy(parent.GetChild(i).gameObject);
+            }
+        }
     }
 }

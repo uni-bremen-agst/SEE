@@ -41,10 +41,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         internal override void Display(MetricValue metricValue)
         {
             // First we need to remove all current points
-            for (int i = coordinatesAnchor.transform.childCount -1; i >= 0; i--)
-            {
-                Destroy(coordinatesAnchor.transform.GetChild(i).gameObject);
-            }
+            DestroyChildren(coordinatesAnchor.transform);
             
             if (metricValue.GetType() == typeof(MetricValueCollection))
             {
