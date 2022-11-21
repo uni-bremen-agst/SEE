@@ -11,6 +11,9 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal abstract class WidgetController : MonoBehaviour
     {
+        /// <summary>
+        /// While the widget can be moved, there will be a reference to the responsible WidgetMover in this field.
+        /// </summary>
         private WidgetMover mover;
         
         /// <summary>
