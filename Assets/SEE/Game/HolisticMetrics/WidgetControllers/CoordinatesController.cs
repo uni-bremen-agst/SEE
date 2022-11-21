@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -94,7 +95,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     point.transform.localPosition = coordinates;
                 }
             }
-            else
+            else if (metricValue.GetType() == typeof(MetricValueRange))
             {
                 // It would be weird to give this widget a single metric value. But in case that is ever done, we still
                 // handle that case by putting that value in a MetricValueCollection so we can recursively call this
@@ -104,6 +105,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     MetricValues = new List<MetricValueRange> { (MetricValueRange)metricValue }
                 };
                 Display(collection);
+            }
+            else
+            {
+                throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with" +
+                                            $"the CoordinateSystem widget.");
             }
         }
     }
