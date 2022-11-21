@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
@@ -61,6 +62,10 @@ namespace SEE.Game.HolisticMetrics
             EnsureBoardsDirectoryExists();
             string configuration = File.ReadAllText(metricsBoardsPath + fileName + fileNameExtension);
             BoardConfig boardConfiguration = JsonUtility.FromJson<BoardConfig>(configuration);
+            foreach (WidgetConfig config in boardConfiguration.WidgetConfigs)
+            {
+                config.ID = Guid.NewGuid();
+            }
             return boardConfiguration;
         }
         
