@@ -1,6 +1,7 @@
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics.Components
@@ -33,24 +34,20 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            if (Camera.main != null)
+            if (!Raycasting.IsMouseOverGUI())
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out _))
-                {
-                    Transform parentTransform = transform.parent;
-                    deletionDone = true;
-                    
-                    // A config instance of the widget to delete, so it can be restored if needed
-                    WidgetConfig config = ConfigManager.GetWidgetConfig(
-                        GetComponent<WidgetController>(), 
-                        GetComponent<Metric>());
-                    
-                    new DeleteWidgetAction(
-                            parentTransform.GetComponent<WidgetsManager>().GetTitle(), 
-                            config)
-                        .Execute();
-                }
+                Transform parentTransform = transform.parent;
+                deletionDone = true;
+
+                // A config instance of the widget to delete, so it can be restored if needed
+                WidgetConfig config = ConfigManager.GetWidgetConfig(
+                    GetComponent<WidgetController>(),
+                    GetComponent<Metric>());
+
+                new DeleteWidgetAction(
+                        parentTransform.GetComponent<WidgetsManager>().GetTitle(),
+                        config)
+                    .Execute();
             }
         }
 

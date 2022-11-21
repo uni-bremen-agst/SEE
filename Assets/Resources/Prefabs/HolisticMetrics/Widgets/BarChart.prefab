@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2214374211726733769}
   - component: {fileID: 2214374211726733771}
   - component: {fileID: 2214374211726733768}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 2214374211862451963}
   - component: {fileID: 2214374211862451965}
   - component: {fileID: 2214374211862451962}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 2214374211884457637}
   - component: {fileID: 2214374211884457639}
   - component: {fileID: 2214374211884457636}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -257,7 +257,7 @@ GameObject:
   - component: {fileID: 2214374212151541201}
   - component: {fileID: 2214374212151541203}
   - component: {fileID: 2214374212151541200}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 2214374212313190432}
   - component: {fileID: 2214374212313190434}
   - component: {fileID: 2214374212313190435}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -411,7 +411,7 @@ GameObject:
   - component: {fileID: 2214374212359319634}
   - component: {fileID: 2214374212359319636}
   - component: {fileID: 2214374212359319637}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -486,7 +486,7 @@ GameObject:
   - component: {fileID: 2214374212377954950}
   - component: {fileID: 2214374212377954952}
   - component: {fileID: 2214374212377954953}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -562,7 +562,7 @@ GameObject:
   - component: {fileID: 2214374212693761842}
   - component: {fileID: 2214374212693761844}
   - component: {fileID: 2214374212693761845}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -641,7 +641,7 @@ GameObject:
   - component: {fileID: 2214374212904124127}
   - component: {fileID: 2214374212904124129}
   - component: {fileID: 2214374212904124126}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -720,7 +720,7 @@ GameObject:
   - component: {fileID: 2214374213175076111}
   - component: {fileID: 2214374213175076113}
   - component: {fileID: 2214374213175076110}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -799,7 +799,7 @@ GameObject:
   - component: {fileID: 2214374213241711652}
   - component: {fileID: 2214374213241711654}
   - component: {fileID: 2214374213241711655}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: YLabel3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -878,7 +878,7 @@ GameObject:
   - component: {fileID: 2214374213467621233}
   - component: {fileID: 2214374213467621235}
   - component: {fileID: 2214374213467621232}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -953,7 +953,7 @@ GameObject:
   - component: {fileID: 2214374213482852749}
   - component: {fileID: 2214374213482852751}
   - component: {fileID: 2214374213482852748}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: XLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1032,7 +1032,7 @@ GameObject:
   - component: {fileID: 2214374213542076687}
   - component: {fileID: 2214374213542076689}
   - component: {fileID: 2214374213542076686}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1107,7 +1107,7 @@ GameObject:
   - component: {fileID: 2214374213681581793}
   - component: {fileID: 2214374213681581795}
   - component: {fileID: 2214374213681581792}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1184,7 +1184,7 @@ GameObject:
   - component: {fileID: 2214374213732897477}
   - component: {fileID: 1748459503972228958}
   - component: {fileID: 2929793686880820694}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: BarChart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1272,7 +1272,8 @@ MonoBehaviour:
   - {fileID: 2214374213175076110}
   - {fileID: 2214374212904124126}
   titleText: {fileID: 2214374211726733768}
-  barPrefab: {fileID: 4773943366600967721, guid: 488801ab5fb57b4fc9af69c5f54842f2, type: 3}
+  barPrefab: {fileID: 4773943366600967721, guid: 488801ab5fb57b4fc9af69c5f54842f2,
+    type: 3}
 --- !u!65 &2929793686880820694
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1297,7 +1298,7 @@ GameObject:
   - component: {fileID: 2214374213768230491}
   - component: {fileID: 2214374213768230493}
   - component: {fileID: 2214374213768230490}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: HLine1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1370,7 +1371,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3190434960413246116}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: BarsAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
