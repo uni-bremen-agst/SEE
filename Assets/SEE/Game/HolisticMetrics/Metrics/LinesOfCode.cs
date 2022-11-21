@@ -11,6 +11,12 @@ namespace SEE.Game.HolisticMetrics.Metrics
     internal class LinesOfCode : Metric
     {
         /// <summary>
+        /// This is the attribute name which we will try to get for each node. This should give us the lines of code
+        /// metric for each node. 
+        /// </summary>
+        private const string attributeName = "Metric.Lines.LOC";
+        
+        /// <summary>
         /// Given a see city, gathers the lines of code metric from each node and puts it into a metric value
         /// collection.
         /// </summary>
@@ -24,7 +30,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
             };
             foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (node.TryGetNumeric("Metric.Lines.LOC", out var lines))
+                if (node.TryGetNumeric(attributeName, out var lines))
                 {
                     MetricValueRange metricValue = new MetricValueRange()
                     {
