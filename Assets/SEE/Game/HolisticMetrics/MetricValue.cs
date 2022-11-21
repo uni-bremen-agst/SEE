@@ -49,6 +49,6 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// All the metrics values that this collection contains.
         /// </summary>
-        internal List<MetricValueRange> MetricValues;
+        internal IList<MetricValueRange> MetricValues;
     }
 }

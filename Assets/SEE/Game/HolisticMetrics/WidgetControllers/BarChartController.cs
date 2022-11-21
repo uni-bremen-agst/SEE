@@ -46,7 +46,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 
                 // Cast the collection so it is usable
-                List<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
+                IList<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
                 
                 // Set the name of the widget
                 titleText.text = metricValues[0].Name;
