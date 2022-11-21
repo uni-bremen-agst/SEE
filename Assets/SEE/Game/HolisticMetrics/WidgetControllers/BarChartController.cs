@@ -40,10 +40,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             if (metricValue.GetType() == typeof(MetricValueCollection))
             {
                 // First, remove all old bars 
-                for (int i = barsAnchor.transform.childCount - 1; i >= 0; i--)
-                {
-                    Destroy(barsAnchor.transform.GetChild(i).gameObject);
-                }
+                DestroyChildren(barsAnchor.transform);
                 
                 // Cast the collection so it is usable
                 IList<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
