@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +35,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             {
                 MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
                 Display(metricValueCollection.MetricValues[0]);
+            }
+            else
+            {
+                throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with" +
+                                            $"the CircularProgression widget.");
             }
         }
     }

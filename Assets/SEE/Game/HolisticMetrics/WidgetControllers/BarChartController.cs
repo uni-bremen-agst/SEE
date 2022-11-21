@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -79,7 +80,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     bar.GetComponent<Image>().fillAmount = metricValues[i].Value / maximum;
                 }
             }
-            else
+            else if (metricValue.GetType() == typeof(MetricValueRange))
             {
                 // In case this method gets a single metric value, we put it into a new metric value collection and then
                 // recursively call this method with that collection.
@@ -89,6 +90,11 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     MetricValues = new List<MetricValueRange>() { (MetricValueRange)metricValue }
                 };
                 Display(collection);
+            }
+            else
+            {
+                throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with" +
+                                            $"the BarChart widget.");
             }
         }
     }
