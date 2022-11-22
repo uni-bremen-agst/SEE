@@ -70,7 +70,6 @@ namespace SEE.Controls.Actions
         /// started to shuffle the code city.
         /// </summary>
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
-        private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
 
         private void Awake()
         {
