@@ -30,10 +30,10 @@ namespace SEE.Net.Actions
         public Quaternion rotation;
 
         /// <summary>
-        /// The local scale of the interactable or <see cref="Vector3.zero"/>, if the
+        /// The local scale of the interactable or <c>null</c>, if the
         /// local scale is not to be synchronized.
         /// </summary>
-        public Vector3 localScale;
+        public Vector3? localScale = null;
 
         /// <summary>
         /// Constructor.
@@ -48,7 +48,10 @@ namespace SEE.Net.Actions
             id = interactable.name;
             position = interactable.transform.position;
             rotation = interactable.transform.rotation;
-            localScale = syncLocalScale ? interactable.transform.localScale : Vector3.zero;
+            if (syncLocalScale)
+            {
+                localScale = interactable.transform.localScale;
+            }
         }
 
         protected override void ExecuteOnServer()
@@ -69,9 +72,9 @@ namespace SEE.Net.Actions
                     interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
                     interactable.transform.position = position;
                     interactable.transform.rotation = rotation;
-                    if (localScale.sqrMagnitude > 0.0f)
+                    if (localScale.HasValue)
                     {
-                        interactable.transform.localScale = localScale;
+                        interactable.transform.localScale = localScale.Value;
                     }
                 }
             }
