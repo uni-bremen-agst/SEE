@@ -459,12 +459,9 @@ namespace SEE.Controls.Actions
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                if (grabbedObject.TryGetComponent(out NodeOperator nodeOperator))
-                {
-                    float animationTime = AnimationTime;
-                    nodeOperator.ScaleTo(originalLocalScale, animationTime);
-                    new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime).Execute();
-                }
+                float animationTime = AnimationTime;
+                grabbedObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, animationTime);
+                new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime).Execute();
             }
         }
 
