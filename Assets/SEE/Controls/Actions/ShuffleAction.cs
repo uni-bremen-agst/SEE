@@ -126,8 +126,6 @@ namespace SEE.Controls.Actions
                             gizmo.gameObject.SetActive(true);
                             dragStartTransformPosition = originalPosition;
                             dragStartOffset = cityPlaneHitPoint - originalPosition;
-                            // dragCanonicalOffset = dragStartOffset / cityRootNode.localScale
-                            dragCanonicalOffset = dragStartOffset.DividePairwise(cityRootNode.localScale);
                         }
                         // The user is initiating shuffling.
                         shuffling = true;
