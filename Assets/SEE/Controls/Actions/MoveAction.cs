@@ -4,10 +4,12 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -326,7 +328,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Moves <see cref="grabbedObject"/> onto the roof of <paramref name="target"/>
             /// visually and marks it as target (the previously marked object is unmarked).
-            /// If <see cref="withinReflexionCity"/>,the exact semantics of the re-parenting
+            /// Also re-parents <see cref="grabbedObject"/> onto <paramref name="target"/> semantically.
+            /// If <see cref="withinReflexionCity"/>, the exact semantics of the re-parenting
             /// is determined by <see cref="ReflexionMapper.SetParent"/>;
             /// otherwise by <see cref="GameNodeMover.SetParent"/>.
             /// </summary>
@@ -414,9 +417,15 @@ namespace SEE.Controls.Actions
             /// <param name="parent">new parent of <paramref name="child"/></param>
             private static void ReflexionMapperSetParent(GameObject child, GameObject parent)
             {
-                ReflexionMapper.SetParent(child, parent);
-                new SetParentNetAction(child.name, parent.name, true).Execute();
-
+                try
+                {
+                    ReflexionMapper.SetParent(child, parent);
+                    new SetParentNetAction(child.name, parent.name, true).Execute();
+                }
+                catch (Exception e)
+                {
+                    ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                }
             }
 
             /// <summary>
@@ -426,8 +435,15 @@ namespace SEE.Controls.Actions
             /// <param name="parent">new parent of <paramref name="child"/></param>
             private static void GameNodeMoverSetParent(GameObject child, GameObject parent)
             {
-                GameNodeMover.SetParent(child, parent);
-                new SetParentNetAction(child.name, parent.name, false).Execute();
+                try
+                {
+                    GameNodeMover.SetParent(child, parent);
+                    new SetParentNetAction(child.name, parent.name, false).Execute();
+                }
+                catch (Exception e)
+                {
+                    ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                }
             }
 
             #endregion Basic Scene Manipulators Propagated to all Clients
@@ -496,7 +512,6 @@ namespace SEE.Controls.Actions
                 }
                 else // continue moving the grabbed object
                 {
-                    // Assert: grabbedObject != null
                     // The grabbed object will be moved on the surface of a sphere with
                     // radius distanceToUser in the direction the user is pointing to.
                     Ray ray = Raycasting.UserPointsTo();
