@@ -141,7 +141,6 @@ namespace SEE.Controls.Actions
                 {
                     // The plane in which the cityRoodNode lies is hit. We accept movements
                     // only within this area.
-                    // FIXME: Doesn't work in certain perspectives, particularly when looking at the horizon.
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), cityRootNode.localScale);
                     if (SEEInput.Snap())
                     {
