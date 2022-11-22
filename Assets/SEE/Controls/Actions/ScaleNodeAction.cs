@@ -177,11 +177,9 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be restored</param>
             public void Revert(GameObject gameObject)
             {
-                if (gameObject.TryGetComponentOrLog(out NodeOperator nodeOperator))
-                {
-                    nodeOperator.ScaleTo(Scale, 0);
-                    nodeOperator.MoveTo(Position, 0);
-                }
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.ScaleTo(Scale, 0);
+                nodeOperator.MoveTo(Position, 0);
             }
         }
 
