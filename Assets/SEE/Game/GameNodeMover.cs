@@ -22,106 +22,6 @@ namespace SEE.Game
         public const float SCALING_FACTOR = 0.2f;
 
         /// <summary>
-        /// Finalizes the position of the <paramref name="movingObject"/>. If the current
-        /// pointer of the user is pointing at a game object with a <see cref="NodeRef"/>, the final
-        /// position of <paramref name="movingObject"/> will be the game object with a <see cref="NodeRef"/>
-        /// that is at the deepest level of the node hierarchy (the pointer may actually
-        /// hit multiple nested nodes), in the following called target parent. The
-        /// <paramref name="movingObject"/> will then be placed onto the roof of the target
-        /// parent and its associated graph node will be become a child of the graph node
-        /// associated with the target parent and <paramref name="movingObject"/> becomes
-        /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
-        /// must be in sync). That target node is returned.
-        ///
-        /// If no such target node can be identified, neither the graph-node hierarchy
-        /// nor the game-node hierarchy will be changed and null will be returned.
-        ///
-        /// The assumption is that <paramref name="movingObject"/> is not the root node
-        /// of a code city.
-        /// </summary>
-        /// <param name="movingObject">the object being moved</param>
-        /// <param name="parent">Will be set to the new parent of <paramref name="movingObject"/> (may be null)</param>
-        /// <returns>Whether the movement shall be actually implemented.
-        /// Will be false if, e.g., the movement was illegal—in such a case, the movement must be cancelled.</returns>
-        //[Obsolete("This method is no longer used. It will be deleted soon.")]
-        //public static bool FinalizePosition(GameObject movingObject, out GameObject parent)
-        //{
-        //    const float OuterPadding = 0.02f;
-
-        //    // FIXME: This method can be deleted. However, we may want to re-use the padding.
-        //    // The underlying graph node of the moving object.
-        //    NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
-        //    Node movingNode = movingNodeRef.Value;
-
-        //    RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
-
-        //    if (newGraphParent != null && raycastHit != null)
-        //    {
-        //        // The new parent of the movingNode in the game-object hierarchy.
-        //        GameObject newGameParent = raycastHit.Value.collider.gameObject;
-
-        //        if (movingObject.IsInArea(newGameParent, OuterPadding))
-        //        {
-        //            ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer margins of other nodes!", log: false);
-        //            parent = null;
-        //            return false;
-        //        }
-
-        //        if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
-        //        {
-        //            // Reflexion analysis already done in MoveAction
-        //            // TODO: Make sure this action is still reversible
-        //        }
-        //        else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
-        //        {
-        //            ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
-        //                                                         + "architecture, not the other way around.", log: false);
-        //            parent = null;
-        //            return false;
-        //        }
-        //        else if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
-        //        {
-        //            // We are moving an already mapped node back to its implementation city, so we should unmap it.
-        //            SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
-        //            ReflexionGraph analysis = reflexionCity.ReflexionGraph;
-        //            analysis.RemoveFromMapping(movingNode);
-        //        }
-        //        else if (!movingNode.IsInImplementation())
-        //        {
-        //            // The new position of the movingNode in world space.
-        //            Vector3 newPosition = raycastHit.Value.point;
-        //            movingObject.AddOrGetComponent<NodeOperator>().MoveTo(newPosition, 0);
-        //            if (movingNode.Parent != newGraphParent)
-        //            {
-        //                movingNode.Reparent(newGraphParent);
-        //                movingObject.transform.SetParent(newGameParent.transform);
-        //            }
-        //        }
-
-        //        parent = newGameParent;
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        // Attempt to move the node outside of any node in the node hierarchy.
-        //        parent = null;
-        //        if (movingNode.IsInImplementation())
-        //        {
-        //            SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
-
-        //            if (movingNode.IsInMapping())
-        //            {
-        //                // If the node was already mapped, we'll unmap it again.
-        //                ReflexionGraph analysis = reflexionCity.ReflexionGraph;
-        //                analysis.RemoveFromMapping(movingNode);
-        //            }
-        //        }
-
-        //        return true;
-        //    }
-        //}
-
-        /// <summary>
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
         /// game-object hierarchy and in the underlying graph. If <paramref name="newParent"/>
         /// is null, the <paramref name="child"/> becomes a root in the underlying graph
@@ -262,11 +162,11 @@ namespace SEE.Game
             GameObject originalParent, Vector3 originalLocalScale)
         {
             bool scaleDown = newParent != originalParent.gameObject;
-            if (!scaleDown && child.TryGetComponent(out NodeOperator nodeOperator))
+            if (!scaleDown)
             {
                 // The gameObject may have already been scaled down, hence,
                 // we need to restore its original scale.
-                nodeOperator.ScaleTo(originalLocalScale, 0);
+                child.gameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, 0);
             }
             PutOn(child, newParent, scaleDown: scaleDown);
         }
