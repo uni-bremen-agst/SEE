@@ -214,10 +214,13 @@ namespace SEE.Controls.Actions
             MoveAndScale();
         }
 
+        /// <summary>
+        /// Scales and moves <see cref="objectToScale"/> in all clients to its current localScale and position.
+        /// </summary>
         private void MoveAndScale()
         {
             new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
-            new MoveNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
+            new MoveNetAction(objectToScale.name, objectToScale.transform.position, 0).Execute();
         }
 
         /// <summary>
