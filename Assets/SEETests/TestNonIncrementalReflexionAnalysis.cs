@@ -291,7 +291,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency between siblings not mapped
             NewEdge(n1_c1_c1, n1_c1_c2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1_c2);
         }
@@ -301,7 +301,7 @@ namespace SEE.Tools.Architecture
         {
             // self dependency for node not mapped
             NewEdge(n1_c1_c1, n1_c1_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1_c1);
         }
@@ -311,7 +311,7 @@ namespace SEE.Tools.Architecture
         {
             // self dependency for node mapped
             NewEdge(n1_c1, n1_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             CommonImplicitlyAllowed(n1_c1, n1_c1);
         }
@@ -321,7 +321,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency to parent where source is not mapped and target is mapped
             NewEdge(n1_c1_c1, n1_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             CommonImplicitlyAllowed(n1_c1_c1, n1_c1);
         }
@@ -352,7 +352,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency to parent where source and target are mapped explicitly
             NewEdge(n1_c1, n1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1, n1, call));
@@ -365,7 +365,7 @@ namespace SEE.Tools.Architecture
             // dependency to parent where source is not mapped explicitly but
             // target is mapped explicitly
             NewEdge(n1_c1_c1, n1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1_c1, n1, call));
@@ -377,7 +377,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency from parent to child where both are mapped explicitly
             NewEdge(n1_c1, n1_c1_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 implicitly allowed propagated dependencies
             Assert.That(IsImplicitlyAllowed(n1_c1, n1_c1_c1, call));
@@ -389,7 +389,7 @@ namespace SEE.Tools.Architecture
         {
             // dependency from parent to child where both are mapped explicitly
             NewEdge(n1, n1_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 disallowed propagated dependencies
             Assert.That(IsDivergent(n1, n1_c1, call));
@@ -410,7 +410,7 @@ namespace SEE.Tools.Architecture
             NewEdge(n2, n1_c2, call);
             NewEdge(n3, n2_c1, call);
             NewEdge(n3, n1_c2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 4 propagated edges
             AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
@@ -440,7 +440,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences2()
         {
             NewEdge(n2, n1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 propagated edges
             AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
@@ -480,7 +480,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences3()
         {
             NewEdge(n2_c1, n1_c2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1_c2, call));
@@ -492,7 +492,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences4()
         {
             NewEdge(n2_c1, n1_c1_c2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1_c1_c2, call));
@@ -504,7 +504,7 @@ namespace SEE.Tools.Architecture
         public void TestConvergences5()
         {
             NewEdge(n2_c1, n1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 allowed propagated dependencies
             Assert.That(IsAllowed(n2_c1, n1, call));
@@ -537,7 +537,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences1()
         {
             NewEdge(n1, n2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1, n2, call));
@@ -549,7 +549,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences2()
         {
             NewEdge(n1_c1, n2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c1, n2, call));
@@ -562,7 +562,7 @@ namespace SEE.Tools.Architecture
         {
             NewEdge(n1_c1_c1, n2, call);
             NewEdge(n1_c1_c2, n2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 2 divergent propagated dependencies
             Assert.That(IsDivergent(n1_c1_c1, n2, call));
@@ -575,7 +575,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences4()
         {
             NewEdge(n1, n2_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1, n2_c1, call));
@@ -587,7 +587,7 @@ namespace SEE.Tools.Architecture
         public void TestDivergences5()
         {
             NewEdge(n1_c2, n2_c1, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c2, n2_c1, call));
@@ -600,7 +600,7 @@ namespace SEE.Tools.Architecture
         {
             NewEdge(n1_c1_c1, n1_c2, call);
             NewEdge(n1_c1_c2, n1_c2, call);
-            graph.Run();
+            graph.RunAnalysis();
 
             // 1 divergent propagated dependency
             Assert.That(IsDivergent(n1_c1_c1, n1_c2, call));

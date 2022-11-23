@@ -62,7 +62,7 @@ namespace SEE.Tools.Architecture
         {
             graph.Subscribe(this);
             // An initial run is necessary to set up the necessary data structures.
-            graph.Run();
+            graph.RunAnalysis();
         }
 
         [TearDown]
@@ -549,7 +549,7 @@ namespace SEE.Tools.Architecture
             AddToGraph(ReflexionGraph.MapsToType, i4, a_4);
 
             ResetEvents();
-            graph.Run();
+            graph.RunAnalysis();
             Assert.That(IsAbsent(a2, a1, call));
             Assert.That(IsConvergent(a2, a3, call));
             Assert.That(IsDivergent(i1, i2, call));

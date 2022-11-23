@@ -100,7 +100,8 @@ namespace SEE.Game.City
             CityGraph = graph;
             Events.Clear();
             graph.Subscribe(this);
-            graph.Run();
+            graph.RunAnalysis();
+            graph.NewVersion();  // required because we don't want to highlight any initial changes
         }
 
         /// <summary>
