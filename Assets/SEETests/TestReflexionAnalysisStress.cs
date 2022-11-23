@@ -28,7 +28,7 @@ namespace SEE.Tools.Architecture
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
             graph = new ReflexionGraph(impl, arch, mapping);
             graph.Subscribe(this);
-            graph.Run();
+            graph.RunAnalysis();
             p.End();
         }
 
@@ -49,7 +49,7 @@ namespace SEE.Tools.Architecture
             // Passing the empty graph as mapping argument to reflexion.
             graph = new ReflexionGraph(impl, arch, new Graph("DUMMYBASEPATH"));
             graph.Subscribe(this);
-            graph.Run(); // from scratch
+            graph.RunAnalysis(); // from scratch
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
             {

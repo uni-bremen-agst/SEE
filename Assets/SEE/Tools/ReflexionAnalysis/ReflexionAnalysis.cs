@@ -127,7 +127,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Runs the reflexion analysis. If an observer has registered before,
         /// the observer will receive the results via the callback Update(ChangeEvent).
         /// </summary>
-        public void Run()
+        public void RunAnalysis()
         {
             AnalysisInitialized = true;
             ConstructTransitiveMapping();
