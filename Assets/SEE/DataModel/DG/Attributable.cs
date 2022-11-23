@@ -59,7 +59,7 @@ namespace SEE.DataModel.DG
         /// The newly created version ID is returned.
         /// </summary>
         /// <returns>the newly created version ID</returns>
-        public Guid BeginVersion()
+        public Guid NewVersion()
         {
             Guid newVersion = Guid.NewGuid();
             Notify(new VersionChangeEvent(newVersion, version));

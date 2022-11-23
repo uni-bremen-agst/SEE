@@ -97,6 +97,13 @@ namespace SEE.Controls.Actions
                     // We need to know whether we are in a reflexion city in order to
                     // interpret the re-parenting of a node properly.
                     withinReflexionCity = gameObject.ContainingCity<SEEReflexionCity>() != null;
+
+                    if (withinReflexionCity)
+                    {
+                        // Beginning to drag to, e.g., create a new mapping should lead to a new version,
+                        // because then changes will be highlighted relative to the state before moving.
+                        NewVersion(gameObject);
+                    }
                 }
                 else
                 {
@@ -382,6 +389,16 @@ namespace SEE.Controls.Actions
             }
 
             #region Basic Scene Manipulators Propagated to all Clients
+
+            /// <summary>
+            /// Creates a new version in the underlying graph, marking the start of a new movement.
+            /// </summary>
+            /// <param name="grabbedObject">the moved object</param>
+            private static void NewVersion(GameObject grabbedObject)
+            {
+                GameNodeMover.NewMovementVersion(grabbedObject);
+                new VersionNetAction(grabbedObject.name).Execute();
+            }
 
             /// <summary>
             /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
