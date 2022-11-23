@@ -163,10 +163,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The name of the grabbed object if any was grabbed; otherwise the empty string.
             /// </summary>
-            internal string Name
-            {
-                get => grabbedObject?.name ?? String.Empty;
-            }
+            internal string Name => grabbedObject != null ? grabbedObject.name : string.Empty;
 
             /// <summary>
             /// The position of the grabbed object in world space.
@@ -191,10 +188,7 @@ namespace SEE.Controls.Actions
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
-            public NodeRef Node
-            {
-                get => grabbedObject.TryGetNodeRef(out NodeRef result) ? result : null;
-            }
+            public NodeRef Node => grabbedObject.TryGetNodeRef(out NodeRef result) ? result : null;
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
@@ -261,7 +255,7 @@ namespace SEE.Controls.Actions
             /// Highlights <paramref name="hitObject"/> as a target of the grabbed and moved node.
             /// </summary>
             /// <param name="hitObject">the target of the grabbed and moved node</param>
-            void MarkAsTarget(Transform hitObject)
+            private void MarkAsTarget(Transform hitObject)
             {
                 markedGameObject = hitObject.gameObject;
                 // [Highlight Plus note] Important! If you change the hierarchy of your object
@@ -274,7 +268,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Turns off the highlighting of <see cref="markedGameObject"/> if not <c>null</c>.
             /// </summary>
-            void UnmarkAsTarget()
+            private void UnmarkAsTarget()
             {
                 if (markedGameObject)
                 {
@@ -557,7 +551,7 @@ namespace SEE.Controls.Actions
         {
             // Index of the left mouse button.
             const int LeftMouseButton = 0;
-            // FIXME: We need a VR interation, too.
+            // FIXME: We need a VR interaction, too.
             return Input.GetMouseButton(LeftMouseButton);
         }
 
@@ -578,8 +572,7 @@ namespace SEE.Controls.Actions
                     // Note: the root node can never be grabbed. See above.
                     if (raycastHit.HasValue)
                     {
-                        // The user is currently aiming at a node. The grabbed node is reparented onto
-                        // this aimed node.
+                        // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
                         grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
                     }
                     else
