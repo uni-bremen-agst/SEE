@@ -128,12 +128,20 @@ namespace SEE.Tools.ReflexionAnalysis
                     events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
                                                                   && e.Parent == hierarchyChangeEvent.Parent),
                 NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
+                VersionChangeEvent versionChangeEvent => events.IncorporateVersionEvent(versionChangeEvent),
                 AttributeEvent<string> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<int> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<float> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<Attributable.UnitType> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 _ => throw new ArgumentOutOfRangeException(nameof(newEvent), newEvent.GetType(), "Unknown event type!")
             };
+
+        private static IList<ChangeEvent> IncorporateVersionEvent(this IList<ChangeEvent> events, VersionChangeEvent versionChangeEvent)
+        {
+            // We will simply retain the most recent version change event. 
+            // Keeping the others doesn't make much sense, as we've "compacted" previous events already.
+            return events.Where(x => !(x is VersionChangeEvent)).Append(versionChangeEvent).ToList();
+        }
 
         private static IList<ChangeEvent> IncorporateAttributeEvent<T>(this IList<ChangeEvent> events, AttributeEvent<T> attributeEvent)
         {
