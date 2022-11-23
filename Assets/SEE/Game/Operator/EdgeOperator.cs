@@ -7,6 +7,7 @@ using SEE.GO;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
@@ -36,6 +37,11 @@ namespace SEE.Game.Operator
         /// Amount of glow that should be animated towards.
         /// </summary>
         private float fullGlow;
+
+        /// <summary>
+        /// Whether the glow effect is currently (supposed to be) enabled.
+        /// </summary>
+        private bool glowEnabled;
 
         /// <summary>
         /// The <see cref="SEESpline"/> represented by this edge.
@@ -93,6 +99,7 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Fade the alpha property of the edge to the given new <paramref name="alpha"/> value.
+        /// Note that this will affect edge highlights as well.
         /// </summary>
         /// <param name="alpha">The new alpha value for the edge. Must be in interval [0; 1]</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
@@ -108,7 +115,14 @@ namespace SEE.Game.Operator
             }
 
             (Color start, Color end) = color.TargetValue;
-            return color.AnimateTo((start.WithAlpha(alpha), end.WithAlpha(alpha)), duration);
+            // Edges being faded should also lead to highlights being faded.
+            float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
+
+            return new AndCombinedOperationCallback<Action>(new[]
+            {
+                color.AnimateTo((start.WithAlpha(alpha), end.WithAlpha(alpha)), duration),
+                glow.AnimateTo(targetGlow, duration)
+            });
         }
 
         /// <summary>
@@ -119,7 +133,9 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> GlowIn(float duration)
         {
-            return glow.AnimateTo(fullGlow, duration);
+            float targetGlow = GetTargetGlow(fullGlow, color.TargetValue.start.a);
+            glowEnabled = true;
+            return glow.AnimateTo(targetGlow, duration);
         }
 
         /// <summary>
@@ -130,10 +146,40 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> GlowOut(float duration)
         {
+            glowEnabled = false;
             return glow.AnimateTo(0, duration);
         }
 
+        /// <summary>
+        /// Flashes an edge in its inverted color for a short <paramref name="duration"/>.
+        /// Note that this animation is not controlled by an operation and thus not necessarily synchronized.
+        /// </summary>
+        /// <param name="duration">Amount of time the flashed color shall fade out for.</param>
+        public void HitEffect(float duration = 0.5f)
+        {
+            // NOTE: This is not controlled by an operation. HighlightEffect itself controls the animation.
+            //       Should be alright because overlapping animations aren't a big problem here.
+            highlightEffect.hitFxFadeOutDuration = duration;
+            highlightEffect.hitFxColor = Color.Lerp(color.TargetValue.start, color.TargetValue.end, 0.5f).Invert();
+            highlightEffect.HitFX();
+        }
+
         #endregion
+
+        /// <summary>
+        /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
+        /// min(<paramref name="glowTarget"/> / <see cref="fullGlow"/>, <paramref name="alphaTarget"/>) * fullGlow
+        ///
+        /// In other words, this ensures the edge doesn't glow brighter than its alpha value.
+        /// </summary>
+        /// <param name="glowTarget">The desired glow target value</param>
+        /// <param name="alphaTarget">The desired alpha target value</param>
+        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        private float GetTargetGlow(float glowTarget, float alphaTarget)
+        {
+            // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
+            return Mathf.Min(glowTarget/fullGlow, alphaTarget) * fullGlow;
+        }
 
         private void OnEnable()
         {
@@ -207,6 +253,7 @@ namespace SEE.Game.Operator
         private void SetupGlow()
         {
             fullGlow = highlightEffect.glow;
+            Assert.IsTrue(fullGlow > 0, "fullGlow must be bigger than zero!");
             if (!highlightEffect.highlighted)
             {
                 // We control highlighting not by the `highlighted` toggle, but by the amount of `glow`.
@@ -270,7 +317,7 @@ namespace SEE.Game.Operator
             // we need to call Refresh() on it or it will stop working.
             if (value is HierarchyEvent)
             {
-                RefreshGlow();
+                RefreshGlow().Forget();
             }
         }
         
