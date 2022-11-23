@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -10,6 +9,7 @@ using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.Controls.Actions
 {

@@ -49,12 +49,6 @@ namespace SEE.Audio
         void UnmuteSoundEffects();
 
         /// <summary>
-        /// Add music to the lobby music queue. The music is picked automatically based on the game state.
-        /// </summary>
-        /// <param name="gameState">The game state that music should be queued for.</param>
-        void QueueLobbyMusic(GameState gameState);
-
-        /// <summary>
         /// Pause the currently playing music.
         /// </summary>
         void PauseMusic();
@@ -67,8 +61,7 @@ namespace SEE.Audio
         /// <summary>
         /// Change the currently playing music based on the new game state.
         /// </summary>
-        /// <param name="gameState">The game state that was switched to.</param>
-        void GameStateChanged(GameState gameState);
+        void GameStateChanged();
 
         /// <summary>
         /// Adds a sound effect to the sound effect queue.
@@ -78,19 +71,16 @@ namespace SEE.Audio
         void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject);
 
         /// <summary>
-        /// Defines the different game states that music can be played for.
-        /// </summary>
-        enum GameState
-        {
-            LOBBY, CONNECTING, IN_GAME
-        }
-
-        /// <summary>
         /// Defines abstract names for different sound effects that can be played ingame.
         /// </summary>
         enum SoundEffect
         {
-            CLICK_SOUND, JOINED_GAME, MENU_POPPED_UP, MOVE, ROTATE, HIDE, NEW_EDGE, NEW_NODE, EDIT_NODE, SCALE_NODE, DELETE, SHOW_CODE, DRAW 
+            CLICK_SOUND, DROP_SOUND, MESSAGE_POP_UP, PICKUP_SOUND, SWITCH_SOUND, WALKING_SOUND, WARNING_SOUND
+        }
+
+        enum Music
+        {
+            LOBBY_MUSIC
         }
     }
 }

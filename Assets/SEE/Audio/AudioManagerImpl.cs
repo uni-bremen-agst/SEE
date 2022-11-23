@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static SEE.Audio.AudioManager;
+using static SEE.Audio.GameStateManager;
 
 namespace SEE.Audio
 {
@@ -8,6 +10,12 @@ namespace SEE.Audio
     {
         public AudioClip lobbyMusic;
         public AudioClip clickSoundEffect;
+        public AudioClip dropSoundEffect;
+        public AudioClip footstepSoundEffect;
+        public AudioClip messagePopAlert;
+        public AudioClip pickSoundEffect;
+        public AudioClip switchSoundEffekt;
+        public AudioClip warningSoundEffect;
 
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
@@ -52,6 +60,11 @@ namespace SEE.Audio
         private float soundEffectVolume;
 
         /// <summary>
+        /// Stores the previous scene name.
+        /// </summary>
+        private string previousSceneName;
+
+        /// <summary>
         /// Get the current music volume.
         /// </summary>
         public virtual float MusicVolume
@@ -83,13 +96,29 @@ namespace SEE.Audio
         /// </summary>
         private AudioSource musicPlayer;
 
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         private static AudioManagerImpl instance = null;
+        
+        /// <summary>
+        /// Store the current state of the music player.
+        /// </summary>
+        private bool musicPaused = false;
 
+        /// <summary>
+        /// Get the singleton instance.
+        /// </summary>
+        /// <returns>The AudioManager singleton instance.</returns>
         public static AudioManagerImpl GetAudioManager()
         {
             return instance;
         }
 
+        /// <summary>
+        /// Set the AudioManager singleton instance.
+        /// </summary>
+        /// <param name="audioManagerImpl">The AudioManager instance.</param>
         public static void SetAudioManager(AudioManagerImpl audioManagerImpl)
         {
             instance = audioManagerImpl;
@@ -103,17 +132,36 @@ namespace SEE.Audio
             this.soundEffectVolume = this.defaultSoundEffectVolume;
             this.musicPlayer.volume = this.musicVolume;
             SetAudioManager(this);
-            GetAudioManager().QueueLobbyMusic(GameState.CONNECTING); // todo remove
+            previousSceneName = SceneManager.GetActiveScene().name;
+            QueueMusic();
         }
 
         void Update()
         {
-            // todo should loop as long as scene doesnt change
-            if (!GetAudioManager().musicPlayer.isPlaying)
+            if (CheckSceneChanged()) GameStateChanged();
+            HandleSceneMusic();
+            DeleteRemovedAudioObjects(GetRemovedAudioObjects());
+        }
+
+        /// <summary>
+        /// Removed removed AudioObjects from the AudioManager's AudioObject collection.
+        /// </summary>
+        /// <param name="removedElements">A list of AudioObjects that were removed in the current frame.</param>
+        private void DeleteRemovedAudioObjects(HashSet<AudioGameObject> removedElements)
+        {
+            foreach (AudioGameObject removedElement in removedElements)
             {
-                GetAudioManager().musicPlayer.clip = musicQueue.Dequeue();
-                GetAudioManager().musicPlayer.Play();
+                soundEffectGameObjects.Remove(removedElement);
             }
+        }
+
+        /// <summary>
+        /// Returns a HashSet of AudioObjects that have been removed in the current frame.
+        /// Additionally calls the update method of any object that was not removed.
+        /// </summary>
+        /// <returns>A HashSet of removed AudiObjects.</returns>
+        private HashSet<AudioGameObject> GetRemovedAudioObjects()
+        {
             HashSet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
@@ -126,10 +174,37 @@ namespace SEE.Audio
                     audioGameObject.Update();
                 }
             }
-            foreach (AudioGameObject removedElement in removedElements)
+            return removedElements;
+        }
+
+        /// <summary>
+        /// Handles the music player in a loaded scene.
+        /// </summary>
+        private void HandleSceneMusic()
+        {
+            if (this.musicPlayer.isPlaying || this.musicPaused) return;
+            if (this.musicPlayer.clip == null)
             {
-                soundEffectGameObjects.Remove(removedElement);
+                if (this.musicQueue.Count == 0) QueueMusic();
+                this.musicPlayer.clip = musicQueue.Dequeue();
             }
+            this.musicPlayer.loop = true;
+            this.musicPlayer.Play();
+        }
+
+        /// <summary>
+        /// Check if the loaded scene was changed.
+        /// </summary>
+        /// <returns>True if the scene was changed, false otherwise.</returns>
+        private bool CheckSceneChanged()
+        {
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            if (currentSceneName != previousSceneName)
+            {
+                previousSceneName = currentSceneName;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -164,9 +239,19 @@ namespace SEE.Audio
            
         }
 
-        public void GameStateChanged(AudioManager.GameState gameState)
+        public void GameStateChanged()
         {
-            throw new System.NotImplementedException();
+            QueueMusic();
+            if (!this.musicPaused) this.musicPlayer.Stop();
+            this.musicPlayer.clip = musicQueue.Dequeue();
+        }
+
+        /// <summary>
+        /// Queues music based on the loaded scene.
+        /// </summary>
+        private void QueueMusic()
+        {
+            this.QueueMusic(GameStateManager.GetBySceneName(this.previousSceneName));
         }
 
         public void IncreaseMusicVolume()
@@ -207,24 +292,21 @@ namespace SEE.Audio
         public void PauseMusic()
         {
             if (musicPlayer.isPlaying)
-            
             {
                 musicPlayer.Pause();
+                musicPaused = true;
             }
         }
 
-        public void QueueLobbyMusic(GameState gameState)
+        public void QueueMusic(GameState gameState)
         {
             switch (gameState)
             {
                 case GameState.LOBBY:
-                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.LobbyMusic));
-                    break;
-                case GameState.CONNECTING:
-                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.ConnectingMusic));
+                    musicQueue.Enqueue(GetAudioClipFromMusicName(Music.LOBBY_MUSIC));
                     break;
                 case GameState.IN_GAME:
-                    musicQueue.Enqueue(GetAudioClipFromMusicName(AudioConstants.InGameMusic));
+                    musicQueue.Enqueue(GetAudioClipFromMusicName(Music.LOBBY_MUSIC));
                     break;
             }
         }
@@ -253,6 +335,7 @@ namespace SEE.Audio
             if (!musicPlayer.isPlaying)
             {
                 musicPlayer.Play();
+                musicPaused = false;
             }
         }
 
@@ -271,13 +354,49 @@ namespace SEE.Audio
             TriggerVolumeChanges();
         }
 
-        private AudioClip GetAudioClipFromMusicName(string MusicName)
+        /// <summary>
+        /// Get the AudioClip of the music that should be played.
+        /// </summary>
+        /// <param name="music">The enum referencing the music track that should be played.</param>
+        /// <returns>An AudioSource matching the given enum music name.</returns>
+        private AudioClip GetAudioClipFromMusicName(Music music)
         {
-            return lobbyMusic; // todo
+            switch (music)
+            {
+                case Music.LOBBY_MUSIC:
+                    return lobbyMusic;
+                default:
+                    return lobbyMusic;
+
+            }
         }
-        private AudioClip GetAudioClipFromSoundEffectName(SoundEffect SoundEffect)
+
+        /// <summary>
+        /// Get the AudioClip of the sound effect that should be played.
+        /// </summary>
+        /// <param name="soundEffect">The enum referencing the sound effect that should be played.</param>
+        /// <returns>An AudioSource matching the given enum sound effect name.</returns>
+        private AudioClip GetAudioClipFromSoundEffectName(SoundEffect soundEffect)
         {
-            return clickSoundEffect; // todo
+            switch (soundEffect)
+            {
+                case SoundEffect.CLICK_SOUND:
+                    return clickSoundEffect;
+                case SoundEffect.DROP_SOUND:
+                    return dropSoundEffect;
+                case SoundEffect.MESSAGE_POP_UP:
+                    return messagePopAlert;
+                case SoundEffect.PICKUP_SOUND:
+                    return pickSoundEffect;
+                case SoundEffect.SWITCH_SOUND:
+                    return switchSoundEffekt;
+                case SoundEffect.WALKING_SOUND:
+                    return footstepSoundEffect;
+                case SoundEffect.WARNING_SOUND:
+                   return warningSoundEffect;
+                default:
+                    return clickSoundEffect;
+            }
         }
     }
 }

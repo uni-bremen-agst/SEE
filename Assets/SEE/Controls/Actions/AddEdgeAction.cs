@@ -6,6 +6,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using System;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -159,6 +160,7 @@ namespace SEE.Controls.Actions
                 from = null;
                 to = null;
                 result = createdEdge != null;
+                AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.PICKUP_SOUND, hoveredObject);
                 currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
