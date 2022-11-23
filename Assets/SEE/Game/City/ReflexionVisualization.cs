@@ -32,7 +32,7 @@ namespace SEE.Game.City
         /// List of <see cref="ChangeEvent"/>s received from the reflexion <see cref="Analysis"/>.
         /// Note that this list is constructed by using <see cref="ReflexionGraphTools.Incorporate"/>.
         /// </summary>
-        private readonly List<ChangeEvent> Events = new List<ChangeEvent>();
+        private IList<ChangeEvent> Events = new List<ChangeEvent>();
 
         /// <summary>
         /// The graph used for the reflexion analysis.
@@ -63,6 +63,18 @@ namespace SEE.Game.City
         /// More specifically, these are intended to be handled after the city has been drawn.
         /// </summary>
         private readonly Queue<ChangeEvent> UnhandledEvents = new Queue<ChangeEvent>();
+
+        /// <summary>
+        /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
+        /// edges which have changed compared to the <see cref="PreviousVersion"/>.
+        /// </summary>
+        private readonly Queue<EdgeOperator> HighlightedEdgeOperators = new Queue<EdgeOperator>();
+
+        /// <summary>
+        /// Mapping from Edge IDs to the state they had in the previous version.
+        /// This is used to check for changes from the previous to this version.
+        /// </summary>
+        private IDictionary<string, State> PreviousEdgeStates = new Dictionary<string, State>();
 
         private void Start()
         {
@@ -173,16 +185,53 @@ namespace SEE.Game.City
                 case EdgeEvent edgeEvent:
                     HandleEdgeEvent(edgeEvent);
                     break;
+                case VersionChangeEvent versionEvent:
+                    HandleVersionEvent(versionEvent);
+                    break;
             }
 
-            Events.Incorporate(changeEvent);
+            Events = Events.Incorporate(changeEvent);
+        }
+
+        /// <summary>
+        /// Handles the given <paramref name="versionChange"/> by "unhighlighting" all changes
+        /// and marking the given old version as the new <see cref="PreviousVersion"/>.
+        /// </summary>
+        /// <param name="versionChange">The event which shall be handled.</param>
+        private void HandleVersionEvent(VersionChangeEvent versionChange)
+        {
+            SaveEdgeStates();
+            ResetEdgeHighlights();
+
+            #region Local Functions
+            
+            void ResetEdgeHighlights()
+            {
+                while (HighlightedEdgeOperators.Count > 0)
+                {
+                    // Fade out the highlights for each previously marked edge.
+                    EdgeOperator edgeOperator = HighlightedEdgeOperators.Dequeue();
+                    if (edgeOperator != null)
+                    {
+                        edgeOperator.GlowOut(ANIMATION_DURATION);
+                    }
+                }
+            }
+
+            void SaveEdgeStates()
+            {
+                // Due to us using `Incorporate`, only the most recent edge change will exist.
+                PreviousEdgeStates = Events.OfType<EdgeChange>().ToDictionary(x => x.Edge.ID, x => x.NewState);
+            }
+            
+            #endregion
         }
 
         /// <summary>
         /// Handles the given <paramref name="edgeChange"/> by modifying the scene accordingly.
         /// </summary>
         /// <param name="edgeChange">The event which shall be handled.</param>
-        private static async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
+        private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
             if (HiddenEdgeStates.Contains(edgeChange.NewState))
@@ -211,6 +260,14 @@ namespace SEE.Game.City
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
                 edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
+
+                if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
+                {
+                    // Mark changed edges compared to previous version.
+                    edgeOperator.GlowIn(ANIMATION_DURATION);
+                    edgeOperator.HitEffect(ANIMATION_DURATION);
+                    HighlightedEdgeOperators.Enqueue(edgeOperator);
+                }
             }
             else
             {
