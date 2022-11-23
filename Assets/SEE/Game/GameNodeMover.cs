@@ -143,6 +143,21 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Sets up a new movement action for the <see cref="movedObject"/>.
+        /// Specifically, this will create a new version for the associated graph.
+        ///
+        /// Pre-condition: <see cref="movedObject"/> has a valid NodeRef component attached.
+        /// </summary>
+        /// <param name="movedObject">The object which is being moved</param>
+        public static void NewMovementVersion(GameObject movedObject)
+        {
+            if (movedObject.TryGetComponentOrLog(out NodeRef nodeRef))
+            {
+                nodeRef.Value.ItsGraph.NewVersion();
+            }
+        }
+
+        /// <summary>
         /// Puts <paramref name="child"/> on <paramref name="newParent"/> visually. If <paramref name="newParent"/>
         /// is different from <paramref name="originalParent"/>, the <paramref name="child"/> will be scaled
         /// down so that it fits into <paramref name="newParent"/>. If instead <paramref name="newParent"/>
