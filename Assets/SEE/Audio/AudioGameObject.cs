@@ -56,11 +56,10 @@ namespace SEE.Audio
         public void Update()
         {
             AudioSource audioSource = this.parentObject.GetComponent<AudioSource>();
-            if (!audioSource.isPlaying)
-            {
-                audioSource.clip = effectsQueue.Dequeue();
-                audioSource.Play();
-            }
+            if (audioSource.isPlaying && effectsQueue.Count <= 0) return;
+            audioSource.Stop();
+            audioSource.clip = effectsQueue.Dequeue();
+            audioSource.Play();
         }
 
         public bool EqualsGameObject(GameObject gameObject)

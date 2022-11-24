@@ -311,6 +311,11 @@ namespace SEE.Audio
             }
         }
 
+        public void QueueSoundEffect(SoundEffect soundEffect)
+        {
+            QueueSoundEffect(soundEffect, this.playerObject);
+        }
+
         public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject)
         {
             AudioGameObject controlObject = null;
