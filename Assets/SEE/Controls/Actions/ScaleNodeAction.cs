@@ -4,7 +4,9 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using SEE.Net;
+using SEE.Net.Actions;
+using static SEE.Utils.Raycasting;
+using SEE.Game.Operator;
 
 namespace SEE.Controls.Actions
 {
@@ -175,8 +177,9 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be restored</param>
             public void Revert(GameObject gameObject)
             {
-                gameObject.SetScale(Scale);
-                gameObject.transform.position = Position;
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.ScaleTo(Scale, 0);
+                nodeOperator.MoveTo(Position, 0);
             }
         }
 
@@ -208,7 +211,16 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             beforeAction.Revert(objectToScale);
-            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+            MoveAndScale();
+        }
+
+        /// <summary>
+        /// Scales and moves <see cref="objectToScale"/> in all clients to its current localScale and position.
+        /// </summary>
+        private void MoveAndScale()
+        {
+            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
+            new MoveNetAction(objectToScale.name, objectToScale.transform.position, 0).Execute();
         }
 
         /// <summary>
@@ -223,7 +235,7 @@ namespace SEE.Controls.Actions
                 // we need to re-do the action.
                 base.Redo();
                 afterAction.Revert(objectToScale);
-                new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+                MoveAndScale();
             }
         }
 
@@ -372,24 +384,82 @@ namespace SEE.Controls.Actions
             // Each gizmo is locked to one particular axis.
             if (scalingGizmo == topSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, false, true, false);
+                MoveToLockAxes(scalingGizmo, false, true, false);
             }
             else if (scalingGizmo == firstCornerSphere || scalingGizmo == secondCornerSphere
                      || scalingGizmo == thirdCornerSphere || scalingGizmo == forthCornerSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, true);
+                MoveToLockAxes(scalingGizmo, true, false, true);
             }
             else if (scalingGizmo == firstSideSphere || scalingGizmo == secondSideSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, false);
+                MoveToLockAxes(scalingGizmo, true, false, false);
             }
             else if (scalingGizmo == thirdSideSphere || scalingGizmo == forthSideSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, false, false, true);
+                MoveToLockAxes(scalingGizmo, false, false, true);
             }
             else
             {
                 throw new ArgumentException($"Unexpected scaling gizmo {scalingGizmo.name}.");
+            }
+        }
+
+        /// <summary>
+        /// Moves the given <paramref name="movingObject"/> on a sphere around the
+        /// camera. The radius of this sphere is the original distance
+        /// from the <paramref name="movingObject"/> to the camera. The point
+        /// on that sphere is determined by a ray driven by the user hitting
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
+        ///
+        /// This method is expected to be called at every Update().
+        ///
+        /// You can lock any of the three axes.
+        /// </summary>
+        /// <param name="movingObject">the object to be moved</param>
+        /// <param name="lockX">whether the movement should be locked on this axis</param>
+        /// <param name="lockY">whether the movement should be locked on this axis</param>
+        /// <param name="lockZ">whether the movement should be locked on this axis</param>
+        private static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
+        {
+            // The speed by which to move a selected object.
+            const float MOVING_SPEED = 1.0f;
+
+            float step = MOVING_SPEED * Time.deltaTime;
+            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 movingObjectPos = movingObject.transform.position;
+
+            if (!lockX)
+            {
+                target.x = movingObjectPos.x;
+            }
+
+            if (!lockY)
+            {
+                target.y = movingObjectPos.y;
+            }
+
+            if (!lockZ)
+            {
+                target.z = movingObjectPos.z;
+            }
+
+            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
+
+            /// <summary>
+            /// Returns the position of the tip of the ray drawn from the camera towards
+            /// the position the user is currently pointing to. The distance of that
+            /// point along this ray is the distance between the camera from which the
+            /// ray originated and the position of the given <paramref name="selectedObject"/>.
+            ///
+            /// That means, the selected object moves on a sphere around the camera
+            /// at the distance of the selected object.
+            /// </summary>
+            /// <param name="selectedObject">the selected object currently moved around</param>
+            /// <returns>tip of the ray</returns>
+            static Vector3 TipOfRayPosition(GameObject selectedObject)
+            {
+                return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
             }
         }
 
@@ -495,9 +565,8 @@ namespace SEE.Controls.Actions
             // Transform the new position and scale
             objectToScale.transform.position = position;
             objectToScale.SetScale(scale);
+            MoveAndScale();
             currentState = ReversibleAction.Progress.InProgress;
-
-            new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
         /// <summary>

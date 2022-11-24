@@ -2,6 +2,7 @@ using System.Collections.Generic;
 ﻿using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 
@@ -223,7 +224,7 @@ namespace SEE.Controls.Actions
 
             if (synchronize)
             {
-                new Net.RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
+                new RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)

@@ -142,7 +142,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent { 
+        public Node Parent {
             get => parent;
             private set
             {
@@ -384,6 +384,17 @@ namespace SEE.DataModel.DG
         public ISet<Edge> Outgoings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
+        /// Returns all outgoing edges of given node that have exactly the given <paramref name="edgeType"/>.
+        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all outgoing edges are returned.
+        /// </summary>
+        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
+        /// <returns>all outgoing edges of <paramref name="edgeType"/></returns>
+        public IEnumerable<Edge> OutgoingsOfType(string edgeType)
+        {
+            return Outgoings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
+        }
+
+        /// <summary>
         /// Resets this node, i.e., removes all incoming and outgoing edges
         /// and children from this node. Resets its graph and parent to null.
         ///
@@ -499,6 +510,7 @@ namespace SEE.DataModel.DG
         /// Re-assigns the node to a different <paramref name="newParent"/>.
         /// </summary>
         /// <param name="newParent">the new parent of this node</param>
+        /// <remarks><paramref name="newParent"/> may be <c>null</c> in which case the given node becomes a root</remarks>
         public void Reparent(Node newParent)
         {
             if (this == newParent)

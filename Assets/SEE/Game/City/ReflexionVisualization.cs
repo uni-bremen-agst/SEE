@@ -242,14 +242,17 @@ namespace SEE.Game.City
         /// <param name="mapsToEdge">The edge which has been removed.</param>
         private static void HandleRemovedMapping(Edge mapsToEdge)
         {
-            Node implNode = mapsToEdge.Source;
-            GameObject implGameNode = implNode.RetrieveGameNode();
+            // FIXME: This code is currently commented out. If we are confident that it is really
+            // not needed, we need to remove it.
+
+            //Node implNode = mapsToEdge.Source;
+            //GameObject implGameNode = implNode.RetrieveGameNode();
 
             // Node's original parent should be restored.
-            implGameNode.transform.SetParent(implNode.Parent.RetrieveGameNode().transform);
+            //implGameNode.transform.SetParent(implNode.Parent.RetrieveGameNode().transform);
 
             // The layout of all attached edges need to be updated as well.
-            implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
+            //implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
         }
 
         /// <summary>
@@ -261,21 +264,24 @@ namespace SEE.Game.City
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(Edge.IsVirtualToggle);
 
-            Node implNode = mapsToEdge.Source;
-            GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
-            GameObject implGameNode = implNode.RetrieveGameNode();
+            // FIXME: This code is currently commented out. If we are confident that it is really
+            // not needed, we need to remove it.
 
-            Vector3 oldPosition = implGameNode.transform.position;
+            //Node implNode = mapsToEdge.Source;
+            //GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
+            //GameObject implGameNode = implNode.RetrieveGameNode();
+
+            //Vector3 oldPosition = implGameNode.transform.position;
 
             // TODO: Rather than returning the old scale from PutOn, lossyScale should be used.
-            Vector3 oldScale = GameNodeMover.PutOn(implGameNode.transform, archGameNode, scaleDown: true, topPadding: 0.3f);
-            Vector3 newPosition = implGameNode.transform.position;
-            Vector3 newScale = implGameNode.transform.localScale;
-            implGameNode.transform.position = oldPosition;
-            implGameNode.transform.localScale = oldScale;
-            NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
-            nodeOperator.MoveYTo(newPosition.y, ANIMATION_DURATION);
-            nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
+            //Vector3 oldScale = GameNodeMover.PutOn(implGameNode.transform, archGameNode, scaleDown: true, topPadding: 0.3f);
+            //Vector3 newPosition = implGameNode.transform.position;
+            //Vector3 newScale = implGameNode.transform.localScale;
+            //implGameNode.transform.position = oldPosition;
+            //implGameNode.transform.localScale = oldScale;
+            //NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
+            //nodeOperator.MoveYTo(newPosition.y, ANIMATION_DURATION);
+            //nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
         }
     }
 }

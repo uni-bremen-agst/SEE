@@ -1,8 +1,9 @@
-﻿using System;
+﻿using SEE.Game;
+using System;
 using System.Net;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// !!! IMPORTANT !!!
@@ -203,6 +204,27 @@ namespace SEE.Net
         /// returning <code>false</code>.
         /// </summary>
         protected abstract void ExecuteOnClient();
+
+        /// <summary>
+        /// Retrieves and returns the game object registered at <see cref="GraphElementIDMap"/>
+        /// under the given <paramref name="ID"/>.
+        /// </summary>
+        /// <param name="ID">the unique ID that is to be used to retrieve the game object</param>
+        /// <returns>the game object registered at <see cref="GraphElementIDMap"/></returns>
+        /// <exception cref="Exception">thrown if <see cref="GraphElementIDMap"/>
+        /// has no game object registered by <paramref name="ID"/></exception>
+        protected static GameObject Find(string ID)
+        {
+            GameObject result = GraphElementIDMap.Find(ID);
+            if (result == null)
+            {
+                throw new Exception($"There is no game object with the ID {ID}.");
+            }
+            else
+            {
+                return result;
+            }
+        }
 
 #if UNITY_EDITOR
         /// <summary>

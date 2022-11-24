@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
@@ -212,24 +211,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Raycasts against the given <paramref name="plane"/>. If the plane is hit, <paramref name="hit"/>
-        /// contains the co-ordinates of the location where the raycast hit the <paramref name="plane"/>
-        /// and <c>true</c> is returned. If the plane is not hit, <c>false</c> is returned and <paramref name="hit"/>
-        /// will be <see cref="Vector3.positiveInfinity"/>.
-        /// </summary>
-        /// <param name="plane">The plane to raycast against.</param>
-        /// <param name="hit">The hit point on the plane or <see cref="Vector3.positiveInfinity"/>,
-        /// if ray and plane are parallel.</param>
-        /// <returns>Whether the plane was hit.</returns>
-        public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)
-        {
-            Ray ray = UserPointsTo();
-            bool result = plane.Raycast(ray, out float enter);
-            hit = result ? ray.GetPoint(enter) : Vector3.positiveInfinity;
-            return result;
-        }
-
-        /// <summary>
         /// Raycasts against the clipping plane.
         /// </summary>
         /// <param name="clippingPlane">The plane, which defines the clipping area.</param>
@@ -261,7 +242,26 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// A ray from the user's mouse.
+        /// Raycasts against the given <paramref name="plane"/>. If the plane is hit, <paramref name="hit"/>
+        /// contains the co-ordinates of the location where the raycast hit the <paramref name="plane"/>
+        /// and <c>true</c> is returned. If the plane is not hit, <c>false</c> is returned and <paramref name="hit"/>
+        /// will be <see cref="Vector3.positiveInfinity"/>.
+        /// </summary>
+        /// <param name="plane">The plane to raycast against.</param>
+        /// <param name="hit">The hit point on the plane or <see cref="Vector3.positiveInfinity"/>,
+        /// if ray and plane are parallel.</param>
+        /// <returns>Whether the plane was hit.</returns>
+        public static bool RaycastPlane(UnityEngine.Plane plane, out Vector3 hit)
+        {
+            Ray ray = UserPointsTo();
+            bool result = plane.Raycast(ray, out float enter);
+            hit = result ? ray.GetPoint(enter) : Vector3.positiveInfinity;
+            return result;
+        }
+
+        /// <summary>
+        /// A ray from the user's pointing device (mouse in a desktop environment,
+        /// controller in VR).
         /// </summary>
         /// <returns>ray from the user's mouse</returns>
         public static Ray UserPointsTo()

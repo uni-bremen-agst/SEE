@@ -2,7 +2,7 @@
 using System.Linq;
 using SEE.Game;
 using SEE.GO;
-using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;

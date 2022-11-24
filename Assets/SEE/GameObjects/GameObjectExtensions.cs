@@ -84,14 +84,27 @@ namespace SEE.GO
         /// <summary>
         /// True if <paramref name="gameNode"/> represents a leaf in the graph.
         ///
-        /// Precondition: <paramref name="gameNode"/> has a NodeRef component attached to it
-        /// that is a valid graph node reference.
+        /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
+        /// attached to it that is a valid graph node reference.
         /// </summary>
         /// <param name="gameNode">game object representing a Node to be queried whether it is a leaf</param>
         /// <returns>true if <paramref name="gameNode"/> represents a leaf in the graph</returns>
         public static bool IsLeaf(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsLeaf() ?? false;
+        }
+
+        /// <summary>
+        /// True if <paramref name="gameNode"/> represents the root of the graph.
+        ///
+        /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
+        /// attached to it that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is a root node</param>
+        /// <returns>true if <paramref name="gameNode"/> represents a root in the graph</returns>
+        public static bool IsRoot(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
         }
 
         /// <summary>
@@ -558,7 +571,6 @@ namespace SEE.GO
             {
                 node = nodeRef.Value;
             }
-
             return node != null;
         }
 
@@ -570,6 +582,8 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">the game object whose Node is requested</param>
         /// <returns>the correponding graph node (will never be null)</returns>
+        /// <exception cref="NullReferenceException">thrown if <paramref name="gameObject"/> has
+        /// no valid <see cref="NodeRef"/> or <see cref="Node"/></exception>
         public static Node GetNode(this GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out NodeRef nodeRef))

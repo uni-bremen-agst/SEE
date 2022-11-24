@@ -1,14 +1,13 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
+using TinySpline;
 using UnityEngine;
-using static SEE.Utils.Raycasting;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -18,160 +17,42 @@ namespace SEE.Game
     public static class GameNodeMover
     {
         /// <summary>
-        /// The speed by which to move a selected object.
-        /// </summary>
-        private const float MOVING_SPEED = 1.0f;
-
-        /// <summary>
         /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
         /// </summary>
         public const float SCALING_FACTOR = 0.2f;
 
-        private const float OUTER_EDGE_MARGIN = 0.02f;
-
         /// <summary>
-        /// Moves the given <paramref name="movingObject"/> on a sphere around the
-        /// camera. The radius sphere of this sphere is the original distance
-        /// from the <paramref name="movingObject"/> to the camera. The point
-        /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
+        /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
+        /// game-object hierarchy and in the underlying graph. If <paramref name="newParent"/>
+        /// is null, the <paramref name="child"/> becomes a root in the underlying graph
+        /// and will have <c>null</c> as its game-object parent.
         ///
-        /// This method is expected to be called at every Update().
-        /// </summary>
-        /// <param name="movingObject">the object to be moved.</param>
-        public static void MoveTo(GameObject movingObject)
-        {
-            float step = MOVING_SPEED * Time.deltaTime;
-            // FIXME regarding 'target': currently, the tip of the ray is of a fixed distance from
-            // the ray starting position into the ray direction. it would be better if we did a
-            // raycast into the scene, see what we hit and use that as the tip. the result feels
-            // way better and it also prevents intersection with other objects.
-            Vector3 target = TipOfRayPosition(movingObject);
-            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
-        }
-
-        /// <summary>
-        /// Finalizes the position of the <paramref name="movingObject"/>. If the current
-        /// pointer of the user is pointing at a game object with a <see cref="NodeRef"/>, the final
-        /// position of <paramref name="movingObject"/> will be the game object with a <see cref="NodeRef"/>
-        /// that is at the deepest level of the node hierarchy (the pointer may actually
-        /// hit multiple nested nodes), in the following called target parent. The
-        /// <paramref name="movingObject"/> will then be placed onto the roof of the target
-        /// parent and its associated graph node will be become a child of the graph node
-        /// associated with the target parent and <paramref name="movingObject"/> becomes
-        /// a child of the target node (the game-node hierarchy and the graph-node hierarchy
-        /// must be in sync). That target node is returned.
-        /// 
-        /// If no such target node can be identified, neither the graph-node hierarchy
-        /// nor the game-node hierarchy will be changed and null will be returned.
-        /// 
-        /// The assumption is that <paramref name="movingObject"/> is not the root node
-        /// of a code city.
-        /// </summary>
-        /// <param name="movingObject">the object being moved</param>
-        /// <param name="parent">Will be set to the new parent of <paramref name="movingObject"/> (may be null)</param>
-        /// <returns>Whether the movement shall be actually implemented.
-        /// Will be false if, e.g., the movement was illegal—in such a case, the movement must be cancelled.</returns>
-        public static bool FinalizePosition(GameObject movingObject, out GameObject parent)
-        {
-            // The underlying graph node of the moving object.
-            NodeRef movingNodeRef = movingObject.GetComponent<NodeRef>();
-            Node movingNode = movingNodeRef.Value;
-
-            RaycastLowestNode(out RaycastHit? raycastHit, out Node newGraphParent, movingNodeRef);
-
-            if (newGraphParent != null && raycastHit != null)
-            {
-                // The new parent of the movingNode in the game-object hierarchy.
-                GameObject newGameParent = raycastHit.Value.collider.gameObject;
-
-                if (movingObject.IsInArea(newGameParent, OUTER_EDGE_MARGIN))
-                {
-                    ShowNotification.Error("Node placed in margins", "Nodes can't be placed in the outer margins of other nodes!", log: false);
-                    parent = null;
-                    return false;
-                }
-
-                if (newGraphParent.IsInArchitecture() && movingNode.IsInImplementation())
-                {
-                    // Reflexion analysis already done in MoveAction
-                    // TODO: Make sure this action is still reversible
-                }
-                else if (newGraphParent.IsInImplementation() && movingNode.IsInArchitecture())
-                {
-                    ShowNotification.Error("Reflexion Analysis", "Please map from implementation to "
-                                                                 + "architecture, not the other way around.", log: false);
-                    parent = null;
-                    return false;
-                }
-                else if (newGraphParent.IsInImplementation() && movingNode.IsInImplementation() && movingNode.IsInMapping())
-                {
-                    // We are moving an already mapped node back to its implementation city, so we should unmap it.
-                    SEEReflexionCity reflexionCity = newGameParent.ContainingCity<SEEReflexionCity>();
-                    ReflexionGraph analysis = reflexionCity.ReflexionGraph;
-                    analysis.RemoveFromMapping(movingNode);
-                }
-                else if (!movingNode.IsInImplementation())
-                {
-                    // The new position of the movingNode in world space.
-                    Vector3 newPosition = raycastHit.Value.point;
-                    movingObject.AddOrGetComponent<NodeOperator>().MoveTo(newPosition, 0);
-                    if (movingNode.Parent != newGraphParent)
-                    {
-                        movingNode.Reparent(newGraphParent);
-                        movingObject.transform.SetParent(newGameParent.transform);
-                    }
-                }
-
-                parent = newGameParent;
-                return true;
-            }
-            else
-            {
-                // Attempt to move the node outside of any node in the node hierarchy.
-                parent = null;
-                if (movingNode.IsInImplementation())
-                {
-                    SEEReflexionCity reflexionCity = movingObject.ContainingCity<SEEReflexionCity>();
-
-                    if (movingNode.IsInMapping())
-                    {
-                        // If the node was already mapped, we'll unmap it again.
-                        ReflexionGraph analysis = reflexionCity.ReflexionGraph;
-                        analysis.RemoveFromMapping(movingNode);
-                    }
-                }
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Sets the new parent for <paramref name="child"/> to the game node with <paramref name="parentName"/>
-        /// at the given <paramref name="position"/> in world space.
+        /// Precondition: <paramref name="child"/> and <paramref name="newParent"/> must
+        /// be game nodes associated with a graph node.
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
-        /// <param name="parentName">the new parent's name (assumed to be unique)</param>
-        /// <param name="position">new position</param>
-        public static void Reparent(GameObject child, string parentName, Vector3 position)
+        /// <param name="newParent">new parent</param>
+        /// <remarks>This method changes only the parentship in the game-object hierarchy
+        /// and the graph-node hierarchy. It does not change any visual attribute
+        /// of either of the two nodes.</remarks>
+        public static void SetParent(GameObject child, GameObject newParent)
         {
-            GameObject parent = GraphElementIDMap.Find(parentName);
-            if (parent != null)
+            if (newParent != null)
             {
-                child.transform.position = position;
-                PutOn(child.transform, parent, parent.transform.position.XZ());
-                child.GetComponent<NodeRef>().Value.Reparent(parent.GetComponent<NodeRef>().Value);
-                child.transform.SetParent(parent.transform);
+                child.GetComponent<NodeRef>().Value.Reparent(newParent.GetComponent<NodeRef>().Value);
+                child.transform.SetParent(newParent.transform);
             }
             else
             {
-                throw new Exception($"No parent found with name {parentName}.");
+                child.GetComponent<NodeRef>().Value.Reparent(null);
+                child.transform.SetParent(null);
             }
         }
 
         /// <summary>
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
-        /// assuming <paramref name="scaleDown"/> is true.
+        /// assuming <paramref name="scaleDown"/> is true. This method makes sure that <paramref name="child"/>
+        /// will be contained within the area of the roof of <paramref name="parent"/>.
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
@@ -194,80 +75,199 @@ namespace SEE.Game
             }
 
             NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
-            Vector3 oldScale = child.localScale;
+            Vector3 oldLocalScale = child.localScale;
             if (scaleDown)
             {
-                nodeOperator.ScaleTo(new Vector3(SCALING_FACTOR, SCALING_FACTOR, SCALING_FACTOR), 0);
+                nodeOperator.ScaleTo(ScaleDown(child, parent), 0);
             }
+            // ScaleTo with animation duration = 0 has immediate effect.
+            Vector3 newWorldScale = child.lossyScale;
 
+            // Where to move the child.
+            Vector3 targetWorldPosition = child.position;
             float parentRoof = parent.GetRoof();
-            nodeOperator.MoveYTo(parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y, 0);
+            targetWorldPosition.y = parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y;
+
             if (targetXZ.HasValue)
             {
-                nodeOperator.MoveXTo(targetXZ.Value.x, 0);
-                nodeOperator.MoveZTo(targetXZ.Value.y, 0);
+                targetWorldPosition.x = targetXZ.Value.x;
+                targetWorldPosition.z = targetXZ.Value.y;
             }
 
-            return oldScale;
+            // Make sure mappingTarget stays within the roof of parent. We do not
+            // work with local position here because we cannot assume that child
+            // is actually a game-object child of parent (only if setParent were true,
+            // we could assume that).
+            {
+                Vector3 parentWorldExtent = parent.transform.lossyScale / 2;
+                Vector3 childWorldExtent = newWorldScale / 2;
+
+                // Fit child into x range of parent.
+                if (targetWorldPosition.x + childWorldExtent.x > parent.transform.position.x + parentWorldExtent.x)
+                {
+                    // Right corner of child must not be farther than right corner of parent.
+                    targetWorldPosition.x = parent.transform.position.x + parentWorldExtent.x - childWorldExtent.x;
+                }
+                else if (targetWorldPosition.x - childWorldExtent.x < parent.transform.position.x - parentWorldExtent.x)
+                {
+                    // Left corner of child must be right from right corner of parent.
+                    targetWorldPosition.x = parent.transform.position.x - parentWorldExtent.x + childWorldExtent.x;
+                }
+
+                // Fit child into z range of parent.
+                if (targetWorldPosition.z + childWorldExtent.z > parent.transform.position.z + parentWorldExtent.z)
+                {
+                    // Front edge of child must not be farther than back edge of parent.
+                    targetWorldPosition.z = parent.transform.position.z + parentWorldExtent.z - childWorldExtent.z;
+                }
+                else if (targetWorldPosition.z - childWorldExtent.z < parent.transform.position.z - parentWorldExtent.z)
+                {
+                    // Front edge of child must not be before front edge of parent.
+                    targetWorldPosition.z = parent.transform.position.z - parentWorldExtent.z + childWorldExtent.z;
+                }
+            }
+
+            nodeOperator.MoveTo(targetWorldPosition, 0);
+            return oldLocalScale;
+
+            // Returns the target local scale of child relative to parent when child is to be put onto parent.
+            static Vector3 ScaleDown(Transform child, GameObject parent)
+            {
+                // TODO: We need a strategy to scale down a node to the maximal size that is still
+                // fitting into the area where the nodes has been placed.
+                // We want to shrink only the ground area, but maintain the height.
+                float localHeight = parent.transform.lossyScale.y == 0 ?
+                    0 : child.transform.lossyScale.y / parent.transform.lossyScale.y;
+                return new Vector3(SCALING_FACTOR, localHeight, SCALING_FACTOR);
+            }
         }
 
         /// <summary>
-        /// Moves the given <paramref name="movingObject"/> on a sphere around the
-        /// camera. The radius of this sphere is the original distance
-        /// from the <paramref name="movingObject"/> to the camera. The point
-        /// on that sphere is determined by a ray driven by the user hitting
-        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
-        ///
-        /// This method is expected to be called at every Update().
-        ///
-        /// You can lock any of the three axes.
+        /// Puts <paramref name="child"/> on <paramref name="newParent"/> visually. If <paramref name="newParent"/>
+        /// is different from <paramref name="originalParent"/>, the <paramref name="child"/> will be scaled
+        /// down so that it fits into <paramref name="newParent"/>. If instead <paramref name="newParent"/>
+        /// and <paramref name="originalParent"/> are the same, <paramref name="child"/> will be scaled back
+        /// to its <paramref name="originalLocalScale"/>.
         /// </summary>
-        /// <param name="movingObject">the object to be moved</param>
-        /// <param name="lockX">whether the movement should be locked on this axis</param>
-        /// <param name="lockY">whether the movement should be locked on this axis</param>
-        /// <param name="lockZ">whether the movement should be locked on this axis</param>
-        public static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
+        /// <remarks>Calling this method is equivalent to <see cref="PutOn(child, newParent, scaleDown: newParent != originalParent.gameObject)"/>
+        /// with a previous scaling of <paramref name="child"/> to <paramref name="originalLocalScale"/> if
+        /// <paramref name="newParent"/> equals <paramref name="originalParent"/>.</remarks>
+        /// <param name="child">game object to be put onto <paramref name="newParent"/></param>
+        /// <param name="newParent">where to put <paramref name="child"/></param>
+        /// <param name="originalParent">the <paramref name="originalParent"/> of <paramref name="child"/></param>
+        /// <param name="originalLocalScale">original local scale of <paramref name="child"/> relative to
+        /// <paramref name="originalParent"/>; used to restore this scale if <paramref name="newParent"/>
+        /// and <paramref name="originalParent"/> are the same</param>
+        internal static void PutOnAndFit(Transform child, GameObject newParent,
+            GameObject originalParent, Vector3 originalLocalScale)
         {
-            float step = MOVING_SPEED * Time.deltaTime;
-            Vector3 target = TipOfRayPosition(movingObject);
-            Vector3 movingObjectPos = movingObject.transform.position;
-
-            if (!lockX)
+            bool scaleDown = newParent != originalParent.gameObject;
+            if (!scaleDown)
             {
-                target.x = movingObjectPos.x;
+                // The gameObject may have already been scaled down, hence,
+                // we need to restore its original scale.
+                child.gameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, 0);
             }
-
-            if (!lockY)
-            {
-                target.y = movingObjectPos.y;
-            }
-
-            if (!lockZ)
-            {
-                target.z = movingObjectPos.z;
-            }
-
-            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
+            PutOn(child, newParent, scaleDown: scaleDown);
         }
 
-        // -------------------------------------------------------------
-        // User input
-        // -------------------------------------------------------------
+        /// <summary>
+        /// Moves <paramref name="gameObject"/> (assumed to represent a node) to <paramref name="targetPosition"/>
+        /// through some animation. All existing animations are cancelled.
+        /// </summary>
+        /// <param name="gameObject">game node to be moved</param>
+        /// <param name="targetPosition">target position in world space</param>
+        /// <param name="duration">the duration of the animation in seconds</param>
+        internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float duration)
+        {
+            if (gameObject.TryGetComponent(out NodeOperator nodeOperator))
+            {
+                // FIXME: Why is this killing necessary. Do we need to re-enable it?
+                // KillActiveAnimations(nodeOperator);
+                nodeOperator.MoveTo(targetPosition, duration);
+                // FIXME: Isn't that meanwhile handled by the NodeOperator? Do we need to re-enable it?
+                //MorphEdgesToSplines(gameObject, duration);
+            }
+
+            void KillActiveAnimations(NodeOperator nodeOperator)
+            {
+                if (gameObject.TryGetNodeRef(out NodeRef node))
+                {
+                    // We will also kill any active tweens (=> Reflexion Analysis), if necessary.
+                    if (node.Value.IsInImplementation() || node.Value.IsInArchitecture())
+                    {
+                        // TODO: Instead of just killing animations here with this trick,
+                        //       handle all movement inside the NodeOperator.
+                        nodeOperator.MoveTo(nodeOperator.TargetPosition, 0);
+                    }
+                }
+            }
+        }
 
         /// <summary>
-        /// Returns the position of the tip of the ray drawn from the camera towards
-        /// the position the user is currently pointing to. The distance of that
-        /// point along this ray is the distance between the camera from which the
-        /// ray originated and the position of the given <paramref name="selectedObject"/>.
-        ///
-        /// That means, the selected object moves on a sphere around the camera
-        /// at the distance of the selected object.
+        /// Morphs the incoming and outgoing edges of <see cref="gameObject"/> to simple splines.
         /// </summary>
-        /// <param name="selectedObject">the selected object currently moved around</param>
-        /// <returns>tip of the ray</returns>
-        private static Vector3 TipOfRayPosition(GameObject selectedObject)
+        /// <param name="duration">the duration of the morphing animation in seconds</param>
+        private static void MorphEdgesToSplines(GameObject gameObject, float duration)
         {
-            return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
+            // The minimal y offset for the point in between the start and end
+            // of a spline through which the spline should pass.
+            const float MinimalSplineOffset = 0.05f;
+
+            // We will also "stick" the connected edges to the moved node during its movement.
+            // In order to do this, we need to modify the splines of each one.
+            // --------------------------------------------------------------------------------
+            // FIXME: This is too simplistic. It does not handle the case of moving an inner
+            // node whose descendants have connecting edges. The descendants will be moved
+            // along with the inner node, but not their edges.
+            // --------------------------------------------------------------------------------
+            foreach ((SEESpline connectedSpline, bool nodeIsSource) hitEdge in GetConnectedEdges(gameObject))
+            {
+                Edge edge = hitEdge.connectedSpline.gameObject.GetComponent<EdgeRef>().Value;
+                BSpline spline;
+                if (hitEdge.nodeIsSource)
+                {
+                    spline = SplineEdgeLayout.CreateSpline(gameObject.transform.position,
+                                                           edge.Target.RetrieveGameNode().transform.position,
+                                                           true,
+                                                           MinimalSplineOffset);
+                }
+                else
+                {
+                    spline = SplineEdgeLayout.CreateSpline(edge.Source.RetrieveGameNode().transform.position,
+                                                           gameObject.transform.position,
+                                                           true,
+                                                           MinimalSplineOffset);
+                }
+
+                if (hitEdge.connectedSpline.gameObject.TryGetComponentOrLog(out EdgeOperator edgeOperator))
+                {
+                    edgeOperator.MorphTo(spline, duration);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of <see cref="SEESpline"/>s of the incoming and outgoing edges
+        /// of <paramref name="gameNode"/>. The boolean in the returned pair indicates
+        /// whether the edge is outgoing (if it is false, the edge is incoming).
+        /// </summary>
+        private static IList<(SEESpline, bool nodeIsSource)> GetConnectedEdges(GameObject gameNode)
+        {
+            IList<(SEESpline, bool nodeIsSource)> ConnectedEdges = new List<(SEESpline, bool)>();
+            if (gameNode.TryGetNode(out Node node))
+            {
+                foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+                {
+                    GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                    Assert.IsNotNull(gameEdge);
+                    if (gameEdge.TryGetComponentOrLog(out SEESpline spline))
+                    {
+                        ConnectedEdges.Add((spline, node == edge.Source));
+                    }
+                }
+            }
+            return ConnectedEdges;
         }
     }
 }

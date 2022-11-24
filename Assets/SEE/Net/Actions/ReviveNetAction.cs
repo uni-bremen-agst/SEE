@@ -3,7 +3,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class propagates an undo of <see cref="DeleteAction"/> to all clients
