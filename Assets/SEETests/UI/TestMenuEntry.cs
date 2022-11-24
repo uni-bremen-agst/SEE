@@ -63,7 +63,7 @@ namespace SEETests.UI
             Assert.AreEqual(true, entry.Enabled);
             Assert.AreEqual(null, entry.Icon);
             Assert.AreEqual(default(Color), entry.EntryColor);
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 
             Assert.AreNotEqual(default(Color), entry.DisabledColor, "Entry color must differ from disabled color!");
 #endif
@@ -92,7 +92,7 @@ namespace SEETests.UI
             Assert.AreEqual(enabled, entry.Enabled);
             Assert.AreEqual(icon, entry.Icon);
             Assert.AreEqual(entryColor, entry.EntryColor);
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 
             Debug.Log($"{entryColor}, {entry.DisabledColor}");
             Assert.AreNotEqual(entryColor, entry.DisabledColor, "Disabled color must differ from normal color!");

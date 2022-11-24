@@ -23,7 +23,7 @@ SOFTWARE.
 
 using System.Collections.Generic;
 using UnityEngine;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
 
@@ -31,7 +31,7 @@ namespace SEE.GO.Whiteboard
 {
     [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     [RequireComponent(typeof(Rigidbody))]
-#if !UNITY_STANDALONE_OSX
+#if  INCLUDE_STEAM_VR
     [RequireComponent(typeof(Interactable))]
 #endif
     public class DraggableObject : MonoBehaviour
@@ -39,7 +39,7 @@ namespace SEE.GO.Whiteboard
         [SerializeField] private readonly Transform wallTransform, offsetTransform;
 
         [SerializeField] private readonly float followingSpeed = 50f;
-
+		
         protected Rigidbody mRigidbody;
 
         private const int MaxNumberOfPositions = 8;
@@ -57,7 +57,7 @@ namespace SEE.GO.Whiteboard
         {
             get { return controllerTransform != null; }
         }
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// SteamVR component required for interactions. We assume the gameObject has it as 
         /// component attached. It will be set in Start().
@@ -71,7 +71,7 @@ namespace SEE.GO.Whiteboard
 
             startPosition = mRigidbody.position;
             starRotation = mRigidbody.rotation;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             interactable = GetComponent<Interactable>();
             if (interactable == null)
             {
@@ -193,7 +193,7 @@ namespace SEE.GO.Whiteboard
         // Private actions called by the hand when the object is hovered.
         //---------------------------------------------------------------
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Called by the Hand when that Hand starts hovering over this object.
         /// 

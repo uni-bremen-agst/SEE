@@ -222,7 +222,7 @@ namespace SEE.Game.UI.Menu
                 else
                 {
                     buttonManager.useRipple = false;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 
                     buttonImage.color = entry.DisabledColor;
                     textMeshPro.color = entry.DisabledColor.IdealTextColor();

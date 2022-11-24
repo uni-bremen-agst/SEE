@@ -3,7 +3,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
 using UnityEngine;
-#if !UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_WIN
 using Valve.VR.InteractionSystem;
 #endif
 namespace SEE.Game
@@ -29,7 +29,7 @@ namespace SEE.Game
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 
             Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
             interactable.highlightOnHover = false;

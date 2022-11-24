@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.Actions;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
 
@@ -18,7 +18,7 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (newState != null)
             {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
                 ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
 #endif
             }

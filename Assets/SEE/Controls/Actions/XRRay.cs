@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 #endif
@@ -52,10 +52,9 @@ namespace SEE.Controls.Actions
             /// </summary>
             private bool buttonEventConsumed = false;
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             private readonly SteamVR_Action_Boolean button;
-#endif
-#if !UNITY_STANDALONE_OSX
+
             public DelayedToggle(SteamVR_Action_Boolean button)
             {
                 this.button = button;
@@ -64,7 +63,7 @@ namespace SEE.Controls.Actions
 
             public void OnUpdate()
             {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
                 if (button.stateDown)
                 {
                     buttonEventConsumed = false;
@@ -87,7 +86,7 @@ namespace SEE.Controls.Actions
         }
 
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         [Tooltip("The VR controller for pointing")]
         public Hand PointingHand;
 #endif
@@ -115,7 +114,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         [Tooltip("The width of the selection ray line")]
         public float rayWidth = 0.005f;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         private readonly SteamVR_Action_Single GrabAction =
  SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, "Grab");
 
@@ -124,14 +123,14 @@ namespace SEE.Controls.Actions
 #endif
         private DelayedToggle selectionButton;
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The position of the PointingHand.
         /// </summary>
         public Vector3 Position => PointingHand.transform.position;
 #endif
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The direction the PointingHand points to.
         /// </summary>
@@ -148,7 +147,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject lineRendererGameObject;
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// True if the user presses the grabbing button ("Grab" in SteamVR) deeply enough.
         /// </summary>
@@ -157,7 +156,7 @@ namespace SEE.Controls.Actions
 
         private void Start()
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             selectionButton = new DelayedToggle(SelectionButton);
 #endif
 
@@ -188,11 +187,11 @@ namespace SEE.Controls.Actions
         private void Update()
         {
             selectionButton.OnUpdate();
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             bool isGrabbing = IsGrabbing;
 #endif
             bool isSelecting = selectionButton.State;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             if (isGrabbing || isSelecting)
             {
                 bool result = Physics.Raycast(Position, Direction, out RaycastHit hitInfo, RayDistance);
@@ -219,7 +218,7 @@ namespace SEE.Controls.Actions
         /// <paramref name="selectedObject"/> is different from <c>null</c></param>
         private void ShowRay(GameObject selectedObject, Vector3 rayEnd)
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             Vector3 origin = Position;
             lineRenderer.SetPosition(0, origin);
 
@@ -256,7 +255,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void HideRay()
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             Vector3 origin = Position;
             lineRenderer.SetPosition(0, origin);
             lineRenderer.SetPosition(1, origin);

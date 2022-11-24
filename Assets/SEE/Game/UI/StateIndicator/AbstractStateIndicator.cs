@@ -3,7 +3,7 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
 
@@ -52,7 +52,7 @@ namespace SEE.Game.UI.StateIndicator
         /// </summary>
         protected Image ModePanelImage;
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
@@ -71,7 +71,7 @@ namespace SEE.Game.UI.StateIndicator
         /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text, Color color)
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             if (HasStarted)
             {
                 ModePanelImage.color = color.ColorWithAlpha(0.5f);
@@ -99,7 +99,7 @@ namespace SEE.Game.UI.StateIndicator
 
             if (indicator.TryGetComponentOrLog(out ModePanelImage))
             {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
                 ModePanelImage.color = StartColor;
 #endif
             }

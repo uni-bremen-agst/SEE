@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 #endif
@@ -15,7 +15,7 @@ namespace SEE.Controls
         /// Gravity of the player. This is required to let a player jump down from platforms.
         /// </summary>
         private static readonly Vector3 gravity = new Vector3(0, 0.981f, 0);
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         [Tooltip("The VR controller for directing")]
         public Hand DirectingHand;
 #endif
@@ -23,7 +23,7 @@ namespace SEE.Controls
         public bool KeepDirectionInPlane = false;
 
         public CharacterController characterController;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         private readonly SteamVR_Action_Single throttleAction =
  SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, XRInput.ThrottleActionName);
 #endif
@@ -34,7 +34,7 @@ namespace SEE.Controls
         /// </summary>
         public void Update()
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             // Check for the magnitude of the speed up so that the teleport locomotion
             // system does not interfere with the locomotion based on the VR controller
             // direction and throttle.

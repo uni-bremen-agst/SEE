@@ -9,6 +9,7 @@
     "includePlatforms": [],
     "excludePlatforms": [
         "Android",
+        "LinuxStandalone64",
         "macOSStandalone"
     ],
     "allowUnsafeCode": false,

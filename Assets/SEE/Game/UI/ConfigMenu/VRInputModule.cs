@@ -22,7 +22,7 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 #endif
 
@@ -35,7 +35,8 @@ namespace SEE.Game.UI.ConfigMenu
     /// </summary>
     public class VRInputModule : BaseInputModule
     {
-#if !UNITY_STANDALONE_OSX
+       
+#if INCLUDE_STEAM_VR
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.LeftHand;
         private readonly SteamVR_Action_Boolean clickAction = SteamVR_Actions._default.InteractUI;
 #endif
@@ -66,7 +67,7 @@ namespace SEE.Game.UI.ConfigMenu
             HandlePointerExitAndEnter(data, currentObject);
             ExecuteEvents.Execute(data.pointerDrag, data, ExecuteEvents.dragHandler);
 
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 
             if (clickAction.GetStateDown(inputSource))
             {

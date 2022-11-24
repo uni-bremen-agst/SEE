@@ -20,7 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Game.Charts;
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 #endif
 
@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
 {
     public class XRChartAction : ChartAction
     {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
         private readonly SteamVR_Action_Vector2 moveAction =
             SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
 
@@ -45,7 +45,7 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-#if !UNITY_STANDALONE_OSX
+#if INCLUDE_STEAM_VR
             if (resetAction.stateDown)
             {
                 ChartManager.ResetPosition();
