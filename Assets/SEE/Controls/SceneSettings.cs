@@ -157,15 +157,26 @@ namespace SEE.Controls
             // Turn off VR controller hints if requested in the user settings.
             if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
-                foreach (Hand hand in Player.instance.hands)
+                if (Player.instance != null)
                 {
-                    ControllerButtonHints.HideAllButtonHints(hand);
-                    ControllerButtonHints.HideAllTextHints(hand);
+                    foreach (Hand hand in Player.instance.hands)
+                    {
+                        ControllerButtonHints.HideAllButtonHints(hand);
+                        ControllerButtonHints.HideAllTextHints(hand);
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"{nameof(Player)}.instance is null. Is VR running?\n");
                 }
 
                 if (Teleport.instance != null)
                 {
                     Teleport.instance.CancelTeleportHint();
+                }
+                else
+                {
+                    Debug.LogWarning($"{nameof(Teleport)}.instance is null. Is there no teleport area in the scene?\n");
                 }
             }
 #if UNITY_EDITOR
@@ -298,7 +309,7 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (playerInputType == PlayerInputType.VRPlayer)
+            if (playerInputType == PlayerInputType.VRPlayer && Player.instance != null)
             {
                 foreach (Hand hand in Player.instance.hands)
                 {
