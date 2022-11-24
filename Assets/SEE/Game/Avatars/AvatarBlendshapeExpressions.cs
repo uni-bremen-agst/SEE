@@ -46,7 +46,7 @@ namespace SEE.Game.Avatars
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Open", 100, junkData, junkData, junkData); // Jaw_Open_Close - range (0 - 1) 
 
             // Mouth
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Ape_Shape", 100, junkData, junkData, junkData); // Ganzen Mund nach unten ziehen
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Ape_Shape", 100, junkData, junkData, junkData); // Ganzen Mund nach unten ziehen TODO
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_Left", 100, junkData, junkData, junkData); // Mouth Left_Right - range (0 - 1)
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_Right", 100, junkData, junkData, junkData); // Mouth Left_Right - range (-1 - 0)
@@ -54,8 +54,8 @@ namespace SEE.Game.Avatars
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Left", 100, junkData, junkData, junkData); // Mouth Left_Right - range (0 - 1)
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Right", 100, junkData, junkData, junkData); // Mouth Left_Right - range (-1 - 0)
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_Overturn", 100, junkData, junkData, junkData); // ??
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Overturn", 100, junkData, junkData, junkData); // ??
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_Overturn", 100, junkData, junkData, junkData); // TODO
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Overturn", 100, junkData, junkData, junkData); // TODO
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Pout", 100, junkData, junkData, junkData); // Mouth Narrow_Pucker (but only (0-1) ??)
 
@@ -66,37 +66,37 @@ namespace SEE.Game.Avatars
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Sad_Right", 100, junkData, junkData, junkData); // Left Mouth Smile_Frown (-1 - 0)
 
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_UpLeft", 100, junkData, junkData, junkData); // Left Upper Lip Up_Down
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_UpRight", 100, junkData, junkData, junkData); // Right Upper Lip Up_Down
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_DownLeft", 100, junkData, junkData, junkData); // Left Lower Lip Up_Down
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_DownRight", 100, junkData, junkData, junkData); // Right Lower Lip Up_Down
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_UpLeft", 100, junkData, junkData, junkData); // Left Upper Lip Up_Down - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_UpRight", 100, junkData, junkData, junkData); // Right Upper Lip Up_Down - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_DownLeft", 100, junkData, junkData, junkData); // Left Lower Lip Up_Down - range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_DownRight", 100, junkData, junkData, junkData); // Right Lower Lip Up_Down - range (-1 - 0)
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Upper_Inside", 100, junkData, junkData, junkData); // Left Upper Lip Up_Down && Right Upper Lip Up_Down (-1 - 1)
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Inside", 100, junkData, junkData, junkData); // Left Lower Lip Up_Down && Right Lower Lip Up_Down (0 - 1)
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Overlay", 100, junkData, junkData, junkData); // Maybe Jaw Close with range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Overlay", 100, junkData, junkData, junkData); // Maybe Jaw Close with range (-1 - 0) TODO
 
             // Tongue
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_LongStep1", 100, junkData, junkData, junkData); // Zunge leicht anheben
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_LongStep2", 100, junkData, junkData, junkData); // Tongue Out
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_LongStep1", 100, junkData, junkData, junkData); // Zunge leicht anheben?? TODO
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_LongStep2", 100, junkData, junkData, junkData); // Tongue Out - range (0 - 1)
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Left", 100, junkData, junkData, junkData); // Tongue Left_Right
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Right", 100, junkData, junkData, junkData); // Zunge Left_Right
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Up", 100, junkData, junkData, junkData); // Tongue Up_Down
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Down", 100, junkData, junkData, junkData); // Tongue Up_Down
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Left", 100, junkData, junkData, junkData); // Tongue Left_Right - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Right", 100, junkData, junkData, junkData); // Tongue Left_Right - range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Up", 100, junkData, junkData, junkData); // Tongue Up_Down - range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Down", 100, junkData, junkData, junkData); // Tongue Up_Down - range (1 - 0)
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Roll", 100, junkData, junkData, junkData); // Tongue Curl
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_Roll", 100, junkData, junkData, junkData); // Tongue Curl - range (0-1)
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpLeft_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus oben links
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpRight_Morph", 100, junkData, junkData, junkData); // Zunge leich raus oben rechts
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpLeft_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus oben links TODO
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpRight_Morph", 100, junkData, junkData, junkData); // Zunge leich raus oben rechts TODO
 
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownLeft_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus unten links
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownRight_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus unten rechts
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownLeft_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus unten links TODO
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownRight_Morph", 100, junkData, junkData, junkData); // Zunge leicht raus unten rechts TODO
 
             // Cheeks
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Left", 100, junkData, junkData, junkData); // Left Cheek Puff_Squint
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Right", 100, junkData, junkData, junkData); // Right Cheek Puff_Squint
-            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Suck", 100, junkData, junkData, junkData); // Maybe "Left Cheek Puff_Squint" && "Right Cheek Puff_Squint" - range (-1 - 0)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Left", 100, junkData, junkData, junkData); // Left Cheek Puff_Squint - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Right", 100, junkData, junkData, junkData); // Right Cheek Puff_Squint - range (0 - 1)
+            targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Suck", 100, junkData, junkData, junkData); // Maybe "Left Cheek Puff_Squint && Right Cheek Puff_Squint" - range (-1 - 0) TODO
         }
 
         private void Update()
@@ -197,7 +197,6 @@ namespace SEE.Game.Avatars
             // TODO
             float mouthUpperInside = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Upper_Inside"));
             float mouthLowerInside = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_Inside"));
-
             float mouthOverlay = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_Overlay"));
             
             
