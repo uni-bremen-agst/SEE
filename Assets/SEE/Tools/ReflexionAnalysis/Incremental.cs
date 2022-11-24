@@ -540,7 +540,7 @@ namespace SEE.Tools.ReflexionAnalysis
         public void UnparentInImplementation(Node child)
         {
             Node parent = child.Parent;
-            AssertOrThrow(parent != null, () => new IsAnOrphanException(parent));
+            AssertOrThrow(parent != null, () => new IsAnOrphanException(child));
             AssertOrThrow(child.IsInImplementation() && ContainsNode(child),
                           () => new NotInSubgraphException(Implementation, child));
 

@@ -78,7 +78,12 @@ namespace SEE.Game
                     // TODO (falko17): This branch and the next branch can be merged as soon
                     // as the general Unparent and AddChild methods are implemented.
                     // This changes the node hierarchy in the implementation only.
-                    reflexionCity.ReflexionGraph.UnparentInImplementation(source);
+                    if (source.Parent != null)
+                    {
+                        // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
+                        // TODO: Implement a proper transaction model for the reflexion analysis.
+                        reflexionCity.ReflexionGraph.UnparentInImplementation(source);
+                    }
                     reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
                     mappingSource.transform.SetParent(mappingTarget.transform);
                 }
@@ -88,7 +93,10 @@ namespace SEE.Game
                     // TODO (falko17): This branch and the previous branch can be merged as soon
                     // as the general Unparent and AddChild methods are implemented.
                     // This changes the node hierarchy in the architecture only.
-                    reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
+                    if (source.Parent != null)
+                    {
+                        reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
+                    }
                     reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
                     mappingSource.transform.SetParent(mappingTarget.transform);
                 }
