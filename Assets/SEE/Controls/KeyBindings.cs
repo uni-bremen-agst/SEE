@@ -390,5 +390,14 @@ namespace SEE.Controls
         internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
 
         #endregion
+        
+        //-----------------------------------------------------
+        // Holistic metrics menu
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the menu for holistic code metrics.
+        /// </summary>
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, "Toggles the menu for holistic code metrics");
     }
 }
