@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 namespace SEE.Game
 {
     /// <summary>
-    /// Provides queries on game objects in the current scence at run-time.
+    /// Provides queries on game objects in the current scene at run-time.
     /// </summary>
     internal static class SceneQueries
     {
