@@ -24,6 +24,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "LoadCityButton", 
                 () => {
+                    Debug.Log("Load City: mini.cfg");
                     RuntimeConfigMenuUtilities.LoadCity("mini/mini.cfg");
                     runtimeConfigMenu.SetActive(false);
                 });
@@ -31,6 +32,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "ResetCityButton",
                 () =>
                 {
+                    Debug.Log("Reset City.");
                     RuntimeConfigMenuUtilities.ResetCity();
                     runtimeConfigMenu.SetActive(false);
                 }
