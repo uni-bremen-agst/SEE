@@ -7,9 +7,9 @@ using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -433,7 +433,7 @@ namespace SEE.Controls.Actions
                     ReflexionMapper.SetParent(child, parent);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
-                catch (Exception e)
+                catch (ArchitectureAnalysisException e)
                 {
                     ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
@@ -451,7 +451,7 @@ namespace SEE.Controls.Actions
                     GameNodeMover.SetParent(child, parent);
                     new SetParentNetAction(child.name, parent.name, false).Execute();
                 }
-                catch (Exception e)
+                catch (ArchitectureAnalysisException e)
                 {
                     ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
