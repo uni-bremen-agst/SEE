@@ -22,13 +22,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             runtimeConfigMenu.name = "RuntimeConfigMenu";
             runtimeConfigMenu.SetActive(false);
 
-            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "Canvas/LoadCityButton", 
+            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "LoadCityButton", 
                 () => {
                     RuntimeConfigMenuUtilities.LoadCity("mini/mini.cfg");
                     runtimeConfigMenu.SetActive(false);
                 });
             
-            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "Canvas/ResetCityButton",
+            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "ResetCityButton",
                 () =>
                 {
                     RuntimeConfigMenuUtilities.ResetCity();

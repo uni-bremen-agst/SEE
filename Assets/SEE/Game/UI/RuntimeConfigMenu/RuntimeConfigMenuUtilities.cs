@@ -38,7 +38,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         public static void AddPrefab(GameObject runtimeConfigMenu, string prefabPath, bool center = false)
         {
             // FIXME: Adding the instance as a child of the canvas not working
-            Transform canvas = runtimeConfigMenu.transform.Find("Canvas");
+            Transform canvas = runtimeConfigMenu.transform;
             GameObject instance = PrefabInstantiator.InstantiatePrefab(prefabPath, canvas);
             if (center)
             {
