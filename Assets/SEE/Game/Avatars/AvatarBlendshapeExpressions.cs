@@ -130,11 +130,11 @@ namespace SEE.Game.Avatars
             float mouthLowerLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_Left"));
             if (mouthUpperLeft >= mouthLowerLeft)
             {
-                expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperLeft - mouthLowerLeft, true);
+                expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperLeft, true); 
             }
             else
             {
-                expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerLeft - mouthUpperLeft, true);
+                expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerLeft, true); 
             }
             
 
@@ -142,12 +142,13 @@ namespace SEE.Game.Avatars
             float mouthLowerRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_Right"));
             if (mouthUpperRight >= mouthLowerRight)
             {
-                expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperRight - mouthLowerRight, true);
+                expressionPlayer.mouthLeft_Right = ValueConverter(mouthUpperRight, false); 
             }
             else
             {
-                expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerRight - mouthUpperRight, true);
+                expressionPlayer.mouthLeft_Right = ValueConverter(mouthLowerRight, false); 
             }
+            
             
             // TODO
             //float mouthUpperOverturn = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Upper_Overturn"));
@@ -173,11 +174,11 @@ namespace SEE.Game.Avatars
             float mouthSadRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Sad_Right"));
             if (mouthSmileRight >= mouthSadRight)
             {
-                expressionPlayer.leftMouthSmile_Frown = ValueConverter(mouthSmileRight - mouthSadRight, true);
+                expressionPlayer.rightMouthSmile_Frown = ValueConverter(mouthSmileRight - mouthSadRight, true);
             }
             else
             {
-                expressionPlayer.leftMouthSmile_Frown = ValueConverter(mouthSadRight - mouthSmileRight, false);
+                expressionPlayer.rightMouthSmile_Frown = ValueConverter(mouthSadRight - mouthSmileRight, false);
             }
             
             
@@ -249,14 +250,26 @@ namespace SEE.Game.Avatars
             
             // Cheeks
             float cheekPuffLeft = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Cheek_Puff_Left"));
-            expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheekPuffLeft, true);
+            //expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheekPuffLeft, true);
             
             float cheekPuffRight = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Cheek_Puff_Right"));
-            expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheekPuffRight, true);
+            //expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheekPuffRight, true);
 
             float cheeckSuck = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Cheek_Suck"));
-            expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheeckSuck, false);
-            expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheeckSuck, false);
+            //expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheeckSuck, false);
+            //expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheeckSuck, false);
+
+
+            if (cheekPuffLeft >= cheeckSuck && cheekPuffRight >= cheeckSuck)
+            {
+                expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheekPuffLeft, true);
+                expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheekPuffRight, true);
+            }
+            else
+            {
+                expressionPlayer.leftCheekPuff_Squint = ValueConverter(cheeckSuck, false);
+                expressionPlayer.rightCheekPuff_Squint = ValueConverter(cheeckSuck, false);
+            }
             
             
         }

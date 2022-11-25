@@ -1,4 +1,3 @@
-
 //========= Copyright 2019, HTC Corporation. All rights reserved. ===========
 using System;
 using UnityEngine;
