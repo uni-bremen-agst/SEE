@@ -12,6 +12,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private const string menuPrefabPath = "Prefabs/UI/RuntimeConfigMenu";
         private const string switchPrefabPath = "Prefabs/UI/Input Group - Switch";
 
+        private string settingsPanelName = "SeeSettingPanel";
+
         private GameObject runtimeConfigMenu;
 
         void Awake()
