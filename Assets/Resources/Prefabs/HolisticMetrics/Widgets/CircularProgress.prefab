@@ -171,9 +171,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38a6f0846f694605be41033fe2a41960, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleText: {fileID: 3629768286039884194}
+  valueText: {fileID: 1319088655241679311}
   circle: {fileID: 1319088656306546808}
-  text: {fileID: 1319088655241679311}
-  title: {fileID: 3629768286039884194}
 --- !u!65 &2350874601786406945
 BoxCollider:
   m_ObjectHideFlags: 0
