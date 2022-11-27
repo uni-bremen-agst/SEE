@@ -16,6 +16,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             SEECity city;
             if (implementation && implementation.TryGetComponent(out city))
             {
+                city.ConfigurationPath.Root = DataPath.RootKind.StreamingAssets;
                 city.ConfigurationPath.RelativePath = cityPath;
 
                 city.LoadConfiguration();
