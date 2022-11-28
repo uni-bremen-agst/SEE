@@ -1,8 +1,9 @@
 using SEE.Game.Avatars;
 using UnityEngine;
+using ViveSR.anipal.Lip;
 
 /// <summary>
-/// Searches for UMARenderer in parent gameObject and adds AvatarBlendshapeExpression script to it.
+/// Searches for UMARenderer in parent gameObject and adds AvatarBlendshapeExpression and SRanipalLip Tracker script to it.
 /// </summary>
 public class AvatarFindUmaRenderer : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class AvatarFindUmaRenderer : MonoBehaviour
         if (transform != null)
         {
             transform.gameObject.AddComponent<AvatarBlendshapeExpressions>();
+            transform.gameObject.AddComponent<AvatarSRanipalLipV2>();
             Destroy(this);
         }
     }
