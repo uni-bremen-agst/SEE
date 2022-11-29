@@ -244,7 +244,7 @@ namespace SEE.Game.Operator
                 return new[] { DOTween.To(() => spline.SubsplineEndT,
                                           u => spline.SubsplineEndT = u,
                                           extending ? 1.0f : 0.0f,
-                                          duration).Play() };
+                                          duration).SetEase(Ease.InOutExpo).Play() };
             }
             construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
         }
