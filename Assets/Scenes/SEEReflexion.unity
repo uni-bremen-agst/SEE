@@ -9608,7 +9608,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -10364,7 +10364,7 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
