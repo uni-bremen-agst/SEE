@@ -569,6 +569,13 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes to be decorated</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
+            AddLabels(gameNodes);
+
+            foreach (GameObject node in gameNodes)
+            {
+                AddGeneralDecorations(node);
+            }
+
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
@@ -586,13 +593,6 @@ namespace SEE.Game
                 ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(),
                                                                  scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
-            }
-
-            AddLabels(innerNodes);
-
-            foreach (GameObject node in leafNodes.Concat(innerNodes))
-            {
-                AddGeneralDecorations(node);
             }
         }
 
