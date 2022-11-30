@@ -10250,7 +10250,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Module
+      Data: File
     - Name: $v
       Entry: 7
       Data: 47|SEE.Game.City.VisualNodeAttributes, SEE
@@ -10271,7 +10271,7 @@ MonoBehaviour:
       Data: Metric.Includes.Direct_Includes
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.Lines.File.LOC
     - Name: 
       Entry: 1
       Data: ' Metric.Includes.Direct_Includers'
@@ -10286,7 +10286,7 @@ MonoBehaviour:
       Data: 49|SEE.Game.City.ColorProperty, SEE
     - Name: Property
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: TypeColor
       Entry: 7
       Data: UnityEngine.Color, UnityEngine.CoreModule
@@ -10310,7 +10310,7 @@ MonoBehaviour:
       Data: true
     - Name: ColorMetric
       Entry: 1
-      Data: 
+      Data: Metric.Halstead.Difficulty
     - Name: 
       Entry: 8
       Data: 
@@ -10391,13 +10391,67 @@ MonoBehaviour:
       Data: 4
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
       Data: Metric.McCabe_Complexity
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.9622642
+    - Name: 
+      Entry: 4
+      Data: 0.9291707
+    - Name: 
+      Entry: 4
+      Data: 0.295033842
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.156862751
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0.08628178
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Halstead.Difficulty
     - Name: $v
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -10630,7 +10684,7 @@ MonoBehaviour:
     absolutePath: Architecture.gxl
   GxlMappingPath:
     Root: 3
-    relativePath: /reflexion/minilax/Mapping.gxl
+    relativePath: /reflexion/minilax/EmptyMapping.gxl
     absolutePath: Mapping.gxl
   CsvArchitecturePath:
     Root: 2
