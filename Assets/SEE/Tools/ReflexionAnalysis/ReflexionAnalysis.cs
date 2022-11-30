@@ -127,7 +127,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Runs the reflexion analysis. If an observer has registered before,
         /// the observer will receive the results via the callback Update(ChangeEvent).
         /// </summary>
-        public void Run()
+        public void RunAnalysis()
         {
             AnalysisInitialized = true;
             ConstructTransitiveMapping();
@@ -191,7 +191,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
                 else
                 {
-                    Notify(new EdgeChange(edge, oldState, newState, edge.GetSubgraphs()));
+                    Notify(new EdgeChange(version, edge, oldState, newState, edge.GetSubgraphs()));
                 }
             }
         }
@@ -717,7 +717,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 AddSubtreeToImplicitMap(source, target);
                 
                 // We'll now also notify our observer's that a "new" mapping edge exists.
-                Notify(new EdgeEvent(mapsTo, ChangeType.Addition, Mapping));
+                Notify(new EdgeEvent(version, mapsTo, ChangeType.Addition, Mapping));
                 // TODO: Unsure whether we still need the above notification?
                 //       Graph sends it out on creation of the edge anyway.
             }

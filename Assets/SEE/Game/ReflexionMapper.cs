@@ -14,7 +14,7 @@ namespace SEE.Game
     ///
     /// Used by user actions.
     /// </summary>
-    static class ReflexionMapper
+    internal static class ReflexionMapper
     {
         /// <summary>
         /// Maps <paramref name="mappingSource"/> onto <paramref name="mappingTarget"/> distinguishing
@@ -78,7 +78,12 @@ namespace SEE.Game
                     // TODO (falko17): This branch and the next branch can be merged as soon
                     // as the general Unparent and AddChild methods are implemented.
                     // This changes the node hierarchy in the implementation only.
-                    reflexionCity.ReflexionGraph.UnparentInImplementation(source);
+                    if (source.Parent != null)
+                    {
+                        // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
+                        // TODO: Implement a proper transaction model for the reflexion analysis.
+                        reflexionCity.ReflexionGraph.UnparentInImplementation(source);
+                    }
                     reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
                     mappingSource.transform.SetParent(mappingTarget.transform);
                 }
@@ -88,7 +93,10 @@ namespace SEE.Game
                     // TODO (falko17): This branch and the previous branch can be merged as soon
                     // as the general Unparent and AddChild methods are implemented.
                     // This changes the node hierarchy in the architecture only.
-                    reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
+                    if (source.Parent != null)
+                    {
+                        reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
+                    }
                     reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
                     mappingSource.transform.SetParent(mappingTarget.transform);
                 }
@@ -111,21 +119,19 @@ namespace SEE.Game
         /// <param name="mapsToEdge">the outgoing maps-to edge of <paramref name="node"/> or null</param>
         /// <returns>true if and only if <paramref name="node"/> has a single
         /// outgoing maps-to edge</returns>
-        /// <exception cref="Exception">thrown in case <paramref name="node"/> has more
+        /// <exception cref="InvalidOperationException">thrown in case <paramref name="node"/> has more
         /// than one outgoing maps-to edge</exception>
         private static bool TryGetMapsToEdge(Node node, out Edge mapsToEdge)
         {
-            IEnumerable<Edge> mapsToEdges = node.OutgoingsOfType(ReflexionGraph.MapsToType);
-            switch (mapsToEdges.Count())
+            try
             {
-                case 0:
-                    mapsToEdge = null;
-                    return false;
-                case 1:
-                    mapsToEdge = mapsToEdges.First();
-                    return true;
-                default:
-                    throw new Exception($"The node {node.ID} has {mapsToEdges.Count()} mapping(s).");
+                mapsToEdge = node.OutgoingsOfType(ReflexionGraph.MapsToType).SingleOrDefault();
+                return mapsToEdge != null;
+            }
+            catch (InvalidOperationException)
+            {
+                // Rethrow with more helpful error message.
+                throw new InvalidOperationException($"The node {node.ID} has more than one mapping.");
             }
         }
     }

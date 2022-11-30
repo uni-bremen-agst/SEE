@@ -119,6 +119,8 @@ namespace SEE.Tools.ReflexionAnalysis
         public static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, ChangeEvent newEvent) =>
             newEvent switch
             {
+                // TODO: Version concept isn't really integrated as neatly as it could be.
+                //       E.g., when merging two events, we discard the older version ID and just use the newer one.
                 EdgeChange edgeChange => events.Incorporate(edgeChange),
                 GraphElementTypeEvent typeEvent => events.Incorporate(typeEvent),
                 EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
@@ -126,12 +128,20 @@ namespace SEE.Tools.ReflexionAnalysis
                     events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
                                                                   && e.Parent == hierarchyChangeEvent.Parent),
                 NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
+                VersionChangeEvent versionChangeEvent => events.IncorporateVersionEvent(versionChangeEvent),
                 AttributeEvent<string> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<int> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<float> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 AttributeEvent<Attributable.UnitType> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
                 _ => throw new ArgumentOutOfRangeException(nameof(newEvent), newEvent.GetType(), "Unknown event type!")
             };
+
+        private static IList<ChangeEvent> IncorporateVersionEvent(this IList<ChangeEvent> events, VersionChangeEvent versionChangeEvent)
+        {
+            // We will simply retain the most recent version change event. 
+            // Keeping the others doesn't make much sense, as we've "compacted" previous events already.
+            return events.Where(x => !(x is VersionChangeEvent)).Append(versionChangeEvent).ToList();
+        }
 
         private static IList<ChangeEvent> IncorporateAttributeEvent<T>(this IList<ChangeEvent> events, AttributeEvent<T> attributeEvent)
         {
@@ -157,7 +167,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // We only care about the most recent NewState of an edge.
             // However, we also care about the first OldState of an edge, so we find it first.
             State? oldState = events.OfType<EdgeChange>().FirstOrDefault(x => x.Edge == edgeChange.Edge)?.OldState;
-            EdgeChange newEvent = new EdgeChange(edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
+            EdgeChange newEvent = new EdgeChange(edgeChange.VersionId, edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
             // Now we just have to filter out previous EdgeChange events and add the new one.
             return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
         }
@@ -168,7 +178,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, GraphElementTypeEvent typeEvent)
         {
             string oldType = events.OfType<GraphElementTypeEvent>().FirstOrDefault(x => x.Element == typeEvent.Element)?.OldType;
-            GraphElementTypeEvent newEvent = new GraphElementTypeEvent(oldType ?? typeEvent.OldType, typeEvent.NewType, typeEvent.Element);
+            GraphElementTypeEvent newEvent = new GraphElementTypeEvent(typeEvent.VersionId, oldType ?? typeEvent.OldType, typeEvent.NewType, typeEvent.Element);
             return events.Where(x => !(x is GraphElementTypeEvent e && e.Element == typeEvent.Element)).Append(newEvent).ToList();
         }
 

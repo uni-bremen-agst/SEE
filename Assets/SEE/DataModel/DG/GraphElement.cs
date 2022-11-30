@@ -47,7 +47,7 @@ namespace SEE.DataModel.DG
             {
                 string oldType = type;
                 type = !string.IsNullOrEmpty(value) ? value : Graph.UnknownType;
-                Notify(new GraphElementTypeEvent(oldType, type, this));
+                Notify(new GraphElementTypeEvent(version, oldType, type, this));
             }
         }
 

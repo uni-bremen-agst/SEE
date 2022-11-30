@@ -7,9 +7,9 @@ using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -97,6 +97,13 @@ namespace SEE.Controls.Actions
                     // We need to know whether we are in a reflexion city in order to
                     // interpret the re-parenting of a node properly.
                     withinReflexionCity = gameObject.ContainingCity<SEEReflexionCity>() != null;
+
+                    if (withinReflexionCity)
+                    {
+                        // Beginning to drag to, e.g., create a new mapping should lead to a new version,
+                        // because then changes will be highlighted relative to the state before moving.
+                        NewVersion(gameObject);
+                    }
                 }
                 else
                 {
@@ -156,10 +163,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The name of the grabbed object if any was grabbed; otherwise the empty string.
             /// </summary>
-            internal string Name
-            {
-                get => grabbedObject?.name ?? String.Empty;
-            }
+            internal string Name => grabbedObject != null ? grabbedObject.name : string.Empty;
 
             /// <summary>
             /// The position of the grabbed object in world space.
@@ -184,10 +188,7 @@ namespace SEE.Controls.Actions
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
-            public NodeRef Node
-            {
-                get => grabbedObject.TryGetNodeRef(out NodeRef result) ? result : null;
-            }
+            public NodeRef Node => grabbedObject.TryGetNodeRef(out NodeRef result) ? result : null;
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
@@ -254,7 +255,7 @@ namespace SEE.Controls.Actions
             /// Highlights <paramref name="hitObject"/> as a target of the grabbed and moved node.
             /// </summary>
             /// <param name="hitObject">the target of the grabbed and moved node</param>
-            void MarkAsTarget(Transform hitObject)
+            private void MarkAsTarget(Transform hitObject)
             {
                 markedGameObject = hitObject.gameObject;
                 // [Highlight Plus note] Important! If you change the hierarchy of your object
@@ -267,7 +268,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Turns off the highlighting of <see cref="markedGameObject"/> if not <c>null</c>.
             /// </summary>
-            void UnmarkAsTarget()
+            private void UnmarkAsTarget()
             {
                 if (markedGameObject)
                 {
@@ -384,6 +385,16 @@ namespace SEE.Controls.Actions
             #region Basic Scene Manipulators Propagated to all Clients
 
             /// <summary>
+            /// Creates a new version in the underlying graph, marking the start of a new movement.
+            /// </summary>
+            /// <param name="grabbedObject">the moved object</param>
+            private static void NewVersion(GameObject grabbedObject)
+            {
+                GameNodeMover.NewMovementVersion(grabbedObject);
+                new VersionNetAction(grabbedObject.name).Execute();
+            }
+
+            /// <summary>
             /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
             /// </summary>
             /// <param name="targetPosition">the position where the grabbed object
@@ -422,7 +433,7 @@ namespace SEE.Controls.Actions
                     ReflexionMapper.SetParent(child, parent);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
-                catch (Exception e)
+                catch (ArchitectureAnalysisException e)
                 {
                     ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
@@ -440,7 +451,7 @@ namespace SEE.Controls.Actions
                     GameNodeMover.SetParent(child, parent);
                     new SetParentNetAction(child.name, parent.name, false).Execute();
                 }
-                catch (Exception e)
+                catch (ArchitectureAnalysisException e)
                 {
                     ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
@@ -540,7 +551,7 @@ namespace SEE.Controls.Actions
         {
             // Index of the left mouse button.
             const int LeftMouseButton = 0;
-            // FIXME: We need a VR interation, too.
+            // FIXME: We need a VR interaction, too.
             return Input.GetMouseButton(LeftMouseButton);
         }
 
@@ -561,8 +572,7 @@ namespace SEE.Controls.Actions
                     // Note: the root node can never be grabbed. See above.
                     if (raycastHit.HasValue)
                     {
-                        // The user is currently aiming at a node. The grabbed node is reparented onto
-                        // this aimed node.
+                        // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
                         grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
                     }
                     else

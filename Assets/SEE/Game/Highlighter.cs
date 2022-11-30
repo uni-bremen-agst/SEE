@@ -27,18 +27,22 @@ namespace SEE.Game
         /// will be returned.
         /// </summary>
         /// <param name="gameObject">game objec</param>
-        /// <returns></returns>
-        private static HighlightEffect GetHighlightEffect(GameObject gameObject)
+        /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect</returns>
+        public static HighlightEffect GetHighlightEffect(GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out HighlightEffect highlight))
             {
                 highlight = gameObject.AddComponent<HighlightEffect>();
                 highlight.innerGlow = 0;
-                highlight.outlineColor = gameObject.GetComponent<Renderer>().material.color.Invert();
+                Color inverted = gameObject.GetComponent<Renderer>().material.color.Invert();
+                highlight.outlineColor = inverted;
                 highlight.SetGlowColor(Color.yellow);
                 highlight.glow = 2;
                 highlight.glowQuality = HighlightPlus.QualityLevel.Highest;
                 highlight.effectGroup = TargetOptions.OnlyThisObject;
+                highlight.glowDownsampling = 1;
+                highlight.hitFxColor = inverted;
+                highlight.hitFxInitialIntensity = 1f;
             }
             return highlight;
         }
