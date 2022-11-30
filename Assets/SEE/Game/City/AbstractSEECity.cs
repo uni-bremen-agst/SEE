@@ -431,9 +431,9 @@ namespace SEE.Game.City
             }
             else
             {
-                ICollection<string> matches = NodeTypes.Where(pair => pair.Value.IsRelevant)
+                ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
                   .Select(pair => pair.Key).ToList();
-                return graph.SubgraphByNodeType(matches);
+                return graph.SubgraphByNodeType(relevantNodeTypes);
             }
         }
 
