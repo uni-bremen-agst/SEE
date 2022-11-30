@@ -70,7 +70,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </param>
         /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
         /// <remarks>
-        /// This does not really run the reflexion analysis. Use <see cref="Run"/> to start the analysis.
+        /// This does not really run the reflexion analysis. Use <see cref="RunAnalysis"/> to start the analysis.
         /// </remarks>
         public ReflexionGraph(Graph fullGraph, bool allowDependenciesToParents = true): base(fullGraph)
         {

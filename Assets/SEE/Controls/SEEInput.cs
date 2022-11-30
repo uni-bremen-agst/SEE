@@ -680,5 +680,10 @@ namespace SEE.Controls
         }
         
         #endregion
+
+        public static bool ToggleHolisticMetricsMenu()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);
+        }
     }
 }

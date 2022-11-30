@@ -11,9 +11,34 @@ namespace SEE.DataModel
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
-        protected GraphEvent(ReflexionSubgraph? affectedGraph = null, ChangeType? change = null) : base(affectedGraph, change)
+        protected GraphEvent(Guid version, ReflexionSubgraph? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
         {
         }
+    }
+
+    /// <summary>
+    /// An event representing a new version being introduced.
+    /// Events following this one will have the new <see cref="VersionId"/>, while events before this
+    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="OldVersion"/>.
+    /// </summary>
+    public class VersionChangeEvent : GraphEvent
+    {
+        /// <summary>
+        /// The version before this one.
+        /// </summary>
+        private readonly Guid OldVersion;
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="newVersion">new version ID</param>
+        /// <param name="oldVersion">old version ID</param>
+        public VersionChangeEvent(Guid newVersion, Guid oldVersion) : base(newVersion)
+        {
+            OldVersion = oldVersion;
+        }
+
+        protected override string Description() => $"Changed version from {OldVersion} to {VersionId}.";
     }
 
     /// <summary>
@@ -31,10 +56,11 @@ namespace SEE.DataModel
         /// <summary>
         /// Constructor preserving the edge added to the graph or removed from it.
         /// </summary>
+        /// <param name="version">the graph version this event is associated to</param>
         /// <param name="edge">the edge being added or removed</param>
         /// <param name="change">the type of change to <paramref name="edge"/></param>
         /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? edge.GetSubgraph(), change)
+        public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
         {
             Edge = edge;
         }
@@ -60,7 +86,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Child;
 
-        public HierarchyEvent(Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? child.GetSubgraph(), change)
+        public HierarchyEvent(Guid version, Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? child.GetSubgraph(), change)
         {
             if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
             {
@@ -87,7 +113,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Node;
 
-        public NodeEvent(Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(affectedGraph ?? node.GetSubgraph(), change)
+        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
         {
             if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
             {
@@ -150,7 +176,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly T AttributeValue;
 
-        public AttributeEvent(Attributable attributable, string attributeName, T attributeValue, ChangeType change) : base(null, change)
+        public AttributeEvent(Guid version, Attributable attributable, string attributeName, T attributeValue, ChangeType change) : base(version, null, change)
         {
             Attributable = attributable;
             AttributeName = attributeName;
@@ -180,7 +206,7 @@ namespace SEE.DataModel
         /// </summary>
         public readonly GraphElement Element;
 
-        public GraphElementTypeEvent(string oldType, string newType, GraphElement element)
+        public GraphElementTypeEvent(Guid version, string oldType, string newType, GraphElement element) : base(version)
         {
             OldType = oldType;
             NewType = newType;

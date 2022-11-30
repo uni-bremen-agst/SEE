@@ -447,7 +447,7 @@ namespace SEE.Controls.Actions
         /// If <paramref name="gameObject"/> has a label attached to it, that label
         /// will be turned off.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">the GameObject whose label shall be turned off</param>
         public static void Off(GameObject gameObject)
         {
             if (gameObject.TryGetComponent(out ShowLabel showLabel))

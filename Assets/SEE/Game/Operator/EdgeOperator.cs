@@ -1,9 +1,13 @@
 using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using HighlightPlus;
+using SEE.DataModel;
 using SEE.GO;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
@@ -12,7 +16,7 @@ namespace SEE.Game.Operator
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
-    public class EdgeOperator : AbstractOperator
+    public partial class EdgeOperator : AbstractOperator, IObserver<ChangeEvent>
     {
         /// <summary>
         /// Operation handling edge morphing.
@@ -25,9 +29,29 @@ namespace SEE.Game.Operator
         private TweenOperation<(Color start, Color end)> color;
 
         /// <summary>
+        /// Operation handling the glow effect around the edge.
+        /// </summary>
+        private TweenOperation<float> glow;
+
+        /// <summary>
+        /// Amount of glow that should be animated towards.
+        /// </summary>
+        private float fullGlow;
+
+        /// <summary>
+        /// Whether the glow effect is currently (supposed to be) enabled.
+        /// </summary>
+        private bool glowEnabled;
+
+        /// <summary>
         /// The <see cref="SEESpline"/> represented by this edge.
         /// </summary>
         private SEESpline spline;
+
+        /// <summary>
+        /// The highlight effect of the edge.
+        /// </summary>
+        private HighlightEffect highlightEffect;
 
         #region Public API
 
@@ -75,6 +99,7 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Fade the alpha property of the edge to the given new <paramref name="alpha"/> value.
+        /// Note that this will affect edge highlights as well.
         /// </summary>
         /// <param name="alpha">The new alpha value for the edge. Must be in interval [0; 1]</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
@@ -90,16 +115,80 @@ namespace SEE.Game.Operator
             }
 
             (Color start, Color end) = color.TargetValue;
-            return color.AnimateTo((start.WithAlpha(alpha), end.WithAlpha(alpha)), duration);
+            // Edges being faded should also lead to highlights being faded.
+            float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
+
+            return new AndCombinedOperationCallback<Action>(new[]
+            {
+                color.AnimateTo((start.WithAlpha(alpha), end.WithAlpha(alpha)), duration),
+                glow.AnimateTo(targetGlow, duration)
+            });
+        }
+
+        /// <summary>
+        /// Fade in the glow effect on this edge.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> GlowIn(float duration)
+        {
+            float targetGlow = GetTargetGlow(fullGlow, color.TargetValue.start.a);
+            glowEnabled = true;
+            return glow.AnimateTo(targetGlow, duration);
+        }
+
+        /// <summary>
+        /// Fade out the glow effect on this edge.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> GlowOut(float duration)
+        {
+            glowEnabled = false;
+            return glow.AnimateTo(0, duration);
+        }
+
+        /// <summary>
+        /// Flashes an edge in its inverted color for a short <paramref name="duration"/>.
+        /// Note that this animation is not controlled by an operation and thus not necessarily synchronized.
+        /// </summary>
+        /// <param name="duration">Amount of time the flashed color shall fade out for.</param>
+        public void HitEffect(float duration = 0.5f)
+        {
+            // NOTE: This is not controlled by an operation. HighlightEffect itself controls the animation.
+            //       Should be alright because overlapping animations aren't a big problem here.
+            highlightEffect.hitFxFadeOutDuration = duration;
+            highlightEffect.hitFxColor = Color.Lerp(color.TargetValue.start, color.TargetValue.end, 0.5f).Invert();
+            highlightEffect.HitFX();
         }
 
         #endregion
 
+        /// <summary>
+        /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
+        /// min(<paramref name="glowTarget"/> / <see cref="fullGlow"/>, <paramref name="alphaTarget"/>) * fullGlow
+        ///
+        /// In other words, this ensures the edge doesn't glow brighter than its alpha value.
+        /// </summary>
+        /// <param name="glowTarget">The desired glow target value</param>
+        /// <param name="alphaTarget">The desired alpha target value</param>
+        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        private float GetTargetGlow(float glowTarget, float alphaTarget)
+        {
+            // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
+            return Mathf.Min(glowTarget/fullGlow, alphaTarget) * fullGlow;
+        }
+
         private void OnEnable()
         {
+            // Assigned so that the expensive getter isn't called everytime.
+            GameObject go = gameObject;
+
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
-                SplineMorphism Animator = gameObject.AddOrGetComponent<SplineMorphism>();
+                SplineMorphism Animator = go.AddOrGetComponent<SplineMorphism>();
 
                 if (Animator.IsActive())
                 {
@@ -108,7 +197,7 @@ namespace SEE.Game.Operator
                 }
                 else
                 {
-                    gameObject.MustGetComponent(out SEESpline sourceSpline);
+                    go.MustGetComponent(out SEESpline sourceSpline);
                     Animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
                             .OnComplete(() =>
                             {
@@ -122,7 +211,7 @@ namespace SEE.Game.Operator
                 return Animator;
             }
 
-            gameObject.MustGetComponent(out spline);
+            go.MustGetComponent(out spline);
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
 
             Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
@@ -137,6 +226,55 @@ namespace SEE.Game.Operator
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+            if (TryGetComponent(out highlightEffect))
+            {
+                // If the component already exists, we need to rebuild it to be sure it fits our material.
+                RefreshGlow(true).Forget();
+            }
+            else
+            {
+                highlightEffect = Highlighter.GetHighlightEffect(go);
+                highlightEffect.Refresh();
+            }
+
+            SetupGlow();
+
+            if (go.TryGetComponentOrLog(out EdgeRef edge) && edge.Value != null)
+            {
+                // When the hierarchy changes, we need to refresh the glow effect properties.
+                edge.Value.Subscribe(this);
+            }
+        }
+
+        /// <summary>
+        /// Sets up the <see cref="highlightEffect"/>, assuming it has been assigned
+        /// a new instance of <see cref="HighlightEffect"/>.
+        /// </summary>
+        private void SetupGlow()
+        {
+            fullGlow = highlightEffect.glow;
+            Assert.IsTrue(fullGlow > 0, "fullGlow must be bigger than zero!");
+            if (!highlightEffect.highlighted)
+            {
+                // We control highlighting not by the `highlighted` toggle, but by the amount of `glow`.
+                highlightEffect.glow = 0;
+                highlightEffect.highlighted = true;
+            }
+
+            highlightEffect.outline = 0;
+            Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
+            {
+                DOTween.To(() => highlightEffect.glow, g =>
+                {
+                    highlightEffect.glow = g;
+                    highlightEffect.UpdateMaterialProperties();
+                }, endGlow, duration).OnPlay(() =>
+                {
+                    highlightEffect.Refresh();
+                }).Play()
+            };
+
+            glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
         }
 
         private void OnDisable()
@@ -145,49 +283,53 @@ namespace SEE.Game.Operator
             morphism = null;
             color.KillAnimator();
             color = null;
+            glow.KillAnimator();
+            glow = null;
         }
 
-        // TODO: Maybe refactor this? Type signature is somewhat complex
         /// <summary>
-        /// An <see cref="Operation{T,V}"/> which uses a <see cref="SplineMorphism"/> as the animator.
-        /// Use this operation for morphing edges.
-        /// The target value consists of the target spline, as well as an optional temporary game object associated
-        /// to the spline. If the latter is given, it will be destroyed upon completion.
+        /// Refreshes the glow effect properties.
+        /// 
+        /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically
         /// </summary>
-        protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject), TweenCallback>
+        public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
         {
-            public override void KillAnimator(bool complete = false)
+            if (highlightEffect != null)
             {
-                if (Animator != null && Animator.IsActive())
+                if (fullRefresh)
                 {
-                    Animator.tween.Kill();
-                    Destroy(Animator);
-                    Animator = null;
+                    glow.KillAnimator();
+                    Destroyer.DestroyComponent(highlightEffect);
+                    await UniTask.WaitForEndOfFrame();  // component is only destroyed by the end of the frame.
+                    highlightEffect = Highlighter.GetHighlightEffect(gameObject);
+                    SetupGlow();
                 }
-
-                base.KillAnimator(complete);
-            }
-
-            protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration)
-            {
-                // No need to kill any old animators, the spline morphism can change its target.
-                Animator = AnimateToAction(newTarget, duration);
-                if (duration == 0)
+                else
                 {
-                    // We execute the first step immediately. This way, callers can expect the change to
-                    // be implemented when control is returned to them, the same way it would work when
-                    // setting the target value manually.
-                    Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                    highlightEffect.Refresh();
                 }
-            }
-
-            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator.tween);
-
-            public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction,
-                                     BSpline targetSpline, GameObject temporaryGameObject)
-                : base(animateToAction, (targetSpline, temporaryGameObject))
-            {
             }
         }
+
+        public void OnNext(ChangeEvent value)
+        {
+            // As stated in the documentation of Highlight Plus, whenever the hierarchy of an object changes,
+            // we need to call Refresh() on it or it will stop working.
+            if (value is HierarchyEvent)
+            {
+                RefreshGlow().Forget();
+            }
+        }
+        
+        public void OnCompleted()
+        {
+            // Nothing to be done.
+        }
+
+        public void OnError(Exception error)
+        {
+            throw error;
+        }
+
     }
 }

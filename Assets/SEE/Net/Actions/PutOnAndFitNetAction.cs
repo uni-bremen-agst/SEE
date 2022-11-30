@@ -28,7 +28,6 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// The original scale of the child relative to its original parent (local scale).
-        ///
         /// </summary>
         public Vector3 OriginalLocalScale;
 
