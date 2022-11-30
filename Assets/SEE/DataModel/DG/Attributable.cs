@@ -43,18 +43,35 @@ namespace SEE.DataModel.DG
         /// </summary>
         private HashSet<string> toggleAttributes = new HashSet<string>();
         public ISet<string> ToggleAttributes => toggleAttributes;
+
+        /// <summary>
+        /// The version of this <see cref="Attributable"/>.
+        /// </summary>
+        public Guid version { get; private set; } = Guid.Empty;
         
         /// <summary>
         /// Unit type consisting of a single value.
         /// </summary>
         public enum UnitType {Unit}
-        
+
+        /// <summary>
+        /// Creates a new version for sent-out events on this <see cref="Attributable"/>.
+        /// The newly created version ID is returned.
+        /// </summary>
+        /// <returns>the newly created version ID</returns>
+        public Guid NewVersion()
+        {
+            Guid newVersion = Guid.NewGuid();
+            Notify(new VersionChangeEvent(newVersion, version));
+            return version = newVersion;
+        }
+
         public void SetToggle(string attributeName)
         {
             if (!toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Add(attributeName);
-                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Addition));
+                Notify(new AttributeEvent<UnitType>(version, this, attributeName, UnitType.Unit, Addition));
             }
         }
 
@@ -63,7 +80,7 @@ namespace SEE.DataModel.DG
             if (toggleAttributes.Contains(attributeName))
             {
                 toggleAttributes.Remove(attributeName);
-                Notify(new AttributeEvent<UnitType>(this, attributeName, UnitType.Unit, Removal));
+                Notify(new AttributeEvent<UnitType>(version, this, attributeName, UnitType.Unit, Removal));
             }
         }
 
@@ -81,7 +98,7 @@ namespace SEE.DataModel.DG
         public void SetString(string attributeName, string value)
         {
             StringAttributes[attributeName] = value;
-            Notify(new AttributeEvent<string>(this, attributeName, value, Addition));
+            Notify(new AttributeEvent<string>(version, this, attributeName, value, Addition));
         }
 
         public bool TryGetString(string attributeName, out string value)
@@ -111,7 +128,7 @@ namespace SEE.DataModel.DG
         {
             FloatAttributes[attributeName] = value;
             NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<float>(this, attributeName, value, Addition));
+            Notify(new AttributeEvent<float>(version, this, attributeName, value, Addition));
         }
 
         public float GetFloat(string attributeName)
@@ -141,7 +158,7 @@ namespace SEE.DataModel.DG
         {
             IntAttributes[attributeName] = value;
             NumericAttributeNames.Add(attributeName);
-            Notify(new AttributeEvent<int>(this, attributeName, value, Addition));
+            Notify(new AttributeEvent<int>(version, this, attributeName, value, Addition));
         }
 
         public int GetInt(string attributeName)

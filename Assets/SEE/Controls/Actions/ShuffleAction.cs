@@ -70,7 +70,6 @@ namespace SEE.Controls.Actions
         /// started to shuffle the code city.
         /// </summary>
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
-        private Vector3 dragCanonicalOffset = Vector3.positiveInfinity;
 
         private void Awake()
         {
@@ -127,8 +126,6 @@ namespace SEE.Controls.Actions
                             gizmo.gameObject.SetActive(true);
                             dragStartTransformPosition = originalPosition;
                             dragStartOffset = cityPlaneHitPoint - originalPosition;
-                            // dragCanonicalOffset = dragStartOffset / cityRootNode.localScale
-                            dragCanonicalOffset = dragStartOffset.DividePairwise(cityRootNode.localScale);
                         }
                         // The user is initiating shuffling.
                         shuffling = true;
@@ -141,7 +138,6 @@ namespace SEE.Controls.Actions
                 {
                     // The plane in which the cityRoodNode lies is hit. We accept movements
                     // only within this area.
-                    // FIXME: Doesn't work in certain perspectives, particularly when looking at the horizon.
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), cityRootNode.localScale);
                     if (SEEInput.Snap())
                     {
@@ -173,7 +169,7 @@ namespace SEE.Controls.Actions
                     new ShuffleNetAction(cityRootNode.name, plane.CenterTop).Execute();
                     gizmo.gameObject.SetActive(false);
 
-                    synchronize = false; // We just called MoveNodeNetAction for the synchronization.
+                    synchronize = false; // We just called ShuffleNetAction for the synchronization.
                 }
             }
             else if (shuffling)

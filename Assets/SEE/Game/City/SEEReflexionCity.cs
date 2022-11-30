@@ -3,10 +3,10 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -16,7 +16,6 @@ namespace SEE.Game.City
     /// A code city that supports architectural mappings from
     /// implementation nodes onto architecture nodes.
     /// NOTE: It is assumed the implementation and architecture graphs are not edited!
-    /// TODO: We should allow changes, but trigger the respective incremental reflexion analysis methods.
     /// </summary>
     public class SEEReflexionCity : SEECity
     {
