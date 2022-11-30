@@ -28,7 +28,7 @@ namespace SEE.DataModel.DG
         /// A toggle marking artificial root nodes as such.
         /// </summary>
         public const string RootToggle = "Root";
-        
+
         /// <summary>
         /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
         /// propagated through the graph's own observable implementation.
@@ -173,7 +173,7 @@ namespace SEE.DataModel.DG
 
             if (nodes.Remove(node.ID))
             {
-                
+
                 // We need to send out this event here, before the node is modified but after it has been removed.
                 Notify(new NodeEvent(version, node, ChangeType.Removal));
 
@@ -196,7 +196,7 @@ namespace SEE.DataModel.DG
                     edges.Remove(incoming.ID);
                     incoming.ItsGraph = null;
                 }
-                
+
                 // Adjust the node hierarchy.
                 if (node.NumberOfChildren() > 0)
                 {
@@ -1219,6 +1219,12 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// If true, lifted edges whose source and target nodes are the same are ignored.
+        /// TODO: We need to make this a parameter that can be set by the user.
+        /// </summary>
+        private const bool IgnoreSelfLoops = true;
+
+        /// <summary>
         /// Propagates edge from this graph onto <paramref name="subgraph"/> as follows:
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
         /// if and only if <paramref name="includeElement"/>(E) == true
@@ -1226,7 +1232,9 @@ namespace SEE.DataModel.DG
         /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
         /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
         /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propagated
-        /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
+        /// edge is marked with the toggle attribute <see cref="Edge.IsLiftedToggle"/>.
+        /// If <see cref="IgnoreSelfLoops"/>, lifted edges whose source and target nodes
+        /// are the same (i.e., self loops), will not be propagated.
         /// </summary>
         /// <param name="subgraph">graph to propagate the edges to</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
@@ -1240,7 +1248,8 @@ namespace SEE.DataModel.DG
                 Node targetInSubgraph = mapsTo[edge.Target];
 
                 if (sourceInSubgraph != null && targetInSubgraph != null
-                                             && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                    && (!IgnoreSelfLoops || sourceInSubgraph != targetInSubgraph)
+                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
                 {
                     Edge edgeInSubgraph = (Edge)edge.Clone();
                     edgeInSubgraph.Source = sourceInSubgraph;
@@ -1528,7 +1537,7 @@ namespace SEE.DataModel.DG
             }
             return result;
         }
-        
+
         /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
         /// an artificial root is created and added to the <paramref name="graph"/>
