@@ -47,7 +47,7 @@ namespace SEE.Game.City
         /// to make it easier to call reflexion-specific methods.
         /// May be <c>null</c> if the graph has not yet been loaded.
         /// </summary>
-        public ReflexionGraph ReflexionGraph => LoadedGraph as ReflexionGraph;
+        public ReflexionGraph ReflexionGraph => VisualizedSubGraph as ReflexionGraph;
 
         /// <summary>
         /// Root node of the implementation subgraph.
@@ -132,7 +132,7 @@ namespace SEE.Game.City
                 LoadedGraph = reflexionGraph;
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
-                Visualization.StartFromScratch(reflexionGraph);
+                Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph);
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 
