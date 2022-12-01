@@ -204,7 +204,7 @@ namespace SEE.Game.City
             ResetEdgeHighlights();
 
             #region Local Functions
-            
+
             void ResetEdgeHighlights()
             {
                 while (HighlightedEdgeOperators.Count > 0)
@@ -223,7 +223,7 @@ namespace SEE.Game.City
                 // Due to us using `Incorporate`, only the most recent edge change will exist.
                 PreviousEdgeStates = Events.OfType<EdgeChange>().ToDictionary(x => x.Edge.ID, x => x.NewState);
             }
-            
+
             #endregion
         }
 
@@ -269,7 +269,7 @@ namespace SEE.Game.City
                     HighlightedEdgeOperators.Enqueue(edgeOperator);
                 }
             }
-            else
+            else if (!edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle))
             {
                 Debug.LogError($"Couldn't find edge {edgeChange.Edge}, whose state changed "
                                + $"from {edgeChange.OldState} to {edgeChange.NewState}!");
