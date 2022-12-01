@@ -70,7 +70,7 @@ namespace SEE.Game.City
         public Graph LoadedGraph
         {
             get => loadedGraph;
-            set
+            protected set
             {
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
@@ -89,6 +89,14 @@ namespace SEE.Game.City
                 loadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
+        
+        /// <summary>
+        /// The graph to be visualized. It may be a subgraph of the loaded graph
+        /// containing only nodes with relevant node types or the original LoadedGraph
+        /// if all node types are relevant. It is null if no graph has been loaded yet
+        /// (i.e. <see cref="LoadedGraph"/> is null).
+        /// </summary>
+        private Graph visualizedSubGraph;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -96,20 +104,21 @@ namespace SEE.Game.City
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        private Graph VisualizedSubGraph
+        protected Graph VisualizedSubGraph
         {
             get
             {
                 if (loadedGraph == null)
                 {
+                    visualizedSubGraph = null;
                     return null;
                 }
-                else
+                else if (visualizedSubGraph == null)
                 {
-                    Graph graph = RelevantGraph(loadedGraph);
-                    LoadDataForGraphListing(graph);
-                    return graph;
+                    visualizedSubGraph = RelevantGraph(loadedGraph);
+                    LoadDataForGraphListing(visualizedSubGraph);
                 }
+                return visualizedSubGraph;
             }
         }
 
@@ -407,6 +416,7 @@ namespace SEE.Game.City
             // Delete the underlying graph.
             loadedGraph?.Destroy();
             LoadedGraph = null;
+            visualizedSubGraph = null;
         }
 
         /// <summary>
