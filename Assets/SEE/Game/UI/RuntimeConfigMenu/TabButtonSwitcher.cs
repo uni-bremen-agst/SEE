@@ -1,37 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class TabButtonSwitcher : MonoBehaviour
+public class TabButtonSwitcher : MonoBehaviour, IPointerClickHandler
 {
     public GameObject Tab;
 
     private string debug = "";
     private void OnGUI()
     {
-        GUI.TextField(new Rect(0, 0, 300, 50),
-            debug.ToString());
+        GUI.TextField(new Rect(0, 0, 300, 50), debug);
     }
-    
-    
-    // Start is called before the first frame update
-    void Start()
+
+    public void OnPointerClick(PointerEventData eventData)
     {
-        
-        Button button = this.GetComponent<Button>();
-        button.onClick.AddListener(() =>
+        /*
+         * TODO: Maybe get ContentView through attribute?
+         * Advantages:
+         * + TabButtonSwitcher could be used for other stuff
+         * + hierarchy changes don't corrupt the code
+         */
+        Transform contentView = transform.parent.parent.parent.Find("ContentView");
+        // disable all (other) content panels
+        foreach (Transform childTransform in contentView)
         {
-            debug = this.transform.parent.parent.parent.Find("ContentView").gameObject.name;
-            // disable all other content panels
-            foreach (Transform childTransform in this.transform.parent.parent.parent.Find("ContentView"))
-            {
-                childTransform.gameObject.SetActive(false);
-            }
+            childTransform.gameObject.SetActive(false);
+        }
             
-            
-            // open connected panel
-            Tab.SetActive(true);
-        });
+        // open connected panel
+        Tab.SetActive(true);
     }
 }
