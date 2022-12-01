@@ -40,6 +40,15 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleMenu);
         }
+        
+        /// <summary>
+        /// Toggles the live documentation menu.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleDocumentationMenu()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleDocumentation);
+        }
 
         /// <summary>
         /// Opens/closes the search menu.

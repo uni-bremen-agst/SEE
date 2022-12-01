@@ -100,6 +100,11 @@ namespace SEE.Controls
         /// Opens the search menu.
         /// </summary>
         internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");
+        
+        /// <summary>
+        /// Opens the documentation menu.
+        /// </summary>
+        internal static readonly KeyCode ToggleDocumentation = Register(KeyCode.J, Scope.Always, "Opens the documentation menu.");
 
         /// <summary>
         /// Undoes the last action.
