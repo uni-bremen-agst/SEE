@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -1145,7 +1146,7 @@ namespace SEE.DataModel.DG
         /// </returns>
         public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
         {
-            Graph subgraph = new Graph(BasePath);
+            Graph subgraph = this is ReflexionGraph ? new ReflexionGraph(BasePath) : new Graph(BasePath);
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
             return subgraph;
