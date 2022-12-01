@@ -79,7 +79,7 @@ namespace SEE.Game.City
         private void Start()
         {
             // We have to set an initial color for the edges, and we have to convert them to meshes.
-            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
             {
                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))

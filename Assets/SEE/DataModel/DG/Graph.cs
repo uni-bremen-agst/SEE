@@ -483,6 +483,15 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns all nodes and non-hierarchical edges of the graph.
+        /// </summary>
+        /// <returns>all nodes and non-hierarchical edges</returns>
+        public IEnumerable<GraphElement> Elements()
+        {
+            return nodes.Values.Union<GraphElement>(edges.Values);
+        }
+
+        /// <summary>
         /// Returns true if a node with the given <paramref name="ID"/> is part of the graph.
         /// </summary>
         /// <param name="ID">unique ID of the node searched</param>

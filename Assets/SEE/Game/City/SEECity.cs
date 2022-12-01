@@ -124,15 +124,23 @@ namespace SEE.Game.City
         {
             base.Awake();
             LoadData();
-            loadedGraph = VisualizedSubGraph;
-            if (loadedGraph != null)
+            Graph subGraph = VisualizedSubGraph;
+            if (subGraph != null)
             {
-                SetNodeEdgeRefs(loadedGraph, gameObject);
+                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
+                {
+                    // All other elements are virtual, i.e., should not be drawn.
+                    graphElement.SetToggle(GraphElement.IsVirtualToggle);
+                }
+
+                SetNodeEdgeRefs(subGraph, gameObject);
             }
             else
             {
                 Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
             }
+
+            loadedGraph = subGraph;
         }
 
         /// <summary>
