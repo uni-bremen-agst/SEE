@@ -25,7 +25,10 @@ namespace SEE.Game.Avatars
             }
             else
             {
+                Debug.Log("Found expression player - setting override Jaw = true");
                 expressionPlayer = this.transform.parent.GetComponent<UMAExpressionPlayer>();
+                expressionPlayer.overrideMecanimJaw = true;
+                expressionPlayer.overrideMecanimHead = false;
             }
             
 

@@ -1211,39 +1211,9 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: CityPath
+    - Name: SourceCodeDirectory
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: projectPath
-      Entry: 7
-      Data: 1|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SolutionPath
-      Entry: 7
-      Data: 2|SEE.Game.DataPath, SEE
+      Data: 0|SEE.Utils.DirectoryPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -1258,7 +1228,7 @@ MonoBehaviour:
       Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -1280,101 +1250,55 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: SelectedNodeTypes
+    - Name: NodeTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
+      Data: 2|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 6
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Class
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Method
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Member
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Package
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 6|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -1404,11 +1328,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -1424,11 +1348,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1440,11 +1364,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1456,11 +1380,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -1480,7 +1404,11 @@ MonoBehaviour:
       Entry: 8
       Data: 
   LODCulling: 0.001
-  CityPath:
+  ConfigurationPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  sourceCodeDirectory:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -1490,28 +1418,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    HeightMetric: Metric.LOC
-    ColorMetric: Metric.McCabe_Complexity
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    WidthMetric: Metric.Number_Of_Parameters
-    DepthMetric: Metric.Maximum_Nesting
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 5
-  InnerNodeSettings:
-    HeightMetric: 0.0001
-    ColorMetric: Metric.Level
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 5
-    InnerDonutMetric: Metric.IssuesTotal
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
@@ -1809,10 +1715,7 @@ MonoBehaviour:
   Ground: {fileID: 531878081}
   HideVRControllers: 0
   ShowControllerHints: 0
-  ExperienceScale: 1
   CityScalingFactor: 1
-  EyeGazeHover: 1
-  EyeStareDelay: 1
 --- !u!114 &338787054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2901,6 +2804,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2972,6 +2876,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3053,6 +2958,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3124,6 +3030,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3278,6 +3185,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3318,6 +3226,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3358,6 +3267,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3503,6 +3413,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3543,6 +3454,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3583,6 +3495,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3623,6 +3536,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3746,6 +3660,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3786,6 +3701,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3826,6 +3742,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3949,6 +3866,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3989,6 +3907,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4029,6 +3948,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4152,6 +4072,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4192,6 +4113,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4232,6 +4154,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4333,6 +4256,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4373,6 +4297,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4474,6 +4399,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4514,6 +4440,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4659,6 +4586,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4699,6 +4627,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4739,6 +4668,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4779,6 +4709,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5045,6 +4976,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5085,6 +5017,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5331,6 +5264,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5371,6 +5305,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5411,6 +5346,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5451,6 +5387,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5491,6 +5428,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5531,6 +5469,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5571,6 +5510,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5611,6 +5551,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5651,6 +5592,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5853,6 +5795,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5893,6 +5836,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5933,6 +5877,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5973,6 +5918,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6013,6 +5959,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6053,6 +6000,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6093,6 +6041,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6273,6 +6222,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6313,6 +6263,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6353,6 +6304,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6393,6 +6345,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6433,6 +6386,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6473,6 +6427,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6587,6 +6542,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6627,6 +6583,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6667,6 +6624,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6869,6 +6827,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6909,6 +6868,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6949,6 +6909,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -6989,6 +6950,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7029,6 +6991,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7069,6 +7032,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7109,6 +7073,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7289,6 +7254,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7329,6 +7295,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7369,6 +7336,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7409,6 +7377,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7449,6 +7418,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -7489,6 +7459,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -8317,7 +8288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab:
-  - {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382, type: 3}
+  - {fileID: 4680964957050400198, guid: 89119bcfe4086484a9e92e644599cc1e, type: 3}
   - {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c, type: 3}
   - {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0, type: 3}
   - {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4, type: 3}
@@ -8650,39 +8621,9 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: CityPath
+    - Name: SourceCodeDirectory
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: projectPath
-      Entry: 7
-      Data: 1|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SolutionPath
-      Entry: 7
-      Data: 2|SEE.Game.DataPath, SEE
+      Data: 0|SEE.Utils.DirectoryPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -8697,7 +8638,7 @@ MonoBehaviour:
       Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -8719,77 +8660,55 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: SelectedNodeTypes
+    - Name: NodeTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
+      Data: 2|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Class
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Package
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Cluster
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Architecture_Layer
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 6|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -8819,11 +8738,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -8839,11 +8758,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -8855,11 +8774,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -8871,11 +8790,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -8895,7 +8814,11 @@ MonoBehaviour:
       Entry: 8
       Data: 
   LODCulling: 0.001
-  CityPath:
+  ConfigurationPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  sourceCodeDirectory:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -8905,28 +8828,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    HeightMetric: 
-    ColorMetric: 
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    WidthMetric: Metric.Number_of_Tokens
-    DepthMetric: Metric.LOC
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 5
-  InnerNodeSettings:
-    HeightMetric: 
-    ColorMetric: 
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    InnerDonutMetric: Metric.IssuesTotal
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 1
     LayoutPath:
@@ -8974,20 +8875,12 @@ MonoBehaviour:
     Root: 2
     relativePath: 
     absolutePath: 
-  GxlImplementationPath:
-    Root: 1
-    relativePath: 
-    absolutePath: 
   GxlArchitecturePath:
     Root: 1
     relativePath: 
     absolutePath: 
   GxlMappingPath:
     Root: 1
-    relativePath: 
-    absolutePath: 
-  CsvImplementationPath:
-    Root: 2
     relativePath: 
     absolutePath: 
   CsvArchitecturePath:
@@ -11101,39 +10994,9 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: CityPath
+    - Name: SourceCodeDirectory
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: projectPath
-      Entry: 7
-      Data: 1|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SolutionPath
-      Entry: 7
-      Data: 2|SEE.Game.DataPath, SEE
+      Data: 0|SEE.Utils.DirectoryPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -11148,7 +11011,7 @@ MonoBehaviour:
       Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -11170,53 +11033,55 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: SelectedNodeTypes
+    - Name: NodeTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
+      Data: 2|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Cluster
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Architecture_Layer
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 6|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -11246,11 +11111,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -11266,11 +11131,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -11282,11 +11147,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -11298,11 +11163,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -11322,7 +11187,11 @@ MonoBehaviour:
       Entry: 8
       Data: 
   LODCulling: 0.001
-  CityPath:
+  ConfigurationPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  sourceCodeDirectory:
     Root: 2
     relativePath: 
     absolutePath: 
@@ -11332,28 +11201,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    HeightMetric: 0.0001
-    ColorMetric: Metric.Level
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    WidthMetric: 
-    DepthMetric: 
-    MinimalBlockLength: 0.01
-    MaximalBlockLength: 5
-  InnerNodeSettings:
-    HeightMetric: 0.0001
-    ColorMetric: Metric.Level
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    InnerDonutMetric: Metric.IssuesTotal
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 7
     LayoutPath:
@@ -12005,45 +11852,15 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: CityPath
+    - Name: SourceCodeDirectory
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
+      Data: 0|SEE.Utils.DirectoryPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
     - Name: relativePath
       Entry: 1
-      Data: /mini/CodeFacts.cfg
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: projectPath
-      Entry: 7
-      Data: 1|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 3
-    - Name: relativePath
-      Entry: 1
-      Data: /mini
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SolutionPath
-      Entry: 7
-      Data: 2|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 3
-    - Name: relativePath
-      Entry: 1
-      Data: /mini/src/mini.sln
+      Data: /mini/
     - Name: absolutePath
       Entry: 1
       Data: 
@@ -12052,7 +11869,7 @@ MonoBehaviour:
       Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -12074,20 +11891,22 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: SelectedNodeTypes
+    - Name: NodeTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
+      Data: 2|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 4
+      Data: 5
     - Name: 
       Entry: 7
       Data: 
@@ -12095,8 +11914,122 @@ MonoBehaviour:
       Entry: 1
       Data: Class
     - Name: $v
+      Entry: 7
+      Data: 5|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
       Entry: 5
       Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 1
+    - Name: MetricToLength
+      Entry: 7
+      Data: 6|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 1
+      Data: 0.0001
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 7|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.1935398
+    - Name: 
+      Entry: 4
+      Data: 0.9339623
+    - Name: 
+      Entry: 4
+      Data: 0.06608222
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.0001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 8|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 9|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 10|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -12107,8 +12040,131 @@ MonoBehaviour:
       Entry: 1
       Data: Method
     - Name: $v
+      Entry: 7
+      Data: 11|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
       Entry: 5
       Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 12|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: Metric.LOC
+    - Name: 
+      Entry: 1
+      Data: Metric.Number_Of_Parameters
+    - Name: 
+      Entry: 1
+      Data: Metric.McCabe_Complexity
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 13|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 1
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: Metric.Lines.LOC
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 14|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: Metric.Number_Of_Invocations
+    - Name: 
+      Entry: 1
+      Data: Metric.Lines.LOC
+    - Name: 
+      Entry: 1
+      Data: Metric.Halstead.Vocabulary
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 16|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -12119,8 +12175,122 @@ MonoBehaviour:
       Entry: 1
       Data: Member
     - Name: $v
+      Entry: 7
+      Data: 17|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
       Entry: 5
       Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 18|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.5
+    - Name: 
+      Entry: 1
+      Data: 0.5
+    - Name: 
+      Entry: 1
+      Data: 0.5
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 19|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.9745736
+    - Name: 
+      Entry: 4
+      Data: 0.990566
+    - Name: 
+      Entry: 4
+      Data: 0.07943219
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 20|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 21|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 22|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -12131,8 +12301,248 @@ MonoBehaviour:
       Entry: 1
       Data: Namespace
     - Name: $v
+      Entry: 7
+      Data: 23|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
       Entry: 5
       Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 1
+    - Name: MetricToLength
+      Entry: 7
+      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 1
+      Data: 0.0001
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 25|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 26|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 27|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 28|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: UNKNOWNTYPE
+    - Name: $v
+      Entry: 7
+      Data: 29|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 30|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 1
+      Data: 0.1
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 31|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 32|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 33|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AntennaWidth
+      Entry: 4
+      Data: 0.1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 34|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationDuration
+      Entry: 4
+      Data: 0.5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -12142,9 +12552,195 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 35|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 36|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Lines.LOC
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Number_Of_Invocations
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0.9921569
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Halstead.Vocabulary
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0.7929423
+    - Name: 
+      Entry: 4
+      Data: 0.9716981
+    - Name: 
+      Entry: 4
+      Data: 0.8817493
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 37|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -12174,11 +12770,11 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 38|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 8|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 39|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -12194,11 +12790,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 40|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 39
     - Name: 
       Entry: 12
       Data: 0
@@ -12210,11 +12806,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 41|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 39
     - Name: 
       Entry: 12
       Data: 0
@@ -12226,11 +12822,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 42|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 8
+      Data: 39
     - Name: 
       Entry: 12
       Data: 0
@@ -12250,9 +12846,13 @@ MonoBehaviour:
       Entry: 8
       Data: 
   LODCulling: 0.001
-  CityPath:
+  ConfigurationPath:
     Root: 3
-    relativePath: /mini/CodeFacts.cfg
+    relativePath: /mini/mini.cfg
+    absolutePath: 
+  sourceCodeDirectory:
+    Root: 3
+    relativePath: /mini/
     absolutePath: 
   SolutionPath:
     Root: 3
@@ -12260,34 +12860,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
-  LeafNodeSettings:
-    HeightMetric: Metric.Lines.LOC
-    ColorMetric: Metric.McCabe_Complexity
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Lines.Comment
-        Color: {r: 0, g: 0, b: 0, a: 1}
-      - Metric: Metric.Lines.Fixme
-        Color: {r: 0.9254902, g: 0.4901961, b: 0.3254902, a: 1}
-      - Metric: Metric.Halstead.Volume
-        Color: {r: 0.3254902, g: 0.8627451, b: 0.9254902, a: 1}
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 0
-    WidthMetric: Metric.Number_Of_Calling_Routines
-    DepthMetric: Metric.Number_Of_Called_Routines
-    MinimalBlockLength: 0.01
-    MaximalBlockLength: 0.5
-  InnerNodeSettings:
-    HeightMetric: 0.0001
-    ColorMetric: Metric.Level
-    AntennaSettings:
-      AntennaSections: []
-      AntennaWidth: 0.1
-    OutlineWidth: 1
-    Kind: 5
-    InnerDonutMetric: Metric.IssuesTotal
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
@@ -12348,7 +12920,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0048571825
+  HeightOffset: 0.0011351109
 --- !u!65 &1535691041
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13261,39 +13833,9 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
-    - Name: CityPath
+    - Name: SourceCodeDirectory
       Entry: 7
-      Data: 0|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 3
-    - Name: relativePath
-      Entry: 1
-      Data: mini-evolution/mini-evolution.cfg
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: projectPath
-      Entry: 7
-      Data: 1|SEE.Game.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 2
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SolutionPath
-      Entry: 7
-      Data: 2|SEE.Game.DataPath, SEE
+      Data: 0|SEE.Utils.DirectoryPath, SEE
     - Name: Root
       Entry: 3
       Data: 2
@@ -13308,7 +13850,7 @@ MonoBehaviour:
       Data: 
     - Name: HierarchicalEdges
       Entry: 7
-      Data: 3|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 1|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 4
@@ -13330,65 +13872,55 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: SelectedNodeTypes
+    - Name: NodeTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
+      Data: 2|SEE.Game.City.NodeTypeVisualsMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 3|SEE.Game.City.VisualNodeAttributesMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 5|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Method
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Class
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Package
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
     - Name: 
       Entry: 8
       Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MetricToColor
+      Entry: 7
+      Data: 5|SEE.Game.City.ColorMap, SEE
+    - Name: map
+      Entry: 7
+      Data: 6|SEE.Game.City.ColorRangeMapping, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: CoseGraphSettings
       Entry: 7
-      Data: 6|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
+      Data: 7|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
     - Name: EdgeLength
       Entry: 3
       Data: 20
@@ -13418,11 +13950,15 @@ MonoBehaviour:
       Data: false
     - Name: ListInnerNodeToggle
       Entry: 7
-      Data: 7|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 5
+      Entry: 7
+      Data: 9|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -13434,11 +13970,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 8|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -13450,11 +13986,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 9|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.InnerNodeKinds,
+      Data: 11|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -13466,11 +14002,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 10|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 12|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 5
+      Data: 9
     - Name: 
       Entry: 12
       Data: 0
@@ -13490,9 +14026,13 @@ MonoBehaviour:
       Entry: 8
       Data: 
   LODCulling: 0.001
-  CityPath:
-    Root: 3
-    relativePath: mini-evolution/mini-evolution.cfg
+  ConfigurationPath:
+    Root: 2
+    relativePath: 
+    absolutePath: 
+  sourceCodeDirectory:
+    Root: 2
+    relativePath: 
     absolutePath: 
   SolutionPath:
     Root: 2
@@ -13500,40 +14040,6 @@ MonoBehaviour:
     absolutePath: 
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 0
-  LeafNodeSettings:
-    HeightMetric: Metric.Lines.LOC
-    ColorMetric: Metric.McCabe_Complexity
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Vcs2See.Commit.Lines_Added
-        Color: {r: 0.1333333, g: 0.5294118, b: 0.3490196, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Edited
-        Color: {r: 0.9137255, g: 0.7568628, b: 0.3058824, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Deleted
-        Color: {r: 0.9137255, g: 0.4156863, b: 0.3058824, a: 1}
-      AntennaWidth: 0.015
-    OutlineWidth: 1
-    Kind: 0
-    WidthMetric: Metric.Number_Of_Calling_Routines
-    DepthMetric: Metric.Number_Of_Called_Routines
-    MinimalBlockLength: 0.001
-    MaximalBlockLength: 5
-  InnerNodeSettings:
-    HeightMetric: 0.0001
-    ColorMetric: Metric.Level
-    AntennaSettings:
-      AntennaSections:
-      - Metric: Metric.Vcs2See.Commit.Lines_Added
-        Color: {r: 0.1333333, g: 0.5294118, b: 0.3490196, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Edited
-        Color: {r: 0.9137255, g: 0.7568628, b: 0.3058824, a: 1}
-      - Metric: Metric.Vcs2See.Commit.Lines_Deleted
-        Color: {r: 0.9137255, g: 0.4156863, b: 0.3058824, a: 1}
-      AntennaWidth: 0.015
-    OutlineWidth: 1
-    Kind: 5
-    InnerDonutMetric: Metric.IssuesTotal
-    ShowNames: 0
   NodeLayoutSettings:
     Kind: 4
     LayoutPath:
