@@ -153,7 +153,7 @@ namespace SEE.Game.Avatars
             LookAt.enabled = false;
             if (gameObject.TryGetComponent(out aimIK))
             {
-                laserMaterial = Materials.New(Materials.ShaderType.Opaque, MissColor);
+                laserMaterial = Materials.New(Materials.ShaderType.TransparentLine, MissColor);
                 laserLine = LineFactory.Draw(aimIK.solver.transform.gameObject, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
             }
             else
