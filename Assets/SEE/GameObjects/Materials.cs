@@ -21,6 +21,7 @@ namespace SEE.GO
         {
             Opaque,          // fully drawn with no transparency
             TransparentLine, // for lines with transparency
+            OpaqueMetallic // for opaque meshes with a more realistic metallic effect
         }
 
         /// <summary>
@@ -31,6 +32,10 @@ namespace SEE.GO
         /// Name of the material for transparent lines (located in folder Resources).
         /// </summary>
         private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        /// <summary>
+        /// Name of the material for opaque, metallic meshes (located in folder Resources).
+        /// </summary>
+        private const string OpaqueMetallicMaterialName = "Materials/SEEMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
@@ -303,6 +308,9 @@ namespace SEE.GO
                     break;
                 case ShaderType.TransparentLine:
                     name = TransparentLineMaterialName;
+                    break;
+                case ShaderType.OpaqueMetallic:
+                    name = OpaqueMetallicMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

@@ -160,7 +160,7 @@ namespace SEE.Game
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType ShaderType = Materials.ShaderType.Opaque;
+        private const Materials.ShaderType ShaderType = Materials.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
