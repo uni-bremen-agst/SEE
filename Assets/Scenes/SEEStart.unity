@@ -277,7 +277,7 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382, type: 3}
+      Prefab: {fileID: 4680964957050400198, guid: 89119bcfe4086484a9e92e644599cc1e, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc1cedcf0a20b04ca3d2bb78035f3cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInputType: 0
+  playerInputType: 2
 --- !u!4 &1859932784
 Transform:
   m_ObjectHideFlags: 0
@@ -450,6 +450,7 @@ MonoBehaviour:
   m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
 --- !u!114 &1909299427
 MonoBehaviour:
   m_ObjectHideFlags: 0

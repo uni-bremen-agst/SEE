@@ -1,4 +1,5 @@
 using SEE.Game.Avatars;
+using UMA.PoseTools;
 using UnityEngine;
 using ViveSR.anipal.Lip;
 
@@ -16,7 +17,7 @@ public class AvatarFindUmaRenderer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Transform transform = gameObject.transform.parent.Find("UMARenderer");
+        Transform transform = gameObject.transform.Find("UMARenderer");
         if (transform != null)
         {
             transform.gameObject.AddComponent<AvatarBlendshapeExpressions>();
