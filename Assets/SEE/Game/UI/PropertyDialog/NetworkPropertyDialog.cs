@@ -109,6 +109,14 @@ namespace SEE.Game.UI.PropertyDialog
             group.Name = "Network settings";
 
             {
+                environmentSelector = dialog.AddComponent<SelectionProperty>();
+                environmentSelector.Name = "Environment";
+                environmentSelector.Description = "Select an environment";
+                environmentSelector.AddOptions(PlayerInputTypesToStrings());
+                environmentSelector.Value = SceneSettings.InputType.ToString();
+                group.AddProperty(environmentSelector);
+            }
+            {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
                 ipAddress.Value = networkConfig.ServerIP4Address;
@@ -136,14 +144,6 @@ namespace SEE.Game.UI.PropertyDialog
                 voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
                 voiceChatSelector.Value = networkConfig.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
-            }
-            {
-                environmentSelector = dialog.AddComponent<SelectionProperty>();
-                environmentSelector.Name = "Environment";
-                environmentSelector.Description = "Select an environment";
-                environmentSelector.AddOptions(PlayerInputTypesToStrings());
-                environmentSelector.Value = SceneSettings.InputType.ToString();
-                group.AddProperty(environmentSelector);
             }
             // Dialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
