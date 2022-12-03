@@ -25,7 +25,6 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using Valve.VR;
-using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI.ConfigMenu
 {
