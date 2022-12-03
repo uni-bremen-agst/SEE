@@ -152,6 +152,12 @@ namespace SEE.Game.City
             loadedGraph = subGraph;
         }
 
+        protected override void Start()
+        {
+            // Load the holistic metric board, if one was setup.
+            BoardSettings.LoadBoard();
+        }
+
         /// <summary>
         /// Sets all NodeRefs and EdgeRefs for this city to the nodes and edges, respectively,
         /// they correspond to. This will take place for the graph elements of the

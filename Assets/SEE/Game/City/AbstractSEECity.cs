@@ -12,6 +12,7 @@ using SEE.Tools;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
 {
@@ -169,6 +170,12 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for the visualization of software erosions.")]
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
+
+        /// <summary>
+        /// Holistic metric boards.
+        /// </summary>
+        [Tooltip("Settings for holistic metric boards.")]
+        public BoardAttributes BoardSettings = new BoardAttributes();
 
         /// <summary>
         /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
