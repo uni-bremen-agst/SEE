@@ -62,7 +62,13 @@ namespace SEE.Controls
                 string input = File.ReadAllText(path).Trim();
                 if (Enum.TryParse(input, out PlayerInputType playerInputType))
                 {
+                    Debug.Log($"Loaded environment {playerInputType} from configuration file {path}.\n");
                     SceneSettings.InputType = playerInputType;
+
+                    // FIXME: We use desktop during the opening dialog whatever the user set earlier
+                    // because the GUI for the opening dialog is implemented only for desktop.
+                    Debug.LogWarning($"Because of partial GUI implementation, we will use {PlayerInputType.DesktopPlayer}.\n");
+                    SceneSettings.InputType = PlayerInputType.DesktopPlayer;
                 }
                 else
                 {
@@ -76,15 +82,6 @@ namespace SEE.Controls
                 InputType = PlayerInputType.DesktopPlayer;
             }
         }
-
-        [Tooltip("The position at which to spawn the player initially.")]
-        [ShowInInspector]
-        private Vector3 PlayerOrigin = Vector3.one;
-
-        [Tooltip("The rotation along the y axis at which to spawn the player initially (in degree).")]
-        [ShowInInspector]
-        [Range(0, 359)]
-        private float PlayerYRotation = 0;
 
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
         [ShowInInspector]
@@ -255,27 +252,25 @@ namespace SEE.Controls
                     // position and rotation of the local desktop player are set
                     // elsewhere by the player spawner. That is why we can return
                     // this local player immediately.
-                    return LocalPlayerForDesktop();
+                    return LocalPlayer();
                 case PlayerInputType.VRPlayer:
                     {
                         /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
-                        player = PlayerFactory.CreateVRPlayer();
+                        player = LocalPlayer();
                         SetupVR(player, Ground);
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
                     /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
-                    player = PlayerFactory.CreateTouchGamepadPlayer();
+                    player = LocalPlayer();
                     break;
                 case PlayerInputType.None: return null; // No player needs to be created
                 default:
                     throw new NotImplementedException($"Unhandled case {inputType}.");
             }
-            player.transform.position = PlayerOrigin;
-            player.transform.rotation = Quaternion.Euler(0, PlayerYRotation, 0);
             return player;
 
-            static GameObject LocalPlayerForDesktop()
+            static GameObject LocalPlayer()
             {
                 // The local player is holding the main camera. Remote players do not have
                 // a camera attached. Hence, we only need to retrieve that camera.
