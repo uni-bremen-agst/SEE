@@ -22,18 +22,16 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The MetricValue to display</param>
         internal override void Display(MetricValue metricValue)
         {
-            if (metricValue.GetType() == typeof(MetricValueRange))
+            if (metricValue is MetricValueRange metricValueRange)
             {
-                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
                 titleText.text = metricValueRange.Name;
-                valueText.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
+                valueText.text = metricValueRange.Value.ToString($"F{metricValueRange.DecimalPlaces}");
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 circle.fillAmount = actual / maximum;    
             }
-            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
                 Display(metricValueCollection.MetricValues[0]);
             }
             else
