@@ -16,8 +16,9 @@ namespace SEEEditor
     /// <summary>
     /// An editor for the player settings class. Allows the user to set platform settings and create new code cities.
     /// </summary>
-    [CustomEditor(typeof(SceneSettings))]
+    ///[CustomEditor(typeof(SceneSettings))]
     [CanEditMultipleObjects]
+    [Obsolete]
     public class SceneSettingsEditor : Editor
     {
         /// <summary>
