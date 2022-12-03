@@ -195,7 +195,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void SetupEnvironment()
         {
-            if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
                 // Attach the pointer to the appropriate hand.
                 Transform attachmentPoint = GameObject

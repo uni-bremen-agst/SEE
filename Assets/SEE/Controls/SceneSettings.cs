@@ -8,6 +8,8 @@ using DG.Tweening;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using Sirenix.OdinInspector;
+using System.IO;
 
 namespace SEE.Controls
 {
@@ -27,18 +29,66 @@ namespace SEE.Controls
         //-----------------------------------------------
         // Attributes that can be configured by the user.
         //-----------------------------------------------
+
+        [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
+        [ShowInInspector]
+        public static PlayerInputType InputType = PlayerInputType.DesktopPlayer;
+
+        /// <summary>
+        /// The path of the configuration file in which to store the selected <see cref="InputType"/>.
+        /// </summary>
+        /// <returns>path of the configuration file</returns>
+        private static string ConfigurationFilename()
+        {
+            return Application.persistentDataPath + "/SceneSettings.cfg";
+        }
+
+        /// <summary>
+        /// Saves the <see cref="InputType"/> in a configuration file.
+        /// </summary>
+        internal static void Save()
+        {
+            File.WriteAllText(ConfigurationFilename(), InputType.ToString());
+        }
+
+        /// <summary>
+        /// Restores the <see cref="InputType"/> from the configuration file.
+        /// </summary>
+        internal static void Load()
+        {
+            string path = ConfigurationFilename();
+            if (File.Exists(path))
+            {
+                string input = File.ReadAllText(path).Trim();
+                if (Enum.TryParse(input, out PlayerInputType playerInputType))
+                {
+                    SceneSettings.InputType = playerInputType;
+                }
+                else
+                {
+                    Debug.LogError($"Configuration file {path} for the selected kind of environment (desktop, VR, etc.) does not contain the expected content. Using default {PlayerInputType.DesktopPlayer}.\n");
+                    playerInputType = PlayerInputType.DesktopPlayer;
+                }
+            }
+            else
+            {
+                Debug.Log($"Configuration file {path} for the selected kind of environment (desktop, VR, etc.) does not exist. Using default {PlayerInputType.DesktopPlayer}.\n");
+                InputType = PlayerInputType.DesktopPlayer;
+            }
+        }
+
         [Tooltip("The position at which to spawn the player initially.")]
-        [OdinSerialize]
-        public Vector3 PlayerOrigin = Vector3.one;
+        [ShowInInspector]
+        private Vector3 PlayerOrigin = Vector3.one;
 
         [Tooltip("The rotation along the y axis at which to spawn the player initially (in degree).")]
-        [OdinSerialize]
+        [ShowInInspector]
         [Range(0, 359)]
-        public float PlayerYRotation = 0;
+        private float PlayerYRotation = 0;
 
         [Tooltip("The plane the player is to focus initially in the desktop environment.")]
-        [OdinSerialize]
-        public GO.Plane FocusPlane;
+        [ShowInInspector]
+        private GO.Plane FocusPlane;
 
         [Header("VR specific settings (relevant only for VR players)")]
 
@@ -116,7 +166,7 @@ namespace SEE.Controls
             {
                 if (localPlayer == null)
                 {
-                    localPlayer = instance.CreatePlayer(PlayerSettings.GetInputType());
+                    localPlayer = instance.CreatePlayer(InputType);
                 }
                 return localPlayer;
             }
@@ -135,27 +185,21 @@ namespace SEE.Controls
         /// </summary>
         private void Awake()
         {
-            playerInputType = PlayerSettings.GetInputType();
-            Debug.Log($"Player input type: {playerInputType}.\n");
-            VRStatus.Enable(playerInputType == PlayerInputType.VRPlayer);
+            //InputType = PlayerSettings.GetInputType();
+            Debug.Log($"Player input type: {InputType}.\n");
+            VRStatus.Enable(InputType == PlayerInputType.VRPlayer);
         }
 
         /// <summary>
-        /// The player input type derived from <see cref="PlayerSettings.GetInputType()"/>. This value
-        /// is cached here because it will be used in <see cref="Update"/>.
-        /// </summary>
-        private PlayerInputType playerInputType;
-
-        /// <summary>
         /// If we are running in a VR environment and the user wants us to hide the controllers,
-        /// we do so. Caches <see cref="PlayerSettings.GetInputType()"/> in <see cref="playerInputType"/>.
+        /// we do so. Caches <see cref="SceneSettings.InputType"/> in <see cref="InputType"/>.
         /// </summary>
         private void Start()
         {
             SetDoTweenSettings();
             SetInstance();
             // Turn off VR controller hints if requested in the user settings.
-            if (playerInputType == PlayerInputType.VRPlayer && !ShowControllerHints)
+            if (InputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
                 if (Player.instance != null)
                 {
@@ -239,7 +283,7 @@ namespace SEE.Controls
                 /// FIXME: This should be the case for all environments as soon as we
                 /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
                 /// <see cref="Game.Avatars.AvatarAdapter"/>
-                return PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer ?
+                return InputType == PlayerInputType.DesktopPlayer ?
                     MainCamera.Camera.gameObject : null;
             }
         }
@@ -309,7 +353,7 @@ namespace SEE.Controls
         /// </summary>
         private void Update()
         {
-            if (playerInputType == PlayerInputType.VRPlayer && Player.instance != null)
+            if (InputType == PlayerInputType.VRPlayer && Player.instance != null)
             {
                 foreach (Hand hand in Player.instance.hands)
                 {
