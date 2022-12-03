@@ -213,13 +213,13 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 noneCovered = false;
                 ChangeSpecifiedDependency(edge, GetImplCounter(coveredEdge));
-                Transition(coveredEdge, coveredEdge.State(), State.Allowed);
+                Transition(coveredEdge, State.Allowed);
             }
 
             if (noneCovered)
             {
                 // In this case, we need to set the state manually because `ChangeSpecifiedDependency` wasn't called.
-                Transition(edge, State.Specified, State.Absent);
+                Transition(edge, State.Absent);
                 SetCounter(edge, 0);
             }
         }
@@ -278,7 +278,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                                      .Where(IsCoveredEdge);
                 foreach (Edge coveredEdge in coveredEdges)
                 {
-                    Transition(coveredEdge, coveredEdge.State(), State.Divergent);
+                    Transition(coveredEdge, State.Divergent);
                 }
             }
 
@@ -625,7 +625,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Allowed);
+                    Transition(edge, State.Allowed);
                 }
             }
 
@@ -633,7 +633,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Allowed);
+                    Transition(edge, State.Allowed);
                 }
             }
 
@@ -641,7 +641,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Allowed);
+                    Transition(edge, State.Allowed);
                 }
             }
         }
@@ -671,7 +671,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Divergent);
+                    Transition(edge, State.Divergent);
                 }
             }
 
@@ -679,7 +679,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 if (Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Divergent);
+                    Transition(edge, State.Divergent);
                 }
             }
 
@@ -688,7 +688,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 if (Lift(parent, edge.Target, edge.Type, -GetCounter(edge), out _)
                     || Lift(edge.Source, parent, edge.Type, -GetCounter(edge), out _))
                 {
-                    Transition(edge, edge.State(), State.Divergent);
+                    Transition(edge, State.Divergent);
                 }
             }
 
