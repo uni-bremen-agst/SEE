@@ -49,7 +49,7 @@ namespace SEE.XR
         /// XR plug-ins are started (as set in the project settings).
         /// </summary>
         /// <returns>null if initialization is not yet completed</returns>
-        public IEnumerator StartXRCoroutine()
+        public static IEnumerator StartXRCoroutine()
         {
             Debug.Log("[XR] Initializing XR...\n");
 
