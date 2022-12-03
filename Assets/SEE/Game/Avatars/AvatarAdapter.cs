@@ -1,6 +1,7 @@
 ﻿using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
+using RootMotion.FinalIK;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
@@ -9,6 +10,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
+using ViveSR.anipal.Lip;
 
 namespace SEE.Game.Avatars
 {
@@ -16,7 +18,7 @@ namespace SEE.Game.Avatars
     /// This component is assumed to be attached to a game object representing
     /// an avatar (representing a local or remote player). It will adapt that
     /// avatar according to the platform we are currently running on
-    /// (<see cref="PlayerSettings.GetInputType()"/>. In particular, it will
+    /// (<see cref="SceneSettings.InputType"/>. In particular, it will
     /// enable SALSA's lip sync and Dissonance.
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
@@ -35,7 +37,7 @@ namespace SEE.Game.Avatars
                     gameObject.AddComponent<CodeSpaceManager>();
                 }
 
-                switch (PlayerSettings.GetInputType())
+                switch (SceneSettings.InputType)
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
@@ -45,7 +47,7 @@ namespace SEE.Game.Avatars
                         PrepareForXR();
                         break;
                     default:
-                        throw new NotImplementedException($"Unhandled case {PlayerSettings.GetInputType()}");
+                        throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;
@@ -164,24 +166,6 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
-        /// as a child and an <see cref="XRPlayerMovement"/> component.
-        /// </summary>
-        private void PrepareForXR()
-        {
-            GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
-            vrPlayer.name = PlayerInputType.VRPlayer.ToString();
-            gameObject.transform.position = vrPlayer.transform.position;
-            gameObject.transform.rotation = vrPlayer.transform.rotation;
-            vrPlayer.transform.SetParent(gameObject.transform);
-            //vrPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
-            //vrPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
-            XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
-            movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
-            movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
-        }
-
-        /// <summary>
         /// Returns the height of a desktop avatar. Call this method only when running
         /// in a desktop environment.
         /// </summary>
@@ -201,6 +185,42 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
+        /// as a child and an <see cref="XRPlayerMovement"/> component.
+        /// </summary>
+        private void PrepareForXR()
+        {
+            GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
+            vrPlayer.name = PlayerInputType.VRPlayer.ToString();
+            gameObject.transform.position = vrPlayer.transform.position;
+            gameObject.transform.rotation = vrPlayer.transform.rotation;
+            vrPlayer.transform.SetParent(gameObject.transform);
+            //vrPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
+            //vrPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
+
+            if (gameObject.TryGetComponentOrLog(out VRIK vrIK))
+            {
+                vrIK.enabled = true;
+            }
+            //if (gameObject.TryGetComponentOrLog(out UMA_VRIK uma_VRIK))
+            //{
+            //    vrIK.enabled = true;
+            //}
+            if (gameObject.TryGetComponentOrLog(out SRanipal_Lip_Framework lipFW))
+            {
+                lipFW.enabled = true;
+            }
+
+            //gameObject.EnableChild("Controller (left)", true);
+            //gameObject.EnableChild("Controller (right)", true);
+            //gameObject.EnableChild("Camera", true);
+
+            XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
+            movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
+            movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
+        }
+
+        /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
         /// as a child and a <see cref="DesktopPlayerMovement"/> component.
         /// </summary>
@@ -213,6 +233,15 @@ namespace SEE.Game.Avatars
             desktopPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
             desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
 
+            if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aaSystem))
+            {
+                // Note: the two components LookAtIK and AimIK are managed by AvatarAimingSystem;
+                // we do not turn these on here.
+                aaSystem.enabled = true;
+            }
+            //gameObject.EnableChild("Controller (left)", false);
+            //gameObject.EnableChild("Controller (right)", false);
+            //gameObject.EnableChild("Camera", false);
             gameObject.AddComponent<DesktopPlayerMovement>();
         }
     }
