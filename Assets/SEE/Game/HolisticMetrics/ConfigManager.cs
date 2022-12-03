@@ -3,6 +3,7 @@ using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Game.HolisticMetrics.Components;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics
@@ -51,6 +52,22 @@ namespace SEE.Game.HolisticMetrics
 
             return fileNames;
         }
+        
+        /// <summary>
+        /// Loads a metrics board from a file at the given <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The path to the file which shall be loaded</param>
+        /// <returns>The GameObject that represents the metrics displays</returns>
+        internal static BoardConfig LoadBoard(FilePath path)
+        {
+            string configuration = File.ReadAllText(path.Path);
+            BoardConfig boardConfiguration = JsonUtility.FromJson<BoardConfig>(configuration);
+            foreach (WidgetConfig config in boardConfiguration.WidgetConfigs)
+            {
+                config.ID = Guid.NewGuid();
+            }
+            return boardConfiguration;
+        }
 
         /// <summary>
         /// Loads a metrics board from a file.
@@ -60,13 +77,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
-            string configuration = File.ReadAllText(metricsBoardsPath + fileName + fileNameExtension);
-            BoardConfig boardConfiguration = JsonUtility.FromJson<BoardConfig>(configuration);
-            foreach (WidgetConfig config in boardConfiguration.WidgetConfigs)
-            {
-                config.ID = Guid.NewGuid();
-            }
-            return boardConfiguration;
+            return LoadBoard(new FilePath(metricsBoardsPath + fileName + fileNameExtension));
         }
         
         /// <summary>
