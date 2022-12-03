@@ -87,7 +87,7 @@ namespace SEE.Game.UI
             HasStarted = true;
 
             // Execute platform dependent code
-            Platform = PlayerSettings.GetInputType();
+            Platform = SceneSettings.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: StartDesktop();

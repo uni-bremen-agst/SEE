@@ -84,7 +84,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Update()
         {
-            switch (PlayerSettings.GetInputType())
+            switch (SceneSettings.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -93,7 +93,7 @@ namespace SEE.Game.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {SceneSettings.InputType}.");
             }
         }
 

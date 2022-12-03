@@ -1,5 +1,6 @@
 ﻿using SEE.GO;
 using Sirenix.Serialization;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -10,6 +11,7 @@ namespace SEE.Controls
     /// or gamepads using InControl, (3) virtual reality, or (4) augmented
     /// reality.
     /// </summary>
+    [Obsolete]
     public class PlayerSettings : MonoBehaviour
     {
         /// <summary>
@@ -72,14 +74,14 @@ namespace SEE.Controls
         /// The player input type within this local instance of Unity.
         /// </summary>
         /// <returns>player input type</returns>
-        public static PlayerInputType GetInputType()
-        {
-            if (localPlayerInputType == PlayerInputType.None)
-            {
-                localPlayerInputType = GetPlayerSettings().playerInputType;
-            }
-            return localPlayerInputType;
-        }
+        //public static PlayerInputType GetInputType()
+        //{
+        //    if (localPlayerInputType == PlayerInputType.None)
+        //    {
+        //        localPlayerInputType = GetPlayerSettings().playerInputType;
+        //    }
+        //    return localPlayerInputType;
+        //}
 
         /// <summary>
         /// The player settings within this local instance of Unity.
