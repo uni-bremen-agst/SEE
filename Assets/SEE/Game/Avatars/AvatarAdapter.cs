@@ -201,7 +201,7 @@ namespace SEE.Game.Avatars
         /// is set up for VR. This controller will be assigned to the UMA avatar
         /// as the default race animation controller.
         /// </summary>
-        private const string AnimatorForVRIK = "Prefabs/Players/Locomotion"; // "Prefabs/Players/VRIKAnimatedLocomotion";
+        private const string AnimatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion"; // "Prefabs/Players/Locomotion";
 
         public IEnumerator StartXRCoroutine()
         {
@@ -216,9 +216,11 @@ namespace SEE.Game.Avatars
 
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
-            // Now we can instantiate the prefabs for VR that require that SteamVR is up and running.
+            // Now we can instantiate the prefabs for VR that requires that SteamVR is up and running.
             GameObject rig = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRUMACameraRig");
             rig.transform.position = gameObject.transform.position;
+            // FIXME: Only the server is allowed to spawn objects.
+
             rig.AddComponent<NetworkObject>().Spawn();
             rig.AddComponent<ClientNetworkTransform>();
 
