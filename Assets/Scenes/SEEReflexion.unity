@@ -10658,6 +10658,12 @@ MonoBehaviour:
     MetricIssue_SUM: Metric.Metric_SUM
     StyleIssue_SUM: Metric.Style_SUM
     UniversalIssue_SUM: Metric.Universal_SUM
+  BoardSettings:
+    LoadBoardOnStartup: 0
+    BoardPath:
+      Root: 2
+      relativePath: 
+      absolutePath: 
   GXLPath:
     Root: 3
     relativePath: /reflexion/minilax/Files.gxl
@@ -16914,15 +16920,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d774210f68c92ba42a39ab95f8b89946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab:
-  - {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382, type: 3}
-  - {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0, type: 3}
-  - {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c, type: 3}
-  - {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4, type: 3}
-  - {fileID: 7839154548958412681, guid: aa2505da96d6e284a9ff9d911702535a, type: 3}
-  - {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa, type: 3}
-  InitialPosition: {x: -30.143, y: 0.017, z: 7.275}
-  InitialRotation: {x: 0, y: 0, z: 0}
+  PlayerSpawns:
+  - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
+      type: 3}
+    Position: {x: -28.9, y: 0.017, z: 9.4}
+    Rotation: 0
+  - PlayerPrefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
+      type: 3}
+    Position: {x: -31.3, y: 0.017, z: 9.19}
+    Rotation: 90
+  - PlayerPrefab: {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c,
+      type: 3}
+    Position: {x: -31.3, y: 0.017, z: 8.521}
+    Rotation: 90
+  - PlayerPrefab: {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4,
+      type: 3}
+    Position: {x: -31.3, y: 0.017, z: 7.931}
+    Rotation: 90
+  - PlayerPrefab: {fileID: 7839154548958412681, guid: aa2505da96d6e284a9ff9d911702535a,
+      type: 3}
+    Position: {x: -31.3, y: 0.017, z: 7.931}
+    Rotation: 90
+  - PlayerPrefab: {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa,
+      type: 3}
+    Position: {x: -31.3, y: 0.017, z: 7.931}
+    Rotation: 90
 --- !u!4 &1706360000
 Transform:
   m_ObjectHideFlags: 0
@@ -16931,7 +16953,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1706359998}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.143, y: 0.017, z: 7.275}
+  m_LocalPosition: {x: 0, y: 0.017, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
