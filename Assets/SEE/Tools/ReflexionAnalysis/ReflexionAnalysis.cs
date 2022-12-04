@@ -165,17 +165,17 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Transfers edge from its <paramref name="oldState"/> to <paramref name="newState"/>;
-        /// notifies all observers if <paramref name="oldState"/> and <paramref name="newState"/> actually differ.
+        /// Transfers edge from its old state to <paramref name="newState"/>;
+        /// notifies all observers if the old state and <paramref name="newState"/> actually differ.
         /// Note that, if <paramref name="edge"/> is a propagated edge, <see cref="Transition"/> will be recursively
         /// called on each originating edge, and no notification will be sent for the propagated edge.
         /// </summary>
         /// <param name="edge">edge being changed</param>
-        /// <param name="oldState">the old state of the edge</param>
         /// <param name="newState">the new state of the edge after the change</param>
-        private void Transition(Edge edge, State oldState, State newState)
+        private void Transition(Edge edge, State newState)
         {
-            if (oldState != newState)
+            State state = edge.State();
+            if (state != newState)
             {
                 SetState(edge, newState);
                 if (edge.IsInArchitecture() && !IsSpecified(edge))
@@ -186,12 +186,12 @@ namespace SEE.Tools.ReflexionAnalysis
                     AssertOrThrow(propagationTable.ContainsKey(edge.ID), () => new ExpectedPropagatedEdgeException(edge));
                     foreach (Edge originatingEdge in GetOriginatingEdges(edge))
                     {
-                        Transition(originatingEdge, oldState, newState);
+                        Transition(originatingEdge, newState);
                     }
                 }
                 else
                 {
-                    Notify(new EdgeChange(version, edge, oldState, newState, edge.GetSubgraphs()));
+                    Notify(new EdgeChange(version, edge, state, newState, edge.GetSubgraphs()));
                 }
             }
         }
@@ -309,7 +309,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 // This will also send notifications about all originating implementation dependencies which
                 // are now unmapped.
-                Transition(edge, edge.State(), State.Unmapped);
+                Transition(edge, State.Unmapped);
                 // We can drop this edge; it is no longer needed.
                 SetCounter(edge, 0);
                 propagationTable.Remove(edge.ID);
@@ -503,7 +503,7 @@ namespace SEE.Tools.ReflexionAnalysis
                         bool implRemoved = propagationTable[propagatedEdge.ID].Remove(implementationDependency);
                         Assert.IsTrue(implRemoved, "Originating edge should have been present in propagation table!");
                         // Not every originating dependency has been unmapped, only the one passed in here.
-                        Transition(implementationDependency, implementationDependency.State(), State.Unmapped);
+                        Transition(implementationDependency, State.Unmapped);
                     }
                     // Otherwise, edge has been removed. We shall not call `Transition` in this case,
                     // because the propagated edge no longer exists.
@@ -805,11 +805,11 @@ namespace SEE.Tools.ReflexionAnalysis
 
             if (oldValue == 0)
             {
-                Transition(edge, state, State.Convergent);
+                Transition(edge, State.Convergent);
             }
             else if (newValue == 0)
             {
-                Transition(edge, state, State.Absent);
+                Transition(edge, State.Absent);
             }
 
             SetCounter(edge, newValue);
@@ -845,7 +845,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             foreach (Edge edge in Edges().Where(x => x.IsInImplementation()))
             {
-                Transition(edge, edge.State(), State.Unmapped);
+                Transition(edge, State.Unmapped);
             }
         }
 
@@ -866,12 +866,12 @@ namespace SEE.Tools.ReflexionAnalysis
                     case State.Undefined:
                     case State.Specified:
                         SetCounter(edge, 0); // Note: architecture edges have a counter
-                        Transition(edge, state, State.Specified); // initial state must be State.specified
+                        Transition(edge, State.Specified); // initial state must be State.specified
                         break;
                     case State.Absent:
                     case State.Convergent:
                         // The initial state of an architecture dependency that was not propagated is specified.
-                        Transition(edge, state, State.Specified);
+                        Transition(edge, State.Specified);
                         SetCounter(edge, 0); // Note: architecture edges have a counter
                         break;
                     case State.Allowed:
@@ -933,7 +933,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 State state = edge.State();
                 if (IsSpecified(edge) && state != State.Convergent)
                 {
-                    Transition(edge, state,
+                    Transition(edge,
                                edge.HasToggle("Architecture.Is_Optional") ? State.AllowedAbsent : State.Absent);
                 }
             }
@@ -1016,7 +1016,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 propagationTable[architectureDependency.ID].Add(implementationDependency);
                 Lift(architectureDependency.Source, architectureDependency.Target, implType, implCounter, out allowingEdge);
                 ChangePropagatedDependency(architectureDependency, implCounter);
-                Transition(implementationDependency, implementationDependency.State(), architectureDependency.State());
+                Transition(implementationDependency, architectureDependency.State());
             }
             // TODO: keep a trace of dependency propagation
             //causing.insert(std::pair<Edge*, Edge*>
@@ -1206,12 +1206,12 @@ namespace SEE.Tools.ReflexionAnalysis
             if (Lift(archSource, archTarget, edgeType, counter, out allowingEdgeOut))
             {
                 // found a matching specified architecture dependency allowing propagatedArchitectureDep
-                Transition(propagatedArchitectureDep, State.Undefined, State.Allowed);
+                Transition(propagatedArchitectureDep, State.Allowed);
             }
             else if (archSource == archTarget)
             {
                 // by default, every entity may use itself
-                Transition(propagatedArchitectureDep, State.Undefined, State.ImplicitlyAllowed);
+                Transition(propagatedArchitectureDep, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Self dependencies are implicitly allowed.
                 allowingEdgeOut = null;
@@ -1219,7 +1219,7 @@ namespace SEE.Tools.ReflexionAnalysis
             else if (AllowDependenciesToParents
                      && IsDescendantOf(propagatedArchitectureDep.Source, propagatedArchitectureDep.Target))
             {
-                Transition(propagatedArchitectureDep, State.Undefined, State.ImplicitlyAllowed);
+                Transition(propagatedArchitectureDep, State.ImplicitlyAllowed);
                 // Note: there is no specified architecture dependency that allows this implementation
                 // dependency. Dependencies from descendants to ancestors are implicitly allowed if
                 // AllowDependenciesToParents is true.
@@ -1227,7 +1227,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             else
             {
-                Transition(propagatedArchitectureDep, State.Undefined, State.Divergent);
+                Transition(propagatedArchitectureDep, State.Divergent);
                 allowingEdgeOut = null;
             }
 
