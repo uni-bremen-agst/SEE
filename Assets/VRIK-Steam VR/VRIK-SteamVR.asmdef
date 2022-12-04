@@ -1,0 +1,17 @@
+{
+    "name": "VRIK-SteamVR",
+    "rootNamespace": "",
+    "references": [
+        "GUID:26ea63ed790ab644cab0eb6640e30170",
+        "GUID:1fbf338ef6b952a448262a7ff7df5fe4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
