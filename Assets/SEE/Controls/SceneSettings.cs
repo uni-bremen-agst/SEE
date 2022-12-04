@@ -87,22 +87,6 @@ namespace SEE.Controls
         [ShowInInspector]
         private GO.Plane FocusPlane;
 
-        [Header("VR specific settings (relevant only for VR players)")]
-
-        /// <summary>
-        /// The game object representing the ground in the scene. A Unity plane
-        /// should generally be attached to it. In the VR  environment, the TeleportArea will be attached to it.
-        /// </summary>
-        [Tooltip("The ground in the scene. This attribute must be set in VR for determining the teleporting area.")]
-        [OdinSerialize]
-        public GameObject Ground;
-
-        [Tooltip("Whether the VR controllers should be hidden.")]
-        public bool HideVRControllers = false;
-
-        [Tooltip("Whether hints should be shown for controllers.")]
-        public bool ShowControllerHints = false;
-
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
 
@@ -195,31 +179,6 @@ namespace SEE.Controls
         {
             SetDoTweenSettings();
             SetInstance();
-            // Turn off VR controller hints if requested in the user settings.
-            if (InputType == PlayerInputType.VRPlayer && !ShowControllerHints)
-            {
-                if (Player.instance != null)
-                {
-                    foreach (Hand hand in Player.instance.hands)
-                    {
-                        ControllerButtonHints.HideAllButtonHints(hand);
-                        ControllerButtonHints.HideAllTextHints(hand);
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"{nameof(Player)}.instance is null. Is VR running?\n");
-                }
-
-                if (Teleport.instance != null)
-                {
-                    Teleport.instance.CancelTeleportHint();
-                }
-                else
-                {
-                    Debug.LogWarning($"{nameof(Teleport)}.instance is null. Is there no teleport area in the scene?\n");
-                }
-            }
 #if UNITY_EDITOR
             KeyBindings.PrintBindings();
 #endif
@@ -257,7 +216,6 @@ namespace SEE.Controls
                     {
                         /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
                         player = LocalPlayer();
-                        SetupVR(player, Ground);
                     }
                     break;
                 case PlayerInputType.TouchGamepadPlayer:
@@ -280,89 +238,6 @@ namespace SEE.Controls
                 /// <see cref="Game.Avatars.AvatarAdapter"/>
                 return InputType == PlayerInputType.DesktopPlayer ?
                     MainCamera.Camera.gameObject : null;
-            }
-        }
-
-        /// <summary>
-        /// Sets up the scene for playing in an VR environment. This means to instantiate the
-        /// Teleporting object and to attach a TeleportArea to the ground plane named <see cref="FloorName"/>.
-        /// In addition, the VR camera is assigned to the ChartManager if it exists.
-        ///
-        /// Precondition: There must be a game object named <see cref="FloorName"/> in the scene, representing
-        /// the ground (a Unity Plane would be attached to it).
-        /// </summary>
-        /// <param name="player">the current VR player</param>
-        /// <param name="ground"></param>
-        /// <exception cref="Exception">thrown if there is no plane named <see cref="FloorName"/> in the scene</exception>
-        private static void SetupVR(GameObject player, GameObject ground)
-        {
-            if (ground == null)
-            {
-                throw new InvalidOperationException("A Ground must be assigned in the PlayerSettings. Use the Inspector.");
-            }
-            else
-            {
-                // Create Teleporting game object
-                PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
-                {
-                    // Attach TeleportArea to floor
-                    // The TeleportArea replaces the material of the game object it is attached to
-                    // into a transparent material. This way the game object becomes invisible.
-                    // For this reason, we will clone the floor and move the cloned floor slightly above
-                    // its origin and then attach the TeleportArea to the cloned floor.
-                    Vector3 position = ground.transform.position;
-                    position.y += 0.01f;
-                    GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
-                    clonedFloor.AddComponent<TeleportArea>();
-                }
-                {
-                    // Assign the VR camera to the chart manager so that charts can move along with the camera.
-                    GameObject chartManager = GameObject.Find(ChartManagerName);
-                    if (chartManager)
-                    {
-                        ChartPositionVr chartPosition = chartManager.GetComponentInChildren<ChartPositionVr>();
-                        if (chartPosition)
-                        {
-                            chartPosition.enabled = true;
-                            chartPosition.CameraTransform = player.GetComponentInChildren<Camera>().transform;
-                            Debug.Log($"VR camera of {player.name} successfully assigned to {ChartManagerName}.\n");
-                        }
-                        else
-                        {
-                            Debug.LogError($"{ChartManagerName} has no component {nameof(ChartPositionVr)}.\n");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"No {ChartManagerName} found.\n");
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
-        /// will not be visualized together with the hands of the player. Apparently, this
-        /// hiding/showing must be run at each frame and, hence, we need to put this code into
-        /// an Update() method.
-        /// </summary>
-        private void Update()
-        {
-            if (InputType == PlayerInputType.VRPlayer && Player.instance != null)
-            {
-                foreach (Hand hand in Player.instance.hands)
-                {
-                    if (HideVRControllers)
-                    {
-                        hand.HideController();
-                        hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
-                    }
-                    else
-                    {
-                        hand.ShowController();
-                        hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
-                    }
-                }
             }
         }
     }

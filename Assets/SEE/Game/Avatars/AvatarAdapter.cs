@@ -4,7 +4,6 @@ using Dissonance.Audio.Playback;
 using RootMotion.FinalIK;
 using SEE.Controls;
 using SEE.GO;
-using SEE.Net;
 using SEE.Utils;
 using SEE.XR;
 using System;
@@ -26,6 +25,14 @@ namespace SEE.Game.Avatars
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
     {
+        [Header("VR specific settings (relevant only for VR players)")]
+
+        [Tooltip("Whether the VR controllers should be hidden.")]
+        public bool HideVRControllers = false;
+
+        [Tooltip("Whether hints should be shown for controllers.")]
+        public bool ShowControllerHints = false;
+
         /// <summary>
         /// If this code is executed for the local player, the necessary player type
         /// for the environment we are currently running on are added to this game object.
@@ -203,6 +210,26 @@ namespace SEE.Game.Avatars
         /// </summary>
         private const string AnimatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion"; // "Prefabs/Players/Locomotion";
 
+        /// <summary>
+        /// The path of the prefab for the VR camera rig.
+        /// </summary>
+        private const string VRPlayerRigPrefab = "Prefabs/Players/VRUMACameraRig"; // "Prefabs/Players/VRPlayerRig";
+        /// <summary>
+        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// representing the head for VRIK.
+        /// </summary>
+        private const string VRPlayerHeadForVRIK = "Camera/Head"; //"SteamVRObjects/VRCamera/HeadForVRIK";
+        /// <summary>
+        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// representing the left hand for VRIK.
+        /// </summary>
+        private const string VRPLayerLeftHandForVRIK = "Controller (left)/LeftHand"; // "SteamVRObjects/LeftHand/LeftHandForVRIK";
+        /// <summary>
+        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// representing the right hand for VRIK.
+        /// </summary>
+        private const string VRPlayerRightHandForVRIK = "Controller (right)/RightHand";  // "SteamVRObjects/RightHand/RightHandForVRIK";
+
         public IEnumerator StartXRCoroutine()
         {
             // Start XR manually.
@@ -217,30 +244,78 @@ namespace SEE.Game.Avatars
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
             // Now we can instantiate the prefabs for VR that requires that SteamVR is up and running.
-            GameObject rig = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRUMACameraRig");
+            GameObject rig = PrefabInstantiator.InstantiatePrefab(VRPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
             // FIXME: Only the server is allowed to spawn objects.
+            //rig.AddComponent<NetworkObject>().Spawn();
+            //rig.AddComponent<ClientNetworkTransform>();
 
-            rig.AddComponent<NetworkObject>().Spawn();
-            rig.AddComponent<ClientNetworkTransform>();
+            //gameObject.transform.SetParent(rig.transform);
+            //gameObject.transform.position = Vector3.zero;
 
-            gameObject.transform.SetParent(rig.transform);
-            gameObject.transform.position = Vector3.zero;
-
+            PrepareScene();
             TurnOffAvatarAimingSystem();
             ReplaceAnimator();
-
             SetupVRIK();
+            AddVRPlayer();
 
-            //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
-            //vrPlayer.name = PlayerInputType.VRPlayer.ToString();
-            //gameObject.transform.position = vrPlayer.transform.position;
-            //gameObject.transform.rotation = vrPlayer.transform.rotation;
-            //vrPlayer.transform.SetParent(gameObject.transform);
+            /// <summary>
+            /// Sets up the scene for playing in an VR environment. This means to instantiate the
+            /// Teleporting object and to attach a TeleportArea to the ground plane named <see cref="FloorName"/>.
+            /// In addition, the VR camera is assigned to the ChartManager if it exists.
+            ///
+            /// Precondition: There must be a game object named <see cref="FloorName"/> in the scene, representing
+            /// the ground (a Unity Plane would be attached to it).
+            /// </summary>
+            void PrepareScene()
+            {
+                const string GroundName = "Ground";
 
-            //XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
-            //movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
-            //movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
+                GameObject ground = GameObject.Find(GroundName);
+                if (ground == null)
+                {
+                    Debug.LogError($"There is no ground object named {GroundName}. Teleporting cannot be set up.\n");
+                }
+                else
+                {
+                    // Create Teleporting game object
+                    PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
+                    {
+                        // Attach TeleportArea to floor
+                        // The TeleportArea replaces the material of the game object it is attached to
+                        // into a transparent material. This way the game object becomes invisible.
+                        // For this reason, we will clone the floor and move the cloned floor slightly above
+                        // its origin and then attach the TeleportArea to the cloned floor.
+                        Vector3 position = ground.transform.position;
+                        position.y += 0.01f;
+                        GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
+                        clonedFloor.AddComponent<TeleportArea>();
+                    }
+                    // FIXME: This needs to work again for our metric charts.
+                    //{
+                    //    // Assign the VR camera to the chart manager so that charts can move along with the camera.
+                    //    GameObject chartManager = GameObject.Find(ChartManagerName);
+                    //    if (chartManager)
+                    //    {
+                    //        ChartPositionVr chartPosition = chartManager.GetComponentInChildren<ChartPositionVr>();
+                    //        if (chartPosition)
+                    //        {
+                    //            chartPosition.enabled = true;
+                    //            chartPosition.CameraTransform = player.GetComponentInChildren<Camera>().transform;
+                    //            Debug.Log($"VR camera of {player.name} successfully assigned to {ChartManagerName}.\n");
+                    //        }
+                    //        else
+                    //        {
+                    //            Debug.LogError($"{ChartManagerName} has no component {nameof(ChartPositionVr)}.\n");
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        Debug.LogError($"No {ChartManagerName} found.\n");
+                    //    }
+                    //}
+                }
+            }
 
             // Turns off
             void TurnOffAvatarAimingSystem()
@@ -295,12 +370,57 @@ namespace SEE.Game.Avatars
             void SetupVRIK()
             {
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
-                vrIK.solver.spine.headTarget = rig.transform.Find("Camera/Head");
+                vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
-                vrIK.solver.leftArm.target = rig.transform.Find("Controller (left)/LeftHand");
+                vrIK.solver.leftArm.target = rig.transform.Find(VRPLayerLeftHandForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.leftArm.target);
-                vrIK.solver.rightArm.target = rig.transform.Find("Controller (right)/RightHand");
+                vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
+            }
+
+            // Adds VRPlayer prefab.
+            void AddVRPlayer()
+            {
+                //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
+                //gameObject.transform.position = vrPlayer.transform.position;
+                //gameObject.transform.rotation = vrPlayer.transform.rotation;
+                //vrPlayer.transform.SetParent(gameObject.transform);
+
+                //XRPlayerMovement movement = gameObject.AddOrGetComponent<XRPlayerMovement>();
+                //movement.DirectingHand = rig.
+                //movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
+                //movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
+            }
+        }
+
+        /// <summary>
+        /// Turns off VR controller hints if <see cref="ShowControllerHints"/> is <c>false</c>.
+        /// </summary>
+        private void TurnOffControllerHintsIfRequested()
+        {
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer && !ShowControllerHints)
+            {
+                if (Player.instance != null)
+                {
+                    foreach (Hand hand in Player.instance.hands)
+                    {
+                        ControllerButtonHints.HideAllButtonHints(hand);
+                        ControllerButtonHints.HideAllTextHints(hand);
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"{nameof(Player)}.instance is null. Is VR running?\n");
+                }
+
+                if (Teleport.instance != null)
+                {
+                    Teleport.instance.CancelTeleportHint();
+                }
+                else
+                {
+                    Debug.LogWarning($"{nameof(Teleport)}.instance is null. Is there no teleport area in the scene?\n");
+                }
             }
         }
 
@@ -325,5 +445,31 @@ namespace SEE.Game.Avatars
             }
             gameObject.AddComponent<DesktopPlayerMovement>();
         }
+
+        /// <summary>
+        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
+        /// will not be visualized together with the hands of the player. Apparently, this
+        /// hiding/showing must be run at each frame and, hence, we need to put this code into
+        /// an Update() method.
+        /// </summary>
+        //private void Update()
+        //{
+        //    if (SceneSettings.InputType == PlayerInputType.VRPlayer && Player.instance != null)
+        //    {
+        //        foreach (Hand hand in Player.instance.hands)
+        //        {
+        //            if (HideVRControllers)
+        //            {
+        //                hand.HideController();
+        //                hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
+        //            }
+        //            else
+        //            {
+        //                hand.ShowController();
+        //                hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
