@@ -26,7 +26,6 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 using Valve.VR;
-using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -96,7 +95,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Update()
         {
-            switch (PlayerSettings.GetInputType())
+            switch (SceneSettings.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -105,7 +104,7 @@ namespace SEE.Game.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new NotImplementedException($"ConfigMenuFactory.Update not implemented for {PlayerSettings.GetInputType()}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {SceneSettings.InputType}.");
             }
         }
 

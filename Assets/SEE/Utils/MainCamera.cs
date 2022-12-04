@@ -37,17 +37,24 @@ namespace SEE.Utils
                             NotifyAll();
                             break;
                         default:
-                            Debug.LogWarning($"There are {Camera.allCameras.Length} cameras in the scene. Expect unexpected visual results.\n");
+                            // There is more than one camera, but there should be only one that is tagged as the "MainCamera".
                             foreach (Camera cam in Camera.allCameras)
                             {
                                 // Analogous to Camera.main we are returning the first enabled camera tagged "MainCamera".
-                                if (camera == null && cam.CompareTag(Tags.MainCamera))
+                                if (cam.CompareTag(Tags.MainCamera))
                                 {
-                                    camera = cam;
+                                    if (camera == null)
+                                    {
+                                        Debug.Log($"Found main camera tagged by {Tags.MainCamera}: {cam.gameObject.FullName()}\n");
+                                        camera = cam;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Multiple cameras tagged by {Tags.MainCamera}: {cam.gameObject.FullName()}\n");
+                                    }
                                 }
-                                Debug.LogWarning($"Camera: {cam.gameObject.FullName()}\n");
                             }
-                            camera = Camera.main;
+                            //camera = Camera.main;
                             NotifyAll();
                             break;
                     }

@@ -2,22 +2,21 @@
 
 using System;
 using System.Linq;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Net.Dashboard;
 using UnityEditor;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
-using PlayerSettings = SEE.Controls.PlayerSettings;
 
 namespace SEEEditor
 {
     /// <summary>
     /// An editor for the player settings class. Allows the user to set platform settings and create new code cities.
     /// </summary>
-    [CustomEditor(typeof(SceneSettings))]
+    ///[CustomEditor(typeof(SceneSettings))]
     [CanEditMultipleObjects]
+    [Obsolete]
     public class SceneSettingsEditor : Editor
     {
         /// <summary>
@@ -123,11 +122,11 @@ namespace SEEEditor
             //TODO: This is out of date, the MainScene looks different now!
 
             // Add dashboard retriever to PlayerSettings if it isn't there yet
-            PlayerSettings settings = FindObjectOfType<PlayerSettings>();
-            if (!settings.TryGetComponent(out DashboardRetriever _))
-            {
-                settings.gameObject.AddComponent<DashboardRetriever>();
-            }
+            //PlayerSettings settings = FindObjectOfType<PlayerSettings>();
+            //if (!settings.TryGetComponent(out DashboardRetriever _))
+            //{
+            //    settings.gameObject.AddComponent<DashboardRetriever>();
+            //}
 
             // Create light
             GameObject light = new GameObject {name = "Light"};

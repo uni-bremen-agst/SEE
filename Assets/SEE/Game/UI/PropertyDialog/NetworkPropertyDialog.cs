@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.Game.UI.Notification;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,8 @@ using static SEE.Net.Network;
 namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
-    /// A dialog to enter the network properties (<see cref="NetworkConfig"/>).
+    /// A dialog to enter the network properties (<see cref="NetworkConfig"/>)
+    /// and scene settings (<see cref="SceneSettings"/>).
     /// </summary>
     internal class NetworkPropertyDialog
     {
@@ -83,6 +85,11 @@ namespace SEE.Game.UI.PropertyDialog
         private SelectionProperty voiceChatSelector;
 
         /// <summary>
+        /// The selector for the kind of environment (desktop, VR, etc.).
+        /// </summary>
+        private SelectionProperty environmentSelector;
+
+        /// <summary>
         /// The dialog for the user input.
         /// </summary>
         private PropertyDialog propertyDialog;
@@ -92,6 +99,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
+            SceneSettings.Load();
             networkConfig.Load();
 
             dialog = new GameObject("Network settings");
@@ -100,6 +108,14 @@ namespace SEE.Game.UI.PropertyDialog
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Network settings";
 
+            {
+                environmentSelector = dialog.AddComponent<SelectionProperty>();
+                environmentSelector.Name = "Environment";
+                environmentSelector.Description = "Select an environment";
+                environmentSelector.AddOptions(PlayerInputTypesToStrings());
+                environmentSelector.Value = SceneSettings.InputType.ToString();
+                group.AddProperty(environmentSelector);
+            }
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
@@ -125,8 +141,7 @@ namespace SEE.Game.UI.PropertyDialog
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
                 voiceChatSelector.Name = "Voice Chat";
                 voiceChatSelector.Description = "Select a voice chat system";
-                IList<string> voiceChats = VoiceChatSystemsToStrings();
-                voiceChatSelector.AddOptions(voiceChats);
+                voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
                 voiceChatSelector.Value = networkConfig.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
@@ -157,6 +172,15 @@ namespace SEE.Game.UI.PropertyDialog
         private IList<string> VoiceChatSystemsToStrings()
         {
             return Enum.GetNames(typeof(VoiceChatSystems)).ToList();
+        }
+
+        /// <summary>
+        /// Returns the enum values of <see cref="PlayerInputType"/> as a list of strings.
+        /// </summary>
+        /// <returns>enum values of <see cref="PlayerInputType"/> as a list of strings</returns>
+        private IList<string> PlayerInputTypesToStrings()
+        {
+            return Enum.GetNames(typeof(PlayerInputType)).ToList();
         }
 
         /// <summary>
@@ -230,7 +254,20 @@ namespace SEE.Game.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error("Invalid Voice Chat", "Your choice is not available");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available");
+                    errorOccurred = true;
+                }
+            }
+            {
+                // Environment
+                string value = environmentSelector.Value.Trim();
+                if (Enum.TryParse(value, out PlayerInputType playerInputType))
+                {
+                    SceneSettings.InputType = playerInputType;
+                }
+                else
+                {
+                    ShowNotification.Error("Invalid Environment", "Your choice environment is not available");
                     errorOccurred = true;
                 }
             }
@@ -239,6 +276,7 @@ namespace SEE.Game.UI.PropertyDialog
             {
                 propertyDialog.Close();
                 networkConfig.Save();
+                SceneSettings.Save();
                 OnConfirm.Invoke();
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Close();
