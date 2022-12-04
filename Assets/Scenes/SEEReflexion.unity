@@ -16921,11 +16921,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerSpawns:
-  - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
+  - PlayerPrefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
       type: 3}
     Position: {x: -28.9, y: 0.017, z: 9.4}
     Rotation: 0
-  - PlayerPrefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
+  - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
       type: 3}
     Position: {x: -31.3, y: 0.017, z: 9.19}
     Rotation: 90
