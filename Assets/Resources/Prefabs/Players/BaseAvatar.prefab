@@ -201,7 +201,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4391900957157232560}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54c9647dc784a46bca664910f182491e, type: 3}
+  m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -210,15 +210,14 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
   PositionThreshold: 0.001
-  RotAngleThreshold: 0.1
-  ScaleThreshold: 0.1
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
-  CanCommitToTransform: 0
 --- !u!1 &6671601005151458724
 GameObject:
   m_ObjectHideFlags: 0
@@ -620,7 +619,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6671601005151458724}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 54c9647dc784a46bca664910f182491e, type: 3}
+  m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -629,15 +628,14 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.01
-  RotAngleThreshold: 0.1
-  ScaleThreshold: 0.1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
-  CanCommitToTransform: 0
 --- !u!114 &5576220223124706630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,6 +839,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -881,6 +880,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1127,6 +1127,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1167,6 +1168,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1207,6 +1209,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1247,6 +1250,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1287,6 +1291,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1327,6 +1332,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1367,6 +1373,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1407,6 +1414,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1447,6 +1455,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1649,6 +1658,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1689,6 +1699,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1729,6 +1740,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1769,6 +1781,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1809,6 +1822,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1849,6 +1863,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -1889,6 +1904,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2069,6 +2085,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2109,6 +2126,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2149,6 +2167,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2189,6 +2208,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2229,6 +2249,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2269,6 +2290,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2383,6 +2405,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2423,6 +2446,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2463,6 +2487,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2665,6 +2690,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2705,6 +2731,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2745,6 +2772,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2785,6 +2813,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2825,6 +2854,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2865,6 +2895,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -2905,6 +2936,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3085,6 +3117,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3125,6 +3158,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3165,6 +3199,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3205,6 +3240,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3245,6 +3281,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3285,6 +3322,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3433,6 +3471,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3473,6 +3512,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3513,6 +3553,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3658,6 +3699,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3698,6 +3740,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3738,6 +3781,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3778,6 +3822,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3901,6 +3946,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3941,6 +3987,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -3981,6 +4028,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4104,6 +4152,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4144,6 +4193,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4184,6 +4234,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4307,6 +4358,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4347,6 +4399,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4387,6 +4440,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4488,6 +4542,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4528,6 +4583,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4629,6 +4685,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4669,6 +4726,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4814,6 +4872,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4854,6 +4913,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4894,6 +4954,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -4934,6 +4995,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5171,6 +5233,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5242,6 +5305,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5323,6 +5387,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 
@@ -5394,6 +5459,7 @@ MonoBehaviour:
         minShape: 0
         maxShape: 1
         eyeGizmo: {fileID: 0}
+        eventSender: {fileID: 0}
         animator: {fileID: 0}
         isTriggerParameterBiDirectional: 0
         eventIdentityName: 

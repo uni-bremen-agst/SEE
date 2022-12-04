@@ -16,6 +16,9 @@ namespace SEE.Game
         /// <param name="enable">if true, VR will be enabled</param>
         public static void Enable(bool enable)
         {
+            // FIXME: Temporarily disabled.
+            return;
+
             if (!enable)
             {
                 // Note: For some reason, disabling an XRDisplaySubsystem will also

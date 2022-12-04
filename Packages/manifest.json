@@ -22,6 +22,7 @@
     "com.unity.xr.interaction.toolkit": "2.0.2",
     "com.unity.xr.legacyinputhelpers": "2.1.10",
     "com.unity.xr.management": "4.2.1",
+    "com.unity.xr.openxr": "1.5.3",
     "com.unity.xr.windowsmr": "4.6.4",
     "com.valvesoftware.unity.openvr": "file:../Assets/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",
     "judah4.hsvcolorpickerunity": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
