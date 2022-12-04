@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions
             }
 
             // TODO: Perhaps the node along with its edges should be cached?
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings)) //.Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
                 ShowEdge(edge);
             }
@@ -231,7 +231,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings))//.Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
                 HideEdge(edge);
             }

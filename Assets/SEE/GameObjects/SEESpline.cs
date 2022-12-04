@@ -81,7 +81,7 @@ namespace SEE.GO
         /// The end position of the subspline for the build-up animation, element of [0,1]
         /// </summary>
         [SerializeField]
-        private float subsplineEndT = 0.0f;
+        private float subsplineEndT = 1.0f;
 
         /// <summary>
         /// Property of <see cref="subsplineEndT"/>.
@@ -112,7 +112,7 @@ namespace SEE.GO
             set
             {
                 spline = value;
-                chordLengths = value.ChordLenghts();
+                chordLengths = null;
                 needsUpdate = true;
             }
         }
@@ -518,7 +518,6 @@ namespace SEE.GO
             {
                 return filter.mesh;
             }
-
 
             Mesh mesh = CreateOrUpdateMesh();
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
