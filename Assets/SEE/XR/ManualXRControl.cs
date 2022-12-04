@@ -53,16 +53,24 @@ namespace SEE.XR
         {
             Debug.Log("[XR] Initializing XR...\n");
 
+            if (XRGeneralSettings.Instance.Manager.activeLoader)
+            {
+                Debug.LogWarning($"[XR] There is already an active XR loader '{XRGeneralSettings.Instance.Manager.activeLoader.name}'.\n");
+                XRGeneralSettings.Instance.Manager.StopSubsystems();
+                bool deinitialized = XRGeneralSettings.Instance.Manager.activeLoader.Deinitialize();
+                Debug.LogWarning($"[XR] Active XR loader '{XRGeneralSettings.Instance.Manager.activeLoader.name}' was deinitialized: {deinitialized}.\n");
+            }
             yield return XRGeneralSettings.Instance.Manager.InitializeLoader();
 
             if (XRGeneralSettings.Instance.Manager.activeLoader == null)
             {
-                Debug.LogError("[XR] Initializing XR Failed. Check Editor or Player log for details.");
+                Debug.LogError("[XR] Initializing XR Failed. Check Editor or Player log for details.\n");
             }
             else
             {
-                Debug.Log("[XR] Starting XR...");
+                Debug.Log("[XR] Starting XR...\n");
                 XRGeneralSettings.Instance.Manager.StartSubsystems();
+                Debug.Log("[XR] XR subsystems were started.\n");
             }
         }
 
@@ -82,10 +90,10 @@ namespace SEE.XR
         /// </summary>
         public static void StopXR()
         {
-            Debug.Log("[XR] Stopping XR...");
+            Debug.Log("[XR] Stopping XR...\n");
             XRGeneralSettings.Instance.Manager.StopSubsystems();
             XRGeneralSettings.Instance.Manager.DeinitializeLoader();
-            Debug.Log("[XR] XR stopped completely.");
+            Debug.Log("[XR] XR stopped completely.\n");
             Status();
         }
 
