@@ -8,9 +8,9 @@ namespace SEE.Controls
     public class DesktopPlayerMovement : PlayerMovement
     {
         [Tooltip("Speed of movements")]
-        public float Speed = 1f;
+        public float Speed = 2f;
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
-        public float BoostFactor = 4f;
+        public float BoostFactor = 2f;
 
         private struct CameraState
         {
