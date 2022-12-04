@@ -21,6 +21,11 @@ namespace SEE.Game.Avatars
     internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
+        /// The distance from the top of the player's height to his eyes.
+        /// </summary>
+        private const float PlayerTopToEyeDistance = 0.14f;
+
+        /// <summary>
         /// If this code is executed for the local player, the necessary player type
         /// for the environment we are currently running on are added to this game object.
         /// </summary>
@@ -203,7 +208,7 @@ namespace SEE.Game.Avatars
             GameObject desktopPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
             desktopPlayer.name = PlayerInputType.DesktopPlayer.ToString();
             desktopPlayer.transform.SetParent(gameObject.transform);
-            desktopPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight()-0.14f, 0.3f);
+            desktopPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
             desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
 
             gameObject.AddComponent<DesktopPlayerMovement>();
