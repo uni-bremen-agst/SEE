@@ -4,9 +4,12 @@ using Dissonance.Audio.Playback;
 using RootMotion.FinalIK;
 using SEE.Controls;
 using SEE.GO;
+using SEE.Net;
 using SEE.Utils;
+using SEE.XR;
 using System;
 using System.Collections;
+using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -41,10 +44,10 @@ namespace SEE.Game.Avatars
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
-                        PrepareForDesktop();
+                        PrepareLocalPlayerForDesktop();
                         break;
                     case PlayerInputType.VRPlayer:
-                        PrepareForXR();
+                        PrepareLocalPlayerForXR();
                         break;
                     default:
                         throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
@@ -188,43 +191,122 @@ namespace SEE.Game.Avatars
         /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
         /// as a child and an <see cref="XRPlayerMovement"/> component.
         /// </summary>
-        private void PrepareForXR()
+        private void PrepareLocalPlayerForXR()
         {
-            GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
-            vrPlayer.name = PlayerInputType.VRPlayer.ToString();
-            gameObject.transform.position = vrPlayer.transform.position;
-            gameObject.transform.rotation = vrPlayer.transform.rotation;
-            vrPlayer.transform.SetParent(gameObject.transform);
-            //vrPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight(), 0.3f);
-            //vrPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
+            StartCoroutine(StartXRCoroutine());
+        }
 
-            if (gameObject.TryGetComponentOrLog(out VRIK vrIK))
+        /// <summary>
+        /// The path to the animator controller that should be used when the avatar
+        /// is set up for VR. This controller will be assigned to the UMA avatar
+        /// as the default race animation controller.
+        /// </summary>
+        private const string AnimatorForVRIK = "Prefabs/Players/Locomotion"; // "Prefabs/Players/VRIKAnimatedLocomotion";
+
+        public IEnumerator StartXRCoroutine()
+        {
+            // Start XR manually.
+            StartCoroutine(ManualXRControl.StartXRCoroutine());
+
+            // Wait until XR is initialized.
+            while (!ManualXRControl.IsInitialized())
             {
-                vrIK.enabled = true;
+                yield return null;
             }
-            //if (gameObject.TryGetComponentOrLog(out UMA_VRIK uma_VRIK))
-            //{
-            //    vrIK.enabled = true;
-            //}
-            if (gameObject.TryGetComponentOrLog(out SRanipal_Lip_Framework lipFW))
+
+            Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
+
+            // Now we can instantiate the prefabs for VR that require that SteamVR is up and running.
+            GameObject rig = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRUMACameraRig");
+            rig.transform.position = gameObject.transform.position;
+            rig.AddComponent<NetworkObject>().Spawn();
+            rig.AddComponent<ClientNetworkTransform>();
+
+            gameObject.transform.SetParent(rig.transform);
+            gameObject.transform.position = Vector3.zero;
+
+            TurnOffAvatarAimingSystem();
+            ReplaceAnimator();
+
+            SetupVRIK();
+
+            //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
+            //vrPlayer.name = PlayerInputType.VRPlayer.ToString();
+            //gameObject.transform.position = vrPlayer.transform.position;
+            //gameObject.transform.rotation = vrPlayer.transform.rotation;
+            //vrPlayer.transform.SetParent(gameObject.transform);
+
+            //XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
+            //movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
+            //movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
+
+            // Turns off
+            void TurnOffAvatarAimingSystem()
             {
-                lipFW.enabled = true;
+                if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
+                {
+                    Destroyer.DestroyComponent(aimingSystem);
+                }
+                if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
+                {
+                    Destroyer.DestroyComponent(aimIK);
+                }
+                if (gameObject.TryGetComponentOrLog(out LookAtIK lookAtIK))
+                {
+                    Destroyer.DestroyComponent(lookAtIK);
+                }
+                // AvatarMovementAnimator is using animation parameters that are defined only
+                // in our own AvatarAimingSystem animation controller. We will remove it
+                // to avoid error messages.
+                if (gameObject.TryGetComponentOrLog(out AvatarMovementAnimator avatarMovement))
+                {
+                    Destroyer.DestroyComponent(avatarMovement);
+                }
             }
 
-            //gameObject.EnableChild("Controller (left)", true);
-            //gameObject.EnableChild("Controller (right)", true);
-            //gameObject.EnableChild("Camera", true);
+            // We need to replace the animator of the avatar.
+            // The prefab has an aiming animation. We just want locomotion.
+            void ReplaceAnimator()
+            {
+                if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
+                {
+                    RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(AnimatorForVRIK);
+                    Debug.Log($"Loaded animation controller: {animationController != null}\n");
+                    if (animationController != null)
+                    {
+                        avatar.raceAnimationControllers.defaultAnimationController = animationController;
 
-            XRPlayerMovement movement = gameObject.AddComponent<XRPlayerMovement>();
-            movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
-            movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
+                        if (gameObject.TryGetComponentOrLog(out Animator animator))
+                        {
+                            animator.runtimeAnimatorController = animationController;
+                            Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"Could not load the animation controller at '{AnimatorForVRIK}.'\n");
+                    }
+                }
+            }
+
+            // Set up FinalIK's VR IK on the avatar.
+            void SetupVRIK()
+            {
+                VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
+                vrIK.solver.spine.headTarget = rig.transform.Find("Camera/Head");
+                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
+                vrIK.solver.leftArm.target = rig.transform.Find("Controller (left)/LeftHand");
+                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.leftArm.target);
+                vrIK.solver.rightArm.target = rig.transform.Find("Controller (right)/RightHand");
+                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
+            }
         }
 
         /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
         /// as a child and a <see cref="DesktopPlayerMovement"/> component.
         /// </summary>
-        private void PrepareForDesktop()
+        private void PrepareLocalPlayerForDesktop()
         {
             // Set up the desktop player at the top of the player just in front of it.
             GameObject desktopPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
@@ -239,9 +321,6 @@ namespace SEE.Game.Avatars
                 // we do not turn these on here.
                 aaSystem.enabled = true;
             }
-            //gameObject.EnableChild("Controller (left)", false);
-            //gameObject.EnableChild("Controller (right)", false);
-            //gameObject.EnableChild("Camera", false);
             gameObject.AddComponent<DesktopPlayerMovement>();
         }
     }
