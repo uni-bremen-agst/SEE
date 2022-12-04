@@ -3,7 +3,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
@@ -52,7 +51,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Root node of the implementation subgraph.
         /// </summary>
-        public Node ImplementationRoot => ReflexionGraph.ArchitectureRoot;
+        public Node ImplementationRoot => ReflexionGraph.ImplementationRoot;
 
         /// <summary>
         /// Root node of the architecture subgraph.

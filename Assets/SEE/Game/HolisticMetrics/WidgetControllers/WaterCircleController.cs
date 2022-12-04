@@ -28,9 +28,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The metric value to display</param>
         internal override void Display(MetricValue metricValue)
         {
-            if (metricValue.GetType() == typeof(MetricValueRange))
+            if (metricValue is MetricValueRange metricValueRange)
             {
-                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 float percentage = actual / maximum;
@@ -39,19 +38,18 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 water.color = color;
                 titleText.text = metricValueRange.Name;
                 percentage *= 100;
-                if (metricValue.DecimalPlaces < 2) 
+                if (metricValueRange.DecimalPlaces < 2) 
                 {
-                    metricValue.DecimalPlaces = 0;
+                    metricValueRange.DecimalPlaces = 0;
                 }
                 else
                 {
-                    metricValue.DecimalPlaces -= 2;
+                    metricValueRange.DecimalPlaces -= 2;
                 }
-                valueText.text = percentage.ToString("F" + metricValue.DecimalPlaces) + "%";
+                valueText.text = $"{percentage.ToString($"F{metricValueRange.DecimalPlaces}")}%";
             }
-            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
                 Display(metricValueCollection.MetricValues[0]);
             }
             else

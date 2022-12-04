@@ -16,6 +16,7 @@ namespace SEE.Game.City
         private const string NodeTypesLabel = "NodeTypes";
         private const string CoseGraphSettingsLabel = "CoseGraph";
         private const string ErosionMetricsLabel = "ErosionIssues";
+        private const string BoardSettingsLabel = "BoardSettings";
         private const string NodeLayoutSettingsLabel = "NodeLayout";
         private const string EdgeLayoutSettingsLabel = "EdgeLayout";
         private const string CityPathLabel = "ConfigPath";
@@ -44,6 +45,7 @@ namespace SEE.Game.City
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
             ErosionSettings.Save(writer, ErosionMetricsLabel);
+            BoardSettings.Save(writer, BoardSettingsLabel);
             NodeLayoutSettings.Save(writer, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, EdgeSelectionLabel);
@@ -66,6 +68,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
             ErosionSettings.Restore(attributes, ErosionMetricsLabel);
+            BoardSettings.Restore(attributes, BoardSettingsLabel);
             NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, EdgeSelectionLabel);
