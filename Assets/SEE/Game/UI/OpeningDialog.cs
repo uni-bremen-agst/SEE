@@ -6,6 +6,7 @@ using UnityEngine;
 using SEE.Game.UI.PropertyDialog;
 using System;
 using SEE.Game.UI.Notification;
+using SEE.Controls;
 
 namespace SEE.UI
 {
@@ -63,6 +64,13 @@ namespace SEE.UI
                                           description: "Starts a local client connection to a server.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Client")),
+                      new ToggleMenuEntry(active: false,
+                                          entryAction: JoinInVR,
+                                          exitAction: null,
+                                          title: "Join in VR",
+                                          description: "Starts a local client connection to a server and enters in VR.",
+                                          entryColor: NextColor(),
+                                          icon: Resources.Load<Sprite>("Icons/Client")),
                       // FIXME: Running only a server is currently not working.
                       //new ToggleMenuEntry(active: false,
                       //                    entryAction: StartServer,
@@ -105,6 +113,25 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu(false);
+                network.StartHost(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu(true);
+                ShowNotification.Error("Host cannot be started", exception.Message);
+            }
+        }
+
+        private void JoinInVR()
+        {
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // user select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu(false);
+                SceneSettings.InputType = PlayerInputType.VRPlayer;
                 network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
