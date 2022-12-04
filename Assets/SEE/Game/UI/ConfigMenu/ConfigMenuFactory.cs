@@ -54,7 +54,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void Start()
         {
-            if (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer)
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
                 try
                 {
