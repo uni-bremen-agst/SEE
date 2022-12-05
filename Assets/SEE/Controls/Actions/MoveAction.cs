@@ -334,15 +334,16 @@ namespace SEE.Controls.Actions
             /// is determined by <see cref="ReflexionMapper.SetParent"/>;
             /// otherwise by <see cref="GameNodeMover.SetParent"/>.
             /// </summary>
-            /// <param name="target">the target node of the re-parenting</param>
+            /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
             internal void Reparent(GameObject target)
             {
-                PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
-                UnmarkAsTarget();
-                MarkAsTarget(target.transform);
-
-                if (target != newParent)
+                // target must not be a descendant of grabbedObject
+                if (!IsDescendant(target, grabbedObject))
                 {
+                    PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
+                    UnmarkAsTarget();
+                    MarkAsTarget(target.transform);
+
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
                     // and the mapping target is not the root of the graph.
@@ -354,6 +355,12 @@ namespace SEE.Controls.Actions
                     {
                         GameNodeMoverSetParent(grabbedObject, target);
                     }
+                }
+
+                // True if node is a descendant of root in the underlying graph.
+                static bool IsDescendant(GameObject node, GameObject root)
+                {
+                    return node.GetNode().IsDescendantOf(root.GetNode());
                 }
             }
 
