@@ -83,7 +83,7 @@ namespace SEE.Game.Avatars
         /// Toggles between pointing and not pointing.
         /// </summary>
         /// <remarks>This method is called either as a interaction request of the local
-        /// player or from <see cref="TogglePointingAction"/> from a remote player via
+        /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
         /// the network.</remarks>
         public void TogglePointing()
         {
@@ -93,7 +93,7 @@ namespace SEE.Game.Avatars
             aimIK.solver.target.gameObject.SetActive(IsPointing);
             if (IsLocallyControlled)
             {
-                new TogglePointingAction(networkObject.NetworkObjectId).Execute();
+                new TogglePointingNetAction(networkObject.NetworkObjectId).Execute();
             }
         }
 
