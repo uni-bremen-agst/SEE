@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CompilerArchMapping" edgeids="true">
+    <node id="N3389">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Main</string>
+      </attr>
+    </node>
+    <node id="N3390">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>FrontEnd</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>FrontEnd</string>
+      </attr>
+    </node>
+    <node id="N3391">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>MiddleEnd</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>MiddleEnd</string>
+      </attr>
+    </node>
+    <node id="N3392">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>BackEnd</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>BackEnd</string>
+      </attr>
+    </node>
+    <node id="N3393">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Common</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Common</string>
+      </attr>
+    </node>
+    <node id="N3394">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>utils</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>utils</string>
+      </attr>
+    </node>
+    <node id="N3395">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>main</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>main</string>
+      </attr>
+    </node>
+    <node id="N3396">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>frontend</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>frontend</string>
+      </attr>
+    </node>
+    <node id="N3397">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>middleend</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>middleend</string>
+      </attr>
+    </node>
+    <node id="N3398">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>backend</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>backend</string>
+      </attr>
+    </node>
+    <edge id="E13922" from="N3398" to="N3392">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13923" from="N3396" to="N3390">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13924" from="N3395" to="N3389">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13925" from="N3397" to="N3391">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E13926" from="N3394" to="N3393">
+      <type xlink:href="Maps_To"/>
+    </edge>
+  </graph>
+</gxl>
