@@ -136,8 +136,11 @@ namespace SEE.Utils
 
             raycastHit = null;
             hitNode = null;
-            foreach (RaycastHit hit in hits)
+            // We are using a loop iteration bounded by numberOfHits. A foreach loop would traverse
+            // all elements in hits, where most of them would be null.
+            for (int i = 0; i < numberOfHits; i++)
             {
+                RaycastHit hit = hits[i];
                 // referenceNode will be ignored if set
                 if (referenceNode == null || hit.collider.gameObject != referenceNode.gameObject)
                 {
