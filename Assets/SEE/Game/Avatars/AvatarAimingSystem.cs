@@ -82,6 +82,9 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
+        /// <remarks>This method is called either as a interaction request of the local
+        /// player or from <see cref="TogglePointingAction"/> from a remote player via
+        /// the network.</remarks>
         public void TogglePointing()
         {
             IsPointing = !IsPointing;
