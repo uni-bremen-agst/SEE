@@ -79,7 +79,9 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Enables/disables local control of the aiming system of the avatar.
         /// </summary>
-        /// <param name="isLocalPlayer">if true, the aiming system will be enabled, otherwise disabled</param>
+        /// <param name="isLocalPlayer">if true, the aiming system will be locally controlled
+        /// (i.e., by the local player) or remotely controlled (i.e., the aiming action
+        /// of a remote player are to be replicated on its local representation)</param>
         private void EnableLocalControl(bool isLocalPlayer)
         {
             if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
