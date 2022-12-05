@@ -10029,10 +10029,10 @@ MonoBehaviour:
     StyleIssue_SUM: Metric.Style_SUM
     UniversalIssue_SUM: Metric.Universal_SUM
   BoardSettings:
-    LoadBoardOnStartup: 0
+    LoadBoardOnStartup: 1
     BoardPath:
-      Root: 2
-      relativePath: 
+      Root: 3
+      relativePath: /reflexion/compiler/Reflexion.json
       absolutePath: 
   GXLPath:
     Root: 3
