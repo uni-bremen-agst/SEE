@@ -620,10 +620,9 @@ namespace SEE.Game
         /// be too large and is not really neeed anyway).
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        /// <param name="innerNodeFactory">inner node factory</param>
-        /// <returns>the game objects created for the text labels</returns>
         private void AddLabels(IEnumerable<GameObject> gameNodes)
         {
+            const float RelativeLabelSize = 0.8f;
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
@@ -632,9 +631,9 @@ namespace SEE.Game
                 {
                     Vector3 size = node.transform.lossyScale;
                     float length = Mathf.Min(size.x, size.z);
-                    // The text may occupy up to 30% of the length.
+                    // The text may occupy up to RelativeLabelSize of the length.
                     GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
-                                                                   node.transform.position, length * 0.3f);
+                                                                   node.transform.position, length * RelativeLabelSize);
                     text.transform.SetParent(node.transform);
                     codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     Portal.SetPortal(codeCity, text);
