@@ -8,7 +8,7 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Toggles pointing of a player's avatar on all remote clients.
     /// </summary>
-    public class TogglePointingAction : AbstractNetAction
+    public class TogglePointingNetAction : AbstractNetAction
     {
         /// <summary>
         /// The network object ID of the spawned avatar. Not to be confused
@@ -20,7 +20,7 @@ namespace SEE.Net.Actions
         /// Constructor.
         /// </summary>
         /// <param name="networkObjectID">network object ID of the spawned avatar game object</param>
-        public TogglePointingAction(ulong networkObjectID)
+        public TogglePointingNetAction(ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;
         }
