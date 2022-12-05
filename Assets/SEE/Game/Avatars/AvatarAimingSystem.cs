@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
-using SEE.Utils;
 using SEE.Controls;
 using SEE.Net.Actions;
 using Unity.Netcode;
@@ -42,40 +41,8 @@ namespace SEE.Game.Avatars
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
 
-        /// <summary>
-        /// Maximal length of laser beam.
-        /// </summary>
-        [Tooltip("Maximal length of laser beam.")]
-        public float LaserLength = 2.0f;
-
-        /// <summary>
-        /// The width of the laser beam.
-        /// </summary>
-        [Tooltip("Width of laser beam.")]
-        public float LaserWidth = 0.005f;
-
-        /// <summary>
-        /// Color of the laser beam when it hits anything.
-        /// </summary>
-        [Tooltip("Color of the laser beam when it hits anything.")]
-        public Color HitColor = Color.green;
-
-        /// <summary>
-        /// Color of the laser beam when it does not hit anything.
-        /// </summary>
-        [Tooltip("Color of the laser beam when it does not hit anything.")]
-        public Color MissColor = Color.red;
-
-        /// <summary>
-        /// The material of the laser beam. Will be used to change its
-        /// color depending upon whether it hits anything or not.
-        /// </summary>
-        private Material laserMaterial;
-
-        /// <summary>
-        /// The line renderer that draws the laser beam as a line.
-        /// </summary>
-        private LineRenderer laserLine;
+        [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
+        public LaserPointer laser;
 
         /// <summary>
         /// AimPoser is a tool that returns an animation name based on direction.
@@ -119,7 +86,7 @@ namespace SEE.Game.Avatars
         {
             IsPointing = !IsPointing;
             // Laser beam should be active only while we are pointing.
-            laserLine.enabled = IsPointing;
+            laser.Toggle();
             aimIK.solver.target.gameObject.SetActive(IsPointing);
             if (IsLocallyControlled)
             {
@@ -151,10 +118,11 @@ namespace SEE.Game.Avatars
             /// we can control their update cycle ourselves.
             Aim.enabled = false;
             LookAt.enabled = false;
+
             if (gameObject.TryGetComponent(out aimIK))
             {
-                laserMaterial = Materials.New(Materials.ShaderType.PortalFree, MissColor);
-                laserLine = LineFactory.Draw(aimIK.solver.transform.gameObject, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
+                laser = gameObject.AddOrGetComponent<LaserPointer>();
+                laser.Source = aimIK.solver.transform;
             }
             else
             {
@@ -183,7 +151,7 @@ namespace SEE.Game.Avatars
             else if (IsPointing)
             {
                 // This code will be run for a non-local player currently pointing.
-                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
+                laser.Draw(aimIK.solver.target.position);
             }
         }
 
@@ -195,20 +163,7 @@ namespace SEE.Game.Avatars
         {
             if (IsPointing)
             {
-                Color color;
-                if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
-                {
-                    aimIK.solver.target.position = raycastHit.point;
-                    color = HitColor;
-                }
-                else
-                {
-                    Ray ray = Raycasting.UserPointsTo();
-                    aimIK.solver.target.position = ray.origin + ray.direction * LaserLength;
-                    color = MissColor;
-                }
-                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
-                laserMaterial.color = color;
+                aimIK.solver.target.position = laser.Point();
             }
         }
 
