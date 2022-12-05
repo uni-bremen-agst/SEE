@@ -639,6 +639,7 @@ namespace SEE.Game
                                                                    lift: true,
                                                                    textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
+                    AddLOD(text);
                     codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     Portal.SetPortal(codeCity, text);
                 }
