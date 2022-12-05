@@ -632,8 +632,12 @@ namespace SEE.Game
                     Vector3 size = node.transform.lossyScale;
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to RelativeLabelSize of the length.
-                    GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
-                                                                   node.transform.position, length * RelativeLabelSize);
+                    Vector3 position = node.GetRoofCenter();
+                    GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
+                                                                   position: position,
+                                                                   width: length * RelativeLabelSize,
+                                                                   lift: true,
+                                                                   textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
                     codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     Portal.SetPortal(codeCity, text);
