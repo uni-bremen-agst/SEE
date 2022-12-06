@@ -1,4 +1,3 @@
-using Crosstales;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
@@ -13,11 +12,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     {
         private SteamVR_Action_Boolean openAction = SteamVR_Actions._default?.OpenSettingsMenu;
         private const string menuPrefabPath = "Prefabs/UI/RuntimeConfigMenu";
-        private const string switchPrefabPath = "Prefabs/UI/Input Group - Switch";
-
-        private string settingsPanelName = "SeeSettingPanel";
 
         private GameObject runtimeConfigMenu;
+
+        private GameObject seeTables;
+
+        private GameObject codeCityLoader;
 
         private GameObject seeSettingsView;
         
@@ -33,28 +33,17 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             runtimeConfigMenu.name = "RuntimeConfigMenu";
             runtimeConfigMenu.SetActive(false);
 
-            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "LoadCityButton", 
-                () => {
-                    Debug.Log("Load City: mini.cfg");
-                    RuntimeConfigMenuUtilities.LoadCity("mini/mini.cfg");
-                    runtimeConfigMenu.SetActive(false);
-                });
-            
-            RuntimeConfigMenuUtilities.AddActionToButton(runtimeConfigMenu, "ResetCityButton",
-                () =>
-                {
-                    Debug.Log("Reset City.");
-                    RuntimeConfigMenuUtilities.ResetCity();
-                    runtimeConfigMenu.SetActive(false);
-                }
-            );
+
 
             seeSettingsView = runtimeConfigMenu.transform.Find("SeeSettingsPanel").gameObject;
 
             seeSettingsTabs = seeSettingsView.transform.Find("Tabs").gameObject;
             
             seeSettingsContentView = seeSettingsView.transform.Find("ContentView").gameObject;
-            
+
+            seeTables = runtimeConfigMenu.transform.Find("SeeTables").gameObject;
+
+            codeCityLoader = runtimeConfigMenu.transform.Find("CodeCityLoader").gameObject;
 
             InitSettings();
         }
@@ -65,6 +54,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer 
                  && openAction != null && openAction.GetStateDown(SteamVR_Input_Sources.Any)))
             {
+                // Menu is always displayed from the top
+                // Should be changed as soon as backwards navigation has been added to each individual menu
+                seeSettingsView.SetActive(false);
+                codeCityLoader.SetActive(false);
+                seeTables.SetActive(true);
+
                 runtimeConfigMenu.SetActive(!runtimeConfigMenu.activeSelf);
             }
         }
@@ -83,44 +78,23 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             GameObject tabButtonSize= SetupTabButton("Size");
             GameObject settingsViewSize = SetupSettingsView(tabButtonSize);
+            SetupSettingsSize(settingsViewSize);
 
             GameObject tabButtonColor= SetupTabButton("Color");
             GameObject settingsViewColor = SetupSettingsView(tabButtonColor);
-            
+            SetupSettingsColor(settingsViewColor);
+
             GameObject tabButtonLayout= SetupTabButton("Layout");
             GameObject settingsViewLayout= SetupSettingsView(tabButtonLayout);
-            
-            
-            //
-            // 
-            //
-            // GameObject tableButton = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeTableButton");
-            // tableButton.transform.parent = tableView.transform;
-            // tableButton.name = "DebugButton";
-            // Button debugButtonComponent = tableButton.GetComponent<Button>();
-            // UnityAction action = () =>
-            // {
-            //     seeTables.SetActive(false);
-            //     seeSettingsPanel.SetActive(true);
-            // };
-            //
-            // debugButtonComponent.onClick.AddListener(action);
-        }
+            SetupSettingsLayout(settingsViewLayout);
 
-        private void SetupSettingsNodes(GameObject settingsViewNodes)
-        {
-            GameObject nodesettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewNodes.transform.Find("Content"), false);
-            nodesettingTest.GetComponentInChildren<Text>().text = "TEST";
         }
 
         private GameObject SetupTabButton(string tabName)
         {
             GameObject tabButton = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeTabButton", seeSettingsTabs.transform.Find("TabObjects"), false);
             tabButton.name = tabName;
-            // tabButton.GetComponentInChildren<TextMeshProUGUI>().name = name;
-            // tabButton.GetComponentInChildren<TextMeshProUGUI>().SetText(name);
-
-            //TODO name für TabButton
+            tabButton.GetComponentInChildren<TextMeshProUGUI>().text = tabName;
             return tabButton;
         }
         
@@ -132,8 +106,29 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             return settingsView;
         }
 
+        private void SetupSettingsNodes(GameObject settingsViewNodes)
+        {
+            GameObject nodeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewNodes.transform.Find("Content"), false);
+            nodeSettingTest.GetComponentInChildren<Text>().text = "TestSetting Nodes";
+        }
 
+        private void SetupSettingsSize(GameObject settingsViewSize)
+        {
+            GameObject sizeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewSize.transform.Find("Content"), false);
+            sizeSettingTest.GetComponentInChildren<Text>().text = "TestSetting Size";
+        }
 
+        private void SetupSettingsColor(GameObject settingsViewColor)
+        {
+            GameObject colorSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewColor.transform.Find("Content"), false);
+            colorSettingTest.GetComponentInChildren<Text>().text = "TestSetting Color";
+        }
+
+        private void SetupSettingsLayout(GameObject settingsViewLayout)
+        {
+            GameObject layoutSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewLayout.transform.Find("Content"), false);
+            layoutSettingTest.GetComponentInChildren<Text>().text = "TestSetting Layout";
+        }
 
     }
 }

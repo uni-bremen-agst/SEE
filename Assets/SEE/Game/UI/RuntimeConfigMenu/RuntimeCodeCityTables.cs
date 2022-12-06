@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using SEE.DataModel;
-using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -12,13 +8,12 @@ public class RuntimeCodeCityTables : MonoBehaviour
 {
     private GameObject tableView;
     private GameObject seeTables;
-    private GameObject seeSettingsPanel;
+    private GameObject codeCityLoader;
     
     private void Awake()
     {
         seeTables = GameObject.Find("SeeTables");
-        seeSettingsPanel = GameObject.Find("SeeSettingsPanel");
-        seeSettingsPanel.SetActive(false);
+        codeCityLoader = seeTables.transform.parent.transform.Find("CodeCityLoader").gameObject;
         tableView = seeTables.transform.Find("CodeCityTables").Find("Content").gameObject;
     }
 
@@ -36,7 +31,7 @@ public class RuntimeCodeCityTables : MonoBehaviour
             UnityAction action = () =>
             {
                 seeTables.SetActive(false);
-                seeSettingsPanel.SetActive(true);
+                codeCityLoader.SetActive(true);
             };
             
             debugButtonComponent.onClick.AddListener(action);
