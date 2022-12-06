@@ -176,7 +176,7 @@ namespace SEE.Game.Operator
                 {
                     // This node may be mapped to. We need to expand it to include the node we're mapped to.
                     return mappedNode.Incomings.Where(ReflexionGraphTools.IsInMapping)
-                                     .SelectMany(x => x.Source.PostOrderDescendants());
+                                     .SelectMany(x => x.Source.PostOrderDescendants()).Append(mappedNode);
                 }
 
                 return new[] { mappedNode };
