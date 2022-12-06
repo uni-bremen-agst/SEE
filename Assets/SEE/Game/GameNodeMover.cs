@@ -53,20 +53,23 @@ namespace SEE.Game
         /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
         /// assuming <paramref name="scaleDown"/> is true. This method makes sure that <paramref name="child"/>
         /// will be contained within the area of the roof of <paramref name="parent"/>.
+        ///
+        /// The <paramref name="child"/> will be an immediate child of <paramref name="parent"/> in the
+        /// game-object hierarchy afterwards.
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
         /// <param name="targetXZ">XZ coordinates <paramref name="child"/> should be placed at
         /// (will be center of <paramref name="parent"/> if not given)</param>
         /// <param name="topPadding">Additional amount of empty space that should be between <paramref name="parent"/>
-        /// and <paramref name="child"/>, given as a percentage of the parent's height</param>
+        /// and <paramref name="child"/> in absolute world-space terms</param>
         /// <param name="setParent">Whether <paramref name="parent"/> should become a parent of
         /// <paramref name="child"/></param>
         /// <param name="scaleDown">Whether <paramref name="child"/> should be scaled down to fit into
         /// <paramref name="parent"/></param>
         /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
         /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
-        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, 
+        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null,
                                     float topPadding = 0.0001f, bool setParent = true, bool scaleDown = false)
         {
             if (setParent)
@@ -163,6 +166,9 @@ namespace SEE.Game
         /// down so that it fits into <paramref name="newParent"/>. If instead <paramref name="newParent"/>
         /// and <paramref name="originalParent"/> are the same, <paramref name="child"/> will be scaled back
         /// to its <paramref name="originalLocalScale"/>.
+        ///
+        /// The <paramref name="child"/> will be an immediate child of <paramref name="parent"/> in the
+        /// game-object hierarchy afterwards.
         /// </summary>
         /// <remarks>Calling this method is equivalent to <see cref="PutOn(child, newParent, scaleDown: newParent != originalParent.gameObject)"/>
         /// with a previous scaling of <paramref name="child"/> to <paramref name="originalLocalScale"/> if
