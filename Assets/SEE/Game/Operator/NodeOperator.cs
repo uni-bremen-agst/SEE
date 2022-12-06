@@ -173,13 +173,14 @@ namespace SEE.Game.Operator
             // TODO: Iterating over all game edges is currently very costly,
             //       consider adding a cached mapping either here or in SceneQueries.
             //       Alternatively, we can iterate over game edges instead.
-            foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            foreach (Edge edge in node.PostOrderDescendants().SelectMany(n => n.Incomings.Union(n.Outgoings).Where(edge => !edge.HasToggle(GraphElement.IsVirtualToggle))))
             {
                 // Add new target edge, we'll animate the current edge to it.
                 GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
                 if (gameEdge == null)
                 {
                     // TODO: How is this possible?
+                    Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!");
                     continue;
                 }
 
@@ -198,8 +199,6 @@ namespace SEE.Game.Operator
                 //       having to use SEESpline as a wrapper.
                 Destroy(newEdge);
                 edgeOperator.MorphTo(targetSpline, duration);
-
-                // FIXME: We need to recurse into the children so that their edges are considered, too.
             }
 
             // Once we're done, we reset the gameObject to its original position.

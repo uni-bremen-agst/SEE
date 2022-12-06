@@ -66,8 +66,8 @@ namespace SEE.Game
         /// <paramref name="parent"/></param>
         /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
         /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
-        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, float topPadding = 0,
-                                    bool setParent = true, bool scaleDown = false)
+        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, 
+                                    float topPadding = 0.0001f, bool setParent = true, bool scaleDown = false)
         {
             if (setParent)
             {
@@ -86,7 +86,7 @@ namespace SEE.Game
             // Where to move the child.
             Vector3 targetWorldPosition = child.position;
             float parentRoof = parent.GetRoof();
-            targetWorldPosition.y = parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y;
+            targetWorldPosition.y = parentRoof + child.lossyScale.y / 2.0f + topPadding;
 
             if (targetXZ.HasValue)
             {

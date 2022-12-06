@@ -54,8 +54,9 @@ namespace SEE.Game.City
         /// </summary>
         private static readonly ISet<State> HiddenEdgeStates = new HashSet<State>
         {
-            // We hide all implementation edges by default.
-            State.Unmapped, State.ImplicitlyAllowed, State.AllowedAbsent, State.Allowed, State.Divergent
+            // TODO: Make this configurable in, e.g., the SEECity editor.
+            // We hide all implementation edges except divergences by default.
+            State.Unmapped, State.ImplicitlyAllowed, State.AllowedAbsent, State.Allowed
         };
 
         /// <summary>
