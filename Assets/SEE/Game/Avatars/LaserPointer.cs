@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using SEE.GO;
 using SEE.Utils;
-using UnityEditor;
+using System;
 
 namespace SEE.Game.Avatars
 {
@@ -52,14 +52,20 @@ namespace SEE.Game.Avatars
         private LineRenderer laserLine;
 
         /// <summary>
+        /// As to whether the leaser beam is turned on.
+        /// </summary>
+        public bool On
+        {
+            get => laserLine.enabled;
+            internal set => laserLine.enabled = value;
+        }
+
+        /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
-        public void Toggle()
+        public void SetActive(bool activate)
         {
-            if (laserLine)
-            {
-                laserLine.enabled = !laserLine.enabled;
-            }
+            laserLine.enabled = activate;
         }
 
         /// <summary>
@@ -73,11 +79,11 @@ namespace SEE.Game.Avatars
             laserMaterial = Materials.New(Materials.ShaderType.PortalFree, MissColor);
             GameObject laserBeam = new GameObject
             {
-                name = "Laser " + GUID.Generate().ToString()
+                name = "Laser " + Guid.NewGuid().ToString()
             };
             laserBeam.transform.SetParent(gameObject.transform);
             laserLine = LineFactory.Draw(laserBeam, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
-            laserLine.enabled = false;
+            laserLine.enabled = true;
         }
 
         /// <summary>
@@ -109,7 +115,6 @@ namespace SEE.Game.Avatars
         {
             Vector3 result;
             Color color;
-            // FIXME: Works only when a mouse is used.
             if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
             {
                 result = raycastHit.point;
@@ -124,6 +129,18 @@ namespace SEE.Game.Avatars
             laserMaterial.color = color;
             Draw(result);
             return result;
+        }
+
+        /// <summary>
+        /// The laser beam is to be directed towards given <paramref name="direction"/>.
+        /// </summary>
+        /// <param name="direction">requested direction of the laser beam</param>
+        /// <returns>the position of the tip of the laser beam</returns>
+        internal Vector3 PointTowards(Vector3 direction)
+        {
+            Vector3 target = Source.position + direction * LaserLength;
+            Draw(target);
+            return target;
         }
     }
 }

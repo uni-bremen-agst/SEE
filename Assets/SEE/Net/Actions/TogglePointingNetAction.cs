@@ -17,12 +17,18 @@ namespace SEE.Net.Actions
         public ulong NetworkObjectID;
 
         /// <summary>
+        /// Whether pointing should be activated or deactivated.
+        /// </summary>
+        public bool Activate;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="networkObjectID">network object ID of the spawned avatar game object</param>
-        public TogglePointingNetAction(ulong networkObjectID)
+        public TogglePointingNetAction(ulong networkObjectID, bool activate)
         {
             NetworkObjectID = networkObjectID;
+            Activate = activate;
         }
 
         /// <summary>
@@ -41,7 +47,7 @@ namespace SEE.Net.Actions
                     {
                         if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
                         {
-                            aimingSystem.TogglePointing();
+                            aimingSystem.SetPointing(Activate);
                         }
                     }
                     else
