@@ -67,10 +67,8 @@ namespace SEE.Game
         /// <paramref name="child"/></param>
         /// <param name="scaleDown">Whether <paramref name="child"/> should be scaled down to fit into
         /// <paramref name="parent"/></param>
-        /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
-        /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
-        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null,
-                                    float topPadding = 0.0001f, bool setParent = true, bool scaleDown = false)
+        private static void PutOn(Transform child, GameObject parent, Vector2? targetXZ = null,
+                                  float topPadding = 0.0001f, bool setParent = true, bool scaleDown = false)
         {
             if (setParent)
             {
@@ -78,7 +76,6 @@ namespace SEE.Game
             }
 
             NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
-            Vector3 oldLocalScale = child.localScale;
             if (scaleDown)
             {
                 nodeOperator.ScaleTo(ScaleDown(child, parent), 0);
@@ -131,7 +128,6 @@ namespace SEE.Game
             }
 
             nodeOperator.MoveTo(targetWorldPosition, 0);
-            return oldLocalScale;
 
             // Returns the target local scale of child relative to parent when child is to be put onto parent.
             static Vector3 ScaleDown(Transform child, GameObject parent)
