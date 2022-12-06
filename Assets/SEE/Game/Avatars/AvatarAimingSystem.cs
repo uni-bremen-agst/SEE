@@ -36,7 +36,7 @@ namespace SEE.Game.Avatars
         /// Whether the avatar is currently pointing, i.e., whether it has an aiming or looking target.
         /// </summary>
         [Tooltip("If true, the avatar is currently pointing. Its pose will be adjusted according to the aimed target.")]
-        public bool IsPointing = false;
+        public bool IsPointing = true;
 
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
@@ -82,18 +82,55 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
+        private void TogglePointing()
+        {
+            SetPointing(!IsPointing);
+        }
+
+        /// <summary>
+        /// If <paramref name="activate"/> is true, the laser will be turned on;
+        /// otherwise turned off.
+        /// This parameter is also propagated to all clients.
+        /// </summary>
+        /// <param name="activate">whether pointing is to be activated</param>
         /// <remarks>This method is called either as a interaction request of the local
         /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
         /// the network.</remarks>
-        public void TogglePointing()
+        public void SetPointing(bool activate)
         {
-            IsPointing = !IsPointing;
+            IsPointing = activate;
+            Debug.Log($"[AAS] SetPointing({IsPointing}).\n");
+            if (aimIK == null)
+            {
+                gameObject.TryGetComponentOrLog(out aimIK);
+            }
             // Laser beam should be active only while we are pointing.
-            laser.Toggle();
-            aimIK.solver.target.gameObject.SetActive(IsPointing);
+            if (laser == null)
+            {
+                Debug.Log($"[AAS] No laser yet. Adding one.\n");
+                laser = gameObject.AddOrGetComponent<LaserPointer>();
+                laser.Source = aimIK.solver.transform;
+            }
+            UnityEngine.Assertions.Assert.IsNotNull(laser);
+            laser.SetActive(IsPointing);
+            Debug.Log($"[AAS] Laser activated: {IsPointing}.\n");
+
+            // Activate the aimed target. FIXME: What for?
+            if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
+            {
+                aimIK.solver.target.gameObject.SetActive(IsPointing);
+            }
             if (IsLocallyControlled)
             {
-                new TogglePointingNetAction(networkObject.NetworkObjectId).Execute();
+                if (gameObject.TryGetComponentOrLog(out networkObject))
+                {
+                    Debug.Log($"[AAS] TogglePointingNetAction({networkObject.NetworkObjectId}, {IsPointing}).\n");
+                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
+                }
+            }
+            else
+            {
+                Debug.Log($"[AAS] Not locally controlled.\n");
             }
         }
 
@@ -135,6 +172,8 @@ namespace SEE.Game.Avatars
             }
             gameObject.TryGetComponentOrLog(out networkObject);
             MoveTarget();
+            /// We start in the pointing state.
+            SetPointing(true);
         }
 
         /// <summary>
@@ -151,7 +190,7 @@ namespace SEE.Game.Avatars
                 }
                 MoveTarget();
             }
-            else if (IsPointing)
+            if (IsPointing)
             {
                 // This code will be run for a non-local player currently pointing.
                 laser.Draw(aimIK.solver.target.position);
