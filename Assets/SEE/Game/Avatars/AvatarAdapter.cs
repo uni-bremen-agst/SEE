@@ -261,10 +261,13 @@ namespace SEE.Game.Avatars
             //gameObject.transform.position = Vector3.zero;
 
             PrepareScene();
+            // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
+            // will remove components, the former must query.
+            AddComponents();
             TurnOffAvatarAimingSystem();
             ReplaceAnimator();
             SetupVRIK();
-            AddVRPlayer();
+
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the
@@ -385,9 +388,16 @@ namespace SEE.Game.Avatars
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
 
-            // Adds VRPlayer prefab.
-            void AddVRPlayer()
+            // Adds required components.
+            void AddComponents()
             {
+                VRAvatarAimingSystem aiming = gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
+                if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
+                {
+                    aiming.Source = aimIK.solver.transform;
+                    aiming.Target = aimIK.solver.target;
+                }
+
                 //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
                 //gameObject.transform.position = vrPlayer.transform.position;
                 //gameObject.transform.rotation = vrPlayer.transform.rotation;
