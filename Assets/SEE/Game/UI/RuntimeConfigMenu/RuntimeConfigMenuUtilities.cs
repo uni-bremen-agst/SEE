@@ -11,14 +11,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     {
         public static void LoadCity(string cityPath)
         {
-            Debug.Log("Select City: " + cityPath);
             GameObject implementation = GameObject.FindGameObjectWithTag(Tags.CodeCity);
             SEECity city;
             if (implementation && implementation.TryGetComponent(out city))
             {
-                city.ConfigurationPath.Root = DataPath.RootKind.StreamingAssets;
-                city.ConfigurationPath.RelativePath = cityPath;
+                city.ConfigurationPath.Root = DataPath.RootKind.Absolute;
+                city.ConfigurationPath.AbsolutePath = cityPath;
 
+                RuntimeConfigMenu.SetSEECity(city);
                 city.LoadConfiguration();
                 city.LoadData();
                 city.DrawGraph();
@@ -32,6 +32,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             SEECity city;
             if (implementation && implementation.TryGetComponent(out city))
             {
+                RuntimeConfigMenu.SetSEECity(null);
                 city.Reset();
             }
         }

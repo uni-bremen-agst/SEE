@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -23,7 +24,9 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         
         private GameObject seeSettingsTabs;
         
-        private GameObject seeSettingsContentView;
+        private static GameObject seeSettingsContentView;
+
+        private static SEECity city;
 
         void Awake()
         {
@@ -32,8 +35,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             runtimeConfigMenu = PrefabInstantiator.InstantiatePrefab(menuPrefabPath);
             runtimeConfigMenu.name = "RuntimeConfigMenu";
             runtimeConfigMenu.SetActive(false);
-
-
 
             seeSettingsView = runtimeConfigMenu.transform.Find("SeeSettingsPanel").gameObject;
 
@@ -45,7 +46,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             codeCityLoader = runtimeConfigMenu.transform.Find("CodeCityLoader").gameObject;
 
-            InitSettings();
+            InitMenu();
         }
         
         void Update()
@@ -64,7 +65,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             }
         }
 
-        private void InitSettings()
+        // Creating the Menu without the individual settings at Awake
+        private void InitMenu()
         {
             // 1. TabButton
             // 2. SettingsView
@@ -72,24 +74,48 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             GameObject tabButtonNodes = SetupTabButton("Nodes");
             GameObject settingsViewNodes = SetupSettingsView(tabButtonNodes);
-            SetupSettingsNodes(settingsViewNodes);
             // first Tab is visible
             settingsViewNodes.SetActive(true);
 
             GameObject tabButtonSize= SetupTabButton("Size");
             GameObject settingsViewSize = SetupSettingsView(tabButtonSize);
-            SetupSettingsSize(settingsViewSize);
 
             GameObject tabButtonColor= SetupTabButton("Color");
             GameObject settingsViewColor = SetupSettingsView(tabButtonColor);
-            SetupSettingsColor(settingsViewColor);
 
             GameObject tabButtonLayout= SetupTabButton("Layout");
             GameObject settingsViewLayout= SetupSettingsView(tabButtonLayout);
-            SetupSettingsLayout(settingsViewLayout);
 
         }
 
+        // Adding the settings to the Menu after a city was loaded
+        public static void InitSettings()
+        {
+            foreach (Transform settingsview in seeSettingsContentView.transform)
+            {
+                foreach(Transform setting in settingsview.Find("Content"))
+                {
+                    Destroy(setting.gameObject);
+                }
+            }
+
+            if(city != null)
+            {
+                // TODO after adding the settings to the menu, the vertical layout group only puts the elements in order
+                //      after switching to another tab
+                //      already tried: Canvas.ForceUpdateCanvases() and LayoutRebuilder.ForceRebuildLayoutImmediate()
+                SetupSettingsNodes();
+                
+                SetupSettingsSize();
+
+                SetupSettingsColor();
+
+                SetupSettingsLayout();
+            }
+            
+        }
+
+        // Tabs
         private GameObject SetupTabButton(string tabName)
         {
             GameObject tabButton = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeTabButton", seeSettingsTabs.transform.Find("TabObjects"), false);
@@ -98,6 +124,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             return tabButton;
         }
         
+        // Views
         private GameObject SetupSettingsView(GameObject tabButton)
         {
             GameObject settingsView = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsView", seeSettingsContentView.transform, false);
@@ -106,28 +133,47 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             return settingsView;
         }
 
-        private void SetupSettingsNodes(GameObject settingsViewNodes)
+        // Settings
+        private static void SetupSettingsNodes()
         {
-            GameObject nodeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewNodes.transform.Find("Content"), false);
-            nodeSettingTest.GetComponentInChildren<Text>().text = "TestSetting Nodes";
+            foreach(var type in city.NodeTypes)
+            {
+                // Display NodeType
+                GameObject nodeType = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                nodeType.GetComponentInChildren<Text>().text = type.Key;
+                nodeType.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
+
+                // Display Visibility of NodeType
+                GameObject nodeTypeVisibility = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                nodeTypeVisibility.GetComponentInChildren<Text>().text = type.Value.IsRelevant.ToString();
+
+                // Display Shape of NodeType
+                GameObject nodeTypeShape = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                nodeTypeShape.GetComponentInChildren<Text>().text = type.Value.Shape.ToString();
+            }
         }
 
-        private void SetupSettingsSize(GameObject settingsViewSize)
+        private static void SetupSettingsSize()
         {
-            GameObject sizeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewSize.transform.Find("Content"), false);
+            GameObject sizeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("SizeView").transform.Find("Content"), false);
             sizeSettingTest.GetComponentInChildren<Text>().text = "TestSetting Size";
         }
 
-        private void SetupSettingsColor(GameObject settingsViewColor)
+        private static void SetupSettingsColor()
         {
-            GameObject colorSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewColor.transform.Find("Content"), false);
+            GameObject colorSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("ColorView").transform.Find("Content"), false);
             colorSettingTest.GetComponentInChildren<Text>().text = "TestSetting Color";
         }
 
-        private void SetupSettingsLayout(GameObject settingsViewLayout)
+        private static void SetupSettingsLayout()
         {
-            GameObject layoutSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", settingsViewLayout.transform.Find("Content"), false);
+            GameObject layoutSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("LayoutView").transform.Find("Content"), false);
             layoutSettingTest.GetComponentInChildren<Text>().text = "TestSetting Layout";
+        }
+
+        public static void SetSEECity(SEECity newCity)
+        {
+            city = newCity;
         }
 
     }

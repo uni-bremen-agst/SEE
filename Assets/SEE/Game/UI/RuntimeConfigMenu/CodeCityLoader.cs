@@ -1,5 +1,7 @@
 using SEE.Game.UI.RuntimeConfigMenu;
 using UnityEngine;
+using UnityEditor;
+using SEE.Utils;
 
 public class CodeCityLoader : MonoBehaviour
 {
@@ -14,21 +16,38 @@ public class CodeCityLoader : MonoBehaviour
         seeTables = cityLoader.transform.parent.transform.Find("SeeTables").gameObject;
 
         RuntimeConfigMenuUtilities.AddActionToButton(cityLoader, "LoadCityButton",
-                () => {
-                    Debug.Log("Load City: mini.cfg");
-                    RuntimeConfigMenuUtilities.LoadCity("mini/mini.cfg");
-                    cityLoader.SetActive(false);
-                    seeSettingsPanel.SetActive(true);
+            () => 
+            {
+                // Open file choser dialog
+                string path = EditorUtility.OpenFilePanel("Wählen Sie eine config Datei aus", Application.streamingAssetsPath, "cfg");
+
+                // If a file was selected, open it
+                if(path != null && path != "")
+                {
+                    Debug.Log("Loading city: " + path);
+                    // Might not be needed, had some trouble with loading a city while there was already an existing city but it may have just been a broken .cfg
+                    RuntimeConfigMenuUtilities.ResetCity();
+
+                    RuntimeConfigMenuUtilities.LoadCity(path);
                 }
+                    
+            }
         );
 
         RuntimeConfigMenuUtilities.AddActionToButton(cityLoader, "ResetCityButton",
             () =>
             {
-                Debug.Log("Reset City.");
+                Debug.Log("Reset City");
                 RuntimeConfigMenuUtilities.ResetCity();
-                cityLoader.SetActive(false);
-                seeSettingsPanel.SetActive(true);
+            }
+        );
+
+        RuntimeConfigMenuUtilities.AddActionToButton(cityLoader, "ContinueButton",
+            () =>
+            {
+                RuntimeConfigMenu.InitSettings();
+                cityLoader.SetActive(false);    
+                seeSettingsPanel.SetActive(true);  
             }
         );
     }
