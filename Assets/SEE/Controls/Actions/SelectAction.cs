@@ -1,6 +1,7 @@
 using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -30,6 +31,7 @@ namespace SEE.Controls.Actions
             if (SEEInput.Unselect())
             {
                 InteractableObject.UnselectAll(true);
+                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
             }
             else if (SEEInput.Select())
             {

@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions
                 (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
                 new DeleteNetAction(hitGraphElement.name).Execute();
                 currentState = ReversibleAction.Progress.Completed;
-                AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.DROP_SOUND);
+                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 return true; // the selected objects are deleted and this action is done now
             }
             else

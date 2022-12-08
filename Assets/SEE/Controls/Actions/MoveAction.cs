@@ -275,7 +275,7 @@ namespace SEE.Controls.Actions
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
                     new HighlightNetAction(markedGameObject.name, false).Execute();
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
                 }
             }
 
@@ -348,7 +348,7 @@ namespace SEE.Controls.Actions
                     PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
                     UnmarkAsTarget();
                     MarkAsTarget(target.transform);
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.SWITCH_SOUND, originalParent.gameObject);
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SWITCH_SOUND, originalParent.gameObject);
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
@@ -447,7 +447,7 @@ namespace SEE.Controls.Actions
                 try
                 {
                     ReflexionMapper.SetParent(child, parent);
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.DROP_SOUND, parent.gameObject);
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, parent.gameObject);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
                 catch (ArchitectureAnalysisException e)

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static SEE.Audio.AudioManager;
+using static SEE.Audio.IAudioManager;
 using static SEE.Audio.GameStateManager;
 
 namespace SEE.Audio
 {
-    public class AudioManagerImpl : MonoBehaviour, AudioManager
+    public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
         public AudioClip lobbyMusic;
         public AudioClip clickSoundEffect;
@@ -16,6 +16,7 @@ namespace SEE.Audio
         public AudioClip pickSoundEffect;
         public AudioClip switchSoundEffekt;
         public AudioClip warningSoundEffect;
+        public AudioClip scribbleSoundEffect;
 
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
@@ -107,6 +108,11 @@ namespace SEE.Audio
         private bool musicPaused = false;
 
         /// <summary>
+        /// Audio source used for playing sound effects.
+        /// </summary>
+        private AudioSource soundEffectPlayer;
+
+        /// <summary>
         /// Get the singleton instance.
         /// </summary>
         /// <returns>The AudioManager singleton instance.</returns>
@@ -131,9 +137,16 @@ namespace SEE.Audio
             this.musicVolume = this.defaultMusicVolume;
             this.soundEffectVolume = this.defaultSoundEffectVolume;
             this.musicPlayer.volume = this.musicVolume;
+            InitializeSoundEffectPlayer();
             SetAudioManager(this);
             previousSceneName = SceneManager.GetActiveScene().name;
             QueueMusic();
+        }
+
+        private void InitializeSoundEffectPlayer()
+        {
+            this.soundEffectPlayer = this.playerObject.AddComponent<AudioSource>();
+            this.soundEffectPlayer.volume = this.soundEffectVolume;
         }
 
         void Update()
@@ -212,7 +225,8 @@ namespace SEE.Audio
         /// </summary>
         private void TriggerVolumeChanges()
         {
-            musicPlayer.volume = musicVolume;
+            this.musicPlayer.volume = this.musicVolume;
+            this.soundEffectPlayer.volume = this.soundEffectVolume;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
                 audioGameObject.ChangeVolume(soundEffectVolume);
@@ -266,9 +280,9 @@ namespace SEE.Audio
 
         public void IncreaseSoundEffectVolume()
         {
-            if (soundEffectVolume <= 0.9f)
+            if (this.soundEffectVolume <= 0.9f)
             {
-                soundEffectVolume+= 0.1f;
+                this.soundEffectVolume+= 0.1f;
                 TriggerVolumeChanges();
             }
             
@@ -276,7 +290,7 @@ namespace SEE.Audio
 
         public void MuteMusic()
         {
-            musicVolumeBeforeMute = MusicVolume;
+            this.musicVolumeBeforeMute = MusicVolume;
             musicVolume = 0;
             TriggerVolumeChanges();
             PauseMusic();
@@ -284,17 +298,17 @@ namespace SEE.Audio
 
         public void MuteSoundEffects()
         {
-            soundEffectVolumeBeforeMute = soundEffectVolume;
-            soundEffectVolume = 0;
+            this.soundEffectVolumeBeforeMute = soundEffectVolume;
+            this.soundEffectVolume = 0;
             TriggerVolumeChanges();
         }
 
         public void PauseMusic()
         {
-            if (musicPlayer.isPlaying)
+            if (this.musicPlayer.isPlaying)
             {
-                musicPlayer.Pause();
-                musicPaused = true;
+                this.musicPlayer.Pause();
+                this.musicPaused = true;
             }
         }
 
@@ -313,10 +327,16 @@ namespace SEE.Audio
 
         public void QueueSoundEffect(SoundEffect soundEffect)
         {
-            QueueSoundEffect(soundEffect, this.playerObject);
+            this.soundEffectPlayer.Stop();
+            this.soundEffectPlayer.clip = GetAudioClipFromSoundEffectName(soundEffect);
+            this.soundEffectPlayer.Play();
         }
 
-        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject)
+        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject) {
+            QueueSoundEffect(soundEffect, sourceObject, false);
+        }
+
+        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction)
         {
             AudioGameObject controlObject = null;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
@@ -333,6 +353,10 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
+            if (!networkAction)
+            {
+                new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name);
+            }
         }
 
         public void ResumeMusic()
@@ -386,21 +410,23 @@ namespace SEE.Audio
             switch (soundEffect)
             {
                 case SoundEffect.CLICK_SOUND:
-                    return clickSoundEffect;
+                    return this.clickSoundEffect;
                 case SoundEffect.DROP_SOUND:
-                    return dropSoundEffect;
+                    return this.dropSoundEffect;
                 case SoundEffect.MESSAGE_POP_UP:
-                    return messagePopAlert;
+                    return this.messagePopAlert;
                 case SoundEffect.PICKUP_SOUND:
-                    return pickSoundEffect;
+                    return this.pickSoundEffect;
                 case SoundEffect.SWITCH_SOUND:
-                    return switchSoundEffekt;
+                    return this.switchSoundEffekt;
                 case SoundEffect.WALKING_SOUND:
-                    return footstepSoundEffect;
+                    return this.footstepSoundEffect;
                 case SoundEffect.WARNING_SOUND:
-                   return warningSoundEffect;
+                   return this.warningSoundEffect;
+                case SoundEffect.SCRIBBLE:
+                    return this.scribbleSoundEffect;
                 default:
-                    return clickSoundEffect;
+                    return this.clickSoundEffect;
             }
         }
     }

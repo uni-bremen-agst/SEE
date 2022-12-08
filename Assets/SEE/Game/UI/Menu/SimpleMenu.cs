@@ -373,7 +373,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
-            AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.CLICK_SOUND, this.gameObject);
+            AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.CLICK_SOUND, this.gameObject);
             entry.DoAction?.Invoke();
             OnMenuEntrySelected.Invoke(entry);
         }

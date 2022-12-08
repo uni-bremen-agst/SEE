@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
                 from = null;
                 to = null;
                 result = createdEdge != null;
-                AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.PICKUP_SOUND, hoveredObject);
+                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SWITCH_SOUND, hoveredObject);
                 currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.

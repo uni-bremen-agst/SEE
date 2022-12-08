@@ -4,6 +4,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -127,6 +128,10 @@ namespace SEE.Controls.Actions
                     DrawLine();
                     // The line has been continued so this action has had a visible effect.
                     currentState = ReversibleAction.Progress.Completed;
+                }
+                if (Input.GetMouseButtonUp(0))
+                {
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SCRIBBLE);
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
                 return Input.GetMouseButtonUp(0);

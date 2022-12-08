@@ -5,6 +5,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -117,7 +118,7 @@ namespace SEE.Controls.Actions
                         }
                     }
                     gizmo.gameObject.SetActive(false);
-
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                     rotating = false;
                     synchronize = true;
                 }
@@ -217,8 +218,9 @@ namespace SEE.Controls.Actions
                 {
                     interactable.SetGrab(false, true);
                 }
+                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 gizmo.gameObject.SetActive(false);
-
+                
                 currentState = ReversibleAction.Progress.Completed;
             }
 

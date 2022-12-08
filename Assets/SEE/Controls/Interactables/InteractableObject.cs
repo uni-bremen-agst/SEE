@@ -322,7 +322,7 @@ namespace SEE.Controls
                     // Non-local player are not concerned here.
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(AudioManager.SoundEffect.PICKUP_SOUND, this.gameObject);
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, this.gameObject);
                 }
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
