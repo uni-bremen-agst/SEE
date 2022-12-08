@@ -27,13 +27,13 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup)]
         public FilePath GXLPath = new FilePath();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup)]
         public FilePath CSVPath = new FilePath();
 
         /// <summary>
