@@ -47,7 +47,9 @@ public class CodeCityLoader : MonoBehaviour
             {
                 RuntimeConfigMenu.InitSettings();
                 cityLoader.SetActive(false);    
-                seeSettingsPanel.SetActive(true);  
+                seeSettingsPanel.SetActive(true);
+
+                Canvas.ForceUpdateCanvases();
             }
         );
     }

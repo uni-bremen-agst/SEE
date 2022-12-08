@@ -1,9 +1,12 @@
+using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -144,8 +147,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 nodeType.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
 
                 // Display Visibility of NodeType
-                GameObject nodeTypeVisibility = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
-                nodeTypeVisibility.GetComponentInChildren<Text>().text = type.Value.IsRelevant.ToString();
+                GameObject nodeTypeVisibility = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsSwitch", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                nodeTypeVisibility.GetComponentInChildren<SwitchManager>().isOn = type.Value.IsRelevant;
+                //nodeTypeVisibility.GetComponentInChildren<TextMeshProUGUI>().fontSize = nodeType.GetComponent<Text>().fontSize;
+                //nodeTypeVisibility.GetComponentInChildren<TextMeshProUGUI>().color = nodeType.GetComponent<Text>().color;
+                nodeTypeVisibility.GetComponentInChildren<TextMeshProUGUI>().text = "Is Relevant?";
+                nodeTypeVisibility.GetComponentInChildren<Button>().onClick.AddListener(() => changeVisibility(type));
 
                 // Display Shape of NodeType
                 GameObject nodeTypeShape = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
@@ -174,6 +181,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         public static void SetSEECity(SEECity newCity)
         {
             city = newCity;
+        }
+
+        private static void changeVisibility(KeyValuePair<string, VisualNodeAttributes> type)
+        {
+            type.Value.IsRelevant = !type.Value.IsRelevant;
+            city.ReDrawGraph();
         }
 
     }
