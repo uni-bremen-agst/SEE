@@ -80,7 +80,12 @@ namespace SEE.Audio
 
         public bool EmptyQueue()
         {
-            return this.effectsQueue.Count == 0 && !this.parentObject.GetComponent<AudioSource>().isPlaying;
+            bool emptyQueue = this.effectsQueue.Count == 0 && !this.parentObject.GetComponent<AudioSource>().isPlaying;
+            if (emptyQueue)
+            {
+                GameObject.Destroy(this.parentObject.GetComponent<AudioSource>());
+            }
+            return emptyQueue;
         }
     }
 }
