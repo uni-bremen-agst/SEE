@@ -327,7 +327,11 @@ namespace SEE.Game.Avatars
                 }
             }
 
-            // Turns off
+            // Removes AvatarAimingSystem and its associated AimIK and LookAtIK
+            // because our local VR avatar is controlled by VRIK instead.
+            // Removes AvatarMovementAnimator from gameObject, too, because
+            // it is using animation parameters that are defined only
+            // in our own AvatarAimingSystem animation controller.
             void TurnOffAvatarAimingSystem()
             {
                 if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
