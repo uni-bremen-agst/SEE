@@ -18,7 +18,7 @@ namespace SEE.GO.Menu
     /// A menu which allows its user to fuzzy search for nodes by entering the
     /// source name of a node.
     /// </summary>
-    public class SearchMenu : MonoBehaviour
+    public class SearchMenu: MonoBehaviour
     {
         /// <summary>
         /// The time (in seconds) the found node will blink.
@@ -74,8 +74,7 @@ namespace SEE.GO.Menu
         /// time a search is executed. Note that this implies that changes to the cities while the game is running
         /// will not be reflected in the search.
         /// </summary>
-        private readonly IDictionary<string, ICollection<GameObject>> cachedNodes =
-            new Dictionary<string, ICollection<GameObject>>();
+        private readonly IDictionary<string, ICollection<GameObject>> cachedNodes = new Dictionary<string, ICollection<GameObject>>();
 
         /// <summary>
         /// A list containing all entries in the <see cref="resultMenu"/>.
@@ -93,38 +92,37 @@ namespace SEE.GO.Menu
             // Format: (score, name, found game object)
             IEnumerable<(int, string, GameObject)> results =
                 Process.ExtractTop(FilterString(searchString.Value), cachedNodes.Keys)
-                    .Where(x => x.Score > 0) // results with score 0 are usually garbage
-                    .SelectMany(x => cachedNodes[x.Value].Select(y => (x.Score, x.Value, y)))
-                    .ToList();
+                       .Where(x => x.Score > 0) // results with score 0 are usually garbage
+                       .SelectMany(x => cachedNodes[x.Value].Select(y => (x.Score, x.Value, y)))
+                       .ToList();
 
             // In cases there are duplicates in the result, we append the filename too
             HashSet<string> encounteredNames = new HashSet<string>();
             results = results.GroupBy(x => x.Item2)
-                .SelectMany(x => x.Select((entry, i) => (entry, index: i)))
-                .Select(x =>
-                {
-                    ((int score, string name, GameObject gameObject) entry, int index) = x;
-                    if (index <= 0)
-                    {
-                        return entry;
-                    }
-                    else
-                    {
-                        string newName = $"{entry.name} ({entry.gameObject.GetNode().SourceFile ?? index.ToString()})";
-                        if (!encounteredNames.Contains(newName))
-                        {
-                            encounteredNames.Add(newName);
-                        }
-                        else
-                        {
-                            // If this node exists multiple times within this filename,
-                            // we append the index to it.
-                            newName += $" ({index.ToString()})";
-                        }
-
-                        return (entry.score, newName, entry.gameObject);
-                    }
-                });
+                             .SelectMany(x => x.Select((entry, i) => (entry, index: i)))
+                             .Select(x =>
+                             {
+                                 ((int score, string name, GameObject gameObject) entry, int index) = x;
+                                 if (index <= 0)
+                                 {
+                                     return entry;
+                                 }
+                                 else
+                                 {
+                                     string newName = $"{entry.name} ({entry.gameObject.GetNode().SourceFile ?? index.ToString()})";
+                                     if (!encounteredNames.Contains(newName))
+                                     {
+                                         encounteredNames.Add(newName);
+                                     }
+                                     else
+                                     {
+                                         // If this node exists multiple times within this filename,
+                                         // we append the index to it.
+                                         newName += $" ({index.ToString()})";
+                                     }
+                                     return (entry.score, newName, entry.gameObject);
+                                 }
+                             });
 
 
             switch (results.Count())
@@ -162,7 +160,7 @@ namespace SEE.GO.Menu
             resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
             resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2),
-                x.Item2, entryColor: ScoreColor(x.Item1))));
+                                                                         x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
             resultMenu.ShowMenu(true);
 
@@ -190,7 +188,7 @@ namespace SEE.GO.Menu
         private void HighlightNode(GameObject result, string resultName)
         {
             ShowNotification.Info($"Highlighting '{resultName}'",
-                $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
+                                  $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
             GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
             if (result.TryGetComponentOrLog(out Renderer cityRenderer))
             {
@@ -206,7 +204,7 @@ namespace SEE.GO.Menu
             {
                 // Remove marker either when a new search is started or when time is up
                 await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)),
-                    UniTask.WaitUntil(() => !stillHighlighting));
+                                      UniTask.WaitUntil(() => !stillHighlighting));
                 marker.Clear();
             }
         }
@@ -227,7 +225,6 @@ namespace SEE.GO.Menu
                     // Another search has been started
                     break;
                 }
-
                 material.color = material.color.Invert();
                 await UniTask.Delay(TimeSpan.FromSeconds(BLINK_INTERVAL));
             }
@@ -260,7 +257,6 @@ namespace SEE.GO.Menu
                 {
                     cachedNodes[sourceName] = new List<GameObject>();
                 }
-
                 cachedNodes[sourceName].Add(node);
             }
 
