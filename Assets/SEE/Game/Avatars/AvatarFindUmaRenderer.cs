@@ -3,6 +3,11 @@ using UMA.PoseTools;
 using UnityEngine;
 using ViveSR.anipal.Lip;
 
+// FIMXE: This class was merged from the Facial Tracker branch.
+// Changes necessary to conform to our coding styles should be
+// made there and then merged. I do not want to make the changes
+// here because that may result in conflicts.
+
 /// <summary>
 /// Searches for UMARenderer in parent gameObject and adds AvatarBlendshapeExpression and SRanipalLip Tracker script to it.
 /// </summary>
@@ -11,7 +16,7 @@ public class AvatarFindUmaRenderer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
