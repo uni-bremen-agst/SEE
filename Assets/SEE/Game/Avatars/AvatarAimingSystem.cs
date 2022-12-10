@@ -99,7 +99,6 @@ namespace SEE.Game.Avatars
         public void SetPointing(bool activate)
         {
             IsPointing = activate;
-            Debug.Log($"[AAS] SetPointing({IsPointing}).\n");
             if (aimIK == null)
             {
                 gameObject.TryGetComponentOrLog(out aimIK);
@@ -107,13 +106,11 @@ namespace SEE.Game.Avatars
             // Laser beam should be active only while we are pointing.
             if (laser == null)
             {
-                Debug.Log($"[AAS] No laser yet. Adding one.\n");
                 laser = gameObject.AddOrGetComponent<LaserPointer>();
                 laser.Source = aimIK.solver.transform;
             }
             UnityEngine.Assertions.Assert.IsNotNull(laser);
             laser.SetActive(IsPointing);
-            Debug.Log($"[AAS] Laser activated: {IsPointing}.\n");
 
             // Activate the aimed target. FIXME: What for?
             if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
@@ -124,13 +121,8 @@ namespace SEE.Game.Avatars
             {
                 if (gameObject.TryGetComponentOrLog(out networkObject))
                 {
-                    Debug.Log($"[AAS] TogglePointingNetAction({networkObject.NetworkObjectId}, {IsPointing}).\n");
                     new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
                 }
-            }
-            else
-            {
-                Debug.Log($"[AAS] Not locally controlled.\n");
             }
         }
 
