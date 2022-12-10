@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using ViveSR.anipal.Lip;
 
+// FIMXE: This class was merged from the Facial Tracker branch.
+// Changes necessary to conform to our coding styles should be
+// made there and then merged. I do not want to make the changes
+// here because that may result in conflicts.
+
 namespace SEE.Game.Avatars
 {
     public class AvatarSRanipalLipV2 : MonoBehaviour
@@ -31,8 +36,8 @@ namespace SEE.Game.Avatars
                         int lipShapeTableSize = skinnedMeshRenderer.sharedMesh.blendShapeCount;
 
                         LipShapeTables[0].lipShapes = new LipShape_v2[lipShapeTableSize];
-                        
-                        
+
+
                         for (int i = 0; i < skinnedMeshRenderer.sharedMesh.blendShapeCount; ++i)
                         {
                             string elementName = skinnedMeshRenderer.sharedMesh.GetBlendShapeName(i);
@@ -44,12 +49,12 @@ namespace SEE.Game.Avatars
                                 {
                                     LipShapeTables[0].lipShapes[i] = lipShape;
                                 }
-                                    
+
                             }
-                            
+
                         }
                     }
-                    
+
                     SetLipShapeTables(LipShapeTables);
 
                 }

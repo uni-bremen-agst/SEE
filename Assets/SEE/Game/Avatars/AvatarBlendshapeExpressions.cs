@@ -1,6 +1,11 @@
 using UMA.PoseTools;
 using UnityEngine;
 
+// FIMXE: This class was merged from the Facial Tracker branch.
+// Changes necessary to conform to our coding styles should be
+// made there and then merged. I do not want to make the changes
+// here because that may result in conflicts.
+
 namespace SEE.Game.Avatars
 {
     internal class AvatarBlendshapeExpressions : MonoBehaviour
@@ -42,7 +47,7 @@ namespace SEE.Game.Avatars
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Forward", 100, junkData, junkData,
                 junkData); //  Jaw_Forward_Back - range (0 - 1)
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Open", 100, junkData, junkData,
-                junkData); // Jaw_Open_Close - range (0 - 1) 
+                junkData); // Jaw_Open_Close - range (0 - 1)
 
             // Mouth
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Ape_Shape", 100, junkData, junkData,
@@ -92,7 +97,7 @@ namespace SEE.Game.Avatars
                 junkData); // Left Lower Lip Up_Down && Right Lower Lip Up_Down (0 - 1)
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Lower_Overlay", 100, junkData, junkData,
-                junkData); // Jaw Close with range (-1 - 0) 
+                junkData); // Jaw Close with range (-1 - 0)
 
             // Tongue
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_LongStep1", 100, junkData, junkData,
@@ -113,14 +118,14 @@ namespace SEE.Game.Avatars
                 junkData); // Tongue Curl - range (0-1)
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpLeft_Morph", 100, junkData, junkData,
-                junkData); // Zunge leicht raus oben links 
+                junkData); // Zunge leicht raus oben links
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_UpRight_Morph", 100, junkData, junkData,
-                junkData); // Zunge leich raus oben rechts 
+                junkData); // Zunge leich raus oben rechts
 
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownLeft_Morph", 100, junkData, junkData,
-                junkData); // Zunge leicht raus unten links 
+                junkData); // Zunge leicht raus unten links
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Tongue_DownRight_Morph", 100, junkData, junkData,
-                junkData); // Zunge leicht raus unten rechts 
+                junkData); // Zunge leicht raus unten rechts
 
             // Cheeks
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Left", 100, junkData, junkData,
@@ -128,7 +133,7 @@ namespace SEE.Game.Avatars
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Puff_Right", 100, junkData, junkData,
                 junkData); // Right Cheek Puff_Squint - range (0 - 1)
             targetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Cheek_Suck", 100, junkData, junkData,
-                junkData); // Maybe "Left Cheek Puff_Squint && Right Cheek Puff_Squint" - range (-1 - 0) 
+                junkData); // Maybe "Left Cheek Puff_Squint && Right Cheek Puff_Squint" - range (-1 - 0)
         }
 
         private void Update()
@@ -254,7 +259,7 @@ namespace SEE.Game.Avatars
             }
             else
             {
-                expressionPlayer.tongueOut = ValueConverter(tongueLongStep2, true); 
+                expressionPlayer.tongueOut = ValueConverter(tongueLongStep2, true);
             }
 
 
@@ -285,7 +290,7 @@ namespace SEE.Game.Avatars
             float tongueRoll = targetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Roll"));
             expressionPlayer.tongueCurl = ValueConverter(tongueRoll, true);
 
-            
+
 
 
             // Cheeks
