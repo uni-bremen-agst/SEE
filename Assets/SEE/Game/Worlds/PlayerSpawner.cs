@@ -13,6 +13,9 @@ namespace SEE.Game.Worlds
     /// </summary>
     public class PlayerSpawner : MonoBehaviour
     {
+        /// <summary>
+        /// Information needed to spawn a player avatar.
+        /// </summary>
         [Serializable]
         private class SpawnInfo
         {
@@ -24,7 +27,10 @@ namespace SEE.Game.Worlds
             public float Rotation;
         }
 
-        [Tooltip("The prefabs to be used to spawn players."), ShowInInspector, SerializeField]
+        /// <summary>
+        /// The information needed to spawn player avatars.
+        /// </summary>
+        [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
         private List<SpawnInfo> PlayerSpawns = new List<SpawnInfo>();
 
         /// <summary>
