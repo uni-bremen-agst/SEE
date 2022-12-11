@@ -1,4 +1,5 @@
 using SEE.DataModel;
+using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,7 +25,7 @@ public class RuntimeCodeCityTables : MonoBehaviour
 
         foreach (var table in tables)
         {
-            GameObject tableButton = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeTableButton");
+            GameObject tableButton = PrefabInstantiator.InstantiatePrefab(RuntimeConfigMenu.TABLE_BUTTON_PREFAB_PATH);
             tableButton.transform.parent = tableView.transform;
             tableButton.name = "DebugButton";
             Button debugButtonComponent = tableButton.GetComponent<Button>();

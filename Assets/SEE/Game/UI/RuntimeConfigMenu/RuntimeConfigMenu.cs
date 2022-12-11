@@ -14,9 +14,16 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 {
     public class RuntimeConfigMenu : MonoBehaviour
     {
+        // paths of prefabs
+        private const string PREFAB_FOLDER =  "Prefabs/UI/RuntimeConfigMenu/";
+        public const string MENU_PREFAB_PATH = PREFAB_FOLDER + "RuntimeConfigMenu";
+        public const string TAB_BUTTON_PREFAB_PATH = PREFAB_FOLDER + "RuntimeTabButton";
+        public const string SETTINGS_VIEW_PREFAB_PATH = PREFAB_FOLDER + "RuntimeSettingsView";
+        public const string SETTINGS_OBJECT_PREFAB_PATH = PREFAB_FOLDER + "RuntimeSettingsObject";
+        public const string SWITCH_PREFAB_PATH = PREFAB_FOLDER + "RuntimeSettingsSwitch";
+        public const string TABLE_BUTTON_PREFAB_PATH = PREFAB_FOLDER + "RuntimeTableButton";
+    
         private SteamVR_Action_Boolean openAction = SteamVR_Actions._default?.OpenSettingsMenu;
-        private const string menuPrefabPath = "Prefabs/UI/RuntimeConfigMenu";
-
         private GameObject runtimeConfigMenu;
 
         private GameObject seeTables;
@@ -34,8 +41,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         void Awake()
         {
             Debug.Log("Awake Runtime Config Menu");
-
-            runtimeConfigMenu = PrefabInstantiator.InstantiatePrefab(menuPrefabPath);
+            
+            runtimeConfigMenu = PrefabInstantiator.InstantiatePrefab(MENU_PREFAB_PATH);
             runtimeConfigMenu.name = "RuntimeConfigMenu";
             runtimeConfigMenu.SetActive(false);
 
@@ -121,7 +128,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         // Tabs
         private GameObject SetupTabButton(string tabName)
         {
-            GameObject tabButton = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeTabButton", seeSettingsTabs.transform.Find("TabObjects"), false);
+            GameObject tabButton = PrefabInstantiator.InstantiatePrefab(TAB_BUTTON_PREFAB_PATH, seeSettingsTabs.transform.Find("TabObjects"), false);
             tabButton.name = tabName;
             tabButton.GetComponentInChildren<TextMeshProUGUI>().text = tabName;
             return tabButton;
@@ -130,7 +137,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         // Views
         private GameObject SetupSettingsView(GameObject tabButton)
         {
-            GameObject settingsView = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsView", seeSettingsContentView.transform, false);
+            GameObject settingsView = PrefabInstantiator.InstantiatePrefab(SETTINGS_VIEW_PREFAB_PATH, seeSettingsContentView.transform, false);
             settingsView.name = tabButton.name + "View";
             tabButton.GetComponent<TabButtonSwitcher>().Tab = settingsView;
             return settingsView;
@@ -142,12 +149,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             foreach(var type in city.NodeTypes)
             {
                 // Display NodeType
-                GameObject nodeType = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                GameObject nodeType = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB_PATH, seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
                 nodeType.GetComponentInChildren<Text>().text = type.Key;
                 nodeType.GetComponentInChildren<Text>().fontStyle = FontStyle.Bold;
 
                 // Display Visibility of NodeType
-                GameObject nodeTypeVisibility = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsSwitch", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                GameObject nodeTypeVisibility = PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB_PATH, seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
                 nodeTypeVisibility.GetComponentInChildren<SwitchManager>().isOn = type.Value.IsRelevant;
                 //nodeTypeVisibility.GetComponentInChildren<TextMeshProUGUI>().fontSize = nodeType.GetComponent<Text>().fontSize;
                 //nodeTypeVisibility.GetComponentInChildren<TextMeshProUGUI>().color = nodeType.GetComponent<Text>().color;
@@ -155,26 +162,26 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 nodeTypeVisibility.GetComponentInChildren<Button>().onClick.AddListener(() => changeVisibility(type));
 
                 // Display Shape of NodeType
-                GameObject nodeTypeShape = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
+                GameObject nodeTypeShape = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB_PATH, seeSettingsContentView.transform.Find("NodesView").transform.Find("Content"), false);
                 nodeTypeShape.GetComponentInChildren<Text>().text = type.Value.Shape.ToString();
             }
         }
 
         private static void SetupSettingsSize()
         {
-            GameObject sizeSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("SizeView").transform.Find("Content"), false);
+            GameObject sizeSettingTest = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB_PATH, seeSettingsContentView.transform.Find("SizeView").transform.Find("Content"), false);
             sizeSettingTest.GetComponentInChildren<Text>().text = "TestSetting Size";
         }
 
         private static void SetupSettingsColor()
         {
-            GameObject colorSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("ColorView").transform.Find("Content"), false);
+            GameObject colorSettingTest = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB_PATH, seeSettingsContentView.transform.Find("ColorView").transform.Find("Content"), false);
             colorSettingTest.GetComponentInChildren<Text>().text = "TestSetting Color";
         }
 
         private static void SetupSettingsLayout()
         {
-            GameObject layoutSettingTest = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/RuntimeSettingsObject", seeSettingsContentView.transform.Find("LayoutView").transform.Find("Content"), false);
+            GameObject layoutSettingTest = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB_PATH, seeSettingsContentView.transform.Find("LayoutView").transform.Find("Content"), false);
             layoutSettingTest.GetComponentInChildren<Text>().text = "TestSetting Layout";
         }
 
