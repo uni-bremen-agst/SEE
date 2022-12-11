@@ -1,7 +1,7 @@
 using UMA.PoseTools;
 using UnityEngine;
 
-// FIMXE: This class was merged from the Facial Tracker branch.
+// FIXME: This class was merged from the Facial Tracker branch.
 // Changes necessary to conform to our coding styles should be
 // made there and then merged. I do not want to make the changes
 // here because that may result in conflicts.
