@@ -54,20 +54,6 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Broadcasts <see cref="TogglePointingNetAction"/> to all corresponding
-        /// remote representations of this avatar. We want to turn on pointing
-        /// initially.
-        /// </summary>
-        private void Start()
-        {
-            //if (gameObject.TryGetComponentOrLog(out NetworkObject networkObject))
-            //{
-            //    // By default, all VR avatars are pointing initially.
-            //    new TogglePointingNetAction(networkObject.NetworkObjectId, true).Execute();
-            //}
-        }
-
-        /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
