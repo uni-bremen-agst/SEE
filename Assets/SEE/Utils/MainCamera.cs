@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Allows to retrieve the main camera, that is, the camera attached to the
+    /// local player.
+    /// </summary>
     public static class MainCamera
     {
         /// <summary>
@@ -45,7 +49,6 @@ namespace SEE.Utils
                                 {
                                     if (camera == null)
                                     {
-                                        Debug.Log($"Found main camera tagged by {Tags.MainCamera}: {cam.gameObject.FullName()}\n");
                                         camera = cam;
                                     }
                                     else
@@ -54,11 +57,9 @@ namespace SEE.Utils
                                     }
                                 }
                             }
-                            //camera = Camera.main;
                             NotifyAll();
                             break;
                     }
-                    // Debug.Log($"Selected main camera {camera.name} in game object {camera.gameObject.FullName()}.\n");
                 }
                 return camera;
             }
