@@ -62,7 +62,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public string SourceName
         {
-            get => GetString(SourceNameAttribute);
+            get => TryGetString(SourceNameAttribute, out string sourceName) ? sourceName : null;
             set => SetString(SourceNameAttribute, value);
         }
 
