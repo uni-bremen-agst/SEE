@@ -53,12 +53,14 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
+            /*
             if (SEEInput.ToggleDocumentationMenu())
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
                 testDialog.DialogShouldBeShown = true;
                 SEEInput.KeyboardShortcutsEnabled = false;
             }
+            */
         }
     }
 }
