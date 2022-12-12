@@ -57,8 +57,8 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-
-                ConfigIO.Restore(values, BoardPathLabel, ref BoardPath);
+                
+                BoardPath.Restore(values, BoardPathLabel);
             }
         }
 
