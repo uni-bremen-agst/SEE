@@ -55,8 +55,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of the roof of <paramref name="parent"/>.
-        ///
+        /// Puts <paramref name="child"/> on top of the roof of <paramref name="parent"/>,
         /// and scales it down,
         /// assuming <paramref name="scaleDown"/> is true. This method makes sure that <paramref name="child"/>
         /// will be contained within the area of the roof of <paramref name="parent"/>.
