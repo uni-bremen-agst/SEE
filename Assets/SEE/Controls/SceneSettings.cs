@@ -64,16 +64,11 @@ namespace SEE.Controls
                 {
                     Debug.Log($"Loaded environment {playerInputType} from configuration file {path}.\n");
                     SceneSettings.InputType = playerInputType;
-
-                    // FIXME: We use desktop during the opening dialog whatever the user set earlier
-                    // because the GUI for the opening dialog is implemented only for desktop.
-                    Debug.LogWarning($"Because of partial GUI implementation, we will use {PlayerInputType.DesktopPlayer}.\n");
-                    SceneSettings.InputType = PlayerInputType.DesktopPlayer;
                 }
                 else
                 {
                     Debug.LogError($"Configuration file {path} for the selected kind of environment (desktop, VR, etc.) does not contain the expected content. Using default {PlayerInputType.DesktopPlayer}.\n");
-                    playerInputType = PlayerInputType.DesktopPlayer;
+                    SceneSettings.InputType = PlayerInputType.DesktopPlayer;
                 }
             }
             else
@@ -82,10 +77,6 @@ namespace SEE.Controls
                 InputType = PlayerInputType.DesktopPlayer;
             }
         }
-
-        [Tooltip("The plane the player is to focus initially in the desktop environment.")]
-        [ShowInInspector]
-        private GO.Plane FocusPlane;
 
         [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
         public float CityScalingFactor = 1f;
