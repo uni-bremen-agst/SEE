@@ -17,7 +17,7 @@ namespace SEE.XR
         /// <summary>
         /// Inializes XR.
         ///
-        /// From the Unity documenation:
+        /// From the Unity documentation:
         /// Manual initialization of XR cannot be done before Start completes as it depends
         /// on graphics initialization within Unity completing.
         /// Initialization of XR must be complete either before the Unity graphics system is
