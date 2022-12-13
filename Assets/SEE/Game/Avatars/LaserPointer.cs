@@ -57,15 +57,7 @@ namespace SEE.Game.Avatars
         public bool On
         {
             get => laserLine.enabled;
-            internal set => laserLine.enabled = value;
-        }
-
-        /// <summary>
-        /// Toggles between pointing and not pointing.
-        /// </summary>
-        public void SetActive(bool activate)
-        {
-            laserLine.enabled = activate;
+            set => laserLine.enabled = value;
         }
 
         /// <summary>

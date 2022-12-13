@@ -1,6 +1,4 @@
 ﻿using SEE.GO;
-using SEE.Net.Actions;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -39,7 +37,7 @@ namespace SEE.Game.Avatars
         /// of the avatar. This transform will be moved by this component during
         /// <see cref="Update"/>. It is assumed that <see cref="Target"/>
         /// has a <see cref="ClientNetworkTransform"/> attached to it, which will then
-        /// automatically the positions of all corresponding aim targets of all remote
+        /// automatically broadcast the positions of all corresponding aim targets of all remote
         /// representations of this avatar.
         /// </summary>
         public Transform Target;
@@ -61,14 +59,14 @@ namespace SEE.Game.Avatars
         private void Update()
         {
             // Draw a line from the AimTransform of the avatar into the direction
-            // of the pointing device.
-            //laser.Draw(aimIK.solver.target.position);
-
+            // where the pointing device is pointing to.
             UnityEngine.XR.InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-            handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR);
-            Vector3 direction = rotR * Vector3.forward;
-            // Move the aim target to the tip of the laser beam.
-            Target.position = laser.PointTowards(direction);
+            if (handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR))
+            {
+                Vector3 direction = rotR * Vector3.forward;
+                // Move the aim target to the tip of the laser beam.
+                Target.position = laser.PointTowards(direction);
+            }
         }
     }
 }
