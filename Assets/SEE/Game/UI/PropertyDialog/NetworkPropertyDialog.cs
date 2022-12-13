@@ -85,11 +85,6 @@ namespace SEE.Game.UI.PropertyDialog
         private SelectionProperty voiceChatSelector;
 
         /// <summary>
-        /// The selector for the kind of environment (desktop, VR, etc.).
-        /// </summary>
-        private SelectionProperty environmentSelector;
-
-        /// <summary>
         /// The dialog for the user input.
         /// </summary>
         private PropertyDialog propertyDialog;
@@ -99,7 +94,6 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         public void Open()
         {
-            SceneSettings.Load();
             networkConfig.Load();
 
             dialog = new GameObject("Network settings");
@@ -107,15 +101,6 @@ namespace SEE.Game.UI.PropertyDialog
             // Group for network properties (one group for all).
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Network settings";
-
-            {
-                environmentSelector = dialog.AddComponent<SelectionProperty>();
-                environmentSelector.Name = "Environment";
-                environmentSelector.Description = "Select an environment";
-                environmentSelector.AddOptions(PlayerInputTypesToStrings());
-                environmentSelector.Value = SceneSettings.InputType.ToString();
-                group.AddProperty(environmentSelector);
-            }
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
@@ -258,25 +243,11 @@ namespace SEE.Game.UI.PropertyDialog
                     errorOccurred = true;
                 }
             }
-            {
-                // Environment
-                string value = environmentSelector.Value.Trim();
-                if (Enum.TryParse(value, out PlayerInputType playerInputType))
-                {
-                    SceneSettings.InputType = playerInputType;
-                }
-                else
-                {
-                    ShowNotification.Error("Invalid Environment", "Your choice environment is not available");
-                    errorOccurred = true;
-                }
-            }
 
             if (!errorOccurred)
             {
                 propertyDialog.Close();
                 networkConfig.Save();
-                SceneSettings.Save();
                 OnConfirm.Invoke();
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Close();
