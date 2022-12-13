@@ -51,31 +51,24 @@ namespace SEE.UI
 
             return new List<ToggleMenuEntry>
                     { new ToggleMenuEntry(active: false,
-                                          entryAction: StartHost,
+                                          entryAction: this.StartHost,
                                           exitAction: null,
                                           title: "Host",
                                           description: "Starts a server and local client process.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Host")),
                       new ToggleMenuEntry(active: false,
-                                          entryAction: StartClient,
+                                          entryAction: this.StartClient,
                                           exitAction: null,
                                           title: "Client",
                                           description: "Starts a local client connection to a server.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Client")),
                       new ToggleMenuEntry(active: false,
-                                          entryAction: HostInVR,
+                                          entryAction: this.ToggleEnvironment,
                                           exitAction: null,
-                                          title: "Host in VR",
-                                          description: "Starts a server and local client process and enters in VR.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: ClientInVR,
-                                          exitAction: null,
-                                          title: "Client in VR",
-                                          description: "Starts a local client connection to a server and enters in VR.",
+                                          title: "Toggle Desktop/VR",
+                                          description: "Toggles between desktop and VR hardware.",
                                           entryColor: NextColor(),
                                           icon: Resources.Load<Sprite>("Icons/Client")),
 
@@ -88,7 +81,7 @@ namespace SEE.UI
                       //                    entryColor: NextColor(),
                       //                    icon: Resources.Load<Sprite>("Icons/Server")),
                       new ToggleMenuEntry(active: false,
-                                          entryAction: Settings,
+                                          entryAction: this.Settings,
                                           exitAction: null,
                                           title: "Settings",
                                           description: "Allows to set additional network settings.",
@@ -121,56 +114,13 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu(false);
+                SceneSettings.InputType = inputType;
                 network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
                 menu.ShowMenu(true);
                 ShowNotification.Error("Host cannot be started", exception.Message);
-            }
-        }
-
-        /// <summary>
-        /// FIXME: Remove after ESE.
-        /// </summary>
-        private void HostInVR()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu(false);
-                SceneSettings.InputType = PlayerInputType.VRPlayer;
-                network.StartHost(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu(true);
-                ShowNotification.Error("Host cannot be started", exception.Message);
-            }
-        }
-
-        /// <summary>
-        /// FIXME: Remove after ESE.
-        /// </summary>
-        private void ClientInVR()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu(false);
-                SceneSettings.InputType = PlayerInputType.VRPlayer;
-                network.StartClient(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu(true);
-                ShowNotification.Error("Server connection failed", exception.Message);
             }
         }
 
@@ -186,6 +136,7 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu(false);
+                SceneSettings.InputType = inputType;
                 network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
@@ -198,23 +149,24 @@ namespace SEE.UI
         /// <summary>
         /// Starts a dedicated server on this machine (only server, no client).
         /// </summary>
-        private void StartServer()
-        {
-            try
-            {
-                // Hide menu while the network is about to be started so that the user
-                // user select any menu entry while this process is running. We do
-                // not want the user to start any other network setting until this
-                // process has come to an end.
-                menu.ShowMenu(false);
-                network.StartServer(NetworkCallBack);
-            }
-            catch (Exception exception)
-            {
-                menu.ShowMenu(true);
-                ShowNotification.Error("Server cannot be started", exception.Message);
-            }
-        }
+        //private void StartServer()
+        //{
+        //    try
+        //    {
+        //        // Hide menu while the network is about to be started so that the user
+        //        // user select any menu entry while this process is running. We do
+        //        // not want the user to start any other network setting until this
+        //        // process has come to an end.
+        //        menu.ShowMenu(false);
+        //        SceneSettings.InputType = inputType;
+        //        network.StartServer(NetworkCallBack);
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        menu.ShowMenu(true);
+        //        ShowNotification.Error("Server cannot be started", exception.Message);
+        //    }
+        //}
 
         /// <summary>
         /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.
@@ -272,7 +224,63 @@ namespace SEE.UI
         private void Start()
         {
             menu = CreateMenu();
+            SceneSettings.Load();
+            inputType = SceneSettings.InputType;
+            // While this OpeningDialog is open, we want to run in a desktop environment,
+            // because our GUI implementation is not yet complete for VR. The NetworkPropertyDialog
+            // uses widgets that are not implemented for VR. Neither are ShowNotifications not
+            // implemented for VR yet.
+            // We reset SceneSettings.InputType here to a desktop environment.
+            // The loaded settings for the input type is kept in inputType. This field
+            // will be toggled by request of the user and only when the host or client is
+            // actually started, we assign the value of inputType to SceneSettings.InputType.
+            SceneSettings.InputType = PlayerInputType.DesktopPlayer;
             menu.ShowMenu(true);
+            ShowEnvironment();
+        }
+
+        /// <summary>
+        /// The currently selected player input type.
+        /// </summary>
+        private PlayerInputType inputType;
+
+        /// <summary>
+        /// Toggles <see cref="inputType"/> between <see cref="PlayerInputType.VRPlayer"/>
+        /// and <see cref="PlayerInputType.DesktopPlayer"/>. The resulting value is saved.
+        /// </summary>
+        private void ToggleEnvironment()
+        {
+            if (inputType == PlayerInputType.DesktopPlayer)
+            {
+                inputType = PlayerInputType.VRPlayer;
+            }
+            else
+            {
+                inputType = PlayerInputType.DesktopPlayer;
+            }
+            SceneSettings.Save();
+            ShowEnvironment();
+        }
+
+        /// <summary>
+        /// Notifies the user via <see cref="ShowNotification.Info(string, string, float, bool)"/>
+        /// which player input type was chosen.
+        /// </summary>
+        private void ShowEnvironment()
+        {
+            ShowNotification.Info("Environment", Environment());
+
+            string Environment()
+            {
+                return inputType switch
+                {
+                    PlayerInputType.DesktopPlayer => "Desktop environment is selected.",
+                    PlayerInputType.VRPlayer => "VR environment is selected.",
+                    PlayerInputType.TouchGamepadPlayer => "Touch gamepad environment is selected.",
+                    PlayerInputType.None => "No environment is selected.",
+                    _ => throw new NotImplementedException($"Case {inputType} is not handled")
+                };
+            }
         }
     }
 }
