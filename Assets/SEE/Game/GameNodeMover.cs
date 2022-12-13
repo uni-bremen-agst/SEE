@@ -137,7 +137,7 @@ namespace SEE.Game
         /// <summary>
         /// FIXME: This is intended to become an improved version of PutOn().
         /// It is still work in progress.
-        /// </summary>m>
+        /// </summary>
         private static void PutOn2(Transform child, GameObject parent, bool scaleDown = false, float topPadding = 0.0001f)
         {
             Assert.IsNotNull(parent);
