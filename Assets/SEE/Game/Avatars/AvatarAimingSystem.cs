@@ -110,7 +110,7 @@ namespace SEE.Game.Avatars
                 laser.Source = aimIK.solver.transform;
             }
             UnityEngine.Assertions.Assert.IsNotNull(laser);
-            laser.SetActive(IsPointing);
+            laser.On = IsPointing;
 
             // Activate the aimed target. FIXME: What for?
             if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
