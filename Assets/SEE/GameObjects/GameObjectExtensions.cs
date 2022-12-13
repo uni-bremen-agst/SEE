@@ -812,7 +812,7 @@ namespace SEE.GO
         /// <param name="gameObject">object whose child is to be enabled/disabled</param>
         /// <param name="childName">the name of the child; may be a composite name</param>
         /// <param name="active">whether to enable it</param>
-        public static void EnableChild(this GameObject gameObject, string childName, bool active)
+        public static void SetChildActive(this GameObject gameObject, string childName, bool active)
         {
             Transform child = gameObject.transform.Find(childName);
             if (child)
