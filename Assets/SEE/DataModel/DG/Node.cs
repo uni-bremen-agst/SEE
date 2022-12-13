@@ -439,7 +439,7 @@ namespace SEE.DataModel.DG
         /// Returns true if this node is a descendant of <paramref name="node"/> in the
         /// node hierarchy.
         /// </summary>
-        /// <param name="node">a potential ascendant of <paramref name="node"/></param>
+        /// <param name="node">a potential ascendant of this node</param>
         /// <returns>true if this node is a descendant of <paramref name="node"/></returns>
         /// <remarks>For clarity: A node is considered its own descendant, i.e.,
         /// <c>n.IsDescendantOf(n)</c> is always <c>true</c>.</remarks>
