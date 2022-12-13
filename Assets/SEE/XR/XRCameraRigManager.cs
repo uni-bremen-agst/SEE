@@ -45,8 +45,8 @@ namespace SEE.XR
             }
 
             Debug.Log($"[{nameof(XRCameraRigManager)}] Enabling controllers.\n");
-            gameObject.EnableChild(LeftControllerName, true);
-            gameObject.EnableChild(RightControllerName, true);
+            gameObject.SetChildActive(LeftControllerName, true);
+            gameObject.SetChildActive(RightControllerName, true);
         }
     }
 }

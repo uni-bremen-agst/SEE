@@ -28,9 +28,7 @@ namespace SEE.XR
         /// </summary>
         private void Start()
         {
-            Status();
             StartCoroutine(nameof(StartXRCoroutine));
-            Status();
         }
 
         /// <summary>
