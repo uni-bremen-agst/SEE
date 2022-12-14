@@ -147,6 +147,7 @@ PlayerSettings:
     enable360StereoCapture: 0
   isWsaHolographicRemotingEnabled: 0
   enableFrameTimingStats: 0
+  enableOpenGLProfilerGPURecorders: 1
   useHDRDisplay: 0
   D3DHDRBitDepth: 0
   m_ColorGamuts: 00000000
@@ -167,7 +168,7 @@ PlayerSettings:
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
   AndroidBundleVersionCode: 16
-  AndroidMinSdkVersion: 19
+  AndroidMinSdkVersion: 22
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: 
@@ -223,6 +224,7 @@ PlayerSettings:
   iOSLaunchScreeniPadCustomStoryboardPath: 
   iOSDeviceRequirements: []
   iOSURLSchemes: []
+  macOSURLSchemes: []
   iOSBackgroundModes: 0
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
@@ -315,6 +317,7 @@ PlayerSettings:
       m_Kind: 0
   m_BuildTargetPlatformIcons: []
   m_BuildTargetBatching: []
+  m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: MacStandaloneSupport
     m_GraphicsJobs: 0
@@ -360,6 +363,8 @@ PlayerSettings:
     m_APIs: 10000000
     m_Automatic: 1
   m_BuildTargetVRSettings: []
+  m_DefaultShaderChunkSizeInMB: 16
+  m_DefaultShaderChunkCount: 0
   openGLRequireES31: 0
   openGLRequireES31AEP: 0
   openGLRequireES32: 0
@@ -376,6 +381,7 @@ PlayerSettings:
     m_EncodingQuality: 1
   m_BuildTargetGroupLightmapSettings: []
   m_BuildTargetNormalMapEncoding: []
+  m_BuildTargetDefaultTextureCompressionFormat: []
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -394,6 +400,7 @@ PlayerSettings:
   switchScreenResolutionBehavior: 2
   switchUseCPUProfiler: 0
   switchUseGOLDLinker: 0
+  switchLTOSetting: 0
   switchApplicationID: 0x01004b9000490000
   switchNSODependencies: 
   switchTitleNames_0: 
@@ -624,10 +631,9 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
+  webGLPowerPreference: 2
   scriptingDefineSymbols:
     1: CMS_SALSA;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;UNITY_CCU;CT_RTV;AMPLIFY_SHADER_EDITOR;ODIN_INSPECTOR;ODIN_INSPECTOR_3;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1
-    4: CT_PROC;CT_RTV
-    7: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     13: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     14: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     19: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
@@ -639,6 +645,22 @@ PlayerSettings:
     30: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     32: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     33: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    4: CT_PROC;CT_RTV
+    7: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Android: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Lumin: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    PS4: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    PS5: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Stadia: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Standalone: CMS_SALSA;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;UNITY_CCU;CT_RTV;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;AMPLIFY_SHADER_EDITOR;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR
+    WebGL: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Windows Store Apps: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    XboxOne: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    iPhone: CT_PROC;CT_RTV
+    tvOS: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
   additionalCompilerArguments: {}
   platformArchitecture:
     iPhone: 1
@@ -655,8 +677,8 @@ PlayerSettings:
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
   useDeterministicCompilation: 1
-  useReferenceAssemblies: 1
   enableRoslynAnalyzers: 1
+  selectedPlatform: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 0
@@ -742,4 +764,6 @@ PlayerSettings:
   organizationId: 
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
+  playerDataPath: 
+  forceSRGBBlit: 1
   virtualTexturingSupportEnabled: 0
