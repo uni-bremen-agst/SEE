@@ -102,6 +102,13 @@ namespace SEE.Game.City
         public NodeTypeVisualsMap NodeTypes = new NodeTypeVisualsMap();
 
         /// <summary>
+        /// If true, lifted edges whose source and target nodes are the same are ignored.
+        /// </summary>
+        [Tooltip("If true, lifted edges whose source and target nodes are the same are ignored.")]
+        [SerializeField]
+        public bool IgnoreSelfLoopsInLifting = false;
+
+        /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
         [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
@@ -440,7 +447,7 @@ namespace SEE.Game.City
             {
                 ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
                   .Select(pair => pair.Key).ToList();
-                return graph.SubgraphByNodeType(relevantNodeTypes);
+                return graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
             }
         }
 

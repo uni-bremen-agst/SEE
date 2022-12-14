@@ -1050,8 +1050,9 @@ namespace SEE.DataModel.DG
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="nodeTypes">the node types that should be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
-        public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes)
+        public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes, bool ignoreSelfLoops = false)
         {
             HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
             return SubgraphBy(element =>
@@ -1065,7 +1066,7 @@ namespace SEE.DataModel.DG
                     // Edges (attached to these nodes) shall be included
                     return true;
                 }
-            });
+            }, ignoreSelfLoops);
         }
 
         /// <summary>
@@ -1074,12 +1075,13 @@ namespace SEE.DataModel.DG
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="toggleAttributes">Toggle attribute a node or edge must have to be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>
         /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
         /// </returns>
         /// <seealso cref="SubgraphBy"/>
-        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) =>
-            SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
+        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes, bool ignoreSelfLoops = false) =>
+            SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes), ignoreSelfLoops);
 
         /// <summary>
         /// Yields a subgraph of given graph that contains only edges for which <paramref name="includeEdge"/> returns
@@ -1087,10 +1089,11 @@ namespace SEE.DataModel.DG
         /// For more on how the subgraph is constructed, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="includeEdge">function returning true if edge shall be added</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>Subgraph containing only edges for which <paramref name="includeEdge"/> returns true
         /// and nodes connected to those edges.</returns>
         /// <seealso cref="SubgraphBy"/>
-        public Graph SubgraphByEdges(Func<Edge, bool> includeEdge)
+        public Graph SubgraphByEdges(Func<Edge, bool> includeEdge, bool ignoreSelfLoops = false)
         {
             ISet<Edge> keptEdges = new HashSet<Edge>(edges.Select(x => x.Value).Where(includeEdge));
 
@@ -1098,7 +1101,7 @@ namespace SEE.DataModel.DG
             ISet<Node> keptNodes = new HashSet<Node>(nodes.Select(x => x.Value)
                                                           .Where(x => keptEdges.Overlaps(x.Incomings.Concat(x.Outgoings))));
 
-            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x));
+            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x), ignoreSelfLoops);
         }
 
         /// <summary>
@@ -1141,14 +1144,15 @@ namespace SEE.DataModel.DG
         /// neglected, we lose information. On the other hand, we reduce the number of edges.
         /// </summary>
         /// <param name="includeElement">function determining whether a given node or edge shall be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>
         /// subgraph containing only nodes and edges for which <paramref name="includeElement"/> returns true.
         /// </returns>
-        public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
+        public Graph SubgraphBy(Func<GraphElement, bool> includeElement, bool ignoreSelfLoops = false)
         {
             Graph subgraph = this is ReflexionGraph ? new ReflexionGraph(BasePath) : new Graph(BasePath);
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
-            AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
+            AddEdgesToSubgraph(subgraph, mapsTo, includeElement, ignoreSelfLoops);
             return subgraph;
         }
 
@@ -1229,12 +1233,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// If true, lifted edges whose source and target nodes are the same are ignored.
-        /// TODO: We need to make this a parameter that can be set by the user.
-        /// </summary>
-        private const bool IgnoreSelfLoops = true;
-
-        /// <summary>
         /// Propagates edge from this graph onto <paramref name="subgraph"/> as follows:
         /// For every edge E in this graph, there is a cloned edge E' in the resulting subgraph
         /// if and only if <paramref name="includeElement"/>(E) == true
@@ -1249,23 +1247,36 @@ namespace SEE.DataModel.DG
         /// <param name="subgraph">graph to propagate the edges to</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo,
-                                        Func<GraphElement, bool> includeElement)
+                                        Func<GraphElement, bool> includeElement,
+                                        bool ignoreSelfLoops)
         {
             foreach (Edge edge in Edges())
             {
+                // edge is contained in the graph for which we calculate the subgraph
                 Node sourceInSubgraph = mapsTo[edge.Source];
                 Node targetInSubgraph = mapsTo[edge.Target];
 
-                if (sourceInSubgraph != null && targetInSubgraph != null
-                    && (!IgnoreSelfLoops || sourceInSubgraph != targetInSubgraph)
-                    && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                if (sourceInSubgraph != null && targetInSubgraph != null)
                 {
-                    Edge edgeInSubgraph = (Edge)edge.Clone();
-                    edgeInSubgraph.Source = sourceInSubgraph;
-                    edgeInSubgraph.Target = targetInSubgraph;
-                    edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
-                    subgraph.AddEdge(edgeInSubgraph);
+                    // Is the propagated edge one that was already in the original graph?
+                    bool isOriginal = edge.Source.ID == sourceInSubgraph.ID && edge.Target.ID == targetInSubgraph.ID;
+                    // Original edges are always added.
+                    // Non-self loops are always added.
+                    // If self loops are not to be ignored, we will add these.
+                    if ((isOriginal || !ignoreSelfLoops || sourceInSubgraph != targetInSubgraph)
+                        && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                    {
+                        Edge edgeInSubgraph = (Edge)edge.Clone();
+                        edgeInSubgraph.Source = sourceInSubgraph;
+                        edgeInSubgraph.Target = targetInSubgraph;
+                        if (!isOriginal)
+                        {
+                            edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
+                        }
+                        subgraph.AddEdge(edgeInSubgraph);
+                    }
                 }
             }
         }

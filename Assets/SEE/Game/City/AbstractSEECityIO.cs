@@ -27,6 +27,7 @@ namespace SEE.Game.City
         private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
         private const string EdgeSelectionLabel = "EdgeSelection";
         private const string MetricToColorLabel = "MetricToColor";
+        private const string IgnoreSelfLoopsInLiftingLabel = "IgnoreSelfLoopsInLifting";
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
@@ -41,6 +42,7 @@ namespace SEE.Game.City
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
             NodeTypes.Save(writer, NodeTypesLabel);
+            writer.Save(IgnoreSelfLoopsInLifting, IgnoreSelfLoopsInLiftingLabel);
             MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
@@ -64,6 +66,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
             NodeTypes.Restore(attributes, NodeTypesLabel);
+            ConfigIO.Restore(attributes, IgnoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
             MetricToColor.Restore(attributes, MetricToColorLabel);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
