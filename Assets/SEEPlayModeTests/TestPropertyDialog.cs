@@ -21,9 +21,7 @@ namespace SEE.Game.UI.PropertyDialog
         public IEnumerator Setup()
         {
             LogAssert.ignoreFailingMessages = true;
-            // A player-settings object must be present in the scene.
-            GameObject playerSettings = new GameObject("Player Settings");
-            playerSettings.AddComponent<PlayerSettings>().playerInputType = GO.PlayerInputType.DesktopPlayer;
+            SceneSettings.InputType = GO.PlayerInputType.DesktopPlayer;
             yield return null;
         }
 

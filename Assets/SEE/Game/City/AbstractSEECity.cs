@@ -12,6 +12,7 @@ using SEE.Tools;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Game.City
 {
@@ -101,6 +102,13 @@ namespace SEE.Game.City
         public NodeTypeVisualsMap NodeTypes = new NodeTypeVisualsMap();
 
         /// <summary>
+        /// If true, lifted edges whose source and target nodes are the same are ignored.
+        /// </summary>
+        [Tooltip("If true, lifted edges whose source and target nodes are the same are ignored.")]
+        [SerializeField]
+        public bool IgnoreSelfLoopsInLifting = false;
+
+        /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
         [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
@@ -169,6 +177,12 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for the visualization of software erosions.")]
         public ErosionAttributes ErosionSettings = new ErosionAttributes();
+
+        /// <summary>
+        /// Holistic metric boards.
+        /// </summary>
+        [Tooltip("Settings for holistic metric boards.")]
+        public BoardAttributes BoardSettings = new BoardAttributes();
 
         /// <summary>
         /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
@@ -431,9 +445,9 @@ namespace SEE.Game.City
             }
             else
             {
-                ICollection<string> matches = NodeTypes.Where(pair => pair.Value.IsRelevant)
+                ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
                   .Select(pair => pair.Key).ToList();
-                return graph.SubgraphByNodeType(matches);
+                return graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
             }
         }
 

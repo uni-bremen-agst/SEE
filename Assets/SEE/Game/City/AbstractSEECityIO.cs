@@ -16,6 +16,7 @@ namespace SEE.Game.City
         private const string NodeTypesLabel = "NodeTypes";
         private const string CoseGraphSettingsLabel = "CoseGraph";
         private const string ErosionMetricsLabel = "ErosionIssues";
+        private const string BoardSettingsLabel = "BoardSettings";
         private const string NodeLayoutSettingsLabel = "NodeLayout";
         private const string EdgeLayoutSettingsLabel = "EdgeLayout";
         private const string CityPathLabel = "ConfigPath";
@@ -26,6 +27,7 @@ namespace SEE.Game.City
         private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
         private const string EdgeSelectionLabel = "EdgeSelection";
         private const string MetricToColorLabel = "MetricToColor";
+        private const string IgnoreSelfLoopsInLiftingLabel = "IgnoreSelfLoopsInLifting";
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file
@@ -40,10 +42,12 @@ namespace SEE.Game.City
             writer.Save(LODCulling, LODCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
             NodeTypes.Save(writer, NodeTypesLabel);
+            writer.Save(IgnoreSelfLoopsInLifting, IgnoreSelfLoopsInLiftingLabel);
             MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
             ErosionSettings.Save(writer, ErosionMetricsLabel);
+            BoardSettings.Save(writer, BoardSettingsLabel);
             NodeLayoutSettings.Save(writer, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, EdgeSelectionLabel);
@@ -62,10 +66,12 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
             NodeTypes.Restore(attributes, NodeTypesLabel);
+            ConfigIO.Restore(attributes, IgnoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
             MetricToColor.Restore(attributes, MetricToColorLabel);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
             ErosionSettings.Restore(attributes, ErosionMetricsLabel);
+            BoardSettings.Restore(attributes, BoardSettingsLabel);
             NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
             EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, EdgeSelectionLabel);

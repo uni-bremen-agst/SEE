@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.Game.UI.Notification;
+using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,8 @@ using static SEE.Net.Network;
 namespace SEE.Game.UI.PropertyDialog
 {
     /// <summary>
-    /// A dialog to enter the network properties (<see cref="NetworkConfig"/>).
+    /// A dialog to enter the network properties (<see cref="NetworkConfig"/>)
+    /// and scene settings (<see cref="SceneSettings"/>).
     /// </summary>
     internal class NetworkPropertyDialog
     {
@@ -99,7 +101,6 @@ namespace SEE.Game.UI.PropertyDialog
             // Group for network properties (one group for all).
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Network settings";
-
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
@@ -125,8 +126,7 @@ namespace SEE.Game.UI.PropertyDialog
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
                 voiceChatSelector.Name = "Voice Chat";
                 voiceChatSelector.Description = "Select a voice chat system";
-                IList<string> voiceChats = VoiceChatSystemsToStrings();
-                voiceChatSelector.AddOptions(voiceChats);
+                voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
                 voiceChatSelector.Value = networkConfig.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
@@ -157,6 +157,15 @@ namespace SEE.Game.UI.PropertyDialog
         private IList<string> VoiceChatSystemsToStrings()
         {
             return Enum.GetNames(typeof(VoiceChatSystems)).ToList();
+        }
+
+        /// <summary>
+        /// Returns the enum values of <see cref="PlayerInputType"/> as a list of strings.
+        /// </summary>
+        /// <returns>enum values of <see cref="PlayerInputType"/> as a list of strings</returns>
+        private IList<string> PlayerInputTypesToStrings()
+        {
+            return Enum.GetNames(typeof(PlayerInputType)).ToList();
         }
 
         /// <summary>
@@ -230,7 +239,7 @@ namespace SEE.Game.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error("Invalid Voice Chat", "Your choice is not available");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available");
                     errorOccurred = true;
                 }
             }

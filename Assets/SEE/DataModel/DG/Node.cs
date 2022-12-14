@@ -62,7 +62,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public string SourceName
         {
-            get => GetString(SourceNameAttribute);
+            get => TryGetString(SourceNameAttribute, out string sourceName) ? sourceName : null;
             set => SetString(SourceNameAttribute, value);
         }
 
@@ -433,6 +433,36 @@ namespace SEE.DataModel.DG
             {
                 Outgoings.Add(edge);
             }
+        }
+
+        /// <summary>
+        /// Returns true if this node is a descendant of <paramref name="node"/> in the
+        /// node hierarchy.
+        /// </summary>
+        /// <param name="node">a potential ascendant of this node</param>
+        /// <returns>true if this node is a descendant of <paramref name="node"/></returns>
+        /// <remarks>For clarity: A node is considered its own descendant, i.e.,
+        /// <c>n.IsDescendantOf(n)</c> is always <c>true</c>.</remarks>
+        internal bool IsDescendantOf(Node node)
+        {
+            if (node == null)
+            {
+                throw new ArgumentException("Node must not be null");
+            }
+            if (ItsGraph != node.ItsGraph)
+            {
+                throw new ArgumentException("Nodes are in different graphs.");
+            }
+            Node cursor = this;
+            while (cursor != null)
+            {
+                if (cursor == node)
+                {
+                    return true;
+                }
+                cursor = cursor.parent;
+            }
+            return false;
         }
 
         /// <summary>

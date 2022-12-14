@@ -19,8 +19,10 @@ namespace SEE.GO
         /// </summary>
         public enum ShaderType
         {
-            Opaque,          // fully drawn with no transparency
-            TransparentLine, // for lines with transparency
+            Opaque = 0,          // fully drawn with no transparency
+            TransparentLine = 1, // for lines with transparency
+            OpaqueMetallic = 2,  // for opaque meshes with a more realistic metallic effect
+            PortalFree = 3       // not limited by a portal (seen everywhere)
         }
 
         /// <summary>
@@ -31,6 +33,15 @@ namespace SEE.GO
         /// Name of the material for transparent lines (located in folder Resources).
         /// </summary>
         private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        /// <summary>
+        /// Name of the material for opaque, metallic meshes (located in folder Resources).
+        /// </summary>
+        private const string OpaqueMetallicMaterialName = "Materials/SEEMaterial";
+        /// <summary>
+        /// Name of the material for materials seen everywhere, i.e., not only within a portal
+        /// (located in folder Resources).
+        /// </summary>
+        private const string PortalFreeMaterialName = "Materials/PortalFreeMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
@@ -303,6 +314,12 @@ namespace SEE.GO
                     break;
                 case ShaderType.TransparentLine:
                     name = TransparentLineMaterialName;
+                    break;
+                case ShaderType.OpaqueMetallic:
+                    name = OpaqueMetallicMaterialName;
+                    break;
+                case ShaderType.PortalFree:
+                    name = PortalFreeMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

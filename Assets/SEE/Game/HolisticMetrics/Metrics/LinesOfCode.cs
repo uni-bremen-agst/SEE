@@ -24,15 +24,12 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>A metric value collection of all the values for the lines of code metric</returns>
         internal override MetricValue Refresh(SEECity city)
         {
-            MetricValueCollection collection = new MetricValueCollection()
-            {
-                MetricValues = new List<MetricValueRange>()
-            };
+            MetricValueCollection collection = new MetricValueCollection();
             foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (node.TryGetNumeric(attributeName, out var lines))
+                if (node.TryGetNumeric(attributeName, out float lines))
                 {
-                    MetricValueRange metricValue = new MetricValueRange()
+                    MetricValueRange metricValue = new MetricValueRange
                     {
                         DecimalPlaces = 2,
                         Higher = 300,

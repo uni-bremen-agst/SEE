@@ -14,8 +14,14 @@ namespace SEE.Game
         /// Enables/disables the VR subsystem depending upon <paramref name="enable"/>.
         /// </summary>
         /// <param name="enable">if true, VR will be enabled</param>
+        [System.Obsolete]
         public static void Enable(bool enable)
         {
+            // FIXME: Temporarily disabled. Whether we need/want to re-enable it, depends
+            // upon the migration to Unity's new XR API. At the moment, VR will be started
+            // when a local VR player is spawned in AvatarAdapter.
+            return;
+
             if (!enable)
             {
                 // Note: For some reason, disabling an XRDisplaySubsystem will also

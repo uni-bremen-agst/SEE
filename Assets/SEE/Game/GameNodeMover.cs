@@ -29,6 +29,11 @@ namespace SEE.Game
         ///
         /// Precondition: <paramref name="child"/> and <paramref name="newParent"/> must
         /// be game nodes associated with a graph node.
+        ///
+        /// Postcondition: <paramref name="child"/> is a child of <paramref name="newParent"/>
+        /// in the hierarchy of game objects if <paramref name="newParent"/> is different
+        /// from <c>null</c>. If <paramref name="newParent"/> is <c>null</c>, <paramref name="child"/>
+        /// will have a <c>null</c> parent.
         /// </summary>
         /// <param name="child">child whose parent is to be set</param>
         /// <param name="newParent">new parent</param>
@@ -50,57 +55,46 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Puts <paramref name="child"/> on top of <paramref name="parent"/> and scales it down,
+        /// Puts <paramref name="child"/> on top of the roof of <paramref name="parent"/>,
+        /// and scales it down,
         /// assuming <paramref name="scaleDown"/> is true. This method makes sure that <paramref name="child"/>
         /// will be contained within the area of the roof of <paramref name="parent"/>.
+        ///
+        /// The <paramref name="child"/> will be an immediate child of <paramref name="parent"/> in the
+        /// game-object hierarchy afterwards.
+        ///
+        /// Precondition: <paramref name="parent"/> is not null.
         /// </summary>
         /// <param name="child">child to be put on <paramref name="parent"/></param>
         /// <param name="parent">parent the <paramref name="child"/> is put on</param>
-        /// <param name="targetXZ">XZ coordinates <paramref name="child"/> should be placed at
-        /// (will be center of <paramref name="parent"/> if not given)</param>
-        /// <param name="topPadding">Additional amount of empty space that should be between <paramref name="parent"/>
-        /// and <paramref name="child"/>, given as a percentage of the parent's height</param>
-        /// <param name="setParent">Whether <paramref name="parent"/> should become a parent of
-        /// <paramref name="child"/></param>
         /// <param name="scaleDown">Whether <paramref name="child"/> should be scaled down to fit into
         /// <paramref name="parent"/></param>
-        /// <returns>Old scale (i.e., before the changes from this function were applied, but after its parent
-        /// was changed if <paramref name="setParent"/> was true) of <paramref name="child"/></returns>
-        public static Vector3 PutOn(Transform child, GameObject parent, Vector2? targetXZ = null, float topPadding = 0,
-                                    bool setParent = true, bool scaleDown = false)
+        /// <param name="topPadding">Additional amount of empty space that should be between <paramref name="parent"/>
+        /// and <paramref name="child"/> in absolute world-space terms</param>
+        ///
+        public static void PutOn(Transform child, GameObject parent,
+                                 bool scaleDown = false, float topPadding = 0.0001f)
         {
-            if (setParent)
-            {
-                child.SetParent(parent.transform);
-            }
+            // Release child from its current parent so that local position and scale
+            // and world-space position and scale are the same, respectively.
+            // The child will receive its new parent at the very end of this method.
+            child.SetParent(null);
 
             NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
-            Vector3 oldLocalScale = child.localScale;
             if (scaleDown)
             {
-                nodeOperator.ScaleTo(ScaleDown(child, parent), 0);
+                // ScaleTo with animation duration = 0 has immediate effect.
+                nodeOperator.ScaleTo(ShrinkedWorldSpaceScale(child, parent), 0);
             }
-            // ScaleTo with animation duration = 0 has immediate effect.
-            Vector3 newWorldScale = child.lossyScale;
 
             // Where to move the child.
             Vector3 targetWorldPosition = child.position;
-            float parentRoof = parent.GetRoof();
-            targetWorldPosition.y = parentRoof + child.lossyScale.y / 2.0f + topPadding * parent.transform.lossyScale.y;
+            Vector3 childWorldExtent = child.lossyScale / 2;
+            targetWorldPosition.y = parent.GetRoof() + childWorldExtent.y + topPadding;
 
-            if (targetXZ.HasValue)
-            {
-                targetWorldPosition.x = targetXZ.Value.x;
-                targetWorldPosition.z = targetXZ.Value.y;
-            }
-
-            // Make sure mappingTarget stays within the roof of parent. We do not
-            // work with local position here because we cannot assume that child
-            // is actually a game-object child of parent (only if setParent were true,
-            // we could assume that).
+            // Make sure mappingTarget stays within the roof of parent.
             {
                 Vector3 parentWorldExtent = parent.transform.lossyScale / 2;
-                Vector3 childWorldExtent = newWorldScale / 2;
 
                 // Fit child into x range of parent.
                 if (targetWorldPosition.x + childWorldExtent.x > parent.transform.position.x + parentWorldExtent.x)
@@ -128,18 +122,103 @@ namespace SEE.Game
             }
 
             nodeOperator.MoveTo(targetWorldPosition, 0);
-            return oldLocalScale;
+            child.SetParent(parent.transform);
 
-            // Returns the target local scale of child relative to parent when child is to be put onto parent.
-            static Vector3 ScaleDown(Transform child, GameObject parent)
+            // Returns the target world space scale of child relative to parent when child is to be put onto parent.
+            static Vector3 ShrinkedWorldSpaceScale(Transform child, GameObject parent)
             {
                 // TODO: We need a strategy to scale down a node to the maximal size that is still
                 // fitting into the area where the nodes has been placed.
                 // We want to shrink only the ground area, but maintain the height.
-                float localHeight = parent.transform.lossyScale.y == 0 ?
-                    0 : child.transform.lossyScale.y / parent.transform.lossyScale.y;
-                return new Vector3(SCALING_FACTOR, localHeight, SCALING_FACTOR);
+                return new Vector3(SCALING_FACTOR * parent.transform.lossyScale.x, child.lossyScale.y, SCALING_FACTOR * parent.transform.lossyScale.z);
             }
+        }
+
+        /// <summary>
+        /// FIXME: This is intended to become an improved version of PutOn().
+        /// It is still work in progress.
+        /// </summary>
+        private static void PutOn2(Transform child, GameObject parent, bool scaleDown = false, float topPadding = 0.0001f)
+        {
+            Assert.IsNotNull(parent);
+            // child's parent is set to null so that we do not need to make a distinction
+            // between localScale and lossyScale. The child will receive its requested
+            // parent at the end of the method.
+            child.SetParent(null);
+
+            Vector3 childExtent = child.lossyScale / 2;
+            Vector3 parentExtent = parent.transform.lossyScale / 2;
+            float parentLeftX = parent.transform.position.x - parentExtent.x;
+            float parentRightX = parent.transform.position.x + parentExtent.x;
+            float parentFrontZ = parent.transform.position.z - parentExtent.z;
+            float parentBackZ = parent.transform.position.z + parentExtent.z;
+
+            // First, we will position child onto the roof of parent (and so that
+            // child's center is contained in the roof of parent if necessary).
+
+            // The target position of child in word space.
+            Vector3 targetPosition;
+
+            // Is the center of child enclosed in the roof rectangle of parent?
+            if (!(parentLeftX <= child.transform.position.x && child.transform.position.x <= parentRightX
+                  && parentFrontZ <= child.transform.position.z && child.transform.position.z <= parentBackZ))
+            {
+                // TODO: We need to develop a better strategy.
+                // child will be put at the center of parent.
+                targetPosition = parent.transform.position;
+            }
+            else
+            {
+                targetPosition = child.position;
+            }
+            targetPosition.y = parent.GetRoof() + childExtent.y + topPadding;
+            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
+            nodeOperator.MoveTo(targetPosition, 0);
+
+            // From now on, we assume that child's center is contained in the
+            // roof rectangle of parent. It will stay at its current location
+            // and only be shrinked so that it fits into parent.
+
+            // Now, we will shrink child so that it is totally enclosed in parent.
+            if (scaleDown)
+            {
+                {
+                    // Shrink if back edge of child is farther back than back edge of parent.
+                    float factor = (parentBackZ - child.position.z) / childExtent.z;
+                    if (factor < 1)
+                    {
+                        childExtent *= factor;
+                    }
+                }
+                {
+                    // Shrink if front edge of child is in front of front edge of parent.
+                    float factor = (child.position.z - parentFrontZ) / childExtent.z;
+                    if (factor < 1)
+                    {
+                        childExtent *= factor;
+                    }
+                }
+                {
+                    // Shrink if left edge of child is farther left than left edge of parent.
+                    float factor = (child.position.x - parentLeftX) / childExtent.x;
+                    if (factor < 1)
+                    {
+                        childExtent *= factor;
+                    }
+                }
+                {
+                    // Shrink if right edge of child is farther right than right edge of parent.
+                    float factor = (parentRightX - child.position.x) / childExtent.x;
+                    if (factor < 1)
+                    {
+                        childExtent *= factor;
+                    }
+                }
+                // ScaleTo with animation duration = 0 has immediate effect.
+                nodeOperator.ScaleTo(2 * childExtent, 0);
+            }
+
+            child.SetParent(parent.transform);
         }
 
         /// <summary>
@@ -163,6 +242,9 @@ namespace SEE.Game
         /// down so that it fits into <paramref name="newParent"/>. If instead <paramref name="newParent"/>
         /// and <paramref name="originalParent"/> are the same, <paramref name="child"/> will be scaled back
         /// to its <paramref name="originalLocalScale"/>.
+        ///
+        /// The <paramref name="child"/> will be an immediate child of <paramref name="parent"/> in the
+        /// game-object hierarchy afterwards.
         /// </summary>
         /// <remarks>Calling this method is equivalent to <see cref="PutOn(child, newParent, scaleDown: newParent != originalParent.gameObject)"/>
         /// with a previous scaling of <paramref name="child"/> to <paramref name="originalLocalScale"/> if
@@ -173,7 +255,7 @@ namespace SEE.Game
         /// <param name="originalLocalScale">original local scale of <paramref name="child"/> relative to
         /// <paramref name="originalParent"/>; used to restore this scale if <paramref name="newParent"/>
         /// and <paramref name="originalParent"/> are the same</param>
-        internal static void PutOnAndFit(Transform child, GameObject newParent,
+        public static void PutOnAndFit(Transform child, GameObject newParent,
             GameObject originalParent, Vector3 originalLocalScale)
         {
             bool scaleDown = newParent != originalParent.gameObject;

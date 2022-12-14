@@ -54,8 +54,9 @@ namespace SEE.Game.City
         /// </summary>
         private static readonly ISet<State> HiddenEdgeStates = new HashSet<State>
         {
-            // We hide all implementation edges by default.
-            State.Unmapped, State.ImplicitlyAllowed, State.AllowedAbsent, State.Allowed, State.Divergent
+            // TODO: Make this configurable in, e.g., the SEECity editor.
+            // We hide all implementation edges except divergences by default.
+            State.Unmapped, State.ImplicitlyAllowed, State.AllowedAbsent, State.Allowed
         };
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace SEE.Game.City
         private void Start()
         {
             // We have to set an initial color for the edges, and we have to convert them to meshes.
-            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
             {
                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
@@ -204,7 +205,7 @@ namespace SEE.Game.City
             ResetEdgeHighlights();
 
             #region Local Functions
-            
+
             void ResetEdgeHighlights()
             {
                 while (HighlightedEdgeOperators.Count > 0)
@@ -223,7 +224,7 @@ namespace SEE.Game.City
                 // Due to us using `Incorporate`, only the most recent edge change will exist.
                 PreviousEdgeStates = Events.OfType<EdgeChange>().ToDictionary(x => x.Edge.ID, x => x.NewState);
             }
-            
+
             #endregion
         }
 
@@ -269,7 +270,7 @@ namespace SEE.Game.City
                     HighlightedEdgeOperators.Enqueue(edgeOperator);
                 }
             }
-            else
+            else if (!edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle))
             {
                 Debug.LogError($"Couldn't find edge {edgeChange.Edge}, whose state changed "
                                + $"from {edgeChange.OldState} to {edgeChange.NewState}!");

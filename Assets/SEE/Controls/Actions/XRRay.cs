@@ -30,7 +30,7 @@ namespace SEE.Controls.Actions
             }
             /// <summary>
             /// Current state: true for down and false for up.
-            /// 
+            ///
             /// Whether this toggle has been pressed long enough. The selection works as a toggle
             /// that can be turned on and off. Each mode continues until the button is pressed again.
             /// </summary>
@@ -154,6 +154,13 @@ namespace SEE.Controls.Actions
             lineRenderer.endWidth = rayWidth;
         }
 
+        /// <summary>
+        /// Checks whether the user is grabbing or selecting. If so, a ray is drawn.
+        /// The ray starts at <see cref="Position"/>. Its end depends upon whether
+        /// an object was hit through pointing. If an object was hit, the end of the
+        /// ray is the position at which this object was hit. If no object was hit,
+        /// the ray is drawn into <see cref="Direction"/> with length <see cref="RayDistance"/>.
+        /// </summary>
         private void Update()
         {
             selectionButton.OnUpdate();
@@ -164,7 +171,7 @@ namespace SEE.Controls.Actions
             {
                 bool result = Physics.Raycast(Position, Direction, out RaycastHit hitInfo, RayDistance);
                 GameObject hitObject = result ? hitInfo.collider.gameObject : null;
-                ShowRay(hitObject, hitInfo);
+                ShowRay(hitObject, hitInfo.point);
             }
             if (!isGrabbing && !isSelecting)
             {
@@ -172,14 +179,25 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private void ShowRay(GameObject selectedObject, RaycastHit hitInfo)
+        /// <summary>
+        /// Draws a ray (line using <see cref="lineRenderer"/>) as follows.
+        /// If <paramref name="selectedObject"/> is different from <c>null</c>,
+        /// the line is drawn from <see cref="Position"/> to <paramref name="rayEnd"/>.
+        /// If <paramref name="selectedObject"/> is <c>null</c>, the line is
+        /// drawn from <see cref="Position"/> into the <see cref="Direction"/>
+        /// with a length of <see cref="RayDistance"/>.
+        /// </summary>
+        /// <param name="selectedObject">the object that was hit, <c>null</c> if none was hit</param>
+        /// <param name="rayEnd">the point at which <paramref name="selectedObject"/> was hit; used only if
+        /// <paramref name="selectedObject"/> is different from <c>null</c></param>
+        private void ShowRay(GameObject selectedObject, Vector3 rayEnd)
         {
             Vector3 origin = Position;
             lineRenderer.SetPosition(0, origin);
 
             if (selectedObject != null)
             {
-                lineRenderer.SetPosition(1, hitInfo.point);
+                lineRenderer.SetPosition(1, rayEnd);
                 if (IsGrabbing)
                 {
                     lineRenderer.material.color = colorOnGrabbingHit;
@@ -203,6 +221,10 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Hides the ray by simply setting its begin and end to <see cref="Position"/>,
+        /// i.e., zero length.
+        /// </summary>
         private void HideRay()
         {
             Vector3 origin = Position;

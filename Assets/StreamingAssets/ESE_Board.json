@@ -1,0 +1,34 @@
+{
+    "Title": "Reflexion Metrics",
+    "Position": {
+        "x": -32.994815826416019,
+        "y": 1.7154335975646973,
+        "z": 11.245939254760743
+    },
+    "Rotation": {
+        "x": 0.0,
+        "y": 0.7257870435714722,
+        "z": 0.0,
+        "w": -0.6879194378852844
+    },
+    "WidgetConfigs": [
+        {
+            "Position": {
+                "x": -349.354248046875,
+                "y": 126.32081604003906,
+                "z": 12.714231491088868
+            },
+            "MetricType": "ReflexionMetrics",
+            "WidgetName": "SingleNumberDisplay"
+        },
+        {
+            "Position": {
+                "x": 215.4649658203125,
+                "y": 43.684059143066409,
+                "z": -0.5002294778823853
+            },
+            "MetricType": "ReflexionMetrics",
+            "WidgetName": "BarChart"
+        }
+    ]
+}

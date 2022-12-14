@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
-using SEE.Utils;
 using SEE.Controls;
 using SEE.Net.Actions;
 using Unity.Netcode;
@@ -37,45 +36,13 @@ namespace SEE.Game.Avatars
         /// Whether the avatar is currently pointing, i.e., whether it has an aiming or looking target.
         /// </summary>
         [Tooltip("If true, the avatar is currently pointing. Its pose will be adjusted according to the aimed target.")]
-        public bool IsPointing = false;
+        public bool IsPointing = true;
 
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
 
-        /// <summary>
-        /// Maximal length of laser beam.
-        /// </summary>
-        [Tooltip("Maximal length of laser beam.")]
-        public float LaserLength = 2.0f;
-
-        /// <summary>
-        /// The width of the laser beam.
-        /// </summary>
-        [Tooltip("Width of laser beam.")]
-        public float LaserWidth = 0.005f;
-
-        /// <summary>
-        /// Color of the laser beam when it hits anything.
-        /// </summary>
-        [Tooltip("Color of the laser beam when it hits anything.")]
-        public Color HitColor = Color.green;
-
-        /// <summary>
-        /// Color of the laser beam when it does not hit anything.
-        /// </summary>
-        [Tooltip("Color of the laser beam when it does not hit anything.")]
-        public Color MissColor = Color.red;
-
-        /// <summary>
-        /// The material of the laser beam. Will be used to change its
-        /// color depending upon whether it hits anything or not.
-        /// </summary>
-        private Material laserMaterial;
-
-        /// <summary>
-        /// The line renderer that draws the laser beam as a line.
-        /// </summary>
-        private LineRenderer laserLine;
+        [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
+        public LaserPointer laser;
 
         /// <summary>
         /// AimPoser is a tool that returns an animation name based on direction.
@@ -115,15 +82,47 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Toggles between pointing and not pointing.
         /// </summary>
-        public void TogglePointing()
+        private void TogglePointing()
         {
-            IsPointing = !IsPointing;
+            SetPointing(!IsPointing);
+        }
+
+        /// <summary>
+        /// If <paramref name="activate"/> is true, the laser will be turned on;
+        /// otherwise turned off.
+        /// This parameter is also propagated to all clients.
+        /// </summary>
+        /// <param name="activate">whether pointing is to be activated</param>
+        /// <remarks>This method is called either as a interaction request of the local
+        /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
+        /// the network.</remarks>
+        public void SetPointing(bool activate)
+        {
+            IsPointing = activate;
+            if (aimIK == null)
+            {
+                gameObject.TryGetComponentOrLog(out aimIK);
+            }
             // Laser beam should be active only while we are pointing.
-            laserLine.enabled = IsPointing;
-            aimIK.solver.target.gameObject.SetActive(IsPointing);
+            if (laser == null)
+            {
+                laser = gameObject.AddOrGetComponent<LaserPointer>();
+                laser.Source = aimIK.solver.transform;
+            }
+            UnityEngine.Assertions.Assert.IsNotNull(laser);
+            laser.On = IsPointing;
+
+            // Activate the aimed target. FIXME: What for?
+            if (aimIK != null && aimIK.solver != null && aimIK.solver.target != null)
+            {
+                aimIK.solver.target.gameObject.SetActive(IsPointing);
+            }
             if (IsLocallyControlled)
             {
-                new TogglePointingAction(networkObject.NetworkObjectId).Execute();
+                if (gameObject.TryGetComponentOrLog(out networkObject))
+                {
+                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
+                }
             }
         }
 
@@ -151,10 +150,11 @@ namespace SEE.Game.Avatars
             /// we can control their update cycle ourselves.
             Aim.enabled = false;
             LookAt.enabled = false;
+
             if (gameObject.TryGetComponent(out aimIK))
             {
-                laserMaterial = Materials.New(Materials.ShaderType.Opaque, MissColor);
-                laserLine = LineFactory.Draw(aimIK.solver.transform.gameObject, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
+                laser = gameObject.AddOrGetComponent<LaserPointer>();
+                laser.Source = aimIK.solver.transform;
             }
             else
             {
@@ -164,6 +164,8 @@ namespace SEE.Game.Avatars
             }
             gameObject.TryGetComponentOrLog(out networkObject);
             MoveTarget();
+            /// We start in the pointing state.
+            SetPointing(true);
         }
 
         /// <summary>
@@ -180,10 +182,10 @@ namespace SEE.Game.Avatars
                 }
                 MoveTarget();
             }
-            else if (IsPointing)
+            if (IsPointing)
             {
                 // This code will be run for a non-local player currently pointing.
-                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
+                laser.Draw(aimIK.solver.target.position);
             }
         }
 
@@ -195,20 +197,7 @@ namespace SEE.Game.Avatars
         {
             if (IsPointing)
             {
-                Color color;
-                if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
-                {
-                    aimIK.solver.target.position = raycastHit.point;
-                    color = HitColor;
-                }
-                else
-                {
-                    Ray ray = Raycasting.UserPointsTo();
-                    aimIK.solver.target.position = ray.origin + ray.direction * LaserLength;
-                    color = MissColor;
-                }
-                LineFactory.ReDraw(laserLine, from: aimIK.solver.transform.position, to: aimIK.solver.target.position);
-                laserMaterial.color = color;
+                aimIK.solver.target.position = laser.Point();
             }
         }
 
